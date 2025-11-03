@@ -1,0 +1,10 @@
+FROM solr:8.11
+
+ADD https://github.com/sul-dlss/sul-solr-configs.git#:argo_prod /myconfig
+
+USER root
+RUN cp /opt/solr/contrib/analysis-extras/lib/icu4j-*.jar /opt/solr/server/solr-webapp/webapp/WEB-INF/lib/
+RUN cp /opt/solr/contrib/analysis-extras/lucene-libs/lucene-analyzers-icu-*.jar /opt/solr/server/solr-webapp/webapp/WEB-INF/lib/
+USER solr
+
+CMD ["solr-create", "-c", "argo", "-d", "/myconfig"]
