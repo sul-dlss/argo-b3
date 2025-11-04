@@ -48,6 +48,7 @@ group :development, :test do
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem 'bundler-audit', require: false
+  gem 'factory_bot_rails'
   gem 'rspec-rails'
   gem 'rubocop', require: false
   gem 'rubocop-capybara', require: false
