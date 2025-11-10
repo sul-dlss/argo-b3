@@ -1,0 +1,31 @@
+<h1>Items search page</h1>
+
+<%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items:') %>
+
+<%= turbo_frame_tag 'items-search' do %>
+  <% if @results.any? %>
+    <section aria-label="Item, collection, and admin policy results">
+      <h3>Item, collection, and admin policy results (<%= number_with_delimiter(@results.total_results) %> found)</h3>
+      <ul>
+        <%= render Search::ItemResultComponent.with_collection(@results) %>
+      </ul>
+      Page <%= number_with_delimiter(@results.page) %> of <%= number_with_delimiter(@results.total_pages) %>
+      <% if @results.page > 1 %>
+        <%= link_to 'Previous page', search_items_path(@search_form.with_attributes(page: @results.page - 1)) %>
+      <% end %>
+      <% if @results.total_pages > @results.page %>
+        <%= link_to 'Next page', search_items_path(@search_form.with_attributes(page: @results.page + 1)) %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
+
+  <turbo-stream action="replace" target="object-types-facet">
+    <template>
+      <%= render Search::FacetComponent.new(label: 'Object Types', facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
+    </template>
+  </turbo-stream>
+<% end %>
+
+<%= render Search::FacetSectionComponent.new(search_form: @search_form) %>

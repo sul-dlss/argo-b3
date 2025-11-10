@@ -40,6 +40,7 @@ gem 'image_processing', '~> 1.2'
 
 # Additional gems
 gem 'config'
+gem 'rsolr'
 gem 'view_component'
 
 group :development, :test do
@@ -60,6 +61,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'erb_lint', require: false
   gem 'overmind'
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem 'web-console'
@@ -68,6 +70,7 @@ end
 group :test do
   gem 'capybara'
   gem 'capybara-lockstep'
+  gem 'cyperful', require: false
   gem 'selenium-webdriver'
   gem 'webmock'
 end

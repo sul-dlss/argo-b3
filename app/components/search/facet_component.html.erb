@@ -1,0 +1,14 @@
+<%= tag.section 'aria-label': label do %>
+  <h3><%= label %></h3>
+  <ul>
+    <% facet_counts.each do |facet_count| %>
+      <li>
+        <% if search_form.selected?(key: form_field, value: facet_count.value) %>
+          <%= facet_count.value %> <%= link_to 'Remove', search_items_path(search_form.without_attributes({ form_field => facet_count.value, page: nil })) %>
+        <% else %>
+          <%= link_to facet_count.value, search_items_path(search_form.with_attributes({ form_field => [facet_count.value], page: nil })) %> (<%= number_with_delimiter(facet_count.count) %>)
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
