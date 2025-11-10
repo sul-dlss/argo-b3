@@ -60,10 +60,14 @@ group :development, :test do
 end
 
 group :development do
-  gem 'capybara'
   gem 'overmind'
-  gem 'selenium-webdriver'
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem 'web-console'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'capybara-lockstep'
+  gem 'selenium-webdriver'
   gem 'webmock'
 end

@@ -20,6 +20,9 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    
+    <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
+    
     <%= javascript_importmap_tags %>
   </head>
 
