@@ -50,3 +50,11 @@ RSpec::Matchers.define :have_results_pages do |expected_page, expected_total_pag
     actual.has_text?("Page #{expected_page} of #{expected_total_pages}", **args)
   end
 end
+
+RSpec::Matchers.define :have_current_filter do |expected_form_field_name, expected_value, args = {}|
+  match do |actual|
+    actual.has_css?('section[aria-label="Current Filters"] li',
+                    text: "#{expected_form_field_name}: #{expected_value}",
+                    **args)
+  end
+end

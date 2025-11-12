@@ -1,0 +1,8 @@
+<section aria-label="Current Filters">
+  <h2>Current Filters</h2>
+  <ul>
+    <% current_filters.each do |form_field, value| %>
+      <%= render Search::CurrentFilterComponent.new(form_field:, value:, search_form: @search_form) %>
+    <% end %>
+  </ul>
+</section>

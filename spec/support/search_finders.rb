@@ -23,3 +23,7 @@ end
 def find_facet_section(facet_label)
   find("section[aria-label='#{facet_label}']")
 end
+
+def find_current_filters_section
+  find('section[aria-label="Current Filters"]')
+end

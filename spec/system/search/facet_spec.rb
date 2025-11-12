@@ -27,14 +27,18 @@ RSpec.describe 'Facets', :solr do
 
     expect(page).to have_result_count(1)
     expect(page).to have_item_result(item_doc)
+    expect(page).to have_current_filter('Object types', 'item')
 
     expect(page).to have_facet_value('Project 1', count: 1, facet: 'Projects')
     expect(page).to have_facet_value('Project 2', count: 1, facet: 'Projects')
 
     expect(page).to have_selected_facet_value('item', facet: 'Object Types')
-    click_link('Remove')
+    within(find_facet_section('Object Types')) do
+      click_link('Remove')
+    end
 
     expect(page).to have_result_count(2)
+    expect(page).not_to have_current_filter('Object types', 'item', wait: 0)
 
     # Projects is a lazy facet.
     expect(page).to have_facet_value('Project 1', count: 2, facet: 'Projects')
@@ -47,12 +51,16 @@ RSpec.describe 'Facets', :solr do
 
     expect(page).to have_result_count(1)
     expect(page).to have_item_result(item_doc)
+    expect(page).to have_current_filter('Projects', 'Project 2')
 
     expect(page).not_to have_facet_value('collection', count: 1, facet: 'Object Types', wait: 0)
 
     expect(page).to have_selected_facet_value('Project 2', facet: 'Projects')
-    click_link('Remove')
+    within(find_facet_section('Projects')) do
+      click_link('Remove')
+    end
 
     expect(page).to have_result_count(2)
+    expect(page).not_to have_current_filter('Projects', 'Project 2', wait: 0)
   end
 end

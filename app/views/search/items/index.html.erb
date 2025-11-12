@@ -2,6 +2,8 @@
 
 <%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items:') %>
 
+<%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
+
 <%= turbo_frame_tag 'items-search' do %>
   <% if @results.any? %>
     <section aria-label="Item, collection, and admin policy results">
