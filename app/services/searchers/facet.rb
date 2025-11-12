@@ -10,9 +10,14 @@ module Searchers
     end
 
     # @param search_form [Search::ItemForm]
-    def initialize(search_form:, field:)
+    # @param field [String] the Solr field to facet on
+    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
+    # @param limit [Integer, nil] maximum number of facet values to return
+    def initialize(search_form:, field:, alpha_sort: false, limit: nil)
       @search_form = search_form
       @field = field
+      @alpha_sort = alpha_sort
+      @limit = limit
     end
 
     # @return [SearchResults::FacetCounts] search results
@@ -22,7 +27,7 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :field
+    attr_reader :search_form, :field, :alpha_sort, :limit
 
     def solr_response
       Search::SolrService.call(request: solr_request)
@@ -34,7 +39,10 @@ module Searchers
           facet: true,
           'facet.field': [field],
           rows: 0
-        }
+        }.tap do |req|
+          req['facet.sort'] = 'alpha' if alpha_sort
+          req['facet.limit'] = limit if limit
+        end
       )
     end
   end

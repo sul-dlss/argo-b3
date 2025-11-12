@@ -28,6 +28,11 @@
       <%= render Search::FacetComponent.new(label: 'Object Types', facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
     </template>
   </turbo-stream>
+  <turbo-stream action="replace" target="access-rights-facet">
+    <template>
+      <%= render Search::FacetComponent.new(label: 'Access Rights', facet_counts: @results.access_rights_facet, search_form: @search_form, form_field: :access_rights) %>
+    </template>
+  </turbo-stream>
 <% end %>
 
 <%= render Search::FacetSectionComponent.new(search_form: @search_form) %>

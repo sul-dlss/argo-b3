@@ -23,6 +23,10 @@ module SearchResults
       FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPE)
     end
 
+    def access_rights_facet
+      FacetCounts.new(solr_response:, field: Search::Fields::ACCESS_RIGHTS)
+    end
+
     def total_results
       @solr_response['response']['numFound']
     end
