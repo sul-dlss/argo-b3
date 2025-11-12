@@ -94,7 +94,7 @@ RSpec.describe Search::Form do
     let(:attributes) { { query: '', page: 2, include_google_books: true } }
 
     it 'returns empty array' do
-      expect(form.this_attributes).to eq([])
+      expect(form.this_attributes).to eq({})
     end
   end
 end

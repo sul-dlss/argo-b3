@@ -47,7 +47,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for object types' do
       result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::OBJECT_TYPE}:(\"dro\" OR \"collection\")")
+      expect(Array(result[:fq])).to include("{!tag=#{Search::Fields::OBJECT_TYPE}}#{Search::Fields::OBJECT_TYPE}:(\"dro\" OR \"collection\")") # rubocop:disable Layout/LineLength
     end
   end
 
@@ -57,6 +57,15 @@ RSpec.describe Search::ItemQueryBuilder do
     it 'builds the correct filter query for projects' do
       result = described_class.call(search_form:)
       expect(Array(result[:fq])).to include("#{Search::Fields::PROJECT_TAGS}:(\"Project A\" OR \"Project B\")")
+    end
+  end
+
+  context 'with access rights' do
+    let(:search_form) { Search::ItemForm.new(access_rights: ['dark']) }
+
+    it 'builds the correct filter query for access rights' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::ACCESS_RIGHTS}:(\"dark\")")
     end
   end
 end

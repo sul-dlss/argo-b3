@@ -1,17 +1,13 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for displaying a section of search facets
+  # Component for displaying a facet section (i.e., a wrapper around the facet values)
   class FacetSectionComponent < ViewComponent::Base
-    def initialize(search_form:)
-      @search_form = search_form
+    def initialize(label:)
+      @label = label
       super()
     end
 
-    attr_reader :search_form
-
-    def blank_search?
-      search_form.blank?
-    end
+    attr_reader :label
   end
 end

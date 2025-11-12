@@ -61,7 +61,7 @@ module Search
     # @return [Hash] attributes defined on this class (not its superclasses)
     def this_attributes
       # To be overridden in subclasses
-      []
+      {}
     end
   end
 end

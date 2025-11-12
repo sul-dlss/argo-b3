@@ -1,0 +1,8 @@
+<%= form_builder.hidden_field :query if query_hidden_field? %>
+<%= form_builder.hidden_field :include_google_books if include_google_books_hidden_field? %>
+<% search_form.this_attributes.each do |attr_name, values| %>
+  <% Array(values).each do |value| %>
+    <%= form_builder.hidden_field attr_name.to_sym, value: value, multiple: true unless attr_name == form_field %>
+  <% end %>
+<% end %>
+

@@ -33,18 +33,26 @@ module Search
 
     def filter_queries
       queries = []
-      queries << facet_filter_query(form_field: :object_types, solr_field: OBJECT_TYPE)
+      queries << facet_filter_query(form_field: :object_types, solr_field: OBJECT_TYPE, tag: true)
       queries << facet_filter_query(form_field: :projects, solr_field: PROJECT_TAGS)
+      queries << facet_filter_query(form_field: :access_rights, solr_field: ACCESS_RIGHTS)
       queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
     end
 
     # Construct a facet filter query for the given form field and Solr field for value facets.
-    def facet_filter_query(form_field:, solr_field:)
+    # @param form_field [Symbol] the attribute on the search form
+    # @param solr_field [String] the Solr field to filter on
+    # @param tag [Boolean] whether to tag the filter (for exclusion from facet counts)
+    def facet_filter_query(form_field:, solr_field:, tag: false)
       return if search_form.send(form_field).blank?
 
       values = search_form.send(form_field).map { |value| "\"#{value}\"" }.join(' OR ')
-      "#{solr_field}:(#{values})"
+      query = "#{solr_field}:(#{values})"
+      # Tagging is used to exclude the filter from the facet counts.
+      # This is useful for checkbox facets (in all values for the facet should be returned).
+      # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
+      tag ? "{!tag=#{solr_field}}#{query}" : query
     end
 
     def query_fields # rubocop:disable Metrics/MethodLength

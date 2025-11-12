@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Search::FacetSectionComponent, type: :component do
+RSpec.describe Search::FacetsSectionComponent, type: :component do
   let(:component) { described_class.new(search_form:) }
 
   context 'with a blank search form' do

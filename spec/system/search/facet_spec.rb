@@ -16,13 +16,14 @@ RSpec.describe 'Facets', :solr do
 
     expect(page).to have_result_count(2)
 
-    # Object types is a non-lazy facet.
+    # Object types is a non-lazy checkbox facet.
     expect(page).to have_facet_value('collection', count: 1, facet: 'Object Types')
     expect(page).to have_facet_value('item', count: 1, facet: 'Object Types')
 
     # Select a facet.
     within(find_facet_section('Object Types')) do
-      click_link('item')
+      check('item')
+      click_button('Filter')
     end
 
     expect(page).to have_result_count(1)
@@ -34,7 +35,8 @@ RSpec.describe 'Facets', :solr do
 
     expect(page).to have_selected_facet_value('item', facet: 'Object Types')
     within(find_facet_section('Object Types')) do
-      click_link('Remove')
+      uncheck('item')
+      click_button('Filter')
     end
 
     expect(page).to have_result_count(2)

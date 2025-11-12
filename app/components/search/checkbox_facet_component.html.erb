@@ -1,0 +1,8 @@
+<%= render Search::FacetSectionComponent.new(label:) do %>
+  <%= helpers.form_with model: search_form, scope: :search, url: search_items_path, method: :get do |form| %>
+    <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: form_field) %>
+    <%= render Search::CheckboxFacetInputComponent.with_collection(facet_counts, search_form: search_form, form_field: form_field, form_builder: form) %>    
+    <%= form.submit 'Filter' %>
+  <% end %>
+<% end %>
+

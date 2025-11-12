@@ -1,5 +1,4 @@
-<%= tag.section 'aria-label': label do %>
-  <h3><%= label %></h3>
+<%= render Search::FacetSectionComponent.new(label:) do %>
   <ul>
     <% facet_counts.each do |facet_count| %>
       <li>

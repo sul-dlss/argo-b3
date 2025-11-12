@@ -39,7 +39,7 @@ module Searchers
           rows:,
           start:
         }.tap do |req|
-          add_facet(req, field: OBJECT_TYPE)
+          add_facet(req, field: OBJECT_TYPE, exclude: true)
           add_facet(req, field: ACCESS_RIGHTS, limit: 50, alpha_sort: true)
         end
       )
@@ -53,8 +53,17 @@ module Searchers
       (search_form.page - 1) * rows
     end
 
-    def add_facet(request, field:, alpha_sort: false, limit: nil)
-      request['facet.field'] << field
+    # @param request [Hash] the Solr request being built
+    # @param field [String] the Solr field to facet on
+    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
+    # @param limit [Integer, nil] maximum number of facet values to return
+    # @param exclude [Boolean] whether to exclude a tagged filter
+    def add_facet(request, field:, alpha_sort: false, limit: nil, exclude: false)
+      # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
+      # Tagging is done in ItemQueryBuilder.
+      # This is useful for checkbox facets (in all values for the facet should be returned).
+      # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
+      request['facet.field'] << (exclude ? "{!ex=#{field}}#{field}" : field)
       request["f.#{field}.facet.sort"] = 'index' if alpha_sort
       request["f.#{field}.facet.limit"] = limit if limit
     end
