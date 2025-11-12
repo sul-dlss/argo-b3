@@ -57,5 +57,11 @@ module Search
       # This drops attributes with false values so that they are not included in URLs.
       super.compact_blank
     end
+
+    # @return [Hash] attributes defined on this class (not its superclasses)
+    def this_attributes
+      # To be overridden in subclasses
+      []
+    end
   end
 end

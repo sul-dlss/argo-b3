@@ -4,12 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Item search', :solr do
   let!(:item_doc) { create(:solr_item) }
+  let!(:collection_doc) { create(:solr_collection) }
 
   before do
     stub_const('Searchers::Item::PER_PAGE', 5)
     create_list(:solr_item, 10)
     create(:solr_item, :google_book)
-    create_list(:solr_collection, 5)
+    create_list(:solr_collection, 4)
   end
 
   context 'when a single page of results' do
@@ -93,6 +94,23 @@ RSpec.describe 'Item search', :solr do
         click_button('Search')
 
         expect(find_item_results_section).to be_nil
+      end
+    end
+
+    context 'when there is a current filter' do
+      it 'applies the current filter when searching' do
+        visit search_items_path('object_types[]': 'collection')
+
+        expect(page).to have_css('h1', text: 'Items search page')
+
+        expect(page).to have_result_count(5)
+        expect(page).to have_current_filter('Object types', 'collection')
+
+        fill_in('Search for items', with: collection_doc[Search::Fields::TITLE])
+        click_button('Search')
+
+        expect(page).to have_result_count(1)
+        expect(page).to have_current_filter('Object types', 'collection')
       end
     end
   end

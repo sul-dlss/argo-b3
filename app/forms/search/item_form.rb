@@ -6,6 +6,13 @@ module Search
     attribute :object_types, array: true, default: -> { [] }
     attribute :projects, array: true, default: -> { [] }
 
+    # @return [Hash] attributes defined on this class (not its superclasses)
+    def this_attributes
+      attributes.slice(*self.class.this_attribute_names)
+    end
+
+    delegate :this_attribute_names, to: :class
+
     # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
     def current_filters
       self.class.this_attribute_names.flat_map do |attr_name|

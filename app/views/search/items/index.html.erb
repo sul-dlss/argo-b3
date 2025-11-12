@@ -1,6 +1,6 @@
 <h1>Items search page</h1>
 
-<%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items:') %>
+<%= render Search::FormComponent.new(search_form: @search_form, url: search_items_path, label: 'Search for items:') %>
 
 <%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
 

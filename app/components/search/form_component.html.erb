@@ -1,4 +1,7 @@
 <%= helpers.form_with model: search_form, scope: :search, url:, method: :get do |form| %>
+  <% search_form.this_attributes.each do |attr_name, value| %>
+    <%= form.hidden_field attr_name.to_sym, value: value, multiple: true %>
+  <% end %>
   <%= form.label :query, label %>
   <%= form.text_field :query %>
   <%= form.submit 'Search' %>
