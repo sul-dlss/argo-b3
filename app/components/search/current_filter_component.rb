@@ -16,6 +16,10 @@ module Search
       form_field.humanize
     end
 
+    def title
+      "Remove filter #{label}: #{value}"
+    end
+
     def remove_path
       search_items_path(search_form.without_attributes({ form_field => value, page: nil }))
     end

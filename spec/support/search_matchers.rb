@@ -8,16 +8,20 @@ end
 
 RSpec::Matchers.define :have_facet_value do |facet_value, facet:, count:, **args|
   match do |actual|
+    # This handles both link-based and checkbox-based facet values.
     expected = count ? "#{facet_value} (#{count})" : facet_value
-    actual.has_css?("section[aria-label='#{facet}'] li", text: expected, **args)
+    actual.has_css?("section[aria-label='#{facet}'] li,label", text: expected, **args)
   end
 end
 
 RSpec::Matchers.define :have_selected_facet_value do |facet_value, facet:, **args|
   match do |actual|
-    actual.has_css?("section[aria-label='#{facet}'] li", text: facet_value, **args) do |el|
+    # This handles both link-based and checkbox-based facet values.
+    return true if actual.has_css?("section[aria-label='#{facet}'] li", text: facet_value, **args) do |el|
       el.has_link?('Remove')
     end
+
+    actual.has_field?(facet_value, checked: true, **args)
   end
 end
 

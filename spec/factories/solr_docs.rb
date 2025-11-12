@@ -39,6 +39,12 @@ FactoryBot.define do
         apo_druid { Settings.google_books_apo }
       end
     end
+
+    trait :agreement do
+      transient do
+        object_type { 'agreement' }
+      end
+    end
   end
 
   factory :solr_collection, class: 'Hash', traits: [:with_projects] do

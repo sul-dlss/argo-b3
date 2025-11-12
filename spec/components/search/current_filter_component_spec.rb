@@ -17,7 +17,9 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('li', text: 'Object types: item')
-      expect(page).to have_link('Remove', href: '/search/items?object_types%5B%5D=collection&projects%5B%5D=Project+1')
+      expect(page).to have_link('Remove',
+                                href: '/search/items?object_types%5B%5D=collection&projects%5B%5D=Project+1',
+                                title: 'Remove filter Object types: item')
     end
   end
 end

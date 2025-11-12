@@ -25,7 +25,7 @@
 
   <turbo-stream action="replace" target="object-types-facet">
     <template>
-      <%= render Search::FacetComponent.new(label: 'Object Types', facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
+      <%= render Search::CheckboxFacetComponent.new(label: 'Object Types', facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
     </template>
   </turbo-stream>
   <turbo-stream action="replace" target="access-rights-facet">
@@ -35,4 +35,4 @@
   </turbo-stream>
 <% end %>
 
-<%= render Search::FacetSectionComponent.new(search_form: @search_form) %>
+<%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>

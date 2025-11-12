@@ -20,6 +20,10 @@ module SearchResults
       end
     end
 
+    def to_ary
+      to_a
+    end
+
     attr_reader :solr_response, :field
   end
 end
