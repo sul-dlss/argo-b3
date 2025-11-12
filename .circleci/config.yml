@@ -3,25 +3,25 @@ orbs:
   node: circleci/node@7.2.1
   ruby-rails: sul-dlss/ruby-rails@4.6.0
 jobs:
-  # stylelint:
-  #   executor: node/default
-  #   steps:
-  #     - checkout
-  #     - node/install-packages:
-  #         pkg-manager: yarn
-  #     - run:
-  #         name: Lint styles
-  #         command: yarn run stylelint
-  # herblint:
-  #   executor: ruby-rails/ruby
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install Ruby dependencies
-  #         command: bundle install
-  #     - run:
-  #         name: Lint ERBs
-  #         command: bin/rake herb
+  stylelint:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Lint styles
+          command: yarn run stylelint
+  herblint:
+    executor: ruby-rails/ruby
+    steps:
+      - checkout
+      - run:
+          name: Install Ruby dependencies
+          command: bundle install
+      - run:
+          name: Lint ERBs
+          command: bin/rake herb
 workflows:
   build:
     jobs:
