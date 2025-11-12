@@ -33,7 +33,9 @@ RSpec.describe Searchers::Item do
       expect(solr_query['fl']).to include(Search::Fields::ID)
       expect(solr_query['facet']).to be true
       # Only testing one field here so that the test is not brittle.
-      expect(solr_query['facet.field']).to include(Search::Fields::OBJECT_TYPE)
+      expect(solr_query['facet.field']).to include(Search::Fields::OBJECT_TYPE, Search::Fields::ACCESS_RIGHTS)
+      expect(solr_query["f.#{Search::Fields::ACCESS_RIGHTS}.facet.sort"]).to eq('index')
+      expect(solr_query["f.#{Search::Fields::ACCESS_RIGHTS}.facet.limit"]).to eq(50)
       expect(solr_query['rows']).to eq(20)
       expect(solr_query['start']).to eq(0)
     end

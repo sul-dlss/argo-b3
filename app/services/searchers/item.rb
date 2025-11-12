@@ -35,10 +35,13 @@ module Searchers
           fl: [ID, TITLE, BARE_DRUID],
           facet: true,
           # These are fast (non-lazy) facets
-          'facet.field': [OBJECT_TYPE],
+          'facet.field' => [],
           rows:,
           start:
-        }
+        }.tap do |req|
+          add_facet(req, field: OBJECT_TYPE)
+          add_facet(req, field: ACCESS_RIGHTS, limit: 50, alpha_sort: true)
+        end
       )
     end
 
@@ -48,6 +51,12 @@ module Searchers
 
     def start
       (search_form.page - 1) * rows
+    end
+
+    def add_facet(request, field:, alpha_sort: false, limit: nil)
+      request['facet.field'] << field
+      request["f.#{field}.facet.sort"] = 'index' if alpha_sort
+      request["f.#{field}.facet.limit"] = limit if limit
     end
   end
 end

@@ -56,10 +56,19 @@ The Solr requests will be executed with `debugQuery=true`, so the response will 
 including the amount of time to execute each part of the query / each facet.
 
 ### Adding a lazy async facet
-The lazy ansync pattern should be used for slow facets. Each of these facets involves a separate query to Solr.
+The lazy async pattern should be used for slow facets. Each of these facets involves a separate query to Solr.
 
 1. Add an attribute for the facet to `Search::ItemForm`.
 2. Add a `<turbo-frame>` for the facet to `Search::FacetSectionComponent`.
 3. Add a new endpoint to facet resource in `routes.rb`.
 4. Add a method for the endpoint to `Search::FacetsController`. For a standard value facet, this should invoke `Searchers::Facet`, which allows specifing sort order, limits, etc.
 5. Add a view for the endpoint, which should include a matching `<turbo-frame>` for the facet.
+
+### Adding a non-lazy sync facet
+The non-lazy sync pattern should be used for fast facets. The facet values are retrieved as part of the main query to Solr (i.e., the query that returns the search results).
+
+1. Add an attribute for the facet to `Search::ItemForm`.
+2. Add an empty `<div>` for the facet to `Search::FacetSectionComponent`.
+3. Add the facet to the Solr request in `Searchers::Item.solr_request`. This allows specifying sort order, limits, etc.
+4. Add a method to `SearchResults::Items` to return the `SearchResults::FacetCounts` for the facet.
+5. Add a turbo stream replace element (`<turbo-stream action="replace">`) for the facet to `views/search/items/index.html.erb` which matches the id of the empty `<div>`.
