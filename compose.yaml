@@ -66,12 +66,17 @@ services:
       context: .
       dockerfile: Dockerfile-solr
     volumes:
-      # - ./solr_conf/conf/:/myconfig
       - solr-data:/var/solr
-    command: solr-create -c argo -d /myconfig
     ports:
       - 8983:8983
-
+  
+  # solr-test is not on a persistent volume.
+  solr-test:
+    build:
+      context: .
+      dockerfile: Dockerfile-solr
+    ports:
+      - 8984:8983
 volumes:
   postgres-data:
   redis-data:

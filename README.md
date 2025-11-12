@@ -1,24 +1,56 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Development
+To connect to production Solr
 
-Things you may want to cover:
+```
+docker compose down solr
+ssh -L 8983:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
+```
 
-* Ruby version
+In a separate terminal window:
+```
+SETTINGS__SOLR__URL=http://localhost:8983/solr/argo_prod bin/dev
+```
 
-* System dependencies
+## Testing
 
-* Configuration
+### Solr
+To reset Solr before and after a test, mark the test as `:solr`. For example:
+```
+RSpec.describe 'My test', :solr do
+```
 
-* Database creation
+Solr document test fixtures can be created with the Solr factories. For example:
+```
+let!(:solr_doc) { create(:solr_item) }
+```
 
-* Database initialization
+## Discovery
+In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:
+* Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)
+* Is optimized for slow searching / faceting by asynchronously loading some search results and facets.
 
-* How to run the test suite
+The following will help illustrate the discovery system components involved for a search from the home page:
+1. The search form is rendered from `Search::Form`.
+2. The user enters a query in the search form and starts the search.
+3. The page is rendered with:
+  * An async turbo frame for items.
+  * Async turbo frames for each of field value types (e.g., projects).
+  * Empty divs for each non-lazy (fast!) facet (e.g., object types).
+  * Async turbo frames for each lazy (slow!) facet (e.g., project tags).
+4. The async turbo frame for items calls `Search::ItemsController.index`. This invokes the items searcher (`Searchers::Item`) which queries Solr and returns `SearchResults::Items` (a wrapper around the Solr response). The rendered response includes:
+  * The item search results
+  * Turbo stream replace elements (`<turbo-stream action="replace">`) for each of the non-lazy facets containing the facet content. When rendering the page, Turbo replaces the empty divs with the facet content.
+5. Concurrently, each of the async field value turbo frames calls the appropriate search controller (e.g., `Search::ProjectsController.index`). This invokes the appropriate searcher (e.g., `Searchers::Project`) which queries Solr and returns `SearchResults::FacetValues` (a wrapper around the Solr response). The rendered response includes the field value search results (e.g., a list of projects).
+6. Concurrently, each of the lazy facet async turbo frames calls the appropriate endpoint on the `Search::FacetsController` (e.g., `project_tags` for the projects facet). This invokes the facets searcher (`Searchers::Facet`) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
 
-* Services (job queues, cache servers, search engines, etc.)
+Notes:
+* On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
+* Putting Turbo stream replace elements directly in HTML is not a typical pattern for turbo streams.
 
-* Deployment instructions
+### Debugging
+To view the Solr response for all Solr requests made to render a page, add `debug=true` to the URL. 
 
-* ...
+The Solr requests will be executed with `debugQuery=true`, so the response will include debugging informations
+including the amount of time to execute each part of the query / each facet.
