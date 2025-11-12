@@ -41,3 +41,14 @@ workflows:
             - run:
                 name: Prepare for running specs (install JS dependencies and build assets)
                 command: bin/rake spec:prepare
+            - setup_remote_docker
+            # Make sure to set SETTINGS__SOLR__URL to http://solr:8983/solr/argo in CircleCI settings
+            - run:
+                name: Build and run Solr
+                command: |
+                  docker build -f Dockerfile-solr -t "argo-b3-solr:latest" .
+                  network=`docker network ls --filter label=task-network --format "{{.ID}}"`
+                  docker run -d --name solr -p 8983:8983 --network-alias solr --network $network argo-b3-solr:latest
+            - run:
+                name: Wait for Solr to be ready
+                command: dockerize -wait tcp://solr:8983 -timeout 1m
