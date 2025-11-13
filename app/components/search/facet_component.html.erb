@@ -1,4 +1,4 @@
-<%= render Search::FacetSectionComponent.new(label:) do %>
+<%= render Search::FacetSectionComponent.new(label:, show: search_form.selected?(key: form_field)) do %>
   <ul>
     <% facet_counts.each do |facet_count| %>
       <li>

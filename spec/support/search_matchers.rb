@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
-RSpec::Matchers.define :have_facet do |facet_label, args = {}|
+RSpec::Matchers.define :have_facet do |facet_label, expanded: nil, **args|
   match do |actual|
-    actual.has_css?("section[aria-label='#{facet_label}']", **args)
+    actual.has_css?("section[aria-label='#{facet_label}']", **args) do |section|
+      next true if expanded.nil?
+
+      is_expanded = section.has_css?('.accordion-collapse.collapse.show')
+      is_expanded == expanded
+    end
   end
 end
 

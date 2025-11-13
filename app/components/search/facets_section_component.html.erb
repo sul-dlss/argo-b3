@@ -1,12 +1,14 @@
-<h2>Facets</h2>
-<% unless blank_search? %>
-  <%= helpers.turbo_frame_tag 'project-tags-facet', src: project_tags_search_facets_path(search_form.attributes), target: '_top' do %>
-    Loading Project Tags facet ...
+<section aria-label="Facets">
+  <h2>Facets</h2>
+  <% unless blank_search? %>
+    <%= helpers.turbo_frame_tag 'project-tags-facet', src: project_tags_search_facets_path(search_form.attributes), target: '_top' do %>
+      Loading Project Tags facet ...
+    <% end %>
   <% end %>
-<% end %>
-<div id="object-types-facet">
-  Loading Object Types facet ...
-</div>
-<div id="access-rights-facet">
-  Loading Access Rights facet ...
-</div>
+  <div id="object-types-facet">
+    Loading Object Types facet ...
+  </div>
+  <div id="access-rights-facet">
+    Loading Access Rights facet ...
+  </div>
+</section>

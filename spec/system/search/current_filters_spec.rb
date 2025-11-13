@@ -18,6 +18,7 @@ RSpec.describe 'Current filters', :solr do
     expect(page).to have_result_count(3)
 
     # Select a facet.
+    find_facet_section('Object Types').click
     within(find_facet_section('Object Types')) do
       check('item')
       check('agreement')

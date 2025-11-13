@@ -14,7 +14,7 @@ module Search
     attr_reader :label, :facet_counts, :search_form, :form_field
 
     def render?
-      facet_counts.present?
+      facet_counts.any?
     end
   end
 end
