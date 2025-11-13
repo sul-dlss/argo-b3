@@ -17,12 +17,12 @@ RSpec.describe 'Facets', :solr do
     expect(page).to have_result_count(2)
 
     # Object types is a non-lazy checkbox facet.
-    find_facet_section('Object Types').click
-    expect(page).to have_facet_value('collection', count: 1, facet: 'Object Types')
-    expect(page).to have_facet_value('item', count: 1, facet: 'Object Types')
+    find_facet_section('Object types').click
+    expect(page).to have_facet_value('collection', count: 1, facet: 'Object types')
+    expect(page).to have_facet_value('item', count: 1, facet: 'Object types')
 
     # Select a facet.
-    within(find_facet_section('Object Types')) do
+    within(find_facet_section('Object types')) do
       check('item')
       click_button('Filter')
     end
@@ -30,20 +30,20 @@ RSpec.describe 'Facets', :solr do
     expect(page).to have_result_count(1)
     expect(page).to have_item_result(item_doc)
     expect(page).to have_current_filter('Object types', 'item')
-    expect(page).to have_facet('Object Types', expanded: true)
+    expect(page).to have_facet('Object types', expanded: true)
 
     find_facet_section('Projects').click
     expect(page).to have_facet_value('Project 1', count: 1, facet: 'Projects')
     expect(page).to have_facet_value('Project 2', count: 1, facet: 'Projects')
 
-    expect(page).to have_selected_facet_value('item', facet: 'Object Types')
-    within(find_facet_section('Object Types')) do
+    expect(page).to have_selected_facet_value('item', facet: 'Object types')
+    within(find_facet_section('Object types')) do
       uncheck('item')
       click_button('Filter')
     end
 
     expect(page).to have_result_count(2)
-    expect(page).to have_facet('Object Types', expanded: false)
+    expect(page).to have_facet('Object types', expanded: false)
     expect(page).not_to have_current_filter('Object types', 'item', wait: 0)
 
     # Projects is a lazy facet.
@@ -60,7 +60,7 @@ RSpec.describe 'Facets', :solr do
     expect(page).to have_item_result(item_doc)
     expect(page).to have_current_filter('Projects', 'Project 2')
 
-    expect(page).not_to have_facet_value('collection', count: 1, facet: 'Object Types', wait: 0)
+    expect(page).not_to have_facet_value('collection', count: 1, facet: 'Object types', wait: 0)
 
     expect(page).to have_facet('Projects', expanded: true)
     expect(page).to have_selected_facet_value('Project 2', facet: 'Projects')

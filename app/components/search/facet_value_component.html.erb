@@ -1,0 +1,7 @@
+<% if selected? %>
+  <%= label %>
+  <%= link_to 'Remove', search_items_path(search_form.without_attributes({ form_field => value, page: nil })), **link_args %>
+<% else %>
+  <%= link_to label, search_items_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
+  <%= "(#{number_with_delimiter(count)})" %>
+<% end %>

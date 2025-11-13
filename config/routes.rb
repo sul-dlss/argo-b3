@@ -22,6 +22,11 @@ Rails.application.routes.draw do
     resources :facets, only: [] do
       collection do
         get 'project_tags'
+        get 'project_tags_children'
+        get 'tags'
+        get 'tags_children'
+        get 'wps_workflows'
+        get 'wps_workflows_children'
       end
     end
   end

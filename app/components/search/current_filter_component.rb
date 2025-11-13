@@ -13,7 +13,7 @@ module Search
     attr_reader :form_field, :value, :search_form
 
     def label
-      form_field.humanize
+      helpers.facet_label(form_field)
     end
 
     def title

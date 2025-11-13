@@ -23,7 +23,8 @@ FactoryBot.define do
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPE => [object_type],
         Search::Fields::APO_ID => [apo_druid],
-        Search::Fields::PROJECT_TAGS => projects,
+        Search::Fields::PROJECT_TAGS => explode_tag_hierarchy(tags: projects),
+        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags: projects, as_hierarchical: true),
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -61,7 +62,8 @@ FactoryBot.define do
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPE => [object_type],
-        Search::Fields::PROJECT_TAGS => projects,
+        Search::Fields::PROJECT_TAGS => explode_tag_hierarchy(tags: projects),
+        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags: projects, as_hierarchical: true),
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -75,7 +77,25 @@ FactoryBot.define do
 
   trait :with_projects do
     transient do
-      projects { ['Project 1', 'Project 2'] }
+      projects { ['Project 1', 'Project 2 : Project 2a'] }
+    end
+  end
+end
+
+# This is similar to code in DSA AdministrativeTagIndexer.
+def explode_tag_hierarchy(tags:, as_hierarchical: false)
+  [].tap do |exploded_tags|
+    tags.each do |tag|
+      tag_parts = tag.split(' : ')
+      1.upto(tag_parts.count).each do |i|
+        joined_parts = tag_parts.take(i).join(' : ')
+        exploded_tags << if as_hierarchical
+                           leaf_or_branch_indicator = i == tag_parts.count ? '-' : '+'
+                           "#{i}|#{joined_parts}|#{leaf_or_branch_indicator}"
+                         else
+                           joined_parts
+                         end
+      end
     end
   end
 end

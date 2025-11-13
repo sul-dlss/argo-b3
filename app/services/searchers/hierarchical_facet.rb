@@ -1,0 +1,56 @@
+# frozen_string_literal: true
+
+module Searchers
+  # Searcher for a hierarchical facet
+  class HierarchicalFacet
+    def self.call(...)
+      new(...).call
+    end
+
+    # @param search_form [Search::ItemForm]
+    # @param field [String] the Solr field to facet on
+    # @param value [String, nil] the facet value to return children for. If nil, returns top-level values
+    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
+    # @param limit [Integer, nil] maximum number of facet values to return
+    def initialize(search_form:, field:, value: nil, alpha_sort: false, limit: nil)
+      @search_form = search_form
+      @field = field
+      @value = value
+      @alpha_sort = alpha_sort
+      @limit = limit
+    end
+
+    # @return [SearchResults::FacetCounts] search results
+    def call
+      SearchResults::HierarchicalFacetCounts.new(solr_response:, field:)
+    end
+
+    private
+
+    attr_reader :search_form, :field, :alpha_sort, :limit, :value
+
+    def solr_response
+      Search::SolrService.call(request: solr_request)
+    end
+
+    def solr_request
+      Search::ItemQueryBuilder.call(search_form:).merge(
+        {
+          facet: true,
+          'facet.field': [field],
+          rows: 0,
+          'facet.prefix': prefix
+        }.tap do |req|
+          req['facet.sort'] = 'alpha' if alpha_sort
+          req['facet.limit'] = limit if limit
+        end
+      )
+    end
+
+    def prefix
+      return '1|' if value.nil?
+
+      "#{HierarchicalValueSupport.level(value) + 1}|#{value}"
+    end
+  end
+end
