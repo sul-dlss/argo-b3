@@ -1,5 +1,7 @@
 solr:
   url: http://localhost:8983/solr/argo
 
+argo:
+  url: https://argo.stanford.edu
 
 google_books_apo: 'druid:bf569gy6501'

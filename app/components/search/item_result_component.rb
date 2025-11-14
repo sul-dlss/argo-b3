@@ -18,5 +18,9 @@ module Search
     def id
       "item-result-#{bare_druid}"
     end
+
+    def argo_path
+      "#{Settings.argo.url}/view/#{bare_druid}"
+    end
   end
 end
