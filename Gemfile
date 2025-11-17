@@ -44,12 +44,12 @@ gem 'rsolr'
 gem 'view_component'
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem 'debug', require: 'debug/prelude'
-
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem 'bundler-audit', require: false
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem 'debug', require: 'debug/prelude'
   gem 'factory_bot_rails'
+  gem 'herb'
   gem 'rspec_junit_formatter' # used by CircleCI
   gem 'rspec-rails'
   gem 'rubocop', require: false

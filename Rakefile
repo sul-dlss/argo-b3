@@ -20,17 +20,23 @@ begin
   desc 'Run linter against JS files'
   task eslint: :environment do
     puts 'Running JS linter...'
-    system('yarn run lint')
+    sh('yarn run lint')
   end
 
   desc 'Run linter against style files'
   task stylelint: :environment do
     puts 'Running style linter...'
-    system('yarn run stylelint')
+    sh('yarn run stylelint')
+  end
+
+  desc 'Run herb against ERB files'
+  task herb: :environment do
+    puts 'Running ERB linter...'
+    sh('bin/herb analyze app --no-log-file --non-interactive --no-timing')
   end
 
   desc 'Run all configured linters'
-  task lint: %i[rubocop erblint eslint stylelint]
+  task lint: %i[rubocop erblint eslint stylelint herb]
 
   # clear the default task injected by rspec
   task(:default).clear

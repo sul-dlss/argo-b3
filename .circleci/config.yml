@@ -31,7 +31,7 @@ workflows:
       - ruby-rails/lint-erb:
           context: dlss
       - ruby-rails/lint-js
-      # - herblint
+      - herblint
       - stylelint
       - ruby-rails/test-rails:
           name: test
