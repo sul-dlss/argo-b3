@@ -23,8 +23,14 @@ begin
     system('yarn run lint')
   end
 
+  desc 'Run linter against style files'
+  task stylelint: :environment do
+    puts 'Running style linter...'
+    system('yarn run stylelint')
+  end
+
   desc 'Run all configured linters'
-  task lint: %i[rubocop erblint eslint]
+  task lint: %i[rubocop erblint eslint stylelint]
 
   # clear the default task injected by rspec
   task(:default).clear
