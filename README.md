@@ -7,13 +7,12 @@
 To connect to production Solr
 
 ```
-docker compose down solr
-ssh -L 8983:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
+ssh -L 8985:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
 ```
 
 In a separate terminal window:
 ```
-SETTINGS__SOLR__URL=http://localhost:8983/solr/argo_prod bin/dev
+SETTINGS__SOLR__URL=http://localhost:8985/solr/argo_prod bin/dev
 ```
 
 ## Testing

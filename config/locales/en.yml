@@ -28,4 +28,7 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  search:
+    # If not provided, will use humanized field name
+    facets:    
+      wps_workflows: "Workflow > Process > Status"

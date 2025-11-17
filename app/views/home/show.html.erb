@@ -1,14 +1,16 @@
 <h1>Home Page</h1>
+
 <%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items, tags or projects:') %>
 
 <% if @items_search_form %>
   <%= turbo_frame_tag 'items-search', src: search_items_path(@items_search_form.attributes) do %>
-    Loading ...
+    Loading items...
   <% end %>
 <% end %>
+
 <% if @projects_search_form %>
   <%= turbo_frame_tag 'projects-search', src: search_projects_path(@projects_search_form.attributes) do %>
-    Loading ...
+    Loading projects...
   <% end %>
 <% end %>
 

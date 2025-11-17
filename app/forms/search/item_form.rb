@@ -5,7 +5,9 @@ module Search
   class ItemForm < Search::Form
     attribute :object_types, array: true, default: -> { [] }
     attribute :projects, array: true, default: -> { [] }
+    attribute :tags, array: true, default: -> { [] }
     attribute :access_rights, array: true, default: -> { [] }
+    attribute :wps_workflows, array: true, default: -> { [] }
 
     # @return [Hash] attributes defined on this class (not its superclasses)
     def this_attributes

@@ -7,11 +7,17 @@
 <%= turbo_frame_tag 'items-search' do %>
   <% if @results.any? %>
     <section aria-label="Item, collection, and admin policy results">
-      <h3>Item, collection, and admin policy results (<%= number_with_delimiter(@results.total_results) %> found)</h3>
+      <h3>
+        Item, collection, and admin policy results
+        (<%= number_with_delimiter(@results.total_results) %> found)
+      </h3>
       <ul>
         <%= render Search::ItemResultComponent.with_collection(@results) %>
       </ul>
-      Page <%= number_with_delimiter(@results.page) %> of <%= number_with_delimiter(@results.total_pages) %>
+      Page
+      <%= number_with_delimiter(@results.page) %>
+      of
+      <%= number_with_delimiter(@results.total_pages) %>
       <% if @results.page > 1 %>
         <%= link_to 'Previous page', search_items_path(@search_form.with_attributes(page: @results.page - 1)) %>
       <% end %>
@@ -25,12 +31,13 @@
 
   <turbo-stream action="replace" target="object-types-facet">
     <template>
-      <%= render Search::CheckboxFacetComponent.new(label: 'Object Types', facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
+      <%= render Search::CheckboxFacetComponent.new(facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
     </template>
   </turbo-stream>
+
   <turbo-stream action="replace" target="access-rights-facet">
     <template>
-      <%= render Search::FacetComponent.new(label: 'Access Rights', facet_counts: @results.access_rights_facet, search_form: @search_form, form_field: :access_rights) %>
+      <%= render Search::FacetComponent.new(facet_counts: @results.access_rights_facet, search_form: @search_form, form_field: :access_rights) %>
     </template>
   </turbo-stream>
 <% end %>

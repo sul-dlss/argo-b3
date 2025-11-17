@@ -1,14 +1,24 @@
 <section aria-label="Facets">
   <h2>Facets</h2>
+
   <% unless blank_search? %>
     <%= helpers.turbo_frame_tag 'project-tags-facet', src: project_tags_search_facets_path(search_form.attributes), target: '_top' do %>
-      Loading Project Tags facet ...
+      Loading <%= helpers.facet_label(:projects) %> facet...
+    <% end %>
+    <%= helpers.turbo_frame_tag 'tags-facet', src: tags_search_facets_path(search_form.attributes), target: '_top' do %>
+      Loading <%= helpers.facet_label(:tags) %> facet...
     <% end %>
   <% end %>
+
   <div id="object-types-facet">
-    Loading Object Types facet ...
+    Loading <%= helpers.facet_label(:object_types) %> facet...
   </div>
+
   <div id="access-rights-facet">
-    Loading Access Rights facet ...
+    Loading <%= helpers.facet_label(:access_rights) %> facet...
   </div>
+
+  <%= helpers.turbo_frame_tag 'wps-workflows-facet', src: wps_workflows_search_facets_path(search_form.attributes), target: '_top' do %>
+    Loading <%= helpers.facet_label(:wps_workflows) %> facet...
+  <% end %>
 </section>

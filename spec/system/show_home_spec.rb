@@ -14,10 +14,10 @@ RSpec.describe 'Show home page', :solr do
     expect(page).to have_css('h1', text: 'Home Page')
 
     # Shows home page facets
-    expect(page).to have_facet('Object Types', expanded: false)
-    find_facet_section('Object Types').click
-    expect(page).to have_facet_value('item', facet: 'Object Types', count: 4)
-    expect(page).to have_facet_value('collection', facet: 'Object Types', count: 3)
+    expect(page).to have_facet('Object types', expanded: false)
+    find_facet_section('Object types').click
+    expect(page).to have_facet_value('item', facet: 'Object types', count: 4)
+    expect(page).to have_facet_value('collection', facet: 'Object types', count: 3)
 
     # Does not show non-home page facets
     expect(page).not_to have_facet('Project Tags', wait: 0)

@@ -68,4 +68,22 @@ RSpec.describe Search::ItemQueryBuilder do
       expect(Array(result[:fq])).to include("#{Search::Fields::ACCESS_RIGHTS}:(\"dark\")")
     end
   end
+
+  context 'with tags' do
+    let(:search_form) { Search::ItemForm.new(tags: ['Tag A', 'Tag B : Tag B1']) }
+
+    it 'builds the correct filter query for tags' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::OTHER_TAGS}:(\"Tag A\" OR \"Tag B : Tag B1\")")
+    end
+  end
+
+  context 'with wps workflows' do
+    let(:search_form) { Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr:waiting']) }
+
+    it 'builds the correct filter query for wps workflows' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::WPS_WORKFLOWS}:(\"ocrWF:end-ocr:waiting\")")
+    end
+  end
 end

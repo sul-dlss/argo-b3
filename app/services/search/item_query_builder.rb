@@ -35,6 +35,8 @@ module Search
       queries = []
       queries << facet_filter_query(form_field: :object_types, solr_field: OBJECT_TYPE, tag: true)
       queries << facet_filter_query(form_field: :projects, solr_field: PROJECT_TAGS)
+      queries << facet_filter_query(form_field: :tags, solr_field: OTHER_TAGS)
+      queries << facet_filter_query(form_field: :wps_workflows, solr_field: WPS_WORKFLOWS)
       queries << facet_filter_query(form_field: :access_rights, solr_field: ACCESS_RIGHTS)
       queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
