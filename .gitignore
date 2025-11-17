@@ -33,7 +33,7 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
-
+# Ignore built assets
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
@@ -42,3 +42,6 @@
 config/settings.local.yml
 config/settings/*.local.yml
 config/environments/*.local.yml
+
+# Ignore test coverage artifacts
+/coverage

@@ -14,6 +14,30 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+
+require 'simplecov'
+
+SKIPPABLE_TEST_COVERAGE_CONCERNS = %w[assets javascript views].freeze
+
+SimpleCov.start(:rails) do
+  add_filter '/lib/tasks/'
+
+  # Use SimpleCov groups to break down test coverage per application concern, e.g.,
+  # controllers, models, & jobs. See https://github.com/simplecov-ruby/simplecov#groups
+  Dir.glob('app/*').each do |concern_path|
+    concern = File.basename(concern_path)
+    next if SKIPPABLE_TEST_COVERAGE_CONCERNS.include?(concern)
+
+    add_group concern.capitalize, concern_path
+  end
+
+  if ENV['CI']
+    require 'simplecov_json_formatter'
+
+    formatter SimpleCov::Formatter::JSONFormatter
+  end
+end
+
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

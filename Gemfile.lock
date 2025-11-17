@@ -158,6 +158,7 @@ GEM
       capistrano-one_time_key (>= 0.2.0)
       capistrano-shared_configs
       ed25519
+    docile (1.4.1)
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (5.1.1)
@@ -373,6 +374,8 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.6)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.81.6)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -423,6 +426,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     smart_properties (1.17.0)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
@@ -523,6 +532,7 @@ DEPENDENCIES
   rails (~> 8.1.0)
   rsolr
   rspec-rails
+  rspec_junit_formatter
   rubocop
   rubocop-capybara
   rubocop-factory_bot
@@ -531,12 +541,12 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rspec_rails
   selenium-webdriver
+  simplecov
   solid_cable
   solid_cache
   solid_queue
   stimulus-rails
   turbo-rails
-  tzinfo-data
   view_component
   web-console
   webmock
