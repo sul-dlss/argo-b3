@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 set :application, 'argo'
-set :repo_url, 'https://github.com/sul-dlss-labs/argo-b3.git'
+set :repo_url, 'https://github.com/sul-dlss/argo-b3.git'
 
 # Default branch is :main
 ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp

@@ -1,5 +1,6 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sul-dlss-labs/argo-b3/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sul-dlss-labs/argo-b3/tree/main)
-[![Test Coverage](https://codecov.io/github/sul-dlss-labs/argo-b3/graph/badge.svg?token=9Y9EL3VG6I)](https://codecov.io/github/sul-dlss-labs/argo-b3)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sul-dlss/argo-b3/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sul-dlss/argo-b3/tree/main
+)
+[![Test Coverage](https://codecov.io/github/sul-dlss/argo-b3/graph/badge.svg?token=9Y9EL3VG6I)](https://codecov.io/github/sul-dlss/argo-b3)
 
 # README
 
