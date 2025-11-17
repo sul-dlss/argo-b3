@@ -40,6 +40,7 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 
+# NOTE: Allow containerized Solr access for CI test environment, where we can't bind localhost ports.
 WebMock.disable_net_connect!(allow_localhost: true, allow: 'solr:8983')
 
 RSpec.configure do |config|
