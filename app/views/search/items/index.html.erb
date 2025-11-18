@@ -29,17 +29,17 @@
 
   <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
 
-  <turbo-stream action="replace" target="object-types-facet">
+  <%= tag.turbo_stream action: 'replace', target: facet_id(:object_types) do %>
     <template>
       <%= render Search::CheckboxFacetComponent.new(facet_counts: @results.object_type_facet, search_form: @search_form, form_field: :object_types) %>
     </template>
-  </turbo-stream>
+  <% end %>
 
-  <turbo-stream action="replace" target="access-rights-facet">
+  <%= tag.turbo_stream action: 'replace', target: facet_id(:access_rights) do %>
     <template>
       <%= render Search::FacetComponent.new(facet_counts: @results.access_rights_facet, search_form: @search_form, form_field: :access_rights) %>
     </template>
-  </turbo-stream>
+  <% end %>
 <% end %>
 
 <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>

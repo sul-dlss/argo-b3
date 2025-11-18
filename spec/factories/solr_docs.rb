@@ -15,6 +15,7 @@ FactoryBot.define do
       apo_druid { generate(:unique_druid) }
       projects { [] }
       tags { [] }
+      workflows { [] }
     end
 
     initialize_with do
@@ -24,10 +25,13 @@ FactoryBot.define do
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPE => [object_type],
         Search::Fields::APO_ID => [apo_druid],
-        Search::Fields::PROJECT_TAGS => explode_tag_hierarchy(tags: projects),
-        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags: projects, as_hierarchical: true),
-        Search::Fields::OTHER_TAGS => explode_tag_hierarchy(tags:),
-        Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags:, as_hierarchical: true),
+        Search::Fields::PROJECT_TAGS => explode_hierarchy(values: projects),
+        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_hierarchy(values: projects, as_hierarchical: true),
+        Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
+        Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
+        Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
+        Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
+                                                                        delimiter: ':'),
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -58,6 +62,7 @@ FactoryBot.define do
       object_type { 'collection' }
       projects { [] }
       tags { [] }
+      workflows { [] }
     end
 
     initialize_with do
@@ -66,10 +71,13 @@ FactoryBot.define do
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPE => [object_type],
-        Search::Fields::PROJECT_TAGS => explode_tag_hierarchy(tags: projects),
-        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags: projects, as_hierarchical: true),
-        Search::Fields::OTHER_TAGS => explode_tag_hierarchy(tags:),
-        Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_tag_hierarchy(tags:, as_hierarchical: true),
+        Search::Fields::PROJECT_TAGS => explode_hierarchy(values: projects),
+        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_hierarchy(values: projects, as_hierarchical: true),
+        Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
+        Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
+        Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
+        Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
+                                                                        delimiter: ':'),
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -92,21 +100,27 @@ FactoryBot.define do
       tags { ['Tag 1', 'Tag 2 : Tag 2a'] }
     end
   end
+
+  trait :with_workflows do
+    transient do
+      workflows { ['accessionWF:shelve:completed', 'accessionWF:technical-metadata:skipped'] }
+    end
+  end
 end
 
 # This is similar to code in DSA AdministrativeTagIndexer.
-def explode_tag_hierarchy(tags:, as_hierarchical: false)
-  [].tap do |exploded_tags|
-    tags.each do |tag|
-      tag_parts = tag.split(' : ')
-      1.upto(tag_parts.count).each do |i|
-        joined_parts = tag_parts.take(i).join(' : ')
-        exploded_tags << if as_hierarchical
-                           leaf_or_branch_indicator = i == tag_parts.count ? '-' : '+'
-                           "#{i}|#{joined_parts}|#{leaf_or_branch_indicator}"
-                         else
-                           joined_parts
-                         end
+def explode_hierarchy(values:, as_hierarchical: false, delimiter: ' : ')
+  [].tap do |exploded_values|
+    values.each do |value|
+      value_parts = value.split(delimiter)
+      1.upto(value_parts.count).each do |i|
+        joined_parts = value_parts.take(i).join(delimiter)
+        exploded_values << if as_hierarchical
+                             leaf_or_branch_indicator = i == value_parts.count ? '-' : '+'
+                             "#{i}|#{joined_parts}|#{leaf_or_branch_indicator}"
+                           else
+                             joined_parts
+                           end
       end
     end
   end

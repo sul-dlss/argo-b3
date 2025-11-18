@@ -4,6 +4,8 @@
 class SearchApplicationController < ApplicationController
   include Search::Fields
 
+  private
+
   # Builds a form object of the given class, permitting parameters appropriately.
   # @param form_class [Class] The form class to instantiate
   # @param base_key [Symbol, nil] Optional base key for nested parameters
@@ -16,8 +18,6 @@ class SearchApplicationController < ApplicationController
     attrs = scope ? permitted_params[scope] : permitted_params
     form_class.new(**attrs, debug: params[:debug])
   end
-
-  private
 
   def filters_for(form_class, scope: nil)
     filters = form_class.attribute_types.map do |name, type|

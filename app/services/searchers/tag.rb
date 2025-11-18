@@ -30,7 +30,7 @@ module Searchers
     end
 
     def solr_request
-      # This is a very imperfect way of querying for projects.
+      # This is a very imperfect way of querying for tags.
       {
         q: '*:*',
         rows: 0,

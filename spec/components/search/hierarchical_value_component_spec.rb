@@ -10,7 +10,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
   let(:search_form) { Search::ItemForm.new }
   let(:path_helper) do
     lambda { |parent_value:, **params|
-      wps_workflows_children_search_facets_path(parent_value:, **params)
+      children_search_workflow_facets_path(parent_value:, **params)
     }
   end
   let(:form_field) { :wps_workflows }
@@ -69,7 +69,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_content('end-ocr')
         expect(page).to have_link('Remove', href: '/search/items')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr', title: 'Toggle end-ocr')
-        expect(page).to have_css('div.collapse.show turbo-frame[src="/search/facets/wps_workflows_children' \
+        expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr"]')
       end
     end
@@ -81,7 +81,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_link('end-ocr', href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr')
         expect(page).to have_content('(10)')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
-        expect(page).to have_css('div.collapse:not(.show) turbo-frame[src="/search/facets/wps_workflows_children' \
+        expect(page).to have_css('div.collapse:not(.show) turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr"]')
       end
     end
@@ -99,7 +99,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
                                         '&wps_workflows%5B%5D=ocrWF%3Aend-ocr')
         expect(page).to have_content('(10)')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
-        expect(page).to have_css('div.collapse.show turbo-frame[src="/search/facets/wps_workflows_children' \
+        expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting"]')
       end
     end

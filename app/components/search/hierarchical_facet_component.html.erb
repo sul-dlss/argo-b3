@@ -2,4 +2,6 @@
   <ul class="list-unstyled" data-controller="hierarchical-facet-value">
     <%= render Search::HierarchicalValueComponent.with_collection(facet_counts, search_form:, path_helper:, form_field:) %>
   </ul>
+
+  <%= facet_search %>
 <% end %>

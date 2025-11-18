@@ -23,14 +23,23 @@ Rails.application.routes.draw do
 
     resources :tags, only: [:index]
 
-    resources :facets, only: [] do
+    resources :tag_facets, only: [:index] do
       collection do
-        get 'project_tags'
-        get 'project_tags_children'
-        get 'tags'
-        get 'tags_children'
-        get 'wps_workflows'
-        get 'wps_workflows_children'
+        get 'children'
+        get 'search'
+      end
+    end
+
+    resources :project_facets, only: [:index] do
+      collection do
+        get 'children'
+        get 'search'
+      end
+    end
+
+    resources :workflow_facets, only: [:index] do
+      collection do
+        get 'children'
       end
     end
   end

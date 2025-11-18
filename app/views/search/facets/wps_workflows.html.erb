@@ -1,4 +1,0 @@
-<%= turbo_frame_tag 'wps-workflows-facet', target: '_top' do %>
-  <%= render Search::HierarchicalFacetComponent.new(facet_counts: @facet_counts, search_form: @search_form, form_field: :wps_workflows, path_helper: method(:wps_workflows_children_search_facets_path)) %>
-  <%= render Search::DebugComponent.new(search_form: @search_form, results: @facet_counts) %>
-<% end %>

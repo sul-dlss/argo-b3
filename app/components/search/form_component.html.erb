@@ -1,5 +1,5 @@
 <%= helpers.form_with model: search_form, scope: :search, url:, method: :get do |form| %>
-  <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
+  <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, include_base_fields: false) %>
   <%= form.label :query, label %>
   <%= form.text_field :query %>
   <%= form.submit 'Search' %>

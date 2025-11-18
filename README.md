@@ -80,10 +80,10 @@ The lazy async pattern should be used for slow facets. Each of these facets invo
 
 1. Add an attribute for the facet to `Search::ItemForm`.
 2. Add a `<turbo-frame>` for the facet to `Search::FacetsSectionComponent`.
-3. Add a new endpoint to facet resource in `routes.rb`.
-4. Add a method for the endpoint to `Search::FacetsController`. For a standard value facet, this should invoke `Searchers::Facet`, which allows specifing sort order, limits, etc.
-5. Add a view for the endpoint, which should include a matching `<turbo-frame>` for the facet.
-6. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+3. Add a new `*_facets` resource to `routes.rb`. See for example, `:tag_facets`. Add collection routes depending on whether the facet is hierarchical, supports search, etc.
+4. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `index` method, as well as any additional collection routes.
+5. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+6. Optionally, add a label for the facet to `en.yml`.
 
 ### Adding a non-lazy sync facet
 The non-lazy sync pattern should be used for fast facets. The facet values are retrieved as part of the main query to Solr (i.e., the query that returns the search results).
@@ -92,5 +92,6 @@ The non-lazy sync pattern should be used for fast facets. The facet values are r
 2. Add an empty `<div>` for the facet to `Search::FacetsSectionComponent`.
 3. Add the facet to the Solr request in `Searchers::Item.solr_request`. This allows specifying sort order, limits, etc.
 4. Add a method to `SearchResults::Items` to return the `SearchResults::FacetCounts` for the facet.
-5. Add a turbo stream replace element (`<turbo-stream action="replace">`) for the facet to `views/search/items/index.html.erb` which matches the id of the empty `<div>`.
+5. Add a turbo stream replace element (`<turbo-stream action="replace">`) for the facet to `views/search/items/index.html.erb`.
 6. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+7. Optionally, add a label for the facet to `en.yml`.

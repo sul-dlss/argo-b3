@@ -1,0 +1,14 @@
+<%= tag.div data:, role: 'combobox' do %>
+  <%= tag.label for: id do %>
+    <%= label %>
+  <% end %>
+
+  <%= tag.input id:, type: 'text', autocomplete: 'off', data: { autocomplete_target: 'input' } %>
+
+  <%= helpers.form_with model: search_form, scope: :search, url: search_items_path, method: :get do |form| %>
+    <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
+    <%= form.hidden_field form_field, multiple: true, data: { autocomplete_target: 'hidden', action: 'change->facet-search#submit' } %>
+  <% end %>
+
+  <ul class="list-group" data-autocomplete-target="results"></ul>
+<% end %>
