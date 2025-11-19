@@ -23,18 +23,22 @@ module SearchResults
       # These should only be yielded once, with the count being the sum of both.
       # When there is a branch and a leaf at the same level and value parts,
       # the branch should be used (with the "+" suffix).
-      facet_result = solr_response['facet_counts']['facet_fields'][field]
-      # Given facet_result=["1|foo|+", 5, "1|foo|-", 2, '1|bar|+', 3]
 
-      grouped_facet_results = facet_result.each_slice(2).group_by { |value, _count| value.rpartition('|').first }
-      # grouped_facet_results={"1|foo" => [["1|foo|+", 5], ["1|foo|-", 2]], "1|bar" => [["1|bar|+", 3]]}
+      # facet_result = solr_response['facet_counts']['facet_fields'][field]
+      # Given facet_result=[{val:"1|foo|+", count:5}, {val:"1|foo|-", count:2}, {val:"1|bar|+", count:3}]
+      return if facet_result.nil?
+
+      grouped_facet_results = facet_result['buckets'].group_by { |bucket| bucket['val'].rpartition('|').first }
+      # grouped_facet_results={"1|foo" => [{val:"1|foo|+", count:5},
+      #   {val:"1|foo|-", count:2}], "1|bar" => [{val:"1|bar|+", count:3}]}
 
       grouped_facet_results.each do |level_and_facet_value, grouped_values_and_counts|
         if grouped_values_and_counts.size == 1
-          value, count = grouped_values_and_counts[0]
+          value = grouped_values_and_counts[0]['val']
+          count = grouped_values_and_counts[0]['count']
         else
           value = "#{level_and_facet_value}|+"
-          count = grouped_values_and_counts.sum { |_value, count| count }
+          count = grouped_values_and_counts.sum { |bucket| bucket['count'] }
         end
         yield HierarchicalFacetCount.new(value:, count:)
       end
@@ -45,5 +49,9 @@ module SearchResults
     end
 
     attr_reader :solr_response, :field
+
+    def facet_result
+      @solr_response['facets'][field]
+    end
   end
 end

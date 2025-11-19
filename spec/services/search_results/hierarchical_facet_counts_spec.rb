@@ -7,14 +7,14 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
 
   let(:solr_response) do
     {
-      'facet_counts' => {
-        'facet_fields' => {
-          field => [
-            '1|Tag A|+', 5,
-            '2|Tag A : Tag A1|-', 2,
-            '2|Tag A : Tag A2|-', 3,
-            '1|Tag B|+', 3,
-            '1|Tag B|-', 4
+      'facets' => {
+        field => {
+          'buckets' => [
+            { 'val' => '1|Tag A|+', 'count' => 5 },
+            { 'val' => '2|Tag A : Tag A1|-', 'count' => 2 },
+            { 'val' => '2|Tag A : Tag A2|-', 'count' => 3 },
+            { 'val' => '1|Tag B|+', 'count' => 3 },
+            { 'val' => '1|Tag B|-', 'count' => 4 }
           ]
         }
       }

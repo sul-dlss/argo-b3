@@ -38,18 +38,16 @@ module Searchers
     def solr_request
       Search::ItemQueryBuilder.call(search_form:).merge(
         {
-          facet: true,
-          'facet.field': [field],
+          'json.facet': facet_json.to_json,
           rows: 0
-        }.tap do |req|
-          req['facet.sort'] = 'alpha' if alpha_sort
-          req['facet.limit'] = limit if limit
-          if facet_query.present?
-            req['facet.contains'] = facet_query
-            req['facet.contains.ignoreCase'] = true
-          end
-        end
+        }
       )
+    end
+
+    def facet_json
+      {
+        field => Search::FacetBuilder.call(field:, alpha_sort:, limit:, facet_query:)
+      }
     end
   end
 end
