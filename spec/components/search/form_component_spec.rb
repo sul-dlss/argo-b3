@@ -14,5 +14,6 @@ RSpec.describe Search::FormComponent, type: :component do
     expect(page).to have_field('Search', type: :text, with: 'test')
     expect(page).to have_field('Include Google Books', type: :checkbox, checked: false)
     expect(page).to have_button('Search')
+    expect(page).to have_link('Start over', href: '/')
   end
 end
