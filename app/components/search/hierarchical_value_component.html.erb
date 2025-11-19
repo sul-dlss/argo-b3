@@ -10,7 +10,7 @@
 
   <% if facet_count.branch? %>
     <%= tag.div id: children_collapse_id, class: collapse_classes do %>
-      <%= helpers.turbo_frame_tag children_turbo_id, src: children_path, loading: 'lazy' do %>
+      <%= helpers.turbo_frame_tag children_turbo_id, src: children_path, loading: expanded? ? 'eager' : 'lazy' do %>
         Loading...
       <% end %>
     <% end %>

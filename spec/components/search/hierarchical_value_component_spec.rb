@@ -70,7 +70,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_link('Remove', href: '/search/items')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr', title: 'Toggle end-ocr')
         expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
-                                 '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr"]')
+                                 '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr"][loading="eager"]')
       end
     end
 
@@ -82,7 +82,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_content('(10)')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('div.collapse:not(.show) turbo-frame[src="/search/workflow_facets/children' \
-                                 '?parent_value=ocrWF%3Aend-ocr"]')
+                                 '?parent_value=ocrWF%3Aend-ocr"][loading="lazy"]')
       end
     end
 
@@ -100,7 +100,8 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_content('(10)')
         expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
-                                 '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting"]')
+                                 '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting"]' \
+                                 '[loading="eager"]')
       end
     end
   end
