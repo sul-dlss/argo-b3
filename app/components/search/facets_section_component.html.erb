@@ -18,6 +18,10 @@
     Loading <%= helpers.facet_label(:access_rights) %> facet...
   <% end %>
 
+  <%= tag.div id: helpers.facet_id(:mimetypes) do %>
+    Loading <%= helpers.facet_label(:mimetypes) %> facet...
+  <% end %>
+
   <%= helpers.turbo_frame_tag helpers.facet_id(:wps_workflows), src: search_workflow_facets_path(search_form.attributes), target: '_top' do %>
     Loading <%= helpers.facet_label(:wps_workflows) %> facet...
   <% end %>

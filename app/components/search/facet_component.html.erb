@@ -1,9 +1,14 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
-  <ul>
-    <% facet_counts.each do |facet_count| %>
-      <li>
-        <%= render Search::FacetValueComponent.new(count: facet_count.count, search_form:, form_field:, value: facet_count.value, selected: search_form.selected?(key: form_field, value: facet_count.value)) %>
-      </li>
-    <% end %>
-  </ul>
+  <%= helpers.turbo_frame_tag frame_id do %>
+    <ul class="mb-0">
+      <% facet_counts.each do |facet_count| %>
+        <li>
+          <%= render Search::FacetValueComponent.new(count: facet_count.count, search_form:, form_field:, value: facet_count.value, selected: search_form.selected?(key: form_field, value: facet_count.value), data: { turbo_frame: '_top' }) %>
+        </li>
+      <% end %>
+    </ul>
+    <%= render Search::FacetPageLinkComponent.new(facet_counts:, search_form:, facet_path_helper: facet_page_path_helper, form_field:) %>
+  <% end %>
+
+  <%= render Search::FacetSearchComponent.new(form_field:, search_form:, facet_search_path_helper:) %>
 <% end %>

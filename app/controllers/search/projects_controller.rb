@@ -5,7 +5,7 @@ module Search
   class ProjectsController < SearchApplicationController
     def index
       @search_form = build_form(form_class: Search::Form)
-      @project_tags = Searchers::Tag.call(search_form: @search_form, field: PROJECT_TAGS)
+      @project_tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::PROJECT_TAGS)
     end
   end
 end

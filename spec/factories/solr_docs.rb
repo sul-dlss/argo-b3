@@ -16,6 +16,7 @@ FactoryBot.define do
       projects { [] }
       tags { [] }
       workflows { [] }
+      mimetypes { ['application/pdf', 'image/jpeg'] }
     end
 
     initialize_with do
@@ -32,6 +33,7 @@ FactoryBot.define do
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),
+        Search::Fields::MIMETYPES => mimetypes,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

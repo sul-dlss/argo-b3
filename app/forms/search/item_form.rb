@@ -8,6 +8,7 @@ module Search
     attribute :tags, array: true, default: -> { [] }
     attribute :access_rights, array: true, default: -> { [] }
     attribute :wps_workflows, array: true, default: -> { [] }
+    attribute :mimetypes, array: true, default: -> { [] }
 
     # @return [Hash] attributes defined on this class (not its superclasses)
     def this_attributes

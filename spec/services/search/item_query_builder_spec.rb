@@ -86,4 +86,13 @@ RSpec.describe Search::ItemQueryBuilder do
       expect(Array(result[:fq])).to include("#{Search::Fields::WPS_WORKFLOWS}:(\"ocrWF:end-ocr:waiting\")")
     end
   end
+
+  context 'with mimetypes' do
+    let(:search_form) { Search::ItemForm.new(mimetypes: ['application/pdf']) }
+
+    it 'builds the correct filter query for mimetypes' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::MIMETYPES}:(\"application/pdf\")")
+    end
+  end
 end

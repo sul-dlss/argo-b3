@@ -11,7 +11,7 @@ RSpec::Matchers.define :have_facet do |facet_label, expanded: nil, **args|
   end
 end
 
-RSpec::Matchers.define :have_facet_value do |facet_value, facet:, count:, **args|
+RSpec::Matchers.define :have_facet_value do |facet_value, facet:, count: nil, **args|
   match do |actual|
     # This handles both link-based and checkbox-based facet values.
     expected = count ? "#{facet_value} (#{count})" : facet_value

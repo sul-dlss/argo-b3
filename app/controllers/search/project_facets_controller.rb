@@ -8,8 +8,9 @@ module Search
         facet_counts:,
         search_form:,
         form_field:,
+        facet_path_helper:, # This enables paging.
         facet_children_path_helper:,
-        facet_search_path_helper:
+        facet_search_path_helper: # This enables the facet search functionality.
       )
       render(component, content_type: 'text/html')
     end
@@ -26,10 +27,10 @@ module Search
 
     # Renders the auto-complete search results for the facet
     def search
-      facet_counts = Searchers::Facet.call(
+      facet_counts = Searchers::FacetQuery.call(
         search_form:,
-        field: PROJECT_TAGS,
-        limit: 25,
+        field: Search::Fields::PROJECT_TAGS,
+        limit:,
         facet_query: facet_query_param
       )
 
@@ -39,24 +40,17 @@ module Search
 
     private
 
+    def facet_config
+      Search::Facets::PROJECTS
+    end
+
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
-                                        field: PROJECT_HIERARCHICAL_TAGS,
+                                        field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
                                         value: for_children ? parent_value_param : nil,
-                                        alpha_sort: true,
-                                        limit: 10_000)
-    end
-
-    def form_field
-      :projects
-    end
-
-    def facet_children_path_helper
-      method(:children_search_project_facets_path)
-    end
-
-    def facet_search_path_helper
-      method(:search_search_project_facets_path)
+                                        alpha_sort:,
+                                        limit: for_children ? -1 : SEARCH_LIMIT,
+                                        page: page_param)
     end
   end
 end

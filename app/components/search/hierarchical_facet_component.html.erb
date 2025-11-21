@@ -1,7 +1,10 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
-  <ul class="list-unstyled" data-controller="hierarchical-facet-value">
-    <%= render Search::HierarchicalValueComponent.with_collection(facet_counts, search_form:, path_helper:, form_field:) %>
-  </ul>
+  <%= helpers.turbo_frame_tag frame_id do %>
+    <ul class="list-unstyled mb-0" data-controller="hierarchical-facet-value">
+      <%= render Search::HierarchicalValueComponent.with_collection(facet_counts, search_form:, path_helper: facet_children_path_helper, form_field:) %>
+    </ul>
+    <%= render Search::FacetPageLinkComponent.new(facet_counts:, search_form:, facet_path_helper:, form_field:) %>
+  <% end %>
 
-  <%= facet_search %>
+  <%= render Search::FacetSearchComponent.new(form_field:, search_form:, facet_search_path_helper:) %>
 <% end %>

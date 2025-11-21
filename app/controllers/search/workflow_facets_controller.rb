@@ -26,19 +26,16 @@ module Search
 
     private
 
+    def facet_config
+      Search::Facets::WORKFLOWS
+    end
+
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
-                                        field: WPS_HIERARCHICAL_WORKFLOWS,
+                                        field: Search::Fields::WPS_HIERARCHICAL_WORKFLOWS,
                                         value: for_children ? parent_value_param : nil,
-                                        limit: 100)
-    end
-
-    def form_field
-      :wps_workflows
-    end
-
-    def facet_children_path_helper
-      method(:children_search_workflow_facets_path)
+                                        alpha_sort:,
+                                        limit: for_children ? -1 : SEARCH_LIMIT)
     end
   end
 end

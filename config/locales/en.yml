@@ -32,3 +32,4 @@ en:
     # If not provided, will use humanized field name
     facets:    
       wps_workflows: "Workflow > Process > Status"
+      mimetypes: "MIME Types"

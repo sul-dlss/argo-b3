@@ -8,11 +8,12 @@ RSpec.describe Searchers::Facet do
   let(:query) { 'test' }
   let(:solr_response) do
     {
-      'response' => {
-        'facet_counts' => {
-          'facet_fields' => {
-            Search::Fields::PROJECT_TAGS => ['Project 1', 2, 'Project 2', 1]
-          }
+      'facets' => {
+        Search::Fields::PROJECT_TAGS => {
+          'buckets' => [
+            { 'val' => 'Project 1', 'count' => 2 },
+            { 'val' => 'Project 2', 'count' => 1 }
+          ]
         }
       }
     }
@@ -30,12 +31,16 @@ RSpec.describe Searchers::Facet do
     expect(Search::SolrService).to have_received(:call) do |args|
       solr_query = args[:request].with_indifferent_access
       expect(solr_query['q']).to eq(query)
-      expect(solr_query['facet']).to be true
+      facet_json = JSON.parse(solr_query['json.facet']).with_indifferent_access
       # Only testing one field here so that the test is not brittle.
-      expect(solr_query['facet.field']).to eq([Search::Fields::PROJECT_TAGS])
+      expect(facet_json[Search::Fields::PROJECT_TAGS])
+        .to match({
+                    type: 'terms',
+                    field: 'exploded_project_tag_ssimdv',
+                    sort: 'count',
+                    numBuckets: true
+                  })
       expect(solr_query['rows']).to eq(0)
-      expect(solr_query).not_to have_key('facet.sort')
-      expect(solr_query).not_to have_key('facet.limit')
     end
   end
 
@@ -45,8 +50,9 @@ RSpec.describe Searchers::Facet do
     it 'includes sort in the Solr request' do
       results
       expect(Search::SolrService).to have_received(:call) do |args|
-        solr_query = args[:request].with_indifferent_access
-        expect(solr_query['facet.sort']).to eq('alpha')
+        solr_query = args[:request]
+        facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
+        expect(facet_json[Search::Fields::PROJECT_TAGS][:sort]).to eq('index')
       end
     end
   end
@@ -58,7 +64,8 @@ RSpec.describe Searchers::Facet do
       results
       expect(Search::SolrService).to have_received(:call) do |args|
         solr_query = args[:request].with_indifferent_access
-        expect(solr_query['facet.limit']).to eq(5)
+        facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
+        expect(facet_json[Search::Fields::PROJECT_TAGS][:limit]).to eq(5)
       end
     end
   end

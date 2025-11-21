@@ -5,7 +5,18 @@ module Search
   class FacetsApplicationController < SearchApplicationController
     layout false
 
+    # Maximum number of facet values to return for a search.
+    SEARCH_LIMIT = 25
+
     private
+
+    def facet_config
+      raise NotImplementedError
+    end
+
+    delegate :form_field, :alpha_sort, :limit,
+             :facet_path_helper, :facet_children_path_helper, :facet_search_path_helper,
+             to: :facet_config
 
     def search_form
       @search_form ||= build_form(form_class: Search::ItemForm)
@@ -17,6 +28,14 @@ module Search
 
     def facet_query_param
       params.require(:q)
+    end
+
+    def required_page_param
+      params.require(:facet_page).to_i
+    end
+
+    def page_param
+      params[:facet_page]&.to_i
     end
 
     def build_children_component(facet_counts:, path_helper:, form_field:)

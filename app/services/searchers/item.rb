@@ -6,6 +6,8 @@ module Searchers
     include Search::Fields
 
     PER_PAGE = 20
+    # Attributes of Search::Facets::Config to be passed to Search::FacetBuilder
+    FACET_BUILDER_ARGS = %i[limit alpha_sort exclude].freeze
 
     def self.call(...)
       new(...).call
@@ -33,16 +35,20 @@ module Searchers
       Search::ItemQueryBuilder.call(search_form:).merge(
         {
           fl: [ID, TITLE, BARE_DRUID],
-          facet: true,
-          # These are fast (non-lazy) facets
-          'facet.field' => [],
           rows:,
-          start:
-        }.tap do |req|
-          add_facet(req, field: OBJECT_TYPE, exclude: true)
-          add_facet(req, field: ACCESS_RIGHTS, limit: 50, alpha_sort: true)
-        end
+          start:,
+          'json.facet': facet_json.to_json
+        }
       )
+    end
+
+    def facet_json
+      # These are fast (non-lazy) facets
+      {
+        OBJECT_TYPE => Search::FacetBuilder.call(field: OBJECT_TYPE, **Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
+        ACCESS_RIGHTS => Search::FacetBuilder.call(field: ACCESS_RIGHTS, **Search::Facets::ACCESS_RIGHTS.to_h.slice(*FACET_BUILDER_ARGS)),
+        MIMETYPES => Search::FacetBuilder.call(field: MIMETYPES, **Search::Facets::MIMETYPES.to_h.slice(*FACET_BUILDER_ARGS))
+      }
     end
 
     def rows
@@ -51,21 +57,6 @@ module Searchers
 
     def start
       (search_form.page - 1) * rows
-    end
-
-    # @param request [Hash] the Solr request being built
-    # @param field [String] the Solr field to facet on
-    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
-    # @param limit [Integer, nil] maximum number of facet values to return
-    # @param exclude [Boolean] whether to exclude a tagged filter
-    def add_facet(request, field:, alpha_sort: false, limit: nil, exclude: false)
-      # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
-      # Tagging is done in ItemQueryBuilder.
-      # This is useful for checkbox facets (in all values for the facet should be returned).
-      # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
-      request['facet.field'] << (exclude ? "{!ex=#{field}}#{field}" : field)
-      request["f.#{field}.facet.sort"] = 'index' if alpha_sort
-      request["f.#{field}.facet.limit"] = limit if limit
     end
   end
 end

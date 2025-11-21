@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Rails.application.routes.draw do
+Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -40,6 +40,13 @@ Rails.application.routes.draw do
     resources :workflow_facets, only: [:index] do
       collection do
         get 'children'
+      end
+    end
+
+    resources :mimetype_facets, only: [:index] do
+      collection do
+        get 'children'
+        get 'search'
       end
     end
   end

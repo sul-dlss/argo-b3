@@ -27,6 +27,10 @@ module SearchResults
       FacetCounts.new(solr_response:, field: Search::Fields::ACCESS_RIGHTS)
     end
 
+    def mimetypes_facet
+      FacetCounts.new(solr_response:, field: Search::Fields::MIMETYPES)
+    end
+
     def total_results
       @solr_response['response']['numFound']
     end

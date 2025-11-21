@@ -1,0 +1,75 @@
+# frozen_string_literal: true
+
+module Search
+  # Constants for facet configuration
+  module Facets
+    def self.to_path_helper(path_name)
+      ->(*args) { Rails.application.routes.url_helpers.public_send(path_name, *args) }
+    end
+
+    Config = Struct.new('Config', :form_field, :alpha_sort, :limit,
+                        # Path helper for the index endpoint for the facet.
+                        # This is used for a lazy facet and/or a pageable facet.
+                        # If is included and the number of facet values exceeds the limit, paging will be enabled.
+                        :facet_path_helper,
+                        # Path helper for the children endpoint for a hierarchical facet.
+                        :facet_children_path_helper,
+                        # Path helper for the search endpoint for a facet that supports searching.
+                        # If provided, search will be enabled for the facet.
+                        :facet_search_path_helper,
+                        # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
+                        # See FacetBuilder.
+                        # This is used, for example, for a checkbox facet like object types.
+                        :exclude,
+                        keyword_init: true)
+
+    def Config.with_defaults(**)
+      defaults = { alpha_sort: false, limit: 100, exclude: false }
+      new(**defaults, **)
+    end
+
+    ACCESS_RIGHTS = Config.with_defaults(
+      form_field: :access_rights,
+      limit: 50,
+      alpha_sort: true
+    )
+
+    MIMETYPES = Config.with_defaults(
+      form_field: :mimetypes,
+      limit: 10,
+      facet_path_helper: to_path_helper(:search_mimetype_facets_path),
+      facet_search_path_helper: to_path_helper(:search_search_mimetype_facets_path)
+    )
+
+    PROJECTS = Config.with_defaults(
+      form_field: :projects,
+      alpha_sort: true,
+      limit: 25,
+      facet_path_helper: to_path_helper(:search_project_facets_path),
+      facet_children_path_helper: to_path_helper(:children_search_project_facets_path),
+      facet_search_path_helper: to_path_helper(:search_search_project_facets_path)
+    )
+
+    OBJECT_TYPES = Config.with_defaults(
+      form_field: :object_types,
+      exclude: true
+    )
+
+    TAGS = Config.with_defaults(
+      form_field: :tags,
+      alpha_sort: true,
+      limit: 25,
+      facet_path_helper: to_path_helper(:search_tag_facets_path),
+      facet_children_path_helper: to_path_helper(:children_search_tag_facets_path),
+      facet_search_path_helper: to_path_helper(:search_search_tag_facets_path)
+    )
+
+    WORKFLOWS = Config.with_defaults(
+      form_field: :wps_workflows,
+      alpha_sort: false,
+      limit: 100,
+      facet_path_helper: to_path_helper(:search_workflow_facets_path),
+      facet_children_path_helper: to_path_helper(:children_search_workflow_facets_path)
+    )
+  end
+end

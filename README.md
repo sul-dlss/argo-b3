@@ -79,7 +79,9 @@ including the amount of time to execute each part of the query / each facet.
 The lazy async pattern should be used for slow facets. Each of these facets involves a separate query to Solr.
 
 1. Add an attribute for the facet to `Search::ItemForm`.
-2. Add a `<turbo-frame>` for the facet to `Search::FacetsSectionComponent`.
+2. Add any new solr fields to `Search::Fields`.
+3. Add a configuration constant to `Search::Facets`.
+4. Add a `<turbo-frame>` for the facet to `Search::FacetsSectionComponent`.
 3. Add a new `*_facets` resource to `routes.rb`. See for example, `:tag_facets`. Add collection routes depending on whether the facet is hierarchical, supports search, etc.
 4. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `index` method, as well as any additional collection routes.
 5. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
@@ -89,9 +91,43 @@ The lazy async pattern should be used for slow facets. Each of these facets invo
 The non-lazy sync pattern should be used for fast facets. The facet values are retrieved as part of the main query to Solr (i.e., the query that returns the search results).
 
 1. Add an attribute for the facet to `Search::ItemForm`.
-2. Add an empty `<div>` for the facet to `Search::FacetsSectionComponent`.
-3. Add the facet to the Solr request in `Searchers::Item.solr_request`. This allows specifying sort order, limits, etc.
-4. Add a method to `SearchResults::Items` to return the `SearchResults::FacetCounts` for the facet.
-5. Add a turbo stream replace element (`<turbo-stream action="replace">`) for the facet to `views/search/items/index.html.erb`.
-6. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
-7. Optionally, add a label for the facet to `en.yml`.
+2. Add any new solr fields to `Search::Fields`.
+3. Add a configuration constant to `Search::Facets`.
+4. Add an empty `<div>` for the facet to `Search::FacetsSectionComponent`.
+5. Add the facet to the Solr request in `Searchers::Item.facet_json`.
+6. Add a method to `SearchResults::Items` to return the `SearchResults::FacetCounts` for the facet.
+7. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
+8. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+9. Optionally, add a label for the facet to `en.yml`.
+
+### Adding paging to a facet
+1. Add a new `*_facets` resource to `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::MimetypeFacetsController`. This should implement the `index` method.
+3. Add `facet_path_helper` to the configuration constant in `Search::Facets`.
+
+Note:
+* Some of these steps may already have been performed, e.g., for a lazy, async facet.
+
+### Adding facet search to a facet
+1. Add a new `*_facets` resource to `routes.rb`. See for example, `:project_facets`. This should provide an `search` route.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. This should implement the `search` method.
+3. Add `facet_search_path_helper` to the configuration constant in `Search::Facets`.
+
+Note:
+* Some of these steps may already have been performed, e.g., for a lazy, async facet.
+
+### Rendering all of the values for a facet
+1. Set `exclude: true` in the configuration constant in `Search::Facets`.
+
+Note:
+* The default is to only return the facet values for items that match the query.
+* This is a good candidate for a `Search::CheckboxFacetComponent`, e.g., for object types.
+
+### Making a facet hierarchical
+1. Add a new `*_facets` resource to `routes.rb`. See for example, `:tag_facets`. This should provide the `children` route.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `children` method.
+3. Add `facet_children_path_helper` to the configuration constant in `Search::Facets`.
+4. Change the facet to be rendered with the hierarchical facet component. For a lazy async facet, render a `Search::HierarchicalFacetFrameComponent` in `Search::*FacetsController.index`. For a non-lazy sync facet, set the turbo stream replace element in `views/search/items/index.html.erb` to render a `Search::HierarchicalFacetComponent`.
+
+Note:
+* Hierarchical faceting requires 2 separate fields, each which has a specific format.

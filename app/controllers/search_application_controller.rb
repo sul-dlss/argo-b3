@@ -2,8 +2,6 @@
 
 # Base controller for search-related actions
 class SearchApplicationController < ApplicationController
-  include Search::Fields
-
   private
 
   # Builds a form object of the given class, permitting parameters appropriately.

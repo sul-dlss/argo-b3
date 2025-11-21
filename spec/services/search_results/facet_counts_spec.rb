@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SearchResults::HierarchicalFacetCounts do
+RSpec.describe SearchResults::FacetCounts do
   let(:facet_counts) { described_class.new(solr_response:, field:) }
   let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, field:) }
 
@@ -16,11 +16,11 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
       'facets' => {
         field => {
           'buckets' => [
-            { 'val' => '1|Tag A|+', 'count' => 5 },
-            { 'val' => '2|Tag A : Tag A1|-', 'count' => 2 },
-            { 'val' => '2|Tag A : Tag A2|-', 'count' => 3 },
-            { 'val' => '1|Tag B|+', 'count' => 3 },
-            { 'val' => '1|Tag B|-', 'count' => 4 }
+            { 'val' => 'item', 'count' => 5 },
+            { 'val' => 'collection', 'count' => 2 },
+            { 'val' => 'agreement', 'count' => 3 },
+            { 'val' => 'virtual object', 'count' => 3 },
+            { 'val' => 'adminPolicy', 'count' => 4 }
           ],
           'numBuckets' => 100
         }
@@ -37,12 +37,12 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
       'facets' => {}
     }
   end
-  let(:field) { 'tags' }
+  let(:field) { 'object_types' }
   let(:facet_json) do
     {
       field => {
         type: 'terms',
-        field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
+        field: Search::Fields::OBJECT_TYPE,
         sort: 'index',
         numBuckets: true,
         limit: 25,
@@ -54,21 +54,20 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
 
   describe '#each' do
     context 'when there are results' do
-      it 'yields HierarchicalFacetCount objects' do
+      it 'yields FacetCount objects' do
         yielded_values = facet_counts.map do |facet_count|
           {
             value: facet_count.value,
-            level: facet_count.level,
-            leaf_or_branch_indicator: facet_count.leaf_or_branch_indicator,
             count: facet_count.count
           }
         end
 
         expect(yielded_values).to eq([
-                                       { value: 'Tag A', level: 1, leaf_or_branch_indicator: '+', count: 5 },
-                                       { value: 'Tag A : Tag A1', level: 2, leaf_or_branch_indicator: '-', count: 2 },
-                                       { value: 'Tag A : Tag A2', level: 2, leaf_or_branch_indicator: '-', count: 3 },
-                                       { value: 'Tag B', level: 1, leaf_or_branch_indicator: '+', count: 7 }
+                                       { value: 'item', count: 5 },
+                                       { value: 'collection', count: 2 },
+                                       { value: 'agreement', count: 3 },
+                                       { value: 'virtual object', count: 3 },
+                                       { value: 'adminPolicy', count: 4 }
                                      ])
       end
     end
@@ -127,7 +126,7 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
   describe '#to_ary' do
     it 'returns an array of facet counts' do
       expect(facet_counts.to_ary).to be_an(Array)
-      expect(facet_counts.to_ary.size).to eq(4)
+      expect(facet_counts.to_ary.size).to eq(5)
     end
   end
 end
