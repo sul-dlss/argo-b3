@@ -95,4 +95,15 @@ RSpec.describe Search::ItemQueryBuilder do
       expect(Array(result[:fq])).to include("#{Search::Fields::MIMETYPES}:(\"application/pdf\")")
     end
   end
+
+  context 'with dynamic facet released to earthworks' do
+    let(:search_form) { Search::ItemForm.new(released_to_earthworks: %w[last_year never]) }
+
+    it 'builds the correct filter query for released to earthworks' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq]))
+        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO NOW]) OR " \
+                    "(-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *])")
+    end
+  end
 end

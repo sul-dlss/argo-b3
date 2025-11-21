@@ -7,6 +7,14 @@ module Search
       ->(*args) { Rails.application.routes.url_helpers.public_send(path_name, *args) }
     end
 
+    def self.find_config_by_form_field(form_field)
+      Search::Facets.constants.each do |const_name|
+        config = Search::Facets.const_get(const_name)
+        return config if config.is_a?(Config) && config.form_field == form_field.to_sym
+      end
+      nil
+    end
+
     Config = Struct.new('Config', :form_field, :alpha_sort, :limit,
                         # Path helper for the index endpoint for the facet.
                         # This is used for a lazy facet and/or a pageable facet.
@@ -21,6 +29,7 @@ module Search
                         # See FacetBuilder.
                         # This is used, for example, for a checkbox facet like object types.
                         :exclude,
+                        :dynamic_facet,
                         keyword_init: true)
 
     def Config.with_defaults(**)
@@ -53,6 +62,17 @@ module Search
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
       exclude: true
+    )
+
+    RELEASED_TO_EARTHWORKS = Config.with_defaults(
+      form_field: :released_to_earthworks,
+      dynamic_facet: {
+        last_week: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO NOW]",
+        last_month: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1MONTH/DAY TO NOW]",
+        last_year: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO NOW]",
+        ever: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *]",
+        never: "-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *]"
+      }
     )
 
     TAGS = Config.with_defaults(

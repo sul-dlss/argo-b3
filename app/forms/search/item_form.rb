@@ -9,6 +9,7 @@ module Search
     attribute :access_rights, array: true, default: -> { [] }
     attribute :wps_workflows, array: true, default: -> { [] }
     attribute :mimetypes, array: true, default: -> { [] }
+    attribute :released_to_earthworks, array: true, default: -> { [] }
 
     # @return [Hash] attributes defined on this class (not its superclasses)
     def this_attributes

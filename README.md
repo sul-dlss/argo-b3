@@ -131,3 +131,12 @@ Note:
 
 Note:
 * Hierarchical faceting requires 2 separate fields, each which has a specific format.
+
+### Making a dynamic facet
+Dynamic facets have facet values that are the result of a specified query.
+
+1. Add `dynamic_facet` to the configuration constant in `Search::Facets`.
+2. When adding the facet to the Solr request in `Searchers::Item.facet_json` use a `Search::DynamicFacetBuilder`.
+3. When adding a method to `SearchResults::Items`, return a `SearchResults::DynamicFacetCounts` for the facet.
+4. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` use a `Search::DynamicFacetComponent`.
+5. When adding the facet to `Search::ItemQueryBuilder.filter_queries`, call `dynamic_facet_filter_query()`.

@@ -33,3 +33,7 @@ en:
     facets:    
       wps_workflows: "Workflow > Process > Status"
       mimetypes: "MIME Types"
+      released_to_earthworks: "Released to Earthworks"
+    facet_values:
+      ever: "Currently released"
+      never: "Not released"

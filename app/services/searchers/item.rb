@@ -8,6 +8,8 @@ module Searchers
     PER_PAGE = 20
     # Attributes of Search::Facets::Config to be passed to Search::FacetBuilder
     FACET_BUILDER_ARGS = %i[limit alpha_sort exclude].freeze
+    # Attributes of Search::Facets::Config to be passed to Search::DynamicFacetBuilder
+    DYNAMIC_FACET_BUILDER_ARGS = %i[form_field dynamic_facet].freeze
 
     def self.call(...)
       new(...).call
@@ -48,7 +50,7 @@ module Searchers
         OBJECT_TYPE => Search::FacetBuilder.call(field: OBJECT_TYPE, **Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
         ACCESS_RIGHTS => Search::FacetBuilder.call(field: ACCESS_RIGHTS, **Search::Facets::ACCESS_RIGHTS.to_h.slice(*FACET_BUILDER_ARGS)),
         MIMETYPES => Search::FacetBuilder.call(field: MIMETYPES, **Search::Facets::MIMETYPES.to_h.slice(*FACET_BUILDER_ARGS))
-      }
+      }.merge(Search::DynamicFacetBuilder.call(**Search::Facets::RELEASED_TO_EARTHWORKS.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
     end
 
     def rows

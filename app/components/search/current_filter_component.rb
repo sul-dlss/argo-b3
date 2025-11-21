@@ -16,8 +16,18 @@ module Search
       helpers.facet_label(form_field)
     end
 
+    def value_label
+      # Values for dynamic facets may need to be mapped to user-friendly labels.
+      facet_config = Search::Facets.find_config_by_form_field(form_field)
+      if facet_config&.dynamic_facet
+        helpers.facet_value_label(value)
+      else
+        value
+      end
+    end
+
     def title
-      "Remove filter #{label}: #{value}"
+      "Remove filter #{label}: #{value_label}"
     end
 
     def remove_path

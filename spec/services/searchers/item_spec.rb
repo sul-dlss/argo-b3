@@ -45,6 +45,19 @@ RSpec.describe Searchers::Item do
                     sort: 'index',
                     type: 'terms'
                   })
+      # Only testing one dynamic facet here so that the test is not brittle.
+      expect(facet_json).to include(
+        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week",
+        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_month",
+        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_year",
+        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-ever",
+        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-never"
+      )
+      expect(facet_json["#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week"])
+        .to match({
+                    type: 'query',
+                    q: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO NOW]"
+                  })
       expect(solr_query['rows']).to eq(20)
       expect(solr_query['start']).to eq(0)
     end

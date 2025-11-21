@@ -44,14 +44,15 @@ module Search
     end
 
     # @param key [String, Symbol] the attribute name
-    # @param value [String, nil] the attribute value or nil to match any value
+    # @param value [String, Integer, Symbol, nil] the attribute value or nil to match any value
     # @return [boolean] whether the given key/value is selected in this form
     def selected?(key:, value: nil)
       attrs = attributes.with_indifferent_access
+      norm_value = value.is_a?(Symbol) ? value.to_s : value
       if attrs[key].is_a?(Array)
-        value.nil? ? attrs[key].any? : attrs[key].include?(value)
+        value.nil? ? attrs[key].any? : attrs[key].include?(norm_value)
       else
-        value.nil? ? attrs[key].present? : attrs[key] == value
+        value.nil? ? attrs[key].present? : attrs[key] == norm_value
       end
     end
 

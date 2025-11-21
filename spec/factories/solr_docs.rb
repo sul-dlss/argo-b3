@@ -17,6 +17,7 @@ FactoryBot.define do
       tags { [] }
       workflows { [] }
       mimetypes { ['application/pdf', 'image/jpeg'] }
+      released_to_earthworks { true }
     end
 
     initialize_with do
@@ -34,6 +35,7 @@ FactoryBot.define do
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),
         Search::Fields::MIMETYPES => mimetypes,
+        Search::Fields::RELEASED_TO_EARTHWORKS => released_to_earthworks ? Time.now.utc.iso8601 : nil,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

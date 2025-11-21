@@ -13,6 +13,7 @@ module Search
     OTHER_HIERARCHICAL_TAGS = 'hierarchical_other_tag_ssimdv'
     PROJECT_TAGS = 'exploded_project_tag_ssimdv'
     PROJECT_HIERARCHICAL_TAGS = 'hierarchical_project_tag_ssimdv'
+    RELEASED_TO_EARTHWORKS = 'released_to_earthworks_dtpsidv'
     TITLE = 'display_title_ss'
     WPS_HIERARCHICAL_WORKFLOWS = 'wf_hierarchical_wps_ssimdv'
     WPS_WORKFLOWS = 'wf_wps_ssimdv'

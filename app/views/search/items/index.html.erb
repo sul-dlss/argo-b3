@@ -44,6 +44,14 @@
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MIMETYPES,
                                                           facet_counts: @results.mimetypes_facet,
                                                           search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS,
+                                                          facet_counts: @results.released_to_earthworks_facet,
+                                                          search_form: @search_form) do |component| %>
+    <% component.with_facet do %>
+      <%= render Search::DynamicFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
+    <% end %>
+  <% end %>
 <% end %>
 
 <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>

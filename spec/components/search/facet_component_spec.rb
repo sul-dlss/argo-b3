@@ -9,12 +9,6 @@ RSpec.describe Search::FacetComponent, type: :component do
   end
   let(:search_form) { Search::ItemForm.new(object_types: ['collection'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: 1) }
-  let(:result_facet_counts) do
-    [
-      SearchResults::FacetCount.new(value: 'collection', count: 10),
-      SearchResults::FacetCount.new(value: 'item', count: 5)
-    ]
-  end
   let(:facet_page_path_helper) { nil }
   let(:facet_search_path_helper) { nil }
 

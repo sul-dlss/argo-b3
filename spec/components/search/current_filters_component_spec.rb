@@ -17,9 +17,9 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('section[aria-label="Current Filters"]')
-      expect(page).to have_css('li', text: 'Object types: item')
-      expect(page).to have_css('li', text: 'Object types: collection')
-      expect(page).to have_css('li', text: 'Projects: Project 1')
+      expect(page).to have_css('li', text: /Object types:\s+item/)
+      expect(page).to have_css('li', text: /Object types:\s+collection/)
+      expect(page).to have_css('li', text: /Projects:\s+Project 1/)
     end
   end
 

@@ -31,6 +31,10 @@ module SearchResults
       FacetCounts.new(solr_response:, field: Search::Fields::MIMETYPES)
     end
 
+    def released_to_earthworks_facet
+      DynamicFacetCounts.new(solr_response:, facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
+    end
+
     def total_results
       @solr_response['response']['numFound']
     end

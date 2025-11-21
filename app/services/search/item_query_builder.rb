@@ -39,6 +39,7 @@ module Search
       queries << facet_filter_query(form_field: :wps_workflows, solr_field: WPS_WORKFLOWS)
       queries << facet_filter_query(form_field: :access_rights, solr_field: ACCESS_RIGHTS)
       queries << facet_filter_query(form_field: :mimetypes, solr_field: MIMETYPES)
+      queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
       queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
     end
@@ -56,6 +57,18 @@ module Search
       # This is useful for checkbox facets (in all values for the facet should be returned).
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
       tag ? "{!tag=#{solr_field}}#{query}" : query
+    end
+
+    # Construct a facet filter query for the given dynamic facet configuration.
+    # @param facet_config [Search::Facets::Config]
+    def dynamic_facet_filter_query(facet_config:)
+      return if search_form.send(facet_config.form_field).blank?
+
+      query_parts = search_form.send(facet_config.form_field).map do |value|
+        query = facet_config.dynamic_facet[value.to_sym]
+        "(#{query})"
+      end
+      query_parts.join(' OR ')
     end
 
     def query_fields # rubocop:disable Metrics/MethodLength

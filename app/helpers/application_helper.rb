@@ -10,4 +10,8 @@ module ApplicationHelper
     parts << suffix.to_s if suffix.present?
     parts.join('-')
   end
+
+  def facet_value_label(value)
+    I18n.t("search.facet_values.#{value}", default: value.to_s.humanize)
+  end
 end

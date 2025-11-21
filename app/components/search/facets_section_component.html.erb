@@ -22,6 +22,10 @@
     Loading <%= helpers.facet_label(:mimetypes) %> facet...
   <% end %>
 
+  <%= tag.div id: helpers.facet_id(:released_to_earthworks) do %>
+    Loading <%= helpers.facet_label(:released_to_earthworks) %> facet...
+  <% end %>
+
   <%= helpers.turbo_frame_tag helpers.facet_id(:wps_workflows), src: search_workflow_facets_path(search_form.attributes), target: '_top' do %>
     Loading <%= helpers.facet_label(:wps_workflows) %> facet...
   <% end %>

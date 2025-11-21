@@ -72,6 +72,10 @@ RSpec.describe Search::Form do
         expect(form.selected?(key: 'object_types', value: 'DRO')).to be true
       end
 
+      it 'returns true for array attributes when providing a symbol' do
+        expect(form.selected?(key: 'object_types', value: :DRO)).to be true
+      end
+
       it 'returns true for scalar attributes' do
         expect(form.selected?(key: 'page', value: 2)).to be true
       end
