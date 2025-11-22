@@ -18,7 +18,7 @@ module Search
     def search
       facet_counts = Searchers::FacetQuery.call(
         search_form:,
-        field: Search::Fields::MIMETYPES,
+        field:,
         limit:,
         facet_query: facet_query_param
       )
@@ -35,7 +35,7 @@ module Search
 
     def facet_counts
       Searchers::Facet.call(search_form:,
-                            field: Search::Fields::MIMETYPES,
+                            field:,
                             limit:,
                             page: required_page_param)
     end

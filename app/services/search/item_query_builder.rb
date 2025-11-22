@@ -33,31 +33,31 @@ module Search
 
     def filter_queries # rubocop:disable Metrics/AbcSize
       queries = []
-      queries << facet_filter_query(form_field: :object_types, solr_field: OBJECT_TYPE, tag: true)
-      queries << facet_filter_query(form_field: :projects, solr_field: PROJECT_TAGS)
-      queries << facet_filter_query(form_field: :tags, solr_field: OTHER_TAGS)
-      queries << facet_filter_query(form_field: :wps_workflows, solr_field: WPS_WORKFLOWS)
-      queries << facet_filter_query(form_field: :access_rights, solr_field: ACCESS_RIGHTS)
-      queries << facet_filter_query(form_field: :access_rights_exclude, solr_field: ACCESS_RIGHTS, exclude: true)
-      queries << facet_filter_query(form_field: :mimetypes, solr_field: MIMETYPES)
+      queries << facet_filter_query(facet_config: Search::Facets::OBJECT_TYPES)
+      queries << facet_filter_query(facet_config: Search::Facets::PROJECTS)
+      queries << facet_filter_query(facet_config: Search::Facets::TAGS)
+      queries << facet_filter_query(facet_config: Search::Facets::WORKFLOWS)
+      queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS)
+      queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS, exclude: true)
+      queries << facet_filter_query(facet_config: Search::Facets::MIMETYPES)
       queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
       queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
     end
 
     # Construct a facet filter query for the given form field and Solr field for value facets.
-    # @param form_field [Symbol] the attribute on the search form
-    # @param solr_field [String] the Solr field to filter on
-    # @param tag [Boolean] whether to tag the filter (for exclusion from facet counts)
-    def facet_filter_query(form_field:, solr_field:, tag: false, exclude: false)
+    # @param facet_config [Search::Facets::Config]
+    # @param exclude [Boolean] whether to negate the query
+    def facet_filter_query(facet_config:, exclude: false)
+      form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.send(form_field).blank?
 
       values = search_form.send(form_field).map { |value| "\"#{value}\"" }.join(' OR ')
-      query = "#{'-' if exclude}#{solr_field}:(#{values})"
+      query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
       # Tagging is used to exclude the filter from the facet counts.
       # This is useful for checkbox facets (in all values for the facet should be returned).
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
-      tag ? "{!tag=#{solr_field}}#{query}" : query
+      facet_config.exclude ? "{!tag=#{facet_config.field}}#{query}" : query
     end
 
     # Construct a facet filter query for the given dynamic facet configuration.
