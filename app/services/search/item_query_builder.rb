@@ -38,6 +38,7 @@ module Search
       queries << facet_filter_query(form_field: :tags, solr_field: OTHER_TAGS)
       queries << facet_filter_query(form_field: :wps_workflows, solr_field: WPS_WORKFLOWS)
       queries << facet_filter_query(form_field: :access_rights, solr_field: ACCESS_RIGHTS)
+      queries << facet_filter_query(form_field: :access_rights_exclude, solr_field: ACCESS_RIGHTS, exclude: true)
       queries << facet_filter_query(form_field: :mimetypes, solr_field: MIMETYPES)
       queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
       queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
@@ -48,11 +49,11 @@ module Search
     # @param form_field [Symbol] the attribute on the search form
     # @param solr_field [String] the Solr field to filter on
     # @param tag [Boolean] whether to tag the filter (for exclusion from facet counts)
-    def facet_filter_query(form_field:, solr_field:, tag: false)
+    def facet_filter_query(form_field:, solr_field:, tag: false, exclude: false)
       return if search_form.send(form_field).blank?
 
       values = search_form.send(form_field).map { |value| "\"#{value}\"" }.join(' OR ')
-      query = "#{solr_field}:(#{values})"
+      query = "#{'-' if exclude}#{solr_field}:(#{values})"
       # Tagging is used to exclude the filter from the facet counts.
       # This is useful for checkbox facets (in all values for the facet should be returned).
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters

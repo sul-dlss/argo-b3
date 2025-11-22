@@ -140,3 +140,10 @@ Dynamic facets have facet values that are the result of a specified query.
 3. When adding a method to `SearchResults::Items`, return a `SearchResults::DynamicFacetCounts` for the facet.
 4. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` use a `Search::DynamicFacetComponent`.
 5. When adding the facet to `Search::ItemQueryBuilder.filter_queries`, call `dynamic_facet_filter_query()`.
+
+### Adding exclude to a facet
+Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
+
+1. Add an attribute (`*_exclude`) for the facet exclude to `Search::ItemForm`.
+2. Assign the attribute name to `exclude_form_field` for the configuration constant in `Search::Facets`.
+3. Add the facet to `Search::ItemQueryBuilder.filter_queries`, setting `exclude` to `true` when invoking `facet_filter_query` and add a spec to `spec/services/search/item_query_builder_spec.rb`.

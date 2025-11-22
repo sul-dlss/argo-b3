@@ -19,7 +19,7 @@ module Search
 
     attr_reader :facet_config, :facet_counts, :search_form
 
-    delegate :form_field, :facet_search_path_helper, to: :facet_config
+    delegate :form_field, :facet_search_path_helper, :exclude_form_field, to: :facet_config
 
     def facet_id
       helpers.facet_id(form_field)

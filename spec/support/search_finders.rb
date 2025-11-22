@@ -36,6 +36,10 @@ def find_current_filters_section
   find('section[aria-label="Current Filters"]')
 end
 
+def find_current_filter(label, value)
+  find_current_filters_section.find('li', text: "#{label}: #{value}")
+end
+
 def find_facet_toggle(facet_value, facet_label:)
   context = facet_label ? find_facet_section(facet_label) : page
   context.find_link('+', title: "Toggle #{facet_value}")

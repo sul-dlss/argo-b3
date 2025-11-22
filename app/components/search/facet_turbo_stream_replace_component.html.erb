@@ -2,6 +2,6 @@
   <% if facet? %>
     <%= facet %>
   <% else %>
-    <%= render Search::FacetComponent.new(facet_counts:, search_form:, form_field:, facet_page_path_helper:, facet_search_path_helper:) %>
+    <%= render Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:, facet_page_path_helper:, facet_search_path_helper:) %>
   <% end %>
 <% end %>

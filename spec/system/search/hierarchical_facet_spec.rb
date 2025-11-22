@@ -27,7 +27,7 @@ RSpec.describe 'Hierarchical facets', :solr do
     expect(page).to have_current_filter('Projects', 'Project 1')
 
     within(find_facet_section('Projects')) do
-      click_link('Remove')
+      click_link('Remove', title: 'Remove Project 1')
     end
 
     expect(page).to have_result_count(2)
@@ -66,8 +66,8 @@ RSpec.describe 'Hierarchical facets', :solr do
 
     within(find_facet_section('Projects')) do
       expect(page).to have_text('Project 2a')
-      expect(page).to have_no_link('Project 2a')
-      click_link('Remove')
+      expect(page).to have_no_link('Project 2a', exact: true)
+      click_link('Remove', title: 'Remove Project 2a')
     end
 
     expect(page).to have_result_count(2)

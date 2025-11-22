@@ -41,7 +41,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
       it 'renders without children and as selected' do
         render_inline(component)
 
-        expect(page).to have_no_link('waiting')
+        expect(page).to have_no_link('waiting', exact: true)
         expect(page).to have_content('waiting')
         expect(page).to have_link('Remove', href: '/search/items')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')

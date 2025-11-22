@@ -15,7 +15,12 @@ module Search
       nil
     end
 
-    Config = Struct.new('Config', :form_field, :alpha_sort, :limit,
+    Config = Struct.new('Config',
+                        :form_field,
+                        # Provide if this facet supports excluding values.
+                        :exclude_form_field,
+                        :alpha_sort,
+                        :limit,
                         # Path helper for the index endpoint for the facet.
                         # This is used for a lazy facet and/or a pageable facet.
                         # If is included and the number of facet values exceeds the limit, paging will be enabled.
@@ -28,6 +33,7 @@ module Search
                         # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
                         # See FacetBuilder.
                         # This is used, for example, for a checkbox facet like object types.
+                        # Note that this is unrelated to the exclude_form_field above.
                         :exclude,
                         :dynamic_facet,
                         keyword_init: true)
@@ -39,6 +45,7 @@ module Search
 
     ACCESS_RIGHTS = Config.with_defaults(
       form_field: :access_rights,
+      exclude_form_field: :access_rights_exclude,
       limit: 50,
       alpha_sort: true
     )

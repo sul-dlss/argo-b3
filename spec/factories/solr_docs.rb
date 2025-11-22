@@ -18,6 +18,7 @@ FactoryBot.define do
       workflows { [] }
       mimetypes { ['application/pdf', 'image/jpeg'] }
       released_to_earthworks { true }
+      access_rights { 'dark' }
     end
 
     initialize_with do
@@ -36,6 +37,7 @@ FactoryBot.define do
                                                                         delimiter: ':'),
         Search::Fields::MIMETYPES => mimetypes,
         Search::Fields::RELEASED_TO_EARTHWORKS => released_to_earthworks ? Time.now.utc.iso8601 : nil,
+        Search::Fields::ACCESS_RIGHTS => [access_rights],
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -67,6 +69,7 @@ FactoryBot.define do
       projects { [] }
       tags { [] }
       workflows { [] }
+      access_rights { 'dark' }
     end
 
     initialize_with do
@@ -82,6 +85,7 @@ FactoryBot.define do
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),
+        Search::Fields::ACCESS_RIGHTS => [access_rights],
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
