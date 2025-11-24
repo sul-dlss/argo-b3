@@ -17,7 +17,7 @@ RSpec.describe 'Item search', :solr do
     it 'returns search results' do
       visit root_path
 
-      expect(page).to have_css('h1', text: 'Home Page')
+      assert_home_page
 
       fill_in('Search for items, tags or projects', with: item_doc[Search::Fields::TITLE])
       click_button('Search')
@@ -36,7 +36,7 @@ RSpec.describe 'Item search', :solr do
       it 'paginates results' do
         visit root_path
 
-        expect(page).to have_css('h1', text: 'Home Page')
+        assert_home_page
 
         fill_in('Search for items, tags or projects', with: 'Item')
         click_button('Search')
@@ -73,7 +73,7 @@ RSpec.describe 'Item search', :solr do
       it 'shows google books results' do
         visit root_path
 
-        expect(page).to have_css('h1', text: 'Home Page')
+        assert_home_page
         check('Include Google Books')
 
         fill_in('Search for items, tags or projects', with: 'Item')
@@ -89,7 +89,7 @@ RSpec.describe 'Item search', :solr do
       it 'does not return any results' do
         visit root_path
 
-        expect(page).to have_css('h1', text: 'Home Page')
+        assert_home_page
         fill_in('Search for items, tags or projects', with: '')
         click_button('Search')
 
@@ -101,7 +101,7 @@ RSpec.describe 'Item search', :solr do
       it 'applies the current filter when searching' do
         visit search_items_path('object_types[]': 'collection')
 
-        expect(page).to have_css('h1', text: 'Items search page')
+        assert_item_search_page
 
         expect(page).to have_result_count(5)
         expect(page).to have_current_filter('Object types', 'collection')

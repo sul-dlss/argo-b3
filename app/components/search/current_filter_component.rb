@@ -13,9 +13,7 @@ module Search
     attr_reader :form_field, :value, :search_form
 
     def call
-      tag.li(class: 'mx-2') do
-        render Elements::SelectedItemComponent.new(label:, path: remove_path)
-      end
+      render Elements::SelectedItemComponent.new(label:, path: remove_path)
     end
 
     private

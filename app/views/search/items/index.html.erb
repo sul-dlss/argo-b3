@@ -1,4 +1,4 @@
-<h1>Items search page</h1>
+<%= content_for :title, 'Items search page' %>
 
 <%= render Search::FormComponent.new(search_form: @search_form, url: search_items_path, label: 'Search for items:') %>
 

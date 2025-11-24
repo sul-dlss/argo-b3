@@ -13,7 +13,7 @@ RSpec.describe 'Current filters', :solr do
   it 'returns current filters' do
     visit search_items_path(query: 'test')
 
-    expect(page).to have_css('h1', text: 'Items search page')
+    assert_item_search_page
 
     expect(page).to have_result_count(3)
 

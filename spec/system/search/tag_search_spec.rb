@@ -10,7 +10,7 @@ RSpec.describe 'Tag search', :solr do
   it 'returns tag search results' do
     visit root_path
 
-    expect(page).to have_css('h1', text: 'Home Page')
+    assert_home_page
 
     fill_in('Search for items, tags or projects', with: '2a')
     click_button('Search')
@@ -20,7 +20,7 @@ RSpec.describe 'Tag search', :solr do
       find_tag_result('Tag 2 : Tag 2a').first('a').click
     end
 
-    expect(page).to have_css('h1', text: 'Items search page')
+    assert_item_search_page
 
     within(find_item_results_section) do
       expect(page).to have_result_count(5)
