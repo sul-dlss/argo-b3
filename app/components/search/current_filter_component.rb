@@ -12,7 +12,23 @@ module Search
 
     attr_reader :form_field, :value, :search_form
 
+    def call
+      tag.li(class: 'mx-2') do
+        render Elements::SelectedItemComponent.new(label:, path: remove_path)
+      end
+    end
+
+    private
+
     def label
+      "#{field_label} > #{value_label}"
+    end
+
+    def remove_path
+      search_items_path(search_form.without_attributes({ form_field => value, page: nil }))
+    end
+
+    def field_label
       helpers.facet_label(form_field)
     end
 
@@ -24,14 +40,6 @@ module Search
       else
         value
       end
-    end
-
-    def title
-      "Remove filter #{label}: #{value_label}"
-    end
-
-    def remove_path
-      search_items_path(search_form.without_attributes({ form_field => value, page: nil }))
     end
   end
 end
