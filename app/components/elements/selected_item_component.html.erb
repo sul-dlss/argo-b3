@@ -1,0 +1,6 @@
+<li class="d-inline-flex gap-2 align-items-center my-2">
+  <span class="bg-light badge rounded-pill border selected-item">
+    <span class="selected-item-label"><%= label %></span>
+    <%= render Elements::ButtonLinkComponent.new(label: '', path:, title: "Remove #{label}", classes: 'btn-close') %>
+  </span>
+</li>

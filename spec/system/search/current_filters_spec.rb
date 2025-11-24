@@ -31,7 +31,7 @@ RSpec.describe 'Current filters', :solr do
     expect(page).to have_current_filter('Object types', 'agreement')
 
     within(find_current_filters_section) do
-      click_link('Remove filter Object types: item')
+      click_link('Remove Object types > item')
     end
 
     expect(page).to have_result_count(1)

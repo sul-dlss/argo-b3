@@ -37,7 +37,7 @@ def find_current_filters_section
 end
 
 def find_current_filter(label, value)
-  find_current_filters_section.find('li', text: "#{label}: #{value}")
+  find_current_filters_section.find('li', text: "#{label} > #{value}")
 end
 
 def find_facet_toggle(facet_value, facet_label:)

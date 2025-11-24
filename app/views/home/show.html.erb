@@ -2,22 +2,28 @@
 
 <%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items, tags or projects:') %>
 
-<% if @projects_search_form %>
-  <%= turbo_frame_tag 'projects-search', src: search_projects_path(@projects_search_form.attributes) do %>
-    Loading projects...
+<%= render Search::LayoutComponent.new do |layout| %>
+  <%= layout.with_main_content do %>
+    <% if @projects_search_form %>
+      <%= turbo_frame_tag 'projects-search', src: search_projects_path(@projects_search_form.attributes) do %>
+        Loading projects...
+      <% end %>
+    <% end %>
+
+    <% if @tags_search_form %>
+      <%= turbo_frame_tag 'tags-search', src: search_tags_path(@tags_search_form.attributes) do %>
+        Loading tags...
+      <% end %>
+    <% end %>
+
+    <% if @items_search_form %>
+      <%= turbo_frame_tag 'items-search', src: search_items_path(@items_search_form.attributes) do %>
+        Loading items...
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= layout.with_sidebar do %>
+    <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
   <% end %>
 <% end %>
-
-<% if @tags_search_form %>
-  <%= turbo_frame_tag 'tags-search', src: search_tags_path(@tags_search_form.attributes) do %>
-    Loading tags...
-  <% end %>
-<% end %>
-
-<% if @items_search_form %>
-  <%= turbo_frame_tag 'items-search', src: search_items_path(@items_search_form.attributes) do %>
-    Loading items...
-  <% end %>
-<% end %>
-
-<%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
