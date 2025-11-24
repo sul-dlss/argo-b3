@@ -19,8 +19,13 @@ module Search
                         :form_field,
                         # Provide if this facet supports excluding values.
                         :exclude_form_field,
+                        # True to sort alphabetically, otherwise sort by count.
                         :alpha_sort,
                         :limit,
+                        # Solr field.
+                        :field,
+                        # Solr hierarchical field containing the exploded hierarchy. Only for hierarchical facets.
+                        :hierarchical_field,
                         # Path helper for the index endpoint for the facet.
                         # This is used for a lazy facet and/or a pageable facet.
                         # If is included and the number of facet values exceeds the limit, paging will be enabled.
@@ -35,6 +40,8 @@ module Search
                         # This is used, for example, for a checkbox facet like object types.
                         # Note that this is unrelated to the exclude_form_field above.
                         :exclude,
+                        # Hash of dynamic facet keys to Solr queries.
+                        # This is used for facets like released_to_earthworks.
                         :dynamic_facet,
                         keyword_init: true)
 
@@ -45,6 +52,7 @@ module Search
 
     ACCESS_RIGHTS = Config.with_defaults(
       form_field: :access_rights,
+      field: Search::Fields::ACCESS_RIGHTS,
       exclude_form_field: :access_rights_exclude,
       limit: 50,
       alpha_sort: true
@@ -52,6 +60,7 @@ module Search
 
     MIMETYPES = Config.with_defaults(
       form_field: :mimetypes,
+      field: Search::Fields::MIMETYPES,
       limit: 10,
       facet_path_helper: to_path_helper(:search_mimetype_facets_path),
       facet_search_path_helper: to_path_helper(:search_search_mimetype_facets_path)
@@ -59,6 +68,8 @@ module Search
 
     PROJECTS = Config.with_defaults(
       form_field: :projects,
+      field: Search::Fields::PROJECT_TAGS,
+      hierarchical_field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
       alpha_sort: true,
       limit: 25,
       facet_path_helper: to_path_helper(:search_project_facets_path),
@@ -68,6 +79,7 @@ module Search
 
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
+      field: Search::Fields::OBJECT_TYPE,
       exclude: true
     )
 
@@ -84,6 +96,8 @@ module Search
 
     TAGS = Config.with_defaults(
       form_field: :tags,
+      field: Search::Fields::OTHER_TAGS,
+      hierarchical_field: Search::Fields::OTHER_HIERARCHICAL_TAGS,
       alpha_sort: true,
       limit: 25,
       facet_path_helper: to_path_helper(:search_tag_facets_path),
@@ -93,6 +107,8 @@ module Search
 
     WORKFLOWS = Config.with_defaults(
       form_field: :wps_workflows,
+      field: Search::Fields::WPS_WORKFLOWS,
+      hierarchical_field: Search::Fields::WPS_HIERARCHICAL_WORKFLOWS,
       alpha_sort: false,
       limit: 100,
       facet_path_helper: to_path_helper(:search_workflow_facets_path),

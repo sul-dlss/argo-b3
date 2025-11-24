@@ -29,7 +29,7 @@ module Search
     def search
       facet_counts = Searchers::FacetQuery.call(
         search_form:,
-        field: Search::Fields::PROJECT_TAGS,
+        field:,
         limit:,
         facet_query: facet_query_param
       )
@@ -46,7 +46,7 @@ module Search
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
-                                        field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
+                                        field: hierarchical_field,
                                         value: for_children ? parent_value_param : nil,
                                         alpha_sort:,
                                         limit: for_children ? -1 : SEARCH_LIMIT,
