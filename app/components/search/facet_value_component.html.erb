@@ -1,7 +1,8 @@
 <% if selected? %>
   <%= label %>
-  <%= link_to 'Remove', search_items_path(search_form.without_attributes({ form_field => value, page: nil })), **link_args %>
+  <%= link_to 'Remove', search_items_path(search_form.without_attributes({ form_field => value, page: nil })), title: remove_title, **link_args %>
 <% else %>
   <%= link_to label, search_items_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
   <%= "(#{number_with_delimiter(count)})" %>
+  <%= link_to 'Exclude', search_items_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args if with_exclude? %>
 <% end %>

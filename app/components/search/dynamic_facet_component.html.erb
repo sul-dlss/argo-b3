@@ -2,7 +2,12 @@
   <ul class="mb-0">
     <% facet_counts.each do |facet_count| %>
       <li>
-        <%= render Search::FacetValueComponent.new(count: facet_count.count, search_form:, form_field:, value: facet_count.value, label: helpers.facet_value_label(facet_count.value), selected: search_form.selected?(key: form_field, value: facet_count.value), data: { turbo_frame: '_top' }) %>
+        <%= render Search::FacetValueComponent.new(count: facet_count.count,
+                                                   search_form:,
+                                                   form_field:,
+                                                   value: facet_count.value,
+                                                   label: helpers.facet_value_label(facet_count.value),
+                                                   data: { turbo_frame: '_top' }) %>
       </li>
     <% end %>
   </ul>

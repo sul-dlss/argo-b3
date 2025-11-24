@@ -7,6 +7,7 @@ module Search
     attribute :projects, array: true, default: -> { [] }
     attribute :tags, array: true, default: -> { [] }
     attribute :access_rights, array: true, default: -> { [] }
+    attribute :access_rights_exclude, array: true, default: -> { [] }
     attribute :wps_workflows, array: true, default: -> { [] }
     attribute :mimetypes, array: true, default: -> { [] }
     attribute :released_to_earthworks, array: true, default: -> { [] }
