@@ -44,19 +44,26 @@ end
 
 RSpec::Matchers.define :have_next_page do |**args|
   match do |actual|
-    actual.has_link?('Next page', **args)
+    actual.has_css?('li.page-item:not(.disabled) a[aria-label="Go to next page"]', **args)
   end
 end
 
 RSpec::Matchers.define :have_previous_page do |**args|
   match do |actual|
-    actual.has_link?('Previous page', **args)
+    actual.has_css?('li.page-item:not(.disabled) a[aria-label="Go to previous page"]', **args)
   end
 end
 
-RSpec::Matchers.define :have_results_pages do |expected_page, expected_total_pages, args = {}|
+RSpec::Matchers.define :have_current_results_page do |expected_page, args = {}|
   match do |actual|
-    actual.has_text?("Page #{expected_page} of #{expected_total_pages}", **args)
+    actual.has_css?("ul.pagination a[aria-label='Current page, Page #{expected_page}']", **args)
+  end
+end
+
+RSpec::Matchers.define :have_total_results_pages do |expected_total_pages, args = {}|
+  match do |actual|
+    actual.find_all('ul.pagination li.page-item')[-2].has_css?("a[aria-label='Go to page #{expected_total_pages}']",
+                                                               **args)
   end
 end
 

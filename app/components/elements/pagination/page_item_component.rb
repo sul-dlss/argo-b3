@@ -2,6 +2,7 @@
 
 module Elements
   module Pagination
+    # Component for displaying a pagination page item
     class PageItemComponent < ApplicationComponent
       def initialize(page:, path:, current_page: false)
         @page = page

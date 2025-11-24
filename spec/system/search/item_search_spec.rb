@@ -26,9 +26,7 @@ RSpec.describe 'Item search', :solr do
       within(find_item_results_section) do
         expect(page).to have_result_count(1)
         expect(page).to have_item_result(item_doc)
-        expect(page).to have_results_pages(1, 1)
-        expect(page).not_to have_previous_page(wait: 0)
-        expect(page).not_to have_next_page(wait: 0)
+        expect(page).to have_no_css('ul.pagination', wait: 0)
       end
     end
 
@@ -43,28 +41,29 @@ RSpec.describe 'Item search', :solr do
 
         within(find_item_results_section) do
           expect(page).to have_result_count(11)
-          expect(page).to have_results_pages(1, 3)
+          expect(page).to have_current_results_page(1)
+          expect(page).to have_total_results_pages(3)
           expect(page).to have_next_page
           expect(page).not_to have_previous_page(wait: 0)
           find_next_page.click
         end
 
         within(find_item_results_section) do
-          expect(page).to have_results_pages(2, 3)
+          expect(page).to have_current_results_page(2)
           expect(page).to have_next_page
           expect(page).to have_previous_page
           find_next_page.click
         end
 
         within(find_item_results_section) do
-          expect(page).to have_results_pages(3, 3)
+          expect(page).to have_current_results_page(3)
           expect(page).not_to have_next_page(wait: 0)
           expect(page).to have_previous_page
           find_previous_page.click
         end
 
         within(find_item_results_section) do
-          expect(page).to have_results_pages(2, 3)
+          expect(page).to have_current_results_page(2)
         end
       end
     end

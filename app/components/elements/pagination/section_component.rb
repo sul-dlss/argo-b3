@@ -2,6 +2,7 @@
 
 module Elements
   module Pagination
+    # Component for displaying a pagination section
     class SectionComponent < ApplicationComponent
       ELLIPSIS = '...'
 

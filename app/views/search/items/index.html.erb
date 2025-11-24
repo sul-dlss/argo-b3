@@ -13,20 +13,12 @@
             Item, collection, and admin policy results
             (<%= number_with_delimiter(@results.total_results) %> found)
           </h3>
+
           <ul>
             <%= render Search::ItemResultComponent.with_collection(@results) %>
           </ul>
-          Page
-          <%= number_with_delimiter(@results.page) %>
-          of
-          <%= number_with_delimiter(@results.total_pages) %>
-          <% if @results.page > 1 %>
-            <%= link_to 'Previous page', search_items_path(@search_form.with_attributes(page: @results.page - 1)) %>
-          <% end %>
-          <% if @results.total_pages > @results.page %>
-            <%= link_to 'Next page', search_items_path(@search_form.with_attributes(page: @results.page + 1)) %>
-          <% end %>
-          <%= render Elements::Pagination::SectionComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func: ->(page) { search_items_path(@search_form.with_attributes(page: page)) }) %>
+
+          <%= render Elements::Pagination::SectionComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func: ->(page) { search_items_path(@search_form.with_attributes(page:)) }) %>
         </section>
       <% end %>
 

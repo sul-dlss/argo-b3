@@ -13,11 +13,11 @@ def find_tag_results_section
 end
 
 def find_next_page
-  find_link('Next page')
+  find_link('Next »')
 end
 
 def find_previous_page
-  find_link('Previous page')
+  find_link('« Previous')
 end
 
 def find_project_result(project)

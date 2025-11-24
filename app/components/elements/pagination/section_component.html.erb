@@ -1,19 +1,21 @@
 <nav class="paginate-section" aria-label="Pagination links">
   <ul class="pagination">
     <%= tag.li class: previous_classes do %>
-      <%= link_to "« Previous", previous_path, rel: "prev", class: "page-link", "aria-label": "Go to previous page" %>
+      <%= link_to '« Previous', previous_path, rel: 'prev', class: 'page-link', 'aria-label': 'Go to previous page' %>
     <% end %>
 
     <% pages.each do |page| %>
       <% if page == ELLIPSIS %>
-        <li class="page-item disabled"><span class="page-link">…</span></li>
+        <li class="page-item disabled">
+          <span class="page-link"><%= ELLIPSIS %></span>
+        </li>
       <% else %>
-        <%= render Elements::Pagination::PageItemComponent.new(page: page, path: path_func.call(page), current_page: page == current_page) %>
+        <%= render Elements::Pagination::PageItemComponent.new(page:, path: path_func.call(page), current_page: page == current_page) %>
       <% end %>
     <% end %>
 
     <%= tag.li class: next_classes do %>
-      <%= link_to "Next »", next_path, rel: "next", class: "page-link", "aria-label": "Go to next page" %>
+      <%= link_to 'Next »', next_path, rel: 'next', class: 'page-link', 'aria-label': 'Go to next page' %>
     <% end %>
   </ul>
 </nav>
