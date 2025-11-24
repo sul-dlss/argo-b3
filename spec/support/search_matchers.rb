@@ -63,7 +63,7 @@ end
 RSpec::Matchers.define :have_current_filter do |expected_form_field_name, expected_value, args = {}|
   match do |actual|
     actual.has_css?('section[aria-label="Current Filters"] li',
-                    text: "#{expected_form_field_name}: #{expected_value}",
+                    text: "#{expected_form_field_name} > #{expected_value}",
                     **args)
   end
 end

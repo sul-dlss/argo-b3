@@ -4,54 +4,60 @@
 
 <%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
 
-<%= turbo_frame_tag 'items-search' do %>
-  <% if @results.any? %>
-    <section aria-label="Item, collection, and admin policy results">
-      <h3>
-        Item, collection, and admin policy results
-        (<%= number_with_delimiter(@results.total_results) %> found)
-      </h3>
-      <ul>
-        <%= render Search::ItemResultComponent.with_collection(@results) %>
-      </ul>
-      Page
-      <%= number_with_delimiter(@results.page) %>
-      of
-      <%= number_with_delimiter(@results.total_pages) %>
-      <% if @results.page > 1 %>
-        <%= link_to 'Previous page', search_items_path(@search_form.with_attributes(page: @results.page - 1)) %>
+<%= render Search::LayoutComponent.new do |layout| %>
+  <%= layout.with_main_content do %>
+    <%= turbo_frame_tag 'items-search' do %>
+      <% if @results.any? %>
+        <section aria-label="Item, collection, and admin policy results">
+          <h3>
+            Item, collection, and admin policy results
+            (<%= number_with_delimiter(@results.total_results) %> found)
+          </h3>
+          <ul>
+            <%= render Search::ItemResultComponent.with_collection(@results) %>
+          </ul>
+          Page
+          <%= number_with_delimiter(@results.page) %>
+          of
+          <%= number_with_delimiter(@results.total_pages) %>
+          <% if @results.page > 1 %>
+            <%= link_to 'Previous page', search_items_path(@search_form.with_attributes(page: @results.page - 1)) %>
+          <% end %>
+          <% if @results.total_pages > @results.page %>
+            <%= link_to 'Next page', search_items_path(@search_form.with_attributes(page: @results.page + 1)) %>
+          <% end %>
+        </section>
       <% end %>
-      <% if @results.total_pages > @results.page %>
-        <%= link_to 'Next page', search_items_path(@search_form.with_attributes(page: @results.page + 1)) %>
+
+      <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
+
+      <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::OBJECT_TYPES,
+                                                              facet_counts: @results.object_type_facet,
+                                                              search_form: @search_form) do |component| %>
+        <% component.with_facet do %>
+          <%= render Search::CheckboxFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
+        <% end %>
       <% end %>
-    </section>
-  <% end %>
 
-  <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
+      <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::ACCESS_RIGHTS,
+                                                              facet_counts: @results.access_rights_facet,
+                                                              search_form: @search_form) %>
 
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::OBJECT_TYPES,
-                                                          facet_counts: @results.object_type_facet,
-                                                          search_form: @search_form) do |component| %>
-    <% component.with_facet do %>
-      <%= render Search::CheckboxFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
+      <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MIMETYPES,
+                                                              facet_counts: @results.mimetypes_facet,
+                                                              search_form: @search_form) %>
+
+      <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS,
+                                                              facet_counts: @results.released_to_earthworks_facet,
+                                                              search_form: @search_form) do |component| %>
+        <% component.with_facet do %>
+          <%= render Search::DynamicFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::ACCESS_RIGHTS,
-                                                          facet_counts: @results.access_rights_facet,
-                                                          search_form: @search_form) %>
-
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MIMETYPES,
-                                                          facet_counts: @results.mimetypes_facet,
-                                                          search_form: @search_form) %>
-
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS,
-                                                          facet_counts: @results.released_to_earthworks_facet,
-                                                          search_form: @search_form) do |component| %>
-    <% component.with_facet do %>
-      <%= render Search::DynamicFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
-    <% end %>
+  <%= layout.with_sidebar do %>
+    <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
   <% end %>
 <% end %>
-
-<%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>

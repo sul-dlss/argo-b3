@@ -21,6 +21,7 @@ SKIPPABLE_TEST_COVERAGE_CONCERNS = %w[assets javascript views].freeze
 
 SimpleCov.start(:rails) do
   add_filter '/lib/tasks/'
+  add_filter '/lib/components/'
 
   # Use SimpleCov groups to break down test coverage per application concern, e.g.,
   # controllers, models, & jobs. See https://github.com/simplecov-ruby/simplecov#groups
