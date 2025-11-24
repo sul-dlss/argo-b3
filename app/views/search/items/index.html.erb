@@ -26,6 +26,7 @@
           <% if @results.total_pages > @results.page %>
             <%= link_to 'Next page', search_items_path(@search_form.with_attributes(page: @results.page + 1)) %>
           <% end %>
+          <%= render Elements::Pagination::SectionComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func: ->(page) { search_items_path(@search_form.with_attributes(page: page)) }) %>
         </section>
       <% end %>
 
