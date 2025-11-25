@@ -41,7 +41,7 @@ module Search
       queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS, exclude: true)
       queries << facet_filter_query(facet_config: Search::Facets::MIMETYPES)
       queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
-      queries << "-#{APO_ID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
+      queries << "-#{APO_DRUID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
     end
 

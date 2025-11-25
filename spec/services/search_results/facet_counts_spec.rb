@@ -42,7 +42,7 @@ RSpec.describe SearchResults::FacetCounts do
     {
       field => {
         type: 'terms',
-        field: Search::Fields::OBJECT_TYPE,
+        field: Search::Fields::OBJECT_TYPES,
         sort: 'index',
         numBuckets: true,
         limit: 25,

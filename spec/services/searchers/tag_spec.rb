@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Tag do
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECT_TAGS) }
+  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
   let(:search_form) { Search::Form.new(query:) }
   let(:query) { 'project 1' }
   let(:solr_response) do
@@ -11,7 +11,7 @@ RSpec.describe Searchers::Tag do
       'response' => {
         'facet_counts' => {
           'facet_fields' => {
-            Search::Fields::PROJECT_TAGS => ['Project 1', 2]
+            Search::Fields::PROJECTS_EXPLODED => ['Project 1', 2]
           }
         }
       }
@@ -30,7 +30,7 @@ RSpec.describe Searchers::Tag do
       .with(request: { q: '*:*',
                        rows: 0,
                        facet: true,
-                       'facet.field': Search::Fields::PROJECT_TAGS,
+                       'facet.field': Search::Fields::PROJECTS_EXPLODED,
                        'facet.matches': '(?i)(.*(project|1).*){2}',
                        debugQuery: false })
   end

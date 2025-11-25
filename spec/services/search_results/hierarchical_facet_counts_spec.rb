@@ -42,7 +42,7 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
     {
       field => {
         type: 'terms',
-        field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
+        field: Search::Fields::PROJECTS_HIERARCHICAL,
         sort: 'index',
         numBuckets: true,
         limit: 25,

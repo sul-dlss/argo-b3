@@ -47,7 +47,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for object types' do
       result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("{!tag=#{Search::Fields::OBJECT_TYPE}}#{Search::Fields::OBJECT_TYPE}:(\"dro\" OR \"collection\")") # rubocop:disable Layout/LineLength
+      expect(Array(result[:fq])).to include("{!tag=#{Search::Fields::OBJECT_TYPES}}#{Search::Fields::OBJECT_TYPES}:(\"dro\" OR \"collection\")") # rubocop:disable Layout/LineLength
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for projects' do
       result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::PROJECT_TAGS}:(\"Project A\" OR \"Project B\")")
+      expect(Array(result[:fq])).to include("#{Search::Fields::PROJECTS_EXPLODED}:(\"Project A\" OR \"Project B\")")
     end
   end
 

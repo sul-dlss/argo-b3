@@ -14,13 +14,13 @@ module SearchResults
     def each(&)
       return enum_for(:each) unless block_given?
 
-      @solr_response['response']['docs'].each do |solr_doc|
-        yield Item.new(solr_doc:)
+      @solr_response['response']['docs'].each.with_index(1) do |solr_doc, index|
+        yield Item.new(solr_doc:, index: index + start_result)
       end
     end
 
     def object_type_facet
-      FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPE)
+      FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPES)
     end
 
     def access_rights_facet

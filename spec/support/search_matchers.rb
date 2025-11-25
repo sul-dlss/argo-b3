@@ -32,7 +32,7 @@ end
 
 RSpec::Matchers.define :have_item_result do |solr_doc, args = {}|
   match do |actual|
-    actual.has_css?("li#item-result-#{solr_doc[Search::Fields::BARE_DRUID]}", **args)
+    actual.has_css?("#item-result-#{solr_doc[Search::Fields::BARE_DRUID]}", **args)
   end
 end
 

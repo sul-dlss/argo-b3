@@ -10,7 +10,7 @@ RSpec.describe SearchResults::FacetQueryCounts do
     {
       'facet_counts' => {
         'facet_fields' => {
-          'content_file_mimetypes_ssimdv' => [
+          Search::Fields::MIMETYPES => [
             'image/jp2', 2_126_773,
             'image/tiff', 1_696_294,
             'image/jpeg', 463_129
@@ -24,7 +24,7 @@ RSpec.describe SearchResults::FacetQueryCounts do
     {
       'facet_counts' => {
         'facet_fields' => {
-          'content_file_mimetypes_ssimdv' => []
+          Search::Fields::MIMETYPES => []
         }
       }
     }
