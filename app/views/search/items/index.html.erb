@@ -6,7 +6,7 @@
 
 <%= render Search::LayoutComponent.new do |layout| %>
   <%= layout.with_main_content do %>
-    <%= turbo_frame_tag 'items-search' do %>
+    <%= turbo_frame_tag 'items-search', data: { turbo_action: 'advance' } do %>
       <% if @results.any? %>
         <section aria-label="Item, collection, and admin policy results">
           <h3>
@@ -14,7 +14,7 @@
             (<%= number_with_delimiter(@results.total_results) %> found)
           </h3>
 
-          <ul>
+          <ul class="list-unstyled">
             <%= render Search::ItemResultComponent.with_collection(@results) %>
           </ul>
 

@@ -3,13 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Facet do
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECT_TAGS) }
+  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
   let(:search_form) { Search::ItemForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
     {
       'facets' => {
-        Search::Fields::PROJECT_TAGS => {
+        Search::Fields::PROJECTS_EXPLODED => {
           'buckets' => [
             { 'val' => 'Project 1', 'count' => 2 },
             { 'val' => 'Project 2', 'count' => 1 }
@@ -33,7 +33,7 @@ RSpec.describe Searchers::Facet do
       expect(solr_query['q']).to eq(query)
       facet_json = JSON.parse(solr_query['json.facet']).with_indifferent_access
       # Only testing one field here so that the test is not brittle.
-      expect(facet_json[Search::Fields::PROJECT_TAGS])
+      expect(facet_json[Search::Fields::PROJECTS_EXPLODED])
         .to match({
                     type: 'terms',
                     field: 'exploded_project_tag_ssimdv',
@@ -45,27 +45,27 @@ RSpec.describe Searchers::Facet do
   end
 
   context 'when alpha_sort is true' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECT_TAGS, alpha_sort: true) }
+    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, alpha_sort: true) }
 
     it 'includes sort in the Solr request' do
       results
       expect(Search::SolrService).to have_received(:call) do |args|
         solr_query = args[:request]
         facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
-        expect(facet_json[Search::Fields::PROJECT_TAGS][:sort]).to eq('index')
+        expect(facet_json[Search::Fields::PROJECTS_EXPLODED][:sort]).to eq('index')
       end
     end
   end
 
   context 'when limit is provided' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECT_TAGS, limit: 5) }
+    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, limit: 5) }
 
     it 'includes limit in the Solr request' do
       results
       expect(Search::SolrService).to have_received(:call) do |args|
         solr_query = args[:request].with_indifferent_access
         facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
-        expect(facet_json[Search::Fields::PROJECT_TAGS][:limit]).to eq(5)
+        expect(facet_json[Search::Fields::PROJECTS_EXPLODED][:limit]).to eq(5)
       end
     end
   end

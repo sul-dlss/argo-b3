@@ -34,7 +34,7 @@ RSpec.describe Searchers::Item do
       # Only testing one field here so that the test is not brittle.
       facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
       expect(facet_json).to include(
-        Search::Fields::OBJECT_TYPE,
+        Search::Fields::OBJECT_TYPES,
         Search::Fields::ACCESS_RIGHTS
       )
       expect(facet_json[Search::Fields::ACCESS_RIGHTS])

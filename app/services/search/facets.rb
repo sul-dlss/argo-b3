@@ -68,8 +68,8 @@ module Search
 
     PROJECTS = Config.with_defaults(
       form_field: :projects,
-      field: Search::Fields::PROJECT_TAGS,
-      hierarchical_field: Search::Fields::PROJECT_HIERARCHICAL_TAGS,
+      field: Search::Fields::PROJECTS_EXPLODED,
+      hierarchical_field: Search::Fields::PROJECTS_HIERARCHICAL,
       alpha_sort: true,
       limit: 25,
       facet_path_helper: to_path_helper(:search_project_facets_path),
@@ -79,7 +79,7 @@ module Search
 
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
-      field: Search::Fields::OBJECT_TYPE,
+      field: Search::Fields::OBJECT_TYPES,
       exclude: true
     )
 

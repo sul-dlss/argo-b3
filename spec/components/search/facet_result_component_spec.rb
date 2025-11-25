@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::FacetResultComponent, type: :component do
-  let(:component) { described_class.new(value: 'Test Value', form_field: 'projects') }
+  let(:component) { described_class.new(value: 'Test Value', form_field: 'projects', value_counter: 1) }
 
   it 'renders the result' do
     render_inline(component)

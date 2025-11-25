@@ -12,6 +12,7 @@ FactoryBot.define do
       druid { generate(:unique_druid) }
       sequence(:title) { |n| "Test Item #{n}" }
       object_type { 'item' }
+      content_type { 'book' }
       apo_druid { generate(:unique_druid) }
       projects { [] }
       tags { [] }
@@ -26,10 +27,11 @@ FactoryBot.define do
         Search::Fields::ID => druid,
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
-        Search::Fields::OBJECT_TYPE => [object_type],
-        Search::Fields::APO_ID => [apo_druid],
-        Search::Fields::PROJECT_TAGS => explode_hierarchy(values: projects),
-        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_hierarchy(values: projects, as_hierarchical: true),
+        Search::Fields::OBJECT_TYPES => [object_type],
+        Search::Fields::CONTENT_TYPES => [content_type],
+        Search::Fields::APO_DRUID => [apo_druid],
+        Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
+        Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
         Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
@@ -77,9 +79,9 @@ FactoryBot.define do
         Search::Fields::ID => druid,
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
-        Search::Fields::OBJECT_TYPE => [object_type],
-        Search::Fields::PROJECT_TAGS => explode_hierarchy(values: projects),
-        Search::Fields::PROJECT_HIERARCHICAL_TAGS => explode_hierarchy(values: projects, as_hierarchical: true),
+        Search::Fields::OBJECT_TYPES => [object_type],
+        Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
+        Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
         Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),

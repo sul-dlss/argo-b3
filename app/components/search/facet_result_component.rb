@@ -7,16 +7,22 @@ module Search
 
     # @param value [String]
     # @param form_field [String] the form field name for building links
-    def initialize(value:, form_field:)
+    # value_counter is the collection counter provided by with_collection_parameter
+    def initialize(value:, value_counter:, form_field:)
       @value = value
       @form_field = form_field
+      @index = value_counter + 1
       super()
     end
 
-    attr_reader :value, :form_field
+    attr_reader :value, :form_field, :index
 
     def id
       "#{form_field}-result-#{value.parameterize}"
+    end
+
+    def path
+      search_items_path(form_field => [value])
     end
   end
 end

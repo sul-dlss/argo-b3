@@ -11,6 +11,25 @@ module Searchers
     # Attributes of Search::Facets::Config to be passed to Search::DynamicFacetBuilder
     DYNAMIC_FACET_BUILDER_ARGS = %i[form_field dynamic_facet].freeze
 
+    # fl fields to request from Solr
+    FIELD_LIST = [
+      ACCESS_RIGHTS,
+      APO_DRUID,
+      APO_TITLE,
+      BARE_DRUID,
+      CONTENT_TYPES,
+      ID,
+      IDENTIFIERS,
+      OBJECT_TYPES,
+      PROJECTS,
+      SOURCE_ID,
+      RELEASED_TO,
+      STATUS,
+      TICKETS,
+      TITLE,
+      WORKFLOW_ERRORS
+    ].freeze
+
     def self.call(...)
       new(...).call
     end
@@ -36,7 +55,7 @@ module Searchers
     def solr_request
       Search::ItemQueryBuilder.call(search_form:).merge(
         {
-          fl: [ID, TITLE, BARE_DRUID],
+          fl: FIELD_LIST,
           rows:,
           start:,
           'json.facet': facet_json.to_json
@@ -47,7 +66,7 @@ module Searchers
     def facet_json
       # These are fast (non-lazy) facets
       {
-        OBJECT_TYPE => Search::FacetBuilder.call(**Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
+        OBJECT_TYPES => Search::FacetBuilder.call(**Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
         ACCESS_RIGHTS => Search::FacetBuilder.call(**Search::Facets::ACCESS_RIGHTS.to_h.slice(*FACET_BUILDER_ARGS)),
         MIMETYPES => Search::FacetBuilder.call(**Search::Facets::MIMETYPES.to_h.slice(*FACET_BUILDER_ARGS))
       }.merge(Search::DynamicFacetBuilder.call(**Search::Facets::RELEASED_TO_EARTHWORKS.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))

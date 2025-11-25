@@ -6,6 +6,7 @@ module Search
     attribute :object_types, array: true, default: -> { [] }
     attribute :projects, array: true, default: -> { [] }
     attribute :tags, array: true, default: -> { [] }
+    attribute :tickets, array: true, default: -> { [] }
     attribute :access_rights, array: true, default: -> { [] }
     attribute :access_rights_exclude, array: true, default: -> { [] }
     attribute :wps_workflows, array: true, default: -> { [] }

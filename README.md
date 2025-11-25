@@ -150,3 +150,9 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 1. Add an attribute (`*_exclude`) for the facet exclude to `Search::ItemForm`.
 2. Assign the attribute name to `exclude_form_field` for the configuration constant in `Search::Facets`.
 3. Add the facet to `Search::ItemQueryBuilder.filter_queries`, setting `exclude` to `true` when invoking `facet_filter_query` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+
+### Adding a field to item search results
+1. Add any new solr fields to `Search::Fields`.
+2. Add the field to `fl` in `Searchers::Item.solr_request`.
+3. Possibly add a method to `SearchResults::Item`. See description of how missing methods are handled.
+4. Display the field in `Search::ItemResultComponent`.
