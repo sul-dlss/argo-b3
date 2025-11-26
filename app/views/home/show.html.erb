@@ -8,19 +8,19 @@
   <%= layout.with_main_content do %>
     <% if @projects_search_form %>
       <%= turbo_frame_tag 'projects-search', src: search_projects_path(@projects_search_form.attributes) do %>
-        Loading projects...
+        <%= render Search::LoadingFacetResultsComponent.new(label: 'Project results') %>
       <% end %>
     <% end %>
 
     <% if @tags_search_form %>
       <%= turbo_frame_tag 'tags-search', src: search_tags_path(@tags_search_form.attributes) do %>
-        Loading tags...
+        <%= render Search::LoadingFacetResultsComponent.new(label: 'Tag results') %>
       <% end %>
     <% end %>
 
     <% if @items_search_form %>
       <%= turbo_frame_tag 'items-search', src: search_items_path(@items_search_form.attributes) do %>
-        Loading items...
+        <%= render Search::LoadingItemResultsComponent.new %>
       <% end %>
     <% end %>
   <% end %>

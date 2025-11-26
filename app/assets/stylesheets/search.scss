@@ -30,3 +30,7 @@ a[aria-expanded="false"] {
   padding-left: 0.3em;
 }
 
+.accordion-header.facet-field-heading .accordion-button:disabled::after {
+  display: none;
+}
+
