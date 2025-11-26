@@ -1,0 +1,33 @@
+<section aria-label="Loading item, collection, and admin policy results">
+  <h3>
+    Item, collection, and admin policy results (Loading ...)
+  </h3>
+
+  <ul class="list-unstyled placeholder-glow">
+    <% for index in 1..number_of_placeholders %>
+      <%= tag.li class: 'mb-5' do %>
+        <%= render Elements::Tables::RawTableComponent.new(id: "placeholder-#{index}") do |component| %>
+          <% component.with_caption do %>
+            <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
+              <%= component.with_link do %>
+                <span class="placeholder col-8"></span>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <% number_of_placeholder_rows.times do %>
+            <%= component.with_row do %>
+              <tr>
+                <th class="col-3" scope="row">
+                  <span class="placeholder col-8"></span>
+                </th>
+
+                <td class="col-9"><span class="placeholder col-8"></span></td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+</section>

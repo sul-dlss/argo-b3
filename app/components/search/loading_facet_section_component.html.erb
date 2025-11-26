@@ -1,0 +1,10 @@
+<%= tag.section 'aria-label': "Loading #{label}", class: 'accordion mb-1' do %>
+  <div class="accordion-item facet-limit">
+    <h3 class="accordion-header p-0 facet-field-heading h6">
+      <%= tag.button class: 'accordion-button collapsed', type: 'button', disabled: true do %>
+        <%= label %>
+        <%= render Elements::SpinnerComponent.new(message: "Loading #{label} ...", hide_message: true, classes: 'ms-auto', height: 20, width: 20, spinner_classes: 'ms-1') %>
+      <% end %>
+    </h3>
+  </div>
+<% end %>

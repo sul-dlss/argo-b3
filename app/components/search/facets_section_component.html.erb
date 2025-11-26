@@ -3,30 +3,30 @@
 
   <% unless blank_search? %>
     <%= helpers.turbo_frame_tag helpers.facet_id(:projects), src: search_project_facets_path(search_form.attributes), target: '_top' do %>
-      Loading <%= helpers.facet_label(:projects) %> facet...
+      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:projects)) %>
     <% end %>
     <%= helpers.turbo_frame_tag helpers.facet_id(:tags), src: search_tag_facets_path(search_form.attributes), target: '_top' do %>
-      Loading <%= helpers.facet_label(:tags) %> facet...
+      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:tags)) %>
     <% end %>
   <% end %>
 
   <%= tag.div id: helpers.facet_id(:object_types) do %>
-    Loading <%= helpers.facet_label(:object_types) %> facet...
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:object_types)) %>
   <% end %>
 
   <%= tag.div id: helpers.facet_id(:access_rights) do %>
-    Loading <%= helpers.facet_label(:access_rights) %> facet...
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:access_rights)) %>
   <% end %>
 
   <%= tag.div id: helpers.facet_id(:mimetypes) do %>
-    Loading <%= helpers.facet_label(:mimetypes) %> facet...
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:mimetypes)) %>
   <% end %>
 
   <%= tag.div id: helpers.facet_id(:released_to_earthworks) do %>
-    Loading <%= helpers.facet_label(:released_to_earthworks) %> facet...
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:released_to_earthworks)) %>
   <% end %>
 
   <%= helpers.turbo_frame_tag helpers.facet_id(:wps_workflows), src: search_workflow_facets_path(search_form.attributes), target: '_top' do %>
-    Loading <%= helpers.facet_label(:wps_workflows) %> facet...
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:wps_workflows)) %>
   <% end %>
 </section>
