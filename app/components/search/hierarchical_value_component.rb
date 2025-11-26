@@ -51,5 +51,9 @@ module Search
     def collapse_classes
       "collapse#{' show' if expanded?}"
     end
+
+    def toggle_label
+      "Toggle #{label}"
+    end
   end
 end

@@ -1,5 +1,5 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
-  <ul class="mb-0">
+  <ul class="facet-values list-unstyled">
     <% facet_counts.each do |facet_count| %>
       <li>
         <%= render Search::FacetValueComponent.new(count: facet_count.count,

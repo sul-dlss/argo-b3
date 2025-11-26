@@ -1,6 +1,6 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
   <%= helpers.turbo_frame_tag frame_id do %>
-    <ul class="mb-0">
+    <ul class="facet-values list-unstyled">
       <% facet_counts.each do |facet_count| %>
         <li>
           <%= render Search::FacetValueComponent.new(count: facet_count.count,
@@ -13,8 +13,9 @@
         </li>
       <% end %>
     </ul>
+
     <%= render Search::FacetPageLinkComponent.new(facet_counts:, search_form:, facet_path_helper: facet_page_path_helper, form_field:) %>
   <% end %>
 
-  <%= render Search::FacetSearchComponent.new(form_field:, search_form:, facet_search_path_helper:) %>
+  <%= render Search::FacetSearchComponent.new(form_field:, search_form:, facet_search_path_helper:, classes: 'mt-4') %>
 <% end %>

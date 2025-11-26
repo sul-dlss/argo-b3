@@ -1,8 +1,17 @@
 <% if selected? %>
-  <%= label %>
-  <%= link_to 'Remove', search_items_path(search_form.without_attributes({ form_field => value, page: nil })), title: remove_title, **link_args %>
+  <span class="facet-label">
+    <span class="selected"><%= label %></span>
+
+    <%= link_to remove_path, class: 'remove ms-2', rel: 'nofollow', title: remove_title, **link_args do %>
+      <i class="bi bi-x ms-2"></i>
+
+      <span class="visually-hidden">[<%= remove_title %>]</span>
+    <% end %>
+  </span>
 <% else %>
-  <%= link_to label, search_items_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
-  <%= "(#{number_with_delimiter(count)})" %>
+  <span class="facet-label">
+    <%= link_to label, search_items_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
+  </span>
   <%= link_to 'Exclude', search_items_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args if with_exclude? %>
+  <span class="facet-count"><%= number_with_delimiter(count) %></span>
 <% end %>

@@ -21,8 +21,11 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
 
     expect(page).to have_css('form[action="/search/items"][method="get"]')
     expect(page).to have_field('search[query]', with: 'test', type: 'hidden')
-    expect(page).to have_field('collection (10)', type: 'checkbox', checked: true)
-    expect(page).to have_field('item (5)', type: 'checkbox', checked: false)
+    expect(page).to have_field('collection', type: 'checkbox', checked: true)
+    expect(page).to have_field('item', type: 'checkbox', checked: false)
+    check_section = page.first('.facet-values .form-check')
+    expect(check_section).to have_css('label.form-check-label', text: 'collection')
+    expect(check_section).to have_css('.facet-count', text: '10')
   end
 
   context 'when there are no facet counts' do

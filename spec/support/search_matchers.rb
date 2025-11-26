@@ -14,8 +14,11 @@ end
 RSpec::Matchers.define :have_facet_value do |facet_value, facet:, count: nil, **args|
   match do |actual|
     # This handles both link-based and checkbox-based facet values.
-    expected = count ? "#{facet_value} (#{count})" : facet_value
-    actual.has_css?("section[aria-label='#{facet}'] li,label", text: expected, **args)
+    value_match = actual.has_css?("section[aria-label='#{facet}'] .facet-label,.form-check-label", text: facet_value,
+                                                                                                   **args)
+    return value_match if count.nil? || !value_match
+
+    actual.has_css?("section[aria-label='#{facet}'] .facet-count", text: count.to_s, **args)
   end
 end
 

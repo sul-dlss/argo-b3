@@ -1,6 +1,7 @@
 <%= helpers.turbo_frame_tag id, target: '_top' do %>
-  <ul class="list-unstyled">
+  <ul class="list-unstyled facet-values">
     <%= render Search::HierarchicalValueComponent.with_collection(facet_counts, search_form:, path_helper:, form_field:) %>
   </ul>
+
   <%= render Search::DebugComponent.new(search_form:, results: facet_counts) %>
 <% end %>

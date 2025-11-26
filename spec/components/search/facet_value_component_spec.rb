@@ -28,7 +28,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
 
       expect(page).to have_link('collection',
                                 href: '/search/items?object_types%5B%5D=item&object_types%5B%5D=collection')
-      expect(page).to have_content('(10)')
+      expect(page).to have_css('.facet-count', text: '10')
       expect(page).to have_no_link('Remove')
     end
   end
@@ -50,6 +50,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('Remove', href: '/search/items', title: 'Remove collection')
+      expect(page).to have_css('.visually-hidden', text: '[Remove collection]')
       expect(page).to have_css('a[data-turbo="false"]')
     end
   end

@@ -1,4 +1,8 @@
-<div>
-  <%= form_builder.check_box form_field.to_sym, { multiple: true, checked: checked? }, value, nil %>
-  <%= form_builder.label "#{form_field}_#{value}", "#{value} (#{number_with_delimiter(count)})" %>
+<div class="form-check d-flex">
+  <div>
+    <%= form_builder.check_box form_field.to_sym, { multiple: true, checked: checked?, class: 'form-check-input' }, value, nil %>
+    <%= form_builder.label "#{form_field}_#{value}", value, class: label_classes %>
+  </div>
+
+  <div class="facet-count"><%= number_with_delimiter(count) %></div>
 </div>
