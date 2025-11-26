@@ -1,7 +1,8 @@
 <section
   aria-label="Current Filters"
-  class="container d-flex align-items-center">
+  class="container d-flex align-items-center mb-3">
   <%= render Elements::DivHeadingComponent.new(level: 2, label: 'Your selections:', class: 'fw-bold me-2') %>
+
   <ul class="list-unstyled d-flex mb-0">
     <% current_filters.each do |form_field, value| %>
       <%= render Search::CurrentFilterComponent.new(form_field:, value:, search_form: @search_form) %>

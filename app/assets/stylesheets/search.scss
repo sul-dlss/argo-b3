@@ -23,3 +23,10 @@ a[aria-expanded="false"] {
   }
 }
 
+// # Derived from BL .applied-filter .filter-name::after
+.selected-item-separator {
+  color: #adb5bd;
+  font-size: 90%;
+  padding-left: 0.3em;
+}
+

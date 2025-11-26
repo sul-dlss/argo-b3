@@ -127,4 +127,22 @@ RSpec.describe Search::Form do
       expect(form.this_attributes).to eq({})
     end
   end
+
+  describe '#current_filters' do
+    let(:attributes) { { query: 'test', include_google_books: true } }
+
+    context 'when attributes are set' do
+      it 'returns current filters as attribute name/value pairs' do
+        expect(form.current_filters).to eq([%w[query test], ['include_google_books', true]])
+      end
+    end
+
+    context 'when no attributes are set' do
+      let(:attributes) { {} }
+
+      it 'returns empty array' do
+        expect(form.current_filters).to eq([])
+      end
+    end
+  end
 end
