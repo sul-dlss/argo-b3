@@ -17,6 +17,13 @@ RSpec.describe 'Current filters', :solr do
 
     expect(page).to have_result_count(3)
 
+    # Perform a search.
+    fill_in('Search for items', with: 'test')
+    click_button 'Search'
+
+    expect(page).to have_result_count(3)
+    expect(page).to have_current_filter('test')
+
     # Select a facet.
     find_facet_section('Object types').click
     within(find_facet_section('Object types')) do
@@ -27,6 +34,7 @@ RSpec.describe 'Current filters', :solr do
 
     expect(page).to have_result_count(2)
     expect(page).to have_item_result(item_doc)
+    expect(page).to have_current_filter('test')
     expect(page).to have_current_filter('Object types', 'item')
     expect(page).to have_current_filter('Object types', 'agreement')
 
@@ -35,6 +43,7 @@ RSpec.describe 'Current filters', :solr do
     end
 
     expect(page).to have_result_count(1)
+    expect(page).to have_current_filter('test')
     expect(page).not_to have_current_filter('Object types', 'item', wait: 0)
   end
 end

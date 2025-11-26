@@ -18,10 +18,12 @@ RSpec.describe Search::ItemForm do
     it 'returns the current filters as attribute name/value pairs' do
       form = described_class.new(
         object_types: %w[item collection],
-        projects: ['Project 1']
+        projects: ['Project 1'],
+        query: 'test'
       )
 
       expect(form.current_filters).to contain_exactly(
+        %w[query test],
         %w[object_types item],
         %w[object_types collection],
         ['projects', 'Project 1']

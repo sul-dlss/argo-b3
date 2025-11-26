@@ -2,6 +2,8 @@
 
 <%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items, tags or projects:') %>
 
+<%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
+
 <%= render Search::LayoutComponent.new do |layout| %>
   <%= layout.with_main_content do %>
     <% if @projects_search_form %>

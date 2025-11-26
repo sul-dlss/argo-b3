@@ -8,6 +8,8 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
   context 'when there are current filters' do
     let(:search_form) do
       Search::ItemForm.new(
+        query: 'test',
+        include_google_books: true,
         object_types: %w[item collection],
         projects: ['Project 1']
       )
@@ -17,9 +19,11 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('section[aria-label="Current Filters"]')
-      expect(page).to have_css('li', text: 'Object types > item')
-      expect(page).to have_css('li', text: 'Object types > collection')
-      expect(page).to have_css('li', text: 'Projects > Project 1')
+      expect(page).to have_css('li', text: 'test')
+      expect(page).to have_css('li', text: 'Include Google Books')
+      expect(page).to have_css('li', text: /Object types\s+❯\s+item/)
+      expect(page).to have_css('li', text: /Object types\s+❯\s+collection/)
+      expect(page).to have_css('li', text: /Projects\s+❯\s+Project 1/)
       expect(page).to have_link('Clear all', href: '/')
     end
   end

@@ -18,7 +18,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: 'Object types > item')
+      expect(page).to have_css('li', text: /Object types\s+❯\s+item/)
       expect(page).to have_link('',
                                 href: '/search/items?object_types%5B%5D=collection&projects%5B%5D=Project+1',
                                 title: 'Remove Object types > item')
@@ -37,7 +37,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: 'Released to Earthworks > Last year')
+      expect(page).to have_css('li', text: /Released to Earthworks\s+❯\s+Last year/)
     end
   end
 end

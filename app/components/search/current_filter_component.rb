@@ -12,19 +12,26 @@ module Search
 
     attr_reader :form_field, :value, :search_form
 
-    def call
-      render Elements::SelectedItemComponent.new(label:, path: remove_path)
-    end
-
-    private
-
     def label
+      return value_label if query?
+      return field_label if include_google_books?
+
       "#{field_label} > #{value_label}"
     end
 
     def remove_path
       search_items_path(search_form.without_attributes({ form_field => value, page: nil }))
     end
+
+    def query?
+      form_field == 'query'
+    end
+
+    def include_google_books?
+      form_field == 'include_google_books'
+    end
+
+    private
 
     def field_label
       helpers.facet_label(form_field)

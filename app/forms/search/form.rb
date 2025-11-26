@@ -66,5 +66,14 @@ module Search
       # To be overridden in subclasses
       {}
     end
+
+    # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
+    def current_filters
+      # To be overridden in subclasses
+      [].tap do |filters|
+        filters << ['query', query] if query.present?
+        filters << ['include_google_books', true] if include_google_books
+      end
+    end
   end
 end

@@ -22,11 +22,14 @@ module Search
 
     # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
     def current_filters
-      self.class.this_attribute_names.flat_map do |attr_name|
-        values = public_send(attr_name)
-        Array(values).map do |value|
-          [attr_name, value]
+      @current_filters ||= begin
+        filters = self.class.this_attribute_names.flat_map do |attr_name|
+          values = public_send(attr_name)
+          Array(values).map do |value|
+            [attr_name, value]
+          end
         end
+        super + filters
       end
     end
 
