@@ -33,7 +33,8 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
     # There is a turbo-frame around the facet values
     expect(page).to have_css('turbo-frame#tags-facet-page1 ul')
 
-    expect(page).to have_css('li', text: /Audio\s+\(10\)/)
+    expect(page).to have_css('li .facet-label', text: 'Audio')
+    expect(page).to have_css('li .facet-count', text: '10')
   end
 
   context 'when facet search is enabled' do

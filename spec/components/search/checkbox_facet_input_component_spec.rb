@@ -14,7 +14,8 @@ RSpec.describe Search::CheckboxFacetInputComponent, type: :component do
     it 'renders the checkbox as checked' do
       render_inline(component)
 
-      expect(page).to have_field('collection (10)', type: 'checkbox', checked: true)
+      expect(page).to have_field('collection', type: 'checkbox', checked: true)
+      expect(page).to have_css('.facet-count', text: '10')
     end
   end
 
@@ -24,7 +25,7 @@ RSpec.describe Search::CheckboxFacetInputComponent, type: :component do
     it 'renders the checkbox as unchecked' do
       render_inline(component)
 
-      expect(page).to have_field('collection (10)', type: 'checkbox', checked: false)
+      expect(page).to have_field('collection', type: 'checkbox', checked: false)
     end
   end
 end

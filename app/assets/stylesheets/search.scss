@@ -1,0 +1,25 @@
+.more-facets {
+  --bs-link-color-rgb: var(--sul-link-color-rgb);
+  --bs-link-hover-color-rgb: var(--stanford-digital-blue-dark-rgb);
+}
+
+a[aria-expanded="true"] {
+  .expand-icon {
+    display: none;
+  }
+
+  .collapse-icon {
+    display: inline;
+  }
+}
+
+a[aria-expanded="false"] {
+  .expand-icon {
+    display: inline;
+  }
+
+  .collapse-icon {
+    display: none;
+  }
+}
+

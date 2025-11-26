@@ -1,14 +1,13 @@
 <%= tag.section 'aria-label': label, class: 'accordion mb-1' do %>
-  <div class="accordion-item">
-    <h3 class="accordion-header">
-      <%= tag.button class: 'accordion-button', type: 'button', data: { bs_toggle: 'collapse', bs_target: "##{collapse_id}" }, aria: { expanded: 'true', controls: collapse_id } do %>
+  <div class="accordion-item facet-limit">
+    <h3 class="accordion-header p-0 facet-field-heading h6">
+      <%= tag.button class: button_classes, type: 'button', data: { bs_toggle: 'collapse', bs_target: "##{collapse_id}" }, aria: { expanded: show?, controls: collapse_id } do %>
         <%= label %>
       <% end %>
     </h3>
+
     <%= tag.div id: collapse_id, class: collapse_classes do %>
-      <div class="accordion-body">
-        <%= content %>
-      </div>
+      <div class="accordion-body"><%= content %></div>
     <% end %>
   </div>
 <% end %>

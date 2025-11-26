@@ -27,7 +27,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         render_inline(component)
 
         expect(page).to have_link('waiting', href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting')
-        expect(page).to have_content('(10)')
+        expect(page).to have_css('.facet-count', text: '10')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')
         expect(page).to have_no_css('div.collapse')
       end
@@ -68,7 +68,8 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_no_link('end-ocr', exact: true)
         expect(page).to have_content('end-ocr')
         expect(page).to have_link('Remove', href: '/search/items')
-        expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr', title: 'Toggle end-ocr')
+        expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
+        expect(page).to have_css('a[data-bs-toggle="collapse"] .visually-hidden', text: '[Toggle end-ocr]')
         expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr"][loading="eager"]')
       end
@@ -79,8 +80,8 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         render_inline(component)
 
         expect(page).to have_link('end-ocr', href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr')
-        expect(page).to have_content('(10)')
-        expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
+        expect(page).to have_css('.facet-count', text: '10')
+        expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('div.collapse:not(.show) turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr"][loading="lazy"]')
       end
@@ -97,8 +98,8 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_link('end-ocr',
                                   href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting' \
                                         '&wps_workflows%5B%5D=ocrWF%3Aend-ocr')
-        expect(page).to have_content('(10)')
-        expect(page).to have_link('+', href: '#collapse-ocrwf-end-ocr')
+        expect(page).to have_css('.facet-count', text: '10')
+        expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
                                  '?parent_value=ocrWF%3Aend-ocr&wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting"]' \
                                  '[loading="eager"]')

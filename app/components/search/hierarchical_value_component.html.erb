@@ -1,18 +1,24 @@
 <%= tag.li style: do %>
-  <% if facet_count.branch? %>
-    <%= tag.a data: { bs_toggle: 'collapse', action: 'mouseover->hierarchical-facet-value#load' }, href: "##{children_collapse_id}", role: 'button', 'aria-expanded': expanded?, 'aria-controls': children_collapse_id, title: "Toggle #{label}" do %>
-      <%# Avoiding whitespace issues %>
-      <%= '+' -%>
-    <% end %>
-  <% end %>
+  <div class="w-100">
+    <div class="d-flex">
+      <% if facet_count.branch? %>
+        <%= tag.a data: { bs_toggle: 'collapse', action: 'mouseover->hierarchical-facet-value#load' }, href: "##{children_collapse_id}", role: 'button', 'aria-expanded': expanded?, 'aria-controls': children_collapse_id, title: toggle_label do %>
+          <i class="bi bi-plus me-2 expand-icon"></i>
+          <i class="bi bi-dash me-2 collapse-icon"></i>
 
-  <%= render Search::FacetValueComponent.new(label:, count:, search_form:, form_field:, value:, selected: selected?, data: { turbo_frame: '_top' }) %>
+          <span class="visually-hidden">[<%= toggle_label %>]</span>
+        <% end %>
+      <% end %>
 
-  <% if facet_count.branch? %>
-    <%= tag.div id: children_collapse_id, class: collapse_classes do %>
-      <%= helpers.turbo_frame_tag children_turbo_id, src: children_path, loading: expanded? ? 'eager' : 'lazy' do %>
-        Loading...
+      <%= render Search::FacetValueComponent.new(label:, count:, search_form:, form_field:, value:, selected: selected?, data: { turbo_frame: '_top' }) %>
+    </div>
+
+    <% if facet_count.branch? %>
+      <%= tag.div id: children_collapse_id, class: collapse_classes do %>
+        <%= helpers.turbo_frame_tag children_turbo_id, src: children_path, loading: expanded? ? 'eager' : 'lazy' do %>
+          Loading...
+        <% end %>
       <% end %>
     <% end %>
-  <% end %>
+  </div>
 <% end %>

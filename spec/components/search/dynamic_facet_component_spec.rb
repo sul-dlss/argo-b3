@@ -22,7 +22,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
     expect(page).to have_css('section[aria-label="Released to Earthworks"] h3', text: 'Released to Earthworks')
 
     # Add a new facet value
-    item = page.find('li', text: /Last month\s+\(10\)/)
+    item = page.find('li', text: 'Last month')
     expect(item).to have_link('Last month',
                               href: '/search/items?released_to_earthworks%5B%5D=last_week&released_to_earthworks%5B%5D=last_month') # rubocop:disable Layout/LineLength
 

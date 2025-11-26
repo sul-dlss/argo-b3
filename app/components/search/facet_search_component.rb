@@ -2,14 +2,16 @@
 
 module Search
   # Component for displaying a search input for a specific facet
-  class FacetSearchComponent < ViewComponent::Base
+  class FacetSearchComponent < ApplicationComponent
     # @param facet_search_path_helper [Proc, nil] The path helper for performing the facet search
     # @param form_field [Symbol] The form field this search is for
     # @param search_form [Search::ItemForm] The current search form
-    def initialize(facet_search_path_helper:, form_field:, search_form:)
+    # @param classes [String, Array, nil] Additional CSS classes for the combox
+    def initialize(facet_search_path_helper:, form_field:, search_form:, classes: nil)
       @facet_search_path_helper = facet_search_path_helper
       @form_field = form_field
       @search_form = search_form
+      @classes = classes
       super()
     end
 
@@ -23,8 +25,12 @@ module Search
       { controller: 'autocomplete facet-search', autocomplete_url_value: path }
     end
 
+    def classes
+      merge_classes(@classes)
+    end
+
     def label
-      "Search these #{helpers.facet_label(form_field).downcase}: "
+      "Search these #{helpers.facet_label(form_field).downcase}"
     end
 
     def id

@@ -27,7 +27,7 @@ RSpec.describe Search::FacetComponent, type: :component do
     expect(page).to have_css('turbo-frame#object-types-facet-page1 ul')
 
     # Add a new facet value
-    item = page.find('li', text: /item\s+\(5\)/)
+    item = page.find('li', text: 'item')
     expect(item).to have_link('item',
                               href: '/search/items?object_types%5B%5D=collection&object_types%5B%5D=item')
 

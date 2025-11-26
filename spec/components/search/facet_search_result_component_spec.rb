@@ -9,7 +9,8 @@ RSpec.describe Search::FacetSearchResultComponent, type: :component do
   it 'renders the facet search result' do
     render_inline(component)
 
-    expect(page).to have_css('li.list-group-item[role="option"][data-autocomplete-value="collection"]',
-                             text: 'collection (10)')
+    item = page.find('li.list-group-item[role="option"][data-autocomplete-value="collection"]')
+    expect(item).to have_css('.facet-label', text: 'collection')
+    expect(item).to have_css('.facet-count', text: '10')
   end
 end

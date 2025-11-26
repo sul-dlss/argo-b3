@@ -2,7 +2,7 @@
 
 module Search
   # Component for a single checkbox input within a checkbox facet
-  class CheckboxFacetInputComponent < ViewComponent::Base
+  class CheckboxFacetInputComponent < ApplicationComponent
     with_collection_parameter :facet_count
 
     def initialize(facet_count:, search_form:, form_field:, form_builder:)
@@ -19,6 +19,10 @@ module Search
 
     def checked?
       search_form.selected?(key: form_field, value: facet_count.value)
+    end
+
+    def label_classes
+      merge_classes('form-check-label', checked? ? 'selected' : nil)
     end
   end
 end

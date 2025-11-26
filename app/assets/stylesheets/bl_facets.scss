@@ -1,0 +1,221 @@
+// From https://raw.githubusercontent.com/projectblacklight/blacklight/refs/heads/main/app/assets/stylesheets/blacklight/_facets.scss
+// with fixes for style linting.
+
+.facets {
+  --bl-facet-active-bg: var(--bs-success);
+  --bl-facet-active-color: var(--bs-white);
+  --bl-facet-active-item-color: var(--bs-success);
+  --bl-facet-remove-color: var(--bs-secondary-color);
+  --bl-facet-remove-hover-color: var(--bs-danger);
+  --bl-facet-label-indent: -15px;
+  --bl-facet-label-padding-left: 15px;
+  --bl-facet-header-padding-y: 0.5rem;
+  --bl-facet-value-padding-y: 0.2rem;
+
+  .facet-toggle-button {
+    [data-hide-label] {
+      display: inline;
+    }
+
+    [data-show-label] {
+      display: none;
+    }
+
+    &[aria-expanded="false"] {
+      [data-hide-label] {
+        display: none;
+      }
+
+      [data-show-label] {
+        display: inline;
+      }
+    }
+  }
+}
+
+.facets-header {
+  display: flex;
+  justify-content: space-between;
+  padding-block: var(--bl-facet-header-padding-y);
+}
+
+.facets-heading {
+  line-height: inherit;
+}
+
+.facet-limit {
+  --bs-accordion-btn-bg: var(--bs-gray-100);
+  --bs-btn-active-bg: var(--bs-accordion-btn-bg);
+  --bs-btn-hover-bg: var(--bs-accordion-btn-bg);
+  --bs-accordion-active-bg: var(--bs-accordion-btn-bg);
+}
+
+.facet-limit-active {
+  --bs-accordion-btn-bg: var(--bl-facet-active-bg);
+  --bs-btn-hover-bg: var(--bs-accordion-btn-bg);
+  --bs-btn-active-bg: var(--bl-facet-active-bg);
+  --bs-btn-active-color: var(--bl-facet-active-color);
+  --bs-accordion-btn-color: var(--bl-facet-active-color);
+  --bs-btn-hover-color: var(--bs-accordion-btn-color);
+  --bs-accordion-active-color: var(--bs-accordion-btn-color);
+
+  // Accordion icon stroke color can't be set without overriding the whole SVG
+  --bs-accordion-btn-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>");
+  --bs-accordion-btn-active-icon: var(--bs-accordion-btn-icon);
+}
+
+.facet-values {
+  margin-bottom: 0;
+
+  a {
+    text-decoration: none;
+  }
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    padding-block: var(--bl-facet-value-padding-y);
+
+    &.treeitem {
+      display: block;
+    }
+
+    .selected {
+      color: var(--bl-facet-active-item-color);
+    }
+  }
+
+  .remove {
+    color: var(--bl-facet-remove-color);
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--bl-facet-remove-hover-color);
+      text-decoration: none;
+    }
+  }
+
+  .facet-label {
+    hyphens: auto;
+    overflow-wrap: break-word;
+    padding-left: var(--bl-facet-label-padding-left);
+    padding-right: 1em;
+    text-indent: var(--bl-facet-label-indent);
+  }
+
+  .facet-count {
+    margin-left: auto;
+  }
+
+  .facet-checkbox {
+    width: 1.25rem;
+  }
+}
+
+.facet-extended-list {
+  .sort-options {
+    text-align: right;
+  }
+
+  .prev-next-links {
+    float: left;
+  }
+}
+
+.facet-field-heading {
+  a {
+    color: inherit;
+  }
+
+  /* This prevents the contained stretch link from covering the panel body */
+  position: relative;
+}
+
+/* Pivot Facets
+-------------------------------------------------- */
+
+.pivot-facet {
+  --bl-facet-toggle-width: 1em;
+  --bl-facet-toggle-height: var(--bl-facet-toggle-width);
+  --bl-facet-toggle-margin: 0.5em;
+  --bl-facet-toggle-show-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" /><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" /></svg>');
+  --bl-facet-toggle-hide-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" /><path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z" /></svg>');
+
+  // If the item has no expand button, we align it with its siblings that do
+  // by giving it left margin equal to the sum of the button's width & margin
+  li.treeitem:not(:has(button.facet-toggle-handle)) {
+    margin-left: calc(var(--bl-facet-toggle-width) + var(--bl-facet-toggle-margin));
+  }
+}
+
+.facet-toggle-handle {
+  --bs-btn-hover-bg: var(--bs-btn-hover-bg);
+  --bs-btn-active-bg: var(--bs-btn-active-bg);
+
+  margin-block: 0;
+  padding-block: 0;
+  padding: 0;
+  border: 0;
+  width: var(--bl-facet-toggle-width);
+  height: var(--bl-facet-toggle-height);
+  margin-right: var(--bl-facet-toggle-margin);
+
+  .show {
+    display: none;
+  }
+
+  .hide {
+    display: flex;
+  }
+
+  &.collapsed {
+    .show {
+      display: flex;
+    }
+
+    .hide {
+      display: none;
+    }
+  }
+
+  .show .icon,
+  .hide .icon {
+    width: var(--bl-facet-toggle-width);
+    height: var(--bl-facet-toggle-height);
+  }
+
+  .show .icon {
+    background: transparent escape-svg(var(--bl-facet-toggle-show-icon)) center /
+      var(--bl-facet-toggle-width) auto no-repeat;
+  }
+
+  .hide .icon {
+    background: transparent escape-svg(var(--bl-facet-toggle-hide-icon)) center /
+      var(--bl-facet-toggle-width) auto no-repeat;
+  }
+}
+
+.no-js {
+  @include media-breakpoint-down(lg) {
+    #sidebar {
+      order: 6 !important;
+    }
+  }
+
+  .facet-content.collapse {
+    display: block;
+  }
+
+  .facet-toggle-handle {
+    display: none;
+  }
+
+  .pivot-facet.collapse {
+    display: block;
+  }
+
+  .facets-collapse.collapse {
+    display: block;
+  }
+}

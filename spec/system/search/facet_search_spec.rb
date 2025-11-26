@@ -21,10 +21,13 @@ RSpec.describe 'Facet search', :solr do
 
     fill_in('Search these tags', with: 'Tag 2')
 
-    expect(page).to have_css('.list-group-item', text: 'Tag 2 (1)')
-    expect(page).to have_css('.list-group-item', text: 'Tag 2 : Tag 2a (1)')
+    within(first('.list-group-item')) do
+      expect(page).to have_css('.facet-label', text: 'Tag 2')
+      expect(page).to have_css('.facet-count', text: '1')
+    end
+    expect(page).to have_css('.list-group-item .facet-label', text: 'Tag 2 : Tag 2a')
 
-    find('.list-group-item', text: 'Tag 2 : Tag 2a (1)').click
+    find('.list-group-item', text: 'Tag 2 : Tag 2a').click
 
     expect(page).to have_result_count(1)
     expect(page).to have_current_filter('Tags', 'Tag 2 : Tag 2a')
