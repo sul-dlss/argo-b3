@@ -8,6 +8,9 @@
     <%= helpers.turbo_frame_tag helpers.facet_id(:tags), src: search_tag_facets_path(search_form.attributes), target: '_top' do %>
       <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:tags)) %>
     <% end %>
+    <%= helpers.turbo_frame_tag helpers.facet_id(:tickets), src: search_ticket_facets_path(search_form.attributes), target: '_top' do %>
+      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:tickets)) %>
+    <% end %>
   <% end %>
 
   <%= tag.div id: helpers.facet_id(:object_types) do %>

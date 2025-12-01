@@ -18,7 +18,7 @@ RSpec.describe 'Current filters', :solr do
     expect(page).to have_result_count(3)
 
     # Perform a search.
-    fill_in('Search for items', with: 'test')
+    find_search_field.fill_in(with: 'test')
     click_button 'Search'
 
     expect(page).to have_result_count(3)

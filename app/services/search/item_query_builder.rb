@@ -36,6 +36,7 @@ module Search
       queries << facet_filter_query(facet_config: Search::Facets::OBJECT_TYPES)
       queries << facet_filter_query(facet_config: Search::Facets::PROJECTS)
       queries << facet_filter_query(facet_config: Search::Facets::TAGS)
+      queries << facet_filter_query(facet_config: Search::Facets::TICKETS)
       queries << facet_filter_query(facet_config: Search::Facets::WORKFLOWS)
       queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS)
       queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS, exclude: true)

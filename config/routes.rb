@@ -23,6 +23,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
 
     resources :tags, only: [:index]
 
+    resources :tickets, only: [:index]
+
     resources :tag_facets, only: [:index] do
       collection do
         get 'children'
@@ -37,6 +39,12 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       end
     end
 
+    resources :ticket_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
     resources :workflow_facets, only: [:index] do
       collection do
         get 'children'
@@ -45,7 +53,6 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
 
     resources :mimetype_facets, only: [:index] do
       collection do
-        get 'children'
         get 'search'
       end
     end

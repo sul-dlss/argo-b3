@@ -12,7 +12,7 @@ RSpec.describe 'Project search', :solr do
 
     assert_home_page
 
-    fill_in('Search for items, tags or projects', with: '2a')
+    find_search_field.fill_in(with: '2a')
     click_button('Search')
 
     within(find_project_results_section) do

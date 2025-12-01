@@ -12,6 +12,10 @@ def find_tag_results_section
   all('section[aria-label="Tag results"]')&.first
 end
 
+def find_ticket_results_section
+  all('section[aria-label="Ticket results"]')&.first
+end
+
 def find_next_page
   find_link('Next »')
 end
@@ -26,6 +30,10 @@ end
 
 def find_tag_result(tag)
   find("li#tags-result-#{tag.parameterize}")
+end
+
+def find_ticket_result(ticket)
+  find("li#tickets-result-#{ticket.parameterize}")
 end
 
 def find_facet_section(facet_label)
@@ -52,4 +60,9 @@ end
 
 def find_facet_more_link(facet_label)
   find_facet_section(facet_label).find_link('More')
+end
+
+def find_search_field
+  # This matches the search field on home page or items search page.
+  find_field('Search for items')
 end

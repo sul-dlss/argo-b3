@@ -10,5 +10,6 @@ class HomeController < SearchApplicationController
 
     @projects_search_form = build_form(form_class: Search::Form)
     @tags_search_form = build_form(form_class: Search::Form)
+    @tickets_search_form = build_form(form_class: Search::Form)
   end
 end

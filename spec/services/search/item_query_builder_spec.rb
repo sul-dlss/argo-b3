@@ -87,6 +87,15 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with tickets' do
+    let(:search_form) { Search::ItemForm.new(tickets: %w[DIGREQ-123 DIGREQ-456]) }
+
+    it 'builds the correct filter query for tags' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::TICKETS}:(\"DIGREQ-123\" OR \"DIGREQ-456\")")
+    end
+  end
+
   context 'with wps workflows' do
     let(:search_form) { Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr:waiting']) }
 
