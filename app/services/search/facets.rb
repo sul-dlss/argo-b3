@@ -105,6 +105,15 @@ module Search
       facet_search_path_helper: to_path_helper(:search_search_tag_facets_path)
     )
 
+    TICKETS = Config.with_defaults(
+      form_field: :tickets,
+      field: Search::Fields::TICKETS,
+      alpha_sort: true,
+      limit: 25,
+      facet_path_helper: to_path_helper(:search_ticket_facets_path),
+      facet_search_path_helper: to_path_helper(:search_search_ticket_facets_path)
+    )
+
     WORKFLOWS = Config.with_defaults(
       form_field: :wps_workflows,
       field: Search::Fields::WPS_WORKFLOWS,

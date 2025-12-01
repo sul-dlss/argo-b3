@@ -1,6 +1,6 @@
 <%= content_for :title, 'Home page' %>
 
-<%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items, tags or projects:') %>
+<%= render Search::FormComponent.new(search_form: @search_form, url: home_path, label: 'Search for items, tags, projects or tickets:') %>
 
 <%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
 
@@ -15,6 +15,12 @@
     <% if @tags_search_form %>
       <%= turbo_frame_tag 'tags-search', src: search_tags_path(@tags_search_form.attributes) do %>
         <%= render Search::LoadingFacetResultsComponent.new(label: 'Tag results') %>
+      <% end %>
+    <% end %>
+
+    <% if @tickets_search_form %>
+      <%= turbo_frame_tag 'tickets-search', src: search_tickets_path(@tickets_search_form.attributes) do %>
+        <%= render Search::LoadingFacetResultsComponent.new(label: 'Ticket results') %>
       <% end %>
     <% end %>
 

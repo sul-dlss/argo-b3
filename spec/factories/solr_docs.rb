@@ -16,6 +16,7 @@ FactoryBot.define do
       apo_druid { generate(:unique_druid) }
       projects { [] }
       tags { [] }
+      sequence(:ticket) { |n| "TESTREQ-#{n}" }
       workflows { [] }
       mimetypes { ['application/pdf', 'image/jpeg'] }
       released_to_earthworks { true }
@@ -34,6 +35,7 @@ FactoryBot.define do
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
         Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
+        Search::Fields::TICKETS => [ticket],
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),

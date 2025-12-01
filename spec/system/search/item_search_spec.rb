@@ -19,7 +19,7 @@ RSpec.describe 'Item search', :solr do
 
       assert_home_page
 
-      fill_in('Search for items, tags or projects', with: item_doc[Search::Fields::TITLE])
+      find_search_field.fill_in(with: item_doc[Search::Fields::TITLE])
       click_button('Search')
 
       expect(find_project_results_section).to be_nil
@@ -36,7 +36,7 @@ RSpec.describe 'Item search', :solr do
 
         assert_home_page
 
-        fill_in('Search for items, tags or projects', with: 'Item')
+        find_search_field.fill_in(with: 'Item')
         click_button('Search')
 
         within(find_item_results_section) do
@@ -75,7 +75,7 @@ RSpec.describe 'Item search', :solr do
         assert_home_page
         check('Include Google Books')
 
-        fill_in('Search for items, tags or projects', with: 'Item')
+        find_search_field.fill_in(with: 'Item')
         click_button('Search')
 
         within(find_item_results_section) do
@@ -89,7 +89,7 @@ RSpec.describe 'Item search', :solr do
         visit root_path
 
         assert_home_page
-        fill_in('Search for items, tags or projects', with: '')
+        find_search_field.fill_in(with: '')
         click_button('Search')
 
         expect(find_item_results_section).to be_nil
@@ -105,7 +105,7 @@ RSpec.describe 'Item search', :solr do
         expect(page).to have_result_count(5)
         expect(page).to have_current_filter('Object types', 'collection')
 
-        fill_in('Search for items', with: collection_doc[Search::Fields::TITLE])
+        find_search_field.fill_in(with: collection_doc[Search::Fields::TITLE])
         click_button('Search')
 
         expect(page).to have_result_count(1)

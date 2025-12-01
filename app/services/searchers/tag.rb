@@ -37,6 +37,7 @@ module Searchers
         facet: true,
         'facet.field': field,
         'facet.matches': matches_regex,
+        'facet.limit': 10_000,
         debugQuery: search_form.debug
       }
     end

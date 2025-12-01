@@ -31,6 +31,7 @@ RSpec.describe Searchers::Tag do
                        rows: 0,
                        facet: true,
                        'facet.field': Search::Fields::PROJECTS_EXPLODED,
+                       'facet.limit': 10_000,
                        'facet.matches': '(?i)(.*(project|1).*){2}',
                        debugQuery: false })
   end
