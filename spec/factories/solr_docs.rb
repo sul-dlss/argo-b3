@@ -21,6 +21,7 @@ FactoryBot.define do
       mimetypes { ['application/pdf', 'image/jpeg'] }
       released_to_earthworks { true }
       access_rights { 'dark' }
+      earliest_accessioned_date { 1.year.ago }
     end
 
     initialize_with do
@@ -42,6 +43,7 @@ FactoryBot.define do
         Search::Fields::MIMETYPES => mimetypes,
         Search::Fields::RELEASED_TO_EARTHWORKS => released_to_earthworks ? Time.now.utc.iso8601 : nil,
         Search::Fields::ACCESS_RIGHTS => [access_rights],
+        Search::Fields::EARLIEST_ACCESSIONED_DATE => earliest_accessioned_date.utc.iso8601,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

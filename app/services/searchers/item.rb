@@ -69,7 +69,9 @@ module Searchers
         OBJECT_TYPES => Search::FacetBuilder.call(**Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
         ACCESS_RIGHTS => Search::FacetBuilder.call(**Search::Facets::ACCESS_RIGHTS.to_h.slice(*FACET_BUILDER_ARGS)),
         MIMETYPES => Search::FacetBuilder.call(**Search::Facets::MIMETYPES.to_h.slice(*FACET_BUILDER_ARGS))
-      }.merge(Search::DynamicFacetBuilder.call(**Search::Facets::RELEASED_TO_EARTHWORKS.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
+      }
+        .merge(Search::DynamicFacetBuilder.call(**Search::Facets::RELEASED_TO_EARTHWORKS.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
+        .merge(Search::DynamicFacetBuilder.call(**Search::Facets::EARLIEST_ACCESSIONED_DATE.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
     end
 
     def rows

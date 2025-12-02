@@ -12,6 +12,7 @@ module Search
     COLLECTION_DRUIDS = 'member_of_collection_ssim'
     COLLECTION_TITLES = 'collection_title_ssimdv'
     CONTENT_TYPES = 'content_type_ssimdv'
+    EARLIEST_ACCESSIONED_DATE = 'accessioned_earliest_dtpsidv'
     ID = 'id'
     IDENTIFIERS = 'identifier_ssim'
     MIMETYPES = 'content_file_mimetypes_ssimdv'

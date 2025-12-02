@@ -11,4 +11,22 @@
       </li>
     <% end %>
   </ul>
+
+  <% if date_from_form_field || date_to_form_field %>
+    <%= helpers.form_with model: search_form, scope: :search, url: search_items_path, method: :get, class: 'facet-values mt-3' do |form| %>
+      <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field:) %>
+
+      <% if date_from_form_field %>
+        <%= form.label date_from_form_field, 'From:', class: 'form-label' %>
+        <%= form.date_field date_from_form_field, class: 'form-control' %>
+      <% end %>
+
+      <% if date_to_form_field %>
+        <%= form.label date_to_form_field, 'To:', class: 'form-label mt-2' %>
+        <%= form.date_field date_to_form_field, class: 'form-control' %>
+      <% end %>
+
+      <%= form.submit 'Filter', class: 'btn btn-primary btn-sm mt-3' %>
+    <% end %>
+  <% end %>
 <% end %>

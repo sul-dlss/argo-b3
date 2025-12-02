@@ -29,6 +29,10 @@
     <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:released_to_earthworks)) %>
   <% end %>
 
+  <%= tag.div id: helpers.facet_id(:earliest_accessioned_date) do %>
+    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:earliest_accessioned_date)) %>
+  <% end %>
+
   <%= helpers.turbo_frame_tag helpers.facet_id(:wps_workflows), src: search_workflow_facets_path(search_form.attributes), target: '_top' do %>
     <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:wps_workflows)) %>
   <% end %>

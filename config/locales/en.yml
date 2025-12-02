@@ -31,10 +31,14 @@ en:
   search:
     # If not provided, will use humanized field name
     facets:    
-      wps_workflows: "Workflow > Process > Status"
+      earliest_accessioned_date: "Earliest accessioned"
+      earliest_accessioned_date_from: 'Earliest accessioned from'
+      earliest_accessioned_date_to: 'Earliest accessioned to'
+      include_google_books: "Include Google Books"
       mimetypes: "MIME Types"
       released_to_earthworks: "Released to Earthworks"
-      include_google_books: "Include Google Books"
+      wps_workflows: "Workflow > Process > Status"
     facet_values:
       ever: "Currently released"
       never: "Not released"
+      

@@ -47,6 +47,18 @@
           <%= render Search::DynamicFacetComponent.new(facet_counts: component.facet_counts, search_form: component.search_form, form_field: component.form_field) %>
         <% end %>
       <% end %>
+
+      <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE,
+                                                              facet_counts: @results.earliest_accessioned_date_facet,
+                                                              search_form: @search_form) do |component| %>
+        <% component.with_facet do %>
+          <%= render Search::DynamicFacetComponent.new(facet_counts: component.facet_counts,
+                                                       search_form: component.search_form,
+                                                       form_field: component.form_field,
+                                                       date_from_form_field: component.date_from_form_field,
+                                                       date_to_form_field: component.date_to_form_field) %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 

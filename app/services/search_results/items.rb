@@ -35,6 +35,10 @@ module SearchResults
       DynamicFacetCounts.new(solr_response:, facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
     end
 
+    def earliest_accessioned_date_facet
+      DynamicFacetCounts.new(solr_response:, facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE)
+    end
+
     def total_results
       @solr_response['response']['numFound']
     end
