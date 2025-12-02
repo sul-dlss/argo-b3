@@ -124,4 +124,36 @@ RSpec.describe Search::ItemQueryBuilder do
                     "(-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *])")
     end
   end
+
+  context 'with dynamic facet earliest accessioned date' do
+    context 'with from and to dates' do
+      let(:search_form) { Search::ItemForm.new(earliest_accessioned_date_from: '2023-01-01', earliest_accessioned_date_to: '2023-12-31') }
+
+      it 'builds the correct filter query for earliest accessioned date' do
+        result = described_class.call(search_form:)
+        expect(Array(result[:fq]))
+          .to include("#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:[2023-01-01T00:00:00Z TO 2023-12-31T23:59:59Z]")
+      end
+    end
+
+    context 'with from date' do
+      let(:search_form) { Search::ItemForm.new(earliest_accessioned_date_from: '2023-01-01') }
+
+      it 'builds the correct filter query for earliest accessioned date' do
+        result = described_class.call(search_form:)
+        expect(Array(result[:fq]))
+          .to include("#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:[2023-01-01T00:00:00Z TO *]")
+      end
+    end
+
+    context 'with to date' do
+      let(:search_form) { Search::ItemForm.new(earliest_accessioned_date_to: '2023-12-31') }
+
+      it 'builds the correct filter query for earliest accessioned date' do
+        result = described_class.call(search_form:)
+        expect(Array(result[:fq]))
+          .to include("#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:[* TO 2023-12-31T23:59:59Z]")
+      end
+    end
+  end
 end

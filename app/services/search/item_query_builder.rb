@@ -42,6 +42,7 @@ module Search
       queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS, exclude: true)
       queries << facet_filter_query(facet_config: Search::Facets::MIMETYPES)
       queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
+      queries << dynamic_facet_filter_query(facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE)
       queries << "-#{APO_DRUID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       queries.compact
     end
@@ -64,13 +65,25 @@ module Search
     # Construct a facet filter query for the given dynamic facet configuration.
     # @param facet_config [Search::Facets::Config]
     def dynamic_facet_filter_query(facet_config:)
-      return if search_form.send(facet_config.form_field).blank?
-
       query_parts = search_form.send(facet_config.form_field).map do |value|
         query = facet_config.dynamic_facet[value.to_sym]
         "(#{query})"
       end
-      query_parts.join(' OR ')
+      date_range_query_part = date_range_query_part(facet_config:)
+      query_parts << date_range_query_part if date_range_query_part.present?
+      return if query_parts.empty?
+
+      query_parts.compact.join(' OR ')
+    end
+
+    def date_range_query_part(facet_config:)
+      date_from = search_form.send(facet_config.date_from_form_field) if facet_config.date_from_form_field
+      date_to = search_form.send(facet_config.date_to_form_field) if facet_config.date_to_form_field
+      return if date_from.blank? && date_to.blank?
+
+      from_part = date_from.present? ? date_from.strftime('%Y-%m-%dT00:00:00Z') : '*'
+      to_part = date_to.present? ? date_to.strftime('%Y-%m-%dT23:59:59Z') : '*'
+      "#{facet_config.field}:[#{from_part} TO #{to_part}]"
     end
 
     def query_fields # rubocop:disable Metrics/MethodLength

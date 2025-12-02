@@ -40,4 +40,22 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
       expect(component.render?).to be false
     end
   end
+
+  context 'when date range form fields are provided' do
+    let(:component) do
+      described_class.new(facet_counts:, search_form:, form_field: :earliest_accessioned_date,
+                          date_from_form_field: :earliest_accessioned_date_from,
+                          date_to_form_field: :earliest_accessioned_date_to)
+    end
+    let(:search_form) { Search::ItemForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
+
+    it 'renders the date range inputs' do
+      render_inline(component)
+
+      expect(page).to have_css('section[aria-label="Earliest accessioned"]')
+
+      expect(page).to have_field('From', type: 'date')
+      expect(page).to have_field('To', type: 'date')
+    end
+  end
 end

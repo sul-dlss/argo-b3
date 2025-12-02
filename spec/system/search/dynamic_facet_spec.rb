@@ -32,7 +32,7 @@ RSpec.describe 'Dynamic facets', :solr do
 
     expect(page).to have_result_count(5)
     expect(page).to have_item_result(released_item_doc)
-    expect(page).not_to have_item_result(not_released_item_doc)
+    expect(page).not_to have_item_result(not_released_item_doc, wait: 0)
     expect(page).to have_current_filter('Released to Earthworks', 'Currently released')
     expect(page).to have_facet('Released to Earthworks', expanded: true)
 

@@ -144,6 +144,17 @@ Dynamic facets have facet values that are the result of a specified query.
 4. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` use a `Search::DynamicFacetComponent`.
 5. When adding the facet to `Search::ItemQueryBuilder.filter_queries`, call `dynamic_facet_filter_query()`.
 
+### Making a dynamic facet support a user-supplied date range
+Dynamic facets may optionally have a date range filter (where the user specifies a date from and/or date to). See, for example, the "Earliest accessioned" facet.
+
+1. Add `*_from` and `*_to` attributes to `Search::ItemForm`. For example:
+```
+    attribute :earliest_accessioned_date_from, :date, default: nil
+    attribute :earliest_accessioned_date_to, :date, default: nil
+```
+2. Add `date_from_form_field`, `date_to_form_field`, and `field` to the configuration constant in `Search::Facets`.
+3. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` provide the `date_from_form_field` and `date_to_form_field` to `Search::DynamicFacetComponent`
+
 ### Adding exclude (query negation) to a facet
 Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
 

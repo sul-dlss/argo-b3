@@ -2,7 +2,7 @@
 
 module Search
   # Constants for facet configuration
-  module Facets
+  module Facets # rubocop:disable Metrics/ModuleLength
     def self.to_path_helper(path_name)
       ->(*args) { Rails.application.routes.url_helpers.public_send(path_name, *args) }
     end
@@ -26,6 +26,9 @@ module Search
                         :field,
                         # Solr hierarchical field containing the exploded hierarchy. Only for hierarchical facets.
                         :hierarchical_field,
+                        # Form field for the from/to dates in a date range facet.
+                        :date_from_form_field,
+                        :date_to_form_field,
                         # Path helper for the index endpoint for the facet.
                         # This is used for a lazy facet and/or a pageable facet.
                         # If is included and the number of facet values exceeds the limit, paging will be enabled.
@@ -58,12 +61,32 @@ module Search
       alpha_sort: true
     )
 
+    EARLIEST_ACCESSIONED_DATE = Config.with_defaults(
+      form_field: :earliest_accessioned_date,
+      date_from_form_field: :earliest_accessioned_date_from,
+      date_to_form_field: :earliest_accessioned_date_to,
+      field: Search::Fields::EARLIEST_ACCESSIONED_DATE,
+      dynamic_facet: {
+        last_day: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_DAY}",
+        last_week: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_WEEK}",
+        last_month: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_MONTH}",
+        last_year: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_YEAR}",
+        all: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::ALL}"
+      }
+    )
+
     MIMETYPES = Config.with_defaults(
       form_field: :mimetypes,
       field: Search::Fields::MIMETYPES,
       limit: 10,
       facet_path_helper: to_path_helper(:search_mimetype_facets_path),
       facet_search_path_helper: to_path_helper(:search_search_mimetype_facets_path)
+    )
+
+    OBJECT_TYPES = Config.with_defaults(
+      form_field: :object_types,
+      field: Search::Fields::OBJECT_TYPES,
+      exclude: true
     )
 
     PROJECTS = Config.with_defaults(
@@ -77,20 +100,14 @@ module Search
       facet_search_path_helper: to_path_helper(:search_search_project_facets_path)
     )
 
-    OBJECT_TYPES = Config.with_defaults(
-      form_field: :object_types,
-      field: Search::Fields::OBJECT_TYPES,
-      exclude: true
-    )
-
     RELEASED_TO_EARTHWORKS = Config.with_defaults(
       form_field: :released_to_earthworks,
       dynamic_facet: {
-        last_week: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO NOW]",
-        last_month: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1MONTH/DAY TO NOW]",
-        last_year: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO NOW]",
-        ever: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *]",
-        never: "-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *]"
+        last_week: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_WEEK}",
+        last_month: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_MONTH}",
+        last_year: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_YEAR}",
+        ever: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::ALL}",
+        never: "-#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::ALL}"
       }
     )
 

@@ -3,17 +3,21 @@
 module Search
   # Component for displaying a dynamic search facet.
   class DynamicFacetComponent < ViewComponent::Base
-    def initialize(facet_counts:, search_form:, form_field:)
+    def initialize(facet_counts:, search_form:, form_field:, date_from_form_field: nil, date_to_form_field: nil)
       @facet_counts = facet_counts
       @search_form = search_form
       @form_field = form_field
+      @date_from_form_field = date_from_form_field
+      @date_to_form_field = date_to_form_field
       super()
     end
 
-    attr_reader :facet_counts, :search_form, :form_field
+    attr_reader :facet_counts, :search_form, :form_field, :date_from_form_field, :date_to_form_field
 
     def show?
-      search_form.selected?(key: form_field)
+      search_form.selected?(key: form_field) ||
+        (date_from_form_field && search_form.selected?(key: date_from_form_field)) ||
+        (date_to_form_field && search_form.selected?(key: date_to_form_field))
     end
 
     def label

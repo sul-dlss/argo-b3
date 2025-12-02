@@ -3,15 +3,18 @@
 module Search
   # Form for searching items (DROs, collections, or APOs)
   class ItemForm < Search::Form
-    attribute :object_types, array: true, default: -> { [] }
-    attribute :projects, array: true, default: -> { [] }
-    attribute :tags, array: true, default: -> { [] }
-    attribute :tickets, array: true, default: -> { [] }
     attribute :access_rights, array: true, default: -> { [] }
     attribute :access_rights_exclude, array: true, default: -> { [] }
-    attribute :wps_workflows, array: true, default: -> { [] }
+    attribute :earliest_accessioned_date, array: true, default: -> { [] }
+    attribute :earliest_accessioned_date_from, :date, default: nil
+    attribute :earliest_accessioned_date_to, :date, default: nil
     attribute :mimetypes, array: true, default: -> { [] }
+    attribute :object_types, array: true, default: -> { [] }
+    attribute :projects, array: true, default: -> { [] }
     attribute :released_to_earthworks, array: true, default: -> { [] }
+    attribute :tags, array: true, default: -> { [] }
+    attribute :tickets, array: true, default: -> { [] }
+    attribute :wps_workflows, array: true, default: -> { [] }
 
     # @return [Hash] attributes defined on this class (not its superclasses)
     def this_attributes
