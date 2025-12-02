@@ -80,11 +80,11 @@ The lazy async pattern should be used for slow facets. Each of these facets invo
 
 1. Add an attribute for the facet to `Search::ItemForm`.
 2. Add any new solr fields to `Search::Fields`.
-3. Add a `<turbo-frame>` for the facet to `Search::FacetsSectionComponent`.
+3. Add a `Search::LoadingFacetFrameComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `turbo-frame` that will be replaced with the facet content.
 4. Add a new `*_facets` resource to `routes.rb` providing the `index` route. See for example, `:tag_facets`.
 5. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `index` method.
 6. Add a configuration constant to `Search::Facets`. This must include the `form_field`, `field`, and `facet_path_helper` attributes.
-7. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
+7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
 8. Optionally, add a label for the facet to `en.yml`.
 
 Note:
@@ -96,16 +96,15 @@ The non-lazy sync pattern should be used for fast facets. The facet values are r
 1. Add an attribute for the facet to `Search::ItemForm`.
 2. Add any new solr fields to `Search::Fields`.
 3. Add a configuration constant to `Search::Facets`. This must include the `form_field` and `field` attributes.
-4. Add an empty `<div>` for the facet to `Search::FacetsSectionComponent`.
-5. Add the facet to the Solr request in `Searchers::Item.facet_json`.
-6. Add a method to `SearchResults::Items` to return the `SearchResults::FacetCounts` for the facet.
-7. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
-8. Add the facet to `Search::ItemQueryBuilder.filter_queries` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
-9. Optionally, add a label for the facet to `en.yml`.
+4. Add a `Search::LoadingFacetDivComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `div` that will be replaced with the facet content.
+5. Add the facet to the Solr request in `Searchers::Item::FACETS`.
+6. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
+7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
+8. Optionally, add a label for the facet to `en.yml`.
 
 ### Adding paging to a facet
 1. Add a new `*_facets` resource to `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::MimetypeFacetsController`. This should implement the `index` method.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::MimetypeFacetsController`. This should implement the `index` method by including `FacetPagingConcern`.
 3. Add `facet_path_helper` to the configuration constant in `Search::Facets`.
 
 Note:
@@ -113,7 +112,7 @@ Note:
 
 ### Adding facet search to a facet
 1. Add a new `*_facets` resource to `routes.rb`. See for example, `:project_facets`. This should provide a `search` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. This should implement the `search` method.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. This should implement the `search` method by including `FacetSearchingConcern`.
 3. Add `facet_search_path_helper` to the configuration constant in `Search::Facets`.
 
 Note:
@@ -160,7 +159,6 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 
 1. Add an attribute (`*_exclude`) for the facet exclude to `Search::ItemForm`.
 2. Assign the attribute name to `exclude_form_field` for the configuration constant in `Search::Facets`.
-3. Add the facet to `Search::ItemQueryBuilder.filter_queries`, setting `exclude` to `true` when invoking `facet_filter_query` and add a spec to `spec/services/search/item_query_builder_spec.rb`.
 
 ### Adding a field to item search results
 1. Add any new solr fields to `Search::Fields`.

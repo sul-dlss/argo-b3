@@ -5,9 +5,9 @@ module SearchResults
   class FacetCounts
     include Enumerable
 
-    def initialize(solr_response:, field:)
+    def initialize(solr_response:, facet_config:)
       @solr_response = solr_response
-      @field = field
+      @facet_config = facet_config
     end
 
     # @yield [SearchResults::FacetCount] each facet count
@@ -39,7 +39,7 @@ module SearchResults
       (total_facets.to_f / per_page).ceil
     end
 
-    attr_reader :solr_response, :field
+    attr_reader :solr_response, :facet_config
 
     def facet_result
       @solr_response['facets'][field]
@@ -55,6 +55,12 @@ module SearchResults
 
     def offset
       @offset ||= json_facet['offset'] || 0
+    end
+
+    private
+
+    def field
+      facet_config.field
     end
   end
 end

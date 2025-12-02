@@ -36,5 +36,12 @@ module SearchResults
         yield HierarchicalFacetCount.new(value:, count:)
       end
     end
+
+    private
+
+    # This overrides the parent method since this uses the hierarchical_field not field.
+    def field
+      facet_config.hierarchical_field
+    end
   end
 end

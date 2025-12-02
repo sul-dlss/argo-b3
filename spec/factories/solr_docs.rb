@@ -22,6 +22,13 @@ FactoryBot.define do
       released_to_earthworks { true }
       access_rights { 'dark' }
       earliest_accessioned_date { 1.year.ago }
+      collection_titles { ['David Rumsey Map Collection'] }
+      admin_policy_titles { ['University Archives'] }
+      dates { ['2001'] }
+      topics { ['Marching bands'] }
+      regions { ['Palo Alto'] }
+      genres { ['Maps'] }
+      languages { ['English'] }
     end
 
     initialize_with do
@@ -44,6 +51,13 @@ FactoryBot.define do
         Search::Fields::RELEASED_TO_EARTHWORKS => released_to_earthworks ? Time.now.utc.iso8601 : nil,
         Search::Fields::ACCESS_RIGHTS => [access_rights],
         Search::Fields::EARLIEST_ACCESSIONED_DATE => earliest_accessioned_date.utc.iso8601,
+        Search::Fields::COLLECTION_TITLES => collection_titles,
+        Search::Fields::APO_TITLE => admin_policy_titles,
+        Search::Fields::PUBLICATION_DATE => dates,
+        Search::Fields::TOPICS => topics,
+        Search::Fields::REGIONS => regions,
+        Search::Fields::GENRES => genres,
+        Search::Fields::LANGUAGES => languages,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

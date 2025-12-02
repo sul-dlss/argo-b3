@@ -56,7 +56,7 @@ RSpec.describe Searchers::Item do
       expect(facet_json["#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week"])
         .to match({
                     type: 'query',
-                    q: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO NOW]"
+                    q: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO *]"
                   })
       expect(solr_query['rows']).to eq(20)
       expect(solr_query['start']).to eq(0)

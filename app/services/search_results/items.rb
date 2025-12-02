@@ -19,26 +19,6 @@ module SearchResults
       end
     end
 
-    def object_type_facet
-      FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPES)
-    end
-
-    def access_rights_facet
-      FacetCounts.new(solr_response:, field: Search::Fields::ACCESS_RIGHTS)
-    end
-
-    def mimetypes_facet
-      FacetCounts.new(solr_response:, field: Search::Fields::MIMETYPES)
-    end
-
-    def released_to_earthworks_facet
-      DynamicFacetCounts.new(solr_response:, facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
-    end
-
-    def earliest_accessioned_date_facet
-      DynamicFacetCounts.new(solr_response:, facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE)
-    end
-
     def total_results
       @solr_response['response']['numFound']
     end
@@ -57,7 +37,31 @@ module SearchResults
       to_a
     end
 
+    # Derive a getter method for facets, when the "[facet_config]_facet" method is called.
+    # For example, object_types_facet() is handled equivalent to defining:
+    # def object_types_facet
+    #   FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPES)
+    # end
+    def method_missing(method_name, *, &)
+      return super unless respond_to_missing?(method_name)
+
+      facet_config = Search::Facets.const_get(method_name_to_const_name(method_name))
+      # Different facet count classes are needed depending on the facet type.
+      clazz = facet_config.dynamic_facet.present? ? DynamicFacetCounts : FacetCounts
+      clazz.new(solr_response:, facet_config:)
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      return false unless method_name.to_s.end_with?('_facet')
+
+      Search::Facets.const_defined?(method_name_to_const_name(method_name)) || super
+    end
+
     private
+
+    def method_name_to_const_name(method_name)
+      method_name.to_s.delete_suffix('_facet').upcase
+    end
 
     def start_result
       @solr_response['response']['start']

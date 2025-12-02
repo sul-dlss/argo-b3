@@ -3,31 +3,56 @@
 module Searchers
   # Searcher for items (DROs, collections, or APOs)
   class Item
-    include Search::Fields
-
     PER_PAGE = 20
-    # Attributes of Search::Facets::Config to be passed to Search::FacetBuilder
-    FACET_BUILDER_ARGS = %i[field limit alpha_sort exclude].freeze
-    # Attributes of Search::Facets::Config to be passed to Search::DynamicFacetBuilder
-    DYNAMIC_FACET_BUILDER_ARGS = %i[form_field dynamic_facet].freeze
 
     # fl fields to request from Solr
     FIELD_LIST = [
-      ACCESS_RIGHTS,
-      APO_DRUID,
-      APO_TITLE,
-      BARE_DRUID,
-      CONTENT_TYPES,
-      ID,
-      IDENTIFIERS,
-      OBJECT_TYPES,
-      PROJECTS,
-      SOURCE_ID,
-      RELEASED_TO,
-      STATUS,
-      TICKETS,
-      TITLE,
-      WORKFLOW_ERRORS
+      Search::Fields::ACCESS_RIGHTS,
+      Search::Fields::APO_DRUID,
+      Search::Fields::APO_TITLE,
+      Search::Fields::BARE_DRUID,
+      Search::Fields::CONTENT_TYPES,
+      Search::Fields::ID,
+      Search::Fields::IDENTIFIERS,
+      Search::Fields::OBJECT_TYPES,
+      Search::Fields::PROJECTS,
+      Search::Fields::SOURCE_ID,
+      Search::Fields::RELEASED_TO,
+      Search::Fields::STATUS,
+      Search::Fields::TICKETS,
+      Search::Fields::TITLE,
+      Search::Fields::WORKFLOW_ERRORS
+    ].freeze
+
+    FACETS = [
+      Search::Facets::ACCESS_RIGHTS,
+      Search::Facets::ADMIN_POLICIES,
+      Search::Facets::COLLECTIONS,
+      Search::Facets::CONTENT_TYPES,
+      Search::Facets::DATES,
+      Search::Facets::EARLIEST_ACCESSIONED_DATE,
+      Search::Facets::EMBARGO_RELEASE_DATE,
+      Search::Facets::FILE_ROLES,
+      Search::Facets::GENRES,
+      Search::Facets::IDENTIFIERS,
+      Search::Facets::LANGUAGES,
+      Search::Facets::LAST_ACCESSIONED_DATE,
+      Search::Facets::LAST_PUBLISHED_DATE,
+      Search::Facets::LAST_OPENED_DATE,
+      Search::Facets::LICENSES,
+      Search::Facets::METADATA_SOURCES,
+      Search::Facets::MIMETYPES,
+      Search::Facets::MODS_RESOURCE_TYPES,
+      Search::Facets::OBJECT_TYPES,
+      Search::Facets::PROCESSING_STATUSES,
+      Search::Facets::REGIONS,
+      Search::Facets::REGISTERED_DATE,
+      Search::Facets::RELEASED_TO_EARTHWORKS,
+      Search::Facets::RELEASED_TO_PURL_SITEMAP,
+      Search::Facets::RELEASED_TO_SEARCHWORKS,
+      Search::Facets::SW_RESOURCE_TYPES,
+      Search::Facets::TOPICS,
+      Search::Facets::VERSIONS
     ].freeze
 
     def self.call(...)
@@ -64,14 +89,14 @@ module Searchers
     end
 
     def facet_json
-      # These are fast (non-lazy) facets
-      {
-        OBJECT_TYPES => Search::FacetBuilder.call(**Search::Facets::OBJECT_TYPES.to_h.slice(*FACET_BUILDER_ARGS)),
-        ACCESS_RIGHTS => Search::FacetBuilder.call(**Search::Facets::ACCESS_RIGHTS.to_h.slice(*FACET_BUILDER_ARGS)),
-        MIMETYPES => Search::FacetBuilder.call(**Search::Facets::MIMETYPES.to_h.slice(*FACET_BUILDER_ARGS))
-      }
-        .merge(Search::DynamicFacetBuilder.call(**Search::Facets::RELEASED_TO_EARTHWORKS.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
-        .merge(Search::DynamicFacetBuilder.call(**Search::Facets::EARLIEST_ACCESSIONED_DATE.to_h.slice(*DYNAMIC_FACET_BUILDER_ARGS)))
+      FACETS.each_with_object({}) do |facet_config, facet_hash|
+        if facet_config.dynamic_facet.present?
+          facet_hash.merge!(Search::DynamicFacetBuilder.call(**facet_config.to_h.slice(:form_field, :dynamic_facet)))
+        else
+          facet_hash[facet_config.field] =
+            Search::FacetBuilder.call(**facet_config.to_h.slice(:field, :limit, :alpha_sort, :exclude))
+        end
+      end
     end
 
     def rows

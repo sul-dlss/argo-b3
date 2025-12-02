@@ -2,38 +2,39 @@
   <h2 class="facets-heading h4">Filters</h2>
 
   <% unless blank_search? %>
-    <%= helpers.turbo_frame_tag helpers.facet_id(:projects), src: search_project_facets_path(search_form.attributes), target: '_top' do %>
-      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:projects)) %>
-    <% end %>
-    <%= helpers.turbo_frame_tag helpers.facet_id(:tags), src: search_tag_facets_path(search_form.attributes), target: '_top' do %>
-      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:tags)) %>
-    <% end %>
-    <%= helpers.turbo_frame_tag helpers.facet_id(:tickets), src: search_ticket_facets_path(search_form.attributes), target: '_top' do %>
-      <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:tickets)) %>
-    <% end %>
+    <%# Not loaded on home page. %>
+    <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::PROJECTS) %>
+    <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::TAGS) %>
+    <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::TICKETS) %>
   <% end %>
 
-  <%= tag.div id: helpers.facet_id(:object_types) do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:object_types)) %>
-  <% end %>
-
-  <%= tag.div id: helpers.facet_id(:access_rights) do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:access_rights)) %>
-  <% end %>
-
-  <%= tag.div id: helpers.facet_id(:mimetypes) do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:mimetypes)) %>
-  <% end %>
-
-  <%= tag.div id: helpers.facet_id(:released_to_earthworks) do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:released_to_earthworks)) %>
-  <% end %>
-
-  <%= tag.div id: helpers.facet_id(:earliest_accessioned_date) do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:earliest_accessioned_date)) %>
-  <% end %>
-
-  <%= helpers.turbo_frame_tag helpers.facet_id(:wps_workflows), src: search_workflow_facets_path(search_form.attributes), target: '_top' do %>
-    <%= render Search::LoadingFacetSectionComponent.new(label: helpers.facet_label(:wps_workflows)) %>
-  <% end %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::OBJECT_TYPES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::CONTENT_TYPES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::ACCESS_RIGHTS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::LICENSES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::COLLECTIONS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::ADMIN_POLICIES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::MIMETYPES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::FILE_ROLES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::VERSIONS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::PROCESSING_STATUSES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::RELEASED_TO_PURL_SITEMAP) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::RELEASED_TO_SEARCHWORKS) %>
+  <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::WORKFLOWS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::METADATA_SOURCES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::REGISTERED_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::LAST_ACCESSIONED_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::LAST_PUBLISHED_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::LAST_OPENED_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::EMBARGO_RELEASE_DATE) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::IDENTIFIERS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::SW_RESOURCE_TYPES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::MODS_RESOURCE_TYPES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::DATES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::TOPICS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::REGIONS) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::GENRES) %>
+  <%= render Search::LoadingFacetDivComponent.new(facet_config: Search::Facets::LANGUAGES) %>
 </section>

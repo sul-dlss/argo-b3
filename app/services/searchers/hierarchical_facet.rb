@@ -8,28 +8,28 @@ module Searchers
     end
 
     # @param search_form [Search::ItemForm]
-    # @param field [String] the Solr field to facet on
+    # @param facet_config [Search::Facets::FacetConfig] configuration for the facet
     # @param value [String, nil] the facet value to return children for. If nil, returns top-level values
-    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
     # @param limit [Integer, nil] maximum number of facet values to return
     # @param page [Integer, nil] optional page number for paged facets
-    def initialize(search_form:, field:, value: nil, alpha_sort: false, limit: nil, page: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(search_form:, facet_config:, value: nil, limit: nil, page: nil)
       @search_form = search_form
-      @field = field
+      @facet_config = facet_config
       @value = value
-      @alpha_sort = alpha_sort
-      @limit = limit
+      @limit = limit || facet_config.limit
       @page = page
     end
 
     # @return [SearchResults::FacetCounts] search results
     def call
-      SearchResults::HierarchicalFacetCounts.new(solr_response:, field:)
+      SearchResults::HierarchicalFacetCounts.new(solr_response:, facet_config:)
     end
 
     private
 
-    attr_reader :search_form, :field, :alpha_sort, :limit, :value, :page
+    attr_reader :search_form, :facet_config, :limit, :value, :page
+
+    delegate :alpha_sort, to: :facet_config
 
     def solr_response
       Search::SolrService.call(request: solr_request)
@@ -54,6 +54,10 @@ module Searchers
       return '1|' if value.nil?
 
       "#{HierarchicalValueSupport.level(value) + 1}|#{value}"
+    end
+
+    def field
+      facet_config.hierarchical_field
     end
   end
 end

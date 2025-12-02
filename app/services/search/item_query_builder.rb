@@ -5,6 +5,41 @@ module Search
   class ItemQueryBuilder
     include Search::Fields
 
+    FACETS = [
+      Search::Facets::ACCESS_RIGHTS,
+      Search::Facets::ADMIN_POLICIES,
+      Search::Facets::COLLECTIONS,
+      Search::Facets::CONTENT_TYPES,
+      Search::Facets::DATES,
+      Search::Facets::FILE_ROLES,
+      Search::Facets::GENRES,
+      Search::Facets::EARLIEST_ACCESSIONED_DATE,
+      Search::Facets::EMBARGO_RELEASE_DATE,
+      Search::Facets::IDENTIFIERS,
+      Search::Facets::LANGUAGES,
+      Search::Facets::LAST_ACCESSIONED_DATE,
+      Search::Facets::LAST_OPENED_DATE,
+      Search::Facets::LAST_PUBLISHED_DATE,
+      Search::Facets::LICENSES,
+      Search::Facets::METADATA_SOURCES,
+      Search::Facets::MIMETYPES,
+      Search::Facets::MODS_RESOURCE_TYPES,
+      Search::Facets::OBJECT_TYPES,
+      Search::Facets::PROCESSING_STATUSES,
+      Search::Facets::PROJECTS,
+      Search::Facets::REGIONS,
+      Search::Facets::REGISTERED_DATE,
+      Search::Facets::TAGS,
+      Search::Facets::TICKETS,
+      Search::Facets::TOPICS,
+      Search::Facets::RELEASED_TO_EARTHWORKS,
+      Search::Facets::RELEASED_TO_PURL_SITEMAP,
+      Search::Facets::RELEASED_TO_SEARCHWORKS,
+      Search::Facets::SW_RESOURCE_TYPES,
+      Search::Facets::VERSIONS,
+      Search::Facets::WORKFLOWS
+    ].freeze
+
     def self.call(...)
       new(...).call
     end
@@ -32,19 +67,17 @@ module Search
     attr_reader :search_form
 
     def filter_queries # rubocop:disable Metrics/AbcSize
-      queries = []
-      queries << facet_filter_query(facet_config: Search::Facets::OBJECT_TYPES)
-      queries << facet_filter_query(facet_config: Search::Facets::PROJECTS)
-      queries << facet_filter_query(facet_config: Search::Facets::TAGS)
-      queries << facet_filter_query(facet_config: Search::Facets::TICKETS)
-      queries << facet_filter_query(facet_config: Search::Facets::WORKFLOWS)
-      queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS)
-      queries << facet_filter_query(facet_config: Search::Facets::ACCESS_RIGHTS, exclude: true)
-      queries << facet_filter_query(facet_config: Search::Facets::MIMETYPES)
-      queries << dynamic_facet_filter_query(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS)
-      queries << dynamic_facet_filter_query(facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE)
-      queries << "-#{APO_DRUID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
-      queries.compact
+      [].tap do |queries|
+        FACETS.each do |facet_config|
+          if facet_config.dynamic_facet.present?
+            queries << dynamic_facet_filter_query(facet_config:)
+          else
+            queries << facet_filter_query(facet_config:)
+            queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
+          end
+        end
+        queries << "-#{APO_DRUID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
+      end.compact
     end
 
     # Construct a facet filter query for the given form field and Solr field for value facets.

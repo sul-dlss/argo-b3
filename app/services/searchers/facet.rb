@@ -10,26 +10,26 @@ module Searchers
     end
 
     # @param search_form [Search::ItemForm]
-    # @param field [String] the Solr field to facet on
-    # @param alpha_sort [Boolean] whether to sort facet values alphabetically
+    # @param facet_config [Search::Facets::FacetConfig] configuration for the facet
     # @param limit [Integer, nil] maximum number of facet values to return
     # @param page [Integer, nil] optional page number for paged facets
-    def initialize(search_form:, field:, alpha_sort: false, limit: nil, page: nil)
+    def initialize(search_form:, facet_config:, limit: nil, page: nil)
       @search_form = search_form
-      @field = field
-      @alpha_sort = alpha_sort
-      @limit = limit
+      @facet_config = facet_config
+      @limit = limit || facet_config.limit
       @page = page
     end
 
     # @return [SearchResults::FacetCounts] search results
     def call
-      SearchResults::FacetCounts.new(solr_response:, field:)
+      SearchResults::FacetCounts.new(solr_response:, facet_config:)
     end
 
     private
 
-    attr_reader :search_form, :field, :alpha_sort, :limit, :page
+    attr_reader :search_form, :facet_config, :limit, :page
+
+    delegate :field, :alpha_sort, to: :facet_config
 
     def solr_response
       Search::SolrService.call(request: solr_request)

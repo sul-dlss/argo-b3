@@ -3,6 +3,8 @@
 module Search
   # Controller for ticket facet
   class TicketFacetsController < FacetsApplicationController
+    include FacetSearchingConcern
+
     # Render the main facet turbo-frame (when no page param) or a paged facet (when page param present)
     def index
       component = if page_param.present?
@@ -24,19 +26,6 @@ module Search
       render(component, content_type: 'text/html')
     end
 
-    # Renders the auto-complete search results for the facet
-    def search
-      facet_counts = Searchers::FacetQuery.call(
-        search_form:,
-        field:,
-        limit: SEARCH_LIMIT,
-        facet_query: facet_query_param
-      )
-
-      component = Search::FacetSearchResultComponent.with_collection(facet_counts)
-      render(component, content_type: 'text/html')
-    end
-
     private
 
     def facet_config
@@ -45,8 +34,7 @@ module Search
 
     def facet_counts
       Searchers::Facet.call(search_form:,
-                            field:,
-                            limit:,
+                            facet_config:,
                             page: page_param)
     end
   end

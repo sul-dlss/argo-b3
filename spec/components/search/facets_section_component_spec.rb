@@ -30,7 +30,7 @@ RSpec.describe Search::FacetsSectionComponent, type: :component do
 
       # Lazy facets.
       expect(page)
-        .to have_css('turbo-frame#projects-facet[src="/search/project_facets?page=1&query=test"]',
+        .to have_css('turbo-frame#projects-facet[src="/search/project_facets?query=test"]',
                      text: 'Loading')
     end
   end

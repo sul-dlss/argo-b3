@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe SearchResults::FacetCounts do
-  let(:facet_counts) { described_class.new(solr_response:, field:) }
-  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, field:) }
+  let(:facet_counts) { described_class.new(solr_response:, facet_config:) }
+  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, facet_config:) }
 
   let(:solr_response) do
     {
@@ -37,6 +37,7 @@ RSpec.describe SearchResults::FacetCounts do
       'facets' => {}
     }
   end
+  let(:facet_config) { Search::Facets::Config.new(field:) }
   let(:field) { 'object_types' }
   let(:facet_json) do
     {
