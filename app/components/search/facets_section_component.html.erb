@@ -2,7 +2,6 @@
   <h2 class="facets-heading h4">Filters</h2>
 
   <% unless blank_search? %>
-    <%# Not loaded on home page. %>
     <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::PROJECTS) %>
     <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::TAGS) %>
     <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::TICKETS) %>

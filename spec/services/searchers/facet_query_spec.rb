@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Searchers::FacetQuery do
   let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project') }
-  let(:search_form) { Search::ItemForm.new(query:) }
+  let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
     {

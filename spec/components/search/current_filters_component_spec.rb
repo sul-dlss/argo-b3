@@ -7,7 +7,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
 
   context 'when there are current filters' do
     let(:search_form) do
-      Search::ItemForm.new(
+      SearchForm.new(
         query: 'test',
         include_google_books: true,
         object_types: %w[item collection],
@@ -29,7 +29,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
   end
 
   context 'when there are no current filters' do
-    let(:search_form) { Search::ItemForm.new }
+    let(:search_form) { SearchForm.new }
 
     it 'does not render the component' do
       expect(component.render?).to be false

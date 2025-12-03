@@ -7,7 +7,7 @@ RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
 
   let(:facet_config) { Search::Facets::MIMETYPES }
 
-  let(:search_form) { Search::ItemForm.new(mimetypes: ['application/pdf'], page: 2) }
+  let(:search_form) { SearchForm.new(mimetypes: ['application/pdf'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: 1, total_pages: 2) }
   let(:facet_count) { SearchResults::FacetCount.new(value: 'application/pdf', count: 10) }
 

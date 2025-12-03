@@ -2,24 +2,33 @@
 
 require 'rails_helper'
 
-RSpec.describe Search::Form do
-  subject(:form) { form_class.new(attributes) }
+RSpec.describe SearchForm do
+  subject(:form) do
+    described_class.new(
+      object_types: %w[item collection],
+      projects: ['Project 1'],
+      query: 'test'
+    )
+  end
 
-  # Need a few more attributes for testing purposes.
-  let(:form_class) do
-    Class.new(described_class) do
-      attribute :object_types, array: true, default: -> { [] }
-      attribute :projects, array: true, default: -> { [] }
-      attribute :include_google_books, type: :boolean, default: false
-      attribute :access_rights, array: true, default: -> { [] }
+  describe '#facet_attributes' do
+    it 'returns the attributes that correspond to facets' do
+      expect(form.facet_attributes).to eq({
+                                            'object_types' => %w[item collection],
+                                            'projects' => ['Project 1']
+                                          })
     end
   end
 
   describe '#blank?' do
     context 'when attributes are blank' do
-      # Note that for Search::Form, "query" is the only non-ignored attribute.
-      # However, subclasses may have additional attributes.
-      let(:attributes) { { query: '', page: 2, include_google_books: true } }
+      subject(:form) do
+        described_class.new(
+          query: '',
+          page: 2,
+          include_google_books: true
+        )
+      end
 
       it 'returns true' do
         expect(form.blank?).to be true
@@ -27,7 +36,19 @@ RSpec.describe Search::Form do
     end
 
     context 'when query is present' do
-      let(:attributes) { { query: 'test' } }
+      subject(:form) { described_class.new(query: 'test') }
+
+      it 'returns false' do
+        expect(form.blank?).to be false
+      end
+    end
+
+    context 'when a facet attribute is present' do
+      subject(:form) do
+        described_class.new(
+          object_types: ['DRO']
+        )
+      end
 
       it 'returns false' do
         expect(form.blank?).to be false
@@ -36,7 +57,8 @@ RSpec.describe Search::Form do
   end
 
   describe '#with_attributes' do
-    let(:attributes) { { query: 'test', object_types: ['DRO'], page: 1, projects: ['Google Books'] } }
+    subject(:form) { described_class.new(query: 'test', object_types: ['DRO'], page: 1, projects: ['Google Books']) }
+
     let(:new_attrs) { { object_types: ['Collection'], include_google_books: true, page: 2, projects: nil } }
 
     it 'merges array attributes and overrides scalar attributes' do
@@ -52,7 +74,10 @@ RSpec.describe Search::Form do
   end
 
   describe '#without_attributes' do
-    let(:attributes) { { query: 'test', object_types: %w[item collection], page: 2, projects: ['Google Books'] } }
+    subject(:form) do
+      described_class.new(query: 'test', object_types: %w[item collection], page: 2, projects: ['Google Books'])
+    end
+
     let(:without_attrs) { { object_types: 'item', page: 2, projects: nil } }
 
     it 'removes specified attributes' do
@@ -65,7 +90,9 @@ RSpec.describe Search::Form do
   end
 
   describe '#selected?' do
-    let(:attributes) { { query: 'test', object_types: %w[DRO Collection], page: 2, projects: ['Google Books'] } }
+    subject(:form) do
+      described_class.new(query: 'test', object_types: %w[DRO Collection], page: 2, projects: ['Google Books'])
+    end
 
     context 'when the key/value is selected' do
       it 'returns true for array attributes' do
@@ -120,28 +147,49 @@ RSpec.describe Search::Form do
     end
   end
 
-  describe '#this_attributes' do
-    let(:attributes) { { query: '', page: 2, include_google_books: true } }
-
-    it 'returns empty array' do
-      expect(form.this_attributes).to eq({})
-    end
-  end
-
   describe '#current_filters' do
-    let(:attributes) { { query: 'test', include_google_books: true } }
-
     context 'when attributes are set' do
+      subject(:form) { described_class.new(query: 'test', include_google_books: true) }
+
       it 'returns current filters as attribute name/value pairs' do
         expect(form.current_filters).to eq([%w[query test], ['include_google_books', true]])
       end
     end
 
+    context 'when facet attributes are set' do
+      it 'returns the current filters as attribute name/value pairs' do
+        expect(form.current_filters).to contain_exactly(
+          %w[query test],
+          %w[object_types item],
+          %w[object_types collection],
+          ['projects', 'Project 1']
+        )
+      end
+    end
+
     context 'when no attributes are set' do
-      let(:attributes) { {} }
+      subject(:form) { described_class.new }
 
       it 'returns empty array' do
         expect(form.current_filters).to eq([])
+      end
+    end
+  end
+
+  describe '#facets_selected?' do
+    context 'when no facets are selected' do
+      subject(:form) { described_class.new(query: 'test') }
+
+      it 'returns false' do
+        expect(form.facets_selected?).to be false
+      end
+    end
+
+    context 'when a facet is selected' do
+      subject(:form) { described_class.new(object_types: ['DRO']) }
+
+      it 'returns true' do
+        expect(form.facets_selected?).to be true
       end
     end
   end

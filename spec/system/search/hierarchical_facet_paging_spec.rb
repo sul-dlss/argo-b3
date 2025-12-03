@@ -8,7 +8,7 @@ RSpec.describe 'Hierarchical facet paging', :solr do
   end
 
   it 'returns facets' do
-    visit search_items_path(query: 'test')
+    visit search_path(query: 'test')
 
     find_facet_section('Projects').click
 

@@ -7,7 +7,7 @@ RSpec.describe Search::FacetPageLinkComponent, type: :component do
     described_class.new(facet_counts:, search_form:, facet_path_helper:, form_field:)
   end
   let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: current_page, total_pages:) }
-  let(:search_form) { Search::ItemForm.new }
+  let(:search_form) { SearchForm.new }
   let(:facet_path_helper) { Search::Facets::MIMETYPES.facet_path_helper }
   let(:form_field) { :mimetypes }
   let(:current_page) { 1 }

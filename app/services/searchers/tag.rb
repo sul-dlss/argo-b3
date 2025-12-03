@@ -9,7 +9,7 @@ module Searchers
       new(...).call
     end
 
-    # @param search_form [Search::Form]
+    # @param search_form [SearchForm]
     # @param field [String]
     def initialize(search_form:, field:)
       @search_form = search_form

@@ -11,8 +11,6 @@ RSpec.describe 'Show home page', :solr do
   it 'displays the home page' do
     visit root_path
 
-    assert_home_page
-
     # Shows home page facets
     expect(page).to have_facet('Object types', expanded: false)
     find_facet_section('Object types').click

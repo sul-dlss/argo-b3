@@ -9,7 +9,7 @@ RSpec.describe Search::CheckboxFacetInputComponent, type: :component do
   let(:facet_count) { SearchResults::FacetCount.new(value: 'collection', count: 10) }
 
   context 'when the facet value is selected' do
-    let(:search_form) { Search::ItemForm.new(object_types: ['collection']) }
+    let(:search_form) { SearchForm.new(object_types: ['collection']) }
 
     it 'renders the checkbox as checked' do
       render_inline(component)
@@ -20,7 +20,7 @@ RSpec.describe Search::CheckboxFacetInputComponent, type: :component do
   end
 
   context 'when the facet value is not selected' do
-    let(:search_form) { Search::ItemForm.new(object_types: ['item']) }
+    let(:search_form) { SearchForm.new(object_types: ['item']) }
 
     it 'renders the checkbox as unchecked' do
       render_inline(component)

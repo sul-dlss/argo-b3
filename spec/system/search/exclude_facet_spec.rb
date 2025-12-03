@@ -11,9 +11,7 @@ RSpec.describe 'Exclude facets', :solr do
   end
 
   it 'returns facets' do
-    visit search_items_path(query: 'test')
-
-    assert_item_search_page
+    visit search_path(query: 'test')
 
     expect(page).to have_result_count(5)
     expect(page).to have_item_result(world_item_doc)

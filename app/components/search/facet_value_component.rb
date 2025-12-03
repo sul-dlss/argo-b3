@@ -33,7 +33,7 @@ module Search
     end
 
     def remove_path
-      search_items_path(search_form.without_attributes({ form_field => value, page: nil }))
+      search_path(search_form.without_attributes({ form_field => value, page: nil }))
     end
   end
 end

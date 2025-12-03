@@ -24,42 +24,17 @@ module Searchers
       Search::Fields::WORKFLOW_ERRORS
     ].freeze
 
+    # Primary facets that are included in the main item search request
     FACETS = [
-      Search::Facets::ACCESS_RIGHTS,
-      Search::Facets::ADMIN_POLICIES,
-      Search::Facets::COLLECTIONS,
       Search::Facets::CONTENT_TYPES,
-      Search::Facets::DATES,
-      Search::Facets::EARLIEST_ACCESSIONED_DATE,
-      Search::Facets::EMBARGO_RELEASE_DATE,
-      Search::Facets::FILE_ROLES,
-      Search::Facets::GENRES,
-      Search::Facets::IDENTIFIERS,
-      Search::Facets::LANGUAGES,
-      Search::Facets::LAST_ACCESSIONED_DATE,
-      Search::Facets::LAST_PUBLISHED_DATE,
-      Search::Facets::LAST_OPENED_DATE,
-      Search::Facets::LICENSES,
-      Search::Facets::METADATA_SOURCES,
-      Search::Facets::MIMETYPES,
-      Search::Facets::MODS_RESOURCE_TYPES,
-      Search::Facets::OBJECT_TYPES,
-      Search::Facets::PROCESSING_STATUSES,
-      Search::Facets::REGIONS,
-      Search::Facets::REGISTERED_DATE,
-      Search::Facets::RELEASED_TO_EARTHWORKS,
-      Search::Facets::RELEASED_TO_PURL_SITEMAP,
-      Search::Facets::RELEASED_TO_SEARCHWORKS,
-      Search::Facets::SW_RESOURCE_TYPES,
-      Search::Facets::TOPICS,
-      Search::Facets::VERSIONS
+      Search::Facets::OBJECT_TYPES
     ].freeze
 
     def self.call(...)
       new(...).call
     end
 
-    # @param search_form [Search::ItemForm]
+    # @param search_form [SearchForm]
     def initialize(search_form:)
       @search_form = search_form
     end
@@ -83,20 +58,13 @@ module Searchers
           fl: FIELD_LIST,
           rows:,
           start:,
-          'json.facet': facet_json.to_json
+          'json.facet': facet_json
         }
       )
     end
 
     def facet_json
-      FACETS.each_with_object({}) do |facet_config, facet_hash|
-        if facet_config.dynamic_facet.present?
-          facet_hash.merge!(Search::DynamicFacetBuilder.call(**facet_config.to_h.slice(:form_field, :dynamic_facet)))
-        else
-          facet_hash[facet_config.field] =
-            Search::FacetBuilder.call(**facet_config.to_h.slice(:field, :limit, :alpha_sort, :exclude))
-        end
-      end
+      Search::FacetsBuilder.call(facet_configs: FACETS).to_json
     end
 
     def rows

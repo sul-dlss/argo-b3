@@ -7,7 +7,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
   let(:component) { described_class.new(facet_count:, search_form:, path_helper:, form_field:) }
 
-  let(:search_form) { Search::ItemForm.new }
+  let(:search_form) { SearchForm.new }
   let(:path_helper) do
     lambda { |parent_value:, **params|
       children_search_workflow_facets_path(parent_value:, **params)
@@ -26,7 +26,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
       it 'renders without children and with a link' do
         render_inline(component)
 
-        expect(page).to have_link('waiting', href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting')
+        expect(page).to have_link('waiting', href: '/search?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting')
         expect(page).to have_css('.facet-count', text: '10')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')
         expect(page).to have_no_css('div.collapse')
@@ -35,7 +35,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when selected' do
       let(:search_form) do
-        Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
+        SearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
       end
 
       it 'renders without children and as selected' do
@@ -43,7 +43,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
         expect(page).to have_no_link('waiting', exact: true)
         expect(page).to have_content('waiting')
-        expect(page).to have_link('Remove', href: '/search/items')
+        expect(page).to have_link('Remove', href: '/search')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')
         expect(page).to have_no_css('div.collapse')
       end
@@ -59,7 +59,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when selected' do
       let(:search_form) do
-        Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr'])
+        SearchForm.new(wps_workflows: ['ocrWF:end-ocr'])
       end
 
       it 'renders with children showing and as selected' do
@@ -67,7 +67,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
         expect(page).to have_no_link('end-ocr', exact: true)
         expect(page).to have_content('end-ocr')
-        expect(page).to have_link('Remove', href: '/search/items')
+        expect(page).to have_link('Remove', href: '/search')
         expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('a[data-bs-toggle="collapse"] .visually-hidden', text: '[Toggle end-ocr]')
         expect(page).to have_css('div.collapse.show turbo-frame[src="/search/workflow_facets/children' \
@@ -79,7 +79,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
       it 'renders with children and with a link' do
         render_inline(component)
 
-        expect(page).to have_link('end-ocr', href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr')
+        expect(page).to have_link('end-ocr', href: '/search?wps_workflows%5B%5D=ocrWF%3Aend-ocr')
         expect(page).to have_css('.facet-count', text: '10')
         expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('div.collapse:not(.show) turbo-frame[src="/search/workflow_facets/children' \
@@ -89,14 +89,14 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when a child is selected' do
       let(:search_form) do
-        Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
+        SearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
       end
 
       it 'renders with children showing and as not selected' do
         render_inline(component)
 
         expect(page).to have_link('end-ocr',
-                                  href: '/search/items?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting' \
+                                  href: '/search?wps_workflows%5B%5D=ocrWF%3Aend-ocr%3Awaiting' \
                                         '&wps_workflows%5B%5D=ocrWF%3Aend-ocr')
         expect(page).to have_css('.facet-count', text: '10')
         expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')

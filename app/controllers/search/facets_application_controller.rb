@@ -5,9 +5,6 @@ module Search
   class FacetsApplicationController < SearchApplicationController
     layout false
 
-    # Maximum number of facet values to return for a search.
-    SEARCH_LIMIT = 25
-
     private
 
     def facet_config
@@ -20,7 +17,7 @@ module Search
              to: :facet_config
 
     def search_form
-      @search_form ||= build_form(form_class: Search::ItemForm)
+      @search_form ||= build_form(form_class: SearchForm)
     end
 
     def parent_value_param

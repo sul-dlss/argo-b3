@@ -6,11 +6,11 @@ RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
   let(:component) { described_class.new(search_form:, form_field:, form_builder:, include_base_fields:) }
   let(:form_builder) { ActionView::Helpers::FormBuilder.new(nil, search_form, vc_test_controller.view_context, {}) }
   let(:search_form) do
-    Search::ItemForm.new(object_types: %w[collection item],
-                         projects: ['Project 1'],
-                         page: 2,
-                         query: 'test',
-                         include_google_books: true)
+    SearchForm.new(object_types: %w[collection item],
+                   projects: ['Project 1'],
+                   page: 2,
+                   query: 'test',
+                   include_google_books: true)
   end
   let(:form_field) { :object_types }
   let(:include_base_fields) { true }

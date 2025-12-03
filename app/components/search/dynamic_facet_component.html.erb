@@ -13,7 +13,7 @@
   </ul>
 
   <% if date_from_form_field || date_to_form_field %>
-    <%= helpers.form_with model: search_form, scope: :search, url: search_items_path, method: :get, class: 'facet-values mt-3' do |form| %>
+    <%= helpers.form_with model: search_form, scope: :search, url: search_path, method: :get, class: 'facet-values mt-3' do |form| %>
       <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field:) %>
 
       <% if date_from_form_field %>

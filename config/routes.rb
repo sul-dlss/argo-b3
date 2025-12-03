@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
+Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -12,90 +12,96 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root 'home#show'
+  root 'search#show'
 
-  resource :home, only: [:show], controller: 'home'
+  # resource :home, only: [:show], controller: 'home'
 
-  namespace :search do
-    resources :items, only: [:index]
-
-    resources :projects, only: [:index]
-
-    resources :tags, only: [:index]
-
-    resources :tickets, only: [:index]
-
-    resources :tag_facets, only: [:index] do
-      collection do
-        get 'children'
-        get 'search'
+  resource :search, only: [:show], controller: 'search' do
+    scope module: :search do
+      resources :items, only: [:index] do
+        collection do
+          get 'secondary_facets'
+        end
       end
-    end
 
-    resources :project_facets, only: [:index] do
-      collection do
-        get 'children'
-        get 'search'
+      resources :projects, only: [:index]
+
+      resources :tags, only: [:index]
+
+      resources :tickets, only: [:index]
+
+      resources :tag_facets, only: [:index] do
+        collection do
+          get 'children'
+          get 'search'
+        end
       end
-    end
 
-    resources :ticket_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :project_facets, only: [:index] do
+        collection do
+          get 'children'
+          get 'search'
+        end
       end
-    end
 
-    resources :collection_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :ticket_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :admin_policy_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :collection_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :workflow_facets, only: [:index] do
-      collection do
-        get 'children'
+      resources :admin_policy_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :mimetype_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :workflow_facets, only: [:index] do
+        collection do
+          get 'children'
+        end
       end
-    end
 
-    resources :date_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :mimetype_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :topic_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :date_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :region_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :topic_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :genre_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :region_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
-    end
 
-    resources :language_facets, only: [:index] do
-      collection do
-        get 'search'
+      resources :genre_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
+      end
+
+      resources :language_facets, only: [:index] do
+        collection do
+          get 'search'
+        end
       end
     end
   end

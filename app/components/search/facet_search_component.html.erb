@@ -8,7 +8,7 @@
     <%= tag.input id:, type: 'text', autocomplete: 'off', data: { autocomplete_target: 'input' }, class: 'form-control border-start-0', placeholder: label, aria: { autocomplete: 'list' } %>
   </div>
 
-  <%= helpers.form_with model: search_form, scope: :search, url: search_items_path, method: :get do |form| %>
+  <%= helpers.form_with model: search_form, scope: :search, url: search_path, method: :get do |form| %>
     <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
     <%= form.hidden_field form_field, multiple: true, data: { autocomplete_target: 'hidden', action: 'change->facet-search#submit' } %>
   <% end %>

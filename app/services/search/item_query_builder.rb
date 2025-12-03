@@ -44,7 +44,7 @@ module Search
       new(...).call
     end
 
-    # @param search_form [Search::ItemForm]
+    # @param search_form [SearchForm]
     def initialize(search_form:)
       @search_form = search_form
     end

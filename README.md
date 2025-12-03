@@ -49,19 +49,21 @@ let!(:solr_doc) { create(:solr_item) }
 ## Discovery
 In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:
 * Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)
-* Is optimized for slow searching / faceting by asynchronously loading some search results and facets.
+* Is optimized for slow searching / faceting (1) by asynchronously loading some search results and facets (2) by splitting up searching for item results and a small number of primary facets from the rest of the facets (secondary facets)/
 
 The following will help illustrate the discovery system components involved for a search from the home page:
-1. The search form is rendered from `Search::Form`.
+1. The search form is rendered from `SearchForm`.
 2. The user enters a query in the search form and starts the search.
 3. The page is rendered with:
-  * An async turbo frame for items.
+  * An async turbo frame for items and primary facets.
+  * An async turbo frame for secondary facets.
   * Async turbo frames for each of field value types (e.g., projects).
   * Empty divs for each non-lazy (fast!) facet (e.g., object types).
   * Async turbo frames for each lazy (slow!) facet (e.g., project tags).
-4. The async turbo frame for items calls `Search::ItemsController.index`. This invokes the items searcher (`Searchers::Item`) which queries Solr and returns `SearchResults::Items` (a wrapper around the Solr response). The rendered response includes:
+4. The items async turbo frame for items calls `Search::ItemsController.index`. This invokes the items searcher (`Searchers::Item`) which queries Solr and returns `SearchResults::Items` (a wrapper around the Solr response). The rendered response includes:
   * The item search results
-  * Turbo stream replace elements (`<turbo-stream action="replace">`) for each of the non-lazy facets containing the facet content. When rendering the page, Turbo replaces the empty divs with the facet content.
+  * Turbo stream replace elements (`<turbo-stream action="replace">`) for the primary facets containing the facet content. When rendering the page, Turbo replaces the empty divs with the facet content.
+5. Concurrently, the secondary facets async turbo frame calls `Search::ItemsController.secondary_facets`. This invokes the secondary facets searcher (`Searchers::SecondaryFacet`) which queries Solr and returns `SearchResults::Items`. The rendered response includes turbo stream replace elements for the secondary facets containing the facet content.
 5. Concurrently, each of the async field value turbo frames calls the appropriate search controller (e.g., `Search::ProjectsController.index`). This invokes the appropriate searcher (e.g., `Searchers::Project`) which queries Solr and returns `SearchResults::FacetValues` (a wrapper around the Solr response). The rendered response includes the field value search results (e.g., a list of projects).
 6. Concurrently, each of the lazy facet async turbo frames calls the appropriate endpoint on the `Search::FacetsController` (e.g., `project_tags` for the projects facet). This invokes the facets searcher (`Searchers::Facet`) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
 
@@ -78,7 +80,7 @@ including the amount of time to execute each part of the query / each facet.
 ### Adding a lazy async facet
 The lazy async pattern should be used for slow facets. Each of these facets involves a separate query to Solr.
 
-1. Add an attribute for the facet to `Search::ItemForm`.
+1. Add an attribute for the facet to `SearchForm`.
 2. Add any new solr fields to `Search::Fields`.
 3. Add a `Search::LoadingFacetFrameComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `turbo-frame` that will be replaced with the facet content.
 4. Add a new `*_facets` resource to `routes.rb` providing the `index` route. See for example, `:tag_facets`.
@@ -93,12 +95,12 @@ Note:
 ### Adding a non-lazy sync facet
 The non-lazy sync pattern should be used for fast facets. The facet values are retrieved as part of the main query to Solr (i.e., the query that returns the search results).
 
-1. Add an attribute for the facet to `Search::ItemForm`.
+1. Add an attribute for the facet to `SearchForm`.
 2. Add any new solr fields to `Search::Fields`.
 3. Add a configuration constant to `Search::Facets`. This must include the `form_field` and `field` attributes.
 4. Add a `Search::LoadingFacetDivComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `div` that will be replaced with the facet content.
-5. Add the facet to the Solr request in `Searchers::Item::FACETS`.
-6. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
+5. Add the facet to the Solr request in `Searchers::Item::FACETS` or `Searchers::SecondaryFacet::FACETS`.
+6. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` or `views/search/items/secondary_facets.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
 7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
 8. Optionally, add a label for the facet to `en.yml`.
 
@@ -146,7 +148,7 @@ Dynamic facets have facet values that are the result of a specified query.
 ### Making a dynamic facet support a user-supplied date range
 Dynamic facets may optionally have a date range filter (where the user specifies a date from and/or date to). See, for example, the "Earliest accessioned" facet.
 
-1. Add `*_from` and `*_to` attributes to `Search::ItemForm`. For example:
+1. Add `*_from` and `*_to` attributes to `SearchForm`. For example:
 ```
     attribute :earliest_accessioned_date_from, :date, default: nil
     attribute :earliest_accessioned_date_to, :date, default: nil
@@ -157,7 +159,7 @@ Dynamic facets may optionally have a date range filter (where the user specifies
 ### Adding exclude (query negation) to a facet
 Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
 
-1. Add an attribute (`*_exclude`) for the facet exclude to `Search::ItemForm`.
+1. Add an attribute (`*_exclude`) for the facet exclude to `SearchForm`.
 2. Assign the attribute name to `exclude_form_field` for the configuration constant in `Search::Facets`.
 
 ### Adding a field to item search results

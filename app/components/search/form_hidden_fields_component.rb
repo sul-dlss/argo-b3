@@ -7,7 +7,7 @@ module Search
       @form_builder = form_builder
       @search_form = search_form
       # If form_field is provided, it will be excluded from the hidden fields.
-      # Hidden fields will also be created for the fields from Search::Form (e.g., query).
+      # Hidden fields will also be created for the fields from SearchForm (e.g., query).
       @form_field = form_field&.to_s
       @include_base_fields = include_base_fields
       super()

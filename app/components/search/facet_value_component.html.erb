@@ -10,8 +10,8 @@
   </span>
 <% else %>
   <span class="facet-label">
-    <%= link_to label, search_items_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
+    <%= link_to label, search_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
   </span>
-  <%= link_to 'Exclude', search_items_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args if with_exclude? %>
+  <%= link_to 'Exclude', search_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args if with_exclude? %>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
 <% end %>
