@@ -16,9 +16,7 @@ module Search
              :field, :hierarchical_field,
              to: :facet_config
 
-    def search_form
-      @search_form ||= build_form(form_class: SearchForm)
-    end
+    attr_reader :search_form
 
     def parent_value_param
       params.require(:parent_value)
