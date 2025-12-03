@@ -22,7 +22,7 @@ module Search
     end
 
     def path
-      search_items_path(form_field => [value])
+      search_path(form_field => [value])
     end
   end
 end

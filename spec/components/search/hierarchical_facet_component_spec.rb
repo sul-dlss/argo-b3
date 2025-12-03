@@ -16,7 +16,7 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
     ]
   end
 
-  let(:search_form) { Search::ItemForm.new }
+  let(:search_form) { SearchForm.new }
   let(:form_field) { :tags }
   let(:facet_path_helper) { Search::Facets::TAGS.facet_path_helper }
   let(:facet_children_path_helper) { Search::Facets::TAGS.facet_children_path_helper }

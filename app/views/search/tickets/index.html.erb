@@ -10,4 +10,6 @@
       </ul>
     </section>
   <% end %>
+
+  <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
 <% end %>

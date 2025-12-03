@@ -1,6 +1,7 @@
 <div class="container">
   <div class="row">
-    <div class="col-12 col-md-4 col-xxl-3"><%= sidebar %></div>
-    <div class="col-12 col-md-8 col-xxl-9"><%= main_content %></div>
+    <%# Rendering out of order to affect so that results loaded before facets. %>
+    <div class="col-12 col-md-8 col-xxl-9 order-2"><%= main_content %></div>
+    <div class="col-12 col-md-4 col-xxl-3 order-1"><%= sidebar %></div>
   </div>
 </div>

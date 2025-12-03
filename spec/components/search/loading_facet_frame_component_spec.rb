@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::LoadingFacetFrameComponent, type: :component do
-  let(:component) { described_class.new(search_form: Search::ItemForm.new, facet_config: Search::Facets::PROJECTS) }
+  let(:component) { described_class.new(search_form: SearchForm.new, facet_config: Search::Facets::PROJECTS) }
 
   it 'renders the loading facet frame component' do
     render_inline(component)

@@ -2,15 +2,20 @@
   <nav aria-label="Search form" class="container py-2 mb-3">
     <%= helpers.form_with model: search_form, scope: :search, url:, method: :get do |form| %>
       <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, include_base_fields: false) %>
+
       <div class="d-flex align-items-center">
         <%= form.label :query, label, class: 'form-label fw-bold w-auto me-2 mb-0' %>
+
         <div class="input-group w-auto">
           <span class="input-group-text bg-white my-2">
             <i class="bi bi-search"></i>
           </span>
 
           <%= form.text_field :query, class: 'form-control border-start-0 border-end-0 my-2', style: 'width: 400px;' %>
-          <span class="input-group-text bg-white my-2 pe-2"><%= form.submit 'Search', class: 'btn btn-primary' %></span>
+
+          <span class="input-group-text bg-white my-2 pe-2">
+            <%= form.submit 'Search', class: 'btn btn-primary' %>
+          </span>
         </div>
       </div>
 

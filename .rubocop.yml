@@ -32,6 +32,8 @@ Metrics/BlockLength:
     - context
     - namespace
     - class_methods
+  Exclude:
+    - 'config/routes.rb'
 
 Metrics/ClassLength:
   Max: 150 # default 100

@@ -6,7 +6,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
   let(:component) do
     described_class.new(facet_counts:, search_form:, form_field: :released_to_earthworks)
   end
-  let(:search_form) { Search::ItemForm.new(released_to_earthworks: ['last_week'], page: 2) }
+  let(:search_form) { SearchForm.new(released_to_earthworks: ['last_week'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::DynamicFacetCounts) }
 
   before do
@@ -24,11 +24,11 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
     # Add a new facet value
     item = page.find('li', text: 'Last month')
     expect(item).to have_link('Last month',
-                              href: '/search/items?released_to_earthworks%5B%5D=last_week&released_to_earthworks%5B%5D=last_month') # rubocop:disable Layout/LineLength
+                              href: '/search?released_to_earthworks%5B%5D=last_week&released_to_earthworks%5B%5D=last_month') # rubocop:disable Layout/LineLength
 
     # Remove an existing facet value
     collection_item = page.find('li', text: 'Last week')
-    expect(collection_item).to have_link('Remove', href: '/search/items')
+    expect(collection_item).to have_link('Remove', href: '/search')
   end
 
   context 'when there are no facet counts' do
@@ -47,7 +47,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
                           date_from_form_field: :earliest_accessioned_date_from,
                           date_to_form_field: :earliest_accessioned_date_to)
     end
-    let(:search_form) { Search::ItemForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
+    let(:search_form) { SearchForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
 
     it 'renders the date range inputs' do
       render_inline(component)

@@ -7,7 +7,7 @@ module Searchers
       new(...).call
     end
 
-    # @param search_form [Search::ItemForm]
+    # @param search_form [SearchForm]
     # @param facet_config [Search::Facets::FacetConfig] configuration for the facet
     # @param value [String, nil] the facet value to return children for. If nil, returns top-level values
     # @param limit [Integer, nil] maximum number of facet values to return

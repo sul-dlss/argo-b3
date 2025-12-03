@@ -7,7 +7,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     described_class.new(count: 10, search_form:, form_field: :object_types,
                         value: 'collection', label:, data:)
   end
-  let(:search_form) { Search::ItemForm.new(object_types: ['collection'], page: 2) }
+  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2) }
   let(:label) { nil }
   let(:data) { {} }
 
@@ -16,18 +16,18 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_content('collection')
-      expect(page).to have_link('Remove', href: '/search/items')
+      expect(page).to have_link('Remove', href: '/search')
     end
   end
 
   context 'when not selected' do
-    let(:search_form) { Search::ItemForm.new(object_types: ['item'], page: 2) }
+    let(:search_form) { SearchForm.new(object_types: ['item'], page: 2) }
 
     it 'renders the unselected facet value' do
       render_inline(component)
 
       expect(page).to have_link('collection',
-                                href: '/search/items?object_types%5B%5D=item&object_types%5B%5D=collection')
+                                href: '/search?object_types%5B%5D=item&object_types%5B%5D=collection')
       expect(page).to have_css('.facet-count', text: '10')
       expect(page).to have_no_link('Remove')
     end
@@ -49,7 +49,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     it 'includes the link arguments in the link' do
       render_inline(component)
 
-      expect(page).to have_link('Remove', href: '/search/items', title: 'Remove collection')
+      expect(page).to have_link('Remove', href: '/search', title: 'Remove collection')
       expect(page).to have_css('.visually-hidden', text: '[Remove collection]')
       expect(page).to have_css('a[data-turbo="false"]')
     end
@@ -67,7 +67,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
 
       expect(page).to have_link('dark')
       expect(page).to have_link('Exclude',
-                                href: '/search/items?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection',
+                                href: '/search?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection',
                                 title: 'Exclude dark')
     end
   end

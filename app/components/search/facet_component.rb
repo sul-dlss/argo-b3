@@ -4,7 +4,7 @@ module Search
   # Component for displaying a value-based search facet
   class FacetComponent < ViewComponent::Base
     # @param facet_counts [Search::FacetCounts] The facet counts to display
-    # @param search_form [Search::ItemForm] The current search form
+    # @param search_form [SearchForm] The current search form
     # @param form_field [Symbol] The facet field name
     # @param exclude_form_field [Symbol, nil] The form field used for excluding values from this facet.
     #   Enables exclude links if provided.

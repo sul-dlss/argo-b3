@@ -11,7 +11,7 @@ module Searchers
       new(...).call
     end
 
-    # @param search_form [Search::ItemForm]
+    # @param search_form [SearchForm]
     # @param field [String] the Solr field to facet on
     # @param facet_query [String] query to filter facet values
     # @param alpha_sort [Boolean] whether to sort facet values alphabetically

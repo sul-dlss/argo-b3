@@ -11,7 +11,7 @@ module Search
 
     # @param facet_config [Search::Facets::Config]
     # @param facet_counts [SearchResults::FacetCounts]
-    # @param search_form [Search::ItemForm]
+    # @param search_form [SearchForm]
     # @param facet_component [Symbol] type of facet component to render inside turbo stream
     def initialize(facet_config:, facet_counts:, search_form:, facet_component: :facet)
       @facet_config = facet_config

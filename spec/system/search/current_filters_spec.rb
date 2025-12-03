@@ -11,9 +11,7 @@ RSpec.describe 'Current filters', :solr do
   end
 
   it 'returns current filters' do
-    visit search_items_path(query: 'test')
-
-    assert_item_search_page
+    visit search_path(query: 'test')
 
     expect(page).to have_result_count(3)
 

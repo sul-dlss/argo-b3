@@ -17,8 +17,6 @@ RSpec.describe 'Item search', :solr do
     it 'returns search results' do
       visit root_path
 
-      assert_home_page
-
       find_search_field.fill_in(with: item_doc[Search::Fields::TITLE])
       click_button('Search')
 
@@ -33,8 +31,6 @@ RSpec.describe 'Item search', :solr do
     context 'when multiple pages of results' do
       it 'paginates results' do
         visit root_path
-
-        assert_home_page
 
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
@@ -72,7 +68,6 @@ RSpec.describe 'Item search', :solr do
       it 'shows google books results' do
         visit root_path
 
-        assert_home_page
         check('Include Google Books')
 
         find_search_field.fill_in(with: 'Item')
@@ -88,7 +83,6 @@ RSpec.describe 'Item search', :solr do
       it 'does not return any results' do
         visit root_path
 
-        assert_home_page
         find_search_field.fill_in(with: '')
         click_button('Search')
 
@@ -98,9 +92,7 @@ RSpec.describe 'Item search', :solr do
 
     context 'when there is a current filter' do
       it 'applies the current filter when searching' do
-        visit search_items_path('object_types[]': 'collection')
-
-        assert_item_search_page
+        visit search_path('object_types[]': 'collection')
 
         expect(page).to have_result_count(5)
         expect(page).to have_current_filter('Object types', 'collection')

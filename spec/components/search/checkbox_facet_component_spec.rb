@@ -6,7 +6,7 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
   let(:component) do
     described_class.new(facet_counts:, search_form:, form_field: :object_types)
   end
-  let(:search_form) { Search::ItemForm.new(object_types: ['collection'], page: 2, query: 'test') }
+  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2, query: 'test') }
   let(:facet_counts) do
     [
       SearchResults::FacetCount.new(value: 'collection', count: 10),
@@ -19,7 +19,7 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
 
     expect(page).to have_css('section[aria-label="Object types"] h3', text: 'Object types')
 
-    expect(page).to have_css('form[action="/search/items"][method="get"]')
+    expect(page).to have_css('form[action="/search"][method="get"]')
     expect(page).to have_field('search[query]', with: 'test', type: 'hidden')
     expect(page).to have_field('collection', type: 'checkbox', checked: true)
     expect(page).to have_field('item', type: 'checkbox', checked: false)

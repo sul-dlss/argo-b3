@@ -14,8 +14,6 @@ RSpec.describe 'Project search', :solr do
   it 'returns ticket search results' do
     visit root_path
 
-    assert_home_page
-
     find_search_field.fill_in(with: 'TESTREQ-0')
     click_button('Search')
 
@@ -23,8 +21,6 @@ RSpec.describe 'Project search', :solr do
       expect(page).to have_result_count(1)
       find_ticket_result('TESTREQ-0').first('a').click
     end
-
-    assert_item_search_page
 
     within(find_item_results_section) do
       expect(page).to have_result_count(1)

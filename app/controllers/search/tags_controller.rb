@@ -3,8 +3,10 @@
 module Search
   # Controller for tag searches
   class TagsController < SearchApplicationController
+    layout false
+
     def index
-      @search_form = build_form(form_class: Search::Form)
+      @search_form = build_form(form_class: SearchForm)
       @tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::OTHER_TAGS)
     end
   end

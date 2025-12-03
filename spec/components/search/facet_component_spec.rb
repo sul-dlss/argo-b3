@@ -7,7 +7,7 @@ RSpec.describe Search::FacetComponent, type: :component do
     described_class.new(facet_counts:, search_form:, form_field: :object_types,
                         facet_page_path_helper:, facet_search_path_helper:)
   end
-  let(:search_form) { Search::ItemForm.new(object_types: ['collection'], page: 2) }
+  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: 1) }
   let(:facet_page_path_helper) { nil }
   let(:facet_search_path_helper) { nil }
@@ -29,11 +29,11 @@ RSpec.describe Search::FacetComponent, type: :component do
     # Add a new facet value
     item = page.find('li', text: 'item')
     expect(item).to have_link('item',
-                              href: '/search/items?object_types%5B%5D=collection&object_types%5B%5D=item')
+                              href: '/search?object_types%5B%5D=collection&object_types%5B%5D=item')
 
     # Remove an existing facet value
     collection_item = page.find('li', text: 'collection')
-    expect(collection_item).to have_link('Remove', href: '/search/items')
+    expect(collection_item).to have_link('Remove', href: '/search')
   end
 
   context 'when paging is enabled' do

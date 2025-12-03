@@ -4,7 +4,7 @@ module Search
   # Component for displaying a hierarchical search facet
   class HierarchicalFacetComponent < ViewComponent::Base
     # @param facet_counts [Search::HierarchicalFacetCounts] The facet counts to display
-    # @param search_form [Search::ItemForm] The current search form
+    # @param search_form [SearchForm] The current search form
     # @param form_field [Symbol] The form field this facet represents
     # @param facet_children_path_helper [Proc] The path helper for fetching facet children
     # @param facet_path_helper [Proc, nil] Optional path helper for paging the facet. Enables paging if provided.

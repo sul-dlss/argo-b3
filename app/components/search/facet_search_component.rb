@@ -5,7 +5,7 @@ module Search
   class FacetSearchComponent < ApplicationComponent
     # @param facet_search_path_helper [Proc, nil] The path helper for performing the facet search
     # @param form_field [Symbol] The form field this search is for
-    # @param search_form [Search::ItemForm] The current search form
+    # @param search_form [SearchForm] The current search form
     # @param classes [String, Array, nil] Additional CSS classes for the combox
     def initialize(facet_search_path_helper:, form_field:, search_form:, classes: nil)
       @facet_search_path_helper = facet_search_path_helper

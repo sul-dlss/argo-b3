@@ -82,8 +82,8 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       render_inline(component)
 
       cell = find_table_value_cell('item-result-ab123cd4567', 'Projects')
-      expect(cell).to have_link('Project A', href: '/search/items?projects%5B%5D=Project+A')
-      expect(cell).to have_link('Project B', href: '/search/items?projects%5B%5D=Project+B')
+      expect(cell).to have_link('Project A', href: '/search?projects%5B%5D=Project+A')
+      expect(cell).to have_link('Project B', href: '/search?projects%5B%5D=Project+B')
     end
   end
 
@@ -124,8 +124,8 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       render_inline(component)
 
       cell = find_table_value_cell('item-result-ab123cd4567', 'Tickets')
-      expect(cell).to have_link('ticket-001', href: '/search/items?tickets%5B%5D=ticket-001')
-      expect(cell).to have_link('ticket-002', href: '/search/items?tickets%5B%5D=ticket-002')
+      expect(cell).to have_link('ticket-001', href: '/search?tickets%5B%5D=ticket-001')
+      expect(cell).to have_link('ticket-002', href: '/search?tickets%5B%5D=ticket-002')
     end
   end
 

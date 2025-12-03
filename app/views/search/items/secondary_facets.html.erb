@@ -1,0 +1,107 @@
+<%= turbo_frame_tag 'items-search-secondary' do %>
+  <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::ACCESS_RIGHTS,
+                                                          facet_counts: @results.access_rights_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LICENSES,
+                                                          facet_counts: @results.licenses_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MIMETYPES,
+                                                          facet_counts: @results.mimetypes_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::FILE_ROLES,
+                                                          facet_counts: @results.file_roles_facet,
+                                                          search_form: @search_form, facet_component: :checkbox) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::VERSIONS,
+                                                          facet_counts: @results.versions_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::COLLECTIONS,
+                                                          facet_counts: @results.collections_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::ADMIN_POLICIES,
+                                                          facet_counts: @results.admin_policies_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::PROCESSING_STATUSES,
+                                                          facet_counts: @results.processing_statuses_facet,
+                                                          search_form: @search_form, facet_component: :checkbox) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS,
+                                                          facet_counts: @results.released_to_earthworks_facet,
+                                                          search_form: @search_form, facet_component: :dynamic) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_PURL_SITEMAP,
+                                                          facet_counts: @results.released_to_purl_sitemap_facet,
+                                                          search_form: @search_form, facet_component: :dynamic) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_SEARCHWORKS,
+                                                          facet_counts: @results.released_to_searchworks_facet,
+                                                          search_form: @search_form, facet_component: :dynamic) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::METADATA_SOURCES,
+                                                          facet_counts: @results.metadata_sources_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::REGISTERED_DATE,
+                                                          facet_counts: @results.registered_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LAST_ACCESSIONED_DATE,
+                                                          facet_counts: @results.last_accessioned_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::EARLIEST_ACCESSIONED_DATE,
+                                                          facet_counts: @results.earliest_accessioned_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LAST_PUBLISHED_DATE,
+                                                          facet_counts: @results.last_published_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LAST_OPENED_DATE,
+                                                          facet_counts: @results.last_opened_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::EMBARGO_RELEASE_DATE,
+                                                          facet_counts: @results.embargo_release_date_facet,
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::IDENTIFIERS,
+                                                          facet_counts: @results.identifiers_facet,
+                                                          search_form: @search_form, facet_component: :dynamic) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::SW_RESOURCE_TYPES,
+                                                          facet_counts: @results.sw_resource_types_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MODS_RESOURCE_TYPES,
+                                                          facet_counts: @results.mods_resource_types_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::DATES,
+                                                          facet_counts: @results.dates_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::TOPICS,
+                                                          facet_counts: @results.topics_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::REGIONS,
+                                                          facet_counts: @results.regions_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::GENRES,
+                                                          facet_counts: @results.genres_facet,
+                                                          search_form: @search_form) %>
+
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LANGUAGES,
+                                                          facet_counts: @results.languages_facet,
+                                                          search_form: @search_form) %>
+<% end %>

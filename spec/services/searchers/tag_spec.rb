@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Tag do
   let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
-  let(:search_form) { Search::Form.new(query:) }
+  let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'project 1' }
   let(:solr_response) do
     {
@@ -37,7 +37,7 @@ RSpec.describe Searchers::Tag do
   end
 
   context 'when the search form has debug enabled' do
-    let(:search_form) { Search::Form.new(query:, debug: true) }
+    let(:search_form) { SearchForm.new(query:, debug: true) }
 
     it 'includes debugQuery in the Solr request' do
       results

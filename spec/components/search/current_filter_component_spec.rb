@@ -9,7 +9,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     let(:form_field) { :object_types }
     let(:value) { 'item' }
     let(:search_form) do
-      Search::ItemForm.new(
+      SearchForm.new(
         object_types: %w[item collection],
         projects: ['Project 1']
       )
@@ -20,7 +20,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
 
       expect(page).to have_css('li', text: /Object types\s+❯\s+item/)
       expect(page).to have_link('',
-                                href: '/search/items?object_types%5B%5D=collection&projects%5B%5D=Project+1',
+                                href: '/search?object_types%5B%5D=collection&projects%5B%5D=Project+1',
                                 title: 'Remove Object types > item')
     end
   end
@@ -29,7 +29,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     let(:form_field) { :released_to_earthworks }
     let(:value) { 'last_year' }
     let(:search_form) do
-      Search::ItemForm.new(
+      SearchForm.new(
         released_to_earthworks: ['last_year']
       )
     end

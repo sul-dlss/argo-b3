@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Item do
   let(:results) { described_class.call(search_form:) }
-  let(:search_form) { Search::ItemForm.new(query:) }
+  let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
     {
@@ -34,37 +34,15 @@ RSpec.describe Searchers::Item do
       # Only testing one field here so that the test is not brittle.
       facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
       expect(facet_json).to include(
-        Search::Fields::OBJECT_TYPES,
-        Search::Fields::ACCESS_RIGHTS
+        Search::Fields::OBJECT_TYPES
       )
-      expect(facet_json[Search::Fields::ACCESS_RIGHTS])
-        .to match({
-                    field: Search::Fields::ACCESS_RIGHTS,
-                    limit: 50,
-                    numBuckets: true,
-                    sort: 'index',
-                    type: 'terms'
-                  })
-      # Only testing one dynamic facet here so that the test is not brittle.
-      expect(facet_json).to include(
-        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week",
-        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_month",
-        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_year",
-        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-ever",
-        "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-never"
-      )
-      expect(facet_json["#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week"])
-        .to match({
-                    type: 'query',
-                    q: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO *]"
-                  })
       expect(solr_query['rows']).to eq(20)
       expect(solr_query['start']).to eq(0)
     end
   end
 
   context 'when the search form is blank' do
-    let(:search_form) { Search::ItemForm.new }
+    let(:search_form) { SearchForm.new }
 
     it 'sets rows to 0' do
       results
@@ -76,7 +54,7 @@ RSpec.describe Searchers::Item do
   end
 
   context 'when on page 3' do
-    let(:search_form) { Search::ItemForm.new(query:, page: 3) }
+    let(:search_form) { SearchForm.new(query:, page: 3) }
 
     it 'calculates the correct start value' do
       results
