@@ -1,6 +1,13 @@
 <%= helpers.turbo_stream.replace facet_id do %>
   <% if facet? %>
     <%= facet %>
+  <% elsif facet_component == :checkbox %>
+    <%= render Search::CheckboxFacetComponent.new(facet_counts:, search_form:, form_field:) %>
+  <% elsif facet_component == :dynamic %>
+    <%= render Search::DynamicFacetComponent.new(facet_counts:, search_form:, form_field:) %>
+  <% elsif facet_component == :dynamic_with_date_range %>
+    <%= render Search::DynamicFacetComponent.new(facet_counts:, search_form:, form_field:,
+                                                 date_from_form_field:, date_to_form_field:) %>
   <% else %>
     <%= render Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:, facet_page_path_helper:, facet_search_path_helper:) %>
   <% end %>

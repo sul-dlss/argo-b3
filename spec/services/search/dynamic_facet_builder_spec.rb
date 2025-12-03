@@ -13,15 +13,15 @@ RSpec.describe Search::DynamicFacetBuilder do
                         type: 'query'
                       },
                       'released_to_earthworks-last_month' => {
-                        q: 'released_to_earthworks_dtpsidv:[NOW-1MONTH/DAY TO NOW]',
+                        q: 'released_to_earthworks_dtpsidv:[NOW-1MONTH/DAY TO *]',
                         type: 'query'
                       },
                       'released_to_earthworks-last_week' => {
-                        q: 'released_to_earthworks_dtpsidv:[NOW-7DAY/DAY TO NOW]',
+                        q: 'released_to_earthworks_dtpsidv:[NOW-7DAY/DAY TO *]',
                         type: 'query'
                       },
                       'released_to_earthworks-last_year' => {
-                        q: 'released_to_earthworks_dtpsidv:[NOW-1YEAR/DAY TO NOW]',
+                        q: 'released_to_earthworks_dtpsidv:[NOW-1YEAR/DAY TO *]',
                         type: 'query'
                       },
                       'released_to_earthworks-never' => {

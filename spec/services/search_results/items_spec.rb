@@ -51,6 +51,27 @@ RSpec.describe SearchResults::Items do
             Search::Fields::BARE_DRUID => 'zk509gj4865'
           }
         ]
+      },
+      'facets' => {
+        Search::Fields::ACCESS_RIGHTS => {
+          'numBuckets' => 2,
+          'buckets' => [
+            {
+              'val' => 'citation',
+              'count' => 6
+            },
+            {
+              'val' => 'dark',
+              'count' => 3
+            }
+          ]
+        },
+        'released_to_earthworks-ever' => {
+          'count' => 0
+        },
+        'released_to_earthworks-never' => {
+          'count' => 101
+        }
       }
     }
   end
@@ -101,6 +122,19 @@ RSpec.describe SearchResults::Items do
     it 'returns an array of facet counts' do
       expect(items.to_ary).to be_an(Array)
       expect(items.to_ary.size).to eq(3)
+    end
+  end
+
+  describe 'facet methods (method missing)' do
+    it 'returns facet counts for non-dynamic facets' do
+      facet_counts = items.access_rights_facet
+      expect(facet_counts).to be_a(SearchResults::FacetCounts)
+      expect(facet_counts.total_facets).to eq(2)
+    end
+
+    it 'returns facet counts for dynamic facets' do
+      facet_counts = items.released_to_earthworks_facet
+      expect(facet_counts).to be_a(SearchResults::DynamicFacetCounts)
     end
   end
 end

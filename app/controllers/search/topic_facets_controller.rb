@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Search
-  # Controller for mimetypes facet
-  class MimetypeFacetsController < FacetsApplicationController
+  # Controller for topics facet
+  class TopicFacetsController < FacetsApplicationController
     include FacetPagingConcern
     include FacetSearchingConcern
 
     private
 
     def facet_config
-      Search::Facets::MIMETYPES
+      Search::Facets::TOPICS
     end
   end
 end

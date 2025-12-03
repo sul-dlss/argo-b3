@@ -32,10 +32,9 @@ module Search
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
-                                        field: hierarchical_field,
+                                        facet_config:,
                                         value: for_children ? parent_value_param : nil,
-                                        alpha_sort:,
-                                        limit: for_children ? -1 : SEARCH_LIMIT)
+                                        limit: for_children ? -1 : limit)
     end
   end
 end

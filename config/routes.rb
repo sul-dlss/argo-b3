@@ -45,6 +45,18 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       end
     end
 
+    resources :collection_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :admin_policy_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
     resources :workflow_facets, only: [:index] do
       collection do
         get 'children'
@@ -52,6 +64,36 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     end
 
     resources :mimetype_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :date_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :topic_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :region_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :genre_facets, only: [:index] do
+      collection do
+        get 'search'
+      end
+    end
+
+    resources :language_facets, only: [:index] do
       collection do
         get 'search'
       end

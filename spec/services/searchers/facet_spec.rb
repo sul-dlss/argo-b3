@@ -3,9 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Facet do
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
+  let(:results) { described_class.call(search_form:, facet_config:) }
   let(:search_form) { Search::ItemForm.new(query:) }
   let(:query) { 'test' }
+  let(:facet_config) { Search::Facets::Config.new(field: Search::Fields::PROJECTS_EXPLODED) }
   let(:solr_response) do
     {
       'facets' => {
@@ -45,7 +46,7 @@ RSpec.describe Searchers::Facet do
   end
 
   context 'when alpha_sort is true' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, alpha_sort: true) }
+    let(:facet_config) { Search::Facets::Config.new(field: Search::Fields::PROJECTS_EXPLODED, alpha_sort: true) }
 
     it 'includes sort in the Solr request' do
       results
@@ -58,7 +59,7 @@ RSpec.describe Searchers::Facet do
   end
 
   context 'when limit is provided' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, limit: 5) }
+    let(:results) { described_class.call(search_form:, facet_config:, limit: 5) }
 
     it 'includes limit in the Solr request' do
       results

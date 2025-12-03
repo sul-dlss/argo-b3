@@ -30,15 +30,23 @@
 en:
   search:
     # If not provided, will use humanized field name
-    facets:    
+    facets:
+      admin_policy_titles: "Admin policies"
+      collection_titles: "Collections"
       earliest_accessioned_date: "Earliest accessioned"
       earliest_accessioned_date_from: 'Earliest accessioned from'
       earliest_accessioned_date_to: 'Earliest accessioned to'
       include_google_books: "Include Google Books"
-      mimetypes: "MIME Types"
+      mimetypes: "MIME types"
+      mods_resource_types: "MODS resource types"
       released_to_earthworks: "Released to Earthworks"
+      released_to_purl_sitemap: "Released to PURL sitemap"
+      released_to_searchworks: "Released to Searchworks"
+      sw_resource_types: "Searchworks resource types"
       wps_workflows: "Workflow > Process > Status"
     facet_values:
       ever: "Currently released"
       never: "Not released"
+      has_orcids: 'Has contributor ORCIDs'
+      has_doi: 'Has DOI'
       

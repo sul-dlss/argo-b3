@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe SearchResults::HierarchicalFacetCounts do
-  let(:facet_counts) { described_class.new(solr_response:, field:) }
-  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, field:) }
+  let(:facet_counts) { described_class.new(solr_response:, facet_config:) }
+  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, facet_config:) }
 
   let(:solr_response) do
     {
@@ -37,6 +37,7 @@ RSpec.describe SearchResults::HierarchicalFacetCounts do
       'facets' => {}
     }
   end
+  let(:facet_config) { Search::Facets::Config.new(hierarchical_field: field) }
   let(:field) { 'tags' }
   let(:facet_json) do
     {

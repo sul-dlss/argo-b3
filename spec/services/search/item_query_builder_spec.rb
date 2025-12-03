@@ -42,7 +42,7 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
-  context 'with object types' do
+  context 'with object types (facet filter query)' do
     let(:search_form) { Search::ItemForm.new(object_types: %w[dro collection]) }
 
     it 'builds the correct filter query for object types' do
@@ -51,16 +51,7 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
-  context 'with projects' do
-    let(:search_form) { Search::ItemForm.new(projects: ['Project A', 'Project B']) }
-
-    it 'builds the correct filter query for projects' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::PROJECTS_EXPLODED}:(\"Project A\" OR \"Project B\")")
-    end
-  end
-
-  context 'with access rights' do
+  context 'with access rights (facet filter query)' do
     let(:search_form) { Search::ItemForm.new(access_rights: ['dark']) }
 
     it 'builds the correct filter query for access rights' do
@@ -69,7 +60,7 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
-  context 'with access rights exclude' do
+  context 'with access rights exclude (facet filter query)' do
     let(:search_form) { Search::ItemForm.new(access_rights_exclude: ['dark']) }
 
     it 'builds the correct filter query for access rights exclude' do
@@ -78,54 +69,18 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
-  context 'with tags' do
-    let(:search_form) { Search::ItemForm.new(tags: ['Tag A', 'Tag B : Tag B1']) }
-
-    it 'builds the correct filter query for tags' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::OTHER_TAGS}:(\"Tag A\" OR \"Tag B : Tag B1\")")
-    end
-  end
-
-  context 'with tickets' do
-    let(:search_form) { Search::ItemForm.new(tickets: %w[DIGREQ-123 DIGREQ-456]) }
-
-    it 'builds the correct filter query for tags' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::TICKETS}:(\"DIGREQ-123\" OR \"DIGREQ-456\")")
-    end
-  end
-
-  context 'with wps workflows' do
-    let(:search_form) { Search::ItemForm.new(wps_workflows: ['ocrWF:end-ocr:waiting']) }
-
-    it 'builds the correct filter query for wps workflows' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::WPS_WORKFLOWS}:(\"ocrWF:end-ocr:waiting\")")
-    end
-  end
-
-  context 'with mimetypes' do
-    let(:search_form) { Search::ItemForm.new(mimetypes: ['application/pdf']) }
-
-    it 'builds the correct filter query for mimetypes' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::MIMETYPES}:(\"application/pdf\")")
-    end
-  end
-
-  context 'with dynamic facet released to earthworks' do
+  context 'with released to earthworks (dynamic facet)' do
     let(:search_form) { Search::ItemForm.new(released_to_earthworks: %w[last_year never]) }
 
     it 'builds the correct filter query for released to earthworks' do
       result = described_class.call(search_form:)
       expect(Array(result[:fq]))
-        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO NOW]) OR " \
+        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO *]) OR " \
                     "(-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *])")
     end
   end
 
-  context 'with dynamic facet earliest accessioned date' do
+  context 'with earliest accessioned date (dynamic facet)' do
     context 'with from and to dates' do
       let(:search_form) { Search::ItemForm.new(earliest_accessioned_date_from: '2023-01-01', earliest_accessioned_date_to: '2023-12-31') }
 

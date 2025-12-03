@@ -3,6 +3,8 @@
 module Search
   # Controller for project facet
   class ProjectFacetsController < FacetsApplicationController
+    include FacetSearchingConcern
+
     def index
       component = Search::HierarchicalFacetFrameComponent.new(
         facet_counts:,
@@ -25,19 +27,6 @@ module Search
       render(component, content_type: 'text/html')
     end
 
-    # Renders the auto-complete search results for the facet
-    def search
-      facet_counts = Searchers::FacetQuery.call(
-        search_form:,
-        field:,
-        limit:,
-        facet_query: facet_query_param
-      )
-
-      component = Search::FacetSearchResultComponent.with_collection(facet_counts)
-      render(component, content_type: 'text/html')
-    end
-
     private
 
     def facet_config
@@ -46,10 +35,9 @@ module Search
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
-                                        field: hierarchical_field,
+                                        facet_config:,
                                         value: for_children ? parent_value_param : nil,
-                                        alpha_sort:,
-                                        limit: for_children ? -1 : SEARCH_LIMIT,
+                                        limit: for_children ? -1 : limit,
                                         page: page_param)
     end
   end
