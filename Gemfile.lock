@@ -140,6 +140,7 @@ GEM
     crass (1.0.6)
     cssbundling-rails (1.4.3)
       railties (>= 6.0.0)
+    csv (3.3.5)
     cyperful (0.3.1)
       capybara (~> 3)
       listen (~> 3)
@@ -527,6 +528,7 @@ DEPENDENCIES
   capybara-lockstep
   config
   cssbundling-rails
+  csv
   cyperful
   debug
   dlss-capistrano

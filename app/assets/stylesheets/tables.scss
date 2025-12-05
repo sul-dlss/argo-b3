@@ -26,3 +26,10 @@ table.table-h3 {
     padding-left: 0;
   }
 }
+
+table.table-data {
+  th {
+    width: fit-content;
+    white-space: nowrap;
+  }
+}

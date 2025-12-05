@@ -58,6 +58,7 @@ FactoryBot.define do
         Search::Fields::REGIONS => regions,
         Search::Fields::GENRES => genres,
         Search::Fields::LANGUAGES => languages,
+        Search::Fields::PURL => "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}",
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

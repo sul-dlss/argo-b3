@@ -57,16 +57,18 @@
           </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="navbars bg-dark col-md-4">
           <nav
             class="
-              navbar collapse navbar-dark navbar-collapse
-              justify-content-md-end navbar-expand-md d-md-flex
+              navbar bg-dark collapse navbar-collapse justify-content-md-end
+              navbar-expand-md d-md-flex
             "
             aria-label="Browse"
             id="user-util-collapse">
-            <ul class="navbar-nav">
-              <%# Impersonate, Bulk Action, All Workflows, Register, etc. go here. %>
+            <ul class="navbar-nav fw-semibold">
+              <li class="nav-item ms-md-3">
+                <%= link_to 'Report', report_path, class: 'nav-link' %>
+              </li>
 
               <hr class="d-md-none d-block">
 

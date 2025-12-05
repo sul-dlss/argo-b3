@@ -9,7 +9,7 @@ module Elements
       # Subclasses should provide rows, e.g., renders_many :rows
 
       def initialize(id:, label: nil, classes: [], head_classes: [], body_classes: [], show_label: true, role: nil, # rubocop:disable Metrics/ParameterLists
-                     data: {}, empty_message: nil)
+                     data: {}, empty_message: nil, variant: :h3)
         @id = id
         @classes = classes
         @body_classes = body_classes
@@ -21,19 +21,20 @@ module Elements
         @head_classes = head_classes
         raise ArgumentError, 'Subclasses must provide rows' unless respond_to?(:rows)
 
+        @variant = variant
+        raise ArgumentError, 'Unknown variant' unless %i[h3 data].include?(@variant)
+
         super()
       end
 
-      attr_reader :label, :id, :role, :data, :empty_message
+      attr_reader :label, :id, :role, :data, :empty_message, :variant
 
       def before_render
         raise ArgumentError, 'Must provide label or caption' unless label.present? || caption?
       end
 
       def classes
-        # Provides table, table-striped, and table-sm as the static default classes
-        # merged with any additional classes passed in.
-        merge_classes(%w[table table-h3], @classes)
+        merge_classes('table', variant_classes, @classes)
       end
 
       def head_classes
@@ -50,6 +51,15 @@ module Elements
 
       def render?
         rows? || empty_message.present?
+      end
+
+      def variant_classes
+        case variant
+        when :h3
+          'table-h3'
+        when :data
+          'table-data table-striped table-hover table-bordered'
+        end
       end
     end
   end

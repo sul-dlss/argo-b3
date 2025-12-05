@@ -2,6 +2,7 @@
   <% if show_label? %>
     <caption><%= label || caption %></caption>
   <% end %>
+
   <% if headers? %>
     <%= tag.thead class: head_classes do %>
       <tr>
@@ -11,12 +12,14 @@
       </tr>
     <% end %>
   <% end %>
+
   <%= tag.tbody class: body_classes do %>
     <% rows.each do |row| %>
       <%= row %>
     <% end %>
   <% end %>
 <% end %>
+
 <% if empty_message && !rows? %>
   <p class="fst-italic"><%= empty_message %></p>
 <% end %>
