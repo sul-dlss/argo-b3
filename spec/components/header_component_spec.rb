@@ -8,6 +8,8 @@ RSpec.describe HeaderComponent, type: :component do
   it 'renders the header' do
     render_inline(component)
 
-    expect(page).to have_css('header .masthead .h1', text: 'Argo')
+    within('header .masthead') do
+      expect(page).to have_link(href: root_path, text: 'Argo: Build Back Better')
+    end
   end
 end
