@@ -42,6 +42,7 @@ gem 'image_processing', '~> 1.2'
 gem 'config'
 gem 'honeybadger'
 gem 'rsolr'
+gem 'sdr_view_components'
 gem 'view_component'
 
 group :development, :test do
