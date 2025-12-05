@@ -19,14 +19,14 @@ RSpec.describe Searchers::Tag do
   end
 
   before do
-    allow(Search::SolrService).to receive(:call).and_return(solr_response)
+    allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
   it 'returns search results from Solr' do
     expect(results).to be_a(SearchResults::FacetValues)
     expect(results.solr_response).to eq(solr_response)
 
-    expect(Search::SolrService).to have_received(:call)
+    expect(Search::SolrService).to have_received(:post)
       .with(request: { q: '*:*',
                        rows: 0,
                        facet: true,
@@ -41,7 +41,7 @@ RSpec.describe Searchers::Tag do
 
     it 'includes debugQuery in the Solr request' do
       results
-      expect(Search::SolrService).to have_received(:call)
+      expect(Search::SolrService).to have_received(:post)
         .with(request: hash_including(debugQuery: true))
     end
   end

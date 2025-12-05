@@ -7,4 +7,10 @@ class DruidSupport
 
     druid.delete_prefix('druid:')
   end
+
+  def self.prefixed_druid_from(druid)
+    return if druid.nil?
+
+    druid.start_with?('druid:') ? druid : "druid:#{druid}"
+  end
 end
