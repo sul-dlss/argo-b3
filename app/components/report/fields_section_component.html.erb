@@ -1,0 +1,18 @@
+<%= tag.div class: classes do %>
+  <%= label %>
+<% end %>
+
+<%= form.collection_check_boxes :fields, field_configs, :field, :label, include_hidden: false do |builder| %>
+  <div class="form-check">
+    <%= builder.check_box(class: 'form-check-input', data: { checkbox_select_target: 'checkbox', action: 'change->report#updateSubmit' }) %>
+    <%= builder.label(class: 'form-check-label') %>
+
+    <% if builder.object.help_text.present? %>
+      <p class="mb-0">
+        <small class="form-text text-muted">
+          <%= builder.object.help_text %>
+        </small>
+      </p>
+    <% end %>
+  </div>
+<% end %>

@@ -51,7 +51,7 @@ module Searchers
     attr_reader :search_form
 
     def solr_response
-      Search::SolrService.call(request: solr_request)
+      Search::SolrService.post(request: solr_request)
     end
 
     def solr_request

@@ -193,4 +193,12 @@ RSpec.describe SearchForm do
       end
     end
   end
+
+  describe '#to_s' do
+    subject(:form) { described_class.new(query: 'test') }
+
+    it 'returns the serialized search form' do
+      expect(form.to_s).to eq('"test"')
+    end
+  end
 end

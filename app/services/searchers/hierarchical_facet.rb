@@ -32,7 +32,7 @@ module Searchers
     delegate :alpha_sort, to: :facet_config
 
     def solr_response
-      Search::SolrService.call(request: solr_request)
+      Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
