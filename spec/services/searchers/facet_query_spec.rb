@@ -19,7 +19,7 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   before do
-    allow(Search::SolrService).to receive(:call).and_return(solr_response)
+    allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
   it 'returns search results from Solr' do
@@ -27,7 +27,7 @@ RSpec.describe Searchers::FacetQuery do
     expect(results.solr_response).to eq(solr_response)
 
     # This tests the parts of the query that aren't tested by ItemQueryBuilder spec.
-    expect(Search::SolrService).to have_received(:call) do |args|
+    expect(Search::SolrService).to have_received(:post) do |args|
       solr_query = args[:request].with_indifferent_access
       expect(solr_query['q']).to eq(query)
       expect(solr_query['facet']).to be true
@@ -46,7 +46,7 @@ RSpec.describe Searchers::FacetQuery do
 
     it 'includes sort in the Solr request' do
       results
-      expect(Search::SolrService).to have_received(:call) do |args|
+      expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
         expect(solr_query['facet.sort']).to eq('alpha')
       end
@@ -58,7 +58,7 @@ RSpec.describe Searchers::FacetQuery do
 
     it 'includes limit in the Solr request' do
       results
-      expect(Search::SolrService).to have_received(:call) do |args|
+      expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
         expect(solr_query['facet.limit']).to eq(5)
       end

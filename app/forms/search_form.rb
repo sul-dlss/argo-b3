@@ -128,4 +128,8 @@ class SearchForm < ApplicationForm
   def facets_selected?
     facet_attributes.values.any?(&:present?)
   end
+
+  def to_s
+    Search::Serializer.call(search_form: self)
+  end
 end

@@ -105,4 +105,11 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resource :report, only: [:show], controller: 'reports' do
+    collection do
+      post 'download'
+      post 'preview'
+    end
+  end
 end

@@ -1,0 +1,57 @@
+<div class="container py-2" data-controller="report">
+  <%= form_with model: @report_form, url: download_report_path do |form| %>
+    <fieldset data-controller="radio">
+      <legend>Select source of items for report:</legend>
+
+      <div class="form-check mt-3">
+        <%= form.radio_button :source, 'results', class: 'form-check-input', disabled: !defined?(@search_form), data: { radio_target: 'radio', action: 'radio#toggle' } %>
+        <%= form.label :source_results, 'From last search', class: 'form-check-label' %>
+
+        <% if defined?(@search_form) %>
+          <p><%= @total_results %> items for: <%= @search_form.to_s %></p>
+        <% end %>
+      </div>
+
+      <div class="form-check">
+        <%= form.radio_button :source, 'druids', class: 'form-check-input', data: { radio_target: 'radio', action: 'radio#toggle' } %>
+        <%= form.label :source_druids, 'From druid list', class: 'form-check-label' %>
+
+        <%= form.label :druid_list, 'Enter druid list', class: 'form-label visually-hidden' %>
+        <%= form.textarea :druid_list, rows: 5, class: 'form-control' %>
+      </div>
+    </fieldset>
+
+    <fieldset class="mt-4" data-controller="checkbox-select">
+      <legend>Select fields to include in report:</legend>
+
+      <div class="mb-2">
+        <a href="#" class="fw-bold" data-action="click->checkbox-select#checkAll">Select All</a>
+        |
+        <a href="#" class="fw-bold" data-action="click->checkbox-select#checkNone">Deselect All</a>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <%= render Report::FieldsSectionComponent.new(form:, label: 'Frequently used', field_configs: ReportsController::FREQUENTLY_USED_FIELDS) %>
+        </div>
+
+        <div class="col">
+          <%= render Report::FieldsSectionComponent.new(form:, label: 'Citation', field_configs: ReportsController::CITATION_FIELDS) %>
+          <%= render Report::FieldsSectionComponent.new(form:, label: 'History', field_configs: ReportsController::HISTORY_FIELDS, classes: 'mt-3') %>
+        </div>
+
+        <div class="col">
+          <%= render Report::FieldsSectionComponent.new(form:, label: 'Identifiers', field_configs: ReportsController::IDENTIFIERS_FIELDS) %>
+          <%= render Report::FieldsSectionComponent.new(form:, label: 'Content', field_configs: ReportsController::CONTENT_FIELDS, classes: 'mt-3') %>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="d-flex gap-2 my-3">
+      <%= form.submit 'Download', class: 'btn btn-primary', formtarget: '_blank' %>
+      <%= form.submit 'Preview', class: 'btn btn-primary', formaction: preview_report_path, data: { turbo_frame: 'report-preview' } %>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag 'report-preview' %>
+</div>

@@ -21,7 +21,7 @@ RSpec.describe Searchers::Facet do
   end
 
   before do
-    allow(Search::SolrService).to receive(:call).and_return(solr_response)
+    allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
   it 'returns search results from Solr' do
@@ -29,7 +29,7 @@ RSpec.describe Searchers::Facet do
     expect(results.solr_response).to eq(solr_response)
 
     # This tests the parts of the query that aren't tested by ItemQueryBuilder spec.
-    expect(Search::SolrService).to have_received(:call) do |args|
+    expect(Search::SolrService).to have_received(:post) do |args|
       solr_query = args[:request].with_indifferent_access
       expect(solr_query['q']).to eq(query)
       facet_json = JSON.parse(solr_query['json.facet']).with_indifferent_access
@@ -50,7 +50,7 @@ RSpec.describe Searchers::Facet do
 
     it 'includes sort in the Solr request' do
       results
-      expect(Search::SolrService).to have_received(:call) do |args|
+      expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request]
         facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
         expect(facet_json[Search::Fields::PROJECTS_EXPLODED][:sort]).to eq('index')
@@ -63,7 +63,7 @@ RSpec.describe Searchers::Facet do
 
     it 'includes limit in the Solr request' do
       results
-      expect(Search::SolrService).to have_received(:call) do |args|
+      expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
         facet_json = JSON.parse(solr_query[:'json.facet']).with_indifferent_access
         expect(facet_json[Search::Fields::PROJECTS_EXPLODED][:limit]).to eq(5)
