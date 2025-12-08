@@ -67,7 +67,15 @@
             id="user-util-collapse">
             <ul class="navbar-nav fw-semibold">
               <li class="nav-item ms-md-3">
+                <%= link_to 'Search', root_path, class: 'nav-link' %>
+              </li>
+
+              <li class="nav-item ms-md-3">
                 <%= link_to 'Report', report_path, class: 'nav-link' %>
+              </li>
+
+              <li class="nav-item ms-md-3">
+                <%= link_to 'Workflow grid', workflow_grid_index_path, class: 'nav-link' %>
               </li>
 
               <hr class="d-md-none d-block">

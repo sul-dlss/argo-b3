@@ -1,0 +1,44 @@
+<%= render Elements::Tables::TableComponent.new(id:, variant: :data, body_classes: 'placeholder-glow') do |table| %>
+  <%= table.with_caption do %>
+    <h2 class="h3"><%= link_to workflow_name, workflow_path %></h2>
+  <% end %>
+
+  <%= table.with_header(label: 'Process', style: 'width: 250px;') %>
+  <%= table.with_header(label: 'Description') %>
+  <%= table.with_header(label: 'Waiting', style: 'width: 55px;') %>
+  <%= table.with_header(label: 'Started', style: 'width: 55px;') %>
+  <%= table.with_header(label: 'Error', style: 'width: 55px;') %>
+  <%= table.with_header(label: 'Completed', style: 'width: 100px;') %>
+
+  <% @template[:processes].each_with_index do |process, index| %>
+    <%= table.with_row(values: [process[:label]]) do |row| %>
+      <% row.with_label_content do %>
+        <%= index + 1 %>.&nbsp;
+        <%= link_to process[:name], process_path_for(process[:name]) %>
+      <% end %>
+
+      <% if placeholder? %>
+        <% 3.times do %>
+          <%= row.with_cell do %>
+            <span class="placeholder" style="width: 25px;"></span>
+          <% end %>
+        <% end %>
+        <%= row.with_cell do %>
+          <span class="placeholder" style="width: 50px;"></span>
+        <% end %>
+      <% else %>
+        <% statuses.each do |status| %>
+          <%= row.with_cell do %>
+            <% count = count_for(process_name: process[:name], status:) %>
+
+            <% if count.zero? %>
+              0
+            <% else %>
+              <%= link_to number_with_delimiter(count), status_path_for(process[:name], status) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

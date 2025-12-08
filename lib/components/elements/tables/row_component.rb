@@ -5,9 +5,10 @@ module Elements
     # Component for rendering a table row.
     class RowComponent < ApplicationComponent
       renders_many :cells
+      renders_one :label_content
 
       def initialize(label: nil, first_value: nil, values: [], id: nil, tooltip: nil)
-        # Provide either label or first_value but not both; these are rendered in the first column
+        # Provide either label/label_content or first_value but not both; these are rendered in the first column
         # label renders with <th> (bold), first_value is a normal <td>
         @label = label
         @first_value = first_value

@@ -41,6 +41,7 @@ gem 'image_processing', '~> 1.2'
 # Additional gems
 gem 'config'
 gem 'csv'
+gem 'dor-services-client', '~> 15.1'
 gem 'honeybadger'
 gem 'rsolr'
 gem 'view_component'

@@ -112,4 +112,6 @@ Rails.application.routes.draw do
       post 'preview'
     end
   end
+
+  resources :workflow_grid, only: %i[index show], controller: 'workflow_grid'
 end

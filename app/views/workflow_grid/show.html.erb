@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "workflow-grid-#{@workflow_name}" do %>
+  <%= render WorkflowGrid::WorkflowTableComponent.new(workflow_name: @workflow_name, template: @workflow_template, workflow_process_counts: @workflow_process_counts, search_form: @search_form) %>
+<% end %>

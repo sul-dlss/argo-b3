@@ -34,7 +34,7 @@ module Elements
       end
 
       def classes
-        merge_classes('table', variant_classes, @classes)
+        merge_classes('table caption-top', variant_classes, @classes)
       end
 
       def head_classes
