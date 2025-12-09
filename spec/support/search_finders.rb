@@ -16,12 +16,22 @@ def find_ticket_results_section
   all('section[aria-label="Ticket results"]')&.first
 end
 
-def find_next_page
-  find_link('Next »')
+def find_pagination(brief: false)
+  if brief
+    find('nav.pagination')
+  else
+    find('nav.paginate-section')
+  end
 end
 
-def find_previous_page
-  find_link('« Previous')
+def find_next_page(brief: false)
+  pagination_section = find_pagination(brief:)
+  pagination_section.find_link('Next »')
+end
+
+def find_previous_page(brief: false)
+  pagination_section = find_pagination(brief:)
+  pagination_section.find_link('« Previous')
 end
 
 def find_project_result(project)

@@ -2,8 +2,9 @@
 
 module Elements
   module Pagination
-    # Component for displaying a pagination section
-    class SectionComponent < ApplicationComponent
+    # Component for displaying a full pagination section
+    # « Previous 1 2 3 4 5 6 Next »
+    class FullComponent < ApplicationComponent
       ELLIPSIS = '...'
 
       # @param total_pages [Integer] total number of pages

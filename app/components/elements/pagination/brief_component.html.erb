@@ -1,0 +1,7 @@
+<nav class="pagination d-flex align-items-baseline">
+  <%= link_to '« Previous', previous_path, rel: 'prev', class: previous_classes, 'aria-label': 'Go to previous page' %>
+   <strong><%= first_result %></strong> -
+  <strong><%= last_result %></strong>&nbsp;of&nbsp;
+  <strong><%= number_with_delimiter(total_results) %></strong>
+  <%= link_to 'Next »', next_path, rel: 'next', class: next_classes, 'aria-label': 'Go to next page' %>
+</nav>
