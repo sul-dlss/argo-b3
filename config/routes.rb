@@ -113,5 +113,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :workflow_grid, only: %i[index show], controller: 'workflow_grid'
+  resources :workflow_grid, only: %i[index show], controller: 'workflow_grid', param: :workflow do
+    member do
+      resources :processes, only: [], param: :process do
+        member do
+          post 'reset', to: 'workflow_grid#reset'
+        end
+      end
+    end
+  end
 end

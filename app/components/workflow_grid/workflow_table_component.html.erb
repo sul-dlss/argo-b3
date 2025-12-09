@@ -3,11 +3,11 @@
     <h2 class="h3"><%= link_to workflow_name, workflow_path %></h2>
   <% end %>
 
-  <%= table.with_header(label: 'Process', style: 'width: 250px;') %>
+  <%= table.with_header(label: 'Process', style: 'width: 225px;') %>
   <%= table.with_header(label: 'Description') %>
-  <%= table.with_header(label: 'Waiting', style: 'width: 55px;') %>
-  <%= table.with_header(label: 'Started', style: 'width: 55px;') %>
-  <%= table.with_header(label: 'Error', style: 'width: 55px;') %>
+  <%= table.with_header(label: 'Waiting', style: 'width: 100px;') %>
+  <%= table.with_header(label: 'Started', style: 'width: 100px;') %>
+  <%= table.with_header(label: 'Error', style: 'width: 100px;') %>
   <%= table.with_header(label: 'Completed', style: 'width: 100px;') %>
 
   <% @template[:processes].each_with_index do |process, index| %>
@@ -34,8 +34,17 @@
             <% if count.zero? %>
               0
             <% else %>
-              <%= link_to number_with_delimiter(count), status_path_for(process[:name], status) %>
+              <div class="d-flex align-items-center gap-2">
+                <%= link_to number_with_delimiter(count), status_path_for(process[:name], status), data: { turbo_frame: "_top" } %>
+                <% if status == 'error' %>
+                  <%= helpers.form_with model: @search_form, url: reset_process_path(workflow: workflow_name, process: process[:name], scope: @scope) do |form| %>
+                    <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form: @search_form) %>
+                  | <%= form.submit 'Reset', class: 'btn btn-link text-danger mx-0 px-1' %>
+                  <% end %>
+                <% end %>
+              </div>
             <% end %>
+
           <% end %>
         <% end %>
       <% end %>

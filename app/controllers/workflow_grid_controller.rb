@@ -13,7 +13,7 @@ class WorkflowGridController < ApplicationController
   end
 
   def show
-    @workflow_name = params[:id]
+    @workflow_name = params[:workflow]
     @workflow_process_counts = Searchers::Workflow.call(
       search_form: @search_form,
       workflow_name: @workflow_name
@@ -21,6 +21,11 @@ class WorkflowGridController < ApplicationController
     @workflow_template = template_for(@workflow_name)
 
     render layout: false
+  end
+
+  def reset
+    Rails.logger.info "Resetting workflow process #{params[:process]} for workflow #{params[:workflow]}"
+    redirect_to workflow_grid_path(params[:workflow], scope: @scope), flash: { reset: true }
   end
 
   private

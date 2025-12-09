@@ -16,21 +16,32 @@ export default class extends Controller {
         const controller = new AbortController()
         // Replace Turbo's signal with ours so we hold the abort handle
         if (event.detail?.fetchOptions) {
+          // Set low priority for frames
+          event.detail.fetchOptions.priority = 'low';
+
           event.detail.fetchOptions.signal = controller.signal
           this.frameAbortControllers.set(target, controller)
         }
       }
     }
 
-    // On navigation, abort any in-flight frame fetches immediately
+    // On navigation away from the page, abort any in-flight frame fetches immediately
     this._beforeVisitHandler = (event) => {
-      this.frameAbortControllers.values().forEach((controller) => {
-        try {
-          controller.abort()
-        } catch {}
-      })
-      // Cleanup, because leaving this page.
-      this.disconnect()
+      console.log(this.frameAbortControllers)
+      if (event.explicitOriginalTarget.dataset.turboFrame !== '_top') {
+        const turboFrame = event.explicitOriginalTarget.closest('turbo-frame')
+        console.log(turboFrame)
+        console.log(this.frameAbortControllers.get(turboFrame))
+      } else {
+        console.log('Aborting in-flight frame requests before visit')
+        this.frameAbortControllers.values().forEach((controller) => {
+          try {
+            controller.abort()
+          } catch {}
+        })
+        // Cleanup, because leaving this page.
+        this.disconnect()
+      }
     }
 
     // Cleanup controllers once a frame finishes loading

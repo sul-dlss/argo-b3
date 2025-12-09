@@ -30,7 +30,7 @@
 
   <% @templates.each do |workflow_name, template| %>
     <%# Setting to disabled so that workflow-grid controller can register a turbo:before-fetch-request handler. %>
-    <%= turbo_frame_tag "workflow-grid-#{workflow_name}", src: workflow_grid_path(workflow_name, scope: @scope), refresh: 'morph', data:, target: '_top', disabled: true do %>
+    <%= turbo_frame_tag "workflow-grid-#{workflow_name}", src: workflow_grid_path(workflow_name, scope: @scope), refresh: 'morph', data:, disabled: true do %>
       <%= render WorkflowGrid::WorkflowTableComponent.new(workflow_name:, template:, search_form: @search_form) %>
     <% end %>
   <% end %>
