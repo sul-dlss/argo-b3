@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe SearchResults::WorkflowProcessCounts do
+  subject(:workflow_process_counts) { described_class.new(solr_response:) }
+
+  let(:solr_response) do
+    {
+      'facets' => {
+        'wf_hierarchical_wps_ssimdv' => {
+          'buckets' => [
+            { 'val' => '3|preservationIngestWF:start-ingest:completed|-', 'count' => 4_717_947 },
+            { 'val' => '3|preservationIngestWF:update-catalog:completed|-', 'count' => 4_717_940 },
+            { 'val' => '3|preservationIngestWF:update-catalog:waiting|-', 'count' => 4 },
+            { 'val' => '3|preservationIngestWF:update-catalog:error|-', 'count' => 2 },
+            { 'val' => '3|preservationIngestWF:update-catalog:skipped|-', 'count' => 1 }
+          ]
+        }
+      }
+    }
+  end
+
+  describe '#count_for' do
+    it 'returns the correct counts for process name and status' do
+      expect(workflow_process_counts.count_for(process_name: 'start-ingest', status: 'completed')).to eq 4_717_947
+      expect(workflow_process_counts.count_for(process_name: 'update-catalog', status: 'completed')).to eq 4_717_940
+      expect(workflow_process_counts.count_for(process_name: 'update-catalog', status: 'waiting')).to eq 4
+      expect(workflow_process_counts.count_for(process_name: 'update-catalog', status: 'error')).to eq 2
+      expect(workflow_process_counts.count_for(process_name: 'update-catalog', status: 'skipped')).to eq 1
+    end
+
+    it 'returns 0 for unknown process name and status combinations' do
+      expect(workflow_process_counts.count_for(process_name: 'nonexistent-process', status: 'completed')).to eq 0
+      expect(workflow_process_counts.count_for(process_name: 'start-ingest', status: 'waiting')).to eq 0
+    end
+  end
+end

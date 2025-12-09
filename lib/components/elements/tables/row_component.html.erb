@@ -1,7 +1,7 @@
 <%= tag.tr id: do %>
-  <% if label.present? %>
+  <% if label.present? || label_content.present? %>
     <th class="col-3" scope="row">
-      <%= label %>
+      <%= label || label_content %>
 
       <%#
         Tooltip component isn't used currently, so did not import the component.

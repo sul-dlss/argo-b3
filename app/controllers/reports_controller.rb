@@ -61,11 +61,8 @@ class ReportsController < ApplicationController
 
   def show
     @report_form = ReportForm.new(fields: FREQUENTLY_USED_FIELDS.map(&:field))
-    return if cookies.signed[:last_search].blank?
-
-    form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
-    @search_form = SearchForm.new(form_params)
-    @report_form.source = 'results'
+    set_from_last_search_cookie
+    @report_form.source = 'results' if @search_form.present?
   end
 
   def download
