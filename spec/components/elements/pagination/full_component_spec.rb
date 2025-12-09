@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Elements::Pagination::SectionComponent, type: :component do
+RSpec.describe Elements::Pagination::FullComponent, type: :component do
   let(:component) do
     described_class.new(current_page:, total_pages:, path_func:)
   end

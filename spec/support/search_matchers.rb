@@ -45,15 +45,23 @@ RSpec::Matchers.define :have_result_count do |expected_count, args = {}|
   end
 end
 
-RSpec::Matchers.define :have_next_page do |**args|
+RSpec::Matchers.define :have_next_page do |brief: false, **args|
   match do |actual|
-    actual.has_css?('li.page-item:not(.disabled) a[aria-label="Go to next page"]', **args)
+    if brief
+      actual.has_css?('nav.pagination a.page-link[aria-label="Go to next page"]:not(.disabled)', **args)
+    else
+      actual.has_css?('nav.paginate-section li.page-item:not(.disabled) a[aria-label="Go to next page"]', **args)
+    end
   end
 end
 
-RSpec::Matchers.define :have_previous_page do |**args|
+RSpec::Matchers.define :have_previous_page do |brief: false, **args|
   match do |actual|
-    actual.has_css?('li.page-item:not(.disabled) a[aria-label="Go to previous page"]', **args)
+    if brief
+      actual.has_css?('nav.pagination a.page-link[aria-label="Go to previous page"]:not(.disabled)', **args)
+    else
+      actual.has_css?('nav.paginate-section li.page-item:not(.disabled) a[aria-label="Go to previous page"]', **args)
+    end
   end
 end
 
