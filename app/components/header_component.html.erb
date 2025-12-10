@@ -1,8 +1,10 @@
 <%= render SdrViewComponents::Structure::HeaderComponent.new(title: 'Argo: Build Back Better', variant: :dark, background_color: '84, 73, 72') do |header| %>
   <%= header.with_primary_navigation_link do %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: 'mailto:argo-feedback@lists.stanford.edu') %>
+  <% end %>
+  <%= header.with_secondary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Search', path: root_path) %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Report', path: report_path) %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow grid', path: workflow_grid_path) %>
-    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: 'mailto:argo-feedback@lists.stanford.edu') %>
   <% end %>
 <% end %>
