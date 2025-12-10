@@ -1,0 +1,8 @@
+<%= tag.section class: classes, id: do %>
+  <h2 class="h5"><%= label %></h2>
+  <ul class="list-unstyled">
+    <% bulk_actions.each do |bulk_action| %>
+      <li><%= bulk_action %></li>
+    <% end %>
+  </ul>
+<% end %>

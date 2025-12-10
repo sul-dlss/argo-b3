@@ -44,6 +44,7 @@ gem 'csv'
 gem 'dor-services-client', '~> 15.1'
 gem 'honeybadger'
 gem 'rsolr'
+gem 'sdr_view_components', github: 'sul-dlss/sdr_view_components', branch: 'fix_dropdown_menu'
 gem 'view_component'
 
 group :development, :test do
