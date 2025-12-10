@@ -2,10 +2,12 @@
 
 # Controller for displaying the workflow grid
 class WorkflowGridController < ApplicationController
+  include SearchFormConcern
+
   def show
     set_from_last_search_cookie
     set_scope
-    set_search_form
+    set_search_form_for_scope
 
     @templates = workflow_names.index_with do |name|
       template_for(name)
@@ -16,6 +18,15 @@ class WorkflowGridController < ApplicationController
     # The initial load of the workflow grid uses placeholders for faster rendering,
     # then the turbo-frame loads itself with the placeholder parameter to get real data.
     @workflow_process_counts = Searchers::Workflow.call(search_form: @search_form) unless placeholder?
+  end
+
+  # Resets workflow errors to waiting
+  def reset
+    set_search_form # This is from the posted search form.
+    @workflow_name = params[:workflow_name]
+    @process_name = params[:process_name]
+    ResetWorkflowErrorsJob.perform_later(search_form: @search_form, workflow_name: @workflow_name,
+                                         process_name: @process_name)
   end
 
   private
@@ -37,7 +48,7 @@ class WorkflowGridController < ApplicationController
     24.hours
   end
 
-  def set_search_form
+  def set_search_form_for_scope
     # It is already set to last search form if scope is last_search
     @search_form = SearchForm.new if @scope == 'all'
     @search_form = SearchForm.new(include_google_books: true) if @scope == 'all_gb'

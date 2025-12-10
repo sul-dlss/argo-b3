@@ -17,6 +17,8 @@ RSpec.describe 'Item search', :solr do
     it 'returns search results' do
       visit root_path
 
+      expect(page).to have_css('.alert', text: 'Welcome to Argo-B3.')
+
       find_search_field.fill_in(with: item_doc[Search::Fields::TITLE])
       click_button('Search')
 

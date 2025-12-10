@@ -1,0 +1,4 @@
+<%= helpers.form_with model: search_form, scope: :search, url: path do |form| %>
+  <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
+| <%= form.submit 'Reset', class: 'btn btn-link text-danger mx-0 px-1' %>
+<% end %>
