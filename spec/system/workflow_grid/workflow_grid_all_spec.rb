@@ -13,7 +13,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
 
   it 'show all items in the workflow grid' do
     # Note that there is no last search cookie set in this test
-    visit workflow_grid_index_path
+    visit workflow_grid_path
 
     expect(page).to have_field('All items', checked: true)
     expect(page).to have_field('All items including Google Books', checked: false)

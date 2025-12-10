@@ -113,5 +113,5 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :workflow_grid, only: %i[index show], controller: 'workflow_grid'
+  resource :workflow_grid, only: %i[show], controller: 'workflow_grid'
 end

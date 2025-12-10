@@ -22,14 +22,20 @@ module WorkflowGrid
 
     attr_reader :workflow_name, :template, :search_form, :workflow_process_counts
 
-    delegate :count_for, to: :workflow_process_counts
-
     def placeholder?
       workflow_process_counts.nil?
     end
 
     def statuses
       %w[waiting started error completed]
+    end
+
+    def count_for(process_name:, status:)
+      workflow_process_counts.count_for(
+        workflow_name:,
+        process_name:,
+        status:
+      )
     end
 
     def render?

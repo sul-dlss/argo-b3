@@ -8,10 +8,8 @@ module Searchers
     end
 
     # @param search_form [SearchForm]
-    # @param workflow_name [String] the name of the workflow
-    def initialize(search_form:, workflow_name:)
+    def initialize(search_form:)
       @search_form = search_form
-      @workflow_name = workflow_name
     end
 
     # @return [SearchResults::FacetCounts] search results
@@ -21,7 +19,7 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :workflow_name
+    attr_reader :search_form
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -40,7 +38,6 @@ module Searchers
       {
         field => Search::FacetBuilder.call(
           field:,
-          facet_prefix: "3|#{workflow_name}",
           limit: -1
         )
       }

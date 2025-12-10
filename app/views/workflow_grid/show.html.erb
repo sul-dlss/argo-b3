@@ -1,3 +1,30 @@
-<%= turbo_frame_tag "workflow-grid-#{@workflow_name}" do %>
-  <%= render WorkflowGrid::WorkflowTableComponent.new(workflow_name: @workflow_name, template: @workflow_template, workflow_process_counts: @workflow_process_counts, search_form: @search_form) %>
-<% end %>
+<div class="container" data-controller="workflow-grid">
+  <%= form_with url: workflow_grid_path, method: :get do |form| %>
+    <fieldset>
+      <legend>Select scope for workflow grid:</legend>
+
+      <div class="form-check">
+        <%= form.radio_button :scope, 'all', class: 'form-check-input', checked: @scope == 'all' %>
+        <%= form.label :scope_all, 'All items', class: 'form-check-label' %>
+      </div>
+
+      <div class="form-check">
+        <%= form.radio_button :scope, 'all_gb', class: 'form-check-input', checked: @scope == 'all_gb' %>
+        <%= form.label :scope_all_gb, 'All items including Google Books', class: 'form-check-label' %>
+      </div>
+
+      <div class="form-check">
+        <%= form.radio_button :scope, 'last_search', class: 'form-check-input', disabled: !defined?(@last_search_form), checked: @scope == 'last_search' %>
+        <%= form.label :scope_last_search, 'From last search', class: 'form-check-label' %>
+
+        <% if defined?(@last_search_form) %>
+          <p><%= @total_results %> items for: <%= @last_search_form.to_s %></p>
+        <% end %>
+      </div>
+
+      <%= form.submit 'Go', class: 'btn btn-primary' %>
+    </fieldset>
+  <% end %>
+
+  <%= render WorkflowGrid::WorkflowTablesComponent.new(templates: @templates, search_form: @search_form, scope: @scope, workflow_process_counts: @workflow_process_counts) %>
+</div>

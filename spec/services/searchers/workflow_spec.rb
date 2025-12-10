@@ -3,10 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Workflow do
-  subject(:searcher) { described_class.new(search_form:, workflow_name:) }
+  subject(:searcher) { described_class.new(search_form:) }
 
   let(:search_form) { SearchForm.new(query: 'test') }
-  let(:workflow_name) { 'preservationIngestWF' }
 
   let(:solr_response) do
     {
@@ -32,7 +31,8 @@ RSpec.describe Searchers::Workflow do
     it 'returns WorkflowProcessCounts initialized with the solr response' do
       result = searcher.call
       expect(result).to be_a(SearchResults::WorkflowProcessCounts)
-      expect(result.count_for(process_name: 'start-ingest', status: 'completed')).to eq 4_717_947
+      expect(result.count_for(workflow_name: 'preservationIngestWF', process_name: 'start-ingest', status: 'completed'))
+        .to eq 4_717_947
 
       expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
@@ -42,7 +42,6 @@ RSpec.describe Searchers::Workflow do
           .to match({
             type: 'terms',
             field: Search::Fields::WPS_HIERARCHICAL_WORKFLOWS,
-            prefix: "3|#{workflow_name}",
             limit: -1,
             numBuckets: true,
             sort: 'count'

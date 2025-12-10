@@ -7,10 +7,11 @@ module SearchResults
       @solr_response = solr_response
     end
 
+    # @param workflow_name [String] the name of the workflow, e.g., accessionWF
     # @param process_name [String] the name of the process, e.g., publish
     # @param status [String] the status of the process, e.g., completed
-    def count_for(process_name:, status:)
-      count_map[[process_name, status]] || 0
+    def count_for(workflow_name:, process_name:, status:)
+      count_map[[workflow_name, process_name, status]] || 0
     end
 
     private
@@ -23,7 +24,7 @@ module SearchResults
           # For example, 3|accessionWF:sdr-ingest-received:completed|-
           val_parts = bucket['val'].split('|')
           wf_parts = val_parts[1].split(':')
-          hash[[wf_parts[1], wf_parts[2]]] = bucket['count']
+          hash[[wf_parts[0], wf_parts[1], wf_parts[2]]] = bucket['count']
         end
       end
     end
