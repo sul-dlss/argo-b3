@@ -34,7 +34,7 @@
             <% if count.zero? %>
               0
             <% else %>
-              <%= link_to number_with_delimiter(count), status_path_for(process[:name], status) %>
+              <%= link_to number_with_delimiter(count), status_path_for(process[:name], status), data: { turbo_frame: '_top' } %>
             <% end %>
           <% end %>
         <% end %>

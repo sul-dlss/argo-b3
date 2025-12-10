@@ -2,25 +2,20 @@
 
 # Controller for displaying the workflow grid
 class WorkflowGridController < ApplicationController
-  before_action :set_from_last_search_cookie
-  before_action :set_scope
-  before_action :set_search_form
+  def show
+    set_from_last_search_cookie
+    set_scope
+    set_search_form
 
-  def index
     @templates = workflow_names.index_with do |name|
       template_for(name)
     end
-  end
 
-  def show
-    @workflow_name = params[:id]
-    @workflow_process_counts = Searchers::Workflow.call(
-      search_form: @search_form,
-      workflow_name: @workflow_name
-    )
-    @workflow_template = template_for(@workflow_name)
-
-    render layout: false
+    # /workflow_grid renders with placeholders.
+    # /workflow_grid?placeholder=false renders with real data.
+    # The initial load of the workflow grid uses placeholders for faster rendering,
+    # then the turbo-frame loads itself with the placeholder parameter to get real data.
+    @workflow_process_counts = Searchers::Workflow.call(search_form: @search_form) unless placeholder?
   end
 
   private
@@ -49,6 +44,7 @@ class WorkflowGridController < ApplicationController
   end
 
   def set_scope
+    # Scope is provided by the scope param or a default is selected based on whether there is a last search cookie.
     @scope = if (params[:scope] == 'last_search' || params[:scope].blank?) && @last_search_form.present?
                'last_search'
              elsif params[:scope] == 'all_gb'
@@ -56,5 +52,9 @@ class WorkflowGridController < ApplicationController
              else
                'all'
              end
+  end
+
+  def placeholder?
+    params['placeholder'] != 'false'
   end
 end

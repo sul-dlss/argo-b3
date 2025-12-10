@@ -1,0 +1,5 @@
+  <%= helpers.turbo_frame_tag 'workflow-grid', src: frame_src, refresh: 'morph', data: do %>
+    <% templates.each do |workflow_name, template| %>
+      <%= render WorkflowGrid::WorkflowTableComponent.new(workflow_name:, template:, search_form:, workflow_process_counts:) %>
+    <% end %>
+  <% end %>
