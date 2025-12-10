@@ -3,6 +3,9 @@
 # This is to prevent the animation from running in the system tests which can make the tests flaky.
 Capybara.disable_animation = true
 
+# Use Nokogiri's HTML5 parser
+Capybara.use_html5_parsing = true
+
 # Unique per process for parallel tests
 DOWNLOAD_PATH = Rails.root.join("tmp/downloads/#{Process.pid}").to_s
 
