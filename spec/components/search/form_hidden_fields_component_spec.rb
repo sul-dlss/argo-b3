@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
-  let(:component) { described_class.new(search_form:, form_field:, form_builder:, include_base_fields:) }
+  let(:component) { described_class.new(search_form:, form_field:, form_builder:) }
   let(:form_builder) { ActionView::Helpers::FormBuilder.new(nil, search_form, vc_test_controller.view_context, {}) }
   let(:search_form) do
     SearchForm.new(object_types: %w[collection item],
@@ -13,7 +13,6 @@ RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
                    include_google_books: true)
   end
   let(:form_field) { :object_types }
-  let(:include_base_fields) { true }
 
   context 'when rendering hidden fields for a facet field' do
     it 'renders hidden fields for other search form attributes' do
@@ -42,14 +41,22 @@ RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
     end
   end
 
-  context 'when excluding base fields' do
-    let(:include_base_fields) { false }
+  context 'when excluding query' do
+    let(:form_field) { :query }
 
-    it 'does not render hidden fields for base fields' do
+    it 'does not render hidden field' do
       render_inline(component)
 
-      expect(page).to have_no_field('page', type: 'hidden')
       expect(page).to have_no_field('query', type: 'hidden')
+    end
+  end
+
+  context 'when excluding include google books' do
+    let(:form_field) { :include_google_books }
+
+    it 'does not render hidden field' do
+      render_inline(component)
+
       expect(page).to have_no_field('include_google_books', type: 'hidden')
     end
   end

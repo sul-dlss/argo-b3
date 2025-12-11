@@ -1,7 +1,7 @@
 <div class="bg-light mt-2">
   <nav aria-label="Search form" class="container py-2 mb-3">
     <%= helpers.form_with model: search_form, scope: :search, url:, method: :get do |form| %>
-      <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, include_base_fields: false) %>
+      <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :query) %>
 
       <div class="d-flex align-items-center">
         <%= form.label :query, label, class: 'form-label fw-bold w-auto me-2 mb-0' %>
@@ -18,9 +18,13 @@
           </span>
         </div>
       </div>
+    <% end %>
+
+    <%= helpers.form_with model: search_form, scope: :search, url:, method: :get, data: { controller: 'form-submit' } do |form| %>
+      <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :include_google_books) %>
 
       <div class="form-check">
-        <%= form.checkbox :include_google_books, include_hidden: false, class: 'form-check-input' %>
+        <%= form.checkbox :include_google_books, include_hidden: false, class: 'form-check-input', data: { action: 'change->form-submit#submit' } %>
         <%= form.label :include_google_books, 'Include Google Books', class: 'form-check-label' %>
       </div>
     <% end %>

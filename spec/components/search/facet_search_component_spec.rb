@@ -10,7 +10,7 @@ RSpec.describe Search::FacetSearchComponent, type: :component do
   it 'renders the facet search input' do
     render_inline(component)
 
-    expect(page).to have_css('div[data-controller="autocomplete facet-search"][data-autocomplete-url-value=' \
+    expect(page).to have_css('div[data-controller="autocomplete form-submit"][data-autocomplete-url-value=' \
                              '"/search/tag_facets/search?query=test&tags%5B%5D=test+%3A+tag"]')
     expect(page).to have_field('Search these tags', type: 'text')
     expect(page).to have_css("form[action='/search'][method='get']")

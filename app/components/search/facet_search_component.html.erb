@@ -10,7 +10,7 @@
 
   <%= helpers.form_with model: search_form, scope: :search, url: search_path, method: :get do |form| %>
     <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
-    <%= form.hidden_field form_field, multiple: true, data: { autocomplete_target: 'hidden', action: 'change->facet-search#submit' } %>
+    <%= form.hidden_field form_field, multiple: true, data: { autocomplete_target: 'hidden', action: 'change->form-submit#submit' } %>
   <% end %>
 
   <ul class="list-group facet-values" data-autocomplete-target="results"></ul>

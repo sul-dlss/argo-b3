@@ -22,7 +22,7 @@ module Search
     end
 
     def data
-      { controller: 'autocomplete facet-search', autocomplete_url_value: path }
+      { controller: 'autocomplete form-submit', autocomplete_url_value: path }
     end
 
     def classes
