@@ -167,3 +167,10 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 2. Add the field to `fl` in `Searchers::Item.solr_request`.
 3. Possibly add a method to `SearchResults::Item`. See description of how missing methods are handled.
 4. Display the field in `Search::ItemResultComponent`.
+
+## Bulk actions
+
+### Adding a bulk action
+
+1. Add a label and help text to `en.yml` under `bulk_actions`.
+2. Add the bulk action to the list of bulk actions in `views/bulk_actions/new.html.erb`.

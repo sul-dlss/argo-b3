@@ -1,0 +1,49 @@
+<div class="container mt-3">
+  <h1 class="h4">New bulk actions</h1>
+  <div class="row mt-2 gy-3">
+    <%= render BulkActions::ListSectionComponent.new(label: 'Perform actions', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :manage_release, path: '#' %>
+      <% component.with_bulk_action key: :republish, path: '#' %>
+      <% component.with_bulk_action key: :reindex, path: '#' %>
+    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(label: 'Modify objects', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :open_new_version, path: '#' %>
+      <% component.with_bulk_action key: :close_version, path: '#' %>
+      <% component.with_bulk_action key: :add_workflow, path: '#' %>
+      <% component.with_bulk_action key: :extract_text, path: '#' %>
+      <% component.with_bulk_action key: :register, path: '#' %>
+      <% component.with_bulk_action key: :purge, path: '#' %>
+    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(label: 'Manage descriptive metadata', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :refresh_metadata, path: '#' %>
+      <% component.with_bulk_action key: :export_descriptive_metadata, path: '#' %>
+      <% component.with_bulk_action key: :validate_descriptive_metadata, path: '#' %>
+      <% component.with_bulk_action key: :import_descriptive_metadata, path: '#' %>
+      <% component.with_bulk_action key: :export_catalog_data, path: '#' %>
+      <% component.with_bulk_action key: :import_catalog_data, path: '#' %>
+      <% component.with_bulk_action key: :export_mods, path: '#' %>
+    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(label: 'Manage rights and administrative metadata', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :manage_rights, path: '#' %>
+      <% component.with_bulk_action key: :manage_license_and_rights_statements, path: '#' %>
+      <% component.with_bulk_action key: :manage_embargo, path: '#' %>
+      <% component.with_bulk_action key: :manage_governing_apo, path: '#' %>
+      <% component.with_bulk_action key: :apply_apo_defaults, path: '#' %>
+      <% component.with_bulk_action key: :manage_source_id, path: '#' %>
+    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(label: 'Manage structural metadata', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :manage_content_type, path: '#' %>
+      <% component.with_bulk_action key: :export_structural_metadata, path: '#' %>
+      <% component.with_bulk_action key: :import_structural_metadata, path: '#' %>
+      <% component.with_bulk_action key: :manage_collection, path: '#' %>
+      <% component.with_bulk_action key: :create_virtual_object, path: '#' %>
+    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(label: 'Tags and reporting', classes: 'col-lg-4 col-md-6') do |component| %>
+      <% component.with_bulk_action key: :export_tags, path: '#' %>
+      <% component.with_bulk_action key: :import_tags, path: '#' %>
+      <% component.with_bulk_action key: :export_tracking_sheets, path: '#' %>
+      <% component.with_bulk_action key: :export_checksum_report, path: '#' %>
+      <% component.with_bulk_action key: :export_cocina_json, path: '#' %>
+    <% end %>
+  </div>
+</div>

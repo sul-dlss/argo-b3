@@ -6,5 +6,15 @@
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Search', path: root_path) %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Report', path: report_path) %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow grid', path: workflow_grid_path) %>
+    <% if Settings.feature_flags.bulk_actions %>
+      <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
+        <% dropdown.with_item do %>
+          <%= link_to 'New', new_bulk_action_path, class: 'dropdown-item' %>
+        <% end %>
+        <% dropdown.with_item do %>
+          <%= link_to 'History', '/', class: 'dropdown-item' %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 <% end %>
