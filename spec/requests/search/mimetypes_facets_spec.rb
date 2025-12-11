@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Mimetypes facets', :solr do
   before do
     create(:solr_item)
+    sign_in(create(:user))
   end
 
   describe 'index' do

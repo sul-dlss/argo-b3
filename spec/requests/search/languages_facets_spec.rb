@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Languages facets', :solr do
   before do
     create(:solr_item)
+    sign_in(create(:user))
   end
 
   describe 'index' do

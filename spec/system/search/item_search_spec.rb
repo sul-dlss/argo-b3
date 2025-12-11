@@ -11,6 +11,7 @@ RSpec.describe 'Item search', :solr do
     create_list(:solr_item, 10)
     create(:solr_item, :google_book)
     create_list(:solr_collection, 4)
+    sign_in(create(:user))
   end
 
   context 'when a single page of results' do

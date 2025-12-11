@@ -3,6 +3,7 @@
 module BulkActions
   # Controller for reindex bulk action.
   class ReindexController < ApplicationController
+    skip_verify_authorized
     before_action :set_from_last_search_cookie
     before_action :set_bulk_action_config
 

@@ -41,9 +41,18 @@
 
   <body>
     <%= render HeaderComponent.new %>
+    <div class="container mt-3">
+      <%# This prevents the flash from being cached by turbo. %>
+      <div data-turbo-temporary="true">
+        <% flash.filter { |type, _| type.to_sym != :toast }.each do |flash_type, msg| %>
+          <%= render SdrViewComponents::Elements::AlertComponent.new(variant: flash_type, title: msg) %>
+        <% end %>
+      </div>
+    </div>
+
     <%# Toasts can be rendered into this container. %>
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080" id="toast-container">
-      <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast], text: '') if flash[:toast].present? %>
+      <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast]) if flash[:toast].present? %>
     </div>
     <%= yield %>
     <%= render SdrViewComponents::Structure::FooterComponent.new %>

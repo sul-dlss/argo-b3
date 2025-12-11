@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  get '/webauth/login', to: 'authentication#login', as: 'login'
+  get '/webauth/logout', to: 'authentication#logout', as: 'logout'
+  get '/test_login/:id', to: 'authentication#test_login', as: 'test_login', param: :id if Rails.env.test?
+
   # Defines the root path route ("/")
   root 'search#show'
 
@@ -121,5 +125,9 @@ Rails.application.routes.draw do
 
   namespace :bulk_actions do
     resource :reindex, only: %i[new create], controller: 'reindex'
+  end
+
+  namespace :admin do
+    get 'groups'
   end
 end

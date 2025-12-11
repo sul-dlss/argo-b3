@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Project search', :solr do
   before do
     create_list(:solr_item, 5, :with_projects)
+    sign_in(create(:user))
   end
 
   it 'returns project tag search results' do

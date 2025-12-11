@@ -9,6 +9,10 @@ RSpec.describe 'Create a new reindex bulk action' do
     ['druid:pj757vx3102', 'druid:rt276nw8963']
   end
 
+  before do
+    sign_in user
+  end
+
   context 'when a list of druids is provided' do
     it 'submits a reindex bulk action' do
       visit new_bulk_action_path

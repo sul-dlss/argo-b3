@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Facet paging', :solr do
   before do
     create(:solr_item, mimetypes: (1..15).map { |i| "application/test#{format('%02d', i)}" })
+    sign_in(create(:user))
   end
 
   it 'returns facets' do

@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Tags facets', :solr do
   before do
     create(:solr_item, :with_tags)
+    sign_in(create(:user))
   end
 
   describe 'index' do

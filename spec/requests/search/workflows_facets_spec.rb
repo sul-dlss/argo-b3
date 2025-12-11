@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Workflows facets', :solr do
   before do
     create(:solr_item, :with_workflows)
+    sign_in(create(:user))
   end
 
   describe 'index' do

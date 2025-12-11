@@ -14,8 +14,12 @@ ssh -L 8985:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
 
 In a separate terminal window:
 ```
-SETTINGS__SOLR__URL=http://localhost:8985/solr/argo_prod bin/dev
+SETTINGS__SOLR__URL=http://localhost:8985/solr/argo_prod bin/setup
 ```
+
+Note that `bin/setup` will create the database, run yarn, and perform other setup tasks.
+
+The roles, email address, and name of the test user can be provided in environment variables. Defaults are set in `bin/dev`.
 
 ### Linters
 

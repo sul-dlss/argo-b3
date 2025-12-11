@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'New bulk actions', :rack_test do
+  before do
+    sign_in(create(:user))
+  end
+
   it 'lists the available bulk actions' do
     visit new_bulk_action_path
 
