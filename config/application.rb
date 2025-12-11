@@ -32,6 +32,7 @@ module ArgoB3
 
     config.autoload_paths << Rails.root.join('lib/components')
     config.eager_load_paths << Rails.root.join('lib/components')
+    config.autoload_once_paths += Dir[Rails.root.join('app/serializers')] # rubocop:disable Rails/RootPathnameMethods
 
     # Configuration for the application, engines, and railties goes here.
     #

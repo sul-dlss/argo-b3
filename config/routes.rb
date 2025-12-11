@@ -113,7 +113,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resource :workflow_grid, only: %i[show], controller: 'workflow_grid'
+  resource :workflow_grid, only: %i[show], controller: 'workflow_grid' do
+    post 'reset'
+  end
 
   resources :bulk_actions, only: %i[new]
 

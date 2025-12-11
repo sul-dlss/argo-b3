@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "reset-#{@workflow_name}-#{@process_name}" do %>
+  <%= render WorkflowGrid::ResetButtonComponent.new(workflow_name: @workflow_name, process_name: @process_name, status: 'error', search_form: @search_form) %>
+  <%= turbo_stream.append 'toast-container' do %>
+    <%= render SdrViewComponents::Elements::ToastComponent.new(title: "Resetting errors for #{@workflow_name} - #{@process_name}.", text: 'This may take a few moments.') %>
+  <% end %>
+<% end %>

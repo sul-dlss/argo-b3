@@ -3,11 +3,11 @@
     <h2 class="h3"><%= link_to workflow_name, workflow_path %></h2>
   <% end %>
 
-  <%= table.with_header(label: 'Process', style: 'width: 250px;') %>
+  <%= table.with_header(label: 'Process', style: 'width: 225px;') %>
   <%= table.with_header(label: 'Description') %>
-  <%= table.with_header(label: 'Waiting', style: 'width: 55px;') %>
-  <%= table.with_header(label: 'Started', style: 'width: 55px;') %>
-  <%= table.with_header(label: 'Error', style: 'width: 55px;') %>
+  <%= table.with_header(label: 'Waiting', style: 'width: 100px;') %>
+  <%= table.with_header(label: 'Started', style: 'width: 100px;') %>
+  <%= table.with_header(label: 'Error', style: 'width: 100px;') %>
   <%= table.with_header(label: 'Completed', style: 'width: 100px;') %>
 
   <% @template[:processes].each_with_index do |process, index| %>
@@ -34,7 +34,12 @@
             <% if count.zero? %>
               0
             <% else %>
-              <%= link_to number_with_delimiter(count), status_path_for(process[:name], status), data: { turbo_frame: '_top' } %>
+              <div class="d-flex align-items-center gap-2">
+                <%= link_to number_with_delimiter(count), status_path_for(process[:name], status), data: { turbo_frame: '_top' } %>
+                <%= helpers.turbo_frame_tag "reset-#{workflow_name}-#{process[:name]}" do %>
+                  <%= render WorkflowGrid::ResetButtonComponent.new(workflow_name:, process_name: process[:name], status:, search_form: @search_form) %>
+                <% end %>
+              </div>
             <% end %>
           <% end %>
         <% end %>
