@@ -42,7 +42,6 @@ RSpec.describe 'Report by druids', :solr do
     # All checkboxes are selected
     expect(page).to have_no_field('report_form[fields][]', type: 'checkbox', checked: false)
     expect(page).to have_field('report_form[fields][]', type: 'checkbox', checked: true)
-    # expect(page).to have_no_css('input[type="checkbox"][name="report_form[fields][]"]:not(:checked)')
 
     click_link 'Deselect All'
     expect(page).to have_no_field('report_form[fields][]', type: 'checkbox', checked: true)

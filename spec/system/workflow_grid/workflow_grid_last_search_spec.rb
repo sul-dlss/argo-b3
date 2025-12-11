@@ -45,7 +45,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
       click_button 'Reset'
     end
 
-    expect(page).to have_css('.toast', text: 'Resetting errors for accessionWF - update-doi.')
+    expect(page).to have_toast('Resetting errors for accessionWF - update-doi.')
 
     expect(ResetWorkflowErrorsJob).to have_received(:perform_later) do |args|
       expect(args[:workflow_name]).to eq('accessionWF')

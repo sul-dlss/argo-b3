@@ -3,12 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe BulkActions::ListSectionComponent, type: :component do
-  let(:component) { described_class.new(label: 'My bulk actions', classes: 'my-class') }
+  let(:component) do
+    described_class.new(label: 'My bulk actions', classes: 'my-class',
+                        bulk_action_configs: [BulkActions::MANAGE_RELEASE])
+  end
 
   it 'renders the section' do
-    render_inline(component) do |component|
-      component.with_bulk_action key: :manage_release, path: '/bulk_actions/manage_release/new'
-    end
+    render_inline(component)
 
     expect(page).to have_css('section.my-class#my-bulk-actions-bulk-actions-section h2', text: 'My bulk actions')
     within('section ul li:nth-of-type(1)') do

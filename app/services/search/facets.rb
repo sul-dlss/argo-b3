@@ -15,7 +15,7 @@ module Search
       nil
     end
 
-    Config = Struct.new('Config',
+    Config = Struct.new('FacetConfig',
                         :form_field,
                         # Provide if this facet supports excluding values.
                         :exclude_form_field,

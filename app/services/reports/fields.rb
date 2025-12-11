@@ -11,7 +11,7 @@ module Reports
       nil
     end
 
-    Config = Struct.new('Config',
+    Config = Struct.new('ReportFieldConfig',
                         :field,
                         :label,
                         :help_text,

@@ -30,4 +30,18 @@ RSpec.describe DruidSupport do
       expect(described_class.prefixed_druid_from('druid:fc245sm0951')).to eq('druid:fc245sm0951')
     end
   end
+
+  describe '#parse_list' do
+    it 'returns an array of prefixed druids from a whitespace-separated string' do
+      expect(described_class.parse_list("fc245sm0951\ndruid:gh678jk9012  lm345no6789"))
+        .to eq(
+          ['druid:fc245sm0951', 'druid:gh678jk9012', 'druid:lm345no6789']
+        )
+    end
+
+    it 'returns an empty array when given a blank string' do
+      expect(described_class.parse_list('')).to eq([])
+      expect(described_class.parse_list(nil)).to eq([])
+    end
+  end
 end
