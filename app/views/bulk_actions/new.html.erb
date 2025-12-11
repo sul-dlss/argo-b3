@@ -2,6 +2,7 @@
   <h1 class="h4">New bulk actions</h1>
   <div class="row mt-2 gy-3">
     <%= render BulkActions::ListSectionComponent.new(label: 'Perform actions', classes: 'col-lg-4 col-md-6') do |component| %>
+      <%# key corresponds to the bulk action in en.yml %>
       <% component.with_bulk_action key: :manage_release, path: '#' %>
       <% component.with_bulk_action key: :republish, path: '#' %>
       <% component.with_bulk_action key: :reindex, path: '#' %>

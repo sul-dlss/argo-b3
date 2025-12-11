@@ -3,6 +3,8 @@
 module BulkActions
   # Component for rendering a section of bulk actions
   class ListSectionComponent < ApplicationComponent
+    # @param key [String] Key of the bulk action in en.yml.
+    # @param path [String] Path to create a new bulk action.
     renders_many :bulk_actions, lambda { |key:, path:|
       safe_join([
                   link_to(I18n.t("bulk_actions.#{key}.label"), path),
