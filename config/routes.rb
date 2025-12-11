@@ -114,4 +114,10 @@ Rails.application.routes.draw do
   end
 
   resource :workflow_grid, only: %i[show], controller: 'workflow_grid'
+
+  resources :bulk_actions, only: %i[new]
+
+  namespace :bulk_actions do
+    resource :reindex, only: %i[new create]
+  end
 end

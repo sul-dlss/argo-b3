@@ -49,4 +49,132 @@ en:
       never: "Not released"
       has_orcids: 'Has contributor ORCIDs'
       has_doi: 'Has DOI'
-      
+  bulk_actions:
+    add_workflow:
+      label: "Add workflow"
+      help_html: >-
+        Starts a workflow for individual objects.
+    apply_apo_defaults:
+      label: "Apply APO defaults"
+      help_html: >-
+        Overwrite object metadata with the defaults from the APO.
+    close_version:
+      label: "Close version"
+      help_html: >-
+        Close a version of the items so the changes can be accessioned. The items will retain the version description as entered when the item was opened for versioning.
+    create_virtual_object:
+      label: "Create virtual object"
+      help_html: >-
+        Create one or more virtual objects.
+    export_catalog_data:
+      label: "Export FOLIO Instance HRIDs, barcodes, and serials metadata"
+      help_html: >-
+        Download FOLIO Instance HRIDs and barcodes as CSV (comma-separated values) for selected druids.
+    export_checksum_report:
+      label: "Download checksum report"
+      help_html: >-
+        Download checksums of files in objects (as csv).
+    export_cocina_json:
+      label: "Download full Cocina JSON"
+      help_html: >-
+        Download full Cocina JSON for objects.
+    export_descriptive_metadata:
+      label: "Download descriptive metadata spreadsheet"
+      help_html: >-
+        Download descriptive metadata for objects.
+    export_mods:
+      label: "Download descriptive metadata as MODS XML"
+      help_html: >-
+        Download descriptive metadata for objects.
+    export_structural_metadata:
+      label: "Export structural metadata"
+      help_html: >-
+        Export structural metadata as CSV (comma-separated values) for selected druids.
+    export_tracking_sheets:
+      label: "Download tracking sheets"
+      help_html: >-
+        Download PDF tracking sheets of objects.
+    export_tags:
+      label: "Export tags"
+      help_html: >-
+        Download tags as CSV (comma-separated values) for selected druids.
+    extract_text:
+      label: "Text extraction"
+      help_html: >-
+        Start text extraction workflow for the selected items.
+    import_catalog_data:
+      label: "Import FOLIO Instance HRIDs, barcodes, and serials metadata"
+      help_html: >-
+        Adds or updates Folio Instance HRIDs and/or barcodes associated with objects. 
+    import_descriptive_metadata:
+      label: "Upload descriptive metadata spreadsheet"
+      help_html: >-
+        Upload descriptive metadata for objects.
+    import_structural_metadata:
+      label: "Import structural metadata"
+      help_html: >-
+        Upload structural metadata as CSV (comma-separated values).
+    import_tags:
+      label: "Import tags"
+      help_html: >-
+        Upload tags as CSV (comma-separated values).
+    manage_collection:
+      label: "Update collection"
+      help_html: >-
+        Set collection(s).
+    manage_content_type:
+      label: "Update content type"
+      help_html: >-
+        Set content type.
+    manage_embargo:
+      label: "Manage embargo"
+      help_html: >-
+        Manage embargoes with a CSV.
+    manage_governing_apo:
+      label: "Update governing APO"
+      help_html: >-
+        Moves the object to a new governing APO.
+    manage_license_and_rights_statements:
+      label: "Update licenses and rights statements"
+      help_html: >-
+        Edit license, copyright statement, and/or use &amp; reproduction statements
+    manage_release:
+      label: "Manage release"
+      help_html: >-
+        Adds release tags to individual objects.
+    manage_rights:
+      label: "Update rights"
+      help_html: >-
+        Edit rights.
+    manage_source_id:
+      label: "Update source id"
+      help_html: >-
+        Adds or updates source IDs associated with objects.
+    open_new_version:
+      label: "Open new version"
+      help_html: >-
+        Open items not yet open for versioning.
+    purge:
+      label: "Purge"
+      help_html: >-
+        Deletes unpublished DOR objects.
+    refresh_metadata:
+      label: "Refresh metadata from FOLIO record"
+      help_html: >-
+        Refresh metadata from the catalog.
+    register:
+      label: "Register new druids (via CSV)"
+      help_html: >-
+        Register druids.
+    reindex:
+      label: "Reindex"
+      help_html: >-
+        Reindexes the DOR object in Solr.
+    republish:
+      label: "Republish"
+      help_html: >-
+        Republish DOR objects. You still need to use the normal versioning process to make sure your changes are preserved.
+    validate_descriptive_metadata:
+      label: "Validate descriptive metadata spreadsheet"
+      help_html: >-
+        Validate descriptive metadata for objects.

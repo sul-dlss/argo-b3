@@ -1,2 +1,5 @@
 solr:
   url: http://localhost:8983/solr/argo
+
+feature_flags:
+  bulk_actions: true
