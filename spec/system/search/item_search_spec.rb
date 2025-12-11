@@ -72,13 +72,27 @@ RSpec.describe 'Item search', :solr do
       it 'shows google books results' do
         visit root_path
 
-        check('Include Google Books')
-
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
 
         within(find_item_results_section) do
+          expect(page).to have_result_count(11)
+        end
+
+        check('Include Google Books')
+
+        expect(page).to have_current_filter('Include Google Books')
+
+        within(find_item_results_section) do
           expect(page).to have_result_count(12)
+        end
+
+        uncheck('Include Google Books')
+
+        expect(page).not_to have_current_filter('Include Google Books')
+
+        within(find_item_results_section) do
+          expect(page).to have_result_count(11)
         end
       end
     end
