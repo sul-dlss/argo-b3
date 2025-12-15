@@ -55,6 +55,9 @@ RSpec/MultipleExpectations:
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
+RSpec/NestedGroups:
+  Enabled: false
+
 Style/Documentation:
   Exclude:
     - 'config/application.rb'
