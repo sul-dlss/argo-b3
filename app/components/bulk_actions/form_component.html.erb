@@ -1,0 +1,13 @@
+<div class="container my-3">
+  <h1 class="h4"><%= label %></h1>
+  <p><%= help_text %></p>
+  <%= content %>
+
+  <%= form.label :description, 'Describe this bulk action', class: 'form-label mt-3' %>
+  <%= form.textarea :description, rows: 3, class: 'form-control' %>
+
+  <div class="d-flex align-items-center mt-3">
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
+    <%= link_to 'Cancel', new_bulk_action_path %>
+  </div>
+</div>

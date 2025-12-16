@@ -1,0 +1,21 @@
+<fieldset data-controller="radio">
+  <legend>Select source of items for bulk action:</legend>
+
+  <div class="form-check mt-3">
+    <%= form.radio_button :source, 'results', class: 'form-check-input', disabled: !last_search?, data: { radio_target: 'radio', action: 'radio#toggle' } %>
+    <%= form.label :source_results, 'From last search', class: 'form-check-label' %>
+
+    <% if last_search? %>
+      <p><%= total_results %> items for: <%= search_form.to_s %></p>
+    <% end %>
+  </div>
+
+  <div class="form-check">
+    <%= form.radio_button :source, 'druids', class: 'form-check-input', data: { radio_target: 'radio', action: 'radio#toggle' } %>
+    <%= form.label :source_druids, 'From druid list', class: 'form-check-label' %>
+
+    <%= form.label :druid_list, 'Enter druid list', class: 'form-label visually-hidden' %>
+    <%= form.textarea :druid_list, rows: 5, class: 'form-control' %>
+    <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :druid_list) %>
+  </div>
+</fieldset>

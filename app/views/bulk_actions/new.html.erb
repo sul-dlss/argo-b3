@@ -1,50 +1,74 @@
 <div class="container mt-3">
   <h1 class="h4">New bulk actions</h1>
   <div class="row mt-2 gy-3">
-    <%= render BulkActions::ListSectionComponent.new(label: 'Perform actions', classes: 'col-lg-4 col-md-6') do |component| %>
-      <%# key corresponds to the bulk action in en.yml %>
-      <% component.with_bulk_action key: :manage_release, path: '#' %>
-      <% component.with_bulk_action key: :republish, path: '#' %>
-      <% component.with_bulk_action key: :reindex, path: '#' %>
-    <% end %>
-    <%= render BulkActions::ListSectionComponent.new(label: 'Modify objects', classes: 'col-lg-4 col-md-6') do |component| %>
-      <% component.with_bulk_action key: :open_new_version, path: '#' %>
-      <% component.with_bulk_action key: :close_version, path: '#' %>
-      <% component.with_bulk_action key: :add_workflow, path: '#' %>
-      <% component.with_bulk_action key: :extract_text, path: '#' %>
-      <% component.with_bulk_action key: :register, path: '#' %>
-      <% component.with_bulk_action key: :purge, path: '#' %>
-    <% end %>
-    <%= render BulkActions::ListSectionComponent.new(label: 'Manage descriptive metadata', classes: 'col-lg-4 col-md-6') do |component| %>
-      <% component.with_bulk_action key: :refresh_metadata, path: '#' %>
-      <% component.with_bulk_action key: :export_descriptive_metadata, path: '#' %>
-      <% component.with_bulk_action key: :validate_descriptive_metadata, path: '#' %>
-      <% component.with_bulk_action key: :import_descriptive_metadata, path: '#' %>
-      <% component.with_bulk_action key: :export_catalog_data, path: '#' %>
-      <% component.with_bulk_action key: :import_catalog_data, path: '#' %>
-      <% component.with_bulk_action key: :export_mods, path: '#' %>
-    <% end %>
-    <%= render BulkActions::ListSectionComponent.new(label: 'Manage rights and administrative metadata', classes: 'col-lg-4 col-md-6') do |component| %>
-      <% component.with_bulk_action key: :manage_rights, path: '#' %>
-      <% component.with_bulk_action key: :manage_license_and_rights_statements, path: '#' %>
-      <% component.with_bulk_action key: :manage_embargo, path: '#' %>
-      <% component.with_bulk_action key: :manage_governing_apo, path: '#' %>
-      <% component.with_bulk_action key: :apply_apo_defaults, path: '#' %>
-      <% component.with_bulk_action key: :manage_source_id, path: '#' %>
-    <% end %>
-    <%= render BulkActions::ListSectionComponent.new(label: 'Manage structural metadata', classes: 'col-lg-4 col-md-6') do |component| %>
-      <% component.with_bulk_action key: :manage_content_type, path: '#' %>
-      <% component.with_bulk_action key: :export_structural_metadata, path: '#' %>
-      <% component.with_bulk_action key: :import_structural_metadata, path: '#' %>
-      <% component.with_bulk_action key: :manage_collection, path: '#' %>
-      <% component.with_bulk_action key: :create_virtual_object, path: '#' %>
-    <% end %>
-    <%= render BulkActions::ListSectionComponent.new(label: 'Tags and reporting', classes: 'col-lg-4 col-md-6') do |component| %>
-      <% component.with_bulk_action key: :export_tags, path: '#' %>
-      <% component.with_bulk_action key: :import_tags, path: '#' %>
-      <% component.with_bulk_action key: :export_tracking_sheets, path: '#' %>
-      <% component.with_bulk_action key: :export_checksum_report, path: '#' %>
-      <% component.with_bulk_action key: :export_cocina_json, path: '#' %>
-    <% end %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Perform actions',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::ADD_WORKFLOW,
+            BulkActions::MANAGE_RELEASE,
+            BulkActions::REPUBLISH,
+            BulkActions::REINDEX
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Modify objects',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::OPEN_NEW_VERSION,
+            BulkActions::CLOSE_VERSION,
+            BulkActions::ADD_WORKFLOW,
+            BulkActions::EXTRACT_TEXT,
+            BulkActions::REGISTER,
+            BulkActions::PURGE
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Manage descriptive metadata',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::REFRESH_METADATA,
+            BulkActions::EXPORT_DESCRIPTIVE_METADATA,
+            BulkActions::VALIDATE_DESCRIPTIVE_METADATA,
+            BulkActions::IMPORT_DESCRIPTIVE_METADATA,
+            BulkActions::EXPORT_CATALOG_DATA,
+            BulkActions::IMPORT_CATALOG_DATA,
+            BulkActions::EXPORT_MODS
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Manage rights and administrative metadata',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::MANAGE_RIGHTS,
+            BulkActions::MANAGE_LICENSE_AND_RIGHTS_STATEMENTS,
+            BulkActions::MANAGE_EMBARGO,
+            BulkActions::MANAGE_GOVERNING_APO,
+            BulkActions::APPLY_APO_DEFAULTS,
+            BulkActions::MANAGE_SOURCE_ID
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Manage structural metadata',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::MANAGE_CONTENT_TYPE,
+            BulkActions::EXPORT_STRUCTURAL_METADATA,
+            BulkActions::IMPORT_STRUCTURAL_METADATA,
+            BulkActions::MANAGE_COLLECTIONS,
+            BulkActions::CREATE_VIRTUAL_OBJECT
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Tags and reporting',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::EXPORT_TAGS,
+            BulkActions::IMPORT_TAGS,
+            BulkActions::EXPORT_TRACKING_SHEETS,
+            BulkActions::EXPORT_CHECKSUM_REPORT,
+            BulkActions::EXPORT_COCINA_JSON
+          ]
+        ) %>
   </div>
 </div>

@@ -3,26 +3,14 @@
 module BulkActions
   # Component for rendering a section of bulk actions
   class ListSectionComponent < ApplicationComponent
-    # @param key [String] Key of the bulk action in en.yml.
-    # @param path [String] Path to create a new bulk action.
-    renders_many :bulk_actions, lambda { |key:, path:|
-      safe_join([
-                  link_to(I18n.t("bulk_actions.#{key}.label"), path),
-                  tag.p(class: 'mb-0') do
-                    tag.small do
-                      I18n.t("bulk_actions.#{key}.help_html").html_safe
-                    end
-                  end
-                ])
-    }
-
-    def initialize(label:, classes: [])
+    def initialize(label:, bulk_action_configs:, classes: [])
       @label = label
       @classes = classes
+      @bulk_action_configs = bulk_action_configs
       super()
     end
 
-    attr_reader :label
+    attr_reader :label, :bulk_action_configs
 
     def classes
       merge_classes(@classes)

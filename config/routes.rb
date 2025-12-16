@@ -120,6 +120,6 @@ Rails.application.routes.draw do
   resources :bulk_actions, only: %i[new]
 
   namespace :bulk_actions do
-    resource :reindex, only: %i[new create]
+    resource :reindex, only: %i[new create], controller: 'reindex'
   end
 end

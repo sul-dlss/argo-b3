@@ -1,8 +1,15 @@
 <%= tag.section class: classes, id: do %>
   <h2 class="h5"><%= label %></h2>
   <ul class="list-unstyled">
-    <% bulk_actions.each do |bulk_action| %>
-      <li><%= bulk_action %></li>
+    <% bulk_action_configs.each do |bulk_action_config| %>
+      <li>
+        <%= link_to(bulk_action_config.label, bulk_action_config.path_helper&.call || '#') %>
+        <p class="mb-2">
+          <small>
+            <%= bulk_action_config.help_text %>
+          </small>
+        </p>
+      </li>
     <% end %>
   </ul>
 <% end %>

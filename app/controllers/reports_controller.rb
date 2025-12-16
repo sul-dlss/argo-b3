@@ -81,12 +81,6 @@ class ReportsController < ApplicationController
     params.expect(report_form: [:source, :druid_list, { fields: [] }])
   end
 
-  def parse_druid_list(druid_list)
-    return [] if druid_list.blank?
-
-    druid_list.split(/\s+/).map(&:strip).map { |druid| DruidSupport.prefixed_druid_from(druid) }
-  end
-
   def rows
     params[:commit] == 'Preview' ? 5 : 10_000_000
   end
@@ -114,7 +108,7 @@ class ReportsController < ApplicationController
   end
 
   def generate_report_from_druids(stream: nil)
-    druids = parse_druid_list(@report_form.druid_list)
+    druids = DruidSupport.parse_list(@report_form.druid_list)
     Searchers::ReportByDruid.call(druids:, fields: @report_form.fields, rows:, stream:)
   end
 

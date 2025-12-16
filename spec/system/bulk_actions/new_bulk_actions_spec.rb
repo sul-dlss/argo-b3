@@ -12,7 +12,7 @@ RSpec.describe 'New bulk actions', :rack_test do
       expect(page).to have_css('h2', text: 'Perform actions')
       expect(page).to have_link('Manage release')
       expect(page).to have_css('p', text: 'Adds release tags to individual objects.')
-      expect(page).to have_css('a[href]', count: 3)
+      expect(page).to have_css('a[href]', count: 4)
     end
 
     within('section#modify-objects-bulk-actions-section') do
