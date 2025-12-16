@@ -8,6 +8,10 @@ module SearchResults
       @index = index
     end
 
+    def bare_druid
+      DruidSupport.bare_druid_from(druid)
+    end
+
     def druid
       solr_doc[Search::Fields::ID]
     end

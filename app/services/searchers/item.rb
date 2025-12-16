@@ -10,18 +10,23 @@ module Searchers
       Search::Fields::ACCESS_RIGHTS,
       Search::Fields::APO_DRUID,
       Search::Fields::APO_TITLE,
+      Search::Fields::AUTHOR,
       Search::Fields::BARE_DRUID,
       Search::Fields::CONTENT_TYPES,
       Search::Fields::ID,
       Search::Fields::IDENTIFIERS,
       Search::Fields::OBJECT_TYPES,
       Search::Fields::PROJECTS,
+      Search::Fields::PUBLICATION_DATE,
+      Search::Fields::PUBLICATION_PLACE,
+      Search::Fields::PUBLISHER,
       Search::Fields::SOURCE_ID,
       Search::Fields::RELEASED_TO,
       Search::Fields::STATUS,
       Search::Fields::TICKETS,
       Search::Fields::TITLE,
-      Search::Fields::WORKFLOW_ERRORS
+      Search::Fields::WORKFLOW_ERRORS,
+      Search::Fields::FIRST_SHELVED_IMAGE
     ].freeze
 
     # Primary facets that are included in the main item search request

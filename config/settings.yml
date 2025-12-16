@@ -18,3 +18,5 @@ bulk_actions:
 feature_flags:
   bulk_actions: false
 
+stacks:
+  url: "http://stacks.stanford.edu/image"

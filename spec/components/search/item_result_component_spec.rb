@@ -24,7 +24,12 @@ RSpec.describe Search::ItemResultComponent, type: :component do
            status:,
            workflow_errors:,
            access_rights:,
-           index: 2)
+           index: 2,
+           first_shelved_image:,
+           author:,
+           publisher:,
+           publication_place:,
+           publication_date:)
   end
 
   let(:content_types) { nil }
@@ -38,6 +43,11 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   let(:status) { nil }
   let(:workflow_errors) { nil }
   let(:access_rights) { nil }
+  let(:first_shelved_image) { nil }
+  let(:author) { nil }
+  let(:publisher) { nil }
+  let(:publication_place) { nil }
+  let(:publication_date) { nil }
 
   it 'renders the result' do
     render_inline(component)
