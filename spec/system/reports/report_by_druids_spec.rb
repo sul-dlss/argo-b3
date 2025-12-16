@@ -12,9 +12,15 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_field('From last search', type: 'radio', disabled: true)
 
     expect(page).to have_field('From druid list', type: 'radio', checked: true)
+    expect(page).to have_button('Download', disabled: true)
+    expect(page).to have_button('Preview', disabled: true)
+
     # Various separators, whitespace, and druid forms
     druids = "#{item_docs[0][Search::Fields::ID]}\n#{item_docs[1][Search::Fields::ID]} \t\t#{item_docs[2][Search::Fields::BARE_DRUID]} " # rubocop:disable Layout/LineLength
     fill_in 'Enter druid list', with: druids
+
+    expect(page).to have_button('Download', disabled: false)
+    expect(page).to have_button('Preview', disabled: false)
 
     click_button 'Preview'
 

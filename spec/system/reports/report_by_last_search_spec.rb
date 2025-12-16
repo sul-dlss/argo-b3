@@ -27,12 +27,18 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_content('3 items for: "test"')
 
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: true)
+    expect(page).to have_button('Download', disabled: false)
+    expect(page).to have_button('Preview', disabled: false)
 
     choose 'From druid list'
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: false)
+    expect(page).to have_button('Download', disabled: true)
+    expect(page).to have_button('Preview', disabled: true)
 
     choose 'From last search'
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: true)
+    expect(page).to have_button('Download', disabled: false)
+    expect(page).to have_button('Preview', disabled: false)
 
     # Some checkboxes are selected
     expect(page).to have_field('report_form[fields][]', type: 'checkbox', checked: true)
@@ -47,6 +53,7 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_no_field('report_form[fields][]', type: 'checkbox', checked: true)
     expect(page).to have_field('report_form[fields][]', type: 'checkbox', checked: false)
     expect(page).to have_button('Download', disabled: true)
+    expect(page).to have_button('Preview', disabled: true)
 
     check 'Druid'
     check 'PURL'

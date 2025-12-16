@@ -4,7 +4,7 @@
       <legend>Select source of items for report:</legend>
 
       <div class="form-check mt-3">
-        <%= form.radio_button :source, 'results', class: 'form-check-input', disabled: !defined?(@search_form), data: { radio_target: 'radio', action: 'radio#toggle' } %>
+        <%= form.radio_button :source, 'results', class: 'form-check-input', disabled: !defined?(@search_form), data: { radio_target: 'radio', action: 'radio#toggle report#updateSubmit' } %>
         <%= form.label :source_results, 'From last search', class: 'form-check-label' %>
 
         <% if defined?(@search_form) %>
@@ -13,11 +13,11 @@
       </div>
 
       <div class="form-check">
-        <%= form.radio_button :source, 'druids', class: 'form-check-input', data: { radio_target: 'radio', action: 'radio#toggle' } %>
+        <%= form.radio_button :source, 'druids', class: 'form-check-input', data: { radio_target: 'radio', action: 'radio#toggle report#updateSubmit', report_target: 'sourceRadio' } %>
         <%= form.label :source_druids, 'From druid list', class: 'form-check-label' %>
 
         <%= form.label :druid_list, 'Enter druid list', class: 'form-label visually-hidden' %>
-        <%= form.textarea :druid_list, rows: 5, class: 'form-control' %>
+        <%= form.textarea :druid_list, rows: 5, class: 'form-control', data: { report_target: 'druidListInput', action: 'input->report#updateSubmit' } %>
       </div>
     </fieldset>
 
