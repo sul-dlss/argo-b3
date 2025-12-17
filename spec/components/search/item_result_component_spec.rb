@@ -4,76 +4,32 @@ require 'rails_helper'
 
 RSpec.describe Search::ItemResultComponent, type: :component do
   let(:component) { described_class.new(result:) }
+  let(:result) { SearchResults::Item.new(solr_doc:, index: 2) }
+  let(:solr_doc) { build(:solr_item, druid:, title:, apo_druid:) }
+  let(:title) { 'Test Title' }
+  let(:druid) { 'druid:ab123cd4567' }
+  let(:apo_druid) { 'druid:xy987zt6543' }
 
-  let(:result) do
-    double(SearchResults::Item, # rubocop:disable RSpec/VerifiedDoubles
-           title: 'Test Title',
-           druid: 'druid:ab123cd4567',
-           bare_druid: 'ab123cd4567',
-           object_types: ['item'],
-           content_types:,
-           apo_druid: 'druid:xy987zt6543',
-           apo_title: 'Test APO Title',
-           collection_druids:,
-           collection_titles:,
-           projects:,
-           source_id:,
-           identifiers:,
-           released_to:,
-           tickets:,
-           status:,
-           workflow_errors:,
-           access_rights:,
-           index: 2,
-           first_shelved_image:,
-           author:,
-           publisher:,
-           publication_place:,
-           publication_date:)
-  end
-
-  let(:content_types) { nil }
-  let(:collection_druids) { nil }
-  let(:collection_titles) { nil }
-  let(:projects) { nil }
-  let(:source_id) { nil }
-  let(:identifiers) { nil }
-  let(:released_to) { nil }
-  let(:tickets) { nil }
-  let(:status) { nil }
-  let(:workflow_errors) { nil }
-  let(:access_rights) { nil }
-  let(:first_shelved_image) { nil }
-  let(:author) { nil }
-  let(:publisher) { nil }
-  let(:publication_place) { nil }
-  let(:publication_date) { nil }
-
-  it 'renders the result' do
-    render_inline(component)
-
-    caption = page.find('table#item-result-ab123cd4567 caption')
-    expect(caption).to have_css('span', text: '2.')
-    expect(caption).to have_link('Test Title', href: 'https://argo.stanford.edu/view/druid:ab123cd4567')
-
-    expect(page).to have_table_value('item-result-ab123cd4567', 'DRUID', 'druid:ab123cd4567')
-    expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
-    expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy')).to have_link('Test APO Title',
-                                                                                          href: 'https://argo.stanford.edu/view/druid:xy987zt6543')
-    expect(page).to have_css "svg[aria-label='Placeholder: Responsive image']", text: 'Test Title'
-  end
-
-  context 'when content types are present' do
-    let(:content_types) { ['text'] }
-
-    it 'renders the content types' do
+  context 'with a basic item' do
+    it 'renders the result' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Content Type', 'text')
+      caption = page.find('table#item-result-ab123cd4567 caption')
+      expect(caption).to have_css('span', text: '2.')
+      expect(caption).to have_link('Test Title', href: 'https://argo.stanford.edu/view/druid:ab123cd4567')
+
+      expect(page).to have_table_value('item-result-ab123cd4567', 'DRUID', 'druid:ab123cd4567')
+      expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
+      expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy')).to have_link('University Archives',
+                                                                                            href: 'https://argo.stanford.edu/view/druid:xy987zt6543')
+      expect(page).to have_css "svg[aria-label='Placeholder: Responsive image']", text: 'Test Title'
+      expect(page).to have_table_value('item-result-ab123cd4567', 'Content Type', 'book')
+      expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
     end
   end
 
   context 'when collections are present' do
+    let(:solr_doc) { build(:solr_item, druid:, collection_druids:, collection_titles:) }
     let(:collection_druids) { ['druid:xy987zt6555', 'druid:xy987zt6556'] }
     let(:collection_titles) { ['Collection One', 'Collection Two'] }
 
@@ -87,18 +43,19 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when projects are present' do
-    let(:projects) { ['Project A', 'Project B'] }
+    let(:solr_doc) { build(:solr_item, :with_projects, druid:) }
 
     it 'renders the project links' do
       render_inline(component)
 
       cell = find_table_value_cell('item-result-ab123cd4567', 'Projects')
-      expect(cell).to have_link('Project A', href: '/search?projects%5B%5D=Project+A')
-      expect(cell).to have_link('Project B', href: '/search?projects%5B%5D=Project+B')
+      expect(cell).to have_link('Project 1', href: '/search?projects%5B%5D=Project+1')
+      expect(cell).to have_link('Project 2 : Project 2a', href: '/search?projects%5B%5D=Project+2+%3A+Project+2a')
     end
   end
 
   context 'when source ID is present' do
+    let(:solr_doc) { build(:solr_item, druid:, source_id:) }
     let(:source_id) { 'test:source-123' }
 
     it 'renders the source ID' do
@@ -109,6 +66,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when identifiers are present' do
+    let(:solr_doc) { build(:solr_item, druid:, identifiers:) }
     let(:identifiers) { %w[test:source-123 folio:a13335677] }
 
     it 'renders the identifiers' do
@@ -119,6 +77,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when released_to values are present' do
+    let(:solr_doc) { build(:solr_item, druid:, released_to:) }
     let(:released_to) { %w[Earthworks Searchworks] }
 
     it 'renders the released to values' do
@@ -129,6 +88,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when tickets are present' do
+    let(:solr_doc) { build(:solr_item, druid:, tickets:) }
     let(:tickets) { %w[ticket-001 ticket-002] }
 
     it 'renders the ticket links' do
@@ -141,6 +101,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when status is present' do
+    let(:solr_doc) { build(:solr_item, druid:, status:) }
     let(:status) { 'v1 accessioned' }
 
     it 'renders the status' do
@@ -151,6 +112,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   end
 
   context 'when workflow errors are present' do
+    let(:solr_doc) { build(:solr_item, druid:, workflow_errors:) }
     let(:workflow_errors) { ['Error 1', 'Error 2'] }
 
     it 'renders the workflow errors' do
@@ -161,17 +123,8 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     end
   end
 
-  context 'when access rights are present' do
-    let(:access_rights) { %w[dark stanford] }
-
-    it 'renders the access rights' do
-      render_inline(component)
-
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
-    end
-  end
-
   context 'with a thumbnail_url is present' do
+    let(:solr_doc) { build(:solr_item, druid:, title:, first_shelved_image:) }
     let(:first_shelved_image) { 'default.jpg' }
 
     it 'renders the thumbnail' do

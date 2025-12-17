@@ -3,12 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Project search', :solr do
-  let!(:solr_item) { create(:solr_item, ticket: 'TESTREQ-0') }
+  let!(:solr_item) { create(:solr_item, tickets: ['TESTREQ-0']) }
 
   before do
     Search::Facets::TICKETS.limit = 5
     create_list(:solr_item, 6)
-    create(:solr_item, ticket: 'TESTREQ-Z9')
+    create(:solr_item, tickets: ['TESTREQ-Z9'])
     sign_in(create(:user))
   end
 
