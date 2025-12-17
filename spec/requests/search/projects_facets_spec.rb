@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Projects facets', :solr do
   before do
     create(:solr_item, :with_projects)
+    sign_in(create(:user))
   end
 
   describe 'index' do

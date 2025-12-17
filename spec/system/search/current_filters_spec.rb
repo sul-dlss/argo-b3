@@ -8,6 +8,7 @@ RSpec.describe 'Current filters', :solr do
   before do
     create(:solr_collection)
     create(:solr_item, :agreement)
+    sign_in(create(:user))
   end
 
   it 'returns current filters' do

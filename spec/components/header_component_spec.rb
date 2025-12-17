@@ -5,6 +5,12 @@ require 'rails_helper'
 RSpec.describe HeaderComponent, type: :component do
   let(:component) { described_class.new }
 
+  let(:user) { build_stubbed(:user, name: 'Test User') }
+
+  before do
+    allow(Current).to receive(:user).and_return(user)
+  end
+
   it 'renders the header' do
     render_inline(component)
 
@@ -13,5 +19,6 @@ RSpec.describe HeaderComponent, type: :component do
     expect(page).to have_link(href: '/report', text: 'Report')
     expect(page).to have_link(href: '/workflow_grid', text: 'Workflow grid')
     expect(page).to have_link(href: 'mailto:argo-feedback@lists.stanford.edu', text: 'Feedback')
+    expect(page).to have_css('.nav-item', text: 'Logged in as Test User')
   end
 end

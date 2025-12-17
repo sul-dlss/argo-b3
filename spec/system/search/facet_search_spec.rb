@@ -6,6 +6,7 @@ RSpec.describe 'Facet search', :solr do
   before do
     create(:solr_item, :with_tags)
     create(:solr_collection, :with_tags, tags: ['Tag 1'])
+    sign_in(create(:user))
   end
 
   it 'searches facets' do

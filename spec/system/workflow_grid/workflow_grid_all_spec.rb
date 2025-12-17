@@ -6,6 +6,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
   before do
     create_list(:solr_item, 3, :with_workflows)
     create(:solr_item, :with_workflows, :google_book)
+    sign_in(create(:user))
 
     allow(Dor::Services::Client.workflows).to receive(:templates).and_return(['accessionWF'])
     allow(Dor::Services::Client.workflows).to receive(:template).with('accessionWF').and_return(ACCESSIONWF_TEMPLATE)

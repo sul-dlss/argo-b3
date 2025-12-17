@@ -4,6 +4,9 @@
 class ReportsController < ApplicationController
   before_action :set_report_form, only: %i[download preview]
 
+  # Reports don't require authorization.
+  skip_verify_authorized
+
   # These are the categories of report fields.
   # Report fields are defined in Reports::Fields.
   # These groupings are used to render sections in the report form.

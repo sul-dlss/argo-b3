@@ -6,6 +6,7 @@ RSpec.describe 'Show home page', :solr do
   before do
     create_list(:solr_item, 4)
     create_list(:solr_collection, 3)
+    sign_in(create(:user))
   end
 
   it 'displays the home page' do

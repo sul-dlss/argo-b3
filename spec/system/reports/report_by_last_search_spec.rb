@@ -10,6 +10,7 @@ RSpec.describe 'Report by druids', :solr do
   before do
     create(:solr_item, druid:)
     create_list(:solr_item, 2)
+    sign_in(create(:user))
   end
 
   it 'returns a report' do

@@ -39,6 +39,7 @@ gem 'bootsnap', require: false
 gem 'image_processing', '~> 1.2'
 
 # Additional gems
+gem 'action_policy'
 gem 'config'
 gem 'csv'
 gem 'dor-services-client', '~> 15.1'

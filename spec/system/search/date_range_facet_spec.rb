@@ -9,6 +9,10 @@ RSpec.describe 'Date range dynamic facets', :solr do
   let(:from) { 2.years.ago }
   let(:to) { 6.months.ago }
 
+  before do
+    sign_in(create(:user))
+  end
+
   it 'returns facets' do
     visit search_path(query: 'test')
 

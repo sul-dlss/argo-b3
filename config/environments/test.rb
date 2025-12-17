@@ -52,4 +52,8 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.middleware.insert_before 0, Capybara::Lockstep::Middleware
+
+  # This adds shibboleth headers to the request environment for testing.
+  require 'test_shibboleth_headers'
+  config.middleware.use TestShibbolethHeaders
 end

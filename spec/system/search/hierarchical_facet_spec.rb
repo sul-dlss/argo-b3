@@ -6,6 +6,7 @@ RSpec.describe 'Hierarchical facets', :solr do
   before do
     create(:solr_item, :with_projects)
     create(:solr_collection, :with_projects, projects: ['Project 1'])
+    sign_in(create(:user))
   end
 
   it 'returns facets' do

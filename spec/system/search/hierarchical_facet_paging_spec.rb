@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Hierarchical facet paging', :solr do
   before do
     create(:solr_item, projects: (1..30).map { |i| "project #{format('%02d', i)} : testing" })
+    sign_in(create(:user))
   end
 
   it 'returns facets' do

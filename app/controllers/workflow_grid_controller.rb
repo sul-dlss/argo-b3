@@ -4,6 +4,9 @@
 class WorkflowGridController < ApplicationController
   include SearchFormConcern
 
+  # Workflow grid doesn't require authorization.
+  skip_verify_authorized
+
   def show
     set_from_last_search_cookie
     set_scope

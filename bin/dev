@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
-bin/overmind start
+# USER_GROUPS should be semicolon-separated (no spaces).
+USER_GROUPS="${XGROUPS:=sdr:argo-access;workgroup:sdr:administrator}" NAME="${NAME:=A. User}" EMAIL="${EMAIL:=a.user@stanford.edu}" bin/overmind start
