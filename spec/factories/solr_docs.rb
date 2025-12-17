@@ -16,12 +16,16 @@ FactoryBot.define do
       apo_druid { generate(:unique_druid) }
       projects { [] }
       tags { [] }
-      sequence(:ticket) { |n| "TESTREQ-#{n}" }
+      sequence(:tickets) { |n| ["TESTREQ-#{n}"] }
       workflows { [] }
       mimetypes { ['application/pdf', 'image/jpeg'] }
+      released_to { [] }
       released_to_earthworks { true }
-      access_rights { 'dark' }
+      released_to_purl_sitemap { true }
+      released_to_searchworks { true }
+      access_rights { %w[dark stanford] }
       earliest_accessioned_date { 1.year.ago }
+      collection_druids { [generate(:unique_druid)] }
       collection_titles { ['David Rumsey Map Collection'] }
       admin_policy_titles { ['University Archives'] }
       dates { ['2001'] }
@@ -32,7 +36,11 @@ FactoryBot.define do
       author { 'John Doe' }
       publisher { ['Famous Publisher'] }
       publication_place { ['New York'] }
-      first_shelved_image { 'default.jpg' }
+      first_shelved_image { nil }
+      source_id { nil }
+      identifiers { [] }
+      status { nil }
+      workflow_errors { [] }
     end
 
     initialize_with do
@@ -44,29 +52,38 @@ FactoryBot.define do
         Search::Fields::OBJECT_TYPES => [object_type],
         Search::Fields::CONTENT_TYPES => [content_type],
         Search::Fields::APO_DRUID => [apo_druid],
+        Search::Fields::PROJECTS => projects,
         Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
         Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
-        Search::Fields::TICKETS => [ticket],
+        Search::Fields::TICKETS => tickets,
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),
         Search::Fields::MIMETYPES => mimetypes,
+        Search::Fields::RELEASED_TO => released_to,
         Search::Fields::RELEASED_TO_EARTHWORKS => released_to_earthworks ? Time.now.utc.iso8601 : nil,
-        Search::Fields::ACCESS_RIGHTS => [access_rights],
+        Search::Fields::RELEASED_TO_PURL_SITEMAP => released_to_purl_sitemap ? Time.now.utc.iso8601 : nil,
+        Search::Fields::RELEASED_TO_SEARCHWORKS => released_to_searchworks ? Time.now.utc.iso8601 : nil,
+        Search::Fields::ACCESS_RIGHTS => access_rights,
         Search::Fields::EARLIEST_ACCESSIONED_DATE => earliest_accessioned_date.utc.iso8601,
+        Search::Fields::COLLECTION_DRUIDS => collection_druids,
         Search::Fields::COLLECTION_TITLES => collection_titles,
         Search::Fields::APO_TITLE => admin_policy_titles,
         Search::Fields::PUBLISHER => publisher,
         Search::Fields::PUBLICATION_DATE => dates,
         Search::Fields::PUBLICATION_PLACE => publication_place,
+        Search::Fields::SOURCE_ID => source_id,
         Search::Fields::TOPICS => topics,
         Search::Fields::REGIONS => regions,
         Search::Fields::GENRES => genres,
         Search::Fields::LANGUAGES => languages,
         Search::Fields::PURL => "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}",
         Search::Fields::FIRST_SHELVED_IMAGE => first_shelved_image,
+        Search::Fields::IDENTIFIERS => identifiers,
+        Search::Fields::STATUS => status,
+        Search::Fields::WORKFLOW_ERRORS => workflow_errors,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }
@@ -107,6 +124,7 @@ FactoryBot.define do
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPES => [object_type],
+        Search::Fields::PROJECTS => projects,
         Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
         Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
