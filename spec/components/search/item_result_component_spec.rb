@@ -24,7 +24,12 @@ RSpec.describe Search::ItemResultComponent, type: :component do
            status:,
            workflow_errors:,
            access_rights:,
-           index: 2)
+           index: 2,
+           first_shelved_image:,
+           author:,
+           publisher:,
+           publication_place:,
+           publication_date:)
   end
 
   let(:content_types) { nil }
@@ -38,6 +43,11 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   let(:status) { nil }
   let(:workflow_errors) { nil }
   let(:access_rights) { nil }
+  let(:first_shelved_image) { nil }
+  let(:author) { nil }
+  let(:publisher) { nil }
+  let(:publication_place) { nil }
+  let(:publication_date) { nil }
 
   it 'renders the result' do
     render_inline(component)
@@ -50,6 +60,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
     expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy')).to have_link('Test APO Title',
                                                                                           href: 'https://argo.stanford.edu/view/druid:xy987zt6543')
+    expect(page).to have_css "svg[aria-label='Placeholder: Responsive image']", text: 'Test Title'
   end
 
   context 'when content types are present' do
@@ -157,6 +168,16 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
+    end
+  end
+
+  context 'with a thumbnail_url is present' do
+    let(:first_shelved_image) { 'default.jpg' }
+
+    it 'renders the thumbnail' do
+      render_inline(component)
+      expect(page).to have_css "img[src*='default/full/!400,400/0/default.jpg']"
+      expect(page).to have_css "img[alt='']"
     end
   end
 end

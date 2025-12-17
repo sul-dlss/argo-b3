@@ -29,6 +29,10 @@ FactoryBot.define do
       regions { ['Palo Alto'] }
       genres { ['Maps'] }
       languages { ['English'] }
+      author { 'John Doe' }
+      publisher { ['Famous Publisher'] }
+      publication_place { ['New York'] }
+      first_shelved_image { 'default.jpg' }
     end
 
     initialize_with do
@@ -36,6 +40,7 @@ FactoryBot.define do
         Search::Fields::ID => druid,
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
+        Search::Fields::AUTHOR => author,
         Search::Fields::OBJECT_TYPES => [object_type],
         Search::Fields::CONTENT_TYPES => [content_type],
         Search::Fields::APO_DRUID => [apo_druid],
@@ -53,12 +58,15 @@ FactoryBot.define do
         Search::Fields::EARLIEST_ACCESSIONED_DATE => earliest_accessioned_date.utc.iso8601,
         Search::Fields::COLLECTION_TITLES => collection_titles,
         Search::Fields::APO_TITLE => admin_policy_titles,
+        Search::Fields::PUBLISHER => publisher,
         Search::Fields::PUBLICATION_DATE => dates,
+        Search::Fields::PUBLICATION_PLACE => publication_place,
         Search::Fields::TOPICS => topics,
         Search::Fields::REGIONS => regions,
         Search::Fields::GENRES => genres,
         Search::Fields::LANGUAGES => languages,
         Search::Fields::PURL => "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}",
+        Search::Fields::FIRST_SHELVED_IMAGE => first_shelved_image,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

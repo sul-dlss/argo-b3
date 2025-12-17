@@ -22,6 +22,7 @@ module Search
     EMBARGO_RELEASE_DATE = 'embargo_release_dtpsimdv'
     FILE_COUNT = 'content_file_count_itsi'
     FILE_ROLES = 'content_file_roles_ssimdv'
+    FIRST_SHELVED_IMAGE = 'first_shelved_image_ss'
     FORMATTED_EARLIEST_ACCESSIONED_DATE = 'formatted_accessioned_earliest_ss'
     FORMATTED_EMBARGO_RELEASE_DATE = 'formatted_embargo_release_ss'
     FORMATTED_PUBLISHED_EARLIEST_DATE = 'formatted_published_earliest_ss'

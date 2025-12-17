@@ -1,29 +1,36 @@
 <%= tag.li class: 'mb-5' do %>
-  <%= render Elements::Tables::TableComponent.new(id:) do |component| %>
-    <% component.with_caption do %>
-      <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
-        <%= component.with_link do %>
-          <%= helpers.link_to_item title, druid %>
+  <div class="row">
+    <div class="col-md-10">
+      <%= render Elements::Tables::TableComponent.new(id:) do |component| %>
+        <% component.with_caption do %>
+          <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
+            <%= component.with_link do %>
+              <%= helpers.link_to_item title, druid %>
+            <% end %>
+          <% end %>
         <% end %>
+
+        <% component.with_row(label: 'DRUID', values: [druid]) %>
+        <% component.with_row(label: 'Object Type', values: result.object_types) %>
+
+        <%# Only items have content types. %>
+        <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
+
+        <%# In tests, items may not have an admin policy. %>
+        <% component.with_row(label: 'Admin Policy', values: admin_policy_values) if result.apo_druid.present? %>
+        <% component.with_row(label: 'Collections', values: collections_values) if result.collection_druids.present? %>
+        <% component.with_row(label: 'Projects', values: projects_values) if result.projects.present? %>
+        <% component.with_row(label: 'Source', values: [result.source_id]) if result.source_id.present? %>
+        <% component.with_row(label: 'IDs', values: identifier_values) if result.identifiers.present? %>
+        <% component.with_row(label: 'Released to', values: released_to_values) if result.released_to.present? %>
+        <% component.with_row(label: 'Tickets', values: ticket_values) if result.tickets.present? %>
+        <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
+        <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
+        <% component.with_row(label: 'Access Rights', values: access_rights_values) if result.access_rights.present? %>
       <% end %>
-    <% end %>
-
-    <% component.with_row(label: 'DRUID', values: [druid]) %>
-    <% component.with_row(label: 'Object Type', values: result.object_types) %>
-
-    <%# Only items have content types. %>
-    <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
-
-    <%# In tests, items may not have an admin policy. %>
-    <% component.with_row(label: 'Admin Policy', values: admin_policy_values) if result.apo_druid.present? %>
-    <% component.with_row(label: 'Collections', values: collections_values) if result.collection_druids.present? %>
-    <% component.with_row(label: 'Projects', values: projects_values) if result.projects.present? %>
-    <% component.with_row(label: 'Source', values: [result.source_id]) if result.source_id.present? %>
-    <% component.with_row(label: 'IDs', values: identifier_values) if result.identifiers.present? %>
-    <% component.with_row(label: 'Released to', values: released_to_values) if result.released_to.present? %>
-    <% component.with_row(label: 'Tickets', values: ticket_values) if result.tickets.present? %>
-    <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
-    <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
-    <% component.with_row(label: 'Access Rights', values: access_rights_values) if result.access_rights.present? %>
-  <% end %>
+    </div>
+    <div class="col-md-2 mx-auto align-self-center">
+      <%= render Search::ThumbnailComponent.new(result:) %>
+    </div>
+  </div>
 <% end %>
