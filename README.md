@@ -33,6 +33,10 @@ To run linters individually, run which ones you need:
 * JavaScript code: `yarn run lint` (add `--fix` flag to autocorrect violations)
 * SCSS stylesheets: `yarn run stylelint` (add `--fix` flag to autocorrect violations)
 
+### Background Jobs UI
+
+A dashboard for SolidQueue background jobs is available at http://localhost:3000/jobs
+
 ## Deployment
 
 NOTE: The application is deployed continuously by our on-prem Jenkins service (`sul-ci-prod`) to the `poc` environment on every merge to `main`. See `Jenkinsfile` for how that is wired up.

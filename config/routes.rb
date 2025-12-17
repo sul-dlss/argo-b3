@@ -130,4 +130,6 @@ Rails.application.routes.draw do
   namespace :admin do
     get 'groups'
   end
+
+  mount MissionControl::Jobs::Engine, at: '/jobs'
 end
