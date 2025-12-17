@@ -490,7 +490,7 @@ GEM
       logger
     ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
-    sdr_view_components (0.1.7)
+    sdr_view_components (0.1.8)
       rails (~> 8.0)
       view_component
       zeitwerk

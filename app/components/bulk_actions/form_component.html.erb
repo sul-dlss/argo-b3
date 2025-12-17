@@ -3,8 +3,7 @@
   <p><%= help_text %></p>
   <%= content %>
 
-  <%= form.label :description, 'Describe this bulk action', class: 'form-label mt-3' %>
-  <%= form.textarea :description, rows: 3, class: 'form-control' %>
+  <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :description, container_classes: 'mt-3', label_text: 'Describe this bulk action', input_rows: 3) %>
 
   <div class="d-flex align-items-center mt-3">
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
