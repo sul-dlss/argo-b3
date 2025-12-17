@@ -14,7 +14,7 @@ RSpec.describe 'Admin groups' do
       get admin_groups_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('sdr:administrator')
+      expect(response.body).to include(AdminPolicy::ADMIN_GROUP)
     end
   end
 

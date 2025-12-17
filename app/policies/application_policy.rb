@@ -2,7 +2,7 @@
 
 # Base class for application policies
 class ApplicationPolicy < ActionPolicy::Base
-  ADMIN_GROUP = 'sdr:administrator'
+  ADMIN_GROUP = 'sdr:administrator-role'
 
   pre_check :allow_admins
 
