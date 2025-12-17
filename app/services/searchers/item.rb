@@ -63,6 +63,7 @@ module Searchers
           fl: FIELD_LIST,
           rows:,
           start:,
+          sort: @search_form.sort,
           'json.facet': facet_json
         }
       )
