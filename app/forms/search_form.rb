@@ -6,7 +6,7 @@ class SearchForm < ApplicationForm
   attribute :include_google_books, :boolean, default: false
   attribute :page, :integer, default: 1
   attribute :debug, :boolean, default: false
-  attribute :sort, :string, default: 'score desc'
+  attribute :sort, :string
 
   # Facet fields
   attribute :access_rights, array: true, default: -> { [] }

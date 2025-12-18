@@ -3,18 +3,14 @@
 module Elements
   # Component for the sort pulldown on search results.
   class SortComponent < ApplicationComponent
-    def initialize(search_form:)
-      @search_form = search_form
-    end
-
-    attr_reader :search_form
-
-    def druid_sort_path
-      search_items_path(search_form.with_attributes(sort: 'id asc', page: search_form.page))
-    end
-
-    def relevance_sort_path
-      search_items_path(search_form.with_attributes(sort: 'score desc', page: search_form.page))
-    end
+    renders_one :button, lambda { |label:|
+      SdrViewComponents::Elements::ButtonComponent.new(label:,
+                                                       classes: 'btn btn-outline-primary ms-3 dropdown-toggle',
+                                                       data: { 'bs-toggle': 'dropdown' },
+                                                       aria: { expanded: false })
+    }
+    renders_many :sort_options, lambda { |label:, path:|
+      link_to label, path, class: 'dropdown-item', role: 'menuitem'
+    }
   end
 end
