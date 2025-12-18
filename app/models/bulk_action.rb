@@ -6,11 +6,13 @@ class BulkAction < ApplicationRecord
 
   enum :status, { created: 'created', queued: 'queued', started: 'started', completed: 'completed' }, validate: true
 
-  after_create :create_output_directory!, :create_log_file!
+  after_create :create_output_directory!
   before_destroy :remove_output_directory!
 
+  delegate :report_filename, to: :bulk_action_config
+
   def bulk_action_config
-    BulkActions.find_config(action_type)
+    @bulk_action_config ||= BulkActions.find_config(action_type)
   end
 
   def enqueue_job(**params)
@@ -18,8 +20,28 @@ class BulkAction < ApplicationRecord
     queued!
   end
 
-  def open_log_file
-    File.open(log_filepath, 'a')
+  def log_filename
+    'log.txt'
+  end
+
+  def log_filepath
+    @log_filepath ||= filepath_for(filename: log_filename)
+  end
+
+  def log_file?
+    File.exist?(log_filepath)
+  end
+
+  def report_file?
+    report_filename.present? && File.exist?(report_filepath)
+  end
+
+  def report_filepath
+    @report_filepath ||= filepath_for(filename: report_filename)
+  end
+
+  def report_label
+    bulk_action_config.report_label || report_filename
   end
 
   def reset_druid_counts!
@@ -34,15 +56,15 @@ class BulkAction < ApplicationRecord
     @output_directory ||= File.join(Settings.bulk_actions.directory, "#{action_type}_#{id}")
   end
 
+  def filepath_for(filename:)
+    return if filename.nil?
+
+    File.join(output_directory, filename)
+  end
+
   private
 
   def create_output_directory!
     FileUtils.mkdir_p(output_directory) unless File.directory?(output_directory)
-  end
-
-  def create_log_file!
-    log_filepath = File.join(output_directory, 'log.txt')
-    FileUtils.touch(log_filepath)
-    update(log_filepath:)
   end
 end

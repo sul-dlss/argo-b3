@@ -22,7 +22,7 @@ module BulkActions
         )
         bulk_action.enqueue_job(druids:)
         flash[:toast] = "#{@bulk_action_config.label} submitted"
-        redirect_to new_bulk_action_path
+        redirect_to bulk_actions_path
       else
         render :new, status: :unprocessable_content
       end

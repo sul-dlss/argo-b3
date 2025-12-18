@@ -91,7 +91,7 @@ module BulkActions
     private
 
     def log_file
-      @log_file ||= bulk_action.open_log_file
+      @log_file ||= File.open(bulk_action.log_filepath, 'a')
     end
   end
 end

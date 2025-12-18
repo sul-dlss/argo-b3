@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_16_121418) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_18_120533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,7 +21,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_16_121418) do
     t.integer "druid_count_fail", default: 0, null: false
     t.integer "druid_count_success", default: 0, null: false
     t.integer "druid_count_total", default: 0, null: false
-    t.string "log_filepath"
     t.string "status", default: "created", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false

@@ -15,6 +15,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :label,
                       :help_text,
                       :path_helper,
+                      # Filename for the report created by this bulk action, if any.
+                      :report_filename,
+                      :report_label,
                       keyword_init: true) do
                         def action_type
                           BulkActions.constants.find do |const_name|
@@ -56,7 +59,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_COCINA_JSON = Config.new(
     label: 'Download full Cocina JSON',
-    help_text: 'Download full Cocina JSON for objects.'
+    help_text: 'Download full Cocina JSON for objects.',
+    report_filename: 'cocina.jsonl.gz',
+    report_label: 'Cocina JSON'
   )
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(

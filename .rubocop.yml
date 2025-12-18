@@ -46,6 +46,9 @@ Metrics/MethodLength:
 Rails/HasAndBelongsToMany:
   Enabled: false
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 RSpec/ExampleLength:
   Enabled: false
 
@@ -457,8 +460,6 @@ Rails/FreezeTime: # new in 2.16
 Rails/I18nLazyLookup: # new in 2.14
   Enabled: true
 Rails/I18nLocaleAssignment: # new in 2.11
-  Enabled: true
-Rails/I18nLocaleTexts: # new in 2.14
   Enabled: true
 Rails/IgnoredColumnsAssignment: # new in 2.17
   Enabled: true

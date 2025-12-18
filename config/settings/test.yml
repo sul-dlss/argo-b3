@@ -1,2 +1,5 @@
 solr:
   url: http://localhost:8984/solr/argo
+
+bulk_actions:
+  directory: "tmp/bulk_jobs_test"

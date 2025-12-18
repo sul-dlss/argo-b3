@@ -12,8 +12,7 @@ dor_services:
   token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb28ifQ.-BVfLTW9Q1_ZQEsGv4tuzGLs5rESN7LgdtEwUltnKv4
 
 bulk_actions:
-  directory: "tmp/bulk_jobs/"
-
+  directory: "tmp/bulk_jobs"
 
 feature_flags:
   bulk_actions: false

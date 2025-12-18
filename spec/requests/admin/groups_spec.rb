@@ -28,9 +28,7 @@ RSpec.describe 'Admin groups' do
     it 'redirects to root' do
       get admin_groups_path
 
-      expect(response).to redirect_to(root_path)
-      follow_redirect!
-      expect(response.body).to include('You are not authorized to perform the requested action.')
+      expect(response).to be_unauthorized
     end
   end
 end
