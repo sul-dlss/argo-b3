@@ -4,7 +4,7 @@ module Sdr
   # Encapsulates all version-related functionality
   class VersionService
     class << self
-      # @returns [Cocina::Models::DROWithMetadata|CollectionWithMetadata|AdminPolicyWithMetadata] cocina object with updated version # rubocop:disable Metrics/LineLength
+      # @returns [Cocina::Models::DROWithMetadata|CollectionWithMetadata|AdminPolicyWithMetadata] cocina object with updated version # rubocop:disable Layout/LineLength
       def open(druid:, **)
         new(druid:).open(**)
       end
