@@ -3,7 +3,13 @@
   <ul class="list-unstyled">
     <% bulk_action_configs.each do |bulk_action_config| %>
       <li>
-        <%= link_to(bulk_action_config.label, bulk_action_config.path_helper&.call || '#') %>
+        <%# Only display the link when the bulk action has been implemented. %>
+        <%# Once all bulk actions have been implemented, this conditional can be removed. %>
+        <% if bulk_action_config.path_helper.present? %>
+          <%= link_to(bulk_action_config.label, bulk_action_config.path_helper.call) %>
+        <% else %>
+          <span style="font-weight: var(--sul-link-font-weight);"><%= bulk_action_config.label %></span>
+        <% end %>
         <p class="mb-2">
           <small>
             <%= bulk_action_config.help_text %>

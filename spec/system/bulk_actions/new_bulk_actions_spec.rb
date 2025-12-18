@@ -14,34 +14,34 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#perform-actions-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Perform actions')
-      expect(page).to have_link('Manage release')
-      expect(page).to have_css('p', text: 'Adds release tags to individual objects.')
-      expect(page).to have_css('a[href]', count: 4)
+      expect(page).to have_link('Reindex')
+      expect(page).to have_css('p', text: 'Reindexes the DOR object in Solr.')
+      expect(page).to have_css('li', count: 4)
     end
 
     within('section#modify-objects-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Modify objects')
-      expect(page).to have_link('Open new version')
+      expect(page).to have_css('span', text: 'Open new version')
     end
 
     within('section#manage-descriptive-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage descriptive metadata')
-      expect(page).to have_link('Refresh metadata from FOLIO record')
+      expect(page).to have_css('span', text: 'Refresh metadata from FOLIO record')
     end
 
     within('section#manage-rights-and-administrative-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage rights and administrative metadata')
-      expect(page).to have_link('Update rights')
+      expect(page).to have_css('span', text: 'Update rights')
     end
 
     within('section#manage-structural-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage structural metadata')
-      expect(page).to have_link('Update content type')
+      expect(page).to have_css('span', text: 'Update content type')
     end
 
     within('section#tags-and-reporting-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Tags and reporting')
-      expect(page).to have_link('Export tags')
+      expect(page).to have_css('span', text: 'Export tags')
     end
   end
 end
