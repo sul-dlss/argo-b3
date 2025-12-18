@@ -15,7 +15,7 @@ class BulkActionsController < ApplicationController
     authorize! @bulk_action
 
     @bulk_action.destroy
-    flash[:toast] = 'Bulk action deleted.'
+    flash[:toast] = "#{@bulk_action.label} deleted"
     redirect_to bulk_actions_path
   end
 

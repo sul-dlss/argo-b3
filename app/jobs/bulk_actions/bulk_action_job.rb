@@ -26,6 +26,7 @@ module BulkActions
 
       log("Finished #{self.class} for BulkAction #{bulk_action.id}")
       bulk_action.completed!
+      perform_broadcast
     ensure
       export_file&.close
       log_file&.close
@@ -92,6 +93,13 @@ module BulkActions
 
     def log_file
       @log_file ||= File.open(bulk_action.log_filepath, 'a')
+    end
+
+    def perform_broadcast
+      component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed")
+      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
+                                                target: 'toast-container',
+                                                html: ApplicationController.render(component, layout: false))
     end
   end
 end

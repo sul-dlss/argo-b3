@@ -9,7 +9,7 @@ class BulkAction < ApplicationRecord
   after_create :create_output_directory!
   before_destroy :remove_output_directory!
 
-  delegate :report_filename, to: :bulk_action_config
+  delegate :report_filename, :label, to: :bulk_action_config
 
   def bulk_action_config
     @bulk_action_config ||= BulkActions.find_config(action_type)

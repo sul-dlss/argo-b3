@@ -19,7 +19,7 @@ RSpec.describe 'Destroying bulk action' do
       expect(response).to redirect_to(bulk_actions_path)
       follow_redirect!
 
-      expect(response.body).to include('Bulk action deleted.')
+      expect(response.body).to include('Reindex deleted')
     end
   end
 
