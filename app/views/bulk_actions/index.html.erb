@@ -1,0 +1,6 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions) %>

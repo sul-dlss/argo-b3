@@ -1,0 +1,18 @@
+<%= tag.div class: 'container mt-3', data: do %>
+  <h1 class="h4"><%= label %></h1>
+  <%= render Elements::Tables::TableComponent.new(label:, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
+    <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
+    <%= table.with_header(label: 'Action', style: 'width: 10%;') %>
+    <%= table.with_header(label: 'Description', style: 'width: 20%;') %>
+    <%= table.with_header(label: 'Status', style: 'width: 10%;') %>
+    <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Log file', style: 'width: 10%;') %>
+    <%= table.with_header(label: 'Report file', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Delete', style: 'width: 10%;') %>
+    <%= bulk_actions.each do |bulk_action| %>
+      <%= table.with_row(first_value: bulk_action.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                         values: values_for(bulk_action),
+                         id: dom_id(bulk_action, 'row')) %>
+    <% end %>
+  <% end %>
+<% end %>

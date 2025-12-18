@@ -17,7 +17,7 @@ RSpec.describe BulkActions::BulkActionJob do
     stub_const('TestBulkActionJob', bulk_action_job_class)
 
     allow_any_instance_of(TestBulkActionJob).to receive(:export_file).and_return(export_file) # rubocop:disable RSpec/AnyInstance
-    allow_any_instance_of(BulkAction).to receive(:open_log_file).and_return(log) # rubocop:disable RSpec/AnyInstance
+    allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
 
   after do

@@ -47,17 +47,6 @@ RSpec.describe BulkAction do
     end
   end
 
-  describe '.open_log_file' do
-    subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
-
-    it 'opens the log file for appending' do
-      bulk_action.open_log_file do |file|
-        expect(file).to be_a(File)
-        expect(file.path).to eq(bulk_action.log_filepath)
-      end
-    end
-  end
-
   describe '.remove_output_directory!' do
     subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 
@@ -70,12 +59,87 @@ RSpec.describe BulkAction do
     end
   end
 
+  describe '.log_filepath' do
+    subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
+
+    it 'returns the correct log file path' do
+      expect(bulk_action.log_filepath)
+        .to eq(File.join(Settings.bulk_actions.directory, "reindex_#{bulk_action.id}", 'log.txt'))
+    end
+  end
+
+  describe '.log_file?' do
+    subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
+
+    context 'when the log file exists' do
+      before do
+        File.write(bulk_action.log_filepath, 'Log content')
+      end
+
+      it 'returns true' do
+        expect(bulk_action.log_file?).to be true
+      end
+    end
+
+    context 'when the log file does not exist' do
+      it 'returns false' do
+        expect(bulk_action.log_file?).to be false
+      end
+    end
+  end
+
+  describe '.report_file?' do
+    context 'when the report file exists' do
+      subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+
+      before do
+        File.write(bulk_action.report_filepath, 'Report content')
+      end
+
+      it 'returns true' do
+        expect(bulk_action.report_file?).to be true
+      end
+    end
+
+    context 'when the report file does not exist' do
+      subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+
+      it 'returns false' do
+        expect(bulk_action.report_file?).to be false
+      end
+    end
+
+    context 'when there is no report filename configured' do
+      subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
+
+      it 'returns false' do
+        expect(bulk_action.report_file?).to be false
+      end
+    end
+  end
+
+  describe '.report_filepath' do
+    subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+
+    it 'returns the correct report file path' do
+      expect(bulk_action.report_filepath)
+        .to eq(File.join(Settings.bulk_actions.directory, "export_cocina_json_#{bulk_action.id}", 'cocina.jsonl.gz'))
+    end
+  end
+
+  describe '.report_label' do
+    subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+
+    it 'returns the configured report label' do
+      expect(bulk_action.report_label).to eq('Cocina JSON')
+    end
+  end
+
   describe 'creating and removing output directory' do
     subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 
-    it 'creates the output directory and log file on create and removes it on destroy' do
+    it 'creates the output directory on create and removes it on destroy' do
       expect(Dir.exist?(bulk_action.output_directory)).to be true
-      expect(File.exist?(bulk_action.log_filepath)).to be true
 
       bulk_action.destroy
 

@@ -27,7 +27,7 @@ RSpec.describe 'Create a new reindex bulk action' do
 
       click_button 'Submit'
 
-      expect(page).to have_current_path(new_bulk_action_path)
+      expect(page).to have_current_path(bulk_actions_path)
 
       expect(page).to have_toast('Reindex submitted')
 
@@ -60,7 +60,7 @@ RSpec.describe 'Create a new reindex bulk action' do
 
       click_button 'Submit'
 
-      expect(page).to have_current_path(new_bulk_action_path)
+      expect(page).to have_current_path(bulk_actions_path)
 
       expect(page).to have_toast('Reindex submitted')
 

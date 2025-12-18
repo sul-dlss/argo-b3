@@ -121,7 +121,11 @@ Rails.application.routes.draw do
     post 'reset'
   end
 
-  resources :bulk_actions, only: %i[new]
+  resources :bulk_actions, only: %i[new index destroy] do
+    member do
+      get 'file'
+    end
+  end
 
   namespace :bulk_actions do
     resource :reindex, only: %i[new create], controller: 'reindex'

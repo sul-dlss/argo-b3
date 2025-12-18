@@ -51,9 +51,15 @@
     </div>
 
     <%# Toasts can be rendered into this container. %>
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080" id="toast-container">
-      <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast]) if flash[:toast].present? %>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080" id="toast-container" data-turbo-permanent="true">
     </div>
+    <%# Because the toast-container is permanent, appending via turbo stream. %>
+    <% if flash[:toast].present? %>
+      <%= turbo_stream.append 'toast-container' do %>
+        <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast]) %>
+      <% end %>
+    <% end %>
+
     <%= yield %>
     <%= render SdrViewComponents::Structure::FooterComponent.new %>
   </body>
