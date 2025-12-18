@@ -55,7 +55,7 @@ RSpec.describe 'Show bulk actions history' do
     end
 
     expect(page).to have_css('p', text: 'No bulk actions.')
-    expect(page).to have_toast('Bulk action deleted.')
+    expect(page).to have_toast("#{bulk_action.label} deleted")
 
     expect(BulkAction.exists?(bulk_action.id)).to be false
   end

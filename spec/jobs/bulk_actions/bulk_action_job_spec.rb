@@ -18,6 +18,7 @@ RSpec.describe BulkActions::BulkActionJob do
 
     allow_any_instance_of(TestBulkActionJob).to receive(:export_file).and_return(export_file) # rubocop:disable RSpec/AnyInstance
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
+    allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
   end
 
   after do
@@ -58,6 +59,10 @@ RSpec.describe BulkActions::BulkActionJob do
       expect(bulk_action.completed?).to be true
 
       expect(Dir.exist?(bulk_action.output_directory)).to be true
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with('notifications', bulk_action.user,
+                                                                                target: 'toast-container',
+                                                                                html: kind_of(String))
     end
   end
 

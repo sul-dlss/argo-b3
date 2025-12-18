@@ -40,6 +40,7 @@
   </head>
 
   <body>
+    <%= turbo_stream_from 'notifications', current_user, data: { turbo_permanent: true } %>
     <%= render HeaderComponent.new %>
     <div class="container mt-3">
       <%# This prevents the flash from being cached by turbo. %>
