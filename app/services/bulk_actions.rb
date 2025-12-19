@@ -70,7 +70,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Download descriptive metadata spreadsheet',
-    help_text: 'Download descriptive metadata for objects.'
+    help_text: 'Download descriptive metadata for objects.',
+    export_filename: 'descriptive.csv',
+    export_label: 'Descriptive metadata spreadsheet',
+    job: BulkActions::ExportDescriptiveMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_descriptive_metadata_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_MODS = Config.new(
@@ -90,7 +95,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TAGS = Config.new(
     label: 'Export tags',
-    help_text: 'Download tags as CSV (comma-separated values) for selected druids.'
+    help_text: 'Download tags as CSV (comma-separated values) for selected druids.',
+    export_filename: 'tags.csv',
+    export_label: 'Tags',
+    job: BulkActions::ExportTagsJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_tags_path),
+    form: BulkActions::BasicForm
   )
 
   EXTRACT_TEXT = Config.new(
@@ -189,7 +199,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   REPUBLISH = Config.new(
     label: 'Republish',
     help_text: 'Republish objects. You still need to use the normal versioning process to make sure ' \
-               'your changes are preserved.'
+               'your changes are preserved.',
+    job: BulkActions::RepublishJob,
+    path_helper: to_path_helper(:new_bulk_actions_republish_path),
+    form: BulkActions::BasicForm
   )
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(
