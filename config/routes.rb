@@ -129,6 +129,7 @@ Rails.application.routes.draw do
 
   namespace :bulk_actions do
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
+    resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :reindex, only: %i[new create], controller: 'reindex'
     resource :republish, only: %i[new create], controller: 'republish'

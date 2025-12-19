@@ -70,7 +70,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Download descriptive metadata spreadsheet',
-    help_text: 'Download descriptive metadata for objects.'
+    help_text: 'Download descriptive metadata for objects.',
+    export_filename: 'descriptive.csv',
+    export_label: 'Descriptive metadata spreadsheet',
+    job: BulkActions::ExportDescriptiveMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_descriptive_metadata_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_MODS = Config.new(
