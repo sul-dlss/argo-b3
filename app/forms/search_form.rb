@@ -130,12 +130,6 @@ class SearchForm < ApplicationForm
     facet_attributes.values.any?(&:present?)
   end
 
-  def sort_label
-    return 'Druid' if sort == 'id asc'
-
-    'Relevance'
-  end
-
   def to_s
     Search::Serializer.call(search_form: self)
   end

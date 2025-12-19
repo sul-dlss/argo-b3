@@ -1,0 +1,12 @@
+<div class="sort-dropdown ms-auto">
+  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: dropdown_label,
+                                                              classes: 'btn btn-outline-primary ms-3 dropdown-toggle',
+                                                              data: { 'bs-toggle': 'dropdown' },
+                                                              aria: { expanded: false }) %>
+
+  <div class="dropdown-menu" role="menu">
+    <% sort_options.each do |sort| %>
+      <%= link_to label_for(sort), search_items_path(search_form.with_attributes(sort:, page: nil)), class: 'dropdown-item', role: 'menuitem' %>
+    <% end %>
+  </div>
+</div>

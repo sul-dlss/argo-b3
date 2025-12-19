@@ -11,13 +11,7 @@
         <% path_func = ->(page) { search_items_path(@search_form.with_attributes(page:)) } %>
         <%= render Elements::Pagination::BriefComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func:, total_results: @results.total_results, per_page: @results.per_page) %>
 
-        <%= render Elements::SortComponent.new do |component| %>
-          <% component.with_button(label: "Sort by #{@search_form.sort_label}") %>
-          <% component.with_sort_options([
-                                           { label: 'Druid', path: search_items_path(@search_form.with_attributes(sort: 'id asc', page: @search_form.page)) },
-                                           { label: 'Relevance', path: search_items_path(@search_form.with_attributes(sort: 'score desc', page: @search_form.page)) }
-                                         ]) %>
-        <% end %>
+        <%= render Search::SortComponent.new(search_form: @search_form) %>
       </div>
 
       <ul class="list-unstyled">
