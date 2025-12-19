@@ -24,7 +24,7 @@ RSpec.describe 'Show bulk actions history' do
     expect(page).to have_no_css('table#bulk-actions-history-table tbody tr')
     expect(page).to have_css('p', text: 'No bulk actions.')
 
-    bulk_action = create(:bulk_action, :with_log, :with_report, user:, description: 'First bulk action',
+    bulk_action = create(:bulk_action, :with_log, :with_export, user:, description: 'First bulk action',
                                                                 action_type: 'export_cocina_json')
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
@@ -44,11 +44,11 @@ RSpec.describe 'Show bulk actions history' do
     end
     expect(log_txt).to eq('Log content')
 
-    expect(row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.report_label)
-    report_txt = with_download(BulkActions::EXPORT_COCINA_JSON.report_filename) do
-      row.click_link(BulkActions::EXPORT_COCINA_JSON.report_label)
+    expect(row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.export_label)
+    export_txt = with_download(BulkActions::EXPORT_COCINA_JSON.export_filename) do
+      row.click_link(BulkActions::EXPORT_COCINA_JSON.export_label)
     end
-    expect(report_txt).to eq('Report content')
+    expect(export_txt).to eq('Export content')
 
     accept_confirm do
       row.click_button('Delete')

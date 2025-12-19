@@ -15,11 +15,7 @@ module SearchFormConcern
   end
 
   def filters_for(scope: nil)
-    filters = SearchForm.attribute_types.map do |name, type|
-      next { name => [] } if type.instance_of?(ActiveModel::Type::Value)
-
-      name
-    end
+    filters = SearchForm.permitted_params
     return { scope => filters } if scope
 
     filters

@@ -79,6 +79,7 @@ end
 group :test do
   gem 'capybara'
   gem 'capybara-lockstep'
+  gem 'cocina-models' # only need RSpec matchers here
   gem 'cyperful', require: false
   gem 'selenium-webdriver'
   gem 'webmock'

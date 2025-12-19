@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe BulkActions::FormComponent, type: :component do
   let(:component) { described_class.new(form:, bulk_action_config: BulkActions::REINDEX) }
 
-  let(:form) { ActionView::Helpers::FormBuilder.new(nil, BulkActions::ReindexForm.new, vc_test_view_context, {}) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(nil, BulkActions::BasicForm.new, vc_test_view_context, {}) }
 
   it 'renders the bulk action form' do
     render_inline(component)
