@@ -69,6 +69,19 @@ RSpec.describe 'Item search', :solr do
           expect(page).to have_current_results_page(2)
         end
       end
+
+      it 'sorts by druid' do
+        visit root_path
+
+        find_search_field.fill_in(with: 'Item')
+        click_button('Search')
+
+        within(find_item_results_section) do
+          click_link_or_button('Sort by Relevance')
+          find('.dropdown-item', text: 'Druid').click
+        end
+      end
+
     end
 
     context 'when google books are included' do
