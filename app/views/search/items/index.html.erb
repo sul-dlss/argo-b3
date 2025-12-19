@@ -7,8 +7,12 @@
       </h3>
 
       <%# proc that takes a page number and returns the path for that page, used for pagination %>
-      <% path_func = ->(page) { search_items_path(@search_form.with_attributes(page:)) } %>
-      <%= render Elements::Pagination::BriefComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func:, total_results: @results.total_results, per_page: @results.per_page) %>
+      <div class="d-flex sort-pagination d-md-flex justify-content-between" role="navigation" aria-label="Pagination and sorting controls">
+        <% path_func = ->(page) { search_items_path(@search_form.with_attributes(page:)) } %>
+        <%= render Elements::Pagination::BriefComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func:, total_results: @results.total_results, per_page: @results.per_page) %>
+
+        <%= render Search::SortComponent.new(search_form: @search_form) %>
+      </div>
 
       <ul class="list-unstyled">
         <%= render Search::ItemResultComponent.with_collection(@results) %>

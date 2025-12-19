@@ -6,6 +6,7 @@ class SearchForm < ApplicationForm
   attribute :include_google_books, :boolean, default: false
   attribute :page, :integer, default: 1
   attribute :debug, :boolean, default: false
+  attribute :sort, :string
 
   # Facet fields
   attribute :access_rights, array: true, default: -> { [] }
@@ -55,7 +56,7 @@ class SearchForm < ApplicationForm
   attribute :wps_workflows, array: true, default: -> { [] }
 
   def blank?
-    attributes.except('include_google_books', 'page', 'debug').values.all?(&:blank?)
+    attributes.except('include_google_books', 'page', 'debug', 'sort').values.all?(&:blank?)
   end
 
   # @return [hash] this form's attributes merged with new_attrs
@@ -108,7 +109,7 @@ class SearchForm < ApplicationForm
   end
 
   def facet_attributes
-    attributes.except('include_google_books', 'page', 'debug', 'query')
+    attributes.except('include_google_books', 'page', 'debug', 'query', 'sort')
   end
 
   # @return [Array<Array(String, String)>] current filters as attribute name/value pairs

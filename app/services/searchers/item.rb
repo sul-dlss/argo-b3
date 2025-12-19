@@ -63,6 +63,7 @@ module Searchers
           fl: FIELD_LIST,
           rows:,
           start:,
+          sort:,
           'json.facet': facet_json
         }
       )
@@ -74,6 +75,11 @@ module Searchers
 
     def rows
       search_form.blank? ? 0 : PER_PAGE
+    end
+
+    # @return [String, nil] Solr sort value or nil if none
+    def sort
+      Search::SortOptions.find_config_by_sort_field(search_form.sort)&.sort_value
     end
 
     def start

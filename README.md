@@ -80,7 +80,7 @@ Notes:
 * Putting Turbo stream replace elements directly in HTML is not a typical pattern for turbo streams.
 
 ### Debugging
-To view the Solr response for all Solr requests made to render a page, add `debug=true` to the URL. 
+To view the Solr response for all Solr requests made to render a page, add `debug=true` to the URL.
 
 The Solr requests will be executed with `debugQuery=true`, so the response will include debugging informations
 including the amount of time to execute each part of the query / each facet.
@@ -175,6 +175,11 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 2. Add the field to `fl` in `Searchers::Item.solr_request`.
 3. Possibly add a method to `SearchResults::Item`. See description of how missing methods are handled.
 4. Display the field in `Search::ItemResultComponent`.
+
+### Adding sort options to search results
+1. Add any new solr fields to `Search::Fields`.
+2. Add a sort constant for the sort config to `Search::SortOptions`
+3. Add the new search, in the expected order to the `sort_options` in `Search::SortComponent`
 
 ## Bulk actions
 
