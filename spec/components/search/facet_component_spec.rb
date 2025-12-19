@@ -22,7 +22,7 @@ RSpec.describe Search::FacetComponent, type: :component do
   it 'renders the facet' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Object types"] h3', text: 'Object types')
+    expect(page).to have_css('section[aria-label="Object types"] h3 button[aria-expanded="true"]', text: 'Object types')
     # There is a turbo-frame around the facet values
     expect(page).to have_css('turbo-frame#object-types-facet-page1 ul')
 
@@ -33,7 +33,7 @@ RSpec.describe Search::FacetComponent, type: :component do
 
     # Remove an existing facet value
     collection_item = page.find('li', text: 'collection')
-    expect(collection_item).to have_link('Remove', href: '/search')
+    expect(collection_item).to have_link('Remove collection', href: '/search')
   end
 
   context 'when paging is enabled' do
@@ -70,6 +70,38 @@ RSpec.describe Search::FacetComponent, type: :component do
 
     it 'does not render the component' do
       expect(component.render?).to be false
+    end
+  end
+
+  context 'when a facet with exclude_form_field' do
+    let(:component) do
+      described_class.new(facet_counts:, search_form:, form_field: :access_rights,
+                          exclude_form_field: :access_rights_exclude,
+                          facet_page_path_helper:, facet_search_path_helper:)
+    end
+    let(:search_form) { SearchForm.new(access_rights_exclude: ['dark'], page: 2) }
+
+    before do
+      allow(facet_counts).to receive(:each)
+        .and_yield(SearchResults::FacetCount.new(value: 'world', count: 8))
+        .and_yield(SearchResults::FacetCount.new(value: 'dark', count: 3))
+      allow(facet_counts).to receive(:any?).and_return(true)
+    end
+
+    it 'renders the facet with exclude selected' do
+      render_inline(component)
+
+      expect(page)
+        .to have_css('section[aria-label="Access rights"] h3 button[aria-expanded="true"]', text: 'Access rights')
+
+      # Add a new facet value
+      item = page.find('li', text: 'world')
+      expect(item).to have_link('Exclude world',
+                                href: '/search?access_rights_exclude%5B%5D=dark&access_rights_exclude%5B%5D=world')
+
+      # Remove an existing facet value
+      collection_item = page.find('li', text: 'dark exclude')
+      expect(collection_item).to have_link('Remove dark exclude', href: '/search')
     end
   end
 end

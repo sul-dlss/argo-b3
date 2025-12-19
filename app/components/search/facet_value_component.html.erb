@@ -1,9 +1,9 @@
-<% if selected? %>
+<% if selected? || exclude_selected? %>
   <span class="facet-label">
     <span class="selected"><%= label %></span>
 
     <%= link_to remove_path, class: 'remove ms-2', rel: 'nofollow', title: remove_title, **link_args do %>
-      <i class="bi bi-x ms-2"></i>
+      <i class="bi bi-x-lg ms-2"></i>
 
       <span class="visually-hidden">[<%= remove_title %>]</span>
     <% end %>
@@ -12,6 +12,10 @@
   <span class="facet-label">
     <%= link_to label, search_path(search_form.with_attributes({ form_field => [value], page: nil })), **link_args %>
   </span>
-  <%= link_to 'Exclude', search_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args if with_exclude? %>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
+  <% if with_exclude? %>
+    <%= link_to search_path(search_form.with_attributes({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args do %>
+      <i class="ms-2 bi bi-exclude"></i>
+    <% end %>
+  <% end %>
 <% end %>

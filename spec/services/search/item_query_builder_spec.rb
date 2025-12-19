@@ -65,7 +65,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for access rights exclude' do
       result = described_class.call(search_form:)
-      expect(Array(result[:fq])).to include("-#{Search::Fields::ACCESS_RIGHTS}:(\"dark\")")
+      expect(Array(result[:fq])).to include("{!tag=#{Search::Fields::ACCESS_RIGHTS}}-#{Search::Fields::ACCESS_RIGHTS}:(\"dark\")")
     end
   end
 

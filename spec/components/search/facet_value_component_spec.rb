@@ -15,8 +15,8 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     it 'renders the selected facet value' do
       render_inline(component)
 
-      expect(page).to have_content('collection')
-      expect(page).to have_link('Remove', href: '/search')
+      expect(page).to have_css('.selected', text: 'collection')
+      expect(page).to have_link('Remove collection', href: '/search')
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       expect(page).to have_link('collection',
                                 href: '/search?object_types%5B%5D=item&object_types%5B%5D=collection')
       expect(page).to have_css('.facet-count', text: '10')
-      expect(page).to have_no_link('Remove')
+      expect(page).to have_no_link('Remove collection')
     end
   end
 
@@ -49,7 +49,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     it 'includes the link arguments in the link' do
       render_inline(component)
 
-      expect(page).to have_link('Remove', href: '/search', title: 'Remove collection')
+      expect(page).to have_link('Remove collection', href: '/search', title: 'Remove collection')
       expect(page).to have_css('.visually-hidden', text: '[Remove collection]')
       expect(page).to have_css('a[data-turbo="false"]')
     end
@@ -66,9 +66,26 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('dark')
-      expect(page).to have_link('Exclude',
+      expect(page).to have_link('Exclude dark',
                                 href: '/search?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection',
                                 title: 'Exclude dark')
+    end
+  end
+
+  context 'when exclude form field is provided and selected' do
+    let(:component) do
+      described_class.new(count: 10, search_form:, form_field: :access_rights,
+                          exclude_form_field: :access_rights_exclude,
+                          value: 'dark')
+    end
+
+    let(:search_form) { SearchForm.new(access_rights_exclude: ['dark'], object_types: ['collection'], page: 2) }
+
+    it 'renders the exclude link' do
+      render_inline(component)
+
+      expect(page).to have_css('.selected', text: 'dark exclude')
+      expect(page).to have_link('Remove dark exclude', href: '/search?object_types%5B%5D=collection')
     end
   end
 end

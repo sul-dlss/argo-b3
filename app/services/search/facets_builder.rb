@@ -16,8 +16,9 @@ module Search
         if facet_config.dynamic_facet.present?
           facet_hash.merge!(Search::DynamicFacetBuilder.call(**facet_config.to_h.slice(:form_field, :dynamic_facet)))
         else
+          exclude = facet_config.exclude || facet_config.exclude_form_field.present?
           facet_hash[facet_config.field] =
-            Search::FacetBuilder.call(**facet_config.to_h.slice(:field, :limit, :alpha_sort, :exclude))
+            Search::FacetBuilder.call(exclude:, **facet_config.to_h.slice(:field, :limit, :alpha_sort))
         end
       end
     end

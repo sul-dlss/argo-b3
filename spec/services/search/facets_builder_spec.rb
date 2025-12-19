@@ -21,6 +21,7 @@ RSpec.describe Search::FacetsBuilder do
     expect(facet_json[Search::Fields::ACCESS_RIGHTS])
       .to match({
                   field: Search::Fields::ACCESS_RIGHTS,
+                  domain: { excludeTags: [Search::Fields::ACCESS_RIGHTS] },
                   limit: 50,
                   numBuckets: true,
                   sort: 'index',

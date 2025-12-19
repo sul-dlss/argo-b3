@@ -91,8 +91,9 @@ module Search
       query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
       # Tagging is used to exclude the filter from the facet counts.
       # This is useful for checkbox facets (in all values for the facet should be returned).
+      # It is also used for facets that have an exclude_form_field.
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
-      facet_config.exclude ? "{!tag=#{facet_config.field}}#{query}" : query
+      facet_config.exclude || exclude ? "{!tag=#{facet_config.field}}#{query}" : query
     end
 
     # Construct a facet filter query for the given dynamic facet configuration.
