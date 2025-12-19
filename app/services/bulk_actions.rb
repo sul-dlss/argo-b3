@@ -194,7 +194,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   REPUBLISH = Config.new(
     label: 'Republish',
     help_text: 'Republish objects. You still need to use the normal versioning process to make sure ' \
-               'your changes are preserved.'
+               'your changes are preserved.',
+    job: BulkActions::RepublishJob,
+    path_helper: to_path_helper(:new_bulk_actions_republish_path),
+    form: BulkActions::BasicForm
   )
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(
