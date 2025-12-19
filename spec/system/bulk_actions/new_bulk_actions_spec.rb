@@ -41,7 +41,7 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#tags-and-reporting-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Tags and reporting')
-      expect(page).to have_css('span', text: 'Export tags')
+      expect(page).to have_link('Export tags')
     end
   end
 end

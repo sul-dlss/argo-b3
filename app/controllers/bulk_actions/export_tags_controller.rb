@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+module BulkActions
+  # Controller for export tags bulk action.
+  class ExportTagsController < BulkActionApplicationController
+    private
+
+    def bulk_action_config
+      BulkActions::EXPORT_TAGS
+    end
+
+    def job_params_for(bulk_action_form:)
+      { druids: druids_for(bulk_action_form:) }
+    end
+  end
+end

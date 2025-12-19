@@ -90,7 +90,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TAGS = Config.new(
     label: 'Export tags',
-    help_text: 'Download tags as CSV (comma-separated values) for selected druids.'
+    help_text: 'Download tags as CSV (comma-separated values) for selected druids.',
+    export_filename: 'tags.csv',
+    export_label: 'Tags',
+    job: BulkActions::ExportTagsJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_tags_path),
+    form: BulkActions::BasicForm
   )
 
   EXTRACT_TEXT = Config.new(
