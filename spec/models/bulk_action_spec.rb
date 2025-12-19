@@ -88,50 +88,50 @@ RSpec.describe BulkAction do
     end
   end
 
-  describe '.report_file?' do
-    context 'when the report file exists' do
+  describe '.export_file?' do
+    context 'when the export file exists' do
       subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
       before do
-        File.write(bulk_action.report_filepath, 'Report content')
+        File.write(bulk_action.export_filepath, 'Report content')
       end
 
       it 'returns true' do
-        expect(bulk_action.report_file?).to be true
+        expect(bulk_action.export_file?).to be true
       end
     end
 
-    context 'when the report file does not exist' do
+    context 'when the export file does not exist' do
       subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
       it 'returns false' do
-        expect(bulk_action.report_file?).to be false
+        expect(bulk_action.export_file?).to be false
       end
     end
 
-    context 'when there is no report filename configured' do
+    context 'when there is no export filename configured' do
       subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 
       it 'returns false' do
-        expect(bulk_action.report_file?).to be false
+        expect(bulk_action.export_file?).to be false
       end
     end
   end
 
-  describe '.report_filepath' do
+  describe '.export_filepath' do
     subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
-    it 'returns the correct report file path' do
-      expect(bulk_action.report_filepath)
+    it 'returns the correct export file path' do
+      expect(bulk_action.export_filepath)
         .to eq(File.join(Settings.bulk_actions.directory, "export_cocina_json_#{bulk_action.id}", 'cocina.jsonl.gz'))
     end
   end
 
-  describe '.report_label' do
+  describe '.export_label' do
     subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
-    it 'returns the configured report label' do
-      expect(bulk_action.report_label).to eq('Cocina JSON')
+    it 'returns the configured export label' do
+      expect(bulk_action.export_label).to eq('Cocina JSON')
     end
   end
 

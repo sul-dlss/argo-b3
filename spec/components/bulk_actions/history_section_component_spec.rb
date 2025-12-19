@@ -11,7 +11,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
 
   let(:bulk_action) { create(:bulk_action, action_type: :reindex, description: 'Test description') }
   let(:bulk_action_with_files) do
-    create(:bulk_action, :with_log, :with_report,
+    create(:bulk_action, :with_log, :with_export,
            action_type: :export_cocina_json,
            status: :completed,
            druid_count_success: 5, druid_count_fail: 2, druid_count_total: 7)
@@ -42,7 +42,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4)', text: 'Completed')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) a', text: 'Log')
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.report_label)
+    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.export_label)
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
   end
 end

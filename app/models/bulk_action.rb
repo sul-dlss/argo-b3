@@ -9,7 +9,7 @@ class BulkAction < ApplicationRecord
   after_create :create_output_directory!
   before_destroy :remove_output_directory!
 
-  delegate :report_filename, :label, to: :bulk_action_config
+  delegate :export_filename, :label, to: :bulk_action_config
 
   def bulk_action_config
     @bulk_action_config ||= BulkActions.find_config(action_type)
@@ -32,16 +32,16 @@ class BulkAction < ApplicationRecord
     File.exist?(log_filepath)
   end
 
-  def report_file?
-    report_filename.present? && File.exist?(report_filepath)
+  def export_file?
+    export_filename.present? && File.exist?(export_filepath)
   end
 
-  def report_filepath
-    @report_filepath ||= filepath_for(filename: report_filename)
+  def export_filepath
+    @export_filepath ||= filepath_for(filename: export_filename)
   end
 
-  def report_label
-    bulk_action_config.report_label || report_filename
+  def export_label
+    bulk_action_config.export_label || export_filename
   end
 
   def reset_druid_counts!

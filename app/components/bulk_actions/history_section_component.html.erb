@@ -7,7 +7,7 @@
     <%= table.with_header(label: 'Status', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Log file', style: 'width: 10%;') %>
-    <%= table.with_header(label: 'Report file', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Export file', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Delete', style: 'width: 10%;') %>
     <%= bulk_actions.each do |bulk_action| %>
       <%= table.with_row(first_value: bulk_action.created_at.strftime('%Y-%m-%d %H:%M:%S'),

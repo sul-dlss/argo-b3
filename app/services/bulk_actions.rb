@@ -12,12 +12,13 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   Config = Struct.new('BulkActionConfig',
                       :job,
+                      :form,
                       :label,
                       :help_text,
                       :path_helper,
-                      # Filename for the report created by this bulk action, if any.
-                      :report_filename,
-                      :report_label,
+                      # Filename for the export created by this bulk action, if any.
+                      :export_filename,
+                      :export_label,
                       keyword_init: true) do
                         def action_type
                           BulkActions.constants.find do |const_name|
@@ -60,8 +61,11 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_COCINA_JSON = Config.new(
     label: 'Download full Cocina JSON',
     help_text: 'Download full Cocina JSON for objects.',
-    report_filename: 'cocina.jsonl.gz',
-    report_label: 'Cocina JSON'
+    export_filename: 'cocina.jsonl.gz',
+    export_label: 'Cocina JSON',
+    job: BulkActions::ExportCocinaJsonJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_cocina_json_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
@@ -178,7 +182,8 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     label: 'Reindex',
     help_text: 'Reindexes the DOR object in Solr.',
     job: BulkActions::ReindexJob,
-    path_helper: to_path_helper(:new_bulk_actions_reindex_path)
+    path_helper: to_path_helper(:new_bulk_actions_reindex_path),
+    form: BulkActions::BasicForm
   )
 
   REPUBLISH = Config.new(

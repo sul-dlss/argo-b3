@@ -609,6 +609,7 @@ DEPENDENCIES
   capistrano-rails
   capybara
   capybara-lockstep
+  cocina-models
   config
   cssbundling-rails
   csv

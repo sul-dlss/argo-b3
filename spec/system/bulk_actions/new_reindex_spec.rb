@@ -9,6 +9,8 @@ RSpec.describe 'Create a new reindex bulk action' do
     ['druid:pj757vx3102', 'druid:rt276nw8963']
   end
 
+  let(:bulk_action_label) { BulkActions::REINDEX.label }
+
   before do
     sign_in user
   end
@@ -17,9 +19,9 @@ RSpec.describe 'Create a new reindex bulk action' do
     it 'submits a reindex bulk action' do
       visit new_bulk_action_path
 
-      click_link 'Reindex'
+      click_link bulk_action_label
 
-      expect(page).to have_css('h1', text: 'Reindex')
+      expect(page).to have_css('h1', text: bulk_action_label)
 
       fill_in 'Enter druid list', with: druids.join("\n")
 
@@ -29,7 +31,7 @@ RSpec.describe 'Create a new reindex bulk action' do
 
       expect(page).to have_current_path(bulk_actions_path)
 
-      expect(page).to have_toast('Reindex submitted')
+      expect(page).to have_toast("#{bulk_action_label} submitted")
 
       bulk_action = BulkAction.last
       expect(bulk_action.action_type).to eq(BulkActions::REINDEX.action_type.to_s)
@@ -52,7 +54,7 @@ RSpec.describe 'Create a new reindex bulk action' do
     it 'submits a reindex bulk action' do
       visit new_bulk_actions_reindex_path
 
-      expect(page).to have_css('h1', text: 'Reindex')
+      expect(page).to have_css('h1', text: bulk_action_label)
 
       choose 'From last search'
 
@@ -62,7 +64,7 @@ RSpec.describe 'Create a new reindex bulk action' do
 
       expect(page).to have_current_path(bulk_actions_path)
 
-      expect(page).to have_toast('Reindex submitted')
+      expect(page).to have_toast("#{bulk_action_label} submitted")
 
       bulk_action = BulkAction.last
       expect(bulk_action.action_type).to eq(BulkActions::REINDEX.action_type.to_s)
@@ -79,7 +81,7 @@ RSpec.describe 'Create a new reindex bulk action' do
     it 'shows validation errors' do
       visit new_bulk_actions_reindex_path
 
-      expect(page).to have_css('h1', text: 'Reindex')
+      expect(page).to have_css('h1', text: bulk_action_label)
 
       click_button 'Submit'
 

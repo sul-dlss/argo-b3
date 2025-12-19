@@ -128,6 +128,7 @@ Rails.application.routes.draw do
   end
 
   namespace :bulk_actions do
+    resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :reindex, only: %i[new create], controller: 'reindex'
   end
 

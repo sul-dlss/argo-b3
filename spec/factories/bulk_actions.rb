@@ -14,14 +14,14 @@ FactoryBot.define do
       end
     end
 
-    trait :with_report do
+    trait :with_export do
       transient do
-        report_content { 'Report content' }
+        export_content { 'Export content' }
       end
       after(:create) do |bulk_action, evaluator|
-        raise 'No report filename configured for this action type' if bulk_action.report_filename.nil?
+        raise 'No export filename configured for this action type' if bulk_action.export_filename.nil?
 
-        File.write(bulk_action.report_filepath, evaluator.report_content)
+        File.write(bulk_action.export_filepath, evaluator.export_content)
       end
     end
   end

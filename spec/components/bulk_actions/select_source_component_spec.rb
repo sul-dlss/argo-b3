@@ -8,7 +8,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
   let(:form) { ActionView::Helpers::FormBuilder.new(nil, bulk_action_form, vc_test_view_context, {}) }
   let(:search_form) { nil }
   let(:total_results) { nil }
-  let(:bulk_action_form) { BulkActions::ReindexForm.new }
+  let(:bulk_action_form) { BulkActions::BasicForm.new }
 
   context 'when no search form is provided' do
     it 'renders the select source form without last search option' do
@@ -25,7 +25,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
   context 'when last search form is provided' do
     let(:search_form) { SearchForm.new(query: 'test') }
     let(:total_results) { 42 }
-    let(:bulk_action_form) { BulkActions::ReindexForm.new(source: 'results') }
+    let(:bulk_action_form) { BulkActions::BasicForm.new(source: 'results') }
 
     it 'renders the select source form with last search option' do
       render_inline(component)
