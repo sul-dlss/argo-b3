@@ -41,7 +41,7 @@ module Search
                         # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
                         # See FacetBuilder.
                         # This is used, for example, for a checkbox facet like object types.
-                        # Note that this is unrelated to the exclude_form_field above.
+                        # Exclude is also true if exclude_form_field is provided, but does not need to be set here.
                         :exclude,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.

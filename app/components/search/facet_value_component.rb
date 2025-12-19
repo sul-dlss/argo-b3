@@ -14,10 +14,20 @@ module Search
       super()
     end
 
-    attr_reader :label, :count, :search_form, :form_field, :value, :link_args, :exclude_form_field
+    attr_reader :count, :search_form, :form_field, :value, :link_args, :exclude_form_field
+
+    def label
+      return "#{@label} exclude" if exclude_selected?
+
+      @label
+    end
 
     def selected?
       search_form.selected?(key: form_field, value:)
+    end
+
+    def exclude_selected?
+      with_exclude? && search_form.selected?(key: exclude_form_field, value:)
     end
 
     def with_exclude?
@@ -29,11 +39,12 @@ module Search
     end
 
     def exclude_title
-      "Exclude #{label}"
+      "Exclude #{@label}"
     end
 
     def remove_path
-      search_path(search_form.without_attributes({ form_field => value, page: nil }))
+      remove_form_field = exclude_selected? ? exclude_form_field : form_field
+      search_path(search_form.without_attributes({ remove_form_field => value, page: nil }))
     end
   end
 end

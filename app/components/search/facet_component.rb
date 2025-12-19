@@ -26,7 +26,8 @@ module Search
                 :exclude_form_field
 
     def show?
-      search_form.selected?(key: form_field)
+      search_form.selected?(key: form_field) ||
+        (exclude_form_field.present? && search_form.selected?(key: exclude_form_field))
     end
 
     def label

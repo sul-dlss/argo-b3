@@ -32,6 +32,9 @@ RSpec.describe 'Exclude facets', :solr do
     expect(page).to have_item_result(dark_item_doc)
     expect(page).not_to have_item_result(world_item_doc, wait: 0)
 
+    expect(page).to have_facet('Access rights', expanded: true)
+    expect(page).to have_selected_facet_value('world exclude', facet: 'Access rights')
+
     expect(page).to have_current_filter('Access rights exclude', 'world')
     find_current_filter('Access rights exclude', 'world').click_link('Remove')
 
