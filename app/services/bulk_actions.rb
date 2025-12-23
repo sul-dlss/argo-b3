@@ -155,7 +155,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_RELEASE = Config.new(
     label: 'Manage release',
-    help_text: 'Adds release tags to individual objects.'
+    help_text: 'Adds release tags to individual objects.',
+    job: BulkActions::ManageReleaseJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_release_path),
+    form: BulkActions::ManageReleaseForm
   )
 
   MANAGE_RIGHTS = Config.new(
