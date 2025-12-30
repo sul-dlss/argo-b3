@@ -115,7 +115,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Upload descriptive metadata spreadsheet',
-    help_text: 'Upload descriptive metadata for objects.'
+    help_text: 'Upload descriptive metadata for objects.',
+    job: BulkActions::ImportDescriptiveMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_descriptive_metadata_path),
+    form: BulkActions::BasicCsvForm
   )
 
   IMPORT_STRUCTURAL_METADATA = Config.new(

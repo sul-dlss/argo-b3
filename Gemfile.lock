@@ -194,6 +194,10 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.1)
       zeitwerk (~> 2.6)
+    dry-monads (1.9.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
     dry-struct (1.8.0)
       dry-core (~> 1.1)
       dry-types (~> 1.8, >= 1.8.2)
@@ -438,6 +442,12 @@ GEM
     reline (0.6.3)
       io-console (~> 0.5)
     rexml (3.4.4)
+    roo (3.0.0)
+      base64 (~> 0.2)
+      csv (~> 3)
+      logger (~> 1)
+      nokogiri (~> 1)
+      rubyzip (>= 3.0.0, < 4.0.0)
     rsolr (2.6.0)
       builder (>= 2.1.2)
       faraday (>= 0.9, < 3, != 2.0.0)
@@ -618,6 +628,7 @@ DEPENDENCIES
   debug
   dlss-capistrano
   dor-services-client (~> 15.1)
+  dry-monads
   erb_lint
   factory_bot_rails
   herb
@@ -632,6 +643,7 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.0)
+  roo
   rsolr
   rspec-rails
   rspec_junit_formatter

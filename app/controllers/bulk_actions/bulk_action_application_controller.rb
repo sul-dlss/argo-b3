@@ -16,7 +16,7 @@ module BulkActions
       @bulk_action_form = form_class.new(expected_params)
       if @bulk_action_form.valid?
         create_bulk_action
-        @bulk_action.enqueue_job(**job_params_for(bulk_action_form: @bulk_action_form))
+        @bulk_action.enqueue_job(**job_params)
         flash[:toast] = "#{bulk_action_config.label} submitted"
         redirect_to bulk_actions_path
       else
@@ -34,7 +34,7 @@ module BulkActions
 
     # Subclasses must implement.
     # @return [Hash] the parameters to pass to the bulk action job
-    def job_params_for(bulk_action_form:)
+    def job_params
       raise NotImplementedError
     end
 
@@ -47,9 +47,9 @@ module BulkActions
     end
 
     # Gets the druids to process for the bulk action based on the form input.
-    def druids_for(bulk_action_form:)
-      if bulk_action_form.source == 'druids'
-        DruidSupport.parse_list(bulk_action_form.druid_list)
+    def druids_from_form
+      if @bulk_action_form.source == 'druids'
+        DruidSupport.parse_list(@bulk_action_form.druid_list)
       else
         Searchers::DruidList.call(search_form: @last_search_form)
       end
