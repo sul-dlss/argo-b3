@@ -34,7 +34,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   APPLY_APO_DEFAULTS = Config.new(
     label: 'Apply APO defaults',
-    help_text: 'Overwrite object metadata with the defaults from the APO'
+    help_text: 'Overwrite object metadata with the defaults from the APO',
+    job: BulkActions::ApplyApoDefaultsJob,
+    path_helper: to_path_helper(:new_bulk_actions_apply_apo_defaults_path),
+    form: BulkActions::BasicForm
   )
 
   CLOSE_VERSION = Config.new(
