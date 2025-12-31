@@ -134,6 +134,7 @@ Rails.application.routes.draw do
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
     resource :manage_release, only: %i[new create], controller: 'manage_release'
+    resource :open_version, only: %i[new create], controller: 'open_version'
     resource :reindex, only: %i[new create], controller: 'reindex'
     resource :republish, only: %i[new create], controller: 'republish'
   end

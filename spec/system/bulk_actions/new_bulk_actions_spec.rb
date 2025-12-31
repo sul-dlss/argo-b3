@@ -21,7 +21,7 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#modify-objects-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Modify objects')
-      expect(page).to have_css('span', text: 'Open new version')
+      expect(page).to have_link('Open new version')
     end
 
     within('section#manage-descriptive-metadata-bulk-actions-section') do

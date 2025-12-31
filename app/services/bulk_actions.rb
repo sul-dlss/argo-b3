@@ -179,7 +179,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   OPEN_NEW_VERSION = Config.new(
     label: 'Open new version',
-    help_text: 'Open items not yet open for versioning.'
+    help_text: 'Open items not yet open for versioning.',
+    job: BulkActions::OpenVersionJob,
+    path_helper: to_path_helper(:new_bulk_actions_open_version_path),
+    form: BulkActions::OpenVersionForm
   )
 
   PURGE = Config.new(
