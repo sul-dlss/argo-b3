@@ -43,7 +43,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   CLOSE_VERSION = Config.new(
     label: 'Close version',
     help_text: 'Close a version of the items so the changes can be accessioned. The items will retain ' \
-               'the version description as entered when the item was opened for versioning.'
+               'the version description as entered when the item was opened for versioning.',
+    job: BulkActions::CloseVersionJob,
+    path_helper: to_path_helper(:new_bulk_actions_close_version_path),
+    form: BulkActions::BasicForm
   )
 
   CREATE_VIRTUAL_OBJECT = Config.new(
