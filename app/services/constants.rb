@@ -7,4 +7,13 @@ module Constants
     %w[Earthworks Earthworks],
     ['Search engines', 'PURL sitemap']
   ].freeze
+
+  WORKFLOWS = %w[
+    accessionWF
+    gisAssemblyWF
+    gisDeliveryWF
+    goobiWF
+    registrationWF
+    wasSeedPreassemblyWF
+  ].freeze
 end
