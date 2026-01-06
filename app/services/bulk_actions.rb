@@ -127,7 +127,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Upload descriptive metadata for objects.',
     job: BulkActions::ImportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_import_descriptive_metadata_path),
-    form: BulkActions::BasicCsvForm
+    form: BulkActions::ImportDescriptiveMetadataForm
   )
 
   IMPORT_STRUCTURAL_METADATA = Config.new(
@@ -203,7 +203,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REGISTER = Config.new(
     label: 'Register new druids (via CSV)',
-    help_text: 'Register druids.'
+    help_text: 'Register druids.',
+    export_filename: 'registration_report.csv',
+    export_label: 'Registration report',
+    job: BulkActions::RegisterJob,
+    path_helper: to_path_helper(:new_bulk_actions_register_path),
+    form: BulkActions::RegisterForm
   )
 
   REINDEX = Config.new(

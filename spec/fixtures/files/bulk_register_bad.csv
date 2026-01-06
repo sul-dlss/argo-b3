@@ -1,0 +1,3 @@
+collection,initial_workflow,content_type,source_id,label,rights_view,rights_download,tags,tags
+druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two
+druid:bk024qs1808,accessionWF,book,foo:123,A label,world,world

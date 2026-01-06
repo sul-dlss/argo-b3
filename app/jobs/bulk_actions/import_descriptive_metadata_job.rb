@@ -23,15 +23,21 @@ module BulkActions
 
         return failure!(message: 'Description unchanged') if cocina_object.description == description
 
-        open_new_version_if_needed!(description: 'Updated descriptive metadata')
+        open_new_version_if_needed!(description: description_msg)
 
         @cocina_object = cocina_object.new(description:)
-        Sdr::Repository.store(cocina_object:)
+        Sdr::Repository.update(cocina_object:, user_name: user, description: description_msg)
 
         close_version_if_needed!
         success!(message: 'Successfully updated')
       rescue Dor::Services::Client::UnprocessableContentError => e
         failure!(message: "indexing validation failed for #{cocina_object.externalIdentifier}: #{e.message}")
+      end
+
+      private
+
+      def description_msg
+        'Updated descriptive metadata'
       end
     end
   end

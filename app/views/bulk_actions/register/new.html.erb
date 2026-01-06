@@ -1,0 +1,28 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_register_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file') %>
+    <p>
+      Please note that each row should have headers for:
+    </p>
+    <ul>
+      <li>administrative_policy_object (required)</li>
+      <li>collection (optional)</li>
+      <li>initial_workflow (required)</li>
+      <li>content_type (required)</li>
+      <li>reading_order (required if "content_type" is "book" or "image")</li>
+      <li>source_id (required)</li>
+      <li>folio_instance_hrid (optional)</li>
+      <li>barcode (optional)</li>
+      <li>label (required unless a folio_instance_hrid has been entered)</li>
+      <li>rights_view (required)</li>
+      <li>rights_download (required)</li>
+      <li>rights_location (required if "view" or "download" uses "location-based")</li>
+      <li>rights_controlledDigitalLending (optional: to use, enter "true" and also set "view" to "stanford" and "download" to "none")</li>
+      <li>project_name (optional)</li>
+      <li>tags (optional, may repeat)</li>
+      <li>tickets (optional, may repeat)</li>
+    </ul>
+  <% end %>
+<% end %>

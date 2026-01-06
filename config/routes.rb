@@ -138,6 +138,7 @@ Rails.application.routes.draw do
     resource :manage_release, only: %i[new create], controller: 'manage_release'
     resource :open_version, only: %i[new create], controller: 'open_version'
     resource :reindex, only: %i[new create], controller: 'reindex'
+    resource :register, only: %i[new create], controller: 'register'
     resource :republish, only: %i[new create], controller: 'republish'
   end
 
