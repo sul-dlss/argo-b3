@@ -8,5 +8,9 @@ module BulkActions
     attribute :druid_list, :string
     validates :druid_list, presence: true, if: -> { source == 'druids' }
     attribute :description, :string
+
+    # Only applies to some bulk actions.
+    # For those bulk actions, with_close_version to true for BulkActions::FormComponent.
+    attribute :close_version, :boolean, default: true
   end
 end

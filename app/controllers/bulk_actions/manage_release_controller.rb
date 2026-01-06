@@ -9,11 +9,11 @@ module BulkActions
       BulkActions::MANAGE_RELEASE
     end
 
-    def job_params_for(bulk_action_form:)
+    def job_params
       {
-        druids: druids_for(bulk_action_form:),
-        to: bulk_action_form.to,
-        release: bulk_action_form.release
+        druids: druids_from_form,
+        to: @bulk_action_form.to,
+        release: @bulk_action_form.release
       }
     end
   end

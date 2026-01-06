@@ -15,5 +15,14 @@ module Sdr
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
     end
+
+    # @return [Cocina::Models::DRO,Cocina::Models::Collection,Cocina::Models::AdminPolicy] the updated cocina object
+    # @raise [Error] when an error occurs updating the object
+    def self.store(cocina_object:)
+      object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
+      object_client.update(params: cocina_object)
+    rescue Dor::Services::Client::UnexpectedResponse => e
+      raise Error, "Error storing object #{cocina_object.externalIdentifier}: #{e.message}"
+    end
   end
 end

@@ -5,6 +5,15 @@
 
   <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :description, container_classes: 'mt-3', label_text: 'Describe this bulk action', input_rows: 3) %>
 
+  <% if with_close_version? %>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:,
+                                                               field_name: :close_version,
+                                                               container_classes: 'mt-3',
+                                                               label_classes: 'fw-bold',
+                                                               label_text: 'Close version once action is complete',
+                                                               help_text: 'Uncheck this option if you want to make additional edits to these items before closing the version.') %>
+  <% end %>
+
   <div class="d-flex align-items-center mt-3">
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
     <%= link_to 'Cancel', new_bulk_action_path %>

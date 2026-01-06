@@ -1,0 +1,8 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_import_descriptive_metadata_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file',
+                                                           help_text: 'Each row in the spreadsheet should start with the druid in the first field, followed by the descriptive metadata columns.') %>
+  <% end %>
+<% end %>

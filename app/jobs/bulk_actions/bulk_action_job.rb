@@ -2,7 +2,7 @@
 
 module BulkActions
   # Super class for bulk jobs
-  class BulkActionJob < ApplicationJob
+  class BulkActionJob < BaseBulkActionJob
     include ActionPolicy::Behaviour
 
     attr_reader :bulk_action, :druids
@@ -10,26 +10,10 @@ module BulkActions
     # @param [BulkAction] bulk_action BulkAction object
     # @param [Array<String>] druids Array of druid strings
     # @param [Hash] params additional parameters
-    def perform(bulk_action:, druids:, **params) # rubocop:disable Metrics/AbcSize
-      @bulk_action = bulk_action
+    def perform(bulk_action:, druids:, **params)
       @druids = druids
-      Honeybadger.context(bulk_action: bulk_action.id, druids:, params:)
 
-      bulk_action.reset_druid_counts!
-
-      bulk_action.update(status: 'Processing')
-
-      log("Starting #{self.class} for BulkAction #{bulk_action.id}")
-      update_druid_count!
-
-      perform_bulk_action
-
-      log("Finished #{self.class} for BulkAction #{bulk_action.id}")
-      bulk_action.completed!
-      perform_broadcast
-    ensure
-      export_file&.close
-      log_file&.close
+      super
     end
 
     # Invokes a bulk action item for each druid
@@ -44,39 +28,8 @@ module BulkActions
       end
     end
 
-    def update_druid_count!
-      bulk_action.update(druid_count_total: druid_count)
-    end
-
-    def user
-      bulk_action.user.to_s
-    end
-
-    def log(message)
-      log_file.puts("#{Time.zone.now} #{message}")
-    end
-
     def druid_count
       druids.length
-    end
-
-    def close_version?
-      # close version if "true" or true
-      # Note that not every job provides or uses this parameter.
-      ActiveModel::Type::Boolean.new.cast(params[:close_version])
-    end
-
-    def perform_item_class
-      # For example, the bulk action item for AddWorkflowJob is AddWorkflowJob::AddWorkflowJobItem
-      "#{self.class}::#{self.class.name.split('::').last.sub('Job', 'JobItem')}".constantize
-    end
-
-    # Open file to use for export output, if any.
-    # By default, there is no export file.
-    # It will be closed automatically when the job ends and available to BulkActionItem.
-    # For example: @export_file ||= CSV.open(csv_download_path, 'w', write_headers: true, headers: HEADERS)
-    def export_file
-      @export_file ||= nil
     end
 
     def success!(druid:, message: nil)
@@ -87,19 +40,6 @@ module BulkActions
     def failure!(druid:, message:)
       bulk_action.increment(:druid_count_fail)
       log("#{message} for #{druid}")
-    end
-
-    private
-
-    def log_file
-      @log_file ||= File.open(bulk_action.log_filepath, 'a')
-    end
-
-    def perform_broadcast
-      component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed")
-      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
-                                                target: 'toast-container',
-                                                html: ApplicationController.render(component, layout: false))
     end
   end
 end

@@ -9,8 +9,8 @@ module BulkActions
       BulkActions::EXPORT_COCINA_JSON
     end
 
-    def job_params_for(bulk_action_form:)
-      { druids: druids_for(bulk_action_form:) }
+    def job_params
+      { druids: druids_from_form }
     end
   end
 end
