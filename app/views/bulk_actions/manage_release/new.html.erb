@@ -1,0 +1,16 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_manage_release_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+    <p>For items, this overrides any collection release instructions; for a collection this releases the collection object itself, not its members.</p>
+
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
+                                                                  label_text: 'Release this object',
+                                                                  input_value: 'true') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
+                                                                  label_text: 'Do not release this object',
+                                                                  input_value: 'false') %>
+
+    <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :to, text: 'to') %>
+    <%= form.select :to, Constants::RELEASE_TARGETS, {}, class: 'form-select mb-3' %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+  <% end %>
+<% end %>

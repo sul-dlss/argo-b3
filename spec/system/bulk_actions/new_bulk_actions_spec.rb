@@ -16,7 +16,7 @@ RSpec.describe 'New bulk actions', :rack_test do
       expect(page).to have_css('h2', text: 'Perform actions')
       expect(page).to have_link('Reindex')
       expect(page).to have_css('p', text: 'Reindexes the DOR object in Solr.')
-      expect(page).to have_css('li', count: 4)
+      expect(page).to have_css('li', count: 3)
     end
 
     within('section#modify-objects-bulk-actions-section') do

@@ -131,6 +131,7 @@ Rails.application.routes.draw do
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
+    resource :manage_release, only: %i[new create], controller: 'manage_release'
     resource :reindex, only: %i[new create], controller: 'reindex'
     resource :republish, only: %i[new create], controller: 'republish'
   end
