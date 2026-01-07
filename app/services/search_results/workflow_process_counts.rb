@@ -20,7 +20,7 @@ module SearchResults
 
     def count_map
       @count_map ||= {}.tap do |hash|
-        @solr_response['facets'][Search::Fields::WPS_HIERARCHICAL_WORKFLOWS]['buckets'].each do |bucket|
+        Array(@solr_response.dig('facets', Search::Fields::WPS_HIERARCHICAL_WORKFLOWS, 'buckets')).each do |bucket|
           # For example, 3|accessionWF:sdr-ingest-received:completed|-
           val_parts = bucket['val'].split('|')
           wf_parts = val_parts[1].split(':')

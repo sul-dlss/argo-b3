@@ -45,5 +45,16 @@ RSpec.describe SearchResults::WorkflowProcessCounts do
       expect(counts.count_for(workflow_name:, process_name: 'start-ingest', status: 'nonexistent-status'))
         .to eq 0
     end
+
+    context 'with an empty solr response when no results' do
+      let(:solr_response) { { 'facets' => { 'count' => 0 } } }
+
+      it 'returns 0 for any workflow, process, and status combination' do
+        expect(counts.count_for(workflow_name:, process_name: 'start-ingest', status: 'completed'))
+          .to eq 0
+        expect(counts.count_for(workflow_name:, process_name: 'update-catalog', status: 'waiting'))
+          .to eq 0
+      end
+    end
   end
 end
