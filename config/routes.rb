@@ -128,6 +128,7 @@ Rails.application.routes.draw do
   end
 
   namespace :bulk_actions do
+    resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
