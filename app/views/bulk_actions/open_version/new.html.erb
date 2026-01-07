@@ -1,0 +1,6 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_open_version_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+    <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :version_description, container_classes: 'mt-3', label_text: 'Describe this version', input_rows: 3) %>
+  <% end %>
+<% end %>
