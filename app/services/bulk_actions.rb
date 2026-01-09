@@ -193,7 +193,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   PURGE = Config.new(
     label: 'Purge',
-    help_text: 'Deletes unpublished objects.'
+    help_text: 'Deletes unpublished objects.',
+    job: BulkActions::PurgeJob,
+    path_helper: to_path_helper(:new_bulk_actions_purge_path),
+    form: BulkActions::BasicForm
   )
 
   REFRESH_METADATA = Config.new(
