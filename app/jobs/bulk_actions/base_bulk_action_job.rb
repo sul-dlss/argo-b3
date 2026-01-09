@@ -40,7 +40,7 @@ module BulkActions
     end
 
     def user
-      bulk_action.user.to_s
+      bulk_action.user.sunetid
     end
 
     def log(message)

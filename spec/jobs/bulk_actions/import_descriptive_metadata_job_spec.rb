@@ -37,7 +37,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
   before do
     allow(described_class::ImportDescriptiveMetadataJobItem).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
-    allow(Sdr::Repository).to receive(:store)
+    allow(Sdr::Repository).to receive(:update)
     allow(Dor::Services::Client.objects).to receive(:indexable)
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
   end
@@ -51,7 +51,10 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
     expect(job_item).to have_received(:check_update_ability?)
     expect(Dor::Services::Client.objects).to have_received(:indexable).with(druid:, cocina: expected_cocina_object)
     expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Updated descriptive metadata')
-    expect(Sdr::Repository).to have_received(:store).with(cocina_object: expected_cocina_object)
+    expect(Sdr::Repository).to have_received(:update)
+      .with(cocina_object: expected_cocina_object,
+            user_name: bulk_action.user.sunetid,
+            description: 'Updated descriptive metadata')
     expect(job_item).to have_received(:close_version_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
@@ -68,7 +71,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
       job.perform_now
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:store)
+      expect(Sdr::Repository).not_to have_received(:update)
     end
   end
 
@@ -84,7 +87,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
       job.perform_now
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:store)
+      expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include 'Missing type for value in description'
 
@@ -105,7 +108,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
       job.perform_now
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:store)
+      expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include "indexing validation failed for #{druid}: Example field error"
 
@@ -127,7 +130,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
       job.perform_now
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:store)
+      expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include 'Description unchanged'
 
