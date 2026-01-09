@@ -29,7 +29,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   ADD_WORKFLOW = Config.new(
     label: 'Add workflow',
-    help_text: 'Starts a workflow for individual objects'
+    help_text: 'Starts a workflow for individual objects',
+    job: BulkActions::AddWorkflowJob,
+    path_helper: to_path_helper(:new_bulk_actions_add_workflow_path),
+    form: BulkActions::AddWorkflowForm
   )
 
   APPLY_APO_DEFAULTS = Config.new(

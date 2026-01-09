@@ -128,6 +128,7 @@ Rails.application.routes.draw do
   end
 
   namespace :bulk_actions do
+    resource :add_workflow, only: %i[new create], controller: 'add_workflow'
     resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
     resource :close_version, only: %i[new create], controller: 'close_version'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'

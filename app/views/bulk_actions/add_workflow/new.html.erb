@@ -1,0 +1,9 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_add_workflow_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+
+    <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :workflow_name, text: 'Workflow', classes: 'mt-3') %>
+    <%= form.select :workflow_name, @workflow_options, {}, class: 'form-select' %>
+
+  <% end %>
+<% end %>
