@@ -94,7 +94,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Export structural metadata',
-    help_text: 'Export structural metadata as CSV (comma-separated values) for selected druids.'
+    help_text: 'Export structural metadata as CSV (comma-separated values) for selected druids.',
+    export_filename: 'structural_metadata.csv',
+    export_label: 'Structural metadata spreadsheet',
+    job: BulkActions::ExportStructuralMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_structural_metadata_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_TRACKING_SHEETS = Config.new(

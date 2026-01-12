@@ -133,6 +133,7 @@ Rails.application.routes.draw do
     resource :close_version, only: %i[new create], controller: 'close_version'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
+    resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
     resource :manage_release, only: %i[new create], controller: 'manage_release'
