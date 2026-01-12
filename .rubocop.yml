@@ -569,3 +569,5 @@ Rails/RedirectBackOrTo: # new in 2.34
   Enabled: true
 RSpec/LeakyLocalVariable: # new in 3.8
   Enabled: true
+Style/ModuleMemberExistenceCheck: # new in 1.82
+  Enabled: true
