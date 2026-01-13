@@ -2,9 +2,9 @@
 
 module BulkActions
   # Job to apply APO defaults to a set of items
-  class ApplyApoDefaultsJob < BulkActions::BulkActionJob
+  class ApplyApoDefaultsJob < Job
     # Apply APO defaults to single item
-    class ApplyApoDefaultsJobItem < BulkActions::BulkActionJobItem
+    class Item < JobItem
       def perform
         return unless check_update_ability?
 

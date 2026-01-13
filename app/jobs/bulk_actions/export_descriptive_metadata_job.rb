@@ -2,7 +2,7 @@
 
 module BulkActions
   # Export a spreadsheet of descriptive metadata
-  class ExportDescriptiveMetadataJob < BulkActionJob
+  class ExportDescriptiveMetadataJob < Job
     def perform_bulk_action
       grouped_descriptions = DescriptiveCsv::DescriptionsGrouper.group(descriptions:)
       ordered_headers = DescriptiveCsv::Headers.create(headers: grouped_descriptions.values.flat_map(&:keys).uniq)

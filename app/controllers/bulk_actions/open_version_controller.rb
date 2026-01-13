@@ -6,7 +6,7 @@ module BulkActions
     private
 
     def bulk_action_config
-      BulkActions::OPEN_NEW_VERSION
+      BulkActions::OPEN_VERSION
     end
 
     def job_params

@@ -2,7 +2,7 @@
 
 module BulkActions
   # Super class for bulk jobs
-  class BulkActionJob < BaseBulkActionJob
+  class Job < BaseJob
     include ActionPolicy::Behaviour
 
     attr_reader :bulk_action, :druids

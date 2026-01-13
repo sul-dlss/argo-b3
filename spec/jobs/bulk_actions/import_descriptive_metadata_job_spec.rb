@@ -17,7 +17,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
   let(:log) { StringIO.new }
 
   let(:job_item) do
-    described_class::ImportDescriptiveMetadataJobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
+    described_class::Item.new(druid:, index: 2, job:, row:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
       allow(job_item).to receive(:close_version_if_needed!)
@@ -35,7 +35,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
   let(:row) { CSV.parse(csv_file, headers: true).first }
 
   before do
-    allow(described_class::ImportDescriptiveMetadataJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::Item).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Sdr::Repository).to receive(:update)
     allow(Dor::Services::Client.objects).to receive(:indexable)
@@ -45,7 +45,7 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataJob do
   it 'performs the job' do
     job.perform_now
 
-    expect(described_class::ImportDescriptiveMetadataJobItem)
+    expect(described_class::Item)
       .to have_received(:new).with(druid:, index: 2, job:, row:)
 
     expect(job_item).to have_received(:check_update_ability?)

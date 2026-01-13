@@ -2,13 +2,13 @@
 
 module BulkActions
   # A job that exports tags to CSV for one or more objects
-  class ExportTagsJob < BulkActionJob
+  class ExportTagsJob < Job
     def export_file
       @export_file ||= CSV.open(bulk_action.export_filepath, 'w')
     end
 
     # Export tags for single object
-    class ExportTagsJobItem < BulkActionJobItem
+    class Item < JobItem
       def perform
         export_file << [druid, *export_tags]
         success!(message: 'Exported tags')

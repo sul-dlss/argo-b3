@@ -12,7 +12,7 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
   let(:object_client) { instance_double(Dor::Services::Client::Object, apply_admin_policy_defaults: true) }
 
   let(:job_item) do
-    described_class::ApplyApoDefaultsJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::Item.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:close_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
@@ -25,7 +25,7 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(File).to receive(:open).and_return(log)
 
-    allow(described_class::ApplyApoDefaultsJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::Item).to receive(:new).and_return(job_item)
   end
 
   it 'performs the job' do

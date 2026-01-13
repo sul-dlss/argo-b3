@@ -2,7 +2,7 @@
 
 module BulkActions
   # A super class for bulk jobs that take a CSV file as input and support closing versions.
-  class ClosingBulkActionCsvJob < BulkActionCsvJob
+  class ClosingCsvJob < CsvJob
     def perform(bulk_action:, csv_file:, close_version:, **params)
       @close_version = close_version
       super

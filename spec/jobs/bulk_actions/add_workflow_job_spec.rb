@@ -12,7 +12,7 @@ RSpec.describe BulkActions::AddWorkflowJob do
   let(:bulk_action) { create(:bulk_action) }
 
   let(:job_item) do
-    described_class::AddWorkflowJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::Item.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive_messages(check_update_ability?: true, cocina_object:)
     end
@@ -24,7 +24,7 @@ RSpec.describe BulkActions::AddWorkflowJob do
 
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
-    allow(described_class::AddWorkflowJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::Item).to receive(:new).and_return(job_item)
     allow(Sdr::WorkflowService).to receive(:workflow_active?).and_return(false)
   end
 

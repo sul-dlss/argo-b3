@@ -3,7 +3,7 @@
 module BulkActions
   # Super class for performing an action on a single item in a BulkActionJob.
   # Subclasses must implement the perform method.
-  class BulkActionJobItem
+  class JobItem
     include ActionPolicy::Behaviour
 
     def initialize(druid:, index:, job:)

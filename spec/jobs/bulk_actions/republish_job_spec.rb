@@ -11,7 +11,7 @@ RSpec.describe BulkActions::RepublishJob do
   let(:cocina_object) { instance_double(Cocina::Models::DRO) }
 
   let(:job_item) do
-    described_class::RepublishJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::Item.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:cocina_object).and_return(cocina_object)
     end
   end
@@ -19,7 +19,7 @@ RSpec.describe BulkActions::RepublishJob do
   let(:object_client) { instance_double(Dor::Services::Client::Object, publish: true) }
 
   before do
-    allow(described_class::RepublishJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::Item).to receive(:new).and_return(job_item)
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:published?).and_return(true)
 

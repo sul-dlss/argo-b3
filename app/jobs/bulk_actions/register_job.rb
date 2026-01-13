@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to register objects from a CSV file
-  class RegisterJob < BaseBulkActionJob
+  class RegisterJob < BaseJob
     HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Label'].freeze
 
     def perform(bulk_action:, csv_file:, **register_params)
@@ -13,7 +13,7 @@ module BulkActions
 
     def perform_bulk_action
       convert_results.each.with_index do |convert_result, index|
-        RegisterJobItem.new(index:, job: self, convert_result:).perform
+        Item.new(index:, job: self, convert_result:).perform
       rescue StandardError => e
         failure!(message: "Failed #{e.class} #{e.message}", index:)
       end
@@ -50,7 +50,7 @@ module BulkActions
     attr_reader :register_params
 
     # Register a single object from the CSV
-    class RegisterJobItem < BulkActionJobItem
+    class Item < JobItem
       def initialize(convert_result:, **args)
         @convert_result = convert_result
         super(druid: nil, **args)

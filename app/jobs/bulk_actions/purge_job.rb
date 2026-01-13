@@ -2,9 +2,9 @@
 
 module BulkActions
   # Bulk action to purge unpublished objects
-  class PurgeJob < BulkActions::BulkActionJob
+  class PurgeJob < Job
     # Purge a single object
-    class PurgeJobItem < BulkActions::BulkActionJobItem
+    class Item < JobItem
       def perform
         return unless check_update_ability?
 

@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to add a workflow to an object
-  class AddWorkflowJob < BulkActions::ClosingBulkActionJob
+  class AddWorkflowJob < ClosingJob
     def perform(bulk_action:, druids:, close_version:, workflow_name:)
       @workflow_name = workflow_name
       super
@@ -11,7 +11,7 @@ module BulkActions
     attr_reader :workflow_name
 
     # Adds workflow to a single object
-    class AddWorkflowJobItem < BulkActions::BulkActionJobItem
+    class Item < JobItem
       delegate :workflow_name, to: :job
 
       def perform

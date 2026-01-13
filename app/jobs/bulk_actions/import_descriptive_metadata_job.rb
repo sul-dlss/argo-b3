@@ -2,9 +2,9 @@
 
 module BulkActions
   # Job to import descriptive metadata from a CSV file
-  class ImportDescriptiveMetadataJob < BulkActions::ClosingBulkActionCsvJob
+  class ImportDescriptiveMetadataJob < ClosingCsvJob
     # Import descriptive metadata from single CSV row
-    class ImportDescriptiveMetadataJobItem < BulkActions::BulkActionCsvJobItem
+    class Item < CsvJobItem
       # Job to import descriptive metadata from single CSV row
       def perform # rubocop:disable Metrics/AbcSize
         return unless check_update_ability?
