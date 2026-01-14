@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module BulkActions
-  # Super class for bulk jobs
-  class Job < BaseJob
+  # Superclass of bulk action jobs that take druids as input
+  class DruidsJob < BaseJob
     include ActionPolicy::Behaviour
 
     attr_reader :bulk_action, :druids

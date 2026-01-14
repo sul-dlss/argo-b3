@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BulkActions
-  # Super class for bulk jobs
+  # Superclass of all bulk action jobs
   class BaseJob < ApplicationJob
     include ActionPolicy::Behaviour
 
@@ -59,8 +59,8 @@ module BulkActions
     end
 
     def perform_item_class
-      # For example, the bulk action item for AddWorkflowJob is AddWorkflowJob::Item
-      self.class.const_get('Item')
+      # For example, the bulk action item for AddWorkflowJob is AddWorkflowJob::JobItem
+      self.class.const_get('JobItem')
     end
 
     # Open file to use for export output, if any.

@@ -9,14 +9,14 @@ RSpec.describe BulkActions::CloseVersionJob do
   let(:bulk_action) { create(:bulk_action) }
 
   let(:job_item) do
-    described_class::Item.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:close_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
     end
   end
 
   before do
-    allow(described_class::Item).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
   end
 
   after do

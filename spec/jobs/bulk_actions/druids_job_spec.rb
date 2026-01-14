@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe BulkActions::Job do
+RSpec.describe BulkActions::DruidsJob do
   # Setting count fields to ensure that they are reset.
   let(:bulk_action) { create(:bulk_action, druid_count_success: 100, druid_count_fail: 100, druid_count_total: 100) }
   let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222] }
@@ -24,24 +24,24 @@ RSpec.describe BulkActions::Job do
 
   context 'when no errors' do
     before do
-      bulk_action_item_class = Class.new(BulkActions::JobItem) do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
         def perform
           success!(message: 'Testing successful') if druid == 'druid:bb111cc2222'
           failure!(message: 'Testing failed') if druid == 'druid:cc111dd2222'
         end
       end
-      stub_const('TestBulkActionJob::Item', bulk_action_item_class)
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
 
-      allow(TestBulkActionJob::Item).to receive(:new).and_call_original
+      allow(TestBulkActionJob::JobItem).to receive(:new).and_call_original
     end
 
     it 'performs the job' do
       TestBulkActionJob.perform_now(bulk_action:, druids:)
 
-      expect(TestBulkActionJob::Item).to have_received(:new).with(druid: druids.first, index: 0,
-                                                                  job: instance_of(TestBulkActionJob))
-      expect(TestBulkActionJob::Item).to have_received(:new).with(druid: druids.second, index: 1,
-                                                                  job: instance_of(TestBulkActionJob))
+      expect(TestBulkActionJob::JobItem).to have_received(:new).with(druid: druids.first, index: 0,
+                                                                     job: instance_of(TestBulkActionJob))
+      expect(TestBulkActionJob::JobItem).to have_received(:new).with(druid: druids.second, index: 1,
+                                                                     job: instance_of(TestBulkActionJob))
 
       expect(log).to have_received(:puts).with(/Starting TestBulkActionJob for BulkAction #{bulk_action.id}/)
       expect(log).to have_received(:puts).with(/Finished TestBulkActionJob for BulkAction #{bulk_action.id}/)
@@ -65,15 +65,15 @@ RSpec.describe BulkActions::Job do
 
   context 'when errors' do
     before do
-      bulk_action_item_class = Class.new(BulkActions::JobItem) do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
         def perform
           success!(message: 'Testing successful') if druid == 'druid:bb111cc2222'
           raise StandardError, 'Something bad happened' if druid == 'druid:cc111dd2222'
         end
       end
-      stub_const('TestBulkActionJob::Item', bulk_action_item_class)
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
 
-      allow(TestBulkActionJob::Item).to receive(:new).and_call_original
+      allow(TestBulkActionJob::JobItem).to receive(:new).and_call_original
     end
 
     it 'performs the job' do

@@ -2,9 +2,9 @@
 
 module BulkActions
   # Job to republish objects
-  class RepublishJob < Job
+  class RepublishJob < DruidsJob
     # Republish a single object
-    class Item < JobItem
+    class JobItem < BaseJobItem
       def perform
         return failure!(message: 'Not an item or collection') if not_publishable?
         return failure!(message: 'Never previously published') unless Sdr::WorkflowService.published?(druid:)

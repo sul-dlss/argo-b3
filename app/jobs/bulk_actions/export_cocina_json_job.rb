@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to export Cocina JSON
-  class ExportCocinaJsonJob < Job
+  class ExportCocinaJsonJob < DruidsJob
     def perform_bulk_action
       super
 
@@ -14,7 +14,7 @@ module BulkActions
     end
 
     # Export a single object
-    class Item < JobItem
+    class JobItem < BaseJobItem
       def perform
         export_file << "#{cocina_object.to_json}\n"
         success!(message: 'Exported full Cocina JSON')

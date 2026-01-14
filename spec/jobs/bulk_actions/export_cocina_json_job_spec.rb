@@ -14,13 +14,13 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
   let(:log) { StringIO.new }
 
   let(:job_item) do
-    described_class::Item.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:cocina_object).and_return(cocina_object)
     end
   end
 
   before do
-    allow(described_class::Item).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end

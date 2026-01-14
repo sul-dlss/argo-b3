@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe BulkActions::CsvJob do
+RSpec.describe BulkActions::BaseCsvJob do
   # Setting count fields to ensure that they are reset.
   let(:bulk_action) { create(:bulk_action, druid_count_success: 100, druid_count_fail: 100, druid_count_total: 100) }
   let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222] }
@@ -13,15 +13,15 @@ RSpec.describe BulkActions::CsvJob do
     bulk_action_job_class = Class.new(described_class)
     stub_const('TestBulkActionCsvJob', bulk_action_job_class)
 
-    bulk_action_item_class = Class.new(BulkActions::CsvJobItem) do
+    bulk_action_item_class = Class.new(BulkActions::BaseCsvJobItem) do
       def perform
         success!(message: 'Testing successful') if druid == 'druid:bb111cc2222'
         failure!(message: 'Testing failed') if druid == 'druid:cc111dd2222'
       end
     end
-    stub_const('TestBulkActionCsvJob::Item', bulk_action_item_class)
+    stub_const('TestBulkActionCsvJob::JobItem', bulk_action_item_class)
 
-    allow(TestBulkActionCsvJob::Item).to receive(:new).and_call_original
+    allow(TestBulkActionCsvJob::JobItem).to receive(:new).and_call_original
 
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     # allow_any_instance_of(BulkAction).to receive(:open_log_file).and_return(log)
@@ -46,10 +46,10 @@ RSpec.describe BulkActions::CsvJob do
     it 'performs the job' do
       TestBulkActionCsvJob.perform_now(bulk_action:, csv_file:)
 
-      expect(TestBulkActionCsvJob::Item)
+      expect(TestBulkActionCsvJob::JobItem)
         .to have_received(:new).with(druid: druids.first, row: csv[0],
                                      index: 2, job: instance_of(TestBulkActionCsvJob))
-      expect(TestBulkActionCsvJob::Item)
+      expect(TestBulkActionCsvJob::JobItem)
         .to have_received(:new).with(druid: druids.second, row: csv[1],
                                      index: 3, job: instance_of(TestBulkActionCsvJob))
 
@@ -77,7 +77,7 @@ RSpec.describe BulkActions::CsvJob do
     it 'does not processes the druids' do
       TestBulkActionCsvJob.perform_now(bulk_action:, csv_file:)
 
-      expect(TestBulkActionCsvJob::Item).not_to have_received(:new)
+      expect(TestBulkActionCsvJob::JobItem).not_to have_received(:new)
 
       expect(log).to have_received(:puts).with(/Column "druid" not found/)
 

@@ -29,26 +29,26 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   ADD_WORKFLOW = Config.new(
     label: 'Add workflow',
     help_text: 'Starts a workflow for individual objects',
-    job: AddWorkflowJob,
+    job: BulkActions::AddWorkflowJob,
     path_helper: to_path_helper(:new_bulk_actions_add_workflow_path),
-    form: AddWorkflowForm
+    form: BulkActions::AddWorkflowForm
   )
 
   APPLY_APO_DEFAULTS = Config.new(
     label: 'Apply APO defaults',
     help_text: 'Overwrite object metadata with the defaults from the APO',
-    job: ApplyApoDefaultsJob,
+    job: BulkActions::ApplyApoDefaultsJob,
     path_helper: to_path_helper(:new_bulk_actions_apply_apo_defaults_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   CLOSE_VERSION = Config.new(
     label: 'Close version',
     help_text: 'Close a version of the items so the changes can be accessioned. The items will retain ' \
                'the version description as entered when the item was opened for versioning.',
-    job: CloseVersionJob,
+    job: BulkActions::CloseVersionJob,
     path_helper: to_path_helper(:new_bulk_actions_close_version_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   CREATE_VIRTUAL_OBJECT = Config.new(
@@ -71,9 +71,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Download full Cocina JSON for objects.',
     export_filename: 'cocina.jsonl.gz',
     export_label: 'Cocina JSON',
-    job: ExportCocinaJsonJob,
+    job: BulkActions::ExportCocinaJsonJob,
     path_helper: to_path_helper(:new_bulk_actions_export_cocina_json_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
@@ -81,9 +81,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Download descriptive metadata for objects.',
     export_filename: 'descriptive.csv',
     export_label: 'Descriptive metadata spreadsheet',
-    job: ExportDescriptiveMetadataJob,
+    job: BulkActions::ExportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_export_descriptive_metadata_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   EXPORT_MODS = Config.new(
@@ -96,9 +96,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Export structural metadata as CSV (comma-separated values) for selected druids.',
     export_filename: 'structural_metadata.csv',
     export_label: 'Structural metadata spreadsheet',
-    job: ExportStructuralMetadataJob,
+    job: BulkActions::ExportStructuralMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_export_structural_metadata_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   EXPORT_TRACKING_SHEETS = Config.new(
@@ -111,9 +111,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Download tags as CSV (comma-separated values) for selected druids.',
     export_filename: 'tags.csv',
     export_label: 'Tags',
-    job: ExportTagsJob,
+    job: BulkActions::ExportTagsJob,
     path_helper: to_path_helper(:new_bulk_actions_export_tags_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   EXTRACT_TEXT = Config.new(
@@ -129,9 +129,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   IMPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Upload descriptive metadata spreadsheet',
     help_text: 'Upload descriptive metadata for objects.',
-    job: ImportDescriptiveMetadataJob,
+    job: BulkActions::ImportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_import_descriptive_metadata_path),
-    form: ImportDescriptiveMetadataForm
+    form: BulkActions::ImportDescriptiveMetadataForm
   )
 
   IMPORT_STRUCTURAL_METADATA = Config.new(
@@ -172,9 +172,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   MANAGE_RELEASE = Config.new(
     label: 'Manage release',
     help_text: 'Adds release tags to individual objects.',
-    job: ManageReleaseJob,
+    job: BulkActions::ManageReleaseJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_release_path),
-    form: ManageReleaseForm
+    form: BulkActions::ManageReleaseForm
   )
 
   MANAGE_RIGHTS = Config.new(
@@ -190,17 +190,17 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   OPEN_VERSION = Config.new(
     label: 'Open new version',
     help_text: 'Open items not yet open for versioning.',
-    job: OpenVersionJob,
+    job: BulkActions::OpenVersionJob,
     path_helper: to_path_helper(:new_bulk_actions_open_version_path),
-    form: OpenVersionForm
+    form: BulkActions::OpenVersionForm
   )
 
   PURGE = Config.new(
     label: 'Purge',
     help_text: 'Deletes unpublished objects.',
-    job: PurgeJob,
+    job: BulkActions::PurgeJob,
     path_helper: to_path_helper(:new_bulk_actions_purge_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   REFRESH_METADATA = Config.new(
@@ -213,26 +213,26 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Register druids.',
     export_filename: 'registration_report.csv',
     export_label: 'Registration report',
-    job: RegisterJob,
+    job: BulkActions::RegisterJob,
     path_helper: to_path_helper(:new_bulk_actions_register_path),
-    form: RegisterForm
+    form: BulkActions::RegisterForm
   )
 
   REINDEX = Config.new(
     label: 'Reindex',
     help_text: 'Reindexes the DOR object in Solr.',
-    job: ReindexJob,
+    job: BulkActions::ReindexJob,
     path_helper: to_path_helper(:new_bulk_actions_reindex_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   REPUBLISH = Config.new(
     label: 'Republish',
     help_text: 'Republish objects. You still need to use the normal versioning process to make sure ' \
                'your changes are preserved.',
-    job: RepublishJob,
+    job: BulkActions::RepublishJob,
     path_helper: to_path_helper(:new_bulk_actions_republish_path),
-    form: BasicForm
+    form: BulkActions::BasicForm
   )
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(

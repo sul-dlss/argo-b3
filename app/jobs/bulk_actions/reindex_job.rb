@@ -2,9 +2,9 @@
 
 module BulkActions
   # Bulk action job to reindex objects in Solr
-  class ReindexJob < Job
+  class ReindexJob < DruidsJob
     # Reindex a single object
-    class Item < JobItem
+    class JobItem < BaseJobItem
       def perform
         Dor::Services::Client.object(druid).reindex
         success!(message: 'Reindex successful')

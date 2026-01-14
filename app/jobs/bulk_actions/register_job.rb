@@ -13,7 +13,7 @@ module BulkActions
 
     def perform_bulk_action
       convert_results.each.with_index do |convert_result, index|
-        Item.new(index:, job: self, convert_result:).perform
+        JobItem.new(index:, job: self, convert_result:).perform
       rescue StandardError => e
         failure!(message: "Failed #{e.class} #{e.message}", index:)
       end
@@ -50,7 +50,7 @@ module BulkActions
     attr_reader :register_params
 
     # Register a single object from the CSV
-    class Item < JobItem
+    class JobItem < BaseJobItem
       def initialize(convert_result:, **args)
         @convert_result = convert_result
         super(druid: nil, **args)
