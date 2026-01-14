@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to manage release tags
-  class ManageReleaseJob < BulkActionJob
+  class ManageReleaseJob < DruidsJob
     def perform(bulk_action:, druids:, to:, release:, what: 'self')
       @release_to = to
       @who = who
@@ -14,7 +14,7 @@ module BulkActions
     attr_reader :release_to, :who, :what, :release
 
     # Manage release for a single object
-    class ManageReleaseJobItem < BulkActionJobItem
+    class JobItem < BaseJobItem
       delegate :release_to, :what, :release, :bulk_action, to: :job
 
       def perform

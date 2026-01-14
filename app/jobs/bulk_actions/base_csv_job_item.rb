@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module BulkActions
-  # Super class for performing an action on a single row in a BulkActionCsvJob.
-  # Subclasses must implement the perform method.
-  class BulkActionCsvJobItem < BulkActionJobItem
+  # Superclass for performing an action on a single row in a bulk action job.
+  # Subclasses must implement the `#perform` method.
+  class BaseCsvJobItem < BaseJobItem
     def initialize(row:, **args)
       @row = row
       Honeybadger.context(row:)

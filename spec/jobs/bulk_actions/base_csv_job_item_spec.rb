@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 # rubocop:disable RSpec/SubjectStub
-RSpec.describe BulkActions::BulkActionCsvJobItem do
-  subject(:job) { instance_double(BulkActions::BulkActionCsvJob, user:) }
+RSpec.describe BulkActions::BaseCsvJobItem do
+  subject(:job) { instance_double(BulkActions::BaseCsvJob, user:) }
 
   let(:druid) { 'druid:bb111cc2222' }
   let(:row) { instance_double(CSV::Row) }

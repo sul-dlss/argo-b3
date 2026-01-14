@@ -10,13 +10,13 @@ RSpec.describe BulkActions::OpenVersionJob do
   let(:bulk_action) { create(:bulk_action) }
 
   let(:job_item) do
-    described_class::OpenVersionJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:check_update_ability?).and_return(true)
     end
   end
 
   before do
-    allow(described_class::OpenVersionJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
 
     allow(Sdr::VersionService).to receive(:open)
     allow(Sdr::VersionService).to receive(:openable?).and_return(true)

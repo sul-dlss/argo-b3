@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to open a new version for objects
-  class OpenVersionJob < BulkActions::BulkActionJob
+  class OpenVersionJob < DruidsJob
     def perform(bulk_action:, druids:, version_description:)
       @version_description = version_description
       super
@@ -11,7 +11,7 @@ module BulkActions
     attr_reader :version_description
 
     # Open a new version for single item
-    class OpenVersionJobItem < BulkActions::BulkActionJobItem
+    class JobItem < BaseJobItem
       def perform
         return unless check_update_ability?
 

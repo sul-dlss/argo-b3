@@ -9,7 +9,7 @@ RSpec.describe 'Create a new open version bulk action' do
     ['druid:pj757vx3102', 'druid:rt276nw8963']
   end
 
-  let(:bulk_action_label) { BulkActions::OPEN_NEW_VERSION.label }
+  let(:bulk_action_label) { BulkActions::OPEN_VERSION.label }
 
   before do
     sign_in user
@@ -38,7 +38,7 @@ RSpec.describe 'Create a new open version bulk action' do
       expect(page).to have_toast("#{bulk_action_label} submitted")
 
       bulk_action = BulkAction.last
-      expect(bulk_action.action_type).to eq(BulkActions::OPEN_NEW_VERSION.action_type.to_s)
+      expect(bulk_action.action_type).to eq(BulkActions::OPEN_VERSION.action_type.to_s)
       expect(bulk_action.description).to eq('Open version test items')
       expect(bulk_action.user).to eq(user)
       expect(bulk_action.queued?).to be true

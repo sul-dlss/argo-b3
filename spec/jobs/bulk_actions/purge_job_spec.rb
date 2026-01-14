@@ -9,7 +9,7 @@ RSpec.describe BulkActions::PurgeJob do
   let(:bulk_action) { create(:bulk_action) }
 
   let(:job_item) do
-    described_class::PurgeJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:check_update_ability?).and_return(true)
     end
   end
@@ -17,7 +17,7 @@ RSpec.describe BulkActions::PurgeJob do
   let(:purge_service) { instance_double(Sdr::PurgeService, purge: nil) }
 
   before do
-    allow(described_class::PurgeJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(Sdr::PurgeService).to receive(:new).with(druid:).and_return(purge_service)
   end
 

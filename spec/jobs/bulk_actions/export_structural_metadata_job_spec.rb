@@ -169,13 +169,13 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   end
 
   let(:job_item) do
-    described_class::ExportStructuralMetadataJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:cocina_object).and_return(cocina_object)
     end
   end
 
   before do
-    allow(described_class::ExportStructuralMetadataJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -187,7 +187,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   it 'performs the job' do
     job.perform_now
 
-    expect(described_class::ExportStructuralMetadataJobItem).to have_received(:new).with(druid:, index: 0, job:)
+    expect(described_class::JobItem).to have_received(:new).with(druid:, index: 0, job:)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)

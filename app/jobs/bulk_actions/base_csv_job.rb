@@ -3,8 +3,8 @@
 require 'csv'
 
 module BulkActions
-  # A super class for bulk jobs that take a CSV file as input.
-  class BulkActionCsvJob < BaseBulkActionJob
+  # Superclass of bulk action jobs that take a CSV file as input.
+  class BaseCsvJob < BaseJob
     DRUID_COLUMN = 'druid'
 
     def perform(bulk_action:, csv_file:, **params)

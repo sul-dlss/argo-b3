@@ -16,7 +16,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
   let(:log) { StringIO.new }
 
   let(:job_item) do
-    described_class::ManageReleaseJobItem.new(druid:, index: 0, job:).tap do |job_item|
+    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive_messages(check_update_ability?: true, cocina_object:)
     end
   end
@@ -24,7 +24,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, create: true) }
 
   before do
-    allow(described_class::ManageReleaseJobItem).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(Sdr::WorkflowService).to receive(:published?).and_return(true)
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)

@@ -3,7 +3,7 @@
 # Configurations for bulk actions.
 module BulkActions # rubocop:disable Metrics/ModuleLength
   def self.find_config(bulk_action_type)
-    "BulkActions::#{bulk_action_type.to_s.upcase}".constantize
+    "#{name}::#{bulk_action_type.to_s.upcase}".constantize
   end
 
   def self.to_path_helper(path_name)
@@ -20,10 +20,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :export_filename,
                       :export_label,
                       keyword_init: true) do
+                        # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
                         def action_type
-                          BulkActions.constants.find do |const_name|
-                            BulkActions.const_get(const_name) == self
-                          end
+                          job.to_s.demodulize.delete_suffix('Job').underscore.upcase
                         end
                       end
 
@@ -188,7 +187,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Adds or updates source IDs associated with objects.'
   )
 
-  OPEN_NEW_VERSION = Config.new(
+  OPEN_VERSION = Config.new(
     label: 'Open new version',
     help_text: 'Open items not yet open for versioning.',
     job: BulkActions::OpenVersionJob,

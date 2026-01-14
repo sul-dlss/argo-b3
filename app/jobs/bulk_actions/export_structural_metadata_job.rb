@@ -2,7 +2,7 @@
 
 module BulkActions
   # A job that exports structural metadata to CSV for one or more objects
-  class ExportStructuralMetadataJob < BulkActions::BulkActionJob
+  class ExportStructuralMetadataJob < DruidsJob
     def export_file
       @export_file ||= CSV.open(bulk_action.export_filepath, 'w', write_headers: true, headers: StructureSerializer::HEADERS)
     end
@@ -12,7 +12,7 @@ module BulkActions
     end
 
     # Exports structural metadata for a single object
-    class ExportStructuralMetadataJobItem < BulkActions::BulkActionJobItem
+    class JobItem < BaseJobItem
       def perform
         return failure!(message: 'No structural metadata to export') if no_structural?
 

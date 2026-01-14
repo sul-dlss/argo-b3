@@ -3,12 +3,12 @@
 require 'rails_helper'
 
 # rubocop:disable RSpec/SubjectStub
-RSpec.describe BulkActions::BulkActionJobItem do
+RSpec.describe BulkActions::BaseJobItem do
   subject(:bulk_action_item) { described_class.new(druid:, index: 2, job:) }
 
   let(:druid) { 'druid:bb111cc2222' }
 
-  let(:job) { instance_double(BulkActions::BulkActionJob, user:, close_version?: close_version) }
+  let(:job) { instance_double(BulkActions::DruidsJob, user:, close_version?: close_version) }
   let(:user) { instance_double(User, sunetid: 'a_user') }
   let(:close_version) { true }
 

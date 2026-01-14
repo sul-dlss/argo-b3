@@ -2,9 +2,9 @@
 
 module BulkActions
   # Job to close objects
-  class CloseVersionJob < BulkActionJob
+  class CloseVersionJob < DruidsJob
     # Close version for a single object
-    class CloseVersionJobItem < BulkActionJobItem
+    class JobItem < BaseJobItem
       def perform
         return unless check_update_ability?
 
