@@ -129,7 +129,7 @@ GEM
       activesupport (>= 4.2)
       capybara (>= 3.0)
       ruby2_keywords
-    cocina-models (0.108.3)
+    cocina-models (0.109.0)
       activesupport
       deprecation
       dry-struct (~> 1.0)
@@ -175,9 +175,9 @@ GEM
       capistrano-shared_configs
       ed25519
     docile (1.4.1)
-    dor-services-client (15.25.2)
+    dor-services-client (15.25.3)
       activesupport (>= 7.0.0)
-      cocina-models (~> 0.108.2)
+      cocina-models (~> 0.109.0)
       deprecation
       faraday (~> 2.0)
       faraday-retry
@@ -261,7 +261,7 @@ GEM
     herb (0.8.8-x86_64-darwin)
     herb (0.8.8-x86_64-linux-gnu)
     herb (0.8.8-x86_64-linux-musl)
-    honeybadger (6.2.0)
+    honeybadger (6.2.1)
       logger
       ostruct
     i18n (1.14.8)
@@ -388,7 +388,7 @@ GEM
       date
       stringio
     public_suffix (7.0.2)
-    puma (7.1.0)
+    puma (7.2.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
