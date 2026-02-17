@@ -378,23 +378,23 @@ RSpec.describe DescriptiveCsv::Import do
             []
           end
         h[:event] = [
-          contributor: contributor_value,
-          note: [
-            {
-              structuredValue: [],
-              parallelValue: [],
-              groupedValue: [],
-              value: 'noted',
-              identifier: [],
-              note: [],
-              appliesTo: []
-            }
-          ],
-          structuredValue: [],
-          date: [],
-          location: [],
-          identifier: [],
-          parallelEvent: []
+          { contributor: contributor_value,
+            note: [
+              {
+                structuredValue: [],
+                parallelValue: [],
+                groupedValue: [],
+                value: 'noted',
+                identifier: [],
+                note: [],
+                appliesTo: []
+              }
+            ],
+            structuredValue: [],
+            date: [],
+            location: [],
+            identifier: [],
+            parallelEvent: [] }
         ]
       end
     end
@@ -679,14 +679,14 @@ RSpec.describe DescriptiveCsv::Import do
               []
             end
           h[:relatedResource] = [
-            form: form_value,
-            title: [],
-            contributor: [],
-            event: [],
-            language: [],
-            note: [],
-            identifier: [],
-            subject: []
+            { form: form_value,
+              title: [],
+              contributor: [],
+              event: [],
+              language: [],
+              note: [],
+              identifier: [],
+              subject: [] }
           ]
         end
       end
