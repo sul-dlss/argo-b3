@@ -51,7 +51,8 @@ RSpec.describe BulkActions::RegisterJob do
       job.perform_now
 
       expect(Sdr::Repository).not_to have_received(:register)
-      expect(log).to have_received(:puts).with(/does not match value: "druid:123", example: druid:bc123df4567/)
+      expect(log).to have_received(:puts)
+        .with(/.*does not match pattern:\s+\^druid:\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{3\}\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{4\}\$/) # rubocop:disable Layout/LineLength
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
     end
