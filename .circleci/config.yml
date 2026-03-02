@@ -39,6 +39,9 @@ workflows:
           install-chrome: true
           before-test:
             - run:
+                name: Set Docker API version
+                command: echo 'export DOCKER_API_VERSION=1.44' >> "$BASH_ENV"
+            - run:
                 name: Prepare for running specs (install JS dependencies and build assets)
                 command: bin/rake spec:prepare
             - setup_remote_docker
