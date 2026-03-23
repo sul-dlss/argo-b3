@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@7.2.1
-  ruby-rails: sul-dlss/ruby-rails@4.6.0
+  ruby-rails: sul-dlss/ruby-rails@4.7.0
 jobs:
   stylelint:
     executor: node/default
