@@ -71,12 +71,32 @@ services:
       - 8983:8983
   
   # solr-test is not on a persistent volume.
-  solr-test:
+  # Running multiple instances of solr-test allows for parallel testing.
+  solr-test1:
     build:
       context: .
       dockerfile: Dockerfile-solr
     ports:
       - 8984:8983
+  solr-test2:
+    build:
+      context: .
+      dockerfile: Dockerfile-solr
+    ports:
+      - 8985:8983
+  solr-test3:
+    build:
+      context: .
+      dockerfile: Dockerfile-solr
+    ports:
+      - 8986:8983
+  solr-test4:
+    build:
+      context: .
+      dockerfile: Dockerfile-solr
+    ports:
+      - 8987:8983
+
 volumes:
   postgres-data:
   redis-data:
