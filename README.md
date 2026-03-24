@@ -54,6 +54,16 @@ Solr document test fixtures can be created with the Solr factories. For example:
 let!(:solr_doc) { create(:solr_item) }
 ```
 
+### Running tests in parallel
+[parallel_tests](https://github.com/grosser/parallel_tests) will significantly speed up running tests locally.
+
+```
+bin/parallel_rspec
+```
+
+Before running the first time: `bin/rake parallel:prepare`
+After a migration: `bin/rake parallel:migrate`
+
 ## Discovery
 In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:
 * Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)

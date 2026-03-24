@@ -1,5 +1,5 @@
 solr:
-  url: http://localhost:8984/solr/argo
+  url: http://localhost:<%= 8983 + (ENV['TEST_ENV_NUMBER'] || 1).to_i %>/solr/argo
 
 bulk_actions:
   directory: "tmp/bulk_jobs_test"

@@ -378,6 +378,8 @@ GEM
     overmind (2.5.1-arm64-darwin)
     overmind (2.5.1-x86_64-darwin)
     parallel (1.27.0)
+    parallel_tests (5.6.0)
+      parallel
     parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
@@ -654,6 +656,7 @@ DEPENDENCIES
   mission_control-jobs
   okcomputer
   overmind
+  parallel_tests
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

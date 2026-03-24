@@ -61,7 +61,7 @@ Config.setup do |config|
 
   # Evaluate ERB in YAML config files at load time.
   #
-  # config.evaluate_erb_in_yaml = true
+  config.evaluate_erb_in_yaml = Rails.env.test? # Only using this in test for solr port config.
 
   # Name of directory and file to store config keys
   #
