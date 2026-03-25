@@ -48,7 +48,7 @@ class SearchForm < ApplicationForm
   attribute :released_to_earthworks, array: true, default: -> { [] }
   attribute :released_to_purl_sitemap, array: true, default: -> { [] }
   attribute :released_to_searchworks, array: true, default: -> { [] }
-  attribute :sw_resource_types, array: true, default: -> { [] }
+  attribute :sw_formats, array: true, default: -> { [] }
   attribute :tags, array: true, default: -> { [] }
   attribute :tickets, array: true, default: -> { [] }
   attribute :topics, array: true, default: -> { [] }

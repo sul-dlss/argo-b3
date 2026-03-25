@@ -35,7 +35,7 @@ module Search
       Search::Facets::RELEASED_TO_EARTHWORKS,
       Search::Facets::RELEASED_TO_PURL_SITEMAP,
       Search::Facets::RELEASED_TO_SEARCHWORKS,
-      Search::Facets::SW_RESOURCE_TYPES,
+      Search::Facets::SW_FORMATS,
       Search::Facets::VERSIONS,
       Search::Facets::WORKFLOWS
     ].freeze

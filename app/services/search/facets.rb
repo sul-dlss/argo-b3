@@ -290,9 +290,9 @@ module Search
       }
     )
 
-    SW_RESOURCE_TYPES = Config.with_defaults(
-      form_field: :sw_resource_types,
-      field: Search::Fields::SW_RESOURCE_TYPES,
+    SW_FORMATS = Config.with_defaults(
+      form_field: :sw_formats,
+      field: Search::Fields::SW_FORMATS,
       limit: 100
     )
 

@@ -44,7 +44,7 @@ en:
       released_to_earthworks: "Released to Earthworks"
       released_to_purl_sitemap: "Released to PURL sitemap"
       released_to_searchworks: "Released to Searchworks"
-      sw_resource_types: "Searchworks resource types"
+      sw_formats: "Searchworks formats"
       wps_workflows: "Workflow > Process > Status"
     facet_values:
       ever: "Currently released"
