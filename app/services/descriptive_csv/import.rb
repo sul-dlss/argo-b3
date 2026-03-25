@@ -5,6 +5,9 @@ module DescriptiveCsv
   class Import
     include Dry::Monads[:result]
 
+    class_attribute :permitted_types, default: Cocina::Models::Validators::DescriptionTypesValidator.new(nil, nil)
+                                               .send(:types_yaml).values.flatten.pluck('value')
+
     def self.import(csv_row:)
       new(csv_row:).import
     end
@@ -13,7 +16,7 @@ module DescriptiveCsv
       @csv_row = csv_row
     end
 
-    def import # rubocop:disable Metrics/AbcSize
+    def import
       params = {}
 
       # The source_id and druid are only there for the user to reference and should be ignored for data processing
@@ -25,13 +28,7 @@ module DescriptiveCsv
         visit(params, split_address(address), @csv_row[address]) if @csv_row[address]
       end
 
-      compacted_params = compact_params(params)
-
-      remove_contributors_if_role_without_name(compacted_params)
-      remove_form_if_source_without_value(compacted_params)
-      remove_nested_attributes_without_value(compacted_params)
-
-      Success(Cocina::Models::Description.new(compacted_params))
+      Success(ImportFilter.filter(compact_params(params)))
     rescue Cocina::Models::ValidationError => e
       Failure([e.message])
     end
@@ -55,8 +52,15 @@ module DescriptiveCsv
       return value if keys.empty?
 
       key = keys.shift
+      value = normalize_type(value) if key == :type
       val = keys.empty? ? value : nest_hashes(value, *keys)
       key.is_a?(Integer) ? [].tap { |arr| arr[key] = val } : { key => val }
+    end
+
+    # If the type is found in the permitted types, return it as-is; otherwise, return it in downcase.
+    # Almost all types are expected to be downcase, but some are not (e.g. OCLC, ISSN, etc.)
+    def normalize_type(value)
+      permitted_types.include?(value) ? value : value.downcase
     end
 
     # @params [Array,Hash] what a tree or list like data structure. It's one of the nodes in the Cocina descriptive
@@ -95,34 +99,6 @@ module DescriptiveCsv
 
         params[key].compact!
         params[key].map { |param| compact_params(param) }
-      end
-    end
-
-    def remove_contributors_if_role_without_name(compacted_params_hash)
-      return unless compacted_params_hash && compacted_params_hash[:contributor]
-
-      compacted_params_hash[:contributor].delete_if do |contributor|
-        contributor && contributor[:name].nil? && contributor[:role].present?
-      end
-    end
-
-    def remove_form_if_source_without_value(compacted_params_hash) # rubocop:disable Metrics/CyclomaticComplexity
-      return unless compacted_params_hash && compacted_params_hash[:form]
-
-      compacted_params_hash[:form].delete_if do |form|
-        form && form[:value].nil? && form[:structuredValue].nil? && (form[:source].present? || form[:type].present?)
-      end
-    end
-
-    def remove_nested_attributes_without_value(compacted_params_hash)
-      # event can have contributors, geographic can have form, relatedResource can have form and/or contributor
-      %i[relatedResource event geographic].each do |parent_property|
-        next if compacted_params_hash[parent_property].blank?
-
-        compacted_params_hash[parent_property].each do |parent_object|
-          remove_contributors_if_role_without_name(parent_object)
-          remove_form_if_source_without_value(parent_object)
-        end
       end
     end
   end
