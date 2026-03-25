@@ -10,8 +10,6 @@ module Constants
 
   WORKFLOWS = %w[
     accessionWF
-    gisAssemblyWF
-    gisDeliveryWF
     goobiWF
     registrationWF
     wasSeedPreassemblyWF
