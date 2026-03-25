@@ -45,8 +45,7 @@ module Search
                         :exclude,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
-                        :dynamic_facet,
-                        keyword_init: true)
+                        :dynamic_facet)
 
     def Config.with_defaults(**)
       defaults = { alpha_sort: false, limit: 100, exclude: false }

@@ -40,6 +40,6 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
 
     expect(File).to exist(bulk_action.export_filepath)
     File.write(unzipped_path, ActiveSupport::Gzip.decompress(File.read(bulk_action.export_filepath)))
-    expect(File.open(unzipped_path).readlines.size).to eq 1
+    expect(File.open(unzipped_path).readlines.size).to eq 1 # rubocop:disable Style/FileOpen
   end
 end

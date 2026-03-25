@@ -14,8 +14,7 @@ module Reports
     Config = Struct.new('ReportFieldConfig',
                         :field,
                         :label,
-                        :help_text,
-                        keyword_init: true)
+                        :help_text)
 
     ACCESS_RIGHTS = Config.new(
       field: Search::Fields::ACCESS_RIGHTS,
