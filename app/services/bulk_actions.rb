@@ -18,8 +18,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :path_helper,
                       # Filename for the export created by this bulk action, if any.
                       :export_filename,
-                      :export_label,
-                      keyword_init: true) do
+                      :export_label) do
                         # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
                         def action_type
                           job.to_s.demodulize.delete_suffix('Job').underscore.upcase
