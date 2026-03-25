@@ -77,8 +77,8 @@
                                                           facet_counts: @results.identifiers_facet,
                                                           search_form: @search_form, facet_component: :dynamic) %>
 
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::SW_RESOURCE_TYPES,
-                                                          facet_counts: @results.sw_resource_types_facet,
+  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::SW_FORMATS,
+                                                          facet_counts: @results.sw_formats_facet,
                                                           search_form: @search_form) %>
 
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::MODS_RESOURCE_TYPES,
