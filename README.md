@@ -9,12 +9,12 @@
 To connect to production Solr
 
 ```
-ssh -L 8985:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
+ssh -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
 ```
 
 In a separate terminal window:
 ```
-SETTINGS__SOLR__URL=http://localhost:8985/solr/argo_prod bin/setup
+SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_prod bin/setup
 ```
 
 Note that `bin/setup` will create the database, run yarn, and perform other setup tasks.
