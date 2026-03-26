@@ -183,7 +183,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_SOURCE_ID = Config.new(
     label: 'Update source id',
-    help_text: 'Adds or updates source IDs associated with objects.'
+    help_text: 'Adds or updates source IDs associated with objects.',
+    job: BulkActions::ManageSourceIdJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_source_id_path),
+    form: BulkActions::ManageSourceIdForm
   )
 
   OPEN_VERSION = Config.new(

@@ -137,6 +137,7 @@ Rails.application.routes.draw do
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
     resource :manage_release, only: %i[new create], controller: 'manage_release'
+    resource :manage_source_id, only: %i[new create], controller: 'manage_source_id'
     resource :open_version, only: %i[new create], controller: 'open_version'
     resource :purge, only: %i[new create], controller: 'purge'
     resource :reindex, only: %i[new create], controller: 'reindex'

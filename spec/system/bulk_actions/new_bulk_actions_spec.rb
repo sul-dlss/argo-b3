@@ -32,6 +32,7 @@ RSpec.describe 'New bulk actions', :rack_test do
     within('section#manage-rights-and-administrative-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage rights and administrative metadata')
       expect(page).to have_css('span', text: 'Update rights')
+      expect(page).to have_link('Update source id')
     end
 
     within('section#manage-structural-metadata-bulk-actions-section') do

@@ -38,6 +38,10 @@ module BulkActions
       @cocina_object ||= Sdr::Repository.find(druid:)
     end
 
+    def cocina_model
+      @cocina_model ||= Cocina::Factory.build(cocina_object)
+    end
+
     def open_new_version_if_needed!(description:)
       return if Sdr::VersionService.open?(druid:)
       raise 'Unable to open new version' unless Sdr::VersionService.openable?(druid:)
