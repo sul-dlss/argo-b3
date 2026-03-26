@@ -3,13 +3,6 @@
 module Search
   # Controller for collections facet
   class CollectionFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::COLLECTIONS
-    end
+    serves_facet Search::Facets::COLLECTIONS
   end
 end

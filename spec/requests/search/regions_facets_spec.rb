@@ -8,23 +8,10 @@ RSpec.describe 'Regions facets', :solr do
     sign_in(create(:user))
   end
 
-  describe 'index' do
-    it 'returns facet values' do
-      # Normally this wouldn't be facet_page 1, but using here for simplicity.
-      get search_region_facets_path, params: { query: 'test', facet_page: 1 }
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('turbo-frame id="regions-facet-page1"')
-      expect(response.body).to include('Palo Alto')
-    end
-  end
-
-  describe 'search' do
-    it 'returns search results' do
-      get search_search_region_facets_path, params: { query: 'test', q: 'Palo Alto' }
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-autocomplete-value="Palo Alto"')
-    end
-  end
+  it_behaves_like 'a simple facet controller',
+                  index_path: :search_region_facets_path,
+                  search_path: :search_search_region_facets_path,
+                  facet_frame_fragment: 'turbo-frame id="regions-facet-page1"',
+                  facet_value: 'Palo Alto',
+                  search_query: 'Palo Alto'
 end

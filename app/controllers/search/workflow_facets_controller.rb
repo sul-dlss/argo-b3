@@ -3,6 +3,8 @@
 module Search
   # Controller for workflows facet
   class WorkflowFacetsController < FacetsApplicationController
+    serves_facet Search::Facets::WORKFLOWS
+
     # Render the main facet turbo-frame
     def index
       component = Search::HierarchicalFacetFrameComponent.new(
@@ -25,10 +27,6 @@ module Search
     end
 
     private
-
-    def facet_config
-      Search::Facets::WORKFLOWS
-    end
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,

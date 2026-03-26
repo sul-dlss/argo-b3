@@ -102,7 +102,7 @@ The lazy async pattern should be used for slow facets. Each of these facets invo
 2. Add any new solr fields to `Search::Fields`.
 3. Add a `Search::LoadingFacetFrameComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `turbo-frame` that will be replaced with the facet content.
 4. Add a new `*_facets` resource to `routes.rb` providing the `index` route. See for example, `:tag_facets`.
-5. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `index` method.
+5. Add a new `Search::*FacetsController` and add a request spec. For simple (non-hierarchical) paged facets, call `serves_facet <Config>` — the `index` and `search` actions are inherited from `FacetsApplicationController`. For hierarchical facets, implement a custom `index` and `children` method. See for example, `Search::TagFacetsController`.
 6. Add a configuration constant to `Search::Facets`. This must include the `form_field`, `field`, and `facet_path_helper` attributes.
 7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
 8. Optionally, add a label for the facet to `en.yml`.
@@ -124,7 +124,7 @@ The non-lazy sync pattern should be used for fast facets. The facet values are r
 
 ### Adding paging to a facet
 1. Add a new `*_facets` resource to `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::MimetypeFacetsController`. This should implement the `index` method by including `FacetPagingConcern`.
+2. Add a new `Search::*FacetsController` that calls `serves_facet <Config>` and add a request spec using the `'a simple facet controller'` shared examples. See for example, `Search::MimetypeFacetsController`. The `index` action is inherited from `FacetsApplicationController`.
 3. Add `facet_path_helper` to the configuration constant in `Search::Facets`.
 
 Note:
@@ -132,7 +132,7 @@ Note:
 
 ### Adding facet search to a facet
 1. Add a new `*_facets` resource to `routes.rb`. See for example, `:project_facets`. This should provide a `search` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. This should implement the `search` method by including `FacetSearchingConcern`.
+2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. The `search` action is inherited from `FacetsApplicationController`; no custom implementation is needed unless the controller also has a custom `index`.
 3. Add `facet_search_path_helper` to the configuration constant in `Search::Facets`.
 
 Note:

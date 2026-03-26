@@ -8,23 +8,10 @@ RSpec.describe 'Mimetypes facets', :solr do
     sign_in(create(:user))
   end
 
-  describe 'index' do
-    it 'returns facet values' do
-      # Normally this wouldn't be facet_page 1, but using here for simplicity.
-      get search_mimetype_facets_path, params: { query: 'test', facet_page: 1 }
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('turbo-frame id="mimetypes-facet-page1"')
-      expect(response.body).to include('application/pdf')
-    end
-  end
-
-  describe 'search' do
-    it 'returns search results' do
-      get search_search_mimetype_facets_path, params: { query: 'test', q: 'pdf' }
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-autocomplete-value="application/pdf"')
-    end
-  end
+  it_behaves_like 'a simple facet controller',
+                  index_path: :search_mimetype_facets_path,
+                  search_path: :search_search_mimetype_facets_path,
+                  facet_frame_fragment: 'turbo-frame id="mimetypes-facet-page1"',
+                  facet_value: 'application/pdf',
+                  search_query: 'pdf'
 end

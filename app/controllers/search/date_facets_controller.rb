@@ -3,13 +3,6 @@
 module Search
   # Controller for dates facet
   class DateFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::DATES
-    end
+    serves_facet Search::Facets::DATES
   end
 end

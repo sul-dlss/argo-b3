@@ -3,13 +3,6 @@
 module Search
   # Controller for languages facet
   class LanguageFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::LANGUAGES
-    end
+    serves_facet Search::Facets::LANGUAGES
   end
 end

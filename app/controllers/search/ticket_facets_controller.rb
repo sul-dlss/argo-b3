@@ -3,7 +3,7 @@
 module Search
   # Controller for ticket facet
   class TicketFacetsController < FacetsApplicationController
-    include FacetSearchingConcern
+    serves_facet Search::Facets::TICKETS
 
     # Render the main facet turbo-frame (when no page param) or a paged facet (when page param present)
     def index
@@ -27,10 +27,6 @@ module Search
     end
 
     private
-
-    def facet_config
-      Search::Facets::TICKETS
-    end
 
     def facet_counts
       Searchers::Facet.call(search_form:,
