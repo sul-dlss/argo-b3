@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Cocina::Dro do
+RSpec.describe CocinaModels::Dro do
   include ActiveModel::Lint::Tests
   include ActiveSupport::Testing::Assertions
 

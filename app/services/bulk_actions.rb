@@ -165,7 +165,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_LICENSE_AND_RIGHTS_STATEMENTS = Config.new(
     label: 'Update licenses and rights statements',
-    help_text: 'Edit license, copyright statement, and/or use & reproduction statements'
+    help_text: 'Edit license, copyright statement, and/or use & reproduction statements',
+    job: BulkActions::ManageLicenseAndRightsStatementsJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_license_and_rights_statements_path),
+    form: BulkActions::ManageLicenseAndRightsStatementsForm
   )
 
   MANAGE_RELEASE = Config.new(

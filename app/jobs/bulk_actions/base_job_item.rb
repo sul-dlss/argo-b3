@@ -39,7 +39,7 @@ module BulkActions
     end
 
     def cocina_model
-      @cocina_model ||= Cocina::Factory.build(cocina_object)
+      @cocina_model ||= CocinaModels::Factory.build(cocina_object)
     end
 
     def open_new_version_if_needed!(description:)

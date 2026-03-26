@@ -2,15 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe Cocina::Factory do
+RSpec.describe CocinaModels::Factory do
   describe '.build' do
     context 'with a Cocina::Models::DROWithMetadata' do
       let(:cocina_object) { build(:dro_with_metadata) }
 
-      it 'returns a Cocina::Dro' do
+      it 'returns a CocinaModels::Dro' do
         result = described_class.build(cocina_object)
 
-        expect(result).to be_a(Cocina::Dro)
+        expect(result).to be_a(CocinaModels::Dro)
         expect(result.external_identifier).to eq(cocina_object.externalIdentifier)
       end
     end
@@ -18,10 +18,10 @@ RSpec.describe Cocina::Factory do
     context 'with a Cocina::Models::CollectionWithMetadata' do
       let(:cocina_object) { build(:collection_with_metadata) }
 
-      it 'returns a Cocina::Collection' do
+      it 'returns a CocinaModels::Collection' do
         result = described_class.build(cocina_object)
 
-        expect(result).to be_a(Cocina::Collection)
+        expect(result).to be_a(CocinaModels::Collection)
         expect(result.external_identifier).to eq(cocina_object.externalIdentifier)
       end
     end
