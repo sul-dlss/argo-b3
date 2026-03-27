@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Cocina::Collection do
+RSpec.describe CocinaModels::Collection do
   subject(:dro) { described_class.new(cocina_object) }
 
   let(:cocina_object) { build(:collection_with_metadata) }

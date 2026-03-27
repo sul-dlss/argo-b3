@@ -1,0 +1,54 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_manage_license_and_rights_statements_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+  <fieldset class="mb-3">
+    <legend>Use and reproduction statement</legend>
+    <p><%= link_to_new_tab 'Sample use and reproduction statements.', 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements' %></p>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
+                                                                  label_text: 'Do not update use and reproduction statement',
+                                                                  input_value: 'no_change') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
+                                                                  label_text: 'Remove existing use and reproduction statement',
+                                                                  input_value: 'remove') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
+                                                                  label_text: 'Update use and reproduction statement',
+                                                                  input_value: 'update') %>
+    <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :use_and_reproduction_statement,
+                                                               label_text: 'Use and reproduction statement', label_hidden: true,
+                                                               rows: 5) %>
+  </fieldset>
+
+  <fieldset class="mb-3">
+    <legend>Copyright statement</legend>
+    <p><%= link_to_new_tab 'Sample copyright statements.', 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements' %></p>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
+                                                                  label_text: 'Do not update copyright statement',
+                                                                  input_value: 'no_change') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
+                                                                  label_text: 'Remove existing copyright statement',
+                                                                  input_value: 'remove') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
+                                                                  label_text: 'Update copyright statement',
+                                                                  input_value: 'update') %>
+    <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :copyright,
+                                                               label_text: 'Copyright statement', label_hidden: true,
+                                                               rows: 5) %>
+  </fieldset>
+
+  <fieldset class="mb-3">
+    <legend>License</legend>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
+                                                                  label_text: 'Do not update license',
+                                                                  input_value: 'no_change') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
+                                                                  label_text: 'Remove existing license',
+                                                                  input_value: 'remove') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
+                                                                  label_text: 'Update license',
+                                                                  input_value: 'update') %>
+    <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :license, text: 'License', hidden: true) %>
+    <%= form.select :license, Constants::LICENSE_OPTIONS.map { |option| [option[:label], option[:uri]] }, {}, class: 'form-select' %>
+  </fieldset>
+
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+  <% end %>
+<% end %>
