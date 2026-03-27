@@ -3,13 +3,6 @@
 module Search
   # Controller for regions facet
   class RegionFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::REGIONS
-    end
+    serves_facet Search::Facets::REGIONS
   end
 end

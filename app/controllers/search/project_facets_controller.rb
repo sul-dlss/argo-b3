@@ -3,7 +3,7 @@
 module Search
   # Controller for project facet
   class ProjectFacetsController < FacetsApplicationController
-    include FacetSearchingConcern
+    serves_facet Search::Facets::PROJECTS
 
     def index
       component = Search::HierarchicalFacetFrameComponent.new(
@@ -28,10 +28,6 @@ module Search
     end
 
     private
-
-    def facet_config
-      Search::Facets::PROJECTS
-    end
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,

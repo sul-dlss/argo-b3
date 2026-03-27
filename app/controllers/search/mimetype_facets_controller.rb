@@ -3,13 +3,6 @@
 module Search
   # Controller for mimetypes facet
   class MimetypeFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::MIMETYPES
-    end
+    serves_facet Search::Facets::MIMETYPES
   end
 end

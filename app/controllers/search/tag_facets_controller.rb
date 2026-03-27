@@ -3,7 +3,7 @@
 module Search
   # Controller for tag facet
   class TagFacetsController < FacetsApplicationController
-    include FacetSearchingConcern
+    serves_facet Search::Facets::TAGS
 
     # Render the main facet turbo-frame
     def index
@@ -29,10 +29,6 @@ module Search
     end
 
     private
-
-    def facet_config
-      Search::Facets::TAGS
-    end
 
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,

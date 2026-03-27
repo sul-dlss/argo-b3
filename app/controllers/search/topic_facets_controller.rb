@@ -3,13 +3,6 @@
 module Search
   # Controller for topics facet
   class TopicFacetsController < FacetsApplicationController
-    include FacetPagingConcern
-    include FacetSearchingConcern
-
-    private
-
-    def facet_config
-      Search::Facets::TOPICS
-    end
+    serves_facet Search::Facets::TOPICS
   end
 end

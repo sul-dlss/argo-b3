@@ -5,6 +5,33 @@ module Search
   class FacetsApplicationController < SearchApplicationController
     layout false
 
+    SEARCH_LIMIT = 25
+
+    def self.serves_facet(config)
+      define_method(:facet_config) { config }
+    end
+
+    def index
+      facet_counts = Searchers::Facet.call(search_form:, facet_config:, page: required_page_param)
+      component = Search::FacetComponent.new(
+        facet_counts:,
+        search_form:,
+        form_field:,
+        facet_page_path_helper: facet_path_helper
+      )
+      render(component, content_type: 'text/html')
+    end
+
+    def search
+      facet_counts = Searchers::FacetQuery.call(
+        search_form:,
+        field:,
+        limit: SEARCH_LIMIT,
+        facet_query: facet_query_param
+      )
+      render(Search::FacetSearchResultComponent.with_collection(facet_counts), content_type: 'text/html')
+    end
+
     private
 
     def facet_config
