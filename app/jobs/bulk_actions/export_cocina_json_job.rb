@@ -10,7 +10,7 @@ module BulkActions
     end
 
     def export_file
-      @export_file ||= File.open(export_filepath, 'w') # rubocop:disable Style/FileOpen
+      @export_file ||= File.open(export_filepath, 'w')
     end
 
     # Export a single object

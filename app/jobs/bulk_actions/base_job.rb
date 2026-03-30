@@ -74,7 +74,7 @@ module BulkActions
     private
 
     def log_file
-      @log_file ||= File.open(bulk_action.log_filepath, 'a') # rubocop:disable Style/FileOpen
+      @log_file ||= File.open(bulk_action.log_filepath, 'a')
     end
 
     def perform_broadcast
