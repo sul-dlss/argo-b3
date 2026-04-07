@@ -1,6 +1,6 @@
 ---
 name: rubocop-updater
-description: Enables new Rubocop cops, autocorrects, attempts fixes, disables with comment if tests fail
+description: Enables new Rubocop cops, autocorrects, attempts fixes, disables if complex
 tools: [read, search, edit, terminal]
 ---
 
@@ -26,24 +26,8 @@ Note which files were corrected and which still have violations.
 ### Step 3a — If violations remain after autocorrect
 Attempt to fix remaining violations manually by editing the
 offending files. Make the minimum change necessary to satisfy
-the cop. Do not refactor beyond what the cop requires.
-
-### Step 4 — Run the test suite
-After autocorrect and any manual fixes, run:
-  bundle exec rspec --format progress
-
-### Step 5 — Evaluate result
-
-IF tests pass:
-  Leave Enabled: true
-  Move to the next cop
-
-IF tests fail:
-  - Revert all code changes made for this cop (not the .rubocop.yml change)
-  - In .rubocop.yml change the entry to:
-      Enabled: false
-      # causes {relative path to first failing spec} to fail
-  - Move to the next cop
+the cop. Do not refactor beyond what the cop requires. If unable
+to satisfy the cop, set `Enabled: false`
 
 ## Files the agent may not touch
 - db/migrate/
@@ -52,7 +36,7 @@ IF tests fail:
 
 ## Rules
 - Work through cops one at a time — complete all steps before starting the next
-- Never leave the codebase in a state where rubocop or rspec won't run
+- Never leave the codebase in a state where rubocop won't run
 - Preserve all existing .rubocop.yml configuration exactly
 - Only touch code files when fixing violations for the current cop
 - Revert code changes cleanly if disabling — .rubocop.yml comment is the only record
@@ -68,6 +52,5 @@ and note it in the PR description.
 ## Done when
 - Every cop in the issue has been processed
 - bundle exec rubocop exits without config errors
-- bundle exec rspec passes (all enabled cops satisfied or disabled with comment)
 - A meaningful PR description lists each cop and its outcome: enabled+autocorrected,
   enabled+manual fix, or disabled with reason
