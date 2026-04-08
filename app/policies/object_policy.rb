@@ -2,11 +2,13 @@
 
 # Policy for digital objects.
 class ObjectPolicy < ApplicationPolicy
-  # Until authorization requirements are determined, only allowing admins.
+  alias_rule :show_json?, to: :show?
+
   def show?
-    false
+    true
   end
 
+  # Until authorization requirements are determined, only allowing admins.
   def edit?
     false
   end

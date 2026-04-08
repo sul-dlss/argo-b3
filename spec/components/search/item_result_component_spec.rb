@@ -16,15 +16,17 @@ RSpec.describe Search::ItemResultComponent, type: :component do
 
       caption = page.find('table#item-result-ab123cd4567 caption')
       expect(caption).to have_css('span', text: '2.')
-      expect(caption).to have_link('Test Title', href: 'https://argo.stanford.edu/view/druid:ab123cd4567')
+      expect(caption).to have_link('Test Title', href: "/objects/#{druid}")
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'DRUID', 'druid:ab123cd4567')
+      expect(page).to have_table_value('item-result-ab123cd4567', 'DRUID', druid)
       expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
-      expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy')).to have_link('University Archives',
-                                                                                            href: 'https://argo.stanford.edu/view/druid:xy987zt6543')
+      expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy'))
+        .to have_link('University Archives', href: "/objects/#{apo_druid}")
       expect(page).to have_css "svg[aria-label='Placeholder: Responsive image']", text: 'Test Title'
       expect(page).to have_table_value('item-result-ab123cd4567', 'Content Type', 'book')
       expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
+      expect(find_table_value_cell('item-result-ab123cd4567', 'Old Argo'))
+        .to have_link('Test Title', href: "https://argo.stanford.edu/view/#{druid}")
     end
   end
 
@@ -37,8 +39,8 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       render_inline(component)
 
       cell = find_table_value_cell('item-result-ab123cd4567', 'Collections')
-      expect(cell).to have_link('Collection One', href: 'https://argo.stanford.edu/view/druid:xy987zt6555')
-      expect(cell).to have_link('Collection Two', href: 'https://argo.stanford.edu/view/druid:xy987zt6556')
+      expect(cell).to have_link(collection_titles.first, href: "/objects/#{collection_druids.first}")
+      expect(cell).to have_link(collection_titles.last, href: "/objects/#{collection_druids.last}")
     end
   end
 

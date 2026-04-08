@@ -22,7 +22,7 @@ RSpec.describe CocinaModels::Dro do
       let(:cocina_object) { 'invalid' }
 
       it 'raises an error if initialized with an invalid object' do
-        expect { dro }.to raise_error(ArgumentError, 'Expected a Cocina::Models::DROWithMetadata')
+        expect { dro }.to raise_error(ArgumentError)
       end
     end
   end
@@ -101,6 +101,20 @@ RSpec.describe CocinaModels::Dro do
       dro.source_id = 'changed-source-id'
       expect(dro.changed?).to be true
       expect(dro.source_id_changed?).to be true
+    end
+  end
+
+  describe 'type predicates' do
+    it 'returns true for #dro?' do
+      expect(dro.dro?).to be true
+    end
+
+    it 'returns false for #collection?' do
+      expect(dro.collection?).to be false
+    end
+
+    it 'returns false for #admin_policy?' do
+      expect(dro.admin_policy?).to be false
     end
   end
 

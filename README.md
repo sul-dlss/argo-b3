@@ -33,6 +33,8 @@ To run linters individually, run which ones you need:
 * JavaScript code: `yarn run lint` (add `--fix` flag to autocorrect violations)
 * SCSS stylesheets: `yarn run stylelint` (add `--fix` flag to autocorrect violations)
 
+Alternatively, use the `/lint` agent skill to assist with fixing linting errors.
+
 ### Background Jobs UI
 
 A dashboard for SolidQueue background jobs is available at http://localhost:3000/jobs
@@ -63,6 +65,16 @@ bin/parallel_rspec
 
 Before running the first time: `bin/rake parallel:prepare`
 After a migration: `bin/rake parallel:migrate`
+
+## Models
+`CocinaModels::*` are Active Model wrappers around `Cocina::Models::*` objects. They are intended to provide a mutable, simplified interface to the underlying cocina objects.
+
+Note: By convention, `CocinaModels::*` instances are referred to as "cocina models" and instances of `Cocina::Models::*` are referred to as "cocina objects".
+
+## Model presenters
+`CocinaModels::*Presenter` are `SimpleDelegator` wrappers around cocina models primarily for use in views. Model presenters are immutable and should enhance cocina models with additional display fields and convenience methods.
+
+Note: Where possible, `CocinaDisplay` should be used for extracting description from cocina objects.
 
 ## Discovery
 In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:

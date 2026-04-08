@@ -12,6 +12,8 @@ module Searchers
       Search::Fields::APO_TITLE,
       Search::Fields::AUTHOR,
       Search::Fields::BARE_DRUID,
+      Search::Fields::COLLECTION_DRUIDS,
+      Search::Fields::COLLECTION_TITLES,
       Search::Fields::CONTENT_TYPES,
       Search::Fields::ID,
       Search::Fields::IDENTIFIERS,

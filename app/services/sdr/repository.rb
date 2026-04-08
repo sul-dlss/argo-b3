@@ -16,6 +16,16 @@ module Sdr
       raise NotFoundResponse, "Object not found: #{druid}"
     end
 
+    # @param [String] druid the druid of the object
+    # @return [Hash] the Solr document
+    # @raise [Error] if there is an error retrieving the object
+    # @raise [NotFoundResponse] if the object is not found
+    def self.find_solr(druid:)
+      Dor::Services::Client.object(druid).solr(validate: false)
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
     # @param [Cocina::Models::DRO,Cocina::Models::Collection,Cocina::Models::AdminPolicy] cocina_object
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action

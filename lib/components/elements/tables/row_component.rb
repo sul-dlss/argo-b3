@@ -7,13 +7,13 @@ module Elements
       renders_many :cells
       renders_one :label_content
 
-      def initialize(label: nil, first_value: nil, values: [], id: nil, tooltip: nil)
+      def initialize(label: nil, first_value: nil, values: [], value: nil, id: nil, tooltip: nil) # rubocop:disable Metrics/ParameterLists
         # Provide either label/label_content or first_value but not both; these are rendered in the first column
         # label renders with <th> (bold), first_value is a normal <td>
         @label = label
         @first_value = first_value
-        # Provide either values or cells (e.g. for content files).
-        @values = values
+        # Provide either value, values or cells (e.g. for content files).
+        @values = Array(value).presence || values
         @id = id
         @tooltip = tooltip
 

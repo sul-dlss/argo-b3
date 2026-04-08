@@ -40,6 +40,7 @@ gem 'image_processing', '~> 1.2'
 
 # Additional gems
 gem 'action_policy'
+gem 'cocina_display'
 gem 'config'
 gem 'csv'
 gem 'dor-services-client', '~> 15.1'

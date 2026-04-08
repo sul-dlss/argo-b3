@@ -5,13 +5,13 @@
         <% component.with_caption do %>
           <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
             <%= component.with_link do %>
-              <%= helpers.link_to_item title, druid %>
+              <%= helpers.link_to(title, object_path(druid:), data: { turbo_frame: '_top' }) %>
             <% end %>
           <% end %>
         <% end %>
 
         <% component.with_row(label: 'DRUID', values: [druid]) %>
-        <% component.with_row(label: 'Object Type', values: result.object_types) %>
+        <% component.with_row(label: 'Object Type', value: result.object_types) %>
 
         <%# Only items have content types. %>
         <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
@@ -27,6 +27,7 @@
         <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
         <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
         <% component.with_row(label: 'Access Rights', values: access_rights_values) if result.access_rights.present? %>
+        <% component.with_row(label: 'Old Argo', values: [helpers.link_to_old_argo(title, druid)]) %>
       <% end %>
     </div>
     <div class="col-md-2 mx-auto align-self-center">
