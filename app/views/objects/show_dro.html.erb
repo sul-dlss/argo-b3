@@ -1,0 +1,52 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= tag.div class: 'container mb-4', data: { controller: 'cocina-model-show', cocina_model_show_interval_value: Rails.env.test? ? 500 : 10_000 } do %>
+  <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+    <% component.with_header do %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @cocina_model.title, classes: 'mb-5') %>
+    <% end %>
+
+    <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
+    <% component.with_tab(id: 'history-tab', label: 'History') %>
+    <% component.with_tab(id: 'events-tab', label: 'Events') %>
+    <% component.with_tab(id: 'content-tab', label: 'Content') %>
+    <% component.with_tab(id: 'technical-metadata-tab', label: 'Technical metadata') %>
+    <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
+
+    <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
+      <%= render Elements::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
+        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
+        <% component.with_row(label: 'Object type', value: 'Item') %>
+        <% component.with_row(label: 'Admin policy') do |row_component| %>
+          <% row_component.with_cell do %>
+            <%= link_to Sdr::TitleService.call(druid: @cocina_model.admin_policy_druid), object_path(druid: @cocina_model.admin_policy_druid) %>
+            (<%= link_to('All objects with this APO', search_path(Search::Fields::APO_DRUID => [@cocina_model.admin_policy_druid])) %>)
+          <% end %>
+        <% end %>
+        <% component.with_row(label: 'Collection') do |row_component| %>
+          <% row_component.with_cell do %>
+            <% @cocina_model.collection_druids.each do |collection_druid| %>
+              <%= link_to Sdr::TitleService.call(druid: collection_druid), object_path(druid: collection_druid) %>
+              (<%= link_to('All objects with this collection', search_path(Search::Fields::COLLECTION_DRUIDS => [collection_druid])) %>)
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= render Elements::Tables::TableComponent.new(id: 'description-table', classes: 'mb-5') do |component| %>
+        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Description') %><% end %>
+        <% component.with_row(label: 'Title', value: @cocina_model.title) %>
+        <% component.with_row(label: 'Contributors', value: @cocina_model.contributors) %>
+      <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
+      <%= turbo_frame_tag(@cocina_model, 'json', src: json_object_path(@cocina_model), refresh: 'morph') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

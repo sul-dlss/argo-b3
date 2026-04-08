@@ -147,6 +147,15 @@ Rails.application.routes.draw do
     resource :republish, only: %i[new create], controller: 'republish'
   end
 
+  # Redirect legacy route for object show page
+  get '/view/:druid', to: redirect('/objects/%{druid}')
+
+  resources :objects, only: %i[show], param: :druid do
+    member do
+      get 'json', to: 'objects#show_json'
+    end
+  end
+
   namespace :admin do
     get 'groups'
   end

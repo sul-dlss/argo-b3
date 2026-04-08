@@ -16,6 +16,17 @@ module Sdr
       raise NotFoundResponse, "Object not found: #{druid}"
     end
 
+    # @param [String] druid the druid of the object
+    # @param [Boolean] structural whether to return a structural model
+    # @return [Cocina::Models::DROLite, Cocina::Models::CollectionLite,
+    #   Cocina::Models::AdminPolicyLite] the returned model
+    # @raise [NotFoundResponse] if the object is not found
+    def self.find_lite(druid:, structural: true)
+      Dor::Services::Client.object(druid).find_lite(structural:)
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
     # @param [Cocina::Models::DRO,Cocina::Models::Collection,Cocina::Models::AdminPolicy] cocina_object
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action

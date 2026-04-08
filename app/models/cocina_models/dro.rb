@@ -3,14 +3,24 @@
 module CocinaModels
   # Model for a Cocina DRO object.
   class Dro < Base
-    # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to initialize this model with
+    # @param cocina_object [Cocina::Models::DROWithMetadata,
+    #   Cocina::Models::DROLite] the Cocina object to initialize this model with
     def initialize(cocina_object)
-      unless cocina_object.is_a?(Cocina::Models::DROWithMetadata)
-        raise ArgumentError, 'Expected a Cocina::Models::DROWithMetadata'
+      unless cocina_object.is_a?(Cocina::Models::DROWithMetadata) || cocina_object.is_a?(Cocina::Models::DROLite)
+        raise ArgumentError, 'Expected a Cocina::Models::DROWithMetadata or Cocina::Models::DROLite'
       end
 
       super
     end
+
+    attribute :source_id, :string
+    validates :source_id, presence: true
+    validates :source_id, format: { with: /\A.+:.+\z/ }
+
+    # Access fields
+    attribute :use_and_reproduction_statement, :string
+    attribute :license, :string
+    attribute :copyright, :string
 
     private
 

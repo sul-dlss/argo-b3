@@ -24,7 +24,8 @@ module Search
     end
 
     def admin_policy_values
-      [helpers.link_to_item(result.apo_title, result.apo_druid)]
+      [helpers.link_to(result.apo_title, object_path(druid: result.apo_druid),
+                       data: { turbo_frame: '_top' })]
     end
 
     def collections_values
@@ -63,7 +64,8 @@ module Search
 
     def collection_links
       result.collection_druids.map.with_index do |collection_druid, index|
-        helpers.link_to_item(result.collection_titles[index], collection_druid)
+        helpers.link_to(result.collection_titles[index], object_path(druid: collection_druid),
+                        data: { turbo_frame: '_top' })
       end
     end
 

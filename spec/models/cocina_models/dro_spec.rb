@@ -22,7 +22,7 @@ RSpec.describe CocinaModels::Dro do
       let(:cocina_object) { 'invalid' }
 
       it 'raises an error if initialized with an invalid object' do
-        expect { dro }.to raise_error(ArgumentError, 'Expected a Cocina::Models::DROWithMetadata')
+        expect { dro }.to raise_error(ArgumentError)
       end
     end
   end

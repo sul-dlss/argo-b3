@@ -31,8 +31,7 @@ RSpec.describe CocinaModels::Factory do
 
       it 'raises an ArgumentError' do
         expect { described_class.build(cocina_object) }
-          .to raise_error(ArgumentError,
-                          'Expected a Cocina::Models::DROWithMetadata or Cocina::Models::CollectionWithMetadata')
+          .to raise_error(ArgumentError, 'Unexpected cocina object type')
       end
     end
   end

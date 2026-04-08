@@ -1,0 +1,3 @@
+<%= turbo_frame_tag(@cocina_model, 'json') do %>
+  <pre><%= JSON.pretty_generate(@cocina_model.to_h) %></pre>
+<% end %>

@@ -33,6 +33,51 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '#find_lite' do
+    let(:object_client) { instance_double(Dor::Services::Client::Object) }
+    let(:cocina_object) { instance_double(Cocina::Models::DROLite) }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+    end
+
+    context 'when the object is found with the default structural value' do
+      before do
+        allow(object_client).to receive(:find_lite).and_return(cocina_object)
+      end
+
+      it 'returns the object' do
+        expect(described_class.find_lite(druid:)).to eq(cocina_object)
+
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(object_client).to have_received(:find_lite).with(structural: true)
+      end
+    end
+
+    context 'when structural is false' do
+      before do
+        allow(object_client).to receive(:find_lite).and_return(cocina_object)
+      end
+
+      it 'passes the structural flag through to the client' do
+        expect(described_class.find_lite(druid:, structural: false)).to eq(cocina_object)
+
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(object_client).to have_received(:find_lite).with(structural: false)
+      end
+    end
+
+    context 'when the object is not found' do
+      before do
+        allow(object_client).to receive(:find_lite).and_raise(Dor::Services::Client::NotFoundResponse)
+      end
+
+      it 'raises' do
+        expect { described_class.find_lite(druid:) }.to raise_error(Sdr::Repository::NotFoundResponse)
+      end
+    end
+  end
+
   describe '#update' do
     let(:cocina_object) { instance_double(Cocina::Models::DRO, externalIdentifier: druid) }
 
