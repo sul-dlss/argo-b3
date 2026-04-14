@@ -26,13 +26,23 @@ RSpec.describe CocinaModels::Factory do
       end
     end
 
+    context 'with a Cocina::Models::AdminPolicyWithMetadata' do
+      let(:cocina_object) { build(:admin_policy_with_metadata) }
+
+      it 'returns a CocinaModels::AdminPolicy' do
+        result = described_class.build(cocina_object)
+
+        expect(result).to be_a(CocinaModels::AdminPolicy)
+        expect(result.external_identifier).to eq(cocina_object.externalIdentifier)
+      end
+    end
+
     context 'with an invalid object' do
       let(:cocina_object) { 'invalid' }
 
       it 'raises an ArgumentError' do
         expect { described_class.build(cocina_object) }
-          .to raise_error(ArgumentError,
-                          'Expected a Cocina::Models::DROWithMetadata or Cocina::Models::CollectionWithMetadata')
+          .to raise_error(ArgumentError, 'Unexpected cocina object type')
       end
     end
   end

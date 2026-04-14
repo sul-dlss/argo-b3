@@ -33,6 +33,33 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '#find_solr' do
+    context 'when the object is found' do
+      let(:solr_doc) { { 'id' => druid } }
+      let(:object_client) { instance_double(Dor::Services::Client::Object, solr: solr_doc) }
+
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+      end
+
+      it 'returns the Solr document' do
+        expect(described_class.find_solr(druid:)).to eq(solr_doc)
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(object_client).to have_received(:solr).with(validate: false)
+      end
+    end
+
+    context 'when the object is not found' do
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_raise(Dor::Services::Client::NotFoundResponse)
+      end
+
+      it 'raises' do
+        expect { described_class.find_solr(druid:) }.to raise_error(Sdr::Repository::NotFoundResponse)
+      end
+    end
+  end
+
   describe '#update' do
     let(:cocina_object) { instance_double(Cocina::Models::DRO, externalIdentifier: druid) }
 

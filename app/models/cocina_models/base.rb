@@ -18,15 +18,7 @@ module CocinaModels
     end
 
     attr_reader :external_identifier, :previous_cocina_object
-
-    attribute :source_id, :string
-    validates :source_id, presence: true
-    validates :source_id, format: { with: /\A.+:.+\z/ }
-
-    # Access fields
-    attribute :use_and_reproduction_statement, :string
-    attribute :license, :string
-    attribute :copyright, :string
+    alias druid external_identifier
 
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
@@ -38,6 +30,30 @@ module CocinaModels
       validate!
       Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
       changes_applied
+    end
+
+    def to_param
+      persisted? ? druid : nil
+    end
+
+    def to_key
+      persisted? ? [druid] : nil
+    end
+
+    def persisted?
+      true
+    end
+
+    def dro?
+      is_a?(Dro)
+    end
+
+    def collection?
+      is_a?(Collection)
+    end
+
+    def admin_policy?
+      is_a?(AdminPolicy)
     end
 
     private

@@ -6,7 +6,7 @@ module LinkHelper
     link_to(*, target: '_blank', rel: 'noopener', data:, **, &)
   end
 
-  def link_to_item(label, druid, *, data: {}, **, &)
+  def link_to_old_argo(label, druid, *, data: {}, **, &)
     link_to_new_tab(label, "#{Settings.argo.url}/view/#{druid}", *, data:, **, &)
   end
 end

@@ -23,9 +23,27 @@ RSpec.describe SearchResults::Item do
     end
   end
 
+  describe '#druid' do
+    it 'returns the id from the solr document' do
+      expect(item.druid).to eq('druid:rt276nw8963')
+    end
+  end
+
   describe '#title (method missing)' do
     it 'returns the title from the solr document' do
       expect(item.title).to eq('Mark Twain : portrait for orchestra')
+    end
+  end
+
+  describe '#object_types (method missing, pluralized)' do
+    it 'returns the object types from the solr document' do
+      expect(item.object_types).to eq('item')
+    end
+  end
+
+  describe '#object_type (method missing, singularized)' do
+    it 'returns the object type from the solr document' do
+      expect(item.object_type).to eq('item')
     end
   end
 

@@ -12,6 +12,15 @@ module CocinaModels
       super
     end
 
+    attribute :source_id, :string
+    validates :source_id, presence: true
+    validates :source_id, format: { with: /\A.+:.+\z/ }
+
+    # Access fields
+    attribute :use_and_reproduction_statement, :string
+    attribute :license, :string
+    attribute :copyright, :string
+
     private
 
     def model_attrs_for(cocina_object)
