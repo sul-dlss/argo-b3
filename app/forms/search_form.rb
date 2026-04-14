@@ -78,9 +78,9 @@ class SearchForm < ApplicationForm
   end
 
   # @return [hash] this form's attributes with provided attrs removed
-  def without_attributes(without_attrs)
+  def without_attributes(without_attrs) # rubocop:disable Metrics/AbcSize
     attributes.with_indifferent_access.tap do |new_attrs|
-      without_attrs.each do |key, value|
+      Array(without_attrs).each do |key, value|
         if new_attrs[key].is_a?(Array) && value.present?
           new_attrs[key] = new_attrs[key] - Array(value)
         elsif new_attrs[key] == value || value.nil?
@@ -88,6 +88,11 @@ class SearchForm < ApplicationForm
         end
       end
     end.compact
+  end
+
+  # @return [SearchForm] a new SearchForm with the provided attrs removed
+  def without(without_attrs)
+    SearchForm.new(without_attributes(without_attrs))
   end
 
   # @param key [String, Symbol] the attribute name

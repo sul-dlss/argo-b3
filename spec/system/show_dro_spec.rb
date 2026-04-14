@@ -35,6 +35,7 @@ RSpec.describe 'Show DRO' do
 
   before do
     sign_in(create(:user))
+    set_last_search_cookie
   end
 
   it 'displays the object' do
@@ -45,6 +46,8 @@ RSpec.describe 'Show DRO' do
     visit "/objects/#{druid}"
 
     expect(page).to have_css('h1', text: original_title)
+
+    expect(page).to have_link('← Back to search', href: /search\?page=5&query=test/)
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Details')

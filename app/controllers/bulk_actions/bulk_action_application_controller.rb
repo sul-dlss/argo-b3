@@ -51,7 +51,7 @@ module BulkActions
       if @bulk_action_form.source == 'druids'
         DruidSupport.parse_list(@bulk_action_form.druid_list)
       else
-        Searchers::DruidList.call(search_form: @last_search_form)
+        Searchers::DruidList.call(search_form: @last_search_form.without(:page))
       end
     end
 

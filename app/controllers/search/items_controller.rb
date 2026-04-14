@@ -22,7 +22,7 @@ module Search
         cookies.delete(:last_search)
       else
         cookies.signed[:last_search] =
-          { value: { form: @search_form.without_attributes(page: nil), total_results: @results.total_results } }
+          { value: { form: @search_form.attributes, total_results: @results.total_results } }
       end
     end
   end
