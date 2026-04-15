@@ -16,26 +16,33 @@
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
-      <%= render Elements::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
-        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
-        <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
-        <% component.with_row(label: 'Admin policy') do |row_component| %>
-          <% row_component.with_cell do %>
-            <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
-            <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-            (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
-          <% end %>
-        <% end %>
-        <% component.with_row(label: 'Collection') do |row_component| %>
-          <% row_component.with_cell do %>
-            <% @solr_doc.collection_druids.each_with_index do |collection_druid, index| %>
-              <%= link_to @solr_doc.collection_titles[index], object_path(druid: collection_druid) %>
-              <% search_form = SearchForm.new(collection_titles: [@solr_doc.collection_titles[index]]) %>
-              (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
+      <div class="row">
+        <div class="col-md-9">
+          <%= render Elements::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
+            <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
+            <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
+            <% component.with_row(label: 'Admin policy') do |row_component| %>
+              <% row_component.with_cell do %>
+                <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+                <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+                (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+              <% end %>
+            <% end %>
+            <% component.with_row(label: 'Collection') do |row_component| %>
+              <% row_component.with_cell do %>
+                <% @solr_doc.collection_druids.each_with_index do |collection_druid, index| %>
+                  <%= link_to @solr_doc.collection_titles[index], object_path(druid: collection_druid) %>
+                  <% search_form = SearchForm.new(collection_titles: [@solr_doc.collection_titles[index]]) %>
+                  (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
+                <% end %>
+              <% end %>
             <% end %>
           <% end %>
-        <% end %>
-      <% end %>
+        </div>
+        <div class="col-md-3 mx-auto align-self-center">
+          <%= render ThumbnailComponent.new(result: @solr_doc) %>
+        </div>
+      </div>
 
       <%= render Elements::Tables::TableComponent.new(id: 'description-table', classes: 'mb-5') do |component| %>
         <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Description') %><% end %>
