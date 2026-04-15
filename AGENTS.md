@@ -21,6 +21,7 @@
   - Caching
 - For mocking, place allow statements in a before block and expect statements after the action is performed. Prefer testing argument (with) in expect; do not test in both allow and expect.
 - Place let statements before before blocks.
+- When writing CSS matchers, do not test padding or margins (e.g., ps-3, mt-1).
 
 ## References
 

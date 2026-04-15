@@ -10,6 +10,15 @@ RSpec.describe 'Show DRO' do
   let(:original_title)  { 'My title' }
   let(:updated_title)   { 'My updated title' }
 
+  let(:registration_workflow) do
+    xml = <<~XML
+      <workflow id="registrationWF">
+        <process version="1" note="" lifecycle="registered" laneId="low" elapsed="" attempts="0" datetime="2022-04-18T08:32:40+00:00" context="" status="completed" name="register"/>
+      </workflow>
+    XML
+    Dor::Services::Response::Workflow.new(xml:)
+  end
+
   def build_solr_doc(title:)
     {
       Search::Fields::ID => druid,
@@ -34,6 +43,36 @@ RSpec.describe 'Show DRO' do
       )
   end
 
+  def build_accession_workflow(complete: false) # rubocop:disable Metrics/MethodLength
+    xml = <<~XML
+      <workflow id="accessionWF">
+        <process version="1" note="" lifecycle="submitted" laneId="low" elapsed="" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="start-accession"/>
+        <process version="1" note="No descMetadata.xml was provided" lifecycle="described" laneId="low" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="skipped" name="descriptive-metadata"/>
+        <process version="1" note="No contentMetadata.xml was provided" lifecycle="" laneId="low" elapsed="0.551" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="skipped" name="content-metadata"/>
+        <process version="1" note="Completed by technical-metadata-service on dor-techmd-worker-prod-a.stanford.edu." lifecycle="" laneId="low" elapsed="1.525" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="technical-metadata"/>
+        <process version="1" note="Completed Job 10476358 on dor-services-app" lifecycle="" laneId="low" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="shelve"/>
+        <process version="1" note="Completed Job 10476361 on dor-services-app" lifecycle="published" laneId="low" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="publish"/>
+        <process version="1" note="Object does not have a DOI" lifecycle="" laneId="low" elapsed="0.405" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="skipped" name="update-doi"/>
+        <process version="1" note="Completed Job 10476363 on dor-services-app" lifecycle="" laneId="low" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="sdr-ingest-transfer"/>
+        <process version="1" note="preservationIngestWF completed on preservation-robots1-prod.stanford.edu" lifecycle="deposited" laneId="low" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="sdr-ingest-received"/>
+        <process version="1" note="common-accessioning-prod-c.stanford.edu" lifecycle="" laneId="low" elapsed="0.37" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="reset-workspace"/>
+        <process version="1" note="common-accessioning-prod-c.stanford.edu" lifecycle="accessioned" laneId="low" elapsed="1.454" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="end-accession"/>
+        <process version="2" note="" lifecycle="submitted" laneId="default" elapsed="" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="start-accession"/>
+        <process version="2" note="No descMetadata.xml was provided" lifecycle="described" laneId="default" elapsed="0.008" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="descriptive-metadata"/>
+        <process version="2" note="No contentMetadata.xml was provided" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="content-metadata"/>
+        <process version="2" note="change is metadata-only" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="technical-metadata"/>
+        <process version="2" note="Completed Job 21618100 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:20+00:00" context="" status="completed" name="shelve"/>
+        <process version="2" note="Completed Job 21618111 on dor-services-app" lifecycle="published" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:21+00:00" context="" status="completed" name="publish"/>
+        <process version="2" note="Object does not have a DOI" lifecycle="" laneId="default" elapsed="0.111" attempts="0" datetime="2023-06-21T17:36:22+00:00" context="" status="skipped" name="update-doi"/>
+        <process version="2" note="Completed Job 21618118 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:23+00:00" context="" status="completed" name="sdr-ingest-transfer"/>
+        <process version="2" note="" errorMessage="#{'Bag validation failed' unless complete}" lifecycle="deposited" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'error'}" name="sdr-ingest-received"/>
+        <process version="2" note="" lifecycle="" laneId="default" elapsed="0.197" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'started'}" name="reset-workspace"/>
+        <process version="2" note="" lifecycle="accessioned" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:28+00:00" context="" status="#{complete ? 'completed' : 'waiting'}" name="end-accession"/>
+      </workflow>
+    XML
+    Dor::Services::Response::Workflow.new(xml:)
+  end
+
   before do
     sign_in(create(:user))
     set_last_search_cookie
@@ -43,6 +82,7 @@ RSpec.describe 'Show DRO' do
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: original_title))
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow, build_accession_workflow])
 
     visit "/objects/#{druid}"
 
@@ -52,6 +92,7 @@ RSpec.describe 'Show DRO' do
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Details')
+    expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link.disabled', text: 'History')
     expect(page).to have_css('.nav-link.disabled', text: 'Events')
     expect(page).to have_css('.nav-link.disabled', text: 'Content')
@@ -92,5 +133,62 @@ RSpec.describe 'Show DRO' do
 
     click_button 'Details'
     expect(page).to have_table_value('description-table', 'Title', updated_title)
+
+    # Workflows tab
+    click_button 'Workflows'
+    expect(page).to have_css('.accordion-item', count: 2)
+    expect(page).to have_css('.accordion-button.collapsed', text: 'registrationWF')
+    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
+    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'accessionWF')
+    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'In progress')
+
+    within('#accessionwf-collapse.accordion-collapse.show') do
+      expect(page).to have_table(count: 2)
+      expect(page).to have_table_caption('accessionwf-2-table', 'accessionWF - Version 2')
+      expect(page).to have_table_caption('accessionwf-1-table', 'accessionWF - Version 1')
+
+      row = find_table_row('accessionwf-2-table', 'descriptive-metadata')
+      expect(row).to have_css('th', text: 'descriptive-metadata')
+      cells = row.all('td')
+      expect(cells[0]).to have_text('described')
+      expect(cells[1]).to have_text('skipped')
+      expect(cells[2]).to have_text('June 21, 2023 10:36')
+      expect(cells[3]).to have_text('less than a minute')
+      expect(page).to have_css('td.text-success-emphasis', text: 'Note: No descMetadata.xml was provided')
+
+      row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
+      cells = row.all('td')
+      expect(cells[0]).to have_text('deposited')
+      expect(cells[1]).to have_text('error')
+      expect(page).to have_css('td.text-danger', text: 'Error: Bag validation failed')
+    end
+
+    # Collapse accessionWF and expand registrationWF.
+    click_button 'accessionWF'
+    expect(page).to have_no_css('#accessionwf-collapse')
+    click_button 'registrationWF'
+    within('#registrationwf-collapse.accordion-collapse.show') do
+      expect(page).to have_table(count: 1)
+    end
+
+    # Update the workflows
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
+                                                                       build_accession_workflow(complete: true)])
+
+    expect(page).to have_css('.accordion-item',
+                             count: 2)
+    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
+    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'Complete')
+    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
+    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
+
+    click_button 'accessionWF'
+
+    within('#accessionwf-collapse.accordion-collapse.show') do
+      row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
+      cells = row.all('td')
+      expect(cells[1]).to have_text('completed')
+      expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
+    end
   end
 end

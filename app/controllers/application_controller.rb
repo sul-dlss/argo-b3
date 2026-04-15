@@ -14,12 +14,17 @@ class ApplicationController < ActionController::Base
   verify_authorized
 
   rescue_from ActionPolicy::Unauthorized, with: :deny_access
+  rescue_from ActiveSupport::MessageVerifier::InvalidSignature, with: :forbidden_access
 
   private
 
   def deny_access
     flash[:warning] = helpers.t('errors.not_authorized')
     redirect_to main_app.root_path
+  end
+
+  def forbidden_access
+    render plain: 'Forbidden', status: :forbidden
   end
 
   def set_from_last_search_cookie

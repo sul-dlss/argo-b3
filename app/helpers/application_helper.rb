@@ -14,4 +14,10 @@ module ApplicationHelper
   def facet_value_label(value)
     I18n.t("search.facet_values.#{value}", default: value.to_s.humanize)
   end
+
+  def format_datetime(datetime, format: :long)
+    return if datetime.blank?
+
+    I18n.l(datetime.in_time_zone('Pacific Time (US & Canada)'), format:)
+  end
 end

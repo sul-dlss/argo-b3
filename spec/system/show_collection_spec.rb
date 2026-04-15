@@ -30,6 +30,8 @@ RSpec.describe 'Show collection' do
   end
 
   before do
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
+
     sign_in(create(:user))
   end
 
@@ -44,6 +46,7 @@ RSpec.describe 'Show collection' do
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Details')
+    expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link.disabled', text: 'History')
     expect(page).to have_css('.nav-link.disabled', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
