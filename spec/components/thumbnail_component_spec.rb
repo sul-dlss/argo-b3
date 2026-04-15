@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Search::ThumbnailComponent, type: :component do
+RSpec.describe ThumbnailComponent, type: :component do
   let(:component) { described_class.new(result:) }
   let(:result) { SearchResults::Item.new(solr_doc:, index: 1) }
   let(:solr_doc) { build(:solr_item, title:, first_shelved_image:) }

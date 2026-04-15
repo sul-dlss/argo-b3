@@ -3,6 +3,7 @@
 @import 'tables';
 @import 'bl_facets';
 @import 'search';
+@import 'show';
 
 /* Header color */
 .stone-dark {
@@ -14,22 +15,11 @@
   --bs-nav-link-color: white;
 }
 
-// This is used on the object show page
-.nav-underline {
-  border-bottom: 1px solid black;
-  margin-bottom: 10px;
-
-  .nav-link {
-    width: 10.5rem;
-  }
-
-  .nav-link:not(.active, .disabled) {
-    color: rgb(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
-  }
-
-  .nav-link.active {
-    border-bottom: 3px solid #B1040E;
-    color: #B1040E;
-    font-weight: bold;
-  }
+.thumbnail {
+  max-width: 240px;
+  max-height: 240px;
+  border-color: var(--stanford-30-black);
+  border-width: 1px;
+  border-radius: 4px;
+  border-style: solid;
 }

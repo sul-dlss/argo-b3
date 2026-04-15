@@ -18,7 +18,8 @@ RSpec.describe 'Show DRO' do
       Search::Fields::APO_DRUID => [apo_druid],
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::COLLECTION_DRUIDS => [collection_druid],
-      Search::Fields::COLLECTION_TITLES => ['My Collection']
+      Search::Fields::COLLECTION_TITLES => ['My Collection'],
+      Search::Fields::FIRST_SHELVED_IMAGE => 'rr624wq8610_00_0001.jp2'
     }
   end
 
@@ -67,6 +68,9 @@ RSpec.describe 'Show DRO' do
       expect(page).to have_link('All objects with this collection',
                                 href: '/search?collection_titles%5B%5D=My+Collection&page=1')
     end
+
+    # Thumbnail
+    expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!400,400/0/default.jpg"]') # rubocop:disable Layout/LineLength
 
     # Description table
     expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
