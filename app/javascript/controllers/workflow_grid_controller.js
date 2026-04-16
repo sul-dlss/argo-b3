@@ -36,8 +36,8 @@ export default class extends Controller {
     this.element.removeEventListener('turbo:frame-missing', this.handleMissingFrame)
   }
 
-  // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent 
-  // Turbo from rendering an error page in a frame when the server returns an error response. 
+  // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent
+  // Turbo from rendering an error page in a frame when the server returns an error response.
   handleFrameResponse = (event) => {
     const { fetchResponse } = event.detail
 

@@ -5,7 +5,8 @@ const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordio
 // Controller for the Cocina model show page.
 export default class extends Controller {
   static values = {
-    interval: Number
+    interval: Number,
+    stagger: Number
   }
 
   connect () {
@@ -15,20 +16,25 @@ export default class extends Controller {
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
 
     this.href = window.location.href
-    if (this.reloadInterval) return
+    this.frameReloadTimeouts = []
+    if (this.reloadTimeout) return
 
-    // Morph reload every interval to get updates.
-    this.reloadInterval = setInterval(() => {
-      if (this.href !== window.location.href) return
-      document.querySelectorAll('turbo-frame').forEach((frame) => frame.reload())
-    }, this.intervalValue)
+    // Use a single recursive timer so each refresh cycle waits for the prior
+    // staggered frame reloads to be scheduled before starting the next cycle.
+    // Reloads are staggered to allow the Solr docs to be cached after the first request
+    // and to reduce bursts of requests when multiple frames are present.
+    this.scheduleReloadCycle()
   }
 
   disconnect () {
-    if (this.reloadInterval) {
-      clearInterval(this.reloadInterval)
-      this.reloadInterval = null
+    if (this.reloadTimeout) {
+      clearTimeout(this.reloadTimeout)
+      this.reloadTimeout = null
     }
+
+    // Clear any pending staggered frame reloads when leaving the page.
+    this.frameReloadTimeouts.forEach((timeoutId) => clearTimeout(timeoutId))
+    this.frameReloadTimeouts = []
 
     document.removeEventListener('turbo:before-morph-attribute', this.preserveTab)
     document.removeEventListener('turbo:before-fetch-response', this.handleFrameResponse)
@@ -45,8 +51,30 @@ export default class extends Controller {
     }
   }
 
-  // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent 
-  // Turbo from rendering an error page in a frame when the server returns an error response. 
+  scheduleReloadCycle = () => {
+    const frames = Array.from(document.querySelectorAll('turbo-frame'))
+    const cycleDelay = this.intervalValue + (Math.max(frames.length - 1, 0) * this.staggerValue)
+
+    this.reloadTimeout = setTimeout(() => {
+      if (this.href !== window.location.href) return
+
+      this.frameReloadTimeouts = []
+
+      // Reload frames one at a time to spread out requests and reduce bursts.
+      frames.forEach((frame, index) => {
+        const timeoutId = setTimeout(() => {
+          frame.reload()
+        }, index * this.staggerValue)
+
+        this.frameReloadTimeouts.push(timeoutId)
+      })
+
+      this.scheduleReloadCycle()
+    }, cycleDelay)
+  }
+
+  // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent
+  // Turbo from rendering an error page in a frame when the server returns an error response.
   handleFrameResponse = (event) => {
     if (event.target.tagName !== 'TURBO-FRAME') return
 
