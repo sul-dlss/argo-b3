@@ -1,4 +1,5 @@
-<nav class="paginate-section" aria-label="Pagination links">
+<!-- Not prefetching because this changes the last search cookie even if the user never clicks the link. -->
+<nav class="paginate-section" aria-label="Pagination links" data-turbo-prefetch="false">
   <ul class="pagination">
     <%= tag.li class: previous_classes do %>
       <%= link_to '« Previous', previous_path, rel: 'prev', class: 'page-link', 'aria-label': 'Go to previous page' %>

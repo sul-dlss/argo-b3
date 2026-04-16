@@ -6,6 +6,8 @@ class ObjectsController < ApplicationController
     @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: params[:druid]))
     authorize! @solr_doc, with: ObjectPolicy
 
+    set_from_last_search_cookie # This provides @last_search_form
+
     case @solr_doc.object_type
     when 'collection'
       render :show_collection
