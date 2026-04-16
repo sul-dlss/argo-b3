@@ -3,7 +3,11 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: 'container mb-4', data: { controller: 'cocina-model-show', cocina_model_show_interval_value: Rails.env.test? ? 500 : 10_000, cocina_model_show_stagger_value: Rails.env.test? ? 5 : 1_500 } do %>
+<%= tag.div class: 'container mb-4', data: {
+      controller: 'cocina-model-show',
+      cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
+      cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
+    } do %>
   <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
 
   <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>

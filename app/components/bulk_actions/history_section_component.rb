@@ -13,7 +13,7 @@ module BulkActions
     def data
       {
         controller: 'bulk-actions-history',
-        bulk_actions_history_interval_value: Rails.env.test? ? 500 : 10_000
+        bulk_actions_history_interval_value: Settings.reload_intervals.bulk_actions_history.to_i
       }
     end
 

@@ -34,7 +34,6 @@ class ObjectsController < ApplicationController
   end
 
   def show_json
-    # return render plain: 'Internal Server Error', status: :internal_server_error
     @cocina_object = Sdr::Repository.find(druid: verify_token(params[:druid]))
 
     render layout: false

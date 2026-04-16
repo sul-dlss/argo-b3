@@ -1,7 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Reload the turbo-frame every 10 seconds
+// Reload the turbo-frame on the configured interval.
 export default class extends Controller {
+  static values = {
+    interval: Number
+  }
+
   connect () {
     if (this.element.tagName !== 'TURBO-FRAME') return
 
@@ -16,7 +20,7 @@ export default class extends Controller {
     if (this.element.innerHTML.trim() === '') return
     this.reloadInterval = setInterval(() => {
       this.element.reload()
-    }, 10000)
+    }, this.intervalValue)
   }
 
   stop () {

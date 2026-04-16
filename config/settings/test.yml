@@ -3,3 +3,9 @@ solr:
 
 bulk_actions:
   directory: "tmp/bulk_jobs_test"
+
+reload_intervals:
+  cocina_model: 500
+  cocina_model_stagger: 5
+  bulk_actions_history: 500
+  workflow_grid: 500
