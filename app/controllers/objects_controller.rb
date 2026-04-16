@@ -2,23 +2,19 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows show_details]
+  skip_verify_authorized only: %i[show_json show_workflows show_details show_header]
   def show
     @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: params[:druid]))
     authorize! @solr_doc, with: ObjectPolicy
 
     set_from_last_search_cookie # This provides @last_search_form
     @druid_token = generate_token(params[:druid])
+  end
 
-    # case @solr_doc.object_type
-    # when 'collection'
-    #   render :show_collection
-    # when 'admin_policy'
-    #   render :show_admin_policy
-    # else
-    #   # This also includes agreements and virtual objects.
-    #   render :show_dro
-    # end
+  def show_header
+    @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: verify_token(params[:druid])))
+
+    render layout: false
   end
 
   def show_details

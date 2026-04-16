@@ -6,7 +6,9 @@
 <%= tag.div class: 'container mb-4', data: { controller: 'cocina-model-show', cocina_model_show_interval_value: Rails.env.test? ? 500 : 10_000 } do %>
   <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
 
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-4') %>
+  <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: "_top") do %>
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-4') %>
+  <% end %>
 
   <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
 
