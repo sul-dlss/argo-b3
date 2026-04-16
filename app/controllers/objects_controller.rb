@@ -2,7 +2,7 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows show_details show_header]
+  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions]
 
   def show
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(params[:druid]))
@@ -42,6 +42,16 @@ class ObjectsController < ApplicationController
   def show_workflows
     @druid = verify_token(params[:druid])
     @workflows = Sdr::WorkflowService.workflows_for(druid: @druid)
+
+    render layout: false
+  end
+
+  def show_versions
+    @druid = verify_token(params[:druid])
+    object_client = Dor::Services::Client.object(@druid)
+    @versions_presenter = VersionsPresenter.new(version_inventory: object_client.version.inventory,
+                                                milestones: object_client.milestones.list,
+                                                user_version_inventory: object_client.user_version.inventory)
 
     render layout: false
   end
