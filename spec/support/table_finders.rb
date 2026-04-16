@@ -9,3 +9,8 @@ def find_table_value_cell(table_id, row_label)
   row = table.all('tr').find { |tr| tr.has_css?('th', text: row_label) }
   row.find('td')
 end
+
+def find_table_row(table_id, row_label)
+  table = find_table(table_id)
+  table.all('tr').find { |tr| tr.has_css?('th', text: row_label) }
+end

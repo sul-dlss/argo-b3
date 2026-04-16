@@ -4,7 +4,7 @@ module Elements
   module Tables
     # Component for rendering a table row.
     class RowComponent < ApplicationComponent
-      renders_many :cells
+      renders_many :cells, Elements::Tables::CellComponent
       renders_one :label_content
 
       def initialize(label: nil, first_value: nil, values: [], value: nil, id: nil, tooltip: nil) # rubocop:disable Metrics/ParameterLists

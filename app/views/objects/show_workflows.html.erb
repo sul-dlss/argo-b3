@@ -1,0 +1,7 @@
+<%= turbo_frame_tag(@druid, 'workflows') do %>
+  <div class="accordion">
+    <% @workflows.each do |workflow| %>
+      <%= render Show::WorkflowAccordionItemComponent.new(workflow:) %>
+    <% end %>
+  </div>
+<% end %>

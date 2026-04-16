@@ -10,6 +10,7 @@
 
   <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
     <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
+    <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
     <% component.with_tab(id: 'history-tab', label: 'History') %>
     <% component.with_tab(id: 'events-tab', label: 'Events') %>
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
@@ -33,8 +34,14 @@
       <% end %>
     <% end %>
 
+    <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+
     <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
-      <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(@solr_doc), refresh: 'morph') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph') do %>
         <%= render Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>

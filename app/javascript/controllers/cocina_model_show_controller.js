@@ -1,5 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
+const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordion-collapse']
+
 // Controller for the Cocina model show page.
 export default class extends Controller {
   static values = {
@@ -27,9 +29,10 @@ export default class extends Controller {
   }
 
   // This preserves the active tab when the page is refreshed
-  // by preventing Turbo from morphing the tab list and pane attributes.
+  // by preventing Turbo from morphing the tab list, tab pane, accordion button,
+  // and accordion body attributes
   preserveTab (event) {
-    if (event.target.classList.contains('nav-link') || event.target.classList.contains('tab-pane')) {
+    if (PRESERVED_CLASSES.some((className) => event.target.classList.contains(className))) {
       event.preventDefault()
     }
   }

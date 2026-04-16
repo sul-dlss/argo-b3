@@ -1,0 +1,26 @@
+<%= render Elements::Tables::TableComponent.new(id: table_id, classes: 'mb-4',
+                                                label: "#{workflow_name} - Version #{version}") do |component| %>
+          <% component.with_header(label: 'Process') %>
+          <% component.with_header(label: 'Lifecycle') %>
+          <% component.with_header(label: 'Status') %>
+          <% component.with_header(label: 'When') %>
+          <% component.with_header(label: 'Elapsed') %>
+          <% processes.each do |process| %>
+            <% component.with_row(label: process.name) do |row_component| %>
+              <% row_component.with_cell do %><%= process.lifecycle %><% end %>
+              <% row_component.with_cell do %><%= process.status %><% end %>
+              <% row_component.with_cell do %><%= helpers.format_datetime(Time.zone.parse(process.datetime)) if process.datetime %><% end %>
+              <% row_component.with_cell do %><%= helpers.distance_of_time_in_words(0, process.elapsed.to_i) if process.elapsed %><% end %>
+            <% end %>
+            <% if process.error_message.present? %>
+              <% component.with_row do |row_component| %>
+                <% row_component.with_cell(colspan: 5, classes: 'ps-5 text-danger') do %>Error: <%= process.error_message %><% end %>
+              <% end %>
+            <% end %>
+            <% if process.note.present? %>
+              <% component.with_row do |row_component| %>
+                <% row_component.with_cell(colspan: 5, classes: 'ps-5 text-success-emphasis') do %>Note: <%= process.note %><% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>

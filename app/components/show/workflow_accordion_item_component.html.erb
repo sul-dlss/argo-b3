@@ -1,0 +1,21 @@
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <%= tag.button class: button_classes, type: 'button', data: { bs_toggle: 'collapse', bs_target: "##{accordion_collapse_id}" }, aria: { expanded: expanded?, controls: accordion_collapse_id } do %>
+      <%= workflow_name %>
+      <% if complete? %>
+        <span class="badge bg-success ms-2">Complete</span>
+      <% else %>
+        <span class="badge bg-warning text-dark ms-2">In progress</span>
+      <% end %>
+    <% end %>
+  </h2>
+
+  <%= tag.div id: accordion_collapse_id, class: accordion_collapse_classes do %>
+    <div class="accordion-body">
+      <% version_groups = workflow.processes.group_by(&:version) %>
+      <% version_groups.keys.sort.reverse_each do |version| %>
+        <%= render Show::WorkflowTableComponent.new(workflow:, version:, processes: version_groups[version]) %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
