@@ -2,7 +2,7 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows]
+  skip_verify_authorized only: %i[show_json show_workflows show_details]
   def show
     @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: params[:druid]))
     authorize! @solr_doc, with: ObjectPolicy
@@ -10,18 +10,34 @@ class ObjectsController < ApplicationController
     set_from_last_search_cookie # This provides @last_search_form
     @druid_token = generate_token(params[:druid])
 
+    # case @solr_doc.object_type
+    # when 'collection'
+    #   render :show_collection
+    # when 'admin_policy'
+    #   render :show_admin_policy
+    # else
+    #   # This also includes agreements and virtual objects.
+    #   render :show_dro
+    # end
+  end
+
+  def show_details
+    # Need to find way to avoid retrieving solr doc again.
+    @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: verify_token(params[:druid])))
+
     case @solr_doc.object_type
     when 'collection'
-      render :show_collection
+      render :show_collection_details, layout: false
     when 'admin_policy'
-      render :show_admin_policy
+      render :show_admin_policy_details, layout: false
     else
       # This also includes agreements and virtual objects.
-      render :show_dro
+      render :show_dro_details, layout: false
     end
   end
 
   def show_json
+    # return render plain: 'Internal Server Error', status: :internal_server_error
     @cocina_object = Sdr::Repository.find(druid: verify_token(params[:druid]))
 
     render layout: false
