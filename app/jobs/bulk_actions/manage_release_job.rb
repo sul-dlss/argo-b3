@@ -24,7 +24,7 @@ module BulkActions
           return failure!(message: 'Object has never been published and cannot be released')
         end
 
-        object_client.release_tags.create(tag: new_tag)
+        object_client.release_tags.create(tag: new_tag, lane_id: 'low')
 
         success!(message: 'Workflow creation successful')
       end
