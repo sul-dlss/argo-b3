@@ -24,7 +24,11 @@ module WorkflowGrid
     def data
       return {} if Rails.env.test? # So that reloading doesn't occur in tests.
 
-      { controller: 'workflow-grid', action: 'turbo:frame-load->workflow-grid#start' }
+      {
+        controller: 'workflow-grid',
+        action: 'turbo:frame-load->workflow-grid#start',
+        workflow_grid_interval_value: Settings.reload_intervals.workflow_grid.to_i
+      }
     end
 
     def frame_src

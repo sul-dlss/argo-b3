@@ -1,0 +1,18 @@
+<%= turbo_frame_tag(@solr_doc.druid, 'details') do %>
+    <%= render Elements::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
+      <% component.with_row(label: 'Object type', value: 'Admin policy') %>
+      <% component.with_row(label: 'Admin policy') do |row_component| %>
+        <% row_component.with_cell do %>
+          <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+          <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+          (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render Elements::Tables::TableComponent.new(id: 'description-table', classes: 'mb-5') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Description') %><% end %>
+      <% component.with_row(label: 'Title', value: @solr_doc.title) %>
+    <% end %>
+<% end %>

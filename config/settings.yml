@@ -1,6 +1,12 @@
 solr:
   url: http://localhost:8983/solr/argo
 
+reload_intervals:
+  cocina_model: 10000
+  cocina_model_stagger: 1500
+  bulk_actions_history: 10000
+  workflow_grid: 10000
+
 argo:
   url: https://argo.stanford.edu
 

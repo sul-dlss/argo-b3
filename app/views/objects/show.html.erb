@@ -1,0 +1,45 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= tag.div class: 'container mb-4', data: {
+      controller: 'cocina-model-show',
+      cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
+      cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
+    } do %>
+  <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
+
+  <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-4') %>
+  <% end %>
+
+  <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+
+    <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
+    <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
+    <% component.with_tab(id: 'history-tab', label: 'History') %>
+    <% component.with_tab(id: 'events-tab', label: 'Events') %>
+    <% component.with_tab(id: 'content-tab', label: 'Content') if @solr_doc.dro? %>
+    <% component.with_tab(id: 'technical-metadata-tab', label: 'Technical metadata') if @solr_doc.dro? %>
+    <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
+
+    <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'details', src: details_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

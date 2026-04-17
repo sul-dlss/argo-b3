@@ -2,22 +2,34 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows]
+  skip_verify_authorized only: %i[show_json show_workflows show_details show_header]
+
   def show
-    @solr_doc = SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid: params[:druid]))
+    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(params[:druid]))
     authorize! @solr_doc, with: ObjectPolicy
 
     set_from_last_search_cookie # This provides @last_search_form
     @druid_token = generate_token(params[:druid])
+  end
+
+  def show_header
+    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verify_token(params[:druid])))
+
+    render layout: false
+  end
+
+  def show_details
+    # Need to find way to avoid retrieving solr doc again.
+    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verify_token(params[:druid])))
 
     case @solr_doc.object_type
     when 'collection'
-      render :show_collection
+      render :show_collection_details, layout: false
     when 'admin_policy'
-      render :show_admin_policy
+      render :show_admin_policy_details, layout: false
     else
       # This also includes agreements and virtual objects.
-      render :show_dro
+      render :show_dro_details, layout: false
     end
   end
 
@@ -55,5 +67,11 @@ class ObjectsController < ApplicationController
   # @raise [ActiveSupport::MessageVerifier::InvalidSignature] if the token is invalid
   def verify_token(token)
     verifier.verify(token, purpose: 'show')
+  end
+
+  def fetch_solr_doc(druid)
+    Rails.cache.fetch("objects/solr-doc/#{druid}", expires_in: 10.seconds) do
+      Sdr::Repository.find_solr(druid:)
+    end
   end
 end
