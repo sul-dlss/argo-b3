@@ -122,7 +122,8 @@ RSpec.describe 'Show DRO' do
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: original_title))
-    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow, build_accession_workflow])
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
+                                                                       build_accession_workflow])
 
     visit "/objects/#{druid}"
 
@@ -165,15 +166,6 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_css('pre', text: "\"externalIdentifier\": \"#{druid}\"")
     expect(page).to have_css('pre', text: "\"value\": \"#{original_title}\"")
 
-    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
-
-    expect(page).to have_css('h1', text: updated_title)
-    expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
-
-    click_button 'Details'
-    expect(page).to have_table_value('description-table', 'Title', updated_title)
-
     # Workflows tab
     click_button 'Workflows'
     expect(page).to have_css('.accordion-item', count: 2)
@@ -211,26 +203,6 @@ RSpec.describe 'Show DRO' do
       expect(page).to have_table(count: 1)
     end
 
-    # Update the workflows
-    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
-                                                                       build_accession_workflow(complete: true)])
-
-    expect(page).to have_css('.accordion-item',
-                             count: 2)
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'Complete')
-    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
-
-    click_button 'accessionWF'
-
-    within('#accessionwf-collapse.accordion-collapse.show') do
-      row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
-      cells = row.all('td')
-      expect(cells[1]).to have_text('completed')
-      expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
-    end
-
     # Versions tab
     click_button 'Versions'
 
@@ -258,5 +230,35 @@ RSpec.describe 'Show DRO' do
     expect(cells[2]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[3]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
+
+    # Update the object and look for changes.
+    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
+    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
+                                                                       build_accession_workflow(complete: true)])
+
+    expect(page).to have_css('h1', text: updated_title, wait: 15)
+    click_button 'Cocina Model'
+    expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
+
+    click_button 'Details'
+    expect(page).to have_table_value('description-table', 'Title', updated_title)
+
+    click_button 'Workflows'
+    expect(page).to have_css('.accordion-item',
+                             count: 2)
+    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
+    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'Complete')
+    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
+    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
+
+    click_button 'accessionWF'
+
+    within('#accessionwf-collapse.accordion-collapse.show') do
+      row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
+      cells = row.all('td')
+      expect(cells[1]).to have_text('completed')
+      expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
+    end
   end
 end

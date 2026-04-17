@@ -13,10 +13,6 @@ class VersionsPresenter
     @user_version_inventory = user_version_inventory
   end
 
-  def current_version
-    @current_version ||= version_inventory.map(&:version).max
-  end
-
   def versions
     @versions ||= version_inventory.sort_by(&:version).reverse.map do |version|
       Version.new(version: version.version,
