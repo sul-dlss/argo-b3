@@ -20,7 +20,7 @@
         <% component.with_row(label: 'Admin Policy', values: admin_policy_values) if result.apo_druid.present? %>
         <% component.with_row(label: 'Collections', values: collections_values) if result.collection_druids.present? %>
         <% component.with_row(label: 'Projects', values: projects_values) if result.projects.present? %>
-        <% component.with_row(label: 'Source', values: [result.source_id]) if result.source_id.present? %>
+        <% component.with_row(label: 'Source ID', values: [result.source_id]) if result.source_id.present? %>
         <% component.with_row(label: 'IDs', values: identifier_values) if result.identifiers.present? %>
         <% component.with_row(label: 'Released to', values: released_to_values) if result.released_to.present? %>
         <% component.with_row(label: 'Tickets', values: ticket_values) if result.tickets.present? %>
