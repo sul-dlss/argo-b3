@@ -1,0 +1,14 @@
+<%= turbo_frame_tag(@druid, 'versions') do %>
+  <%= render Elements::Tables::TableComponent.new(id: 'versions-table',
+                                                  label: 'Versions', show_label: false) do |component| %>
+    <% component.with_header(label: 'Version') %>
+    <% component.with_header(label: 'Description') %>
+    <% component.with_header(label: 'User Version') %>
+    <% component.with_header(label: 'Registered / opened') %>
+    <% component.with_header(label: 'Submitted') %>
+    <% component.with_header(label: 'Accessioned') %>
+    <% @versions_presenter.versions.each do |version| %>
+      <% component.with_row(label: version.version, values: [version.description, version.user_version, format_datetime(version.opened_at), format_datetime(version.submitted_at), format_datetime(version.accessioned_at)]) %>
+    <% end %>
+  <% end %>
+<% end %>

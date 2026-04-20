@@ -9,6 +9,15 @@ RSpec.describe 'Show admin policy' do
   let(:original_title) { 'My admin policy title' }
   let(:updated_title) { 'My updated admin policy title' }
 
+  # Versions are tested in show_dro_spec so returning [].
+  let(:object_client) do
+    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                   user_version: user_version_client)
+  end
+  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: []) }
+  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
+  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
+
   def build_solr_doc(title:)
     {
       Search::Fields::ID => druid,
@@ -30,6 +39,7 @@ RSpec.describe 'Show admin policy' do
   end
 
   before do
+    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
 
     sign_in(create(:user))
@@ -47,7 +57,7 @@ RSpec.describe 'Show admin policy' do
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Details')
     expect(page).to have_css('.nav-link', text: 'Workflows')
-    expect(page).to have_css('.nav-link.disabled', text: 'History')
+    expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link.disabled', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
 

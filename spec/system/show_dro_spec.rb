@@ -19,6 +19,44 @@ RSpec.describe 'Show DRO' do
     Dor::Services::Response::Workflow.new(xml:)
   end
 
+  let(:object_client) do
+    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                   user_version: user_version_client)
+  end
+  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory) }
+  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
+  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones) }
+
+  let(:version_inventory) do
+    [
+      Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
+      Dor::Services::Client::ObjectVersion::Version.new(versionId: 2, message: 'Second version', cocina: true)
+    ]
+  end
+
+  let(:user_version_inventory) do
+    [
+      Dor::Services::Client::UserVersion::Version.new(version: 2, userVersion: 1)
+    ]
+  end
+
+  let(:milestones) do
+    [
+      { milestone: 'registered', at: '2020-02-28 20:23:30 +0000', version: '1' },
+      { milestone: 'submitted', at: '2020-02-28 20:23:35 +0000', version: '1' },
+      { milestone: 'described', at: '2020-02-28 20:57:36 +0000', version: '1' },
+      { milestone: 'published', at: '2020-02-28 21:01:20 +0000', version: '1' },
+      { milestone: 'deposited', at: '2020-02-28 21:01:51 +0000', version: '1' },
+      { milestone: 'accessioned', at: '2020-02-28 21:02:03 +0000', version: '1' },
+      { milestone: 'opened', at: '2021-03-31 20:23:30 +0000', version: '2' },
+      { milestone: 'submitted', at: '2021-03-31 20:23:35 +0000', version: '2' },
+      { milestone: 'described', at: '2021-03-31 20:57:36 +0000', version: '2' },
+      { milestone: 'published', at: '2021-03-31 21:01:20 +0000', version: '2' },
+      { milestone: 'deposited', at: '2021-03-31 21:01:51 +0000', version: '2' },
+      { milestone: 'accessioned', at: '2021-03-31 21:02:03 +0000', version: '2' }
+    ]
+  end
+
   def build_solr_doc(title:)
     {
       Search::Fields::ID => druid,
@@ -74,6 +112,8 @@ RSpec.describe 'Show DRO' do
   end
 
   before do
+    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+
     sign_in(create(:user))
     set_last_search_cookie
   end
@@ -82,7 +122,8 @@ RSpec.describe 'Show DRO' do
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: original_title))
-    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow, build_accession_workflow])
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
+                                                                       build_accession_workflow])
 
     visit "/objects/#{druid}"
 
@@ -93,7 +134,7 @@ RSpec.describe 'Show DRO' do
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Details')
     expect(page).to have_css('.nav-link', text: 'Workflows')
-    expect(page).to have_css('.nav-link.disabled', text: 'History')
+    expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link.disabled', text: 'Events')
     expect(page).to have_css('.nav-link.disabled', text: 'Content')
     expect(page).to have_css('.nav-link.disabled', text: 'Technical metadata')
@@ -124,15 +165,6 @@ RSpec.describe 'Show DRO' do
     click_button 'Cocina Model'
     expect(page).to have_css('pre', text: "\"externalIdentifier\": \"#{druid}\"")
     expect(page).to have_css('pre', text: "\"value\": \"#{original_title}\"")
-
-    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
-
-    expect(page).to have_css('h1', text: updated_title)
-    expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
-
-    click_button 'Details'
-    expect(page).to have_table_value('description-table', 'Title', updated_title)
 
     # Workflows tab
     click_button 'Workflows'
@@ -171,10 +203,48 @@ RSpec.describe 'Show DRO' do
       expect(page).to have_table(count: 1)
     end
 
-    # Update the workflows
+    # Versions tab
+    click_button 'Versions'
+
+    within(find_table('versions-table')) do
+      expect(page).to have_css('th', text: 'Version')
+      expect(page).to have_css('th', text: 'Description')
+      expect(page).to have_css('th', text: 'User Version')
+      expect(page).to have_css('th', text: 'Registered / opened')
+      expect(page).to have_css('th', text: 'Submitted')
+      expect(page).to have_css('th', text: 'Accessioned')
+    end
+
+    row = find_table_row('versions-table', '1')
+    cells = row.all('td')
+    expect(cells[0]).to have_text('Initial version')
+    expect(cells[1]).to have_text('')
+    expect(cells[2]).to have_text('February 28, 2020 12:23 PM')
+    expect(cells[3]).to have_text('February 28, 2020 12:23 PM')
+    expect(cells[4]).to have_text('February 28, 2020 01:02 PM')
+
+    row = find_table_row('versions-table', '2')
+    cells = row.all('td')
+    expect(cells[0]).to have_text('Second version')
+    expect(cells[1]).to have_text('1')
+    expect(cells[2]).to have_text('March 31, 2021 01:23 PM')
+    expect(cells[3]).to have_text('March 31, 2021 01:23 PM')
+    expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
+
+    # Update the object and look for changes.
+    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
+    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
+    expect(page).to have_css('h1', text: updated_title, wait: 15)
+    click_button 'Cocina Model'
+    expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
+
+    click_button 'Details'
+    expect(page).to have_table_value('description-table', 'Title', updated_title)
+
+    click_button 'Workflows'
     expect(page).to have_css('.accordion-item',
                              count: 2)
     expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')

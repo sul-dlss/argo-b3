@@ -156,6 +156,7 @@ Rails.application.routes.draw do
       get 'details', to: 'objects#show_details'
       get 'json', to: 'objects#show_json'
       get 'workflows', to: 'objects#show_workflows'
+      get 'versions', to: 'objects#show_versions'
     end
   end
 
