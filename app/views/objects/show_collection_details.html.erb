@@ -15,4 +15,11 @@
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Description') %><% end %>
     <% component.with_row(label: 'Title', value: @solr_doc.title) %>
   <% end %>
+
+  <%= render Elements::Tables::TableComponent.new(id: 'identification-table', classes: 'mb-5') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Identification') %><% end %>
+      <% component.with_row(label: 'Druid', value: @solr_doc.id) %>
+      <% component.with_row(label: 'Source ID', value: @solr_doc.source_id) %>
+      <% component.with_row(label: 'Folio Instance HRID', value: @solr_doc.catalog_record_id) %>
+    <% end %>
 <% end %>

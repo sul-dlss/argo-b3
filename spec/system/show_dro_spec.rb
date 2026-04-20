@@ -28,7 +28,11 @@ RSpec.describe 'Show DRO' do
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::COLLECTION_DRUIDS => [collection_druid],
       Search::Fields::COLLECTION_TITLES => ['My Collection'],
-      Search::Fields::FIRST_SHELVED_IMAGE => 'rr624wq8610_00_0001.jp2'
+      Search::Fields::FIRST_SHELVED_IMAGE => 'rr624wq8610_00_0001.jp2',
+      Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
+      Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
+      Search::Fields::BARCODES => ['bb123cd4567'],
+      Search::Fields::DOI => 'https://doi.org/10.5072/bb123cd4567'
     }
   end
 
@@ -100,7 +104,7 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
 
     # Overview table
-    expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
+    expect(page).to have_table_caption('overview-table', 'Overview')
     expect(page).to have_table_value('overview-table', 'Object type', 'Item')
     within(find_table_value_cell('overview-table', 'Admin policy')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
@@ -117,8 +121,17 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!400,400/0/default.jpg"]') # rubocop:disable Layout/LineLength
 
     # Description table
+    expect(page).to have_table_caption('description-table', 'Description')
     expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
     expect(page).to have_table_value('description-table', 'Title', original_title)
+
+    # Identification table
+    expect(page).to have_table_caption('identification-table', 'Identification')
+    expect(page).to have_table_value('identification-table', 'Druid', druid)
+    expect(page).to have_table_value('identification-table', 'Source ID', 'googlebooks:stanford_36105114203446')
+    expect(page).to have_table_value('identification-table', 'Folio Instance HRID', 'a6525053')
+    expect(page).to have_table_value('identification-table', 'Barcode', 'bb123cd4567')
+    expect(page).to have_table_value('identification-table', 'DOI', 'https://doi.org/10.5072/bb123cd4567')
 
     # Cocina model tab
     click_button 'Cocina Model'

@@ -15,7 +15,9 @@ RSpec.describe 'Show collection' do
       Search::Fields::OBJECT_TYPES => ['collection'],
       Search::Fields::TITLE => title,
       Search::Fields::APO_DRUID => [apo_druid],
-      Search::Fields::APO_TITLE => ['My APO']
+      Search::Fields::APO_TITLE => ['My APO'],
+      Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
+      Search::Fields::CATALOG_RECORD_ID => ['a6525053']
     }
   end
 
@@ -63,6 +65,12 @@ RSpec.describe 'Show collection' do
     # Description table
     expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
     expect(page).to have_table_value('description-table', 'Title', original_title)
+
+    # Identification table
+    expect(page).to have_table_caption('identification-table', 'Identification')
+    expect(page).to have_table_value('identification-table', 'Druid', druid)
+    expect(page).to have_table_value('identification-table', 'Source ID', 'googlebooks:stanford_36105114203446')
+    expect(page).to have_table_value('identification-table', 'Folio Instance HRID', 'a6525053')
 
     # Cocina model tab
     click_button 'Cocina Model'
