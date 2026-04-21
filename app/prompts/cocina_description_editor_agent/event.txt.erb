@@ -1,0 +1,615 @@
+You are only updating events. Following are some descriptions and examples of different ways to use the event property in a description. Use these as a reference when updating event in the description.
+
+## "event" model
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| type | Description of the event (creation, publication, etc.). Event types must be from the "event" controlled list. | String | No |
+| displayLabel | The preferred display label to use for the event in access systems. | String | No |
+| date | Dates associated with the event. See event date types, multipart date types, and date note types. | Object ("description" model) | Yes |
+| contributor | Contributors associated with the event. See all contributor types. | Object ("contributor" model) | Yes |
+| location | Locations associated with the event. | Object ("description" model) | Yes |
+| identifier | Identifiers and URIs associated with the event. Identifier types must be from the "identifier" controlled list. | Object ("description" model) | Yes |
+| note | Other information about the event. Event note types must be from the "event.note" controlled list. | Object ("description" model) | Yes |
+| valueLanguage | Language of the descriptive metadata value. | Object ("value language" model) | No |
+| structuredValue | Imprint statement given as place, publisher, date, and/or any other relevant information. | Object ("description" model) | Yes |
+
+### Event type
+
+Used to describe an event in the history of a resource, such as its creation, publication, modification, or capture. Every new event should have a type. Do not add an event type to an existing event that does not have one unless the user specifically that an event type be added. Event types must be from the "event" controlled list.
+
+```json
+{
+  "event": [
+    {
+      "type": "publication",
+      "date": [
+        {
+          "value": "2021-01-01",
+          "type": "publication",
+          "encoding": {
+            "code": "edtf"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Date
+
+The date type will often match the event type, but it may differ. Every date should have a type.  Event date types must be from the "event.date" controlled list.
+
+If possible, dates should be encoded according to a standard, such as W3CDTF, EDTF, or ISO 8601.
+
+#### Single date
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "value": "1924",
+          "type": "publication",
+          "encoding": {
+            "code": "w3cdtf"
+          }
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Date range
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "structuredValue": [
+            {
+              "type": "start",
+              "value": "1922-04-04"
+            },
+            {
+              "type": "end",
+              "value": "1922-06-06"
+            }
+          ]
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+#### Multiple discrete dates for same event
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "1973-10-29",
+          "encoding": {
+            "code": "w3cdtf"
+          }
+        },
+        {
+          "type": "creation",
+          "value": "1973-11-07",
+          "encoding": {
+            "code": "w3cdtf"
+          }
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+#### Approximate date
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "1950",
+          "qualifier": "approximate",
+          "encoding": {
+            "code": "w3cdtf"
+          }
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+#### Approximate date range
+
+Both start and end dates are approximate.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "publication",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "qualifier": "approximate",
+          "structuredValue": [
+            {
+              "type": "start",
+              "value": "1925"
+            },
+            {
+              "type": "end",
+              "value": "1930"
+            }
+          ]
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Date range with one approximate date
+
+One end of the date range is approximate, but the other one is certain.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "publication",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "structuredValue": [
+            {
+              "type": "start",
+              "value": "1860",
+              "qualifier": "approximate"
+            },
+            {
+              "type": "end",
+              "value": "1873"
+            }
+          ]
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Open-ended date range
+
+The earliest possible ("not before", gives start date) or the latest possible ("not after", gives end date) date is known.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "publication",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "structuredValue": [
+            {
+              "type": "start",
+              "value": "1869"
+            }
+          ]
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Date with status
+
+The primary date associated with the resource, used for sorting and similar functions. This status should apply to a single date in the record.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "1995",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "status": "primary"
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+#### Date range with status
+
+The primary date associated with the resource, used for sorting and similar functions. This status should apply to a single date in the record.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "encoding": {
+            "code": "w3cdtf"
+          },
+          "status": "primary",
+          "structuredValue": [
+            {
+              "type": "start",
+              "value": "1860"
+            },
+            {
+              "type": "end",
+              "value": "1873"
+            }
+          ]
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+#### Dates before the year 1000
+
+Because of the absence of the year 0, BCE dates should subtract one from the value.
+
+This example would display as "800 CE":
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "0800",
+          "encoding": {
+            "code": "edtf"
+          }
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+This example would display as "800 BCE":
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "-0799",
+          "encoding": {
+            "code": "edtf"
+          }
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+
+#### Dates before the year 9999 BCE
+
+For years with more than four digits, precede the value with the letter Y.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "encoding": {
+            "code": "edtf"
+          },
+          "value": "Y-10000"
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+
+#### Unencoded date
+
+Use for time spans that are not represented in W3CDTF, EDTF, or ISO 8601 encoding.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "publication",
+          "value": "18th century"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+
+#### Date in non-Gregorian calendar
+
+Indicate the calendar type in a note.
+
+```json
+{
+  "event": [
+    {
+      "date": [
+        {
+          "type": "creation",
+          "value": "1544-02-02",
+          "note": [
+            {
+              "value": "Julian",
+              "type": "calendar"
+            }
+          ]
+        }
+      ],
+      "type": "creation"
+    }
+  ]
+}
+```
+
+
+### Contributor
+
+Use for a contributor associated with the event, such as a publisher, printer, manufacturer, etc. Provide a role from the MARC relator list if possible.
+
+```json
+{
+  "event": [
+    {
+      "contributor": [
+        {
+          "name": [
+            {
+              "value": "Hogarth Press"
+            }
+          ],
+          "type": "organization",
+          "role": [
+            {
+              "value": "publisher",
+              "code": "pub",
+              "source": {
+                "code": "marcrelator"
+              },
+              "uri": "http://id.loc.gov/vocabulary/relators/pbl"
+            }
+          ]
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+### Location
+
+Use for a place associated with the event, such as the place of publication or creation. If both code and value are provided, the value should match the term associated with the code on the MARC Countries or MARC Geographic Areas list.
+
+```json
+{
+  "event": [
+    {
+      "location": [
+        {
+          "value": "San Francisco (Calif.)",
+          "uri": "https://id.loc.gov/authorities/names/n79018452",
+          "source": {
+            "code": "naf"
+          }
+        },
+        {
+          "value": "California",
+          "code": "cau",
+          "uri": "http://id.loc.gov/vocabulary/countries/cau",
+          "source": {
+            "code": "marccountry"
+          }
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+### Note
+
+Event types must be from the "event.note" controlled list.
+
+#### Issuance
+
+The mode of issuance, such as monographic or serial.
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "series",
+          "type": "issuance"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+
+#### Issuance with authority
+
+URIs may be taken from the MARC Issuance vocabulary or other vocabulary.
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "serial",
+          "type": "issuance",
+          "uri": "http://id.loc.gov/vocabulary/issuance/serl"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Frequency
+
+The frequency of issuance, such as weekly or monthly.
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "five times a year",
+          "type": "frequency"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+
+#### Frequency with authority
+
+URIs may be taken from the MARC Publication Frequencies vocabulary or other vocabulary.
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "quarterly",
+          "type": "frequency",
+          "uri": "http://id.loc.gov/vocabulary/frequencies/qrt"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+#### Edition
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "2nd edition",
+          "type": "edition"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+
+#### Copyright statement
+
+Copyright information as stated on the resource.
+
+```json
+{
+  "event": [
+    {
+      "note": [
+        {
+          "value": "©2010",
+          "type": "copyright statement"
+        }
+      ],
+      "type": "publication"
+    }
+  ]
+}
+```
+
+## "event" controlled list
+<%= TypesControlledListTool.new.execute(name: "event") %>
+
+## "event.date" controlled list
+<%= TypesControlledListTool.new.execute(name: "event.date") %>
+
+## "event.note" controlled list
+<%= TypesControlledListTool.new.execute(name: "event.note") %>

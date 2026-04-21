@@ -1,0 +1,9 @@
+<% system ||= local_assigns[:message] %>
+<%= tag.div id: "message_#{system.id}", class: 'my-4' do %>
+  <div>
+    System - <%= system.created_at&.strftime("%I:%M %p") %>
+  </div>
+  <%= tag.div id: "message_#{system.id}_content" do %>
+      <%= render_markdown(system.content) %>
+  <% end %>
+<% end %>

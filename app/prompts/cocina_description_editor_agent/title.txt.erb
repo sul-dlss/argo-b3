@@ -1,0 +1,165 @@
+You are only updating titles. Following are some descriptions and examples of different ways to use the title property in a description. Use these as a reference when updating titles in the description.
+
+## Title
+All properties in the "description" model are available for use with the title property.
+
+### Basic (primary) title
+
+```json
+{
+  "title": [
+    {
+      "value": "Frankenstein"
+    }
+  ]
+}
+```
+
+### Title with subtitle or other parts
+
+For a multipart title, use structuredValue instead of value, and identify the type of each title part. Note that the subtitle is entered using the appropriate capitalization for when the title parts are rejoined, and no punctuation is entered.
+
+```json
+{
+  "title": [
+    {
+      "structuredValue": [
+        {
+          "value": "Flush"
+        },
+        {
+          "value": "a biography",
+          "type": "subtitle"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Title structuredValue types must be from the "title.structuredValue" controlled list.
+
+### Title with non-sorting characters
+
+Nonsorting or non-filing characters are indicated when a title begins with a word such as "The" that should ignored for sorting purposes. It is entered similarly to a multipart title, using structuredValue and type. Note that the main title is entered using the appropriate capitalization for when the title parts are rejoined.
+
+```json
+{
+  "title": [
+    {
+      "structuredValue": [
+        {
+          "value": "A",
+          "type": "nonsorting characters"
+        },
+        {
+          "value": "room with a view",
+          "type": "main title"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Title structuredValue types must be from the "title.structuredValue" controlled list.
+
+### Title types
+
+The type of each title may be indicated if relevant, such as when alternative titles are present. Not all titles need to have types.
+
+```json
+{
+  "title": [
+    {
+      "value": "Five red herrings"
+    },
+    {
+      "value": "Suspicious characters",
+      "type": "alternative"
+    }
+  ]
+}
+```
+
+```json
+{
+  "title": [
+    {
+      "value": "Photograph of Green Library, taken May 3, 2010",
+      "type": "supplied"
+    }
+  ]
+}
+```
+
+Title types must be from the "title" controlled list.
+
+### Title status
+
+If multiple titles are entered, one may be marked as primary.
+
+```json
+{
+  "title": [
+    {
+      "value": "Northern Lights",
+      "status": "primary"
+    },
+    {
+      "value": "The Golden Compass"
+    }
+  ]
+}
+```
+
+### Uniform title
+
+If a uniform title has an associated name as part of the heading, that name should be entered as a title note with type "associated name." The same name should be entered as a contributor to the resource as well.
+
+```json
+{
+  "title": [
+    {
+      "value": "Hamlet",
+      "type": "uniform",
+      "uri": "http://id.loc.gov/authorities/names/n80008522",
+      "source": {
+        "code": "naf"
+      },
+      "note": [
+        {
+          "value": "Shakespeare, William, 1564-1616",
+          "type": "associated name"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Title note types must be from the "title.note" controlled list.
+
+```json
+{
+  "title": [
+    {
+      "value": "Beowulf",
+      "type": "uniform",
+      "uri": "https://id.loc.gov/authorities/names/n79018834",
+      "source": {
+        "code": "naf"
+      }
+    }
+  ]
+}
+```
+
+### "title" controlled list
+<%= TypesControlledListTool.new.execute(name: "title") %>
+
+### "title.structuredValue" controlled list
+<%= TypesControlledListTool.new.execute(name: "title.structuredValue") %>
+
+### "title.note" controlled list
+<%= TypesControlledListTool.new.execute(name: "title.note") %>

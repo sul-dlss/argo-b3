@@ -1,0 +1,44 @@
+<% assistant ||= local_assigns[:message] %>
+<%= tag.div id: "message_#{assistant.id}", class: 'my-4' do %>
+  <div>
+    Assistant - <%= assistant.created_at&.strftime("%I:%M %p") %>
+  </div>
+
+  <% content = JSON.parse(assistant.content) || {} %>
+  <%= tag.div id: "message_#{assistant.id}_content", data: {description_changed: content['description'].present?} do %>
+    <%= content['message'] %>
+    <% diffs = local_assigns[:diffs] %>
+    <% if diffs.present? %>
+      <% collapse_id = "diffs-collapse-#{assistant.id}" %>
+      <div>
+        <%= tag.a class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'true', controls: collapse_id } do %>
+            <i class="bi bi-plus me-1 expand-icon"></i>
+            <i class="bi bi-dash me-1 collapse-icon"></i>
+            Changes to Cocina Description
+        <% end %>
+      </div>
+      <div class="collapse show" id="<%= collapse_id %>">
+        <div class="card card-body">
+          <% diffs.each do |diff| %>
+            <%= render DescriptionEditor::DiffComponent.new(diff: diff) %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <% if content['description'] %>
+      <% collapse_id = "description-collapse-#{assistant.id}" %>
+      <div>
+        <%= tag.a class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'false', controls: collapse_id } do %>
+            <i class="bi bi-plus me-1 expand-icon"></i>
+            <i class="bi bi-dash me-1 collapse-icon"></i>
+            Updated Cocina Description
+        <% end %>
+      </div>
+      <div class="collapse" id="<%= collapse_id %>">
+        <div class="card card-body">
+          <%= render Elements::JsonViewerComponent.new(hash: JSON.parse(content['description'])) %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
