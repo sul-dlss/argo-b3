@@ -63,7 +63,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the source ID' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Source', source_id)
+      expect(page).to have_table_value('item-result-ab123cd4567', 'Source ID', source_id)
     end
   end
 

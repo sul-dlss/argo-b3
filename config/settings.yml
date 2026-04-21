@@ -25,3 +25,6 @@ feature_flags:
 
 stacks:
   url: "http://stacks.stanford.edu/image"
+
+purl:
+  url: "https://purl.stanford.edu"

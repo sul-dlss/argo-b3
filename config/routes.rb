@@ -157,6 +157,7 @@ Rails.application.routes.draw do
       get 'json', to: 'objects#show_json'
       get 'workflows', to: 'objects#show_workflows'
       get 'versions', to: 'objects#show_versions'
+      get 'purl_preview', to: 'objects#show_purl_preview'
     end
   end
 
