@@ -1,0 +1,153 @@
+You are only updating subjects. Following are some descriptions and examples of different ways to use the subject property in a description. Use these as a reference when updating subject in the description.
+
+## subject
+See the "description" model for all properties.
+
+Subject types must be from the "subject" controlled list.
+
+### Basic subject
+
+All subject values must have a corresponding type.
+
+```json
+{
+  "subject": [
+    {
+      "type": "topic",
+      "value": "Cats"
+    }
+  ]
+}
+```
+
+### Multipart subject
+
+For a multipart subject (multiple subject terms joined together as in LCSH), each value must have a corresponding type. No type is provided at the subject level.
+
+```json
+{
+  "subject": [
+    {
+      "structuredValue": [
+        {
+          "type": "topic",
+          "value": "Architecture"
+        },
+        {
+          "type": "place",
+          "value": "United States"
+        },
+        {
+          "type": "time",
+          "value": "1945-1960"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Basic subject with structured value
+
+A single subject term may have internal structure, such as a multipart title or name. The type of a term as a whole must be entered at the subject level. Individual parts within the structured value may have their own types.
+
+```json
+{
+  "subject": [
+    {
+      "type": "person",
+      "structuredValue": [
+        {
+          "type": "name",
+          "value": "Shakespeare, William"
+        },
+        {
+          "type": "life dates",
+          "value": "1564-1616"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Multipart subject with structured value
+
+A structured subject may form part of a multipart subject, as in a multipart name followed by additional subject terms. The type of the first structuredValue must be entered (similar to the multipart subject above). This structuredValue is further divided for the structured term forming one part of the multipart subject.
+
+```json
+{
+  "subject": [
+    {
+      "structuredValue": [
+        {
+          "structuredValue": [
+            {
+              "type": "name",
+              "value": "Shakespeare, William"
+            },
+            {
+              "type": "life dates",
+              "value": "1564-1616"
+            }
+          ],
+          "type": "person"
+        },
+        {
+          "type": "topic",
+          "value": "Criticism and interpretation"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Basic subject with authority
+
+```json
+{
+  "subject": [
+    {
+      "type": "topic",
+      "value": "Cats in literature",
+      "uri": "https://id.loc.gov/authorities/subjects/sh85021280",
+      "source": {
+        "code": "lcsh"
+      }
+    }
+  ]
+}
+```
+
+### Multipart subject with authorities
+
+```json
+{
+  "subject": [
+    {
+      "structuredValue": [
+        {
+          "type": "topic",
+          "value": "Cats in advertising",
+          "uri": "https://id.loc.gov/authorities/subjects/sh85021278",
+          "source": {
+            "code": "lcsh"
+          }
+        },
+        {
+          "type": "topic",
+          "value": "Early works to 1800",
+          "uri": "http://id.loc.gov/authorities/subjects/sh2010013804",
+          "source": {
+            "code": "lcsh"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+## "subject" controlled list
+<%= TypesControlledListTool.new.execute(name: "subject") %>
