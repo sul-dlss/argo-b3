@@ -2,7 +2,7 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions]
+  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions show_purl_preview]
 
   def show
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(params[:druid]))
@@ -34,7 +34,7 @@ class ObjectsController < ApplicationController
   end
 
   def show_json
-    @cocina_object = Sdr::Repository.find(druid: verify_token(params[:druid]))
+    @cocina_hash = fetch_cocina_hash(verify_token(params[:druid]))
 
     render layout: false
   end
@@ -52,7 +52,11 @@ class ObjectsController < ApplicationController
     @versions_presenter = VersionsPresenter.new(version_inventory: object_client.version.inventory,
                                                 milestones: object_client.milestones.list,
                                                 user_version_inventory: object_client.user_version.inventory)
+  end
 
+  def show_purl_preview
+    @cocina_hash = fetch_cocina_hash(verify_token(params[:druid]))
+    @preview = fetch_purl_preview(@cocina_hash)
     render layout: false
   end
 
@@ -83,5 +87,24 @@ class ObjectsController < ApplicationController
     Rails.cache.fetch("objects/solr-doc/#{druid}", expires_in: 10.seconds) do
       Sdr::Repository.find_solr(druid:)
     end
+  end
+
+  def fetch_cocina_hash(druid)
+    cache_key = "objects/cocina-hash/#{druid}"
+    Rails.cache.fetch(cache_key, expires_in: 10.seconds) do
+      cocina_object = Sdr::Repository.find(druid:)
+      CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h)
+    end
+  end
+
+  def fetch_purl_preview(cocina_hash)
+    body = Rails.cache.fetch("objects/purl-preview/#{cocina_hash[:externalIdentifier]}/#{cocina_hash[:lock]}",
+                             expires_in: 1.hour) do
+      PurlPreviewService.call(cocina_hash:)
+    end
+    Nokogiri::HTML(body).css('main').inner_html.html_safe # rubocop:disable Rails/OutputSafety
+  rescue PurlPreviewService::Error => e
+    Honeybadger.notify(e, context: { cocina_hash: })
+    nil
   end
 end

@@ -1,0 +1,7 @@
+<%= turbo_frame_tag(@cocina_hash[:externalIdentifier], 'purl_preview') do %>
+  <% if @preview %>
+  <%= @preview %>
+  <% else %>
+    <%= render SdrViewComponents::Elements::AlertComponent.new(text: 'PURL preview is not available.', variant: :note) %>
+  <% end %>
+<% end %>

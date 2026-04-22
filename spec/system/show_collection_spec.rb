@@ -43,6 +43,7 @@ RSpec.describe 'Show collection' do
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
+    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
 
     sign_in(create(:user))
   end
@@ -62,6 +63,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link.disabled', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
+    expect(page).to have_css('.nav-link', text: 'PURL Description Preview')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
@@ -87,9 +89,14 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('pre', text: "\"externalIdentifier\": \"#{druid}\"")
     expect(page).to have_css('pre', text: "\"value\": \"#{original_title}\"")
 
+    # PURL preview tab
+    click_button 'PURL Description Preview'
+    expect(page).to have_css('p', text: 'preview')
+
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
 
+    click_button 'Cocina Model'
     expect(page).to have_css('h1', text: updated_title)
     expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
 

@@ -23,6 +23,7 @@
     <% component.with_tab(id: 'content-tab', label: 'Content') if @solr_doc.dro? %>
     <% component.with_tab(id: 'technical-metadata-tab', label: 'Technical metadata') if @solr_doc.dro? %>
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
+    <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'details', src: details_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
@@ -48,5 +49,12 @@
       <% end %>
     <% end %>
 
+    <% if @solr_doc.dro? || @solr_doc.collection? %>
+    <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= render Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+    <% end %>
   <% end %>
 <% end %>

@@ -117,6 +117,7 @@ RSpec.describe 'Show DRO' do
 
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
 
     sign_in(create(:user))
     set_last_search_cookie
@@ -143,6 +144,7 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_css('.nav-link.disabled', text: 'Content')
     expect(page).to have_css('.nav-link.disabled', text: 'Technical metadata')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
+    expect(page).to have_css('.nav-link', text: 'PURL Description Preview')
 
     # Overview table
     expect(page).to have_table_caption('overview-table', 'Overview')
@@ -243,6 +245,10 @@ RSpec.describe 'Show DRO' do
     expect(cells[2]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[3]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
+
+    # PURL preview tab
+    click_button 'PURL Description Preview'
+    expect(page).to have_css('p', text: 'preview')
 
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
