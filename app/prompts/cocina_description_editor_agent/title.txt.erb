@@ -1,0 +1,124 @@
+## Title
+All properties in the Description set are available for use with the title property.
+
+## Basic (primary) title
+{
+  "title": [
+    {
+      "value": "Frankenstein"
+    }
+  ]
+}
+
+### Title with subtitle or other parts
+
+For a multipart title, use structuredValue instead of value, and identify the type of each title part. Note that the subtitle is entered using the appropriate capitalization for when the title parts are rejoined, and no punctuation is entered.
+{
+  "title": [
+    {
+      "structuredValue": [
+        {
+          "value": "Flush"
+        },
+        {
+          "value": "a biography",
+          "type": "subtitle"
+        }
+      ]
+    }
+  ]
+}
+
+### Title with non-sorting characters
+
+Nonsorting or non-filing characters are indicated when a title begins with a word such as "The" that should ignored for sorting purposes. It is entered similarly to a multipart title, using structuredValue and type. Note that the main title is entered using the appropriate capitalization for when the title parts are rejoined.
+{
+  "title": [
+    {
+      "structuredValue": [
+        {
+          "value": "A",
+          "type": "nonsorting characters"
+        },
+        {
+          "value": "room with a view",
+          "type": "main title"
+        }
+      ]
+    }
+  ]
+}
+
+### Title types
+
+The type of each title may be indicated if relevant, such as when alternative titles are present. Not all titles need to have types.
+{
+  "title": [
+    {
+      "value": "Five red herrings"
+    },
+    {
+      "value": "Suspicious characters",
+      "type": "alternative"
+    }
+  ]
+}
+
+{
+  "title": [
+    {
+      "value": "Photograph of Green Library, taken May 3, 2010",
+      "type": "supplied"
+    }
+  ]
+}
+
+### Title status
+
+If multiple titles are entered, one may be marked as primary. Discovery systems as SearchWorks use this information when determining which title to prefer for display.
+{
+  "title": [
+    {
+      "value": "Northern Lights",
+      "status": "primary"
+    },
+    {
+      "value": "The Golden Compass"
+    }
+  ]
+}
+
+### Uniform title
+
+If a uniform title has an associated name as part of the heading, that name should be entered as a title note with type "associated name." The same name should be entered as a contributor to the resource as well.
+{
+  "title": [
+    {
+      "value": "Hamlet",
+      "type": "uniform",
+      "uri": "http://id.loc.gov/authorities/names/n80008522",
+      "source": {
+        "code": "naf"
+      },
+      "note": [
+        {
+          "value": "Shakespeare, William, 1564-1616",
+          "type": "associated name"
+        }
+      ]
+    }
+  ]
+}
+
+{
+  "title": [
+    {
+      "value": "Beowulf",
+      "type": "uniform",
+      "uri": "https://id.loc.gov/authorities/names/n79018834",
+      "source": {
+        "code": "naf"
+      }
+    }
+  ]
+}
