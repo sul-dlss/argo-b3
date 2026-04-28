@@ -20,4 +20,8 @@ module ApplicationHelper
 
     I18n.l(datetime.in_time_zone('Pacific Time (US & Canada)'), format:)
   end
+
+  def pretty_compact_hash(hash)
+    JSON.pretty_generate(CocinaDisplay::Utils.deep_compact_blank(hash))
+  end
 end

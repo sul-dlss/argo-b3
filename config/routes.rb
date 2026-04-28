@@ -160,7 +160,7 @@ Rails.application.routes.draw do
       get 'purl_preview', to: 'objects#show_purl_preview'
     end
 
-    resources :chats do
+    resources :chats, only: %i[new show] do
       resources :messages, only: [:create]
     end
   end

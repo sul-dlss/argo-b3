@@ -1,8 +1,5 @@
-<% if defined?(@chat) && @chat.present? %>
-  <%= turbo_stream.replace "new_message" do %>
-    <%= render "messages/form",
-      chat: @chat,
-      message: @chat.messages.build,
-      druid: @druid %>
-  <% end %>
+<%= turbo_stream.replace "new_message" do %>
+  <div id="new_message">
+    <%= render Elements::SpinnerComponent.new(message: 'Working ...') %>
+  </div>
 <% end %>

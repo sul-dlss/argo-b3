@@ -669,6 +669,7 @@ DEPENDENCIES
   dry-monads
   erb_lint
   factory_bot_rails
+  hashdiff
   herb
   honeybadger
   image_processing (~> 1.2)

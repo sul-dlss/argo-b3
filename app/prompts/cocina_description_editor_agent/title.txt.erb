@@ -1,7 +1,9 @@
+You are only updating titles. Following are some descriptions and examples of different ways to use the title property in a description. Use these as a reference when updating titles in the description.
+
 ## Title
 All properties in the Description set are available for use with the title property.
 
-## Basic (primary) title
+### Basic (primary) title
 {
   "title": [
     {
@@ -29,6 +31,8 @@ For a multipart title, use structuredValue instead of value, and identify the ty
   ]
 }
 
+Title structuredValue types must be from the "title.structuredValue.type" controlled list.
+
 ### Title with non-sorting characters
 
 Nonsorting or non-filing characters are indicated when a title begins with a word such as "The" that should ignored for sorting purposes. It is entered similarly to a multipart title, using structuredValue and type. Note that the main title is entered using the appropriate capitalization for when the title parts are rejoined.
@@ -48,6 +52,8 @@ Nonsorting or non-filing characters are indicated when a title begins with a wor
     }
   ]
 }
+
+Title structuredValue types must be from the "title.structuredValue.type" controlled list.
 
 ### Title types
 
@@ -73,9 +79,11 @@ The type of each title may be indicated if relevant, such as when alternative ti
   ]
 }
 
+Title types must be from the "title.type" controlled list.
+
 ### Title status
 
-If multiple titles are entered, one may be marked as primary. Discovery systems as SearchWorks use this information when determining which title to prefer for display.
+If multiple titles are entered, one may be marked as primary.
 {
   "title": [
     {
@@ -109,6 +117,8 @@ If a uniform title has an associated name as part of the heading, that name shou
     }
   ]
 }
+
+Title note types must be from the "title.note.type" controlled list.
 
 {
   "title": [

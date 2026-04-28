@@ -1,0 +1,87 @@
+
+You are only updating adminMetadata. Following are some descriptions and examples of different ways to use the adminMetadata property in a description. Use these as a reference when updating adminMetadata in the description.
+
+## adminMetadata
+The adminMetadata field contains information about the record itself.
+
+### Language of record
+
+The language or languages used in the record description.
+{
+  "adminMetadata": [
+    {
+      "language": [
+        {
+          "value": "English",
+          "code": "eng",
+          "uri": "http://id.loc.gov/vocabulary/iso639-2/eng"
+        }
+      ]
+    }
+  ]
+}
+
+### Creator of record
+
+The institution responsible for creating the record.
+{
+  "adminMetadata": [
+    {
+      "contributor": [
+        {
+          "name": [
+            {
+              "code": "CSt",
+              "uri": "http://id.loc.gov/vocabulary/organizations/cst",
+              "type": "organization",
+              "source": {
+                "code": "marcorg"
+              },
+              "role": [
+                {
+                  "value": "original cataloging agency"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+### Metadata standard
+
+The standard used in constructing the record description.
+{
+  "adminMetadata": [
+    {
+      "metadataStandard": [
+        {
+          "code": "rda",
+          "uri": "http://id.loc.gov/vocabulary/descriptionConventions/rda",
+          "source": {
+            "uri": "http://id.loc.gov/vocabulary/descriptionConventions"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+### Other information
+
+Additional information about the record.
+
+{
+  "adminMetadata": [
+    {
+      "note": [
+        {
+          "value": "human prepared",
+          "type": "record origin"
+        }
+      ]
+    }
+  ]
+}

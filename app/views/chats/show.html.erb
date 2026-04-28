@@ -1,24 +1,25 @@
-<% content_for :title, "Showing chat" %>
-
 <%= turbo_stream_from "chat_#{@chat.id}" %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
-
-  <h1 class="font-bold text-4xl">Showing chat #<%= @chat.id %></h1>
-
-  <div class="my-5">
-    <strong class="block font-medium mb-1">Model:</strong>
-    <%= @chat.model&.label || default_model_display_name %>
+<div class="container mb-5">
+  <div class="row mb-2">
+    <div class="col-6">
+      <%= render Editor::CocinaDescriptionCardComponent.new(cocina_description_hash: @cocina_description_hash) %>
+    </div>
+    <div class="col-6">
+      <%= render Editor::PurlPreviewCardComponent.new(purl_preview: @purl_preview) %>
+    </div>
   </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title h4">What change would you like to make to the description?</div>
 
-  <div id="messages" class="min-w-full divide-y divide-gray-200 space-y-5 my-5">
-    <% @chat.messages.where.not(id: nil).each do |message| %>
-      <%= render message %>
-    <% end %>
+      <div id="messages">
+        <% @chat.messages.where(role: ['user', 'assistant']).where.not(id: nil).each do |message| %>
+          <%= render message if message.content.present? || message.content_raw.present? %>
+        <% end %>
+      </div>
+
+      <%= render "messages/form", chat: @chat, message: @message, druid: @cocina_object.externalIdentifier %>
+    </div>
   </div>
-
-  <%= render "messages/form", chat: @chat, message: @message, druid: @cocina_object.externalIdentifier %>
 </div>

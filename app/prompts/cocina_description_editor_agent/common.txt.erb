@@ -1,18 +1,21 @@
+## Types
+Types are from controlled lists, available from the types_controlled_list_tool. To get a controlled list, call the types_controlled_list_tool with the name of the controlled list.
+
 ## Description (The common model for a descriptive value and associated properties.)
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String value of the descriptive element. | String | No |
 | code | Code value of the descriptive element. | String | No |
-| type | Type of value provided by the descriptive element. See the full list of valid types. | String | No |
+| type | Type of value provided by the descriptive element. | String | No |
 | status | Status of the descriptive element value relative to other instances. | String | No |
 | uri | URI value of the descriptive element. | String | No |
 | standard | Descriptive or content standard to which the value conforms. | See Standard for subproperties | No |
 | encoding | Encoding schema, standard, or syntax to which the value conforms. | See Encoding for subproperties | No |
-| identifier | Identifiers and URIs associated with the descriptive element. See identifier types. | See Description for subproperties | Yes |
+| identifier | Identifiers and URIs associated with the descriptive element. Identifier types must be from the "identifier.type" controlled list. | See Description for subproperties | Yes |
 | source | The vocabulary, authority, or other origin for a term, code, or identifier. | See Source for subproperties | No |
 | displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
 | qualifier | A term providing information about the circumstances of the statement (e.g., approximate dates). | String | No |
-| note | Other information related to the descriptive element. See note types. | See Description for subproperties | Yes |
+| note | Other information related to the descriptive element. Note types must be from the "note.type" controlled list unless a different controlled list is specified in other instructions. | See Description for subproperties | Yes |
 | valueLanguage | Language of the descriptive element value. | See Value language for subproperties | No |
 | valueAt | URL or other pointer to the location of the value of the descriptive element. | String | No |
 | structuredValue | Multiple values intended to be concatenated in order to form a single value. | See Description for subproperties | Yes |
@@ -26,7 +29,7 @@
 | value | String describing the standard. | String | No |
 | code | Code representing the standard. | String | No |
 | uri | URI for the standard. | String | No |
-| note | Other information related to the standard. See all note types. | See Description for subproperties | Yes |
+| note | Other information related to the standard. Note types must be from the "note.type" controlled list. | See Description for subproperties | Yes |
 | source | The vocabulary, authority, or other origin for the standard. | See Source for subproperties | No |
 | version | The version of the standard. | String | No |
 
@@ -36,7 +39,7 @@
 | value | String describing the encoding. | String | No |
 | code | Code representing the encoding. | String | No |
 | uri | URI for the encoding. | String | No |
-| note | Other information related to the encoding. See all note types. | See Description for subproperties | Yes |
+| note | Other information related to the encoding. Note types must be from the "note.type" controlled list. | See Description for subproperties | Yes |
 | source | The vocabulary, authority, or other origin for the encoding. | See Source for subproperties | No |
 | version | The version of the encoding. | String | No |
 
@@ -46,7 +49,7 @@
 | value | String describing the language of the descriptive metadata value. | String | No |
 | code | Code representing the language of the descriptive metadata value. | String | No |
 | uri | URI for the language of the descriptive metadata value. | String | No |
-| note | Other information related to the language of the descriptive metadata value. See all note types. | See Description for subproperties | Yes |
+| note | Other information related to the language of the descriptive metadata value. Note types must be from the "note.type" controlled list. | See Description for subproperties | Yes |
 | source | The vocabulary, authority, or other origin for the language term and/or code. | See Source for subproperties | No |
 | valueScript | An alphabet or other notation used to represent a language or other symbolic system of the descriptive metadata value. | See Value script for subproperties | No |
 
@@ -56,7 +59,7 @@
 | value | String describing the script of the descriptive metadata value. | String | No |
 | code | Code representing the script of the descriptive metadata value. | String | No |
 | uri | URI for the script of the descriptive metadata value. | String | No |
-| note | Other information related to the script. See all note types. | See Description for subproperties | Yes |
+| note | Other information related to the script. Note types must be from the "note.type" controlled list. | See Description for subproperties | Yes |
 | source | The vocabulary, authority, or other origin for the script term and/or code. | See Source for subproperties | No |
 
 ## Source
@@ -65,5 +68,5 @@
 | value | String describing the value source. | String | No |
 | code | Code representing the value source. | String | No |
 | uri | URI for the value source. | String | No |
-| note | Other information related to the value source. See all note types. | See Description for subproperties | Yes |
+| note | Other information related to the value source. Note types must be from the "note.type" controlled list. | See Description for subproperties | Yes |
 | version | The version of the value source. | String | No |
