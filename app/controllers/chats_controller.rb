@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChatsController < ApplicationController
   skip_verify_authorized
   before_action :set_chat, only: %i[show]
@@ -6,7 +8,9 @@ class ChatsController < ApplicationController
   def show
     @message = @chat.messages.build
     last_description = @chat.last_description || {}
-    @cocina_description_hash = @cocina_object.description.to_h.deep_stringify_keys.merge(last_description)
+    @original_cocina_description_hash = @cocina_object.description.to_h.deep_stringify_keys
+    @cocina_description_hash = @original_cocina_description_hash.merge(last_description)
+    @title = CocinaDisplay::CocinaRecord.new({ 'description' => @cocina_description_hash }).display_title
     @purl_preview = PurlPreviewService.call(cocina_hash: @cocina_object.to_h.merge(description: @cocina_description_hash)).then do |body|
       Nokogiri::HTML(body).css('main').inner_html.html_safe
     end

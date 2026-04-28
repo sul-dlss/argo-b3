@@ -1,0 +1,12 @@
+<%= tag.andypf_json_viewer indent: 3,
+  expanded:,
+  theme: 'cupertino',
+  'show-data-types': false,
+  'show-toolbar': show_toolbar,
+  'expand-icon-type': 'arrow',
+  'show-copy': true,
+  'show-size': false,
+  'preserve-expanded': false,
+  'expand-empty': false do %>
+    <%= helpers.pretty_compact_hash(hash) %>
+  <% end %>

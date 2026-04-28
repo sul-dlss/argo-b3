@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CocinaDescriptionEditorSchema < RubyLLM::Schema
   string :cocinaDescriptionJson, required: false,
                                  description: 'The updated Cocina Description JSON after applying the librarian\'s requested changes.'

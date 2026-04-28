@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TypesControlledListTool < RubyLLM::Tool
   description 'Gets controlled list of valid values for a given type.'
 

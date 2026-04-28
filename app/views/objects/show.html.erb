@@ -14,6 +14,8 @@
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-4') %>
   <% end %>
 
+  <%= render Elements::ButtonLinkComponent.new(label: 'Edit description', path: new_object_chat_path(@solr_doc.druid), variant: 'outline-primary', classes: 'mb-4') %>
+
   <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
 
     <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>

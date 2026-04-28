@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Message < ApplicationRecord
   acts_as_message
 
@@ -8,4 +10,7 @@ class Message < ApplicationRecord
   #                       target: "message_#{id}_content",
   #                       content: ERB::Util.html_escape(content.to_s)
   # end
+  def previous_description
+    chat.description_before(before: self)
+  end
 end

@@ -45,6 +45,7 @@ gem 'config'
 gem 'csv'
 gem 'dor-services-client', '~> 15.1'
 gem 'dry-monads'
+gem 'googleauth' # For Vertex AI authentication
 gem 'hashdiff' # For showing differences between original and updated cocina descriptions.
 gem 'honeybadger'
 gem 'mission_control-jobs'

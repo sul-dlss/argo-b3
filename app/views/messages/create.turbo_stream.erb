@@ -1,5 +1,5 @@
 <%= turbo_stream.replace "new_message" do %>
   <div id="new_message">
-    <%= render Elements::SpinnerComponent.new(message: 'Working ...') %>
+    <%= render Elements::SpinnerComponent.new(message: 'Working ...', classes: 'mt-3') %>
   </div>
 <% end %>

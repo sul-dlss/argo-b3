@@ -1,9 +1,9 @@
-class CocinaDescriptionClassifierAgent < RubyLLM::Agent
-  model 'gemini-flash-latest'
+# frozen_string_literal: true
 
-  # Change `Chat` to your app's chat model for Rails persistence.
-  # Remove this line to skip persistence and use plain RubyLLM chats.
-  # chat_model Chat
+class CocinaDescriptionClassifierAgent < RubyLLM::Agent
+  # model 'gemini-flash-latest'
+  model 'gemini-3-flash-preview', provider: Rails.env.production? ? :vertexai : :gemini
+
   instructions
   schema do
     string :field,

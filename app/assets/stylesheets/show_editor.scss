@@ -1,0 +1,9 @@
+// Styles for the show editor page
+
+.container:has(div[data-description-changed="true"]) #save-btn {
+  display: block;
+}
+
+#save-btn {
+  display: none;
+}

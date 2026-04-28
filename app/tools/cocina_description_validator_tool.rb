@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CocinaDescriptionValidatorTool < RubyLLM::Tool
   description 'Validates Cocina Description JSON.'
 

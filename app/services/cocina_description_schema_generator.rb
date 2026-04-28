@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CocinaDescriptionSchemaGenerator
   def self.call
     new.call
@@ -6,8 +8,8 @@ class CocinaDescriptionSchemaGenerator
   def call
     full_schema.dig('$defs', 'Description').dup.tap do |schema|
       # refs_from(description_def)
-      schema['$defs'] = referenced_definitions.to_h do |definition_name|
-        [definition_name, full_schema.dig('$defs', definition_name)]
+      schema['$defs'] = referenced_definitions.index_with do |definition_name|
+        full_schema.dig('$defs', definition_name)
       end
     end
   end

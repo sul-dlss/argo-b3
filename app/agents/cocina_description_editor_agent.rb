@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 class CocinaDescriptionEditorAgent < RubyLLM::Agent
   # model 'gemini-3.1-pro-preview'
-  model 'gemini-flash-latest'
+  # model 'gemini-flash-latest'
+  model 'gemini-3-flash-preview', provider: Rails.env.production? ? :vertexai : :gemini
   chat_model Chat
   # inputs :original_cocina_description_hash
   # instructions do
@@ -17,7 +20,7 @@ class CocinaDescriptionEditorAgent < RubyLLM::Agent
   # tools do
   #   CocinaDescriptionValidatorTool.new(original_cocina_description_hash:)
   # end
-  tools TypesControlledListTool
+  tools TypesControlledListTool, UrlFetchTool
   params generationConfig: { responseMimeType: 'application/json' }
   # schema({ name: 'Cocina Description Schema', schema: CocinaDescriptionSchemaGenerator.call })
   # schema CocinaDescriptionEditorSchema

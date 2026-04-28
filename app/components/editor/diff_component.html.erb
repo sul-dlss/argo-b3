@@ -1,2 +1,2 @@
 <div class="fst-italic fw-semibold"><%= change_type %> at <%= path %>:</div>
-<pre><%= JSON.pretty_generate(change_value) %></pre>
+<%= render Elements::JsonViewerComponent.new(hash: change_value, show_toolbar: false) %>

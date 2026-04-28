@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModelsController < ApplicationController
   skip_verify_authorized
   def index

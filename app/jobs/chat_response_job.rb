@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChatResponseJob < ApplicationJob
   def perform(chat_id:, content:, druid:)
     @druid = druid
@@ -23,6 +25,16 @@ class ChatResponseJob < ApplicationJob
         )
         broadcast_assistant_message(assistant_message)
         broadcast_new_message_form
+        return
+      end
+      if %w[language note subject relatedResource access geographic marcEncodedData
+            valueAt purl].include?(field)
+        assistant_message = chat.messages.create!(
+          role: 'assistant',
+          content: { message: "Changing #{field} isn't supported." }.to_json
+        )
+        broadcast_assistant_message(assistant_message)
+        broadcast_remove_new_message_spinner
         return
       end
 
@@ -163,10 +175,10 @@ class ChatResponseJob < ApplicationJob
     content = JSON.parse(message.content)
     diffs = if content['description'].present?
               description = JSON.parse(content['description'])
-              last_description = chat.last_description(except: message)
-              last_description ||= original_cocina_description_hash.deep_stringify_keys.slice(*description.keys)
+              previous_description = message.previous_description
+              previous_description ||= original_cocina_description_hash.deep_stringify_keys.slice(*description.keys)
               Hashdiff.diff(
-                CocinaDisplay::Utils.deep_compact_blank(last_description),
+                CocinaDisplay::Utils.deep_compact_blank(previous_description),
                 CocinaDisplay::Utils.deep_compact_blank(description)
               )
             end
@@ -193,6 +205,13 @@ class ChatResponseJob < ApplicationJob
       target: 'new_message',
       partial: 'messages/form',
       locals: { message: chat.messages.build, druid: }
+    )
+  end
+
+  def broadcast_remove_new_message_spinner
+    Turbo::StreamsChannel.broadcast_remove_to(
+      "chat_#{chat.id}",
+      target: 'new_message'
     )
   end
 
@@ -229,7 +248,8 @@ class ChatResponseJob < ApplicationJob
       "chat_#{chat.id}",
       target: 'purl-preview-card',
       renderable: Editor::PurlPreviewCardComponent.new(
-        purl_preview:
+        purl_preview:,
+        cocina_description_hash:
       ),
       layout: false,
       method: :morph
