@@ -7,6 +7,7 @@ See the Event model for all properties.
 
 Used to describe an event in the history of a resource, such as its creation, publication, modification, or capture. Every new event should have a type. Do not add an event type to an existing event that does not have one unless the user specifically that an event type be added. Event types must be from the "event" controlled list.
 
+```json
 {
   "event": [
     {
@@ -23,6 +24,7 @@ Used to describe an event in the history of a resource, such as its creation, pu
     }
   ]
 }
+```
 
 ### Date
 
@@ -32,6 +34,7 @@ If possible, dates should be encoded according to a standard, such as W3CDTF, ED
 
 #### Single date
 
+```json
 {
   "event": [
     {
@@ -48,9 +51,11 @@ If possible, dates should be encoded according to a standard, such as W3CDTF, ED
     }
   ]
 }
+```
 
 #### Date range
 
+```json
 {
   "event": [
     {
@@ -76,9 +81,11 @@ If possible, dates should be encoded according to a standard, such as W3CDTF, ED
     }
   ]
 }
+```
 
 #### Multiple discrete dates for same event
 
+```json
 {
   "event": [
     {
@@ -102,9 +109,11 @@ If possible, dates should be encoded according to a standard, such as W3CDTF, ED
     }
   ]
 }
+```
 
 #### Approximate date
 
+```json
 {
   "event": [
     {
@@ -122,11 +131,13 @@ If possible, dates should be encoded according to a standard, such as W3CDTF, ED
     }
   ]
 }
+```
 
 #### Approximate date range
 
 Both start and end dates are approximate.
 
+```json
 {
   "event": [
     {
@@ -153,11 +164,13 @@ Both start and end dates are approximate.
     }
   ]
 }
+```
 
 #### Date range with one approximate date
 
 One end of the date range is approximate, but the other one is certain.
 
+```json
 {
   "event": [
     {
@@ -184,11 +197,13 @@ One end of the date range is approximate, but the other one is certain.
     }
   ]
 }
+```
 
 #### Open-ended date range
 
 The earliest possible ("not before", gives start date) or the latest possible ("not after", gives end date) date is known.
 
+```json
 {
   "event": [
     {
@@ -210,11 +225,13 @@ The earliest possible ("not before", gives start date) or the latest possible ("
     }
   ]
 }
+```
 
 #### Date with status
 
 The primary date associated with the resource, used for sorting and similar functions. This status should apply to a single date in the record.
 
+```json
 {
   "event": [
     {
@@ -232,12 +249,13 @@ The primary date associated with the resource, used for sorting and similar func
     }
   ]
 }
-
+```
 
 #### Date range with status
 
 The primary date associated with the resource, used for sorting and similar functions. This status should apply to a single date in the record.
 
+```json
 {
   "event": [
     {
@@ -264,12 +282,15 @@ The primary date associated with the resource, used for sorting and similar func
     }
   ]
 }
+```
 
 #### Dates before the year 1000
 
 Because of the absence of the year 0, BCE dates should subtract one from the value.
 
 This example would display as "800 CE":
+
+```json
 {
   "event": [
     {
@@ -286,8 +307,11 @@ This example would display as "800 CE":
     }
   ]
 }
+```
 
 This example would display as "800 BCE":
+
+```json
 {
   "event": [
     {
@@ -304,12 +328,14 @@ This example would display as "800 BCE":
     }
   ]
 }
+```
 
 
 #### Dates before the year 9999 BCE
 
 For years with more than four digits, precede the value with the letter Y.
 
+```json
 {
   "event": [
     {
@@ -326,12 +352,14 @@ For years with more than four digits, precede the value with the letter Y.
     }
   ]
 }
+```
 
 
 #### Unencoded date
 
 Use for time spans that are not represented in W3CDTF, EDTF, or ISO 8601 encoding.
 
+```json
 {
   "event": [
     {
@@ -345,12 +373,14 @@ Use for time spans that are not represented in W3CDTF, EDTF, or ISO 8601 encodin
     }
   ]
 }
+```
 
 
 #### Date in non-Gregorian calendar
 
 Indicate the calendar type in a note.
 
+```json
 {
   "event": [
     {
@@ -370,12 +400,14 @@ Indicate the calendar type in a note.
     }
   ]
 }
+```
 
 
 ### Contributor
 
 Use for a contributor associated with the event, such as a publisher, printer, manufacturer, etc. Provide a role from the MARC relator list if possible.
 
+```json
 {
   "event": [
     {
@@ -403,11 +435,13 @@ Use for a contributor associated with the event, such as a publisher, printer, m
     }
   ]
 }
+```
 
 ### Location
 
 Use for a place associated with the event, such as the place of publication or creation. If both code and value are provided, the value should match the term associated with the code on the MARC Countries or MARC Geographic Areas list.
 
+```json
 {
   "event": [
     {
@@ -432,6 +466,7 @@ Use for a place associated with the event, such as the place of publication or c
     }
   ]
 }
+```
 
 ### Note
 
@@ -441,6 +476,7 @@ Event types must be from the "event.note" controlled list.
 
 The mode of issuance, such as monographic or serial.
 
+```json
 {
   "event": [
     {
@@ -454,12 +490,14 @@ The mode of issuance, such as monographic or serial.
     }
   ]
 }
+```
 
 
 #### Issuance with authority
 
 URIs may be taken from the MARC Issuance vocabulary or other vocabulary.
 
+```json
 {
   "event": [
     {
@@ -474,12 +512,13 @@ URIs may be taken from the MARC Issuance vocabulary or other vocabulary.
     }
   ]
 }
-
+```
 
 #### Frequency
 
 The frequency of issuance, such as weekly or monthly.
 
+```json
 {
   "event": [
     {
@@ -493,12 +532,14 @@ The frequency of issuance, such as weekly or monthly.
     }
   ]
 }
+```
 
 
 #### Frequency with authority
 
 URIs may be taken from the MARC Publication Frequencies vocabulary or other vocabulary.
 
+```json
 {
   "event": [
     {
@@ -513,9 +554,11 @@ URIs may be taken from the MARC Publication Frequencies vocabulary or other voca
     }
   ]
 }
+```
 
 #### Edition
 
+```json
 {
   "event": [
     {
@@ -529,12 +572,14 @@ URIs may be taken from the MARC Publication Frequencies vocabulary or other voca
     }
   ]
 }
+```
 
 
 #### Copyright statement
 
 Copyright information as stated on the resource.
 
+```json
 {
   "event": [
     {
@@ -548,3 +593,4 @@ Copyright information as stated on the resource.
     }
   ]
 }
+```

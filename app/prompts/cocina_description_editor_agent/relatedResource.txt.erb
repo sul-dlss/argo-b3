@@ -11,6 +11,7 @@ Whenever possible, a type should be provided that indicates the relationship bet
 
 One option is to represent the resource with structured metadata, similar to the description of the main resource.
 
+```json
 {
   "relatedResource": [
     {
@@ -44,12 +45,13 @@ One option is to represent the resource with structured metadata, similar to the
     }
   ]
 }
-
+```
 
 ### Related resource as citation
 
 If you are providing the related resource as a citation, it should be entered as a note.
 
+```json
 {
   "relatedResource": [
     {
@@ -63,11 +65,13 @@ If you are providing the related resource as a citation, it should be entered as
     }
   ]
 }
+```
 
 ### Related URL
 
 A related URL may be provided with a title for link text, or simply as a URL that will display directly.
 
+```json
 {
   "relatedResource": [
     {
@@ -92,11 +96,13 @@ A related URL may be provided with a title for link text, or simply as a URL tha
     }
   ]
 }
+```
 
 ### Related DOI
 
 A related DOI should be represented as an identifier.
 
+```json
 {
   "relatedResource": [
     {
@@ -110,11 +116,13 @@ A related DOI should be represented as an identifier.
     }
   ]
 }
+```
 
 ### Archival series
 
 If the resource is part of an archival collection organized by series, the series information is entered as a related resource with type "part of" and display label "Series".
 
+```json
 {
   "relatedResource": [
     {
@@ -128,12 +136,13 @@ If the resource is part of an archival collection organized by series, the serie
     }
   ]
 }
-
+```
 
 ### Publication series
 
 A book issued as part of a publisher's series should have type "series".
 
+```json
 {
   "relatedResource": [
     {
@@ -146,3 +155,4 @@ A book issued as part of a publisher's series should have type "series".
     }
   ]
 }
+```

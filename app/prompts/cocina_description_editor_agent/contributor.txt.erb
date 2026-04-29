@@ -5,6 +5,7 @@ The contributor is a real world object that may be associated with multiple name
 
 ### Basic contributor with name and contributor type
 
+```json
 {
   "contributor": [
     {
@@ -17,6 +18,7 @@ The contributor is a real world object that may be associated with multiple name
     }
   ]
 }
+```
 
 Contributor types must be from the "contributor" controlled list.
 
@@ -24,6 +26,7 @@ Contributor types must be from the "contributor" controlled list.
 
 In addition to the contributor type, name values may have types as well to distinguish them from other names of the contributor.
 
+```json
 {
   "contributor": [
     {
@@ -41,12 +44,15 @@ In addition to the contributor type, name values may have types as well to disti
     }
   ]
 }
+```
 
 Contributor name types must be from the "contributor.name" controlled list.
 
 ### Multipart contributor name
 
 A name may be split into component parts and each part given a type using structuredValue.
+
+```json
 {
   "contributor": [
     {
@@ -68,6 +74,7 @@ A name may be split into component parts and each part given a type using struct
     }
   ]
 }
+```
 
 Contributor name part types must be from the "contributor.name.structuredValue" controlled list.
 
@@ -77,6 +84,7 @@ Contributor name part types must be from the "contributor.name.structuredValue" 
 
 The role is associated with the contributor, not the name. See MARC relator terms for role terms, codes, and URIs.
 
+```json
 {
   "contributor": [
     {
@@ -99,11 +107,13 @@ The role is associated with the contributor, not the name. See MARC relator term
     }
   ]
 }
+```
 
 #### Multiple roles
 
 One contributor may have multiple roles.
 
+```json
 {
   "contributor": [
     {
@@ -124,6 +134,7 @@ One contributor may have multiple roles.
     }
   ]
 }
+```
 
 ### Contributor or name with status
 
@@ -131,6 +142,7 @@ One contributor may have multiple roles.
 
 At the contributor level, a status of "primary" indicates that the contributor is the agent primarily responsible for the resource.
 
+```json
 {
   "contributor": [
     {
@@ -152,11 +164,13 @@ At the contributor level, a status of "primary" indicates that the contributor i
     }
   ]
 }
+```
 
 #### Contributor name status
 
 At the name level, a status of "primary" indicates that the name is the preferred form for the contributor.
 
+```json
 {
   "contributor": [
     {
@@ -173,6 +187,7 @@ At the name level, a status of "primary" indicates that the name is the preferre
     }
   ]
 }
+```
 
 Status may be present at both levels.
 
@@ -180,6 +195,7 @@ Status may be present at both levels.
 
 The affiliation is associated with the contributor as it is an attribute of the person or organization.
 
+```json
 {
   "contributor": [
     {
@@ -197,11 +213,13 @@ The affiliation is associated with the contributor as it is an attribute of the 
      }
    ]
 }
+```
 
 ### Contributor with identifier
 
 Identifiers for the agent as an entity, such as ORCID and Wikidata, are associated with the contributor.
 
+```json
 {
   "contributor": [
     {
@@ -236,6 +254,7 @@ Identifiers for the agent as an entity, such as ORCID and Wikidata, are associat
       }
   ]
 }
+```
 
 Contributor name part types must be from the "identifier" controlled list.
 
@@ -243,6 +262,7 @@ Contributor name part types must be from the "identifier" controlled list.
 
 Identifiers for an authorized name string, such as LCNAF, are associated with the name. The entered name should match the authorized form. See name authority source codes.
 
+```json
 {
   "contributor": [
     {
@@ -259,3 +279,4 @@ Identifiers for an authorized name string, such as LCNAF, are associated with th
      }
    ]
 }
+```

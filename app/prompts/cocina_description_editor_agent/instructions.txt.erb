@@ -7,9 +7,15 @@ The librarian will ask you to make specific changes to the description, and you 
 Always respond with a JSON object. Use exactly one of these shapes:
 
 If you have an updated description:
+
+```json
 { "description": "updated description serialized JSON string" }
+```
 
 If you need clarification or have some other response:
+
+```json
 { "message": "your question, clarification, or statement here" }
+```
 
 You can provide a "description" and a "message" in the same response if needed.

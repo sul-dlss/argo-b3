@@ -54,8 +54,10 @@ class ChatResponseJob < ApplicationJob
       chat.with_instructions(build_instructions('instructions'))
       chat.with_instructions(build_instructions(field), append: true)
       chat.with_instructions(build_instructions('common'), append: true)
-      chat.with_instructions("Description JSON: #{original_cocina_description_hash.slice(field.to_sym).to_json}",
-                             append: true)
+      chat.with_instructions(
+        build_instructions('description',
+                           locals: { cocina_description_hash: original_cocina_description_hash.slice(field.to_sym) }), append: true
+      )
 
       # attachment = ActionDispatch::Http::UploadedFile.new(
       #   tempfile: StringIO.new(original_cocina_description_hash.slice(field.to_sym).to_json),
@@ -99,6 +101,7 @@ class ChatResponseJob < ApplicationJob
     broadcast_new_message_form
     broadcast_cocina_description_card(message)
     broadcast_purl_preview_card(message)
+    broadcast_recent_system_and_tool_messages
   rescue Cocina::Models::ValidationError => e
     assistant_message = chat.messages.create!(
       role: 'assistant',
@@ -166,8 +169,8 @@ class ChatResponseJob < ApplicationJob
     false
   end
 
-  def build_instructions(name)
-    CocinaDescriptionEditorAgent.render_prompt(name, chat:, inputs: {}, locals: {})
+  def build_instructions(name, locals: {})
+    CocinaDescriptionEditorAgent.render_prompt(name, chat:, inputs: {}, locals:)
   end
 
   def broadcast_assistant_message(message)
@@ -196,6 +199,26 @@ class ChatResponseJob < ApplicationJob
       partial: 'messages/user',
       locals: { user: message }
     )
+  end
+
+  def broadcast_recent_system_and_tool_messages
+    chat.recent_system_and_tool_messages.each do |message|
+      if message.role == 'tool'
+        Turbo::StreamsChannel.broadcast_append_to(
+          "chat_#{message.chat_id}",
+          target: 'system-and-tool-messages',
+          partial: 'messages/tool_results/default',
+          locals: { message: }
+        )
+      else
+        Turbo::StreamsChannel.broadcast_append_to(
+          "chat_#{message.chat_id}",
+          target: 'system-and-tool-messages',
+          partial: 'messages/system',
+          locals: { message: }
+        )
+      end
+    end
   end
 
   def broadcast_new_message_form

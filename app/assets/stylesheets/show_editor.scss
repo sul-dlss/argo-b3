@@ -7,3 +7,11 @@
 #save-btn {
   display: none;
 }
+
+.container:has(#system-and-tool-messages div) #system-messages-btn {
+  display: inline-block;
+}
+
+#system-messages-btn {
+  display: none;
+}

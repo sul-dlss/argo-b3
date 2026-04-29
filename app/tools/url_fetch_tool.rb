@@ -9,8 +9,8 @@ class UrlFetchTool < RubyLLM::Tool
 
   def execute(url:)
     response = Faraday.get(url)
-    { status: response.status, body: response.body }
+    { url:, status: response.status, body: response.body }
   rescue Faraday::Error => e
-    { error: e.message }
+    { url:, error: e.message }
   end
 end

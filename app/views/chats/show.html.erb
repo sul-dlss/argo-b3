@@ -79,13 +79,15 @@
   </div>
   <% collapse_id = "system-messages-collapse" %>
   <div class="mt-4">
-    <%= tag.a class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'false', controls: collapse_id } do %>
+    <%= tag.a id: "system-messages-btn", class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'false', controls: collapse_id } do %>
         <i class="bi bi-plus me-1 expand-icon"></i>
         <i class="bi bi-dash me-1 collapse-icon"></i>
         System information / tool calls
     <% end %>
   </div>
   <div class="collapse" id="<%= collapse_id %>">
-    <%= render @system_and_tool_messages %>
+    <div id="system-and-tool-messages">
+      <%= render @system_and_tool_messages %>
+    </div>
   </div>
 </div>

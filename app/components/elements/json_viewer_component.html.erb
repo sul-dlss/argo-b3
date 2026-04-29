@@ -10,3 +10,6 @@
   'expand-empty': false do %>
     <%= helpers.pretty_compact_hash(hash) %>
   <% end %>
+<% if show_tip %>
+  <p class="mt-2"><small><em>Tip: Shift + Click to expand/collapse all nodes.</em></small></p>
+<% end %>

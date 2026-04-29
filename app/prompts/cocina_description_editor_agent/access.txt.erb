@@ -19,6 +19,7 @@ The location of the physical object that the digital object represents, such as 
 
 Physical location types must be from the "access.physicalLocation" controlled list.
 
+```json
 {
   "access": [
     {
@@ -31,11 +32,13 @@ Physical location types must be from the "access.physicalLocation" controlled li
     }
   ]
 }
+```
 
 #### Location of born-digital object
 
 The file path to the original of a born-digital object.
 
+```json
 {
   "access": [
     {
@@ -47,11 +50,13 @@ The file path to the original of a born-digital object.
     }
   ]
 }
+```
 
 #### Access contact name
 
 The name of the library, department, or individual responsible for the resource, i.e., who a user should talk to for more information about the object. Use an authorized form of the name and provide a URI if available.
 
+```json
 {
   "access": [
     {
@@ -67,11 +72,13 @@ The name of the library, department, or individual responsible for the resource,
     }
   ]
 }
+```
 
 #### Access contact email
 
 The email of the library, department, or individual responsible for the resource, i.e., who a user should talk to for more information about the object. Used primarily with self-deposit.
 
+```json
 {
   "access": [
     {
@@ -84,11 +91,13 @@ The email of the library, department, or individual responsible for the resource
     }
   ]
 }
+```
 
 #### Alternative URL
 
 An additional URL where a copy of the resource may be found. If it is a different version of the resource, use relatedResource instead. Use the top-level purl property for the object purl rather than entering it here. A display label and/or a note may be added to provide additional context for the URL.
 
+```json
 {
   "access": [
     {
@@ -101,12 +110,14 @@ An additional URL where a copy of the resource may be found. If it is a differen
     }
   ]
 }
+```
 
 
 #### Access note
 
 Information about how the user may access the physical or digital resource.
 
+```json
 {
   "access": [
     {
@@ -119,11 +130,13 @@ Information about how the user may access the physical or digital resource.
     }
   ]
 }
+```
 
 #### Use and reproduction note
 
 Information about how the user may reproduce or otherwise use the resource.
 
+```json
 {
   "access": [
     {
@@ -136,11 +149,13 @@ Information about how the user may reproduce or otherwise use the resource.
     }
   ]
 }
+```
 
 #### License note
 
 Information about a Creative Commons or other license associated with the resource.
 
+```json
 {
   "access": [
     {
@@ -156,3 +171,4 @@ Information about a Creative Commons or other license associated with the resour
     }
   ]
 }
+```

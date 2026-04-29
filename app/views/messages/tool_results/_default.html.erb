@@ -1,3 +1,4 @@
+<% tool ||= local_assigns[:message] %>
 <% if tool.tool_error_message.blank? && tool.content.present? %>
   <%= tag.div id: "message_#{tool.id}", class: 'my-4' do %>
     <div>

@@ -9,6 +9,7 @@ Subject types must be from the "subject" controlled list.
 
 All subject values must have a corresponding type.
 
+```json
 {
   "subject": [
     {
@@ -17,11 +18,13 @@ All subject values must have a corresponding type.
     }
   ]
 }
+```
 
 ### Multipart subject
 
 For a multipart subject (multiple subject terms joined together as in LCSH), each value must have a corresponding type. No type is provided at the subject level.
 
+```json
 {
   "subject": [
     {
@@ -42,11 +45,13 @@ For a multipart subject (multiple subject terms joined together as in LCSH), eac
     }
   ]
 }
+```
 
 ### Basic subject with structured value
 
 A single subject term may have internal structure, such as a multipart title or name. The type of a term as a whole must be entered at the subject level. Individual parts within the structured value may have their own types.
 
+```json
 {
   "subject": [
     {
@@ -64,11 +69,13 @@ A single subject term may have internal structure, such as a multipart title or 
     }
   ]
 }
+```
 
 ### Multipart subject with structured value
 
 A structured subject may form part of a multipart subject, as in a multipart name followed by additional subject terms. The type of the first structuredValue must be entered (similar to the multipart subject above). This structuredValue is further divided for the structured term forming one part of the multipart subject.
 
+```json
 {
   "subject": [
     {
@@ -94,9 +101,11 @@ A structured subject may form part of a multipart subject, as in a multipart nam
     }
   ]
 }
+```
 
 ### Basic subject with authority
 
+```json
 {
   "subject": [
     {
@@ -109,10 +118,11 @@ A structured subject may form part of a multipart subject, as in a multipart nam
     }
   ]
 }
-
+```
 
 ### Multipart subject with authorities
 
+```json
 {
   "subject": [
     {
@@ -137,3 +147,4 @@ A structured subject may form part of a multipart subject, as in a multipart nam
     }
   ]
 }
+```
