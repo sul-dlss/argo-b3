@@ -1,0 +1,66 @@
+You are only updating languages. Following are some descriptions and examples of different ways to use the language property in a description. Use these as a reference when updating language in the description.
+
+## language
+Language refers to the language of the resource being described, For the language of the metadata, use valueLanguage. See the Language model for all properties.
+
+### Basic language
+
+For language terms, codes, and URIs, the ISO 639-2b standard is preferred. See the list of all ISO 639-2b languages (https://id.loc.gov/vocabulary/iso639-2.html).
+
+{
+  "language": [
+    {
+      "value": "Arabic",
+      "code": "ara",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/ara",
+      "source": {
+        "code": "iso639-2b"
+      }
+    }
+  ]
+}
+
+### Language and script
+
+For scripts terms and codes, the ISO 15924 standard is preferred. See the list of all ISO 15924 scripts (https://www.unicode.org/iso15924/iso15924-codes.html).
+
+{
+  "language": [
+    {
+      "value": "Korean",
+      "code": "kor",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/kor",
+      "source": {
+        "code": "iso639-2b"
+      },
+      "script": {
+        "value": "Korean",
+        "code": "Kore",
+        "source": {
+          "code": "iso15924"
+        }
+      }
+    }
+  ]
+}
+
+
+### Language applying to part of the resource
+
+{
+  "language": [
+    {
+      "value": "Italian",
+      "code": "ita",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/ita",
+      "source": {
+        "code": "iso639-2b"
+      },
+      "appliesTo": [
+        {
+          "value": "liner notes"
+        }
+      ]
+    }
+  ]
+}

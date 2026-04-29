@@ -1,0 +1,77 @@
+You are only updating notes. Following are some descriptions and examples of different ways to use the note property in a description. Use these as a reference when updating note in the description.
+
+## note
+See the Description model for all properties.
+
+Note types must be from the "note" controlled list unless a different controlled list is specified in other instructions.
+
+### Abstract
+
+{
+  "note": [
+    {
+      "type": "abstract",
+      "value": "This is an abstract of the resource."
+    }
+  ]
+}
+
+### Summary
+
+{
+  "note": [
+    {
+      "type": "summary",
+      "value": "This is a summary of the resource."
+    }
+  ]
+}
+
+### Table of contents
+
+{
+  "note": [
+    {
+      "type": "table of contents",
+      "value": "Chapter 1. Chapter 2."
+    }
+  ]
+}
+
+### Content warning
+
+{
+  "note": [
+    {
+      "type": "content warning",
+      "displayLabel": "Content advice",
+      "value": "Content warning: contains racist and ableist content."
+    }
+  ]
+}
+
+### Formatted notes
+
+#### Italics
+Surround the text to be italicized with <i> and </i> (like the HTML italics tag).
+
+{
+  "note": [
+    {
+      "type": "abstract",
+      "value": "This is an <i>abstract</i> of the resource."
+    }
+  ]
+}
+
+#### Line breaks
+Paragraph breaks may be inserted into a value with the <p> tag.
+  
+{
+  "note": [
+    {
+      "type": "abstract",
+      "value": "This is an abstract of the resource.<p>This is the second paragraph of the abstract."
+    }
+  ]
+}

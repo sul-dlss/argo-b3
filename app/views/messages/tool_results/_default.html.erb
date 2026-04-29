@@ -1,21 +1,10 @@
-<% error_message = tool.tool_error_message %>
-<% if error_message.present? %>
-  <%= render "messages/error",
-    message: tool,
-    title: "Tool Result Error",
-    error_message: error_message %>
-<% else %>
-  <div id="message_<%= tool.id %>" class="w-full sm:w-auto my-5 space-y-3 rounded-md px-3 py-2 bg-gray-50 border border-gray-200">
+<% if tool.tool_error_message.blank? && tool.content.present? %>
+  <%= tag.div id: "message_#{tool.id}", class: 'my-4' do %>
     <div>
-      <span class="inline-block rounded px-2 py-0.5 text-xs font-medium bg-gray-200 text-gray-700">
-        Tool
-      </span>
+      Tool Call - <%= tool.created_at&.strftime("%I:%M %p") %>
     </div>
-
-    <pre class="whitespace-pre-wrap text-gray-700 text-sm overflow-x-auto"><%= tool.content.presence || "(no output)" %></pre>
-
-    <div>
-      <span class="text-sm text-gray-600"><%= tool.created_at&.strftime("%I:%M %p") %></span>
-    </div>
-  </div>
+    <%= tag.div id: "message_#{tool.id}_content" do %>
+      <%= render_markdown(tool.content) %>
+    <% end %>
+  <% end %>
 <% end %>

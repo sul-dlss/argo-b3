@@ -14,6 +14,7 @@ class ChatsController < ApplicationController
     @purl_preview = PurlPreviewService.call(cocina_hash: @cocina_object.to_h.merge(description: @cocina_description_hash)).then do |body|
       Nokogiri::HTML(body).css('main').inner_html.html_safe
     end
+    @system_and_tool_messages = @chat.messages.where(role: %w[system tool]).order(:created_at)
   end
 
   def new

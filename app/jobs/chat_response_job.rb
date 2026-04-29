@@ -27,8 +27,7 @@ class ChatResponseJob < ApplicationJob
         broadcast_new_message_form
         return
       end
-      if %w[language note subject relatedResource access geographic marcEncodedData
-            valueAt purl].include?(field)
+      if %w[geographic marcEncodedData purl].include?(field)
         assistant_message = chat.messages.create!(
           role: 'assistant',
           content: { message: "Changing #{field} isn't supported." }.to_json

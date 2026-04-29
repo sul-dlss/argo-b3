@@ -1,0 +1,148 @@
+You are only updating relatedResources. Following are some descriptions and examples of different ways to use the relatedResources property in a description. Use these as a reference when updating relatedResources in the description.
+
+## relatedResource
+Related resource has its own set of properties that largely overlap with the Description model.
+
+This field contains information about other resources that are related in some way to the main resource. Examples include an article that cites the resource, a newer or older version of the resource, the resource in a different format, a series to which the resource belongs (including archival series), and component parts that constitute the resource. Metadata for a related resource can range from a full description to just a title or link.
+
+Whenever possible, a type should be provided that indicates the relationship between the resource described in the main record and the related item. Related resource types must come from the "relatedResource" controlled list. This type maps to a corresponding display label, or the user may define a label for display using displayLabel. Note that the type describes the relationship of the main resource to the related one – so, for example, the type "part of" means the main resource is part of the related resource.
+
+### Related resource as structured metadata
+
+One option is to represent the resource with structured metadata, similar to the description of the main resource.
+
+{
+  "relatedResource": [
+    {
+      "type": "part of",
+      "title": [
+        {
+          "value": "The Common Reader"
+        }
+      ],
+      "contributor": [
+        {
+          "name": [
+            {
+              "value": "Virginia Woolf"
+            }
+          ],
+          "type": "person"
+        }
+      ],
+      "event": [
+        {
+          "date": [
+            {
+              "value": "1925",
+              "encoding": "w3cdtf"
+            }
+          ],
+          "type": "publication"
+        }
+      ]
+    }
+  ]
+}
+
+
+### Related resource as citation
+
+If you are providing the related resource as a citation, it should be entered as a note.
+
+{
+  "relatedResource": [
+    {
+      "type": "part of",
+      "note": [
+        {
+          "value": "Woolf, Virginia. The Common Reader (1925).",
+          "type": "preferred citation"
+        }
+      ]
+    }
+  ]
+}
+
+### Related URL
+
+A related URL may be provided with a title for link text, or simply as a URL that will display directly.
+
+{
+  "relatedResource": [
+    {
+      "type": "references",
+      "access": [
+        {
+          "url": [
+            {
+              "value": "http://www.example.com/source"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "is referenced by",
+      "title": [
+        {
+          "value": "A bibliography"
+        }
+      ]
+    }
+  ]
+}
+
+### Related DOI
+
+A related DOI should be represented as an identifier.
+
+{
+  "relatedResource": [
+    {
+      "type": "version of record",
+      "identifier": [
+        {
+          "value": "http://doi.org/12345/45678",
+          "type": "DOI"
+        }
+      ]
+    }
+  ]
+}
+
+### Archival series
+
+If the resource is part of an archival collection organized by series, the series information is entered as a related resource with type "part of" and display label "Series".
+
+{
+  "relatedResource": [
+    {
+      "type": "part of",
+      "title": [
+        {
+          "value": "Correspondence"
+        }
+      ],
+      "displayLabel": "Series"
+    }
+  ]
+}
+
+
+### Publication series
+
+A book issued as part of a publisher's series should have type "series".
+
+{
+  "relatedResource": [
+    {
+      "type": "series",
+      "title": [
+        {
+          "value": "British Library Crime Classics"
+        }
+      ]
+    }
+  ]
+}
