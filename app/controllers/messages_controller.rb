@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
 
   def create
     content = message_params[:content]
-    return if content.blank?
+    return head :unprocessable_content if content.blank?
 
     # ChatResponseJob.perform_later(@chat.id, content)
     ChatResponseJob.perform_later(chat_id: @chat.id, content:, druid: params[:object_druid])

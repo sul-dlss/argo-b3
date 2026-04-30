@@ -2,7 +2,7 @@
 
 class CocinaDescriptionClassifierAgent < RubyLLM::Agent
   # model 'gemini-flash-latest'
-  model 'gemini-3-flash-preview', provider: Rails.env.production? ? :vertexai : :gemini
+  model 'gemini-3.1-flash-lite-preview', provider: Rails.env.production? ? :vertexai : :gemini
 
   instructions
   schema do

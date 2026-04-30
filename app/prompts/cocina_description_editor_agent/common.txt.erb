@@ -1,10 +1,4 @@
-## Types
-Types are from controlled lists, available from the types_controlled_list_tool. To get a controlled list, call the types_controlled_list_tool with the name of the controlled list.
-
-## External URLs
-If you need to read content from an external URL, call the url_fetch_tool with the URL.
-
-## Description model
+## "description" model
 The common model for a descriptive value and associated properties.
 
 | Property | Definition | Value type | Repeatable |
@@ -14,110 +8,64 @@ The common model for a descriptive value and associated properties.
 | type | Type of value provided by the descriptive element. | String | No |
 | status | Status of the descriptive element value relative to other instances. | String | No |
 | uri | URI value of the descriptive element. | String | No |
-| standard | Descriptive or content standard to which the value conforms. | Object (Standard model) | No |
-| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object (Encoding model) | No |
-| identifier | Identifiers and URIs associated with the descriptive element. Identifier types must be from the "identifier" controlled list. | Object (Description model) | Yes |
-| source | The vocabulary, authority, or other origin for a term, code, or identifier. | Object (Source model) | No |
+| standard | Descriptive or content standard to which the value conforms. | Object ("standard" model) | No |
+| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object ("encoding" model) | No |
+| identifier | Identifiers and URIs associated with the descriptive element. Identifier types must be from the "identifier" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for a term, code, or identifier. | Object ("source" model) | No |
 | displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
 | qualifier | A term providing information about the circumstances of the statement (e.g., approximate dates). | String | No |
-| note | Other information related to the descriptive element. Note types must be from the "note" controlled list unless a different controlled list is specified in other instructions. | Object (Description model) | Yes |
-| valueLanguage | Language of the descriptive element value. | Object (Value language model) | No |
+| note | Other information related to the descriptive element. Note types must be from the "note" controlled list unless a different controlled list is specified in other instructions. | Object ("description" model) | Yes |
+| valueLanguage | Language of the descriptive element value. | Object ("value language" model) | No |
 | valueAt | URL or other pointer to the location of the value of the descriptive element. | String | No |
-| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object (Description model) | Yes |
-| parallelValue | Multiple representations of the same information, such as in different languages. | Object (Description model) | Yes |
-| groupedValue | For interoperability with MODS. | Object (Description model) | Yes |
-| appliesTo | Portion or aspect of the resource the value applies to. | Object (Description model) | Yes |
+| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object ("description" model) | Yes |
+| parallelValue | Multiple representations of the same information, such as in different languages. | Object ("description" model) | Yes |
+| groupedValue | For interoperability with MODS. | Object ("description" model) | Yes |
+| appliesTo | Portion or aspect of the resource the value applies to. | Object ("description" model) | Yes |
 
-## Standard model
+## "standard" model
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String describing the standard. | String | No |
 | code | Code representing the standard. | String | No |
 | uri | URI for the standard. | String | No |
-| note | Other information related to the standard. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
-| source | The vocabulary, authority, or other origin for the standard. | Object (Source model) | No |
+| note | Other information related to the standard. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for the standard. | Object ("source" model) | No |
 | version | The version of the standard. | String | No |
 
-## Encoding model
+## "encoding" model
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String describing the encoding. | String | No |
 | code | Code representing the encoding. | String | No |
 | uri | URI for the encoding. | String | No |
-| note | Other information related to the encoding. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
-| source | The vocabulary, authority, or other origin for the encoding. | Object (Source model) | No |
+| note | Other information related to the encoding. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for the encoding. | Object ("source" model) | No |
 | version | The version of the encoding. | String | No |
 
-## Value language model
+## "value language" model
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String describing the language of the descriptive metadata value. | String | No |
 | code | Code representing the language of the descriptive metadata value. | String | No |
 | uri | URI for the language of the descriptive metadata value. | String | No |
-| note | Other information related to the language of the descriptive metadata value. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
-| source | The vocabulary, authority, or other origin for the language term and/or code. | Object (Source model) | No |
-| valueScript | An alphabet or other notation used to represent a language or other symbolic system of the descriptive metadata value. | Object (Value script model) | No |
+| note | Other information related to the language of the descriptive metadata value. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for the language term and/or code. | Object ("source" model) | No |
+| valueScript | An alphabet or other notation used to represent a language or other symbolic system of the descriptive metadata value. | Object ("value script" model) | No |
 
-## Value script model
+## "value script" model
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String describing the script of the descriptive metadata value. | String | No |
 | code | Code representing the script of the descriptive metadata value. | String | No |
 | uri | URI for the script of the descriptive metadata value. | String | No |
-| note | Other information related to the script. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
-| source | The vocabulary, authority, or other origin for the script term and/or code. | Object (Source model) | No |
+| note | Other information related to the script. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for the script term and/or code. | Object ("source" model) | No |
 
-## Source model
+## "source" model
 | Property | Definition | Value type | Repeatable |
 | --- | --- | --- | --- |
 | value | String describing the value source. | String | No |
 | code | Code representing the value source. | String | No |
 | uri | URI for the value source. | String | No |
-| note | Other information related to the value source. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
+| note | Other information related to the value source. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
 | version | The version of the value source. | String | No |
-
-## Contributor model
-| Property | Definition | Value type | Repeatable |
-| --- | --- | --- | --- |
-| name | Names associated with a contributor. Contributor name types must be from the "contributor.name" controlled list and multipart name types must be from the "contributor.name.structuredValue" controlled list. | Object (Description model) | Yes |
-| type | Entity type of the contributor (person, organization, etc.). Contributor types must be from the "contributor" controlled list. | String | No |
-| status | Status of the contributor relative to other parallel contributors (e.g. the primary author among a group of contributors). Use "primary" to indicate preferred status. | String | No |
-| role | Relationships of the contributor to the resource or to an event in its history. | Object (Description model) | Yes |
-| identifier | Identifiers and URIs associated with the contributor entity. Contributor identifier types must be from the "contributor.identifier" controlled list. | Object (Description model) | Yes |
-| affiliation | Institutional or other affiliation associated with a contributor. | Object (Description model) | Yes |
-| note | Other information associated with the contributor. Contributor note types must be from the "contributor.note" controlled list. | Object (Description model) | Yes |
-| valueAt | URL or other pointer to the location of the contributor information. | String | No |
-
-## Event model
-| Property | Definition | Value type | Repeatable |
-| --- | --- | --- | --- |
-| type | Description of the event (creation, publication, etc.). Event types must be from the "event" controlled list. | String | No |
-| displayLabel | The preferred display label to use for the event in access systems. | String | No |
-| date | Dates associated with the event. See event date types, multipart date types, and date note types. | Object (Description model) | Yes |
-| contributor | Contributors associated with the event. See all contributor types. | Object (Contributor model) | Yes |
-| location | Locations associated with the event. | Object (Description model) | Yes |
-| identifier | Identifiers and URIs associated with the event. Identifier types must be from the "identifier" controlled list. | Object (Description model) | Yes |
-| note | Other information about the event. Event note types must be from the "event.note" controlled list. | Object (Description model) | Yes |
-| valueLanguage | Language of the descriptive metadata value. | Object (Value language model) | No |
-| structuredValue | Imprint statement given as place, publisher, date, and/or any other relevant information. | Object (Description model) | Yes |
-
-## Language model
-| Property | Definition | Value type | Repeatable |
-| --- | --- | --- | --- |
-| value | Value of the descriptive element. | String| No |
-| code | Code value of the descriptive element. | String | No |
-| status | Status of the language relative to other parallel language elements (e.g. the primary language). | String | No |
-| uri | URI value of the descriptive element. | String | No |
-| standard | Descriptive or content standard to which the value conforms. | Object (Standard model) | No |
-| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object (Encoding model) | No |
-| source | The vocabulary, authority, or other origin for the language term and/or code. | Object (Source model) | No |
-| displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
-| qualifier | A term providing information about the circumstances of the statement. | String | No |
-| note | Other information about the language of the resource. Note types must be from the "note" controlled list. | Object (Description model) | Yes |
-| valueLanguage | Language of the descriptive metadata value. | Object (Value language model) | No |
-| script | An alphabet or other notation used to represent a language or other symbolic system associated with the resource. | Object (Description model) | No |
-| appliesTo | Portion or aspect of the resource the value applies to. | Object (Description model) | Yes |
-| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object (Description model) | Yes |
-| parallelValue | Multiple representations of the same information, such as in different languages. | Object (Description model) | Yes |
-| groupedValue | For interoperability with MODS. | Object (Description model) | Yes |
-| valueAt | URI or other pointer to the location of the language information. | String | No |

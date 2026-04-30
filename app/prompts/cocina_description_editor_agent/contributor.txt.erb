@@ -1,7 +1,19 @@
 You are only updating contributors. Following are some descriptions and examples of different ways to use the contributor property in a description. Use these as a reference when updating contributor in the description.
 
-## contributor
-The contributor is a real world object that may be associated with multiple name strings. At least one name is required per contributor and the contributor should have a type. See the Contributor model for all properties.
+## "contributor" model
+The contributor is a real world object that may be associated with multiple name strings. At least one name is required per contributor and the contributor should have a type.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| name | Names associated with a contributor. Contributor name types must be from the "contributor.name" controlled list and multipart name types must be from the "contributor.name.structuredValue" controlled list. | Object ("description" model) | Yes |
+| type | Entity type of the contributor (person, organization, etc.). Contributor types must be from the "contributor" controlled list. | String | No |
+| status | Status of the contributor relative to other parallel contributors (e.g. the primary author among a group of contributors). Use "primary" to indicate preferred status. | String | No |
+| role | Relationships of the contributor to the resource or to an event in its history. | Object ("description" model) | Yes |
+| identifier | Identifiers and URIs associated with the contributor entity. Contributor identifier types must be from the "contributor.identifier" controlled list. | Object ("description" model) | Yes |
+| affiliation | Institutional or other affiliation associated with a contributor. | Object ("description" model) | Yes |
+| note | Other information associated with the contributor. Contributor note types must be from the "contributor.note" controlled list. | Object ("description" model) | Yes |
+| valueAt | URL or other pointer to the location of the contributor information. | String | No |
+
 
 ### Basic contributor with name and contributor type
 

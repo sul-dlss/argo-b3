@@ -20,7 +20,7 @@ class CocinaDescriptionEditorAgent < RubyLLM::Agent
   # tools do
   #   CocinaDescriptionValidatorTool.new(original_cocina_description_hash:)
   # end
-  tools TypesControlledListTool, UrlFetchTool
+  tools TypesControlledListTool, UrlFetchTool, ModelTool
   params generationConfig: { responseMimeType: 'application/json' }
   # schema({ name: 'Cocina Description Schema', schema: CocinaDescriptionSchemaGenerator.call })
   # schema CocinaDescriptionEditorSchema

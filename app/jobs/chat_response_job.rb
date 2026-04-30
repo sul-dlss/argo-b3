@@ -91,11 +91,8 @@ class ChatResponseJob < ApplicationJob
     #   locals: { user: message }
     # )
 
-    # debugger
-    # response = JSON.parse(agent.ask(content).content)
     complete_with_validation_retry(agent)
     message = chat.messages.last
-    # Rails.logger.info "Broadcasting chunk for message #{message.id}: #{message.content}"
 
     broadcast_assistant_message(message)
     broadcast_new_message_form
@@ -109,10 +106,15 @@ class ChatResponseJob < ApplicationJob
     )
     broadcast_assistant_message(assistant_message)
     broadcast_new_message_form
-  rescue RubyLLM::Error => e
+  rescue StandardError => e
     Rails.logger.error "Error in ChatResponseJob: #{e.message}"
-    # TODO: Handle RubyLLM::Error
-    raise
+    Honeybadger.notify(e, context: { chat_id:, druid: })
+    assistant_message = chat.messages.create!(
+      role: 'assistant',
+      content: { message: "Sorry, something went wrong: #{e.message}" }.to_json
+    )
+    broadcast_assistant_message(assistant_message)
+    broadcast_new_message_form
   end
 
   private
@@ -131,8 +133,9 @@ class ChatResponseJob < ApplicationJob
     retry_count = 0
 
     begin
+      start = Time.now
       response = JSON.parse(agent.complete.content)
-      Rails.logger.info("ChatResponseJob response: #{response}")
+      Rails.logger.info("ChatResponseJob response in #{Time.now - start} seconds: #{response}")
       validate_description!(JSON.parse(response['description'])) if response['description'].present?
       response
     rescue Cocina::Models::ValidationError, Dry::Struct::Error => e

@@ -1,7 +1,27 @@
 You are only updating languages. Following are some descriptions and examples of different ways to use the language property in a description. Use these as a reference when updating language in the description.
 
-## language
-Language refers to the language of the resource being described, For the language of the metadata, use valueLanguage. See the Language model for all properties.
+## "language" model
+Language refers to the language of the resource being described, For the language of the metadata, use valueLanguage.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| value | Value of the descriptive element. | String| No |
+| code | Code value of the descriptive element. | String | No |
+| status | Status of the language relative to other parallel language elements (e.g. the primary language). | String | No |
+| uri | URI value of the descriptive element. | String | No |
+| standard | Descriptive or content standard to which the value conforms. | Object ("standard" model) | No |
+| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object ("encoding" model) | No |
+| source | The vocabulary, authority, or other origin for the language term and/or code. | Object ("source" model) | No |
+| displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
+| qualifier | A term providing information about the circumstances of the statement. | String | No |
+| note | Other information about the language of the resource. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| valueLanguage | Language of the descriptive metadata value. | Object ("value language" model) | No |
+| script | An alphabet or other notation used to represent a language or other symbolic system associated with the resource. | Object ("description" model) | No |
+| appliesTo | Portion or aspect of the resource the value applies to. | Object ("description" model) | Yes |
+| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object ("description" model) | Yes |
+| parallelValue | Multiple representations of the same information, such as in different languages. | Object ("description" model) | Yes |
+| groupedValue | For interoperability with MODS. | Object ("description" model) | Yes |
+| valueAt | URI or other pointer to the location of the language information. | String | No |
 
 ### Basic language
 
