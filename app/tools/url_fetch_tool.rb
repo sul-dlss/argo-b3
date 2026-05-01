@@ -8,9 +8,11 @@ class UrlFetchTool < RubyLLM::Tool
   end
 
   def execute(url:)
+    raise ArgumentError, 'Invalid URL' unless url&.match?(URI::DEFAULT_PARSER.make_regexp)
+
     response = Faraday.get(url)
     { url:, status: response.status, body: response.body }
-  rescue Faraday::Error => e
+  rescue StandardError => e
     { url:, error: e.message }
   end
 end
