@@ -14,7 +14,13 @@ ssh -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
 
 In a separate terminal window:
 ```
-SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_prod bin/setup
+SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_qa bin/setup
+```
+to connect to the Argo QA solr index. (Alternatively, you can connect to the stage solr index with `argo_stage` or production with `argo_prod`.)
+
+You can also connect to a deployed DSA. First, obtain a token for the DSA instance and then:
+```
+SETTINGS__DOR_SERVICES__URL='https://dor-services-qa-lb.stanford.edu' SETTINGS__DOR_SERVICES__TOKEN=hbGcifaketokenOiJIUzI1NiJ9.jbvl5uai9y2MF7_nFqYrcewO4uKJ8tLY2A69b bin/setup
 ```
 
 Note that `bin/setup` will create the database, run yarn, and perform other setup tasks.
