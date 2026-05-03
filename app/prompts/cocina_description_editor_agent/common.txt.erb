@@ -69,3 +69,9 @@ The common model for a descriptive value and associated properties.
 | uri | URI for the value source. | String | No |
 | note | Other information related to the value source. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
 | version | The version of the value source. | String | No |
+
+## "identifier" controlled list
+<%= TypesControlledListTool.new.execute(name: "identifier") %>
+
+## "note" controlled list
+<%= TypesControlledListTool.new.execute(name: "note") %>
