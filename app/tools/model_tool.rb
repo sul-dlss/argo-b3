@@ -13,14 +13,14 @@ class ModelTool < RubyLLM::Tool
       return "No instructions found for model: #{name}. Valid names are: #{all_models.join(', ')}"
     end
 
-    CocinaDescriptionEditorAgent.render_prompt(name, chat: nil, inputs: {}, locals: {})
+    CocinaDescriptionEditorAgent.render_prompt(name.tr(' ', '_'), chat: nil, inputs: {}, locals: {})
   end
 
   private
 
   def all_models
     @@all_models ||= Rails.root.glob('app/prompts/cocina_description_editor_agent/*.txt.erb').map do |file|
-      File.basename(file, '.txt.erb')
+      File.basename(file, '.txt.erb').tr('_', ' ')
     end.excluding('instructions', 'common', 'description')
   end
 end

@@ -53,9 +53,10 @@ class ChatResponseJob < ApplicationJob
       # field_instructions = CocinaDescriptionEditorAgent.render_prompt(field, chat:, inputs: {}, locals: {})
       chat.with_instructions(build_instructions('instructions'))
       chat.with_instructions(build_instructions(field), append: true)
-      chat.with_instructions(build_instructions('common'), append: true)
+      chat.with_instructions(build_instructions('description'), append: true) if %w[form contributor identifier
+                                                                                    note relatedResource subject title].include?(field)
       chat.with_instructions(
-        build_instructions('description',
+        build_instructions('cocina_description',
                            locals: { cocina_description_hash: original_cocina_description_hash.slice(field.to_sym) }), append: true
       )
 
