@@ -15,6 +15,8 @@ class ChatsController < ApplicationController
       Nokogiri::HTML(body).css('main').inner_html.html_safe
     end
     @system_and_tool_messages = @chat.messages.where(role: %w[system tool]).order(:created_at)
+    @spreadsheet_hash = DescriptiveCsv::Export.export(source_id: @cocina_object.identification.sourceId,
+                                                      description: @cocina_description_hash)
   end
 
   def new

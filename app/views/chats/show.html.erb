@@ -87,11 +87,12 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div class="sticky-top">
+      <div class="sticky-top" style="max-height: 650px; overflow-y: auto;">
         <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
 
           <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Preview', active: true) %>
           <% component.with_tab(id: 'cocina-description-tab', pane_id: 'cocina-description-pane', label: 'Cocina Preview') %>
+          <% component.with_tab(id: 'spreadsheet-tab', pane_id: 'spreadsheet-pane', label: 'Spreadsheet Preview') %>
 
           <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab', active: true) do %>
             <%= render Editor::PurlPreviewCardComponent.new(purl_preview: @purl_preview, cocina_description_hash: @cocina_description_hash) %>
@@ -99,6 +100,10 @@
 
           <%= component.with_pane(id: 'cocina-description-pane', tab_id: 'cocina-description-tab') do %>
             <%= render Editor::CocinaDescriptionCardComponent.new(cocina_description_hash: @cocina_description_hash) %>
+          <% end %>
+
+          <%= component.with_pane(id: 'spreadsheet-pane', tab_id: 'spreadsheet-tab') do %>
+            <%= render Editor::SpreadsheetCardComponent.new(spreadsheet_hash: @spreadsheet_hash) %>
           <% end %>
         <% end %>
       </div>

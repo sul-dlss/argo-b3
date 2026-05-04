@@ -1,0 +1,9 @@
+<div class="card" id="spreadsheet-card">
+  <div class="card-body">
+    <%= render Elements::Tables::TableComponent.new(id: 'spreadsheet-table', label: 'Spreadsheet Preview', show_label: false) do |component| %>
+      <% spreadsheet_hash.each do |label, value| %>
+        <% component.with_row(label:, value:) %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -99,6 +99,7 @@ class ChatResponseJob < ApplicationJob
     broadcast_new_message_form
     broadcast_cocina_description_card(message)
     broadcast_purl_preview_card(message)
+    broadcast_spreadsheet_card(message)
     broadcast_recent_system_and_tool_messages
   rescue Cocina::Models::ValidationError => e
     assistant_message = chat.messages.create!(
@@ -252,6 +253,24 @@ class ChatResponseJob < ApplicationJob
       target: 'cocina-description-card',
       renderable: Editor::CocinaDescriptionCardComponent.new(
         cocina_description_hash: original_cocina_description_hash.deep_stringify_keys.merge(content_description_hash)
+      ),
+      layout: false,
+      method: :morph
+    )
+  end
+
+  def broadcast_spreadsheet_card(message)
+    content = JSON.parse(message.content)
+    return if content['description'].blank?
+
+    content_description_hash = JSON.parse(content['description'])
+
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "chat_#{chat.id}",
+      target: 'spreadsheet-card',
+      renderable: Editor::SpreadsheetCardComponent.new(
+        spreadsheet_hash: DescriptiveCsv::Export.export(source_id: original_cocina_object.identification.sourceId,
+                                                        description: original_cocina_description_hash.deep_stringify_keys.merge(content_description_hash))
       ),
       layout: false,
       method: :morph
