@@ -10,4 +10,5 @@ class CocinaDescriptionClassifierAgent < RubyLLM::Agent
            enum: %w[title contributor event form language note identifier subject access geographic
                     relatedResource adminMetadata marcEncodedData valueAt none]
   end
+  thinking effort: :low
 end

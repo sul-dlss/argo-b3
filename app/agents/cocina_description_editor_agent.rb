@@ -24,5 +24,6 @@ class CocinaDescriptionEditorAgent < RubyLLM::Agent
   params generationConfig: { responseMimeType: 'application/json' }
   # schema({ name: 'Cocina Description Schema', schema: CocinaDescriptionSchemaGenerator.call })
   # schema CocinaDescriptionEditorSchema
-  temperature 0.0
+  temperature 1.0 # With Gemini 3+, recommended to keep >= 1.0
+  thinking effort: :low
 end
