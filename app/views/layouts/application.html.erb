@@ -28,14 +28,13 @@
 
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <% component_library_url = 'https://cdn.jsdelivr.net/gh/sul-dlss/component-library@v2025-09-11' %>
-    <%= tag.link rel: 'icon', href: "#{component_library_url}/styles/icon.png", type: 'image/png' %>
-    <%= tag.link rel: 'icon', href: "#{component_library_url}/styles/icon.svg", type: 'image/svg+xml' %>
-    <%= tag.link rel: 'apple-touch-icon', href: "#{component_library_url}/styles/icon.png" %>
+    <%= tag.link rel: 'icon', href: "#{Settings.component_library.url}/styles/icon.png", type: 'image/png' %>
+    <%= tag.link rel: 'icon', href: "#{Settings.component_library.url}/styles/icon.svg", type: 'image/svg+xml' %>
+    <%= tag.link rel: 'apple-touch-icon', href: "#{Settings.component_library.url}/styles/icon.png" %>
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, 'data-turbo-track': 'reload' %>
-    <%= tag.link rel: 'stylesheet', href: "#{component_library_url}/styles/sul.css" %>
+    <%= tag.link rel: 'stylesheet', href: "#{Settings.component_library.url}/styles/sul.css" %>
     <%= javascript_importmap_tags %>
   </head>
 

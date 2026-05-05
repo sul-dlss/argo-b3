@@ -28,3 +28,6 @@ stacks:
 
 purl:
   url: "https://purl.stanford.edu"
+
+component_library:
+  url: "https://cdn.jsdelivr.net/gh/sul-dlss/component-library@v2025-09-11"

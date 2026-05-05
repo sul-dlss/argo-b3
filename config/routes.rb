@@ -166,4 +166,7 @@ Rails.application.routes.draw do
   end
 
   mount MissionControl::Jobs::Engine, at: '/jobs'
+
+  mount SdrViewComponents::Engine => '/sdr_view_components'
+  mount Lookbook::Engine, at: '/lookbook' if Rails.env.development?
 end
