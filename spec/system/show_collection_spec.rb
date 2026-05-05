@@ -86,8 +86,9 @@ RSpec.describe 'Show collection' do
 
     # Cocina model tab
     click_button 'Cocina Model'
-    expect(page).to have_css('pre', text: "\"externalIdentifier\": \"#{druid}\"")
-    expect(page).to have_css('pre', text: "\"value\": \"#{original_title}\"")
+    # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
+    expect(page).to have_css("andypf-json-viewer[data*='#{druid}']")
+    expect(page).to have_css("andypf-json-viewer[data*='#{original_title}']")
 
     # PURL preview tab
     click_button 'PURL Description Preview'
@@ -98,7 +99,7 @@ RSpec.describe 'Show collection' do
 
     click_button 'Cocina Model'
     expect(page).to have_css('h1', text: updated_title)
-    expect(page).to have_css('pre', text: "\"value\": \"#{updated_title}\"")
+    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
 
     click_button 'Details'
     expect(page).to have_table_value('description-table', 'Title', updated_title)

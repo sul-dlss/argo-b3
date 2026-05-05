@@ -1,3 +1,3 @@
 <%= turbo_frame_tag(@cocina_hash[:externalIdentifier], 'cocina_json') do %>
-  <pre><%= JSON.pretty_generate(@cocina_hash) %></pre>
+  <%= render Elements::JsonViewerComponent.new(hash: @cocina_hash, expanded: 1, show_tip: true) %>
 <% end %>
