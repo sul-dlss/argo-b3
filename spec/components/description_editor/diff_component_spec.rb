@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Editor::PurlPreviewCardComponent, type: :component do
+RSpec.describe DescriptionEditor::DiffComponent, type: :component do
   pending "add some examples to (or delete) #{__FILE__}"
 
   # it "renders something useful" do

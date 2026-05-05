@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Editor::SpreadsheetCardComponent < ApplicationComponent
+class DescriptionEditor::SpreadsheetCardComponent < ApplicationComponent
   def initialize(spreadsheet_hash:)
     @spreadsheet_hash = spreadsheet_hash
     super()

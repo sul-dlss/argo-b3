@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Editor
+module DescriptionEditor
   class DiffComponent < ApplicationComponent
     def initialize(diff:)
       @diff = diff

@@ -251,7 +251,7 @@ class ChatResponseJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_replace_to(
       "chat_#{chat.id}",
       target: 'cocina-description-card',
-      renderable: Editor::CocinaDescriptionCardComponent.new(
+      renderable: DescriptionEditor::CocinaDescriptionCardComponent.new(
         cocina_description_hash: original_cocina_description_hash.deep_stringify_keys.merge(content_description_hash)
       ),
       layout: false,
@@ -268,7 +268,7 @@ class ChatResponseJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_replace_to(
       "chat_#{chat.id}",
       target: 'spreadsheet-card',
-      renderable: Editor::SpreadsheetCardComponent.new(
+      renderable: DescriptionEditor::SpreadsheetCardComponent.new(
         spreadsheet_hash: DescriptiveCsv::Export.export(source_id: original_cocina_object.identification.sourceId,
                                                         description: original_cocina_description_hash.deep_stringify_keys.merge(content_description_hash))
       ),
@@ -292,7 +292,7 @@ class ChatResponseJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_replace_to(
       "chat_#{chat.id}",
       target: 'purl-preview-card',
-      renderable: Editor::PurlPreviewCardComponent.new(
+      renderable: DescriptionEditor::PurlPreviewCardComponent.new(
         purl_preview:,
         cocina_description_hash:
       ),

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Editor
+module DescriptionEditor
   class PurlPreviewCardComponent < ApplicationComponent
     def initialize(purl_preview:, cocina_description_hash:)
       @purl_preview = purl_preview

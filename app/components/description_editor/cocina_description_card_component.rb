@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Editor
+module DescriptionEditor
   class CocinaDescriptionCardComponent < ApplicationComponent
     def initialize(cocina_description_hash:)
       @cocina_description_hash = cocina_description_hash
