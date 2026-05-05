@@ -9,3 +9,4 @@ pin '@hotwired/stimulus-loading', to: 'stimulus-loading.js'
 pin_all_from 'app/javascript/controllers', under: 'controllers'
 pin 'bootstrap', to: 'bootstrap.bundle.min.js'
 pin 'stimulus-autocomplete' # @3.1.0
+pin '@andypf/json-viewer', to: '@andypf--json-viewer.js' # @2.4.0

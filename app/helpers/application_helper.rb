@@ -20,4 +20,13 @@ module ApplicationHelper
 
     I18n.l(datetime.in_time_zone('Pacific Time (US & Canada)'), format:)
   end
+
+  def format_hash(hash, compact: true, pretty: true)
+    formatted_hash = compact ? CocinaDisplay::Utils.deep_compact_blank(hash) : hash
+    if pretty
+      JSON.pretty_generate(formatted_hash)
+    else
+      JSON.generate(formatted_hash)
+    end
+  end
 end
