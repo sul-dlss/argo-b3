@@ -1,0 +1,92 @@
+You are only updating languages. Following are some descriptions and examples of different ways to use the language property in a description. Use these as a reference when updating language in the description.
+
+## "language" model
+Language refers to the language of the resource being described, For the language of the metadata, use valueLanguage.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| value | Value of the descriptive element. | String| No |
+| code | Code value of the descriptive element. | String | No |
+| status | Status of the language relative to other parallel language elements (e.g. the primary language). | String | No |
+| uri | URI value of the descriptive element. | String | No |
+| standard | Descriptive or content standard to which the value conforms. | Object ("standard" model) | No |
+| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object ("encoding" model) | No |
+| source | The vocabulary, authority, or other origin for the language term and/or code. | Object ("source" model) | No |
+| displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
+| qualifier | A term providing information about the circumstances of the statement. | String | No |
+| note | Other information about the language of the resource. Note types must be from the "note" controlled list. | Object ("description" model) | Yes |
+| valueLanguage | Language of the descriptive metadata value. | Object ("value language" model) | No |
+| script | An alphabet or other notation used to represent a language or other symbolic system associated with the resource. | Object ("description" model) | No |
+| appliesTo | Portion or aspect of the resource the value applies to. | Object ("description" model) | Yes |
+| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object ("description" model) | Yes |
+| parallelValue | Multiple representations of the same information, such as in different languages. | Object ("description" model) | Yes |
+| groupedValue | For interoperability with MODS. | Object ("description" model) | Yes |
+| valueAt | URI or other pointer to the location of the language information. | String | No |
+
+### Basic language
+
+For language terms, codes, and URIs, the ISO 639-2b standard is preferred. See the list of all ISO 639-2b languages (https://id.loc.gov/vocabulary/iso639-2.html).
+
+```json
+{
+  "language": [
+    {
+      "value": "Arabic",
+      "code": "ara",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/ara",
+      "source": {
+        "code": "iso639-2b"
+      }
+    }
+  ]
+}
+```
+
+### Language and script
+
+For scripts terms and codes, the ISO 15924 standard is preferred. See the list of all ISO 15924 scripts (https://www.unicode.org/iso15924/iso15924-codes.html).
+
+```json
+{
+  "language": [
+    {
+      "value": "Korean",
+      "code": "kor",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/kor",
+      "source": {
+        "code": "iso639-2b"
+      },
+      "script": {
+        "value": "Korean",
+        "code": "Kore",
+        "source": {
+          "code": "iso15924"
+        }
+      }
+    }
+  ]
+}
+```
+
+
+### Language applying to part of the resource
+
+```json
+{
+  "language": [
+    {
+      "value": "Italian",
+      "code": "ita",
+      "uri": "http://id.loc.gov/vocabulary/iso639-2/ita",
+      "source": {
+        "code": "iso639-2b"
+      },
+      "appliesTo": [
+        {
+          "value": "liner notes"
+        }
+      ]
+    }
+  ]
+}
+```

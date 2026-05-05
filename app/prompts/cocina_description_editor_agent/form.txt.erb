@@ -1,0 +1,233 @@
+You are only updating forms. Following are some descriptions and examples of different ways to use the form property in a description. Use these as a reference when updating form in the description.
+
+## form
+Form is characteristics of the resource's physical, digital, and intellectual form and genre, and of its process of creation. See the "description" model for all properties.
+
+Form types must be from the "form" controlled list.
+
+### Resource type
+
+Choose a value from the Library of Congress Resource Types Scheme (https://id.loc.gov/vocabulary/resourceTypes.html):
+- Artifact
+- Audio
+- Cartographic
+- Collection
+- Dataset
+- Digital
+- Manuscript
+- Mixed material
+- Moving image
+- Multimedia
+- Notated music
+- Still image
+- Tactile
+- Text
+- Unspecified
+
+Every resource should have at least one type.
+
+```json
+{
+  "form": [
+    {
+      "value": "Text",
+      "type": "resource type",
+      "uri": "http://id.loc.gov/vocabulary/resourceTypes/txt",
+      "source": {
+        "value": "LC Resource Types Scheme"
+      }
+    }
+  ]
+}
+```
+
+### DataCite resourceTypeGeneral
+
+Choose a value from the DataCite resource type list (https://datacite-metadata-schema.readthedocs.io/en/4.7/appendices/appendix-1/resourceTypeGeneral/).
+
+```json
+{
+  "form": [
+    {
+      "value": "JournalArticle",
+      "type": "resource type",
+      "source": {
+        "value": "DataCite resource types"
+      }
+    }
+  ]
+}
+```
+
+### DDI General Data Format
+
+Choose a value from the DDI Alliance Controlled Vocabulary for General Data Format (https://rdf-vocabulary.ddialliance.org/ddi-cv/GeneralDataFormat/2.0.3/GeneralDataFormat.html).
+
+```json
+{
+  "form": [
+    {
+      "value": "Numeric",
+      "type": "resource type",
+      "displayLabel": "Data resource type",
+      "uri": "http://rdf-vocabulary.ddialliance.org/cv/GeneralDataFormat/2.0.3/8732239",
+      "source": {
+        "value": "DDI General Data Format"
+      }
+    }
+  ]
+}
+```
+
+### Form
+
+Form refers to the physical or material aspects of the original resource.
+
+```json
+{
+  "form": [
+    {
+      "value": "ink on paper",
+      "type": "form"
+    }
+  ]
+}
+```
+
+```json
+{
+  "form": [
+    {
+      "value": "ambrotypes",
+      "type": "form",
+      "uri": "http://vocab.getty.edu/aat/300127186",
+      "source": {
+        "code": "aat"
+      }
+    }
+  ]
+}
+```
+
+### Genre
+
+Genre refers to aspects of the content of the resource.
+
+```json
+{
+  "form": [
+    {
+      "value": "Oral history",
+      "type": "genre"
+    },
+    {
+      "value": "Documentary photographs",
+      "type": "genre",
+      "uri": "https://id.loc.gov/authorities/genreForms/gf2017027230",
+      "source": {
+        "code": "lcgft"
+      }
+    }
+  ]
+}
+```
+
+### Extent
+
+Extent refers to the size, dimensions, number, or duration of the resource.
+
+```json
+{
+  "form": [
+    {
+      "value": "33 pages",
+      "type": "extent"
+    },
+    {
+      "value": "12 cm x 15 cm",
+      "type": "extent"
+    }
+  ]
+}
+```
+
+
+### Internet media type
+
+See the list of internet media types (https://www.iana.org/assignments/media-types/media-types.xhtml).
+
+```json
+{
+  "form": [
+    {
+      "value": "image/jpeg",
+      "type": "media type",
+      "source": {
+        "value": "IANA media types"
+      }
+    }
+  ]
+}
+```
+
+### Digital origin
+
+See the list of MODS digital origin terms (https://www.loc.gov/standards/mods/userguide/physicaldescription.html#digitalorigin).
+
+```json
+{
+  "form": [
+    {
+      "value": "reformatted digital",
+      "type": "digital origin",
+      "source": {
+        "value": "MODS digital origin terms"
+      }
+    }
+  ]
+}
+```
+
+### Reformatting quality
+
+See the list of MODS reformatting quality terms (https://www.loc.gov/standards/mods/userguide/physicaldescription.html#reformattingquality).
+
+```json
+{
+  "form": [
+    {
+      "value": "access",
+      "type": "reformatting quality",
+      "source": {
+        "value": "MODS reformatting quality terms"
+      }
+    }
+  ]
+}
+```
+
+### Note
+
+Additional information may be provided in a note, with an optional display label.
+
+```json
+{
+  "form": [
+    {
+      "note": [
+        {
+          "value": "Reformatted in 2012.",
+          "displayLabel": "Reformatting note"
+        },
+        {
+          "value": "NTSC",
+          "displayLabel": "Broadcast standard"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## "form" controlled list
+<%= TypesControlledListTool.new.execute(name: "form") %>

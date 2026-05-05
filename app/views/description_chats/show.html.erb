@@ -1,0 +1,112 @@
+<%= turbo_stream_from "chat_#{@chat.id}" %>
+
+<div class="container mb-5">
+  <%= render Elements::ButtonLinkComponent.new(label: "← Back to \"#{@title}\"", classes: 'ps-0 mb-2',
+                                               path: object_path(@cocina_object.externalIdentifier)) %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mt-2">
+        <div class="card-body">
+          <div class="card-title h4">What change would you like to make to the description?</div>
+
+          <% collapse_id = "help" %>
+          <div>
+            <%= tag.a class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'false', controls: collapse_id } do %>
+                <i class="bi bi-plus me-1 expand-icon"></i>
+                <i class="bi bi-dash me-1 collapse-icon"></i>
+                Instructions and examples
+            <% end %>
+          </div>
+          <div class="collapse" id="<%= collapse_id %>">
+            <div class="card card-body">
+              <p>
+                <span class="fst-italic fw-semibold">Instructions:</span> Enter a natural language instruction for how to change the description. Be as clear and specific as possible about what you want to change, including which fields to change and how to change them.
+              </p>
+              <p>
+                <span class="fst-italic fw-semibold">Examples prompts:</span>
+                <ul>
+                  <li>"Change the title to 'The Adventures of Tom Sawyer'"</li>
+                  <li>"Remove the fourth note."</li>
+                  <li>"Add a new subject that is a structured value with source of 'lcsh'. The first value should be 'Mississippi River' with a type of 'place.' The second value should be 'Fiction' with a type of 'topic'".</li>
+                  <li>"Change the title from a structured value to a basic value."</li>
+                  <li>"Undo the last change."</li>
+                </ul>
+              </p>
+              <p>
+                <span class="fst-italic fw-semibold">Tips:</span>
+                <ul>
+                  <li>Only make changes to one field (e.g., title, contributor, event, etc.) at a time. You can make multiple changes to that field (e.g., add a new title, change an existing title).</li>
+                  <li>"Cocina Description Preview" and "PURL Preview" will be updated as you make changes to the description</li>
+                </ul>
+              </p>
+            </div>
+          </div>
+
+
+          <div id="messages">
+            <% @chat.messages.where(role: ['user', 'assistant']).where.not(id: nil).each do |message| %>
+              <% next if message.content.blank? %>
+              <% if message.role == 'user' %>
+                <%= render message %>
+              <% else %>
+                <% content = JSON.parse(message.content) %>
+                <% diffs = if content['description'].present?
+                    description = JSON.parse(content['description'])
+                    previous_description = message.previous_description
+                    previous_description ||= @original_cocina_description_hash.slice(*description.keys)
+                    Hashdiff.diff(
+                      CocinaDisplay::Utils.deep_compact_blank(previous_description),
+                      CocinaDisplay::Utils.deep_compact_blank(description)
+                    )
+                  end %>
+                <%= render message, diffs: diffs %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <%= render "messages/form", chat: @chat, message: @message, druid: @cocina_object.externalIdentifier %>
+        </div>
+      </div>
+      <div class="d-flex mt-3">
+        <%= render Elements::ButtonLinkComponent.new(label: 'Start over', path: new_object_description_chat_path(@cocina_object.externalIdentifier), variant: 'outline-primary', classes: 'me-3') %>
+        <button id="save-btn" class="btn btn-primary" onclick="alert('Save isn\'t implemented yet')">Save changes</button>
+      </div>
+      <% collapse_id = "system-messages-collapse" %>
+      <div class="mt-4">
+        <%= tag.a id: "system-messages-btn", class: 'btn btn-link ps-0', href: "##{collapse_id}", role: 'button', data: { bs_toggle: 'collapse' }, aria: { expanded: 'false', controls: collapse_id } do %>
+            <i class="bi bi-plus me-1 expand-icon"></i>
+            <i class="bi bi-dash me-1 collapse-icon"></i>
+            System information / tool calls
+        <% end %>
+      </div>
+      <%= tag.div class: 'collapse', id: collapse_id do %>
+        <div id="system-and-tool-messages">
+          <%= render @system_and_tool_messages %>
+        </div>
+      <% end %>
+    </div>
+    <div class="col-md-6">
+      <div class="sticky-top" style="max-height: 650px; overflow-y: auto;">
+        <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+
+          <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Preview', active: true) %>
+          <% component.with_tab(id: 'cocina-description-tab', pane_id: 'cocina-description-pane', label: 'Cocina Preview') %>
+          <% component.with_tab(id: 'spreadsheet-tab', pane_id: 'spreadsheet-pane', label: 'Spreadsheet Preview') %>
+
+          <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab', active: true) do %>
+            <%= render DescriptionEditor::PurlPreviewCardComponent.new(purl_preview: @purl_preview, cocina_description_hash: @cocina_description_hash) %>
+          <% end %>
+
+          <%= component.with_pane(id: 'cocina-description-pane', tab_id: 'cocina-description-tab') do %>
+            <%= render DescriptionEditor::CocinaDescriptionCardComponent.new(cocina_description_hash: @cocina_description_hash) %>
+          <% end %>
+
+          <%= component.with_pane(id: 'spreadsheet-pane', tab_id: 'spreadsheet-tab') do %>
+            <%= render DescriptionEditor::SpreadsheetCardComponent.new(spreadsheet_hash: @spreadsheet_hash) %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

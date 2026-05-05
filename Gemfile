@@ -41,16 +41,20 @@ gem 'image_processing', '~> 1.2'
 # Additional gems
 gem 'action_policy'
 gem 'cocina_display'
+gem 'commonmarker' # For rendering markdown in system and tool messages.
 gem 'config'
 gem 'csv'
 gem 'dor-services-client', '~> 15.1'
 gem 'dry-monads'
+gem 'googleauth' # For Vertex AI authentication
+gem 'hashdiff' # For showing differences between original and updated cocina descriptions.
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
 gem 'rsolr'
+gem 'ruby_llm'
 gem 'sdr_view_components'
 gem 'view_component'
 

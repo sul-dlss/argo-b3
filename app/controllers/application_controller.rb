@@ -33,4 +33,9 @@ class ApplicationController < ActionController::Base
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
     @last_search_form = @search_form = SearchForm.new(form_params)
   end
+
+  def available_chat_models
+    RubyLLM.models.chat_models.all
+           .sort_by { |model| [model.provider.to_s, model.name.to_s] }
+  end
 end
