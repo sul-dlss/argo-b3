@@ -1,0 +1,18 @@
+<div class="card" id="resources-card">
+  <div class="card-body">
+    <% if file_sets.present? %>
+      <ul class="list-unstyled">
+        <% file_sets.each do |file_set_hash| %>
+          <li><span class="fw-bold"><%= file_set_hash[:label] %></span> (<%= content_type_for(file_set_hash) %>)</li>
+          <ul>
+            <% file_set_hash[:structural][:contains].each do |file_hash| %>
+              <li><%= file_hash[:filename] %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No file sets.</p>
+    <% end %>
+  </div>
+</div>

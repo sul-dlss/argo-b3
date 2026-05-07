@@ -3,6 +3,7 @@
 # Model for an Argo user.
 class User < ApplicationRecord
   has_many :bulk_actions, dependent: :destroy
+  has_many :structural_chats, dependent: :destroy
 
   EMAIL_SUFFIX = '@stanford.edu'
 

@@ -28,3 +28,13 @@ stacks:
 
 purl:
   url: "https://purl.stanford.edu"
+
+# Gemini API is only used for local development.
+gemini_api:
+  key: ~
+
+# Vertex AI is used in deployed environments.
+vertexai_api:
+  key: 'fake-key' # Base64 encoded service account key; actual values from vault/puppet
+  project_id: 'sul-ai-sandbox'
+  location: 'global'

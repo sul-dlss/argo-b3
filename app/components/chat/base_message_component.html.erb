@@ -1,0 +1,8 @@
+<%= tag.div id: dom_id(message), class: 'my-4' do %>
+  <div>
+    <%= role %> - <%= helpers.format_datetime(message.created_at, format: :time_only) %>
+  </div>
+  <%= tag.div id: dom_id(message, 'content') do %>
+    <%= content || message.content %>
+  <% end %>
+<% end %>

@@ -1,0 +1,18 @@
+<div class="container my-3">
+  <h1 class="h4">Add files</h1>
+  <div class="row mt-2 gy-3">
+    <%= form_with model: @structural_form, url: object_structural_chats_path(@druid) do |form| %>
+      <%= tag.div do %>
+        <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :content_type, text: 'Content type') %>
+        <%= form.select :content_type, [['Object', 'object'], ['Book', 'book']], {}, class: 'form-select' %>
+      <% end %>
+
+      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form: form, field_name: :filenames, label_text: "Files", input_rows: 8, 
+        help_text: 'This is a stand in for a dropzone, mount selection, and/or Globus.', container_classes: 'mt-3') %>
+
+      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form: form, field_name: :instructions, label_text: "Additional instructions", rows: 5, container_classes: 'mt-3') %>
+
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: "Submit", classes: 'mt-3') %>
+    <% end %>
+  </div>
+</div>

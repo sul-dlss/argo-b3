@@ -161,6 +161,12 @@ Rails.application.routes.draw do
     end
   end
 
+  scope '/objects/:druid', as: 'object' do
+    resources :structural_chats, only: %i[new show create] do
+      resources :structural_messages, only: %i[create]
+    end
+  end
+
   namespace :admin do
     get 'groups'
   end
