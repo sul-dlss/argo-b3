@@ -1,0 +1,56 @@
+<%= turbo_stream_from @chat %>
+
+<div class="container mb-5">
+  <%= render Elements::ButtonLinkComponent.new(label: "← Back", classes: 'ps-0 mb-2',
+                                               path: object_path(@druid)) %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <% if @chat.messages.user_and_assistant.present? %>
+        <% @chat.messages.user_and_assistant.each do |message| %>
+          <%= render StructuralEditor::MessageComponent.new(message: message) %>
+        <% end %>
+
+        <%= turbo_frame_tag "new_message" do %>
+          <%= form_with model: @structural_form, url: object_structural_chat_structural_messages_path(@chat.druid, @chat.id) do |form| %>
+
+            <%= render SdrViewComponents::Forms::TextAreaComponent.new(form: form, field_name: :filenames, label_text: "Additional Files", rows: 5, 
+              help_text: 'This is a stand in for a dropzone, mount selection, and/or Globus.', container_classes: 'mt-3') %>
+
+            <%= render SdrViewComponents::Forms::TextAreaComponent.new(form: form, field_name: :instructions, label_text: "Additional instructions", rows: 5, container_classes: 'mt-3') %>
+
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: "Submit", classes: 'mt-3') %>
+          <% end %>
+
+        <% end %>
+
+        <hr class="my-4">
+
+        <div class="d-flex">
+        <%= render Elements::ButtonLinkComponent.new(label: 'Start over', path: new_object_structural_chat_path(@chat.druid), variant: 'outline-primary', classes: 'me-3') %>
+          <button id="save-btn" class="btn btn-primary" onclick="alert('Save isn\'t implemented yet')">Save changes</button>
+        </div>
+      <% else %>
+        <%= render Elements::SpinnerComponent.new(message: 'Working ...', classes: 'mt-3') %>
+      <% end %>
+    </div>
+    <div class="col-md-6">
+      <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+
+          <% component.with_tab(id: 'file-sets-tab', pane_id: 'file-sets-pane', label: 'File Sets Preview', active: true) %>
+          <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
+          <% component.with_tab(id: 'cocina-structural-tab', pane_id: 'cocina-structural-pane', label: 'Cocina Preview') %>
+
+          <%= component.with_pane(id: 'file-sets-pane', tab_id: 'file-sets-tab', active: true) do %>
+            <%= render StructuralEditor::FileSetsCardComponent.new(file_sets: @file_sets) %>
+          <% end %>
+          <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
+            <%= render StructuralEditor::FilesCardComponent.new(file_sets: @file_sets) %>
+          <% end %>
+          <%= component.with_pane(id: 'cocina-structural-pane', tab_id: 'cocina-structural-tab') do %>
+            <%= render StructuralEditor::CocinaStructuralCardComponent.new(file_sets: @file_sets) %>
+          <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

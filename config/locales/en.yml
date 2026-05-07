@@ -31,6 +31,7 @@ en:
   time:
     formats:
       long: "%B %d, %Y %I:%M %p"
+      time_only: "%I:%M %p"
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
   search:
