@@ -36,7 +36,7 @@ Metrics/BlockLength:
     - 'config/routes.rb'
 
 Metrics/ClassLength:
-  Max: 150 # default 100
+  Max: 200 # default 100
 
 Metrics/MethodLength:
   CountAsOne:

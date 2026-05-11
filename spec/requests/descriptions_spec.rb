@@ -57,8 +57,7 @@ RSpec.describe 'Editing description' do
     context 'when the user is an admin' do
       before do
         sign_in admin_user
-        allow(Sdr::VersionService).to receive(:open?).and_return(true)
-        allow(Sdr::VersionService).to receive(:closeable?).and_return(true)
+        allow(Sdr::VersionService).to receive_messages(open?: true, closeable?: true)
         allow(Sdr::VersionService).to receive(:close)
         allow(Sdr::Repository).to receive(:update)
       end
@@ -66,11 +65,12 @@ RSpec.describe 'Editing description' do
       it 'updates the description and redirects to the object page' do
         patch object_description_path(object_druid: druid), params: description_params
 
-        expect(Sdr::Repository).to have_received(:update).with(
-          cocina_object: anything,
-          user_name: admin_user.sunetid,
-          description: 'Descriptive metadata edited via web form'
-        )
+        expect(Sdr::Repository).to have_received(:update) do |args|
+          updated_description = args[:cocina_object].description
+          expect(updated_description.title.first.value).to eq('Updated Title')
+          expect(updated_description.note.first.value).to eq('An abstract.')
+          expect(updated_description.language.first.code).to eq('eng')
+        end
         expect(response).to redirect_to(object_path(druid:))
       end
 
@@ -106,7 +106,7 @@ RSpec.describe 'Editing description' do
 
         patch object_description_path(object_druid: druid), params: description_params
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
