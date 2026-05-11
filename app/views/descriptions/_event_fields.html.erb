@@ -1,10 +1,12 @@
 <%
   if event.nil?
     curated = true
-    event_type = date_val = place_val = publisher_val = nil
+    date_range = false
+    event_type = date_val = date_start_val = date_end_val = place_val = publisher_val = nil
   else
-    complex_date       = event.dig(:date, 0, :structuredValue).present? ||
-                         event.dig(:date, 0, :parallelValue).present?
+    sv = event.dig(:date, 0, :structuredValue)
+    date_range         = sv.present? && sv.all? { |p| p[:type].in?(%w[start end]) }
+    complex_date       = !date_range && (sv.present? || event.dig(:date, 0, :parallelValue).present?)
     has_parallel       = event[:parallelEvent].present?
     simple_contributor = !event[:contributor].present? ||
                          (event[:contributor].length == 1 &&
@@ -13,6 +15,8 @@
     curated        = !complex_date && !has_parallel && simple_contributor
     event_type     = event[:type].presence || event.dig(:date, 0, :type)
     date_val       = event.dig(:date, 0, :value)
+    date_start_val = sv&.find { |p| p[:type] == 'start' }&.dig(:value)
+    date_end_val   = sv&.find { |p| p[:type] == 'end' }&.dig(:value)
     place_val      = event.dig(:location, 0, :value)
     publisher_val  = event.dig(:contributor, 0, :name, 0, :value)
   end
@@ -41,14 +45,33 @@
           <option value="publication"      <%= 'selected' if event_type == 'publication' %>>Publication</option>
         </select>
       </div>
-      <div class="col">
-        <input type="text"
-               class="form-control form-control-sm"
-               name="description[event][][date_value]"
-               value="<%= date_val %>"
-               placeholder="Date (e.g. 1978, 2001-06-15)"
-               aria-label="Event date">
-      </div>
+      <% if date_range %>
+        <div class="col">
+          <input type="text"
+                 class="form-control form-control-sm"
+                 name="description[event][][date_start_value]"
+                 value="<%= date_start_val %>"
+                 placeholder="Start date"
+                 aria-label="Start date">
+        </div>
+        <div class="col">
+          <input type="text"
+                 class="form-control form-control-sm"
+                 name="description[event][][date_end_value]"
+                 value="<%= date_end_val %>"
+                 placeholder="End date"
+                 aria-label="End date">
+        </div>
+      <% else %>
+        <div class="col">
+          <input type="text"
+                 class="form-control form-control-sm"
+                 name="description[event][][date_value]"
+                 value="<%= date_val %>"
+                 placeholder="Date (e.g. 1978, 2001-06-15)"
+                 aria-label="Event date">
+        </div>
+      <% end %>
       <div class="col-auto">
         <button class="btn btn-sm btn-outline-danger"
                 data-action="description-editor#removeItem"
@@ -64,16 +87,14 @@
                placeholder="Publisher (optional)"
                aria-label="Publisher">
       </div>
-      <% if place_val.present? %>
-        <div class="col">
-          <input type="text"
-                 class="form-control form-control-sm"
-                 name="description[event][][place_value]"
-                 value="<%= place_val %>"
-                 placeholder="Place (e.g. New York)"
-                 aria-label="Event place">
-        </div>
-      <% end %>
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[event][][place_value]"
+               value="<%= place_val %>"
+               placeholder="Place (e.g. New York)"
+               aria-label="Event place">
+      </div>
     </div>
     <% render 'descriptions/json_toggle', json_data: event if event.present? %>
 

@@ -152,12 +152,20 @@ class DescriptionBuilder
     params[:type].present? ? result[:type] = params[:type] : result.delete(:type)
   end
 
+  # rubocop:disable Metrics/AbcSize
   def apply_event_date(result, base, params)
-    return if params[:date_value].blank?
-
     existing_date = base.dig(:date, 0) || {}
-    result[:date] = [existing_date.merge(value: params[:date_value])]
+
+    if params[:date_start_value].present? || params[:date_end_value].present?
+      structured = []
+      structured << { value: params[:date_start_value], type: 'start' } if params[:date_start_value].present?
+      structured << { value: params[:date_end_value], type: 'end' } if params[:date_end_value].present?
+      result[:date] = [existing_date.merge(structuredValue: structured)]
+    elsif params[:date_value].present?
+      result[:date] = [existing_date.merge(value: params[:date_value])]
+    end
   end
+  # rubocop:enable Metrics/AbcSize
 
   def apply_event_location(result, base, params)
     return if params[:place_value].blank?

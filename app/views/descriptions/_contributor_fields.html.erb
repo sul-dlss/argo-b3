@@ -26,7 +26,7 @@
                placeholder="Name"
                aria-label="Contributor name">
       </div>
-      <% if structured || life_dates.present? %>
+      <% if structured || life_dates.present? || contributor.nil? %>
         <div class="col-auto">
           <input type="text"
                  class="form-control form-control-sm"

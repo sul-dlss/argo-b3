@@ -78,7 +78,7 @@ class DescriptionsController < ApplicationController
       contributor: %i[_raw_json _original name_value life_dates type primary role_value],
       subject: [:_raw_json, :value, :type, :source_code, :_struct_original, { struct_parts: %i[value type] }],
       form: %i[_raw_json value type source_code],
-      event: %i[_raw_json _original date_value type place_value publisher_value],
+      event: %i[_raw_json _original date_value date_start_value date_end_value type place_value publisher_value],
       related_resource: %i[_raw_json title_value type url],
       access: { physical_location: %i[value type], access_contact: %i[value type] }
     ).to_h.deep_symbolize_keys

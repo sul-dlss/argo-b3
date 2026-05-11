@@ -30,10 +30,65 @@
           <%= render 'title_fields', title: nil %>
         </template>
 
-        <button class="btn btn-sm btn-outline-secondary mt-2"
-                data-action="description-editor#addItem"
-                data-list-id="title-list"
-                data-template-id="title-template">+ Add title</button>
+        <template id="structured-title-template">
+          <div data-item>
+            <div class="border rounded p-2 mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <select class="form-select form-select-sm" style="width: auto" name="description[title][][type]" aria-label="Title type">
+                  <option value="">— title type —</option>
+                  <option value="alternative">Alternative</option>
+                  <option value="uniform">Uniform</option>
+                  <option value="translated">Translated</option>
+                  <option value="abbreviated">Abbreviated</option>
+                  <option value="parallel">Parallel</option>
+                  <option value="supplied">Supplied</option>
+                </select>
+                <button class="btn btn-sm btn-outline-danger" data-action="description-editor#removeItem" aria-label="Remove title">&times;</button>
+              </div>
+              <div class="row g-2 mb-1 align-items-center">
+                <div class="col">
+                  <input type="text" class="form-control form-control-sm" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select form-select-sm" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                    <option value="">— type —</option>
+                    <option value="main title">Main title</option>
+                    <option value="subtitle">Subtitle</option>
+                    <option value="part number">Part number</option>
+                    <option value="part name">Part name</option>
+                    <option value="nonsorting characters">Nonsorting characters</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2 mb-1 align-items-center">
+                <div class="col">
+                  <input type="text" class="form-control form-control-sm" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select form-select-sm" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                    <option value="">— type —</option>
+                    <option value="main title">Main title</option>
+                    <option value="subtitle">Subtitle</option>
+                    <option value="part number">Part number</option>
+                    <option value="part name">Part name</option>
+                    <option value="nonsorting characters">Nonsorting characters</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="title-list"
+                  data-template-id="title-template">+ Add title</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="title-list"
+                  data-template-id="structured-title-template">+ Add structured title</button>
+        </div>
       </div>
     </div>
 
@@ -93,10 +148,48 @@
           <%= render 'subject_fields', subject: nil %>
         </template>
 
-        <button class="btn btn-sm btn-outline-secondary mt-2"
-                data-action="description-editor#addItem"
-                data-list-id="subject-list"
-                data-template-id="subject-template">+ Add subject</button>
+        <template id="structured-subject-template">
+          <div class="border rounded p-2 mb-2" data-item>
+            <% [nil, nil, nil].each do %>
+              <div class="row g-2 align-items-center mb-1">
+                <div class="col">
+                  <input type="text" class="form-control form-control-sm"
+                         name="description[subject][][struct_parts][][value]"
+                         placeholder="Subject part" aria-label="Subject part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select form-select-sm"
+                          name="description[subject][][struct_parts][][type]"
+                          aria-label="Subject part type">
+                    <option value="">— type —</option>
+                    <option value="topic">Topic</option>
+                    <option value="place">Place</option>
+                    <option value="temporal">Temporal</option>
+                    <option value="person">Person</option>
+                    <option value="organization">Organization</option>
+                    <option value="genre">Genre</option>
+                  </select>
+                </div>
+              </div>
+            <% end %>
+            <div class="text-end">
+              <button class="btn btn-sm btn-outline-danger"
+                      data-action="description-editor#removeItem"
+                      aria-label="Remove subject">&times;</button>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="subject-list"
+                  data-template-id="subject-template">+ Add subject</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="subject-list"
+                  data-template-id="structured-subject-template">+ Add structured subject</button>
+        </div>
       </div>
     </div>
 
@@ -156,10 +249,68 @@
           <%= render 'event_fields', event: nil %>
         </template>
 
-        <button class="btn btn-sm btn-outline-secondary mt-2"
-                data-action="description-editor#addItem"
-                data-list-id="event-list"
-                data-template-id="event-template">+ Add event</button>
+        <template id="date-range-event-template">
+          <div class="border rounded p-2 mb-2" data-item>
+            <input type="hidden" name="description[event][][_original]" value="">
+            <div class="row g-2 mb-2 align-items-center">
+              <div class="col-auto">
+                <select class="form-select form-select-sm" name="description[event][][type]" aria-label="Event type">
+                  <option value="">-- type --</option>
+                  <option value="acquisition">Acquisition</option>
+                  <option value="broadcast">Broadcast</option>
+                  <option value="capture">Capture</option>
+                  <option value="copyright">Copyright</option>
+                  <option value="creation">Creation</option>
+                  <option value="degree conferral">Degree conferral</option>
+                  <option value="deposit">Deposit</option>
+                  <option value="distribution">Distribution</option>
+                  <option value="manufacture">Manufacture</option>
+                  <option value="performance">Performance</option>
+                  <option value="production">Production</option>
+                  <option value="publication">Publication</option>
+                </select>
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm"
+                       name="description[event][][date_start_value]"
+                       placeholder="Start date" aria-label="Start date">
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm"
+                       name="description[event][][date_end_value]"
+                       placeholder="End date" aria-label="End date">
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-sm btn-outline-danger"
+                        data-action="description-editor#removeItem"
+                        aria-label="Remove event">&times;</button>
+              </div>
+            </div>
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <input type="text" class="form-control form-control-sm"
+                       name="description[event][][publisher_value]"
+                       placeholder="Publisher (optional)" aria-label="Publisher">
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm"
+                       name="description[event][][place_value]"
+                       placeholder="Place (e.g. New York)" aria-label="Event place">
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="event-list"
+                  data-template-id="event-template">+ Add event</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="event-list"
+                  data-template-id="date-range-event-template">+ Add event with date range</button>
+        </div>
       </div>
     </div>
 
