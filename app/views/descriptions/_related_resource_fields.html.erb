@@ -1,0 +1,92 @@
+<%
+  if related_resource.nil?
+    curated = true
+    rr_type = title_val = url_val = nil
+  else
+    simple_title = related_resource.dig(:title, 0, :value).present? &&
+                   related_resource.dig(:title, 0, :structuredValue).blank?
+    has_complex  = related_resource[:contributor].present? ||
+                   related_resource[:event].present? ||
+                   related_resource[:subject].present?
+    curated   = simple_title || (!has_complex && related_resource[:title].blank?)
+    rr_type   = related_resource[:type]
+    title_val = related_resource.dig(:title, 0, :value)
+    url_val   = related_resource.dig(:access, :url, 0, :value)
+  end
+%>
+
+<div class="border rounded p-2 mb-2" data-item>
+  <% if curated %>
+    <div class="row g-2 mb-2">
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[related_resource][][title_value]"
+               value="<%= title_val %>"
+               placeholder="Title"
+               aria-label="Related resource title">
+      </div>
+      <div class="col-auto">
+        <select class="form-select form-select-sm"
+                name="description[related_resource][][type]"
+                aria-label="Relationship type">
+          <option value="">-- relationship --</option>
+          <option value="described by"   <%= 'selected' if rr_type == 'described by' %>>Described by</option>
+          <option value="describes"      <%= 'selected' if rr_type == 'describes' %>>Describes</option>
+          <option value="has part"       <%= 'selected' if rr_type == 'has part' %>>Has part</option>
+          <option value="has version"    <%= 'selected' if rr_type == 'has version' %>>Has version</option>
+          <option value="host"           <%= 'selected' if rr_type == 'host' %>>Host</option>
+          <option value="in series"      <%= 'selected' if rr_type == 'in series' %>>In series</option>
+          <option value="part of"        <%= 'selected' if rr_type == 'part of' %>>Part of</option>
+          <option value="referenced by"  <%= 'selected' if rr_type == 'referenced by' %>>Referenced by</option>
+          <option value="references"     <%= 'selected' if rr_type == 'references' %>>References</option>
+          <option value="related to"     <%= 'selected' if rr_type == 'related to' %>>Related to</option>
+          <option value="supplement to"  <%= 'selected' if rr_type == 'supplement to' %>>Supplement to</option>
+          <option value="supplemented by" <%= 'selected' if rr_type == 'supplemented by' %>>Supplemented by</option>
+          <option value="version of record" <%= 'selected' if rr_type == 'version of record' %>>Version of record</option>
+          <option value="other relation type" <%= 'selected' if rr_type == 'other relation type' %>>Other</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove related resource">&times;</button>
+      </div>
+    </div>
+    <div class="row g-2">
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[related_resource][][url]"
+               value="<%= url_val %>"
+               placeholder="URL (optional)"
+               aria-label="Related resource URL">
+      </div>
+    </div>
+    <%= render 'descriptions/json_toggle', json_data: related_resource if related_resource.present? %>
+
+  <% else %>
+    <%# Complex related resource — raw JSON escape hatch %>
+    <%
+      reasons = []
+      reasons << 'a structured title' unless simple_title
+      reasons << 'contributors, events, or subjects' if has_complex
+      reasons = ['a complex structure'] if reasons.empty?
+    %>
+    <div class="d-flex gap-2 align-items-start">
+      <div class="flex-grow-1">
+        <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
+          This related resource contains <%= reasons.to_sentence %> and must be edited as JSON.
+        </p>
+        <textarea class="form-control form-control-sm font-monospace"
+                  name="description[related_resource][][_raw_json]"
+                  aria-label="Related resource JSON"
+                  data-controller="json-formatter"
+                  data-action="blur->json-formatter#format"><%= JSON.pretty_generate(related_resource) %></textarea>
+      </div>
+      <button class="btn btn-sm btn-outline-danger mt-4 flex-shrink-0"
+              data-action="description-editor#removeItem"
+              aria-label="Remove related resource">&times;</button>
+    </div>
+  <% end %>
+</div>

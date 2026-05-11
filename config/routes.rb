@@ -159,6 +159,7 @@ Rails.application.routes.draw do
       get 'versions', to: 'objects#show_versions'
       get 'purl_preview', to: 'objects#show_purl_preview'
     end
+    resource :description, only: %i[edit update]
   end
 
   namespace :admin do

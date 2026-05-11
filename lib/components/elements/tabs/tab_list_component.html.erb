@@ -1,5 +1,8 @@
 <%= tag.ul class: classes, role: 'tablist' do %>
   <% tabs.each do |tab| %><%= tab %><% end %>
+  <% if action %>
+    <li class="nav-item"><%= action %></li>
+  <% end %>
 <% end %>
 
 <%= header %>

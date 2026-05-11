@@ -1,0 +1,104 @@
+<%
+  if event.nil?
+    curated = true
+    event_type = date_val = place_val = publisher_val = nil
+  else
+    complex_date       = event.dig(:date, 0, :structuredValue).present? ||
+                         event.dig(:date, 0, :parallelValue).present?
+    has_parallel       = event[:parallelEvent].present?
+    simple_contributor = !event[:contributor].present? ||
+                         (event[:contributor].length == 1 &&
+                          event.dig(:contributor, 0, :name, 0, :value).present? &&
+                          event.dig(:contributor, 0, :name, 0, :structuredValue).blank?)
+    curated        = !complex_date && !has_parallel && simple_contributor
+    event_type     = event[:type].presence || event.dig(:date, 0, :type)
+    date_val       = event.dig(:date, 0, :value)
+    place_val      = event.dig(:location, 0, :value)
+    publisher_val  = event.dig(:contributor, 0, :name, 0, :value)
+  end
+%>
+
+<div class="border rounded p-2 mb-2" data-item>
+  <% if curated %>
+    <%# Preserve full original JSON so location codes, date encoding, notes survive round-trip %>
+    <input type="hidden" name="description[event][][_original]" value="<%= event.to_json %>">
+
+    <div class="row g-2 mb-2 align-items-center">
+      <div class="col-auto">
+        <select class="form-select form-select-sm" name="description[event][][type]" aria-label="Event type">
+          <option value="">-- type --</option>
+          <option value="acquisition"      <%= 'selected' if event_type == 'acquisition' %>>Acquisition</option>
+          <option value="broadcast"        <%= 'selected' if event_type == 'broadcast' %>>Broadcast</option>
+          <option value="capture"          <%= 'selected' if event_type == 'capture' %>>Capture</option>
+          <option value="copyright"        <%= 'selected' if event_type == 'copyright' %>>Copyright</option>
+          <option value="creation"         <%= 'selected' if event_type == 'creation' %>>Creation</option>
+          <option value="degree conferral" <%= 'selected' if event_type == 'degree conferral' %>>Degree conferral</option>
+          <option value="deposit"          <%= 'selected' if event_type == 'deposit' %>>Deposit</option>
+          <option value="distribution"     <%= 'selected' if event_type == 'distribution' %>>Distribution</option>
+          <option value="manufacture"      <%= 'selected' if event_type == 'manufacture' %>>Manufacture</option>
+          <option value="performance"      <%= 'selected' if event_type == 'performance' %>>Performance</option>
+          <option value="production"       <%= 'selected' if event_type == 'production' %>>Production</option>
+          <option value="publication"      <%= 'selected' if event_type == 'publication' %>>Publication</option>
+        </select>
+      </div>
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[event][][date_value]"
+               value="<%= date_val %>"
+               placeholder="Date (e.g. 1978, 2001-06-15)"
+               aria-label="Event date">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove event">&times;</button>
+      </div>
+    </div>
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[event][][publisher_value]"
+               value="<%= publisher_val %>"
+               placeholder="Publisher (optional)"
+               aria-label="Publisher">
+      </div>
+      <% if place_val.present? %>
+        <div class="col">
+          <input type="text"
+                 class="form-control form-control-sm"
+                 name="description[event][][place_value]"
+                 value="<%= place_val %>"
+                 placeholder="Place (e.g. New York)"
+                 aria-label="Event place">
+        </div>
+      <% end %>
+    </div>
+    <% render 'descriptions/json_toggle', json_data: event if event.present? %>
+
+  <% else %>
+    <%# Complex event (parallelEvent, structured date range, multi-contributor) — raw JSON escape hatch %>
+    <%
+      reasons = []
+      reasons << 'structured or parallel date range' if complex_date
+      reasons << 'parallel event values' if has_parallel
+      reasons << 'multiple or complex contributors' unless simple_contributor
+    %>
+    <div class="d-flex gap-2 align-items-start">
+      <div class="flex-grow-1">
+        <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
+          This event contains <%= reasons.to_sentence %> and must be edited as JSON.
+        </p>
+        <textarea class="form-control form-control-sm font-monospace"
+                  name="description[event][][_raw_json]"
+                  aria-label="Event JSON"
+                  data-controller="json-formatter"
+                  data-action="blur->json-formatter#format"><%= JSON.pretty_generate(event) %></textarea>
+      </div>
+      <button class="btn btn-sm btn-outline-danger mt-4 flex-shrink-0"
+              data-action="description-editor#removeItem"
+              aria-label="Remove event">&times;</button>
+    </div>
+  <% end %>
+</div>

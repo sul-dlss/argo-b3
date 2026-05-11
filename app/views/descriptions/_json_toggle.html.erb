@@ -1,0 +1,11 @@
+<% collapse_id = "json-#{json_data.object_id}" %>
+<div class="mt-2">
+  <a class="btn btn-sm btn-light border"
+     data-bs-toggle="collapse"
+     href="#<%= collapse_id %>"
+     aria-expanded="false"
+     aria-controls="<%= collapse_id %>">{ } JSON</a>
+  <div class="collapse" id="<%= collapse_id %>">
+    <pre class="small font-monospace bg-light border rounded p-2 mt-1 mb-0"><%= JSON.pretty_generate(json_data) %></pre>
+  </div>
+</div>

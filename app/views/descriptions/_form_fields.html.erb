@@ -1,0 +1,65 @@
+<%
+  curated = form.nil? || (form.dig(:value).present? && form.dig(:structuredValue).blank?)
+%>
+
+<div class="border rounded p-2 mb-2" data-item>
+  <% if curated %>
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[form][][value]"
+               value="<%= form&.dig(:value) %>"
+               placeholder="Value"
+               aria-label="Form value">
+      </div>
+      <div class="col-auto">
+        <select class="form-select form-select-sm" name="description[form][][type]" aria-label="Form type">
+          <option value="">-- type --</option>
+          <option value="resource type"      <%= 'selected' if form&.dig(:type) == 'resource type' %>>Resource type</option>
+          <option value="genre"              <%= 'selected' if form&.dig(:type) == 'genre' %>>Genre</option>
+          <option value="form"               <%= 'selected' if form&.dig(:type) == 'form' %>>Form</option>
+          <option value="extent"             <%= 'selected' if form&.dig(:type) == 'extent' %>>Extent</option>
+          <option value="carrier"            <%= 'selected' if form&.dig(:type) == 'carrier' %>>Carrier</option>
+          <option value="media"              <%= 'selected' if form&.dig(:type) == 'media' %>>Media</option>
+          <option value="technique"          <%= 'selected' if form&.dig(:type) == 'technique' %>>Technique</option>
+          <option value="digital origin"     <%= 'selected' if form&.dig(:type) == 'digital origin' %>>Digital origin</option>
+          <option value="data format"        <%= 'selected' if form&.dig(:type) == 'data format' %>>Data format</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <input type="text"
+               class="form-control form-control-sm"
+               name="description[form][][source_code]"
+               value="<%= form&.dig(:source, :code) %>"
+               placeholder="Source (e.g. lcgft)"
+               aria-label="Form source"
+               style="width: 9rem">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove form">&times;</button>
+      </div>
+    </div>
+    <%= render 'descriptions/json_toggle', json_data: form if form.present? %>
+
+  <% else %>
+    <%# Structured or grouped form — raw JSON escape hatch %>
+    <div class="d-flex gap-2 align-items-start">
+      <div class="flex-grow-1">
+        <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
+          This form entry has a structured value and must be edited as JSON.
+        </p>
+        <textarea class="form-control form-control-sm font-monospace"
+                  name="description[form][][_raw_json]"
+                  aria-label="Form JSON"
+                  data-controller="json-formatter"
+                  data-action="blur->json-formatter#format"><%= JSON.pretty_generate(form) %></textarea>
+      </div>
+      <button class="btn btn-sm btn-outline-danger mt-4 flex-shrink-0"
+              data-action="description-editor#removeItem"
+              aria-label="Remove form">&times;</button>
+    </div>
+  <% end %>
+</div>

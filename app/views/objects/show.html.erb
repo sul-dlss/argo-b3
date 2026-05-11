@@ -15,6 +15,7 @@
   <% end %>
 
   <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+    <% component.with_action { link_to 'Edit description', edit_object_description_path(object_druid: @solr_doc.druid), class: 'nav-link' } %>
 
     <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
     <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
