@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/sul-dlss/sdr_view_components.git
-  revision: 4c5116815a1f85362f48629900a983256f9d4354
+  revision: f26dbed7d418dbaba4baa0df517f9884c19be9a8
   branch: lookbook
   specs:
     sdr_view_components (0.1.14)
@@ -622,7 +622,7 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    view_component (4.9.0)
+    view_component (4.10.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
       concurrent-ruby (~> 1)
@@ -717,4 +717,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-  4.0.10
+  4.0.11
