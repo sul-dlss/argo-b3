@@ -7,7 +7,7 @@ export default class extends Controller {
 
   resize () {
     this.element.style.height = 'auto'
-    this.element.style.height = `${this.element.scrollHeight}px`
+    this.element.style.height = `${Math.max(this.element.scrollHeight, 160)}px`
   }
 
   format () {
