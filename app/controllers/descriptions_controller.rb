@@ -6,6 +6,9 @@ class DescriptionsController < ApplicationController
 
   def edit
     authorize! @cocina_object, with: ObjectPolicy, to: :edit_description?
+    open_version_if_needed!
+  rescue Sdr::Repository::Error
+    # If pre-opening fails, save will attempt it again
   end
 
   def update

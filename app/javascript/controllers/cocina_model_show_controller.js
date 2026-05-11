@@ -61,7 +61,8 @@ export default class extends Controller {
       this.frameReloadTimeouts = []
 
       // Reload frames one at a time to spread out requests and reduce bursts.
-      frames.forEach((frame, index) => {
+      // Skip frames containing forms — reloading would discard the user's unsaved input.
+      frames.filter(frame => !frame.querySelector('form')).forEach((frame, index) => {
         const timeoutId = setTimeout(() => {
           frame.reload()
         }, index * this.staggerValue)
