@@ -61,7 +61,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.nav-link.active', text: 'Details')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
-    expect(page).to have_css('.nav-link.disabled', text: 'Events')
+    expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
     expect(page).to have_css('.nav-link', text: 'PURL Description Preview')
 
