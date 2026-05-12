@@ -5,6 +5,7 @@ module Elements
     # Component for rendering a list of tabs in a tabbed interface.
     class TabListComponent < ApplicationComponent
       renders_one :header # optional
+      renders_one :action # optional — renders right-aligned in the nav bar
       renders_many :tabs, Elements::Tabs::TabComponent
       renders_many :panes, Elements::Tabs::PaneComponent
 

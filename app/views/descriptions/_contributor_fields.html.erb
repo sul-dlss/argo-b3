@@ -1,0 +1,94 @@
+<%
+  # Determine contributor shape from the hash.
+  # Simple:    name[0].value present          → curated form
+  # Structured: name[0].structuredValue with name + life dates → curated form (two inputs)
+  # Complex:   anything else                  → raw JSON textarea
+  name_entry   = contributor&.dig(:name, 0) || {}
+  simple       = name_entry[:value].present?
+  life_dates   = name_entry[:structuredValue]&.find { |s| s[:type] == 'life dates' }&.dig(:value)
+  name_val     = simple ? name_entry[:value] : name_entry[:structuredValue]&.find { |s| s[:type] == 'name' }&.dig(:value)
+  structured   = !simple && name_val.present?
+  curated      = contributor.nil? || simple || structured
+  role_val     = contributor&.dig(:role, 0, :value)
+%>
+
+<div class="border rounded p-2 mb-2" data-item data-field-type="contributor" data-controller="description-field">
+  <% if curated %>
+    <%# Preserve full original JSON so role codes/URIs survive the round-trip %>
+    <input type="hidden" name="description[contributor][][_original]" value="<%= contributor.to_json %>">
+
+    <div class="row g-2 mb-2">
+      <div class="col">
+        <input type="text"
+               class="form-control"
+               name="description[contributor][][name_value]"
+               value="<%= name_val %>"
+               placeholder="Name"
+               aria-label="Contributor name">
+      </div>
+      <% if structured || life_dates.present? || contributor.nil? %>
+        <div class="col-auto">
+          <input type="text"
+                 class="form-control"
+                 name="description[contributor][][life_dates]"
+                 value="<%= life_dates %>"
+                 placeholder="Life dates (e.g. 1869-1939)"
+                 aria-label="Life dates"
+                 style="width: 14rem">
+        </div>
+      <% end %>
+      <div class="col-auto">
+        <select class="form-select" name="description[contributor][][type]" aria-label="Contributor type">
+          <option value="person"       <%= 'selected' if contributor&.dig(:type) == 'person' %>>Person</option>
+          <option value="organization" <%= 'selected' if contributor&.dig(:type) == 'organization' %>>Organization</option>
+          <option value="conference"   <%= 'selected' if contributor&.dig(:type) == 'conference' %>>Conference</option>
+        </select>
+      </div>
+      <div class="col-auto d-flex align-items-center gap-1">
+        <input class="form-check-input"
+               type="checkbox"
+               name="description[contributor][][primary]"
+               value="1"
+               id="primary-<%= contributor.object_id %>"
+               <%= 'checked' if contributor&.dig(:status) == 'primary' %>>
+        <label class="form-check-label small" for="primary-<%= contributor.object_id %>">Primary</label>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove contributor">&times;</button>
+      </div>
+    </div>
+    <% if role_val.present? || contributor.nil? %>
+      <div class="row g-2">
+        <div class="col">
+          <input type="text"
+                 class="form-control"
+                 name="description[contributor][][role_value]"
+                 value="<%= role_val %>"
+                 placeholder="Role (e.g. author, editor, publisher)"
+                 aria-label="Role">
+        </div>
+      </div>
+    <% end %>
+    <%= render 'descriptions/json_toggle', json_data: contributor || {}, field_name: 'description[contributor][][_raw_json]' %>
+
+  <% else %>
+    <%# Complex contributor — raw JSON escape hatch %>
+    <div class="d-flex gap-2 align-items-start">
+      <div class="flex-grow-1">
+        <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
+          This contributor has a complex name structure and must be edited as JSON.
+        </p>
+        <textarea rows="8" class="form-control font-monospace"
+                  name="description[contributor][][_raw_json]"
+                  aria-label="Contributor JSON"
+                  data-controller="json-formatter"
+                  data-action="blur->json-formatter#format"><%= JSON.pretty_generate(contributor) %></textarea>
+      </div>
+      <button class="btn btn-sm btn-outline-danger mt-4 flex-shrink-0"
+              data-action="description-editor#removeItem"
+              aria-label="Remove contributor">&times;</button>
+    </div>
+  <% end %>
+</div>

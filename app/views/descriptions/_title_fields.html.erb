@@ -1,0 +1,116 @@
+<%
+  if title.nil?
+    curated_simple = true
+    curated_struct = false
+    title_type = nil
+  elsif title.structuredValue.present? && title.structuredValue.none? { |sv| sv.structuredValue.present? }
+    curated_simple = false
+    curated_struct = true
+    title_type     = title.type
+  elsif title.value.present?
+    curated_simple = true
+    curated_struct = false
+    title_type = title.type
+    main_title_val = subtitle_val = part_number_val = part_name_val = nil
+  else
+    curated_simple = false
+    curated_struct = false
+    title_type = nil
+  end
+%>
+
+<div data-item data-field-type="title" data-controller="description-field" class="mb-2">
+  <% if curated_struct %>
+    <%# Preserve full original so status, non-editable attrs survive round-trip %>
+    <input type="hidden" name="description[title][][_original]" value="<%= title.to_h.to_json %>">
+
+    <div class="border rounded p-2 mb-2">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <select class="form-select" style="width: auto" name="description[title][][type]" aria-label="Title type">
+          <option value=""            <%= 'selected' if title_type.blank? %>>— title type —</option>
+          <option value="alternative" <%= 'selected' if title_type == 'alternative' %>>Alternative</option>
+          <option value="uniform"     <%= 'selected' if title_type == 'uniform' %>>Uniform</option>
+          <option value="translated"  <%= 'selected' if title_type == 'translated' %>>Translated</option>
+          <option value="abbreviated" <%= 'selected' if title_type == 'abbreviated' %>>Abbreviated</option>
+          <option value="parallel"    <%= 'selected' if title_type == 'parallel' %>>Parallel</option>
+          <option value="supplied"    <%= 'selected' if title_type == 'supplied' %>>Supplied</option>
+        </select>
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove title">&times;</button>
+      </div>
+      <% title.structuredValue.each do |part| %>
+        <div class="row g-2 mb-1 align-items-center">
+          <div class="col">
+            <input type="text"
+                   class="form-control"
+                   name="description[title][][struct_parts][][value]"
+                   value="<%= part.value %>"
+                   placeholder="Value"
+                   aria-label="Title part value">
+          </div>
+          <div class="col-auto">
+            <select class="form-select"
+                    name="description[title][][struct_parts][][type]"
+                    aria-label="Title part type">
+              <option value="">-- type --</option>
+              <option value="main title"          <%= 'selected' if part.type == 'main title' %>>Main title</option>
+              <option value="subtitle"            <%= 'selected' if part.type == 'subtitle' %>>Subtitle</option>
+              <option value="part number"         <%= 'selected' if part.type == 'part number' %>>Part number</option>
+              <option value="part name"           <%= 'selected' if part.type == 'part name' %>>Part name</option>
+              <option value="nonsorting characters" <%= 'selected' if part.type == 'nonsorting characters' %>>Nonsorting characters</option>
+            </select>
+          </div>
+        </div>
+      <% end %>
+      <%= render 'descriptions/json_toggle', json_data: title.to_h, field_name: 'description[title][][_raw_json]' %>
+    </div>
+
+  <% elsif curated_simple %>
+    <div class="row g-2 mb-2 align-items-center">
+      <div class="col">
+        <input type="text"
+               class="form-control"
+               name="description[title][][value]"
+               value="<%= title&.value %>"
+               placeholder="Title"
+               aria-label="Title value">
+      </div>
+      <div class="col-auto">
+        <select class="form-select" name="description[title][][type]" aria-label="Title type">
+          <option value=""          <%= 'selected' if title_type.blank? %>>Main title</option>
+          <option value="alternative" <%= 'selected' if title_type == 'alternative' %>>Alternative</option>
+          <option value="uniform"     <%= 'selected' if title_type == 'uniform' %>>Uniform</option>
+          <option value="translated"  <%= 'selected' if title_type == 'translated' %>>Translated</option>
+          <option value="abbreviated" <%= 'selected' if title_type == 'abbreviated' %>>Abbreviated</option>
+          <option value="parallel"    <%= 'selected' if title_type == 'parallel' %>>Parallel</option>
+          <option value="supplied"    <%= 'selected' if title_type == 'supplied' %>>Supplied</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-danger"
+                data-action="description-editor#removeItem"
+                aria-label="Remove title">&times;</button>
+      </div>
+    </div>
+    <%= render 'descriptions/json_toggle', json_data: title.to_h, field_name: 'description[title][][_raw_json]' %>
+
+  <% else %>
+    <%# Deeply nested structuredValue — raw JSON escape hatch %>
+    <div class="d-flex gap-2 align-items-start mb-2">
+      <div class="flex-grow-1">
+        <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
+          This title contains nested structured values and must be edited as JSON.
+        </p>
+        <textarea rows="8" class="form-control font-monospace"
+                  name="description[title][][_raw_json]"
+                  aria-label="Title JSON"
+                  data-controller="json-formatter"
+                  data-action="blur->json-formatter#format"><%= JSON.pretty_generate(title.to_h) %></textarea>
+      </div>
+      <button class="btn btn-sm btn-outline-danger mt-4 flex-shrink-0"
+              data-action="description-editor#removeItem"
+              aria-label="Remove title">&times;</button>
+    </div>
+  <% end %>
+</div>

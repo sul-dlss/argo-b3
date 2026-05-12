@@ -1,0 +1,380 @@
+<%= turbo_frame_tag(@cocina_object.externalIdentifier, 'description') do %>
+<div class="mt-3"
+     data-controller="description-editor"
+     data-render-field-url="<%= render_field_object_description_path(object_druid: @cocina_object.externalIdentifier) %>"
+     data-field-json-url="<%= field_json_object_description_path(object_druid: @cocina_object.externalIdentifier) %>">
+  <% if flash[:warning] %>
+    <div class="alert alert-warning" role="alert"><%= flash[:warning] %></div>
+  <% end %>
+
+  <%= form_with url: object_description_path(object_druid: @cocina_object.externalIdentifier),
+                method: :patch,
+                class: 'needs-validation',
+                data: { turbo_frame: '_top' } do %>
+
+    <%# TITLES %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Titles</div>
+      <div class="card-body">
+        <div id="title-list">
+          <% (@cocina_object.description.title || []).each do |title| %>
+            <%= render 'title_fields', title: title %>
+          <% end %>
+        </div>
+
+        <template id="title-template">
+          <%= render 'title_fields', title: nil %>
+        </template>
+
+        <template id="structured-title-template">
+          <div data-item data-field-type="title" data-controller="description-field">
+            <div class="border rounded p-2 mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <select class="form-select" style="width: auto" name="description[title][][type]" aria-label="Title type">
+                  <option value="">— title type —</option>
+                  <option value="alternative">Alternative</option>
+                  <option value="uniform">Uniform</option>
+                  <option value="translated">Translated</option>
+                  <option value="abbreviated">Abbreviated</option>
+                  <option value="parallel">Parallel</option>
+                  <option value="supplied">Supplied</option>
+                </select>
+                <button class="btn btn-sm btn-outline-danger" data-action="description-editor#removeItem" aria-label="Remove title">&times;</button>
+              </div>
+              <div class="row g-2 mb-1 align-items-center">
+                <div class="col">
+                  <input type="text" class="form-control" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                    <option value="">— type —</option>
+                    <option value="main title">Main title</option>
+                    <option value="subtitle">Subtitle</option>
+                    <option value="part number">Part number</option>
+                    <option value="part name">Part name</option>
+                    <option value="nonsorting characters">Nonsorting characters</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2 mb-1 align-items-center">
+                <div class="col">
+                  <input type="text" class="form-control" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                    <option value="">— type —</option>
+                    <option value="main title">Main title</option>
+                    <option value="subtitle">Subtitle</option>
+                    <option value="part number">Part number</option>
+                    <option value="part name">Part name</option>
+                    <option value="nonsorting characters">Nonsorting characters</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="title-list"
+                  data-template-id="title-template">+ Add title</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="title-list"
+                  data-template-id="structured-title-template">+ Add structured title</button>
+        </div>
+      </div>
+    </div>
+
+    <%# NOTES %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Notes</div>
+      <div class="card-body">
+        <div id="note-list">
+          <% (@cocina_object.description.note || []).each do |note| %>
+            <%= render 'note_fields', note: note %>
+          <% end %>
+        </div>
+
+        <template id="note-template">
+          <%= render 'note_fields', note: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="note-list"
+                data-template-id="note-template">+ Add note</button>
+      </div>
+    </div>
+
+    <%# CONTRIBUTORS %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Contributors</div>
+      <div class="card-body">
+        <div id="contributor-list">
+          <% (@cocina_object.description.to_h[:contributor] || []).each do |contributor| %>
+            <%= render 'contributor_fields', contributor: contributor %>
+          <% end %>
+        </div>
+
+        <template id="contributor-template">
+          <%= render 'contributor_fields', contributor: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="contributor-list"
+                data-template-id="contributor-template">+ Add contributor</button>
+      </div>
+    </div>
+
+    <%# SUBJECTS %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Subjects</div>
+      <div class="card-body">
+        <div id="subject-list">
+          <% (@cocina_object.description.to_h[:subject] || []).each do |subject| %>
+            <%= render 'subject_fields', subject: subject %>
+          <% end %>
+        </div>
+
+        <template id="subject-template">
+          <%= render 'subject_fields', subject: nil %>
+        </template>
+
+        <template id="structured-subject-template">
+          <div class="border rounded p-2 mb-2" data-item data-field-type="subject" data-controller="description-field">
+            <% [nil, nil, nil].each do %>
+              <div class="row g-2 align-items-center mb-1">
+                <div class="col">
+                  <input type="text" class="form-control"
+                         name="description[subject][][struct_parts][][value]"
+                         placeholder="Subject part" aria-label="Subject part value">
+                </div>
+                <div class="col-auto">
+                  <select class="form-select"
+                          name="description[subject][][struct_parts][][type]"
+                          aria-label="Subject part type">
+                    <option value="">— type —</option>
+                    <option value="topic">Topic</option>
+                    <option value="place">Place</option>
+                    <option value="temporal">Temporal</option>
+                    <option value="person">Person</option>
+                    <option value="organization">Organization</option>
+                    <option value="genre">Genre</option>
+                  </select>
+                </div>
+              </div>
+            <% end %>
+            <div class="text-end">
+              <button class="btn btn-sm btn-outline-danger"
+                      data-action="description-editor#removeItem"
+                      aria-label="Remove subject">&times;</button>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="subject-list"
+                  data-template-id="subject-template">+ Add subject</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="subject-list"
+                  data-template-id="structured-subject-template">+ Add structured subject</button>
+        </div>
+      </div>
+    </div>
+
+    <%# LANGUAGE %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Language</div>
+      <div class="card-body">
+        <div id="language-list">
+          <% (@cocina_object.description.language || []).each do |language| %>
+            <%= render 'language_fields', language: language %>
+          <% end %>
+        </div>
+
+        <template id="language-template">
+          <%= render 'language_fields', language: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="language-list"
+                data-template-id="language-template">+ Add language</button>
+      </div>
+    </div>
+
+    <%# FORM %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Form</div>
+      <div class="card-body">
+        <div id="form-list">
+          <% (@cocina_object.description.to_h[:form] || []).each do |form| %>
+            <%= render 'form_fields', form: form %>
+          <% end %>
+        </div>
+
+        <template id="form-template">
+          <%= render 'form_fields', form: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="form-list"
+                data-template-id="form-template">+ Add form</button>
+      </div>
+    </div>
+
+    <%# EVENTS %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Events</div>
+      <div class="card-body">
+        <div id="event-list">
+          <% (@cocina_object.description.to_h[:event] || []).each do |event| %>
+            <%= render 'event_fields', event: event %>
+          <% end %>
+        </div>
+
+        <template id="event-template">
+          <%= render 'event_fields', event: nil %>
+        </template>
+
+        <template id="date-range-event-template">
+          <div class="border rounded p-2 mb-2" data-item data-field-type="event" data-controller="description-field">
+            <input type="hidden" name="description[event][][_original]" value="">
+            <div class="row g-2 mb-2 align-items-center">
+              <div class="col-auto">
+                <select class="form-select" name="description[event][][type]" aria-label="Event type">
+                  <option value="">-- type --</option>
+                  <option value="acquisition">Acquisition</option>
+                  <option value="broadcast">Broadcast</option>
+                  <option value="capture">Capture</option>
+                  <option value="copyright">Copyright</option>
+                  <option value="creation">Creation</option>
+                  <option value="degree conferral">Degree conferral</option>
+                  <option value="deposit">Deposit</option>
+                  <option value="distribution">Distribution</option>
+                  <option value="manufacture">Manufacture</option>
+                  <option value="performance">Performance</option>
+                  <option value="production">Production</option>
+                  <option value="publication">Publication</option>
+                </select>
+              </div>
+              <div class="col">
+                <input type="text" class="form-control"
+                       name="description[event][][date_start_value]"
+                       placeholder="Start date" aria-label="Start date">
+              </div>
+              <div class="col">
+                <input type="text" class="form-control"
+                       name="description[event][][date_end_value]"
+                       placeholder="End date" aria-label="End date">
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-sm btn-outline-danger"
+                        data-action="description-editor#removeItem"
+                        aria-label="Remove event">&times;</button>
+              </div>
+            </div>
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <input type="text" class="form-control"
+                       name="description[event][][publisher_value]"
+                       placeholder="Publisher (optional)" aria-label="Publisher">
+              </div>
+              <div class="col">
+                <input type="text" class="form-control"
+                       name="description[event][][place_value]"
+                       placeholder="Place (e.g. New York)" aria-label="Event place">
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="event-list"
+                  data-template-id="event-template">+ Add event</button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  data-action="description-editor#addItem"
+                  data-list-id="event-list"
+                  data-template-id="date-range-event-template">+ Add event with date range</button>
+        </div>
+      </div>
+    </div>
+
+    <%# PHYSICAL ACCESS %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Physical Access</div>
+      <div class="card-body">
+        <h6 class="text-muted small fw-semibold mb-2">Physical Locations</h6>
+        <div id="physical-location-list">
+          <% (@cocina_object.description.to_h.dig(:access, :physicalLocation) || []).each do |pl| %>
+            <%= render 'physical_location_fields', physical_location: pl %>
+          <% end %>
+        </div>
+
+        <template id="physical-location-template">
+          <%= render 'physical_location_fields', physical_location: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="physical-location-list"
+                data-template-id="physical-location-template">+ Add physical location</button>
+
+        <hr class="my-3">
+
+        <h6 class="text-muted small fw-semibold mb-2">Access Contacts</h6>
+        <div id="access-contact-list">
+          <% (@cocina_object.description.to_h.dig(:access, :accessContact) || []).each do |ac| %>
+            <%= render 'access_contact_fields', access_contact: ac %>
+          <% end %>
+        </div>
+
+        <template id="access-contact-template">
+          <%= render 'access_contact_fields', access_contact: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="access-contact-list"
+                data-template-id="access-contact-template">+ Add access contact</button>
+      </div>
+    </div>
+
+    <%# RELATED RESOURCES %>
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Related Resources</div>
+      <div class="card-body">
+        <div id="related-resource-list">
+          <% (@cocina_object.description.to_h[:relatedResource] || []).each do |rr| %>
+            <%= render 'related_resource_fields', related_resource: rr %>
+          <% end %>
+        </div>
+
+        <template id="related-resource-template">
+          <%= render 'related_resource_fields', related_resource: nil %>
+        </template>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-action="description-editor#addItem"
+                data-list-id="related-resource-list"
+                data-template-id="related-resource-template">+ Add related resource</button>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <%= link_to 'Cancel', object_path(druid: @cocina_object.externalIdentifier), class: 'btn btn-outline-secondary' %>
+      <button type="submit" class="btn btn-primary">Save description</button>
+    </div>
+  <% end %>
+</div>
+<% end %>

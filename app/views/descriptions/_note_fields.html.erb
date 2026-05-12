@@ -1,0 +1,23 @@
+<div class="mb-3 border rounded p-2" data-item data-field-type="note" data-controller="description-field">
+  <div class="mb-2">
+    <select class="form-select" name="description[note][][type]" aria-label="Note type">
+      <option value="" <%= 'selected' if note&.type.blank? %>>General note</option>
+      <option value="abstract" <%= 'selected' if note&.type == 'abstract' %>>Abstract</option>
+      <option value="statement of responsibility" <%= 'selected' if note&.type == 'statement of responsibility' %>>Statement of responsibility</option>
+      <option value="preferred citation" <%= 'selected' if note&.type == 'preferred citation' %>>Preferred citation</option>
+      <option value="table of contents" <%= 'selected' if note&.type == 'table of contents' %>>Table of contents</option>
+      <option value="biographical/historical" <%= 'selected' if note&.type == 'biographical/historical' %>>Biographical/historical</option>
+    </select>
+  </div>
+  <div class="d-flex gap-2 align-items-start">
+    <textarea class="form-control"
+              name="description[note][][value]"
+              rows="3"
+              placeholder="Note text"
+              aria-label="Note value"><%= note&.value %></textarea>
+    <button class="btn btn-sm btn-outline-danger flex-shrink-0"
+            data-action="description-editor#removeItem"
+            aria-label="Remove note">&times;</button>
+  </div>
+  <%= render 'descriptions/json_toggle', json_data: note.to_h, field_name: 'description[note][][_raw_json]' %>
+</div>
