@@ -12,6 +12,10 @@ module Elements
       super()
     end
 
-    attr_reader :label, :path
+    attr_reader :label
+
+    def link
+      @path
+    end
   end
 end
