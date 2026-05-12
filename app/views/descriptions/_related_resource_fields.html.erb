@@ -63,7 +63,7 @@
                aria-label="Related resource URL">
       </div>
     </div>
-    <%= render 'descriptions/json_toggle', json_data: related_resource if related_resource.present? %>
+    <%= render 'descriptions/json_toggle', json_data: related_resource, field_name: 'description[related_resource][][_raw_json]' if related_resource.present? %>
 
   <% else %>
     <%# Complex related resource — raw JSON escape hatch %>

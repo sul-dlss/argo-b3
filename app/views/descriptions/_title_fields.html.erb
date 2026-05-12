@@ -63,7 +63,7 @@
           </div>
         </div>
       <% end %>
-      <%= render 'descriptions/json_toggle', json_data: title.to_h %>
+      <%= render 'descriptions/json_toggle', json_data: title.to_h, field_name: 'description[title][][_raw_json]' %>
     </div>
 
   <% elsif curated_simple %>
@@ -93,7 +93,7 @@
                 aria-label="Remove title">&times;</button>
       </div>
     </div>
-    <%= render 'descriptions/json_toggle', json_data: title.to_h if title.present? %>
+    <%= render 'descriptions/json_toggle', json_data: title.to_h, field_name: 'description[title][][_raw_json]' if title.present? %>
 
   <% else %>
     <%# Deeply nested structuredValue — raw JSON escape hatch %>

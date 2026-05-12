@@ -6,6 +6,12 @@
      aria-expanded="false"
      aria-controls="<%= collapse_id %>">{ } JSON</a>
   <div class="collapse" id="<%= collapse_id %>">
-    <pre class="small font-monospace bg-light border rounded p-2 mt-1 mb-0"><%= JSON.pretty_generate(json_data) %></pre>
+    <textarea name="<%= field_name %>"
+              class="form-control form-control-sm font-monospace mt-1"
+              rows="8"
+              disabled
+              data-controller="json-formatter"
+              data-action="blur->json-formatter#format"
+              aria-label="JSON editor"><%= JSON.pretty_generate(json_data) %></textarea>
   </div>
 </div>

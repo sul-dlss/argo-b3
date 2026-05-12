@@ -71,7 +71,7 @@
         </div>
       </div>
     <% end %>
-    <%= render 'descriptions/json_toggle', json_data: contributor if contributor.present? %>
+    <%= render 'descriptions/json_toggle', json_data: contributor, field_name: 'description[contributor][][_raw_json]' if contributor.present? %>
 
   <% else %>
     <%# Complex contributor — raw JSON escape hatch %>

@@ -73,8 +73,8 @@ class DescriptionsController < ApplicationController
   def description_params
     params.require(:description).permit(
       title: [:value, :type, :_raw_json, :_original, { struct_parts: %i[value type] }],
-      note: %i[value type],
-      language: %i[code value],
+      note: %i[value type _raw_json],
+      language: %i[code value _raw_json],
       contributor: %i[_raw_json _original name_value life_dates type primary role_value],
       subject: [:_raw_json, :value, :type, :source_code, :_struct_original, { struct_parts: %i[value type] }],
       form: %i[_raw_json value type source_code],

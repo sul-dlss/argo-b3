@@ -23,5 +23,5 @@
               aria-label="Remove language">&times;</button>
     </div>
   </div>
-  <%= render 'descriptions/json_toggle', json_data: language.to_h if language.present? %>
+  <%= render 'descriptions/json_toggle', json_data: language.to_h, field_name: 'description[language][][_raw_json]' if language.present? %>
 </div>

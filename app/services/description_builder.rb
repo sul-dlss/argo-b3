@@ -10,8 +10,8 @@ class DescriptionBuilder
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def build(submitted)
     titles = submitted[:title]&.filter_map { |t| build_title(t) }
-    notes = submitted[:note]&.filter_map { |n| compact_entry(n, required: :value) }
-    languages = submitted[:language]&.filter_map { |l| compact_entry(l, required: :code) }
+    notes = submitted[:note]&.filter_map { |n| build_note(n) }
+    languages = submitted[:language]&.filter_map { |l| build_language(l) }
     contributors = submitted[:contributor]&.filter_map { |c| build_contributor(c) }
     subjects = submitted[:subject]&.filter_map { |s| build_subject(s) }
     forms = submitted[:form]&.filter_map { |f| build_form(f) }
@@ -34,6 +34,18 @@ class DescriptionBuilder
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   private
+
+  def build_note(params)
+    return safe_parse_json(params[:_raw_json]) if params[:_raw_json].present?
+
+    compact_entry(params, required: :value)
+  end
+
+  def build_language(params)
+    return safe_parse_json(params[:_raw_json]) if params[:_raw_json].present?
+
+    compact_entry(params, required: :code)
+  end
 
   def build_title(params)
     return safe_parse_json(params[:_raw_json]) if params[:_raw_json].present?

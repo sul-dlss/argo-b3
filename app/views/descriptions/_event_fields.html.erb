@@ -96,7 +96,7 @@
                aria-label="Event place">
       </div>
     </div>
-    <%= render 'descriptions/json_toggle', json_data: event if event.present? %>
+    <%= render 'descriptions/json_toggle', json_data: event, field_name: 'description[event][][_raw_json]' if event.present? %>
 
   <% else %>
     <%# Complex event (parallelEvent, structured date range, multi-contributor) — raw JSON escape hatch %>
