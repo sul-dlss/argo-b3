@@ -27,32 +27,32 @@
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'details', src: details_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <%= component.with_pane(id: 'versions-pane', tab_id: 'versions-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <% if @solr_doc.dro? || @solr_doc.collection? %>
     <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
     <% end %>
