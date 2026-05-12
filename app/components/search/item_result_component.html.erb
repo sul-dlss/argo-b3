@@ -1,7 +1,7 @@
 <%= tag.li class: 'mb-5' do %>
   <div class="row">
     <div class="col-md-10">
-      <%= render Elements::Tables::TableComponent.new(id:) do |component| %>
+      <%= render SdrViewComponents::Tables::TableComponent.new(id:) do |component| %>
         <% component.with_caption do %>
           <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
             <%= component.with_link do %>

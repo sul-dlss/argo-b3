@@ -1,6 +1,6 @@
 <%= tag.div class: 'container mt-3', data: do %>
   <h1 class="h4"><%= label %></h1>
-  <%= render Elements::Tables::TableComponent.new(label:, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
     <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Action', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Description', style: 'width: 20%;') %>
