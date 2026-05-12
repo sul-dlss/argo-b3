@@ -56,7 +56,7 @@
                 data-action="description-editor#removeItem"
                 aria-label="Remove subject">&times;</button>
       </div>
-    <%= render 'descriptions/json_toggle', json_data: subject, field_name: 'description[subject][][_raw_json]' if subject.present? %>
+    <%= render 'descriptions/json_toggle', json_data: subject || {}, field_name: 'description[subject][][_raw_json]' %>
     </div>
 
   <% elsif curated_struct %>

@@ -42,7 +42,7 @@
                 aria-label="Remove form">&times;</button>
       </div>
     </div>
-    <%= render 'descriptions/json_toggle', json_data: form, field_name: 'description[form][][_raw_json]' if form.present? %>
+    <%= render 'descriptions/json_toggle', json_data: form || {}, field_name: 'description[form][][_raw_json]' %>
 
   <% else %>
     <%# Structured or grouped form — raw JSON escape hatch %>
