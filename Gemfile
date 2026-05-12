@@ -51,7 +51,7 @@ gem 'okcomputer'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
 gem 'rsolr'
-gem 'sdr_view_components', github: 'sul-dlss/sdr_view_components', branch: 'lookbook'
+gem 'sdr_view_components', github: 'sul-dlss/sdr_view_components', branch: 'spinner_tweaks'
 gem 'view_component'
 
 group :development, :test do

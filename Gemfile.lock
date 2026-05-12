@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/sul-dlss/sdr_view_components.git
-  revision: f26dbed7d418dbaba4baa0df517f9884c19be9a8
-  branch: lookbook
+  revision: 5cf3b060625067d3fcc40cdc12bdda5e0b943684
+  branch: spinner_tweaks
   specs:
     sdr_view_components (0.1.14)
       rails (~> 8.0)
