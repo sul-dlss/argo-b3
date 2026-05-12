@@ -1,6 +1,6 @@
 <%= turbo_frame_tag 'report-preview' do %>
   <div class="table-responsive">
-    <%= render Elements::Tables::TableComponent.new(variant: :data, label: 'Preview', id: 'preview-table', show_label: false) do |table| %>
+    <%= render SdrViewComponents::Tables::TableComponent.new(variant: :data, label: 'Preview', id: 'preview-table', show_label: false) do |table| %>
       <% @csv.headers.each do |header| %>
         <%= table.with_header(label: header) %>
       <% end %>

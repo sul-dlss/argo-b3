@@ -6,7 +6,7 @@
   <ul class="list-unstyled placeholder-glow">
     <% for index in 1..number_of_placeholders %>
       <%= tag.li class: 'mb-5' do %>
-        <%= render Elements::Tables::RawTableComponent.new(id: "placeholder-#{index}") do |component| %>
+        <%= render SdrViewComponents::Tables::RawTableComponent.new(id: "placeholder-#{index}") do |component| %>
           <% component.with_caption do %>
             <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
               <%= component.with_link do %>
