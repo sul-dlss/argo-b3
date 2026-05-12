@@ -19,4 +19,5 @@
             data-action="description-editor#removeItem"
             aria-label="Remove note">&times;</button>
   </div>
+  <%= render 'descriptions/json_toggle', json_data: note.to_h if note.present? %>
 </div>

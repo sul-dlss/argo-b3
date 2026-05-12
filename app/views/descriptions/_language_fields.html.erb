@@ -1,24 +1,27 @@
-<div class="row g-2 mb-2 align-items-center" data-item>
-  <div class="col-auto">
-    <input type="text"
-           class="form-control"
-           name="description[language][][code]"
-           value="<%= language&.code %>"
-           placeholder="Code (e.g. eng)"
-           aria-label="Language code"
-           style="width: 10rem">
+<div class="mb-2" data-item>
+  <div class="row g-2 align-items-center">
+    <div class="col-auto">
+      <input type="text"
+             class="form-control"
+             name="description[language][][code]"
+             value="<%= language&.code %>"
+             placeholder="Code (e.g. eng)"
+             aria-label="Language code"
+             style="width: 10rem">
+    </div>
+    <div class="col">
+      <input type="text"
+             class="form-control"
+             name="description[language][][value]"
+             value="<%= language&.value %>"
+             placeholder="Label (e.g. English)"
+             aria-label="Language label">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-danger"
+              data-action="description-editor#removeItem"
+              aria-label="Remove language">&times;</button>
+    </div>
   </div>
-  <div class="col">
-    <input type="text"
-           class="form-control"
-           name="description[language][][value]"
-           value="<%= language&.value %>"
-           placeholder="Label (e.g. English)"
-           aria-label="Language label">
-  </div>
-  <div class="col-auto">
-    <button class="btn btn-sm btn-outline-danger"
-            data-action="description-editor#removeItem"
-            aria-label="Remove language">&times;</button>
-  </div>
+  <%= render 'descriptions/json_toggle', json_data: language.to_h if language.present? %>
 </div>
