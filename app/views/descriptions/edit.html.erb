@@ -1,12 +1,8 @@
 <%= turbo_frame_tag(@cocina_object.externalIdentifier, 'description') do %>
-<div class="mt-3" data-controller="description-editor">
-  <div class="row mb-3">
-    <div class="col">
-      <h1 class="h3">Edit Description</h1>
-      <p class="text-muted mb-0"><%= @cocina_object.externalIdentifier %></p>
-    </div>
-  </div>
-
+<div class="mt-3"
+     data-controller="description-editor"
+     data-render-field-url="<%= render_field_object_description_path(object_druid: @cocina_object.externalIdentifier) %>"
+     data-field-json-url="<%= field_json_object_description_path(object_druid: @cocina_object.externalIdentifier) %>">
   <% if flash[:warning] %>
     <div class="alert alert-warning" role="alert"><%= flash[:warning] %></div>
   <% end %>
@@ -31,10 +27,10 @@
         </template>
 
         <template id="structured-title-template">
-          <div data-item>
+          <div data-item data-field-type="title" data-controller="description-field">
             <div class="border rounded p-2 mb-2">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <select class="form-select form-select-sm" style="width: auto" name="description[title][][type]" aria-label="Title type">
+                <select class="form-select" style="width: auto" name="description[title][][type]" aria-label="Title type">
                   <option value="">— title type —</option>
                   <option value="alternative">Alternative</option>
                   <option value="uniform">Uniform</option>
@@ -47,10 +43,10 @@
               </div>
               <div class="row g-2 mb-1 align-items-center">
                 <div class="col">
-                  <input type="text" class="form-control form-control-sm" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                  <input type="text" class="form-control" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
                 </div>
                 <div class="col-auto">
-                  <select class="form-select form-select-sm" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                  <select class="form-select" name="description[title][][struct_parts][][type]" aria-label="Title part type">
                     <option value="">— type —</option>
                     <option value="main title">Main title</option>
                     <option value="subtitle">Subtitle</option>
@@ -62,10 +58,10 @@
               </div>
               <div class="row g-2 mb-1 align-items-center">
                 <div class="col">
-                  <input type="text" class="form-control form-control-sm" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
+                  <input type="text" class="form-control" name="description[title][][struct_parts][][value]" placeholder="Value" aria-label="Title part value">
                 </div>
                 <div class="col-auto">
-                  <select class="form-select form-select-sm" name="description[title][][struct_parts][][type]" aria-label="Title part type">
+                  <select class="form-select" name="description[title][][struct_parts][][type]" aria-label="Title part type">
                     <option value="">— type —</option>
                     <option value="main title">Main title</option>
                     <option value="subtitle">Subtitle</option>
@@ -149,16 +145,16 @@
         </template>
 
         <template id="structured-subject-template">
-          <div class="border rounded p-2 mb-2" data-item>
+          <div class="border rounded p-2 mb-2" data-item data-field-type="subject" data-controller="description-field">
             <% [nil, nil, nil].each do %>
               <div class="row g-2 align-items-center mb-1">
                 <div class="col">
-                  <input type="text" class="form-control form-control-sm"
+                  <input type="text" class="form-control"
                          name="description[subject][][struct_parts][][value]"
                          placeholder="Subject part" aria-label="Subject part value">
                 </div>
                 <div class="col-auto">
-                  <select class="form-select form-select-sm"
+                  <select class="form-select"
                           name="description[subject][][struct_parts][][type]"
                           aria-label="Subject part type">
                     <option value="">— type —</option>
@@ -250,11 +246,11 @@
         </template>
 
         <template id="date-range-event-template">
-          <div class="border rounded p-2 mb-2" data-item>
+          <div class="border rounded p-2 mb-2" data-item data-field-type="event" data-controller="description-field">
             <input type="hidden" name="description[event][][_original]" value="">
             <div class="row g-2 mb-2 align-items-center">
               <div class="col-auto">
-                <select class="form-select form-select-sm" name="description[event][][type]" aria-label="Event type">
+                <select class="form-select" name="description[event][][type]" aria-label="Event type">
                   <option value="">-- type --</option>
                   <option value="acquisition">Acquisition</option>
                   <option value="broadcast">Broadcast</option>
@@ -271,12 +267,12 @@
                 </select>
               </div>
               <div class="col">
-                <input type="text" class="form-control form-control-sm"
+                <input type="text" class="form-control"
                        name="description[event][][date_start_value]"
                        placeholder="Start date" aria-label="Start date">
               </div>
               <div class="col">
-                <input type="text" class="form-control form-control-sm"
+                <input type="text" class="form-control"
                        name="description[event][][date_end_value]"
                        placeholder="End date" aria-label="End date">
               </div>
@@ -288,12 +284,12 @@
             </div>
             <div class="row g-2 align-items-center">
               <div class="col">
-                <input type="text" class="form-control form-control-sm"
+                <input type="text" class="form-control"
                        name="description[event][][publisher_value]"
                        placeholder="Publisher (optional)" aria-label="Publisher">
               </div>
               <div class="col">
-                <input type="text" class="form-control form-control-sm"
+                <input type="text" class="form-control"
                        name="description[event][][place_value]"
                        placeholder="Place (e.g. New York)" aria-label="Event place">
               </div>

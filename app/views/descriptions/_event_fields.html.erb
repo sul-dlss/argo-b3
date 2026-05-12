@@ -22,14 +22,14 @@
   end
 %>
 
-<div class="border rounded p-2 mb-2" data-item>
+<div class="border rounded p-2 mb-2" data-item data-field-type="event" data-controller="description-field">
   <% if curated %>
     <%# Preserve full original JSON so location codes, date encoding, notes survive round-trip %>
     <input type="hidden" name="description[event][][_original]" value="<%= event.to_json %>">
 
     <div class="row g-2 mb-2 align-items-center">
       <div class="col-auto">
-        <select class="form-select form-select-sm" name="description[event][][type]" aria-label="Event type">
+        <select class="form-select" name="description[event][][type]" aria-label="Event type">
           <option value="">-- type --</option>
           <option value="acquisition"      <%= 'selected' if event_type == 'acquisition' %>>Acquisition</option>
           <option value="broadcast"        <%= 'selected' if event_type == 'broadcast' %>>Broadcast</option>
@@ -48,7 +48,7 @@
       <% if date_range %>
         <div class="col">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[event][][date_start_value]"
                  value="<%= date_start_val %>"
                  placeholder="Start date"
@@ -56,7 +56,7 @@
         </div>
         <div class="col">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[event][][date_end_value]"
                  value="<%= date_end_val %>"
                  placeholder="End date"
@@ -65,7 +65,7 @@
       <% else %>
         <div class="col">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[event][][date_value]"
                  value="<%= date_val %>"
                  placeholder="Date (e.g. 1978, 2001-06-15)"
@@ -81,7 +81,7 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[event][][publisher_value]"
                value="<%= publisher_val %>"
                placeholder="Publisher (optional)"
@@ -89,7 +89,7 @@
       </div>
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[event][][place_value]"
                value="<%= place_val %>"
                placeholder="Place (e.g. New York)"
@@ -111,7 +111,7 @@
         <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
           This event contains <%= reasons.to_sentence %> and must be edited as JSON.
         </p>
-        <textarea rows="8" class="form-control form-control-sm font-monospace"
+        <textarea rows="8" class="form-control font-monospace"
                   name="description[event][][_raw_json]"
                   aria-label="Event JSON"
                   data-controller="json-formatter"

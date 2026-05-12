@@ -15,19 +15,19 @@
   end
 %>
 
-<div class="border rounded p-2 mb-2" data-item>
+<div class="border rounded p-2 mb-2" data-item data-field-type="related_resource" data-controller="description-field">
   <% if curated %>
     <div class="row g-2 mb-2">
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[related_resource][][title_value]"
                value="<%= title_val %>"
                placeholder="Title"
                aria-label="Related resource title">
       </div>
       <div class="col-auto">
-        <select class="form-select form-select-sm"
+        <select class="form-select"
                 name="description[related_resource][][type]"
                 aria-label="Relationship type">
           <option value="">-- relationship --</option>
@@ -56,7 +56,7 @@
     <div class="row g-2">
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[related_resource][][url]"
                value="<%= url_val %>"
                placeholder="URL (optional)"
@@ -78,7 +78,7 @@
         <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
           This related resource contains <%= reasons.to_sentence %> and must be edited as JSON.
         </p>
-        <textarea rows="8" class="form-control form-control-sm font-monospace"
+        <textarea rows="8" class="form-control font-monospace"
                   name="description[related_resource][][_raw_json]"
                   aria-label="Related resource JSON"
                   data-controller="json-formatter"

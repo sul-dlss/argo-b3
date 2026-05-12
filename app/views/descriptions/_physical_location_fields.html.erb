@@ -2,14 +2,14 @@
   <div class="row g-2 align-items-center">
     <div class="col">
       <input type="text"
-             class="form-control form-control-sm"
+             class="form-control"
              name="description[access][physical_location][][value]"
              value="<%= physical_location&.dig(:value) %>"
              placeholder="Location value"
              aria-label="Physical location value">
     </div>
     <div class="col-auto">
-      <select class="form-select form-select-sm"
+      <select class="form-select"
               name="description[access][physical_location][][type]"
               aria-label="Physical location type">
         <option value="shelf locator"  <%= 'selected' if physical_location&.dig(:type) == 'shelf locator' %>>Shelf locator</option>

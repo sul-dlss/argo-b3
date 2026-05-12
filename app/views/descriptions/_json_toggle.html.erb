@@ -1,13 +1,13 @@
 <% collapse_id = "json-#{json_data.object_id}" %>
 <div class="mt-2">
-  <a class="btn btn-sm btn-light border opacity-50"
+  <a class="btn btn-light border opacity-50" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;"
      data-bs-toggle="collapse"
      href="#<%= collapse_id %>"
      aria-expanded="false"
      aria-controls="<%= collapse_id %>">{ } JSON</a>
   <div class="collapse" id="<%= collapse_id %>">
     <textarea name="<%= field_name %>"
-              class="form-control form-control-sm font-monospace mt-1"
+              class="form-control font-monospace mt-1"
               rows="8"
               disabled
               data-controller="json-formatter"

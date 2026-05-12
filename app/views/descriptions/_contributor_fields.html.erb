@@ -12,7 +12,7 @@
   role_val     = contributor&.dig(:role, 0, :value)
 %>
 
-<div class="border rounded p-2 mb-2" data-item>
+<div class="border rounded p-2 mb-2" data-item data-field-type="contributor" data-controller="description-field">
   <% if curated %>
     <%# Preserve full original JSON so role codes/URIs survive the round-trip %>
     <input type="hidden" name="description[contributor][][_original]" value="<%= contributor.to_json %>">
@@ -20,7 +20,7 @@
     <div class="row g-2 mb-2">
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[contributor][][name_value]"
                value="<%= name_val %>"
                placeholder="Name"
@@ -29,7 +29,7 @@
       <% if structured || life_dates.present? || contributor.nil? %>
         <div class="col-auto">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[contributor][][life_dates]"
                  value="<%= life_dates %>"
                  placeholder="Life dates (e.g. 1869-1939)"
@@ -38,7 +38,7 @@
         </div>
       <% end %>
       <div class="col-auto">
-        <select class="form-select form-select-sm" name="description[contributor][][type]" aria-label="Contributor type">
+        <select class="form-select" name="description[contributor][][type]" aria-label="Contributor type">
           <option value="person"       <%= 'selected' if contributor&.dig(:type) == 'person' %>>Person</option>
           <option value="organization" <%= 'selected' if contributor&.dig(:type) == 'organization' %>>Organization</option>
           <option value="conference"   <%= 'selected' if contributor&.dig(:type) == 'conference' %>>Conference</option>
@@ -63,7 +63,7 @@
       <div class="row g-2">
         <div class="col">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[contributor][][role_value]"
                  value="<%= role_val %>"
                  placeholder="Role (e.g. author, editor, publisher)"
@@ -80,7 +80,7 @@
         <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
           This contributor has a complex name structure and must be edited as JSON.
         </p>
-        <textarea rows="8" class="form-control form-control-sm font-monospace"
+        <textarea rows="8" class="form-control font-monospace"
                   name="description[contributor][][_raw_json]"
                   aria-label="Contributor JSON"
                   data-controller="json-formatter"

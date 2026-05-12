@@ -19,19 +19,19 @@
   end
 %>
 
-<div class="border rounded p-2 mb-2" data-item>
+<div class="border rounded p-2 mb-2" data-item data-field-type="subject" data-controller="description-field">
   <% if curated_simple %>
     <div class="row g-2 align-items-center">
       <div class="col">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[subject][][value]"
                value="<%= subject&.dig(:value) %>"
                placeholder="Subject"
                aria-label="Subject value">
       </div>
       <div class="col-auto">
-        <select class="form-select form-select-sm" name="description[subject][][type]" aria-label="Subject type">
+        <select class="form-select" name="description[subject][][type]" aria-label="Subject type">
           <option value="topic"           <%= 'selected' if subject&.dig(:type) == 'topic' %>>Topic</option>
           <option value="place"           <%= 'selected' if subject&.dig(:type) == 'place' %>>Place</option>
           <option value="temporal"        <%= 'selected' if subject&.dig(:type) == 'temporal' %>>Temporal</option>
@@ -44,7 +44,7 @@
       </div>
       <div class="col-auto">
         <input type="text"
-               class="form-control form-control-sm"
+               class="form-control"
                name="description[subject][][source_code]"
                value="<%= subject&.dig(:source, :code) %>"
                placeholder="Source (e.g. lcsh)"
@@ -66,14 +66,14 @@
       <div class="row g-2 align-items-center mb-1">
         <div class="col">
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="form-control"
                  name="description[subject][][struct_parts][][value]"
                  value="<%= part[:value] %>"
                  placeholder="Subject part"
                  aria-label="Subject part value">
         </div>
         <div class="col-auto">
-          <select class="form-select form-select-sm"
+          <select class="form-select"
                   name="description[subject][][struct_parts][][type]"
                   aria-label="Subject part type">
             <option value="">-- type --</option>
@@ -101,7 +101,7 @@
         <p class="small text-info-emphasis bg-info-subtle border border-info-subtle rounded px-2 py-1 mb-1">
           This subject has a complex or code-only structure and must be edited as JSON.
         </p>
-        <textarea rows="8" class="form-control form-control-sm font-monospace"
+        <textarea rows="8" class="form-control font-monospace"
                   name="description[subject][][_raw_json]"
                   aria-label="Subject JSON"
                   data-controller="json-formatter"
