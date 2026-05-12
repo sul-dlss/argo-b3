@@ -45,6 +45,10 @@ Alternatively, use the `/lint` agent skill to assist with fixing linting errors.
 
 A dashboard for SolidQueue background jobs is available at http://localhost:3000/jobs
 
+### Lookbook for SDR View Components
+
+In development, available at http://localhost:3000/lookbook
+
 ## Deployment
 
 NOTE: The application is deployed continuously by our on-prem Jenkins service (`sul-ci-prod`) to the `poc` environment on every merge to `main`. See `Jenkinsfile` for how that is wired up.
