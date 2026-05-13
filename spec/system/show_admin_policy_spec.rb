@@ -58,7 +58,7 @@ RSpec.describe 'Show admin policy' do
     expect(page).to have_css('.nav-link.active', text: 'Details')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
-    expect(page).to have_css('.nav-link.disabled', text: 'Events')
+    expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina Model')
 
     # Overview table

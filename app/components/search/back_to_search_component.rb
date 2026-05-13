@@ -9,8 +9,9 @@ module Search
     end
 
     def call
-      render Elements::ButtonLinkComponent.new(label: '← Back to search', classes: 'ps-0',
-                                               path: search_path(last_search_form.attributes))
+      render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Back to search', classes: 'ps-0',
+                                                                  variant: nil,
+                                                                  link: search_path(last_search_form.attributes))
     end
 
     def render?

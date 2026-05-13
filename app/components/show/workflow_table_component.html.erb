@@ -1,5 +1,5 @@
-<%= render Elements::Tables::TableComponent.new(id: table_id, classes: 'mb-4',
-                                                label: "#{workflow_name} - Version #{version}") do |component| %>
+<%= render SdrViewComponents::Tables::TableComponent.new(id: table_id, classes: 'mb-4',
+                                                         label: "#{workflow_name} - Version #{version}") do |component| %>
           <% component.with_header(label: 'Process') %>
           <% component.with_header(label: 'Lifecycle') %>
           <% component.with_header(label: 'Status') %>

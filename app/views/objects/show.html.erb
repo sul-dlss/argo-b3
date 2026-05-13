@@ -14,45 +14,57 @@
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-4') %>
   <% end %>
 
-  <%= render Elements::Tabs::TabListComponent.new(classes: 'nav-underline mb-3') do |component| %>
+  <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-3', variant: :underline) do |component| %>
 
     <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
     <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
     <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
-    <% component.with_tab(id: 'events-tab', label: 'Events') %>
-    <% component.with_tab(id: 'content-tab', label: 'Content') if @solr_doc.dro? %>
-    <% component.with_tab(id: 'technical-metadata-tab', label: 'Technical metadata') if @solr_doc.dro? %>
+    <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
+    <% component.with_tab(id: 'content-tab', pane_id: 'content-pane', label: 'Content') if @solr_doc.dro? %>
+    <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
     <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'details', src: details_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <%= component.with_pane(id: 'versions-pane', tab_id: 'versions-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'events-pane', tab_id: 'events-tab') do %>
+      <p>Not implemented yet</p>
+    <% end %>
+
+    <%= component.with_pane(id: 'content-pane', tab_id: 'content-tab') do %>
+      <p>Not implemented yet</p>
+    <% end %>
+
+    <%= component.with_pane(id: 'technical-metadata-pane', tab_id: 'technical-metadata-tab') do %>
+      <p>Not implemented yet</p>
     <% end %>
 
     <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
 
     <% if @solr_doc.dro? || @solr_doc.collection? %>
     <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-        <%= render Elements::SpinnerComponent.new %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
     <% end %>

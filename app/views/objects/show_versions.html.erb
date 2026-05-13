@@ -1,6 +1,6 @@
 <%= turbo_frame_tag(@druid, 'versions') do %>
-  <%= render Elements::Tables::TableComponent.new(id: 'versions-table',
-                                                  label: 'Versions', show_label: false) do |component| %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'versions-table',
+                                                           label: 'Versions', show_label: false) do |component| %>
     <% component.with_header(label: 'Version') %>
     <% component.with_header(label: 'Description') %>
     <% component.with_header(label: 'User Version') %>

@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/sul-dlss/sdr_view_components.git
-  revision: f26dbed7d418dbaba4baa0df517f9884c19be9a8
-  branch: lookbook
-  specs:
-    sdr_view_components (0.1.14)
-      rails (~> 8.0)
-      view_component
-      zeitwerk
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -564,6 +554,10 @@ GEM
       ffi (~> 1.12)
       logger
     rubyzip (3.3.0)
+    sdr_view_components (0.2.1)
+      rails (~> 8.0)
+      view_component
+      zeitwerk
     securerandom (0.4.1)
     selenium-webdriver (4.43.0)
       base64 (~> 0.2)
@@ -704,7 +698,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   rubocop-rspec_rails
-  sdr_view_components!
+  sdr_view_components
   selenium-webdriver
   simplecov
   solid_cable
