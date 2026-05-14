@@ -19,7 +19,7 @@ export default class extends Controller {
     // If the element is empty, no need to refresh it.
     if (this.element.innerHTML.trim() === '') return
     this.reloadInterval = setInterval(() => {
-      this.element.reload()
+      if (document.visibilityState === 'visible') this.element.reload()
     }, this.intervalValue)
   }
 
