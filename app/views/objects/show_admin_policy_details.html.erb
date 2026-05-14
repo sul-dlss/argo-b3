@@ -10,9 +10,4 @@
         <% end %>
       <% end %>
     <% end %>
-
-    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'description-table', classes: 'mb-5') do |component| %>
-      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Description') %><% end %>
-      <% component.with_row(label: 'Title', value: @solr_doc.title) %>
-    <% end %>
 <% end %>

@@ -70,10 +70,6 @@ RSpec.describe 'Show admin policy' do
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
 
-    # Description table
-    expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
-    expect(page).to have_table_value('description-table', 'Title', original_title)
-
     # Cocina model tab
     click_button 'Cocina Model'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
@@ -85,8 +81,5 @@ RSpec.describe 'Show admin policy' do
 
     expect(page).to have_css('h1', text: updated_title)
     expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
-
-    click_button 'Details'
-    expect(page).to have_table_value('description-table', 'Title', updated_title)
   end
 end

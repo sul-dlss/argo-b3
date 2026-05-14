@@ -10,12 +10,17 @@ RSpec.describe CocinaObjectMutators::CollectionMutator do
 
   context 'when the cocina model has an updated source_id' do
     let(:new_source_id) { 'new:source-id' }
+    let(:access_view) { 'world' }
 
-    before { cocina_model.source_id = new_source_id }
+    before do
+      cocina_model.source_id = new_source_id
+      cocina_model.access_view = access_view
+    end
 
     it 'returns a mutated CollectionWithMetadata' do
       expect(result).to be_a(Cocina::Models::CollectionWithMetadata)
       expect(result.identification.sourceId).to eq(new_source_id)
+      expect(result.access.view).to eq(access_view)
       expect(result.lock).to eq(cocina_object.lock)
     end
   end

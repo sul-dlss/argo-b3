@@ -28,8 +28,8 @@ class ObjectsController < ApplicationController
   end
 
   def show_details
-    # Need to find way to avoid retrieving solr doc again.
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
+    @cocina_model = CocinaModels::PresenterFactory.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
 
     case @solr_doc.object_type
     when 'collection'
