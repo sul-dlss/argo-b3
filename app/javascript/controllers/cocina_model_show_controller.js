@@ -63,7 +63,7 @@ export default class extends Controller {
       // Reload frames one at a time to spread out requests and reduce bursts.
       frames.forEach((frame, index) => {
         const timeoutId = setTimeout(() => {
-          frame.reload()
+          if (document.visibilityState === 'visible') frame.reload()
         }, index * this.staggerValue)
 
         this.frameReloadTimeouts.push(timeoutId)
