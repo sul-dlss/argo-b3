@@ -68,4 +68,29 @@ RSpec.describe CocinaModels::Collection do
       expect(collection.admin_policy?).to be false
     end
   end
+
+  describe 'validate access view' do
+    let(:cocina_object) { build(:collection_with_metadata) }
+
+    before do
+      collection.access_view = access_view
+    end
+
+    context 'with a valid access view' do
+      let(:access_view) { 'world' }
+
+      it 'is valid' do
+        expect(collection).to be_valid
+      end
+    end
+
+    context 'with an invalid access view' do
+      let(:access_view) { 'invalid-view' }
+
+      it 'is not valid' do
+        expect(collection).not_to be_valid
+        expect(collection.errors[:access_view]).to include('is not included in the list')
+      end
+    end
+  end
 end

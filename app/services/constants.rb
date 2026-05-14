@@ -105,4 +105,6 @@ module Constants
       uri: 'https://creativecommons.org/publicdomain/mark/1.0/',
       code: 'PDM' }
   ].freeze
+
+  ACCESS_LOCATIONS = ['spec', 'music', 'ars', 'art', 'hoover', 'm&m'].freeze
 end

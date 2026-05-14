@@ -30,13 +30,14 @@ RSpec.describe 'Show collection' do
     }
   end
 
-  def build_cocina_object(title:)
+  def build_cocina_object(title:, access: {})
     build(:collection_with_metadata, id: druid, admin_policy_id: apo_druid)
       .new(
         description: {
           title: [{ value: title }],
           purl: 'https://purl.stanford.edu/bb123cd4567'
-        }
+        },
+        access:
       )
   end
 
@@ -74,15 +75,15 @@ RSpec.describe 'Show collection' do
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
 
-    # Description table
-    expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
-    expect(page).to have_table_value('description-table', 'Title', original_title)
-
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
     expect(page).to have_table_value('identification-table', 'Druid', druid)
     expect(page).to have_table_value('identification-table', 'Source ID', 'googlebooks:stanford_36105114203446')
     expect(page).to have_table_value('identification-table', 'Folio Instance HRID', 'a6525053')
+
+    # Access table
+    expect(page).to have_table_caption('access-table', 'Access')
+    expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark')
 
     # Cocina model tab
     click_button 'Cocina Model'
@@ -95,13 +96,15 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('p', text: 'preview')
 
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
+    allow(Sdr::Repository).to receive(:find)
+      .and_return(build_cocina_object(title: updated_title, access: { view: 'world' }))
 
-    click_button 'Cocina Model'
     expect(page).to have_css('h1', text: updated_title)
-    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
 
     click_button 'Details'
-    expect(page).to have_table_value('description-table', 'Title', updated_title)
+    expect(page).to have_table_value('access-table', 'Access rights', 'View: World')
+
+    click_button 'Cocina Model'
+    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
   end
 end

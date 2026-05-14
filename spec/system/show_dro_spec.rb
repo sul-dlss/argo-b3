@@ -74,14 +74,15 @@ RSpec.describe 'Show DRO' do
     }
   end
 
-  def build_cocina_object(title:)
+  def build_cocina_object(title:, access: {})
     build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
       .new(
         structural: { isMemberOf: [collection_druid] },
         description: {
           title: [{ value: title }],
           purl: 'https://purl.stanford.edu/bb123cd4567'
-        }
+        },
+        access:
       )
   end
 
@@ -163,11 +164,6 @@ RSpec.describe 'Show DRO' do
     # Thumbnail
     expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!400,400/0/default.jpg"]') # rubocop:disable Layout/LineLength
 
-    # Description table
-    expect(page).to have_table_caption('description-table', 'Description')
-    expect(page).to have_css('table[id="description-table"] caption', text: 'Description')
-    expect(page).to have_table_value('description-table', 'Title', original_title)
-
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
     expect(page).to have_table_value('identification-table', 'Druid', druid)
@@ -175,6 +171,10 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_table_value('identification-table', 'Folio Instance HRID', 'a6525053')
     expect(page).to have_table_value('identification-table', 'Barcode', 'bb123cd4567')
     expect(page).to have_table_value('identification-table', 'DOI', 'https://doi.org/10.5072/bb123cd4567')
+
+    # Access table
+    expect(page).to have_table_caption('access-table', 'Access')
+    expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
 
     # Cocina model tab
     click_button 'Cocina Model'
@@ -253,16 +253,18 @@ RSpec.describe 'Show DRO' do
 
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
+    allow(Sdr::Repository).to receive(:find)
+      .and_return(build_cocina_object(title: updated_title, access: { view: 'world', download: 'world' }))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
     expect(page).to have_css('h1', text: updated_title, wait: 15)
-    click_button 'Cocina Model'
-    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
 
     click_button 'Details'
-    expect(page).to have_table_value('description-table', 'Title', updated_title)
+    expect(page).to have_table_value('access-table', 'Access rights', 'View: World, Download: World')
+
+    click_button 'Cocina Model'
+    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
 
     click_button 'Workflows'
     expect(page).to have_css('.accordion-item',

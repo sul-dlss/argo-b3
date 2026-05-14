@@ -20,6 +20,8 @@ module CocinaModels
     attribute :use_and_reproduction_statement, :string
     attribute :license, :string
     attribute :copyright, :string
+    attribute :access_view, :string
+    validates :access_view, inclusion: { in: %w[world dark] }, allow_nil: false
 
     private
 

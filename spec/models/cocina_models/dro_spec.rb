@@ -118,6 +118,126 @@ RSpec.describe CocinaModels::Dro do
     end
   end
 
+  describe 'validate access' do
+    let(:access_view) { 'world' }
+    let(:access_download) { 'none' }
+    let(:access_location) { nil }
+
+    before do
+      dro.access_view = access_view
+      dro.access_download = access_download
+      dro.access_location = access_location
+    end
+
+    context 'when access is dark' do
+      let(:access_view) { 'dark' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when access is citation-only' do
+      let(:access_view) { 'citation-only' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when view access is location-based and download is none' do
+      let(:access_view) { 'location-based' }
+      let(:access_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when view access is location-based and download is location-based' do
+      let(:access_view) { 'location-based' }
+      let(:access_download) { 'location-based' }
+      let(:access_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when download access is location-based with stanford view' do
+      let(:access_view) { 'stanford' }
+      let(:access_download) { 'location-based' }
+      let(:access_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when download access is location-based with world view' do
+      let(:access_download) { 'location-based' }
+      let(:access_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when access is stanford' do
+      let(:access_view) { 'stanford' }
+      let(:access_download) { 'stanford' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when access is world and download is stanford' do
+      let(:access_download) { 'stanford' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when access is world and download is world' do
+      let(:access_download) { 'world' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when access combination is invalid' do
+      let(:access_view) { 'stanford' }
+      let(:access_download) { 'none' }
+
+      it 'is not valid and adds an access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:access]).to include('is not valid')
+      end
+    end
+
+    context 'when location is required but missing' do
+      let(:access_view) { 'location-based' }
+
+      it 'is not valid and adds an access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:access]).to include('is not valid')
+      end
+    end
+
+    context 'when location is invalid' do
+      let(:access_view) { 'location-based' }
+      let(:access_location) { 'invalid-location' }
+
+      it 'is not valid and adds an access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:access]).to include('is not valid')
+      end
+    end
+  end
+
   # ActiveModel::Lint::Tests expects this method name
   def model
     dro
