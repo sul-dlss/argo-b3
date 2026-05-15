@@ -1,4 +1,5 @@
 # Project Guidelines
+Argo-B3 is a Rails application supporting the management of digital objects in the Stanford Digital Repository (SDR).
 
 ## Architecture
 
@@ -20,9 +21,13 @@
   - Memoization
   - Caching
 - For mocking, place allow statements in a before block and expect statements after the action is performed. Prefer testing argument (with) in expect; do not test in both allow and expect.
-- Place let statements before before blocks.
+- Place "let" statements before "before "blocks.
 - When writing CSS matchers, do not test padding or margins (e.g., ps-3, mt-1).
 
 ## References
+For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
 
-- See `README.md` for setup, linting, testing, and discovery details.
+- See `README.md` for setup, linting, testing, bulk actions, and discovery / search / faceting details.
+- Cocina Models (Repository: https://github.com/sul-dlss/cocina-models, Namespace: `Cocina::Models`) - Ruby implementation of the SDR data model for DROs (digital repository objects), Collections, and Admin Policies. It can usually be found locally for reading at `../cocina-models`.
+- DOR Services Client (Repository: https://github.com/sul-dlss/dor-services-client, Namespace: `Dor::Services::Client`) - Client for interacting with DOR Services App (DSA), the backend of SDR. It can usually be found locally for reading at `../dor-services-client`.
+- SDR View Components (Repository: https://github.com/sul-dlss/sdr_view_components, Namespace: `SdrViewComponents`) - A rails gem to provide reusable view components for SDR applications. It can usually be found locally for reading at `../sdr_view_components`. When working with the UI, prefer reusing components from SDR View Components.
