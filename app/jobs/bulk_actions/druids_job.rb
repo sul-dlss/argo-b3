@@ -24,6 +24,7 @@ module BulkActions
         perform_item_class.new(druid:, index:, job: self).perform
       rescue StandardError => e
         failure!(druid:, message: "Failed #{e.class} #{e.message}")
+        Rails.logger.error(e.full_message)
         Honeybadger.notify(e)
       end
     end

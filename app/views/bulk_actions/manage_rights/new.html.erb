@@ -1,0 +1,36 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_manage_rights_path, data: { controller: 'access-rights' } do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+
+    <fieldset class="mb-3">
+      <legend>View rights</legend>
+      <% %w[world dark citation-only stanford location-based].each do |view_value| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :view,
+                                                                      label_text: view_value.titleize,
+                                                                      input_data: { access_rights_target: "#{view_value.underscore.camelize(:lower)}View", action: 'access-rights#toggle' },
+                                                                      input_value: view_value) %>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="mb-3">
+      <legend>Download rights</legend>
+      <% %w[world stanford location-based none].each do |download_value| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :download,
+                                                                      label_text: download_value.titleize,
+                                                                      input_data: { access_rights_target: "#{download_value.underscore.camelize(:lower)}Download", action: 'access-rights#toggle' },
+                                                                      input_value: download_value) %>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="mb-3">
+      <legend>Location</legend>
+      <% Constants::ACCESS_LOCATIONS.each do |location_value| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :location,
+                                                                      label_text: location_value.titleize,
+                                                                      input_data: { access_rights_target: 'location' },
+                                                                      input_value: location_value) %>
+      <% end %>
+    </fieldset>
+
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+  <% end %>
+<% end %>

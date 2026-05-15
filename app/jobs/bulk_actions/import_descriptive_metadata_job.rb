@@ -26,7 +26,7 @@ module BulkActions
         open_new_version_if_needed!(description: description_msg)
 
         @cocina_object = cocina_object.new(description:)
-        Sdr::Repository.update(cocina_object:, user_name: user, description: description_msg)
+        Sdr::Repository.update(cocina_object:, user_name: user_id, description: description_msg)
 
         close_version_if_needed!
         success!(message: 'Successfully updated')

@@ -181,7 +181,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_RIGHTS = Config.new(
     label: 'Update rights',
-    help_text: 'Edit rights.'
+    help_text: 'Edit rights.',
+    job: BulkActions::ManageRightsJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_rights_path),
+    form: BulkActions::ManageRightsForm
   )
 
   MANAGE_SOURCE_ID = Config.new(

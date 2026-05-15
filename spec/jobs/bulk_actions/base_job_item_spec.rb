@@ -8,7 +8,7 @@ RSpec.describe BulkActions::BaseJobItem do
 
   let(:druid) { 'druid:bb111cc2222' }
 
-  let(:job) { instance_double(BulkActions::DruidsJob, user:, close_version?: close_version) }
+  let(:job) { instance_double(BulkActions::DruidsJob, user:, user_id: user.sunetid, close_version?: close_version) }
   let(:user) { instance_double(User, sunetid: 'a_user') }
   let(:close_version) { true }
 
