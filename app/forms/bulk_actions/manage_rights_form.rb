@@ -3,9 +3,8 @@
 module BulkActions
   # Form for manage rights bulk action.
   class ManageRightsForm < BasicForm
-    attribute :rights, :string, default: 'world'
-    attribute :view, :string
-    attribute :download, :string
-    attribute :location, :string
+    attribute :view, :string, default: 'world'
+    attribute :download, :string, default: 'world'
+    attribute :location, :string, default: nil
   end
 end

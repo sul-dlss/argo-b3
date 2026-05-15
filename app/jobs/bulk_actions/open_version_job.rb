@@ -19,7 +19,7 @@ module BulkActions
 
         Sdr::VersionService.open(druid:,
                                  description: version_description,
-                                 opening_user_name: bulk_action.user.sunetid)
+                                 opening_user_name: user_id)
         success!(message: 'Version successfully opened')
       end
 

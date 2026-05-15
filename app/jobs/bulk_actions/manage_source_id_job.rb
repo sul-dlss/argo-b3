@@ -16,7 +16,7 @@ module BulkActions
         return success!(message: 'No changes to source ID') unless cocina_model.changed?
 
         open_new_version_if_needed!(description: description_msg)
-        cocina_model.save!(user_name: user, description: description_msg)
+        cocina_model.save!(user_name: user_id, description: description_msg)
         close_version_if_needed!
 
         success!(message: 'Successfully updated')

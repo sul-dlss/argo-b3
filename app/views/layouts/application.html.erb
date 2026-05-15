@@ -35,6 +35,7 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, 'data-turbo-track': 'reload' %>
     <%= tag.link rel: 'stylesheet', href: "#{Settings.component_library.url}/styles/sul.css" %>
+    <%= stylesheet_link_tag 'sdr_view_components', 'data-turbo-track': 'reload' %>
     <%= javascript_importmap_tags %>
   </head>
 

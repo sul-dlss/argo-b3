@@ -47,7 +47,7 @@ module CocinaModels
     end
 
     def world_access?
-      match_access?(view: 'world', download: %w[none stanford world])
+      match_access?(view: 'world', download: %w[world stanford none])
     end
 
     private
