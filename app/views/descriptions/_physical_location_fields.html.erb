@@ -1,0 +1,28 @@
+<div class="border rounded p-2 mb-2" data-item>
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <input type="text"
+             class="form-control"
+             name="description[access][physical_location][][value]"
+             value="<%= physical_location&.dig(:value) %>"
+             placeholder="Location value"
+             aria-label="Physical location value">
+    </div>
+    <div class="col-auto">
+      <select class="form-select"
+              name="description[access][physical_location][][type]"
+              aria-label="Physical location type">
+        <option value="shelf locator"  <%= 'selected' if physical_location&.dig(:type) == 'shelf locator' %>>Shelf locator</option>
+        <option value="location"       <%= 'selected' if physical_location&.dig(:type) == 'location' %>>Location</option>
+        <option value="repository"     <%= 'selected' if physical_location&.dig(:type) == 'repository' %>>Repository</option>
+        <option value="discovery"      <%= 'selected' if physical_location&.dig(:type) == 'discovery' %>>Discovery</option>
+        <option value="series"         <%= 'selected' if physical_location&.dig(:type) == 'series' %>>Series</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-danger"
+              data-action="description-editor#removeItem"
+              aria-label="Remove physical location">&times;</button>
+    </div>
+  </div>
+</div>

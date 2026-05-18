@@ -1,0 +1,25 @@
+<div class="border rounded p-2 mb-2" data-item>
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <input type="text"
+             class="form-control"
+             name="description[access][access_contact][][value]"
+             value="<%= access_contact&.dig(:value) %>"
+             placeholder="Contact value (e.g. email or department name)"
+             aria-label="Access contact value">
+    </div>
+    <div class="col-auto">
+      <select class="form-select"
+              name="description[access][access_contact][][type]"
+              aria-label="Access contact type">
+        <option value="email"      <%= 'selected' if access_contact&.dig(:type) == 'email' %>>Email</option>
+        <option value="repository" <%= 'selected' if access_contact&.dig(:type) == 'repository' %>>Repository</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-danger"
+              data-action="description-editor#removeItem"
+              aria-label="Remove access contact">&times;</button>
+    </div>
+  </div>
+</div>

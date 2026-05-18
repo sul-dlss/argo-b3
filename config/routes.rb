@@ -166,6 +166,10 @@ Rails.application.routes.draw do
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
     end
+    resource :description, only: %i[edit update] do
+      post :render_field
+      post :field_json
+    end
   end
 
   namespace :admin do
