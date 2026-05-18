@@ -127,7 +127,13 @@ RSpec.describe 'Show DRO' do
   it 'displays the object' do
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: original_title))
+    allow(Sdr::Repository).to receive(:find).and_return(
+      build_cocina_object(title: original_title, access: {
+                            copyright: 'My copyright statement',
+                            license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
+                            useAndReproductionStatement: 'My use statement'
+                          })
+    )
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow])
 
@@ -175,6 +181,9 @@ RSpec.describe 'Show DRO' do
     # Access table
     expect(page).to have_table_caption('access-table', 'Access')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
+    expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
+    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
+    expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
 
     # Cocina model tab
     click_button 'Cocina Model'
@@ -254,7 +263,13 @@ RSpec.describe 'Show DRO' do
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
     allow(Sdr::Repository).to receive(:find)
-      .and_return(build_cocina_object(title: updated_title, access: { view: 'world', download: 'world' }))
+      .and_return(build_cocina_object(title: updated_title, access: {
+                                        view: 'world',
+                                        download: 'world',
+                                        copyright: 'My updated copyright statement',
+                                        license: 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
+                                        useAndReproductionStatement: 'My updated use statement'
+                                      }))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
@@ -262,6 +277,9 @@ RSpec.describe 'Show DRO' do
 
     click_button 'Details'
     expect(page).to have_table_value('access-table', 'Access rights', 'View: World, Download: World')
+    expect(page).to have_table_value('access-table', 'Copyright', 'My updated copyright statement')
+    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
+    expect(page).to have_table_value('access-table', 'Use and reproduction', 'My updated use statement')
 
     click_button 'Cocina Model'
     expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
