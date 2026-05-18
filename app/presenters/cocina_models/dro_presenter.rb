@@ -6,28 +6,40 @@ module CocinaModels
   # Initialize with: CocinaModels::DroPresenter.new(dro),
   # where dro is a CocinaModels::Dro.
   class DroPresenter < BasePresenter
+    include ApplicationHelper
+
     def display_access_rights
-      "#{display_access_view}, #{display_access_download}"
+      display_view = display_view(view: access_view, location: access_location)
+      display_download = display_download(download: access_download, location: access_location)
+      "#{display_view}, #{display_download}"
+    end
+
+    def embargo
+      return unless embargo_release_date?
+
+      display_view = display_view(view: embargo_view, location: embargo_location)
+      display_download = display_download(download: embargo_download, location: embargo_location)
+      "#{format_datetime(embargo_release_date)} - #{display_view}, #{display_download}"
     end
 
     private
 
-    def display_access_view
-      display = "View: #{humanize_access_value(access_view)}"
-      return display unless location_based_access?
+    def display_view(view:, location:)
+      display = "View: #{humanize_access_value(view)}"
+      return display unless view == 'location-based'
 
-      display + display_access_location
+      display + display_location(location:)
     end
 
-    def display_access_download
-      display = "Download: #{humanize_access_value(access_download)}"
-      return display unless location_based_download_access?
+    def display_download(download:, location:)
+      display = "Download: #{humanize_access_value(download)}"
+      return display unless download == 'location-based'
 
-      display + display_access_location
+      display + display_location(location:)
     end
 
-    def display_access_location
-      " (#{access_location})"
+    def display_location(location:)
+      " (#{location})"
     end
   end
 end

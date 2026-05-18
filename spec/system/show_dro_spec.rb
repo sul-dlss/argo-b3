@@ -133,7 +133,12 @@ RSpec.describe 'Show DRO' do
       build_cocina_object(title: original_title, access: {
                             copyright: 'My copyright statement',
                             license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
-                            useAndReproductionStatement: 'My use statement'
+                            useAndReproductionStatement: 'My use statement',
+                            embargo: {
+                              releaseDate: DateTime.parse('2040-06-15T19:00:00Z'),
+                              view: 'world',
+                              download: 'world'
+                            }
                           })
     )
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
@@ -186,6 +191,7 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
+    expect(page).to have_table_value('access-table', 'Embargo', 'June 15, 2040 12:00 PM - View: World, Download: World')
 
     # Tags table
     expect(page).to have_table_caption('tags-table', 'Tags')

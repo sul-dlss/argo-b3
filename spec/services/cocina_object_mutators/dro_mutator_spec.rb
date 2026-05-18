@@ -39,4 +39,46 @@ RSpec.describe CocinaObjectMutators::DroMutator do
       expect(result.lock).to eq(cocina_object.lock)
     end
   end
+
+  context 'when embargo attributes are set' do
+    let(:embargo_release_date) { DateTime.parse('2040-06-01') }
+    let(:embargo_view) { 'world' }
+    let(:embargo_download) { 'none' }
+
+    before do
+      cocina_model.embargo_release_date = embargo_release_date
+      cocina_model.embargo_view = embargo_view
+      cocina_model.embargo_download = embargo_download
+    end
+
+    it 'writes the embargo to the DROWithMetadata' do
+      expect(result).to be_a(Cocina::Models::DROWithMetadata)
+      expect(result.access.embargo.releaseDate).to eq embargo_release_date
+      expect(result.access.embargo.view).to eq embargo_view
+      expect(result.access.embargo.download).to eq embargo_download
+      expect(result.access.embargo.location).to be_nil
+      expect(result.lock).to eq(cocina_object.lock)
+    end
+  end
+
+  context 'when embargo_release_date is nil' do
+    it 'does not write an embargo to the DROWithMetadata' do
+      expect(result.access.embargo).to be_nil
+    end
+  end
+
+  context 'when the cocina object has an existing embargo and embargo_release_date is cleared' do
+    let(:cocina_object) do
+      build(:dro_with_metadata).new(
+        access: { view: 'world', download: 'none',
+                  embargo: { releaseDate: DateTime.parse('2040-06-01'), view: 'world', download: 'world' } }
+      )
+    end
+
+    before { cocina_model.embargo_release_date = nil }
+
+    it 'removes the embargo from the DROWithMetadata' do
+      expect(result.access.embargo).to be_nil
+    end
+  end
 end

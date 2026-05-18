@@ -1,0 +1,18 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_manage_embargo_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file') %>
+
+    <p class="mt-2">
+      The CSV should have the following headers. Values are required unless marked optional:
+    </p>
+    <ul>
+      <li><em>druid</em></li>
+      <li><em>release_date</em> (value should in YYYY-MM-DD format)</li>
+      <li><em>view</em></li>
+      <li><em>download</em></li>
+      <li><em>location</em> (optional)</li>
+    </ul>
+  <% end %>
+<% end %>

@@ -238,6 +238,168 @@ RSpec.describe CocinaModels::Dro do
     end
   end
 
+  describe 'embargo attributes' do
+    context 'when the cocina object has an embargo' do
+      let(:embargo_release_date) { DateTime.parse('2040-01-01') }
+      let(:embargo_view) { 'world' }
+      let(:embargo_download) { 'none' }
+      let(:cocina_object) do
+        build(:dro_with_metadata).new(
+          access: { view: 'world', download: 'world',
+                    embargo: { releaseDate: embargo_release_date, view: embargo_view, download: embargo_download } }
+        )
+      end
+
+      it 'populates embargo attributes from the cocina object' do
+        expect(dro.embargo_release_date).to eq embargo_release_date
+        expect(dro.embargo_view).to eq embargo_view
+        expect(dro.embargo_download).to eq embargo_download
+        expect(dro.embargo_location).to be_nil
+      end
+    end
+
+    context 'when the cocina object has no embargo' do
+      it 'returns nil for all embargo attributes' do
+        expect(dro.embargo_release_date).to be_nil
+        expect(dro.embargo_view).to be_nil
+        expect(dro.embargo_download).to be_nil
+        expect(dro.embargo_location).to be_nil
+      end
+    end
+  end
+
+  describe 'validate embargo access' do
+    let(:embargo_release_date) { DateTime.parse('2040-01-01') }
+    let(:embargo_view) { 'world' }
+    let(:embargo_download) { 'none' }
+    let(:embargo_location) { nil }
+
+    before do
+      dro.embargo_release_date = embargo_release_date
+      dro.embargo_view = embargo_view
+      dro.embargo_download = embargo_download
+      dro.embargo_location = embargo_location
+    end
+
+    context 'when embargo access is dark' do
+      let(:embargo_view) { 'dark' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo access is citation-only' do
+      let(:embargo_view) { 'citation-only' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo view is location-based and download is none' do
+      let(:embargo_view) { 'location-based' }
+      let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo view is location-based and download is location-based' do
+      let(:embargo_view) { 'location-based' }
+      let(:embargo_download) { 'location-based' }
+      let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo download is location-based with stanford view' do
+      let(:embargo_view) { 'stanford' }
+      let(:embargo_download) { 'location-based' }
+      let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo download is location-based with world view' do
+      let(:embargo_download) { 'location-based' }
+      let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo access is stanford' do
+      let(:embargo_view) { 'stanford' }
+      let(:embargo_download) { 'stanford' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo access is world and download is stanford' do
+      let(:embargo_download) { 'stanford' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo access is world and download is world' do
+      let(:embargo_download) { 'world' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when embargo access combination is invalid' do
+      let(:embargo_view) { 'stanford' }
+      let(:embargo_download) { 'none' }
+
+      it 'is not valid and adds an embargo_access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:embargo_access]).to include('is not valid')
+      end
+    end
+
+    context 'when embargo location is required but missing' do
+      let(:embargo_view) { 'location-based' }
+
+      it 'is not valid and adds an embargo_access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:embargo_access]).to include('is not valid')
+      end
+    end
+
+    context 'when embargo location is invalid' do
+      let(:embargo_view) { 'location-based' }
+      let(:embargo_location) { 'invalid-location' }
+
+      it 'is not valid and adds an embargo_access error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:embargo_access]).to include('is not valid')
+      end
+    end
+
+    context 'when embargo_release_date is absent' do
+      let(:embargo_release_date) { nil }
+      let(:embargo_view) { 'stanford' }
+      let(:embargo_download) { 'none' }
+
+      it 'skips embargo validation' do
+        expect(dro).to be_valid
+      end
+    end
+  end
+
   # ActiveModel::Lint::Tests expects this method name
   def model
     dro
