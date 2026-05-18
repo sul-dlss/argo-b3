@@ -39,5 +39,8 @@
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'access-table', classes: 'mb-5') do |component| %>
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Access') %><% end %>
     <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
+    <% component.with_row(label: 'Copyright', value: @cocina_model.copyright) %>
+    <% component.with_row(label: 'License', value: @cocina_model.license) %>
+    <% component.with_row(label: 'Use and reproduction', value: @cocina_model.use_and_reproduction_statement) %>
   <% end %>
 <% end %>
