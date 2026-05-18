@@ -2,7 +2,7 @@
 
 module DescriptiveCsv
   # Validate the descriptive metadata spreadsheet
-  class Validator # rubocop:disable Metrics/ClassLength
+  class Validator
     def initialize(csv, bulk_job: false)
       @csv = csv
       @headers = csv.headers
