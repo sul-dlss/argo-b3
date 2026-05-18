@@ -24,7 +24,9 @@ RSpec.describe 'Show admin policy' do
       Search::Fields::OBJECT_TYPES => ['admin_policy'],
       Search::Fields::TITLE => title,
       Search::Fields::APO_DRUID => [apo_druid],
-      Search::Fields::APO_TITLE => ['My APO']
+      Search::Fields::APO_TITLE => ['My APO'],
+      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
+      Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
 
@@ -69,6 +71,11 @@ RSpec.describe 'Show admin policy' do
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
+
+    # Tags table
+    expect(page).to have_table_caption('tags-table', 'Tags')
+    expect(page).to have_table_value('tags-table', 'Tags', 'Registered By : jdoe, Remediated By : labtech')
+    expect(page).to have_table_value('tags-table', 'Tickets', 'TESTREQ-1')
 
     # Cocina model tab
     click_button 'Cocina Model'

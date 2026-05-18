@@ -70,7 +70,9 @@ RSpec.describe 'Show DRO' do
       Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
       Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
       Search::Fields::BARCODES => ['bb123cd4567'],
-      Search::Fields::DOI => 'https://doi.org/10.5072/bb123cd4567'
+      Search::Fields::DOI => 'https://doi.org/10.5072/bb123cd4567',
+      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
+      Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
 
@@ -184,6 +186,11 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
+
+    # Tags table
+    expect(page).to have_table_caption('tags-table', 'Tags')
+    expect(page).to have_table_value('tags-table', 'Tags', 'Registered By : jdoe, Remediated By : labtech')
+    expect(page).to have_table_value('tags-table', 'Tickets', 'TESTREQ-1')
 
     # Cocina model tab
     click_button 'Cocina Model'

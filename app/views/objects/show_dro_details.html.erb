@@ -43,4 +43,6 @@
     <% component.with_row(label: 'License', value: @cocina_model.license) %>
     <% component.with_row(label: 'Use and reproduction', value: @cocina_model.use_and_reproduction_statement) %>
   <% end %>
+
+  <%= render Show::TagsTableComponent.new(tags: @solr_doc.other_tags, tickets: @solr_doc.tickets) %>
 <% end %>

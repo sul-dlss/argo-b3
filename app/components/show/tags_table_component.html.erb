@@ -1,0 +1,5 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(id: 'tags-table', classes: 'mb-5') do |component| %>
+  <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Tags') %><% end %>
+  <% component.with_row(label: 'Tags', value: tags&.join(', ')) %>
+  <% component.with_row(label: 'Tickets', value: tickets&.join(', ')) %>
+<% end %>

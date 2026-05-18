@@ -10,4 +10,6 @@
         <% end %>
       <% end %>
     <% end %>
+
+  <%= render Show::TagsTableComponent.new(tags: @solr_doc.other_tags, tickets: @solr_doc.tickets) %>
 <% end %>
