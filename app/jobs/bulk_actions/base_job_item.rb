@@ -13,7 +13,7 @@ module BulkActions
       Honeybadger.context(druid:)
     end
 
-    delegate :log, :user, :export_file, :close_version?, to: :job
+    delegate :log, :user, :user_id, :export_file, :close_version?, to: :job
 
     attr_reader :druid, :index, :job
 
@@ -46,7 +46,7 @@ module BulkActions
       return if Sdr::VersionService.open?(druid:)
       raise 'Unable to open new version' unless Sdr::VersionService.openable?(druid:)
 
-      @cocina_object = Sdr::VersionService.open(druid:, description:, opening_user_name: user.sunetid)
+      @cocina_object = Sdr::VersionService.open(druid:, description:, opening_user_name: user_id)
       log("Opened new version (#{description})")
     end
 

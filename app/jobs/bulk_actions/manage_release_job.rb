@@ -36,7 +36,7 @@ module BulkActions
       def new_tag
         Dor::Services::Client::ReleaseTag.new(
           to: release_to,
-          who: bulk_action.user.sunetid,
+          who: user_id,
           what:,
           release:,
           date: DateTime.now.utc.iso8601

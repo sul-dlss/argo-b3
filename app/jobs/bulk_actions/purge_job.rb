@@ -12,7 +12,7 @@ module BulkActions
           return failure!(message: 'Cannot purge item because it has already been submitted')
         end
 
-        purge_service.purge(user_name: user)
+        purge_service.purge(user_name: user_id)
 
         success!(message: 'Purge successful')
       end

@@ -39,8 +39,10 @@ module BulkActions
       bulk_action.update(druid_count_total: druid_count)
     end
 
-    def user
-      bulk_action.user.sunetid
+    delegate :user, to: :bulk_action
+
+    def user_id
+      user.sunetid
     end
 
     def log(message)
@@ -79,7 +81,7 @@ module BulkActions
 
     def perform_broadcast
       component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed")
-      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
+      Turbo::StreamsChannel.broadcast_append_to('notifications', user,
                                                 target: 'toast-container',
                                                 html: ApplicationController.render(component, layout: false))
     end

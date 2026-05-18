@@ -62,7 +62,7 @@ module BulkActions
         return failure!(message: convert_result.failure.message) if convert_result.failure?
 
         # After registration, set druid and cocina_object so that logging, etc. works as expected.
-        @cocina_object = Sdr::Repository.register(user_name: user, **convert_result.value!)
+        @cocina_object = Sdr::Repository.register(user_name: user_id, **convert_result.value!)
         @druid = cocina_object.externalIdentifier
 
         success!(message: 'Registration successful')
