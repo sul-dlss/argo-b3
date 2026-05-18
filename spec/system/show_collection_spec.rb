@@ -26,7 +26,9 @@ RSpec.describe 'Show collection' do
       Search::Fields::APO_DRUID => [apo_druid],
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
-      Search::Fields::CATALOG_RECORD_ID => ['a6525053']
+      Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
+      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
+      Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
 
@@ -84,6 +86,11 @@ RSpec.describe 'Show collection' do
     # Access table
     expect(page).to have_table_caption('access-table', 'Access')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark')
+
+    # Tags table
+    expect(page).to have_table_caption('tags-table', 'Tags')
+    expect(page).to have_table_value('tags-table', 'Tags', 'Registered By : jdoe, Remediated By : labtech')
+    expect(page).to have_table_value('tags-table', 'Tickets', 'TESTREQ-1')
 
     # Cocina model tab
     click_button 'Cocina Model'

@@ -209,7 +209,7 @@ module Reports
     )
 
     TAGS = Config.new(
-      field: Search::Fields::OTHER_TAGS,
+      field: Search::Fields::OTHER_TAGS_EXPLODED,
       label: 'Tags',
       help_text: 'For example: Process : Content Type : Book (ltr)'
     )

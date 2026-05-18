@@ -297,7 +297,7 @@ module Search
 
     TAGS = Config.with_defaults(
       form_field: :tags,
-      field: Search::Fields::OTHER_TAGS,
+      field: Search::Fields::OTHER_TAGS_EXPLODED,
       hierarchical_field: Search::Fields::OTHER_HIERARCHICAL_TAGS,
       alpha_sort: true,
       limit: 25,

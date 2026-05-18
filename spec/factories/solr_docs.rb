@@ -55,7 +55,8 @@ FactoryBot.define do
         Search::Fields::PROJECTS => projects,
         Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
-        Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
+        Search::Fields::OTHER_TAGS => tags,
+        Search::Fields::OTHER_TAGS_EXPLODED => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
         Search::Fields::TICKETS => tickets,
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
@@ -114,6 +115,7 @@ FactoryBot.define do
       object_type { 'collection' }
       projects { [] }
       tags { [] }
+      tickets { [] }
       workflows { [] }
       access_rights { 'dark' }
     end
@@ -127,8 +129,10 @@ FactoryBot.define do
         Search::Fields::PROJECTS => projects,
         Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),
-        Search::Fields::OTHER_TAGS => explode_hierarchy(values: tags),
+        Search::Fields::OTHER_TAGS => tags,
+        Search::Fields::OTHER_TAGS_EXPLODED => explode_hierarchy(values: tags),
         Search::Fields::OTHER_HIERARCHICAL_TAGS => explode_hierarchy(values: tags, as_hierarchical: true),
+        Search::Fields::TICKETS => tickets,
         Search::Fields::WPS_WORKFLOWS => explode_hierarchy(values: workflows, delimiter: ':'),
         Search::Fields::WPS_HIERARCHICAL_WORKFLOWS => explode_hierarchy(values: workflows, as_hierarchical: true,
                                                                         delimiter: ':'),
