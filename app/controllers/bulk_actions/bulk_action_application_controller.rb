@@ -9,7 +9,7 @@ module BulkActions
 
     def new
       @bulk_action_form = form_class.new
-      @bulk_action_form.source = 'results' if @last_search_form.present?
+      @bulk_action_form.source = 'results' if @last_search_form.present? && @bulk_action_form.respond_to?(:source=)
     end
 
     def create
