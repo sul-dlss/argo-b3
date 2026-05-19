@@ -33,3 +33,7 @@ a[aria-expanded="false"] {
 .accordion-header.facet-field-heading .accordion-button:disabled::after {
   display: none;
 }
+
+.input-group-text {
+	border-color: var(--stanford-60-black);
+}
