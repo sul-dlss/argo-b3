@@ -3,26 +3,26 @@
     <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                            field_name: :csv_file,
                                                            label_text: 'Upload a CSV or Excel file') %>
-    <p>
-      Please note that each row should have headers for:
+    <p class="mt-2">
+        The CSV should have the following headers. Values are required unless marked optional:
     </p>
     <ul>
-      <li>administrative_policy_object (required)</li>
-      <li>collection (optional)</li>
-      <li>initial_workflow (required)</li>
-      <li>content_type (required)</li>
-      <li>reading_order (required if "content_type" is "book" or "image")</li>
-      <li>source_id (required)</li>
-      <li>folio_instance_hrid (optional)</li>
-      <li>barcode (optional)</li>
-      <li>label (required unless a folio_instance_hrid has been entered)</li>
-      <li>rights_view (required)</li>
-      <li>rights_download (required)</li>
-      <li>rights_location (required if "view" or "download" uses "location-based")</li>
-      <li>rights_controlledDigitalLending (optional: to use, enter "true" and also set "view" to "stanford" and "download" to "none")</li>
-      <li>project_name (optional)</li>
-      <li>tags (optional, may repeat)</li>
-      <li>tickets (optional, may repeat)</li>
+      <li><em>administrative_policy_object</em></li>
+      <li><em>collection</em> (optional)</li>
+      <li><em>initial_workflow</em></li>
+      <li><em>content_type</em></li>
+      <li><em>reading_order</em> (required if "content_type" is "book" or "image")</li>
+      <li><em>source_id</em></li>
+      <li><em>folio_instance_hrid</em> (optional)</li>
+      <li><em>barcode</em> (optional)</li>
+      <li><em>label</em> (required unless a folio_instance_hrid has been entered)</li>
+      <li><em>rights_view</em></li>
+      <li><em>rights_download</em></li>
+      <li><em>rights_location</em> (required if "view" or "download" uses "location-based")</li>
+      <li><em>rights_controlledDigitalLending</em> (optional: to use, enter "true" and also set "view" to "stanford" and "download" to "none")</li>
+      <li><em>project_name</em> (optional)</li>
+      <li><em>tags</em> (optional, may repeat)</li>
+      <li><em>tickets</em> (optional, may repeat)</li>
     </ul>
   <% end %>
 <% end %>

@@ -155,7 +155,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_EMBARGO = Config.new(
     label: 'Manage embargo',
-    help_text: 'Manage embargoes with a CSV.'
+    help_text: 'Manage embargoes with a CSV.',
+    job: BulkActions::ManageEmbargoJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_embargo_path),
+    form: BulkActions::ManageEmbargoForm
   )
 
   MANAGE_GOVERNING_APO = Config.new(

@@ -136,6 +136,7 @@ Rails.application.routes.draw do
     resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
+    resource :manage_embargo, only: %i[new create], controller: 'manage_embargo'
     resource :manage_license_and_rights_statements, only: %i[new create],
                                                     controller: 'manage_license_and_rights_statements'
     resource :manage_release, only: %i[new create], controller: 'manage_release'
