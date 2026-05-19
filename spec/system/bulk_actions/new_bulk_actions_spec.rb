@@ -37,7 +37,7 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#manage-structural-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage structural metadata')
-      expect(page).to have_css('span', text: 'Update content type')
+      expect(page).to have_link('Update content type')
     end
 
     within('section#tags-and-reporting-bulk-actions-section') do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A module for including constants throughout the Argo application
-module Constants
+module Constants # rubocop:disable Metrics/ModuleLength
   RELEASE_TARGETS = [
     %w[Searchworks Searchworks],
     %w[Earthworks Earthworks],
@@ -107,4 +107,15 @@ module Constants
   ].freeze
 
   ACCESS_LOCATIONS = ['spec', 'music', 'ars', 'art', 'hoover', 'm&m'].freeze
+
+  VIEWING_DIRECTIONS = %w[left-to-right right-to-left].freeze
+
+  CONTENT_TYPES_WITH_VIEWING_DIRECTIONS = [
+    Cocina::Models::ObjectType.book,
+    Cocina::Models::ObjectType.image
+  ].freeze
+
+  CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| uri.split('/').last }.freeze
+
+  RESOURCE_TYPES = Cocina::Models::FileSet::TYPES.index_by { |uri| uri.split('/').last }.freeze
 end

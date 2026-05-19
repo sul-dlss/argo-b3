@@ -49,6 +49,7 @@ module SearchResults
     # This is sloppiness in the indexing -- they should not have been arrays.
     SCALAR_FIELDS = [
       Search::Fields::OBJECT_TYPES,
+      Search::Fields::CONTENT_TYPES,
       Search::Fields::APO_DRUID,
       Search::Fields::APO_TITLE
     ].freeze

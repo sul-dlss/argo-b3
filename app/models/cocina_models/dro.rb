@@ -34,6 +34,14 @@ module CocinaModels
     # Note that the error is reported on :embargo_access, not the individual embargo fields
     validate :validate_embargo_access, if: :embargo_release_date?
 
+    # Content type and viewing direction fields
+    attribute :content_type, :string
+    attribute :viewing_direction, :string
+    validates :content_type, presence: true
+    validates :content_type, inclusion: { in: Cocina::Models::DRO::TYPES }
+    validates :viewing_direction, inclusion: { in: Constants::VIEWING_DIRECTIONS }, allow_nil: true
+    validate :viewing_direction_only_for_applicable_content_types
+
     def dark_access?
       match_access?(view: 'dark', download: 'none')
     end
@@ -94,6 +102,13 @@ module CocinaModels
 
     def mutated_cocina_object
       CocinaObjectMutators::DroMutator.call(cocina_object: previous_cocina_object, cocina_model: self)
+    end
+
+    def viewing_direction_only_for_applicable_content_types
+      return if viewing_direction.blank?
+      return if Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS.include?(content_type)
+
+      errors.add(:viewing_direction, 'is only valid for book and image content types')
     end
 
     def validate_access

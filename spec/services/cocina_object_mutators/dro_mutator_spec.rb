@@ -8,6 +8,35 @@ RSpec.describe CocinaObjectMutators::DroMutator do
   let(:cocina_object) { build(:dro_with_metadata) }
   let(:cocina_model) { CocinaModels::Dro.new(cocina_object) }
 
+  context 'when the cocina model has an updated content_type' do
+    let(:new_content_type) { Cocina::Models::ObjectType.book }
+
+    before { cocina_model.content_type = new_content_type }
+
+    it 'mutates the type on the DROWithMetadata' do
+      expect(result.type).to eq(new_content_type)
+      expect(result.lock).to eq(cocina_object.lock)
+    end
+  end
+
+  context 'when the cocina model has a viewing_direction set' do
+    let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.book) }
+
+    before do
+      cocina_model.viewing_direction = 'right-to-left'
+    end
+
+    it 'sets hasMemberOrders with the viewing direction' do
+      expect(result.structural.hasMemberOrders.first.viewingDirection).to eq('right-to-left')
+    end
+  end
+
+  context 'when the cocina model has a blank viewing_direction' do
+    it 'sets hasMemberOrders to empty' do
+      expect(result.structural.hasMemberOrders).to be_empty
+    end
+  end
+
   context 'when the cocina model has an updated source_id' do
     let(:new_source_id) { 'new:source-id' }
     let(:license) { 'https://creativecommons.org/publicdomain/zero/1.0/legalcode' }

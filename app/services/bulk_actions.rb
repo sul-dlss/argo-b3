@@ -150,7 +150,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_CONTENT_TYPE = Config.new(
     label: 'Update content type',
-    help_text: 'Set content type.'
+    help_text: 'Set content type, reading direction and/or resource types.',
+    job: BulkActions::ManageContentTypeJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_content_type_path),
+    form: BulkActions::ManageContentTypeForm
   )
 
   MANAGE_EMBARGO = Config.new(
