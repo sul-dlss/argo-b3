@@ -219,7 +219,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REFRESH_METADATA = Config.new(
     label: 'Refresh metadata from FOLIO record',
-    help_text: 'Refresh metadata from the catalog.'
+    help_text: 'Refresh metadata from the catalog.',
+    job: BulkActions::RefreshMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_refresh_metadata_path),
+    form: BulkActions::BasicForm
   )
 
   REGISTER = Config.new(
