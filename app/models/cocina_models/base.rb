@@ -2,10 +2,8 @@
 
 module CocinaModels
   # Base model for a Cocina object.
-  class Base
-    include ActiveModel::Model
-    include ActiveModel::Dirty
-    include ActiveModel::Attributes
+  class Base < Blanks::Base
+    include ActiveModel::AttributeAssignment
 
     alias update assign_attributes
 

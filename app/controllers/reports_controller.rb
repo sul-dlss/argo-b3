@@ -81,7 +81,7 @@ class ReportsController < ApplicationController
   private
 
   def report_params
-    params.expect(report_form: [:source, :druid_list, { fields: [] }])
+    params.expect(report: [:source, :druid_list, { fields: [] }])
   end
 
   def rows

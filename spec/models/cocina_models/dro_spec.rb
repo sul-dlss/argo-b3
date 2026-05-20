@@ -25,6 +25,15 @@ RSpec.describe CocinaModels::Dro do
         expect { dro }.to raise_error(ArgumentError)
       end
     end
+
+    context 'with a folio catalog link' do
+      let(:cocina_object) { build(:dro_with_metadata, folio_instance_hrids: ['in11403803']) }
+
+      it 'initializes folio catalog links from the cocina object' do
+        expect(dro.folio_catalog_links.count).to eq(1)
+        expect(dro.folio_catalog_links.first.catalog_record_id).to eq('in11403803')
+      end
+    end
   end
 
   describe '#update' do
@@ -41,7 +50,16 @@ RSpec.describe CocinaModels::Dro do
       let(:attributes) { { external_identifier: new_external_identifier } }
 
       it 'does not allow updating external_identifier' do
-        expect { dro.update(attributes) }.to raise_error(ActiveModel::UnknownAttributeError)
+        expect { dro.update(attributes) }.to raise_error(NoMethodError)
+      end
+    end
+
+    context 'when updating with folio catalog link attributes' do
+      let(:attributes) { { folio_catalog_links_attributes: [{ catalog_record_id: 'in11403803', refresh: true }] } }
+
+      it 'updates the folio catalog links' do
+        dro.update(attributes)
+        expect(dro.folio_catalog_links.first.catalog_record_id).to eq('in11403803')
       end
     end
   end
@@ -92,6 +110,23 @@ RSpec.describe CocinaModels::Dro do
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
+
+    context 'when saving with a folio catalog link' do
+      let(:cocina_object) { build(:dro_with_metadata, folio_instance_hrids: ['in11403803']) }
+
+      before do
+        dro.source_id = 'changed:source-id'
+      end
+
+      it 'saves the model including the folio catalog link' do
+        dro.save!(user_name:, description:)
+        expect(Sdr::Repository).to have_received(:update) do |args|
+          new_cocina_object = args[:cocina_object]
+          folio_link = new_cocina_object.identification.catalogLinks.find { |link| link.catalog == 'folio' }
+          expect(folio_link.catalogRecordId).to eq('in11403803')
+        end
+      end
+    end
   end
 
   describe 'change tracking' do
@@ -101,6 +136,15 @@ RSpec.describe CocinaModels::Dro do
       dro.source_id = 'changed-source-id'
       expect(dro.changed?).to be true
       expect(dro.source_id_changed?).to be true
+    end
+
+    it 'tracks changes to a nested folio catalog link attribute' do
+      cocina_object_with_link = build(:dro_with_metadata, folio_instance_hrids: ['in11403803'])
+      dro_with_link = described_class.new(cocina_object_with_link)
+      folio_link = dro_with_link.folio_catalog_links.first
+      expect(folio_link.changed?).to be false
+      folio_link.catalog_record_id = 'in99999999'
+      expect(folio_link.changed?).to be true
     end
   end
 
@@ -488,6 +532,19 @@ RSpec.describe CocinaModels::Dro do
 
       it 'is valid' do
         expect(dro).to be_valid
+      end
+    end
+  end
+
+  describe 'validate catalog links' do
+    context 'when a folio catalog link has an invalid catalog_record_id' do
+      before do
+        dro.folio_catalog_links_attributes = [{ catalog_record_id: '11403803', refresh: false }]
+      end
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:'folio_catalog_links[0].catalog_record_id']).to be_present
       end
     end
   end

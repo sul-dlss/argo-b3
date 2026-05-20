@@ -40,6 +40,7 @@ gem 'image_processing', '~> 1.2'
 
 # Additional gems
 gem 'action_policy'
+gem 'blanks' # ActiveRecord-like forms.
 gem 'cocina_display'
 gem 'config'
 gem 'csv'

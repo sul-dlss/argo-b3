@@ -95,6 +95,9 @@ GEM
       smart_properties
     bigdecimal (4.1.2)
     bindex (0.8.1)
+    blanks (1.0.0)
+      activemodel (>= 6.0)
+      activesupport (>= 6.0)
     bootsnap (1.24.4)
       msgpack (~> 1.2)
     builder (3.3.0)
@@ -655,6 +658,7 @@ PLATFORMS
 
 DEPENDENCIES
   action_policy
+  blanks
   bootsnap
   bundler-audit
   capistrano-passenger

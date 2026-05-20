@@ -101,7 +101,7 @@ RSpec.describe 'Create a new manage rights bulk action' do
 
     within_fieldset('Download rights') do
       all_download_options.each do |label, value|
-        selector = "input[name='bulk_actions_manage_rights_form[download]'][value='#{value}']"
+        selector = "input[name='bulk_actions_manage_rights[download]'][value='#{value}']"
         if enabled_labels.include?(label)
           expect(page).to have_css("#{selector}:not([disabled])")
         else
@@ -112,10 +112,10 @@ RSpec.describe 'Create a new manage rights bulk action' do
   end
 
   def expect_locations_enabled
-    expect(page).to have_no_css('input[name="bulk_actions_manage_rights_form[location]"][disabled]')
+    expect(page).to have_no_css('input[name="bulk_actions_manage_rights[location]"][disabled]')
   end
 
   def expect_locations_disabled
-    expect(page).to have_css('input[name="bulk_actions_manage_rights_form[location]"][disabled]', count: Constants::ACCESS_LOCATIONS.length)
+    expect(page).to have_css('input[name="bulk_actions_manage_rights[location]"][disabled]', count: Constants::ACCESS_LOCATIONS.length)
   end
 end
