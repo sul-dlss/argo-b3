@@ -26,7 +26,7 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#manage-descriptive-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage descriptive metadata')
-      expect(page).to have_css('span', text: 'Refresh metadata from FOLIO record')
+      expect(page).to have_link('Refresh metadata from FOLIO record')
     end
 
     within('section#manage-rights-and-administrative-metadata-bulk-actions-section') do
