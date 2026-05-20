@@ -1,3 +1,2 @@
---format progress
 --format ParallelTests::RSpec::SummaryLogger
 --format ParallelTests::RSpec::FailuresLogger
