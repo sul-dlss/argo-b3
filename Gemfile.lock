@@ -557,7 +557,7 @@ GEM
       ffi (~> 1.12)
       logger
     rubyzip (3.3.0)
-    sdr_view_components (0.3.0)
+    sdr_view_components (0.4.1)
       rails (~> 8.0)
       view_component
       zeitwerk

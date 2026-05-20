@@ -57,7 +57,8 @@
     <%# Because the toast-container is permanent, appending via turbo stream. %>
     <% if flash[:toast].present? %>
       <%= turbo_stream.append 'toast-container' do %>
-        <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast]) %>
+        <!-- Do not disappear in test env to allow for testing, but disappear in other environments. -->
+        <%= render SdrViewComponents::Elements::ToastComponent.new(title: flash[:toast], disappearing: !Rails.env.test?) %>
       <% end %>
     <% end %>
 
