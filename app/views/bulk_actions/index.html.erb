@@ -3,4 +3,5 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
+<%= turbo_stream_from 'bulk_actions_history', current_user %>
 <%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions) %>

@@ -80,8 +80,10 @@ module BulkActions
     end
 
     def perform_broadcast
+      Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
+
       component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed")
-      Turbo::StreamsChannel.broadcast_append_to('notifications', user,
+      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
                                                 target: 'toast-container',
                                                 html: ApplicationController.render(component, layout: false))
     end
