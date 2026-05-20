@@ -187,7 +187,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
-      expect(log.string).to include("Object is a #{Cocina::Models::ObjectType.collection} and cannot be updated")
+      expect(log.string).to include('Not an item')
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
