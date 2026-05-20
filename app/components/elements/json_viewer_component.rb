@@ -14,10 +14,10 @@ module Elements
       super()
     end
 
-    attr_reader :hash, :expanded, :show_toolbar, :show_tip, :compact
+    attr_reader :expanded, :show_toolbar, :show_tip, :compact
 
-    def data
-      helpers.format_hash(hash, compact:, pretty: false)
+    def hash
+      helpers.format_hash(@hash, compact:, pretty: false)
     end
   end
 end

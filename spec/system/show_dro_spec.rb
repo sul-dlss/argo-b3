@@ -201,8 +201,8 @@ RSpec.describe 'Show DRO' do
     # Cocina model tab
     click_button 'Cocina Model'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
-    expect(page).to have_css("andypf-json-viewer[data*='#{druid}']")
-    expect(page).to have_css("andypf-json-viewer[data*='#{original_title}']")
+    expect(page).to have_css('andypf-json-viewer', text: druid)
+    expect(page).to have_css('andypf-json-viewer', text: original_title)
 
     # Workflows tab
     click_button 'Workflows'
@@ -295,7 +295,7 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My updated use statement')
 
     click_button 'Cocina Model'
-    expect(page).to have_css("andypf-json-viewer[data*='#{updated_title}']")
+    expect(page).to have_css('andypf-json-viewer', text: updated_title)
 
     click_button 'Workflows'
     expect(page).to have_css('.accordion-item',

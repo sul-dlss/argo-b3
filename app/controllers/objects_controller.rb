@@ -2,7 +2,8 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions show_purl_preview]
+  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions
+                                  show_purl_preview show_solr_doc]
 
   include TokenConcern
 
@@ -61,6 +62,12 @@ class ObjectsController < ApplicationController
     @versions_presenter = VersionsPresenter.new(version_inventory: object_client.version.inventory,
                                                 milestones: object_client.milestones.list,
                                                 user_version_inventory: object_client.user_version.inventory)
+  end
+
+  def show_solr_doc
+    @solr_doc_hash = fetch_solr_doc(verified_druid)
+
+    render layout: false
   end
 
   def show_purl_preview

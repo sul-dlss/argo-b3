@@ -23,6 +23,7 @@
     <% component.with_tab(id: 'content-tab', pane_id: 'content-pane', label: 'Content') if @solr_doc.dro? %>
     <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
+    <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'Solr Document') %>
     <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
@@ -57,6 +58,12 @@
 
     <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'solr-doc-pane', tab_id: 'solr-doc-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'solr_doc', src: solr_doc_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
         <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
