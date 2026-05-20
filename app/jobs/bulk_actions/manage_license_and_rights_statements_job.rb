@@ -24,12 +24,10 @@ module BulkActions
       delegate :change_copyright, :copyright, :change_license, :license,
                :change_use_and_reproduction_statement, :use_and_reproduction_statement, to: :job
 
-      def perform # rubocop:disable Metrics/AbcSize
+      def perform
         return unless check_update_ability?
 
-        unless cocina_object.dro? || cocina_object.collection?
-          return failure!(message: "Not an item or collection (#{cocina_object.type})")
-        end
+        return unless check_object_type?(allow_admin_policy: false)
 
         mutate_cocina_model
 

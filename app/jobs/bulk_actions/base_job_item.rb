@@ -79,5 +79,29 @@ module BulkActions
       failure!(message: 'Not authorized to read')
       false
     end
+
+    def check_object_type?(allow_dro: true, allow_collection: true, allow_admin_policy: true)
+      return true if (allow_dro && cocina_object.dro?) ||
+                     (allow_collection && cocina_object.collection?) ||
+                     (allow_admin_policy && cocina_object.administrative_policy?)
+
+      failure!(message: object_type_failure_message(allow_dro:, allow_collection:,
+                                                    allow_admin_policy:))
+
+      false
+    end
+
+    private
+
+    def object_type_failure_message(allow_dro: true, allow_collection: true, allow_admin_policy: true)
+      allowed_types = [].tap do |types|
+        types << 'item' if allow_dro
+        types << 'collection' if allow_collection
+        types << 'administrative policy' if allow_admin_policy
+      end
+
+      article = allowed_types.first == 'collection' ? 'a' : 'an'
+      "Not #{article} #{allowed_types.join(' or ')} (#{cocina_object.type})"
+    end
   end
 end

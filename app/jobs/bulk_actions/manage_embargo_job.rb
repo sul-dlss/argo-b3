@@ -7,7 +7,7 @@ module BulkActions
     class JobItem < BaseCsvJobItem
       def perform # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         return unless check_update_ability?
-        return unless check_dro?
+        return unless check_object_type?(allow_collection: false, allow_admin_policy: false)
         return unless check_release_date?
 
         cocina_model.embargo_release_date = release_date
@@ -29,13 +29,6 @@ module BulkActions
       end
 
       private
-
-      def check_dro?
-        return true if cocina_object.dro?
-
-        failure!(message: "Not an item (#{cocina_object.type})")
-        false
-      end
 
       def check_release_date?
         if row['release_date'].blank?

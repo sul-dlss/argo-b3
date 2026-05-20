@@ -23,7 +23,7 @@ module BulkActions
       def perform # rubocop:disable Metrics/AbcSize
         return unless check_update_ability?
 
-        return failure!(message: "Object is a #{cocina_object.type} and cannot be updated") unless cocina_object.dro?
+        return unless check_object_type?(allow_collection: false, allow_admin_policy: false)
 
         update_cocina_model
 

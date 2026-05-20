@@ -20,9 +20,7 @@ module BulkActions
       def perform # rubocop:disable Metrics/AbcSize
         return unless check_update_ability?
 
-        unless cocina_object.dro? || cocina_object.collection?
-          return failure!(message: "Not an item or collection (#{cocina_object.type})")
-        end
+        return unless check_object_type?(allow_admin_policy: false)
 
         if cocina_object.collection?
           mutate_cocina_collection
