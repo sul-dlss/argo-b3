@@ -7,8 +7,9 @@
                            'show-copy': true,
                            'show-size': false,
                            'preserve-expanded': false,
-                           'expand-empty': false,
-                           data: %>
+                           'expand-empty': false do %>
+  <%= hash %>
+                           <% end %>
 <% if show_tip %>
   <p class="mt-2"><small><em>Tip: Shift + Click to expand/collapse all nodes.</em></small></p>
 <% end %>

@@ -1,0 +1,3 @@
+<%= turbo_frame_tag(@solr_doc_hash['id'], 'solr_doc') do %>
+  <%= render Elements::JsonViewerComponent.new(hash: @solr_doc_hash, expanded: 1, show_tip: true) %>
+<% end %>
