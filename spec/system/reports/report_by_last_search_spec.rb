@@ -25,7 +25,7 @@ RSpec.describe 'Report by druids', :solr do
 
     # Report by last search is selected
     expect(page).to have_field('From last search', type: 'radio', checked: true)
-    expect(page).to have_content('3 items for: "test"')
+    expect(page).to have_text('3 items for: "test"')
 
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: true)
     expect(page).to have_button('Download', disabled: false)

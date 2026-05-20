@@ -42,7 +42,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         render_inline(component)
 
         expect(page).to have_no_link('waiting', exact: true)
-        expect(page).to have_content('waiting')
+        expect(page).to have_text('waiting')
         expect(page).to have_link('Remove', href: '/search')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')
         expect(page).to have_no_css('div.collapse')
@@ -66,7 +66,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         render_inline(component)
 
         expect(page).to have_no_link('end-ocr', exact: true)
-        expect(page).to have_content('end-ocr')
+        expect(page).to have_text('end-ocr')
         expect(page).to have_link('Remove', href: '/search')
         expect(page).to have_link('Toggle end-ocr', href: '#collapse-ocrwf-end-ocr')
         expect(page).to have_css('a[data-bs-toggle="collapse"] .visually-hidden', text: '[Toggle end-ocr]')

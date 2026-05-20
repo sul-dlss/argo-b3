@@ -39,7 +39,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     it 'uses the provided label' do
       render_inline(component)
 
-      expect(page).to have_content('Custom Label')
+      expect(page).to have_text('Custom Label')
     end
   end
 

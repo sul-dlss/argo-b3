@@ -27,7 +27,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
     expect(page).to have_field('All items', checked: false)
     expect(page).to have_field('All items including Google Books', checked: false)
     expect(page).to have_field('From last search', checked: true, disabled: false)
-    expect(page).to have_content('2 items for: "twain"')
+    expect(page).to have_text('2 items for: "twain"')
 
     expect(page).to have_css('table#workflow-table-accessionWF tbody tr:nth-of-type(4) td:nth-of-type(5)', text: '1')
 
