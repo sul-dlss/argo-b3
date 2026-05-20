@@ -12,7 +12,7 @@ RSpec.describe Elements::JsonViewerComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('andypf-json-viewer[expanded][show-toolbar]')
-      expect(page).to have_no_content('Tip: Shift + Click')
+      expect(page).to have_no_text('Tip: Shift + Click')
     end
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Elements::JsonViewerComponent, type: :component do
     it 'renders the tip paragraph' do
       render_inline(component)
 
-      expect(page).to have_content('Tip: Shift + Click')
+      expect(page).to have_text('Tip: Shift + Click')
     end
   end
 end
