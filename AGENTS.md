@@ -3,13 +3,15 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 ## Architecture
 
-- Domain behavior usually lives in Cocina-backed wrappers and presenters rather than conventional Active Record models.
+- Domain behavior usually lives in Cocina-backed Active Model form objects and presenters rather than conventional Active Record models.
+- See the blanks gem (https://github.com/joshmn/blanks) for the implementation of the form objects, which are similar to Active Record models.
 
 ## Conventions
 
 - Match existing service, presenter, form object, and view component patterns before introducing new abstractions.
 - Keep changes focused and avoid rewriting established search flow patterns unless the task requires it.
 - Solr fields are referred to by constants which are defined in `app/services/search/fields.rb`.
+- Prefer full variable names instead of abbreviations (e.g., `full_variable_name` instead of `fvn` or `full_var_name`).
 
 ## Testing notes
 
@@ -20,6 +22,8 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - Unless specifically told to, do not write tests for:
   - Memoization
   - Caching
+  - Getters
+  - Defaults
 - For mocking, place allow statements in a before block and expect statements after the action is performed. Prefer testing argument (with) in expect; do not test in both allow and expect.
 - Place "let" statements before "before "blocks.
 - When writing CSS matchers, do not test padding or margins (e.g., ps-3, mt-1).

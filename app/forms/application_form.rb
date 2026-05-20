@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-class ApplicationForm
-  include ActiveModel::Model
-  include ActiveModel::Attributes
-
+class ApplicationForm < Blanks::Base
   class << self
     # Override in subclasses if needed to prevent a param from being permitted
     def immutable_attributes

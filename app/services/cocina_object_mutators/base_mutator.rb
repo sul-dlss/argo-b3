@@ -30,7 +30,36 @@ module CocinaObjectMutators
         new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement
         new_cocina_props[:access][:license] = cocina_model.license
         new_cocina_props[:access][:copyright] = cocina_model.copyright
+        new_cocina_props[:identification][:catalogLinks] = build_catalog_links
       end
+    end
+
+    def build_catalog_links
+      [
+        *links_to_hash(cocina_model.symphony_catalog_links),
+        *links_to_hash(cocina_model.previous_symphony_catalog_links),
+        *links_to_hash(cocina_model.folio_catalog_links),
+        *links_to_hash(cocina_model.previous_folio_catalog_links)
+      ]
+    end
+
+    def links_to_hash(links)
+      Array(links).map { |catalog_link| link_to_hash(catalog_link) }
+    end
+
+    def link_to_hash(catalog_link)
+      {
+        catalog: catalog_link.catalog,
+        catalogRecordId: catalog_link.catalog_record_id,
+        refresh: catalog_link.refresh
+      }.tap do |link_hash|
+        if catalog_link.respond_to?(:part_label) && catalog_link.part_label.present?
+          link_hash[:partLabel] = catalog_link.part_label
+        end
+        if catalog_link.respond_to?(:sort_key) && catalog_link.sort_key.present?
+          link_hash[:sortKey] = catalog_link.sort_key
+        end
+      end.compact
     end
   end
 end

@@ -12,6 +12,12 @@ module CocinaModels
       super
     end
 
+    has_many :symphony_catalog_links, class_name: 'CocinaModels::SymphonyCatalogLink', allow_destroy: true
+    has_many :previous_symphony_catalog_links, class_name: 'CocinaModels::PreviousSymphonyCatalogLink',
+                                               allow_destroy: true
+    has_many :folio_catalog_links, class_name: 'CocinaModels::FolioCatalogLink', allow_destroy: true
+    has_many :previous_folio_catalog_links, class_name: 'CocinaModels::PreviousFolioCatalogLink', allow_destroy: true
+
     attribute :source_id, :string
     validates :source_id, presence: true
     validates :source_id, format: { with: /\A.+:.+\z/ }

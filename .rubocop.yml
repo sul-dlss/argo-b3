@@ -45,8 +45,9 @@ Metrics/MethodLength:
     - 'hash'
   Max: 15 # default 10
 
-Rails/HasAndBelongsToMany:
-  Enabled: false
+Rails/HasManyOrHasOneDependent:
+  Exclude:
+    - 'app/models/cocina_models/*.rb'
 
 Rails/I18nLocaleTexts:
   Enabled: false

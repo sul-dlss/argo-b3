@@ -96,6 +96,53 @@ RSpec.describe CocinaObjectMutators::DroMutator do
     end
   end
 
+  context 'when the cocina model has a folio catalog link' do
+    before do
+      cocina_model.folio_catalog_links_attributes = [{ catalog_record_id: 'in11403803', refresh: true }]
+    end
+
+    it 'includes the folio catalog link in the result' do
+      folio_link = result.identification.catalogLinks.find { |link| link.catalog == 'folio' }
+      expect(folio_link.catalogRecordId).to eq('in11403803')
+      expect(folio_link.refresh).to be true
+    end
+  end
+
+  context 'when the cocina model has a folio catalog link with part_label and sort_key' do
+    before do
+      cocina_model.folio_catalog_links_attributes = [
+        { catalog_record_id: 'in11403803', refresh: false, part_label: 'vol. 1', sort_key: 'vol. 00001' }
+      ]
+    end
+
+    it 'includes partLabel and sortKey in the result' do
+      folio_link = result.identification.catalogLinks.find { |link| link.catalog == 'folio' }
+      expect(folio_link.partLabel).to eq('vol. 1')
+      expect(folio_link.sortKey).to eq('vol. 00001')
+    end
+  end
+
+  context 'when the cocina model has a symphony catalog link' do
+    before do
+      cocina_model.symphony_catalog_links_attributes = [{ catalog_record_id: '11403803', refresh: true }]
+    end
+
+    it 'includes the symphony catalog link in the result' do
+      symphony_link = result.identification.catalogLinks.find { |link| link.catalog == 'symphony' }
+      expect(symphony_link.catalogRecordId).to eq('11403803')
+      expect(symphony_link.refresh).to be true
+    end
+  end
+
+  context 'when the cocina object has existing catalog links' do
+    let(:cocina_object) { build(:dro_with_metadata, folio_instance_hrids: ['in11403803']) }
+
+    it 'preserves the existing catalog links in the result' do
+      folio_link = result.identification.catalogLinks.find { |link| link.catalog == 'folio' }
+      expect(folio_link.catalogRecordId).to eq('in11403803')
+    end
+  end
+
   context 'when the cocina object has an existing embargo and embargo_release_date is cleared' do
     let(:cocina_object) do
       build(:dro_with_metadata).new(
