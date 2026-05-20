@@ -20,7 +20,7 @@ module Search
     end
 
     def content_type_values
-      [result.content_types.join(', ')]
+      [result.content_type]
     end
 
     def admin_policy_values

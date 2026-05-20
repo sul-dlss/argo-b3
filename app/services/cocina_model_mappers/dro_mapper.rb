@@ -11,7 +11,9 @@ module CocinaModelMappers
         embargo_release_date: cocina_object.access.embargo&.releaseDate,
         embargo_view: cocina_object.access.embargo&.view,
         embargo_download: cocina_object.access.embargo&.download,
-        embargo_location: cocina_object.access.embargo&.location
+        embargo_location: cocina_object.access.embargo&.location,
+        content_type: cocina_object.type,
+        viewing_direction: cocina_object.structural.hasMemberOrders&.first&.viewingDirection
       )
     end
   end

@@ -1,0 +1,61 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_manage_content_type_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+
+    <fieldset class="mb-3">
+      <legend>Content type</legend>
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_content_type,
+                                                                 label_text: 'Change content type',
+                                                                 input_data: { controller: 'checkbox', action: 'checkbox#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :new_content_type,
+                                                                        options: Constants::CONTENT_TYPES,
+                                                                        label_text: 'New content type') %>
+        <% end %>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="mb-3">
+      <legend>Viewing direction</legend>
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_viewing_direction,
+                                                                 label_text: 'Change viewing direction (books and images only)',
+                                                                 input_data: { controller: 'checkbox', action: 'checkbox#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :viewing_direction,
+                                                                        options: Constants::VIEWING_DIRECTIONS,
+                                                                        label_text: 'Viewing direction',
+                                                                        container_classes: 'mt-3') %>
+        <% end %>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="mb-3">
+      <legend>Resource types</legend>
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_resource_type,
+                                                                 label_text: 'Change resource types', container_classes: 'mt-4',
+                                                                 input_data: { controller: 'checkbox', action: 'checkbox#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <p>Suggested mappings from content type to resource type:</p>
+          <ul>
+            <li>Book → page</li>
+            <li>Document → document</li>
+            <li>File → file</li>
+            <li>Image → image</li>
+            <li>Map → image</li>
+          </ul>
+
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :current_resource_type,
+                                                                        options: Constants::RESOURCE_TYPES,
+                                                                        label_text: 'Current resource type') %>
+
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :new_resource_type,
+                                                                        options: Constants::RESOURCE_TYPES,
+                                                                        label_text: 'New resource type',
+                                                                        container_classes: 'mt-2') %>
+        <% end %>
+      <% end %>
+    </fieldset>
+
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form,
+                                                      total_results: @total_results) %>
+  <% end %>
+<% end %>

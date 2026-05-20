@@ -71,6 +71,7 @@ RSpec.describe 'Show DRO' do
       Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
       Search::Fields::BARCODES => ['bb123cd4567'],
       Search::Fields::DOI => 'https://doi.org/10.5072/bb123cd4567',
+      Search::Fields::CONTENT_TYPES => ['book'],
       Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -163,6 +164,7 @@ RSpec.describe 'Show DRO' do
     # Overview table
     expect(page).to have_table_caption('overview-table', 'Overview')
     expect(page).to have_table_value('overview-table', 'Object type', 'Item')
+    expect(page).to have_table_value('overview-table', 'Content type', 'Book')
     within(find_table_value_cell('overview-table', 'Admin policy')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',

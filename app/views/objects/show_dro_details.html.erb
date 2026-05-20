@@ -4,6 +4,7 @@
       <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
         <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
         <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
+        <% component.with_row(label: 'Content type', value: @solr_doc.content_type.titleize) %>
         <% component.with_row(label: 'Admin policy') do |row_component| %>
           <% row_component.with_cell do %>
             <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>

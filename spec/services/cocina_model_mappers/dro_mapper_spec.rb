@@ -14,6 +14,47 @@ RSpec.describe CocinaModelMappers::DroMapper do
     let(:download) { 'location-based' }
     let(:location) { Constants::ACCESS_LOCATIONS.first }
 
+    let(:embargo_release_date) { DateTime.parse('2040-06-01') }
+    let(:embargo_view) { 'location-based' }
+    let(:embargo_download) { 'location-based' }
+    let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+    let(:cocina_object) do
+      build(:dro_with_metadata, source_id:).new(
+        access: {
+          view:,
+          download:,
+          location:,
+          useAndReproductionStatement: use_and_reproduction_statement,
+          license:,
+          copyright:,
+          embargo: {
+            releaseDate: embargo_release_date,
+            view: embargo_view,
+            download: embargo_download,
+            location: embargo_location
+          }
+        }
+      )
+    end
+
+    it 'returns a hash from the cocina object' do
+      expect(result).to eq(
+        source_id:,
+        use_and_reproduction_statement:,
+        license:,
+        copyright:,
+        access_view: view,
+        access_download: download,
+        access_location: location,
+        embargo_release_date:,
+        embargo_view:,
+        embargo_download:,
+        embargo_location:,
+        content_type: cocina_object.type,
+        viewing_direction: nil
+      )
+    end
+
     context 'when the cocina object has no embargo' do
       let(:cocina_object) do
         build(:dro_with_metadata, source_id:).new(
@@ -29,14 +70,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
       end
 
       it 'returns a hash with nil embargo fields' do
-        expect(result).to eq(
-          source_id:,
-          use_and_reproduction_statement:,
-          license:,
-          copyright:,
-          access_view: view,
-          access_download: download,
-          access_location: location,
+        expect(result).to include(
           embargo_release_date: nil,
           embargo_view: nil,
           embargo_download: nil,
@@ -45,11 +79,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
       end
     end
 
-    context 'when the cocina object has an embargo' do
-      let(:embargo_release_date) { DateTime.parse('2040-06-01') }
-      let(:embargo_view) { 'location-based' }
-      let(:embargo_download) { 'location-based' }
-      let(:embargo_location) { Constants::ACCESS_LOCATIONS.first }
+    context 'when hasMemberOrders contains a viewing direction' do
       let(:cocina_object) do
         build(:dro_with_metadata, source_id:).new(
           access: {
@@ -58,31 +88,14 @@ RSpec.describe CocinaModelMappers::DroMapper do
             location:,
             useAndReproductionStatement: use_and_reproduction_statement,
             license:,
-            copyright:,
-            embargo: {
-              releaseDate: embargo_release_date,
-              view: embargo_view,
-              download: embargo_download,
-              location: embargo_location
-            }
-          }
+            copyright:
+          },
+          structural: { hasMemberOrders: [{ viewingDirection: 'right-to-left' }] }
         )
       end
 
-      it 'returns a hash including embargo fields' do
-        expect(result).to eq(
-          source_id:,
-          use_and_reproduction_statement:,
-          license:,
-          copyright:,
-          access_view: view,
-          access_download: download,
-          access_location: location,
-          embargo_release_date:,
-          embargo_view:,
-          embargo_download:,
-          embargo_location:
-        )
+      it 'maps viewing_direction from hasMemberOrders' do
+        expect(result[:viewing_direction]).to eq('right-to-left')
       end
     end
   end

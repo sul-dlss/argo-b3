@@ -400,6 +400,98 @@ RSpec.describe CocinaModels::Dro do
     end
   end
 
+  describe 'content_type' do
+    context 'when initialized from a cocina object' do
+      let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.book) }
+
+      it 'maps content_type from the cocina object type' do
+        expect(dro.content_type).to eq(Cocina::Models::ObjectType.book)
+      end
+    end
+
+    context 'when content_type is blank' do
+      before { dro.content_type = nil }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:content_type]).to include("can't be blank")
+      end
+    end
+
+    context 'when content_type is not in DRO::TYPES' do
+      before { dro.content_type = 'https://cocina.sul.stanford.edu/models/invalid' }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:content_type]).to be_present
+      end
+    end
+
+    context 'when content_type is a valid DRO type' do
+      before { dro.content_type = Cocina::Models::ObjectType.image }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+  end
+
+  describe 'viewing_direction' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, type: Cocina::Models::ObjectType.book).new(
+        structural: { hasMemberOrders: [{ viewingDirection: 'left-to-right' }] }
+      )
+    end
+
+    it 'maps viewing_direction from structural.hasMemberOrders' do
+      expect(dro.viewing_direction).to eq('left-to-right')
+    end
+
+    context 'when hasMemberOrders is empty' do
+      let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.book) }
+
+      it 'maps viewing_direction as nil' do
+        expect(dro.viewing_direction).to be_nil
+      end
+    end
+
+    context 'when viewing_direction is invalid' do
+      before { dro.viewing_direction = 'top-to-bottom' }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:viewing_direction]).to be_present
+      end
+    end
+
+    context 'when viewing_direction is valid and content_type is book' do
+      before { dro.viewing_direction = 'right-to-left' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when viewing_direction is present but content_type is not book or image' do
+      let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.map) }
+
+      before { dro.viewing_direction = 'left-to-right' }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:viewing_direction]).to include('is only valid for book and image content types')
+      end
+    end
+
+    context 'when viewing_direction is blank and content_type is not book or image' do
+      let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.map) }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+  end
+
   # ActiveModel::Lint::Tests expects this method name
   def model
     dro
