@@ -134,6 +134,7 @@ Rails.application.routes.draw do
     resource :export_checksum_report, only: %i[new create], controller: 'export_checksum_report'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
+    resource :export_mods, only: %i[new create], controller: 'export_mods'
     resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'

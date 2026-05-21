@@ -52,7 +52,9 @@ gem 'okcomputer'
 gem 'preservation-client', '~> 7.0'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
+gem 'purl_fetcher-client', '~> 2.1'
 gem 'rsolr'
+gem 'rubyzip'
 gem 'sdr_view_components'
 gem 'view_component'
 

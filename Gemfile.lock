@@ -444,6 +444,9 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.1)
       nio4r (~> 2.0)
+    purl_fetcher-client (2.1.2)
+      activesupport
+      faraday (~> 2.1)
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.6)
@@ -704,6 +707,7 @@ DEPENDENCIES
   preservation-client (~> 7.0)
   propshaft
   puma (>= 5.0)
+  purl_fetcher-client (~> 2.1)
   rails (~> 8.1.0)
   roo
   rsolr
@@ -716,6 +720,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   rubocop-rspec_rails
+  rubyzip
   sdr_view_components
   selenium-webdriver
   simplecov
