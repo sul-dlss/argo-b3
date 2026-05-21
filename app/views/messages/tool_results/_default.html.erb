@@ -1,0 +1,11 @@
+<% tool ||= local_assigns[:message] %>
+<% if tool.tool_error_message.blank? && tool.content.present? %>
+  <%= tag.div id: "message_#{tool.id}", class: 'my-4' do %>
+    <div>
+      Tool Call - <%= tool.created_at&.strftime("%I:%M %p") %>
+    </div>
+    <%= tag.div id: "message_#{tool.id}_content" do %>
+      <%= render_markdown(tool.content) %>
+    <% end %>
+  <% end %>
+<% end %>

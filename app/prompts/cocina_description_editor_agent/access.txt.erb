@@ -1,0 +1,189 @@
+
+You are only updating access. Following are some descriptions and examples of different ways to use the access property in a description. Use these as a reference when updating access in the description.
+
+## access
+The access field contains information about how a user may access, use, or otherwise interact with the resource. It may describe the physical or digital object.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| url | URLs where the resource may be accessed in full or part. | Object (Description model) | Yes |
+| physicalLocation | Location of a physical version of the resource. Physical location types must be from the "access.physicalLocation" controlled list. | Object (Description model) | Yes |
+| digitalLocation | Location of a digital version of the resource, such as a file path for a born digital resource. Digital location types must be from the "access.digitalLocation" controlled list. | Object (Description model) | Yes |
+| accessContact | The library, organization, or person responsible for access to the resource. Access contact types must be from the "access.accessContact" controlled list. | Object (Description model) | Yes |
+| digitalRepository | The digital repositories that hold the resource. Digital repository types must be from the "access.digitalRepository" controlled list. | Object (Description model) | Yes |
+| note | Other information related to accessing the resource. Access notes must be from the "access.note" controlled list. | Object (Description model) | Yes |
+
+### Location of physical object
+
+The location of the physical object that the digital object represents, such as a shelf locator or box and folder number. Do not use this field for archival series or record group.
+
+Physical location types must be from the "access.physicalLocation" controlled list.
+
+```json
+{
+  "access": [
+    {
+      "physicalLocation": [
+        {
+          "value": "SC1070",
+          "type": "shelf locator"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Location of born-digital object
+
+The file path to the original of a born-digital object.
+
+```json
+{
+  "access": [
+    {
+      "digitalLocation": [
+        {
+          "value": "C:\\home\\photographs\\portraits\\san-francisco\\file.jpg"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Access contact name
+
+The name of the library, department, or individual responsible for the resource, i.e., who a user should talk to for more information about the object. Use an authorized form of the name and provide a URI if available.
+
+```json
+{
+  "access": [
+    {
+      "accessContact": [
+        {
+          "value": "Stanford University. Libraries. Department of Special Collections and University Archives",
+          "source": {
+            "code": "naf"
+          },
+          "uri": "http://id.loc.gov/authorities/names/no2014019980"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Access contact email
+
+The email of the library, department, or individual responsible for the resource, i.e., who a user should talk to for more information about the object. Used primarily with self-deposit.
+
+```json
+{
+  "access": [
+    {
+      "accessContact": [
+        {
+          "value": "me@stanford.edu",
+          "type": "email"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Alternative URL
+
+An additional URL where a copy of the resource may be found. If it is a different version of the resource, use relatedResource instead. Use the top-level purl property for the object purl rather than entering it here. A display label and/or a note may be added to provide additional context for the URL.
+
+```json
+{
+  "access": [
+    {
+      "url": [
+        {
+          "value": "https://swap.stanford.edu/20171107174354/https://www.le.ac.uk/english/em1060to1220/index.html",
+          "displayLabel": "Archived website"
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+#### Access note
+
+Information about how the user may access the physical or digital resource.
+
+```json
+{
+  "access": [
+    {
+      "note": [
+        {
+          "value": "Available to Stanford researchers only.",
+          "type": "access restriction"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Use and reproduction note
+
+Information about how the user may reproduce or otherwise use the resource.
+
+```json
+{
+  "access": [
+    {
+      "note": [
+        {
+          "value": "Contact specialcollections@stanford.edu for information about allowed uses and reproduction of this resource.",
+          "type": "use and reproduction"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### License note
+
+Information about a Creative Commons or other license associated with the resource.
+
+```json
+{
+  "access": [
+    {
+      "note": [
+        {
+          "value": "CC BY",
+          "type": "license",
+          "source": {
+            "value": "Creative Commons"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+## "access.digitalLocation" controlled list
+<%= TypesControlledListTool.new.execute(name: "access.digitalLocation") %>
+
+## "access.physicalLocation" controlled list
+<%= TypesControlledListTool.new.execute(name: "access.physicalLocation") %>
+
+## "access.accessContact" controlled list
+<%= TypesControlledListTool.new.execute(name: "access.accessContact") %>
+
+## "access.digitalRepository" controlled list
+<%= TypesControlledListTool.new.execute(name: "access.digitalRepository") %>
+
+## "access.note" controlled list
+<%= TypesControlledListTool.new.execute(name: "access.note") %>

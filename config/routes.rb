@@ -164,6 +164,10 @@ Rails.application.routes.draw do
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
     end
+
+    resources :chats, only: %i[new show] do
+      resources :messages, only: [:create]
+    end
   end
 
   namespace :admin do

@@ -29,4 +29,8 @@ module ApplicationHelper
       JSON.generate(formatted_hash)
     end
   end
+
+  def pretty_compact_hash(hash)
+    JSON.pretty_generate(CocinaDisplay::Utils.deep_compact_blank(hash))
+  end
 end

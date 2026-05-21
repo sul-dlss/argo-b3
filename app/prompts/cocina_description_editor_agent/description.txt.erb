@@ -1,0 +1,23 @@
+## "description" model
+The common model for a descriptive value and associated properties.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| value | String value of the descriptive element. | String | No |
+| code | Code value of the descriptive element. | String | No |
+| type | Type of value provided by the descriptive element. | String | No |
+| status | Status of the descriptive element value relative to other instances. | String | No |
+| uri | URI value of the descriptive element. | String | No |
+| standard | Descriptive or content standard to which the value conforms. | Object ("standard" model) | No |
+| encoding | Encoding schema, standard, or syntax to which the value conforms. | Object ("encoding" model) | No |
+| identifier | Identifiers and URIs associated with the descriptive element. Identifier types must be from the "identifier" controlled list. | Object ("description" model) | Yes |
+| source | The vocabulary, authority, or other origin for a term, code, or identifier. | Object ("source" model) | No |
+| displayLabel | The preferred display label to use for the descriptive element in access systems. | String | No |
+| qualifier | A term providing information about the circumstances of the statement (e.g., approximate dates). | String | No |
+| note | Other information related to the descriptive element. Note types must be from the "note" controlled list unless a different controlled list is specified in other instructions. | Object ("description" model) | Yes |
+| valueLanguage | Language of the descriptive element value. | Object ("value language" model) | No |
+| valueAt | URL or other pointer to the location of the value of the descriptive element. | String | No |
+| structuredValue | Multiple values intended to be concatenated in order to form a single value. | Object ("description" model) | Yes |
+| parallelValue | Multiple representations of the same information, such as in different languages. | Object ("description" model) | Yes |
+| groupedValue | For interoperability with MODS. | Object ("description" model) | Yes |
+| appliesTo | Portion or aspect of the resource the value applies to. | Object ("description" model) | Yes |
