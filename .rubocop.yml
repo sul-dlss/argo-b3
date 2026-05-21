@@ -48,6 +48,7 @@ Metrics/MethodLength:
 Rails/HasManyOrHasOneDependent:
   Exclude:
     - 'app/models/cocina_models/*.rb'
+    - 'app/models/concerns/cocina_models/*.rb'
 
 Rails/I18nLocaleTexts:
   Enabled: false

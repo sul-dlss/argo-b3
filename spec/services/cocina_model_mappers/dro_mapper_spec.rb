@@ -52,10 +52,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
         embargo_location:,
         content_type: cocina_object.type,
         viewing_direction: nil,
-        symphony_catalog_links_attributes: [],
-        previous_symphony_catalog_links_attributes: [],
-        folio_catalog_links_attributes: [],
-        previous_folio_catalog_links_attributes: []
+        folio_catalog_links_attributes: []
       )
     end
 
@@ -83,47 +80,19 @@ RSpec.describe CocinaModelMappers::DroMapper do
       end
     end
 
-    context 'when the cocina object has a symphony catalog link' do
-      let(:cocina_object) do
-        build(:dro_with_metadata, source_id:).new(
-          identification: {
-            sourceId: source_id,
-            catalogLinks: [{ catalog: 'symphony', catalogRecordId: '12345', refresh: true }]
-          }
-        )
-      end
-
-      it 'maps symphony_catalog_links_attributes' do
-        expect(result).to include(
-          symphony_catalog_links_attributes: [{ catalog_record_id: '12345', refresh: true }]
-        )
-      end
-    end
-
-    context 'when the cocina object has a previous symphony catalog link' do
-      let(:cocina_object) do
-        build(:dro_with_metadata, source_id:).new(
-          identification: {
-            sourceId: source_id,
-            catalogLinks: [{ catalog: 'previous symphony', catalogRecordId: '67890', refresh: false }]
-          }
-        )
-      end
-
-      it 'maps previous_symphony_catalog_links_attributes' do
-        expect(result).to include(
-          previous_symphony_catalog_links_attributes: [{ catalog_record_id: '67890', refresh: false }]
-        )
-      end
-    end
-
     context 'when the cocina object has a folio catalog link' do
       let(:cocina_object) do
         build(:dro_with_metadata, source_id:).new(
           identification: {
             sourceId: source_id,
-            catalogLinks: [{ catalog: 'folio', catalogRecordId: 'in11403803', refresh: true,
-                             partLabel: 'vol. 1', sortKey: 'vol. 00001' }]
+            catalogLinks: [
+              { catalog: 'folio', catalogRecordId: 'in11403802' },
+              { catalog: 'previous folio', catalogRecordId: 'in11403801' }, # ignored
+              { catalog: 'folio', catalogRecordId: 'in11403803', refresh: true,
+                partLabel: 'vol. 1', sortKey: 'vol. 00001' },
+              { catalog: 'previous symphony', catalogRecordId: '12345' }, # ignored
+              { catalog: 'symphony', catalogRecordId: '67890' } # ignored
+            ]
           }
         )
       end
@@ -131,27 +100,12 @@ RSpec.describe CocinaModelMappers::DroMapper do
       it 'maps folio_catalog_links_attributes including part_label and sort_key' do
         expect(result).to include(
           folio_catalog_links_attributes: [
-            { catalog_record_id: 'in11403803', refresh: true, part_label: 'vol. 1', sort_key: 'vol. 00001' }
-          ]
-        )
-      end
-    end
-
-    context 'when the cocina object has a previous folio catalog link' do
-      let(:cocina_object) do
-        build(:dro_with_metadata, source_id:).new(
-          identification: {
-            sourceId: source_id,
-            catalogLinks: [{ catalog: 'previous folio', catalogRecordId: 'a12345678', refresh: false }]
-          }
-        )
-      end
-
-      it 'maps previous_folio_catalog_links_attributes' do
-        expect(result).to include(
-          previous_folio_catalog_links_attributes: [
-            { catalog_record_id: 'a12345678', refresh: false, part_label: nil, sort_key: nil }
-          ]
+            { catalog_record_id: 'in11403803' }, # The refreshing link goes first.
+            { catalog_record_id: 'in11403802' }
+          ],
+          catalog_link_refresh: true,
+          catalog_link_part_label: 'vol. 1',
+          catalog_link_sort_key: 'vol. 00001'
         )
       end
     end

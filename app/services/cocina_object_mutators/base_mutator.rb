@@ -35,31 +35,43 @@ module CocinaObjectMutators
     end
 
     def build_catalog_links
-      [
-        *links_to_hash(cocina_model.symphony_catalog_links),
-        *links_to_hash(cocina_model.previous_symphony_catalog_links),
-        *links_to_hash(cocina_model.folio_catalog_links),
-        *links_to_hash(cocina_model.previous_folio_catalog_links)
-      ]
+      # symphony, previous symphony, and previous folio catalog links are retained as is.
+      # If an existing folio catalog link is not in the new catalog links, it changed to a previous folio catalog link.
+      # The new Folio catalog link is added, with refresh, partLabel, and sortKey if present.
+      # The rest of the new Folio catalog links are added, with default refresh of false.
+      build_catalog_links_from_model +
+        build_existing_folio_catalog_links +
+        existing_catalog_links_for('symphony').map(&:to_h) +
+        existing_catalog_links_for('previous symphony').map(&:to_h) +
+        existing_catalog_links_for('previous folio').map(&:to_h)
     end
 
-    def links_to_hash(links)
-      Array(links).map { |catalog_link| link_to_hash(catalog_link) }
+    def build_catalog_links_from_model # rubocop:disable Metrics/AbcSize
+      cocina_model.folio_catalog_links.map.with_index do |catalog_link, index|
+        { catalog: 'folio', catalogRecordId: catalog_link.catalog_record_id, refresh: false }.tap do |link_hash|
+          if index.zero?
+            link_hash[:refresh] = cocina_model.catalog_link_refresh
+            link_hash[:partLabel] = cocina_model.catalog_link_part_label
+            link_hash[:sortKey] = cocina_model.catalog_link_sort_key
+          end
+        end.compact
+      end
     end
 
-    def link_to_hash(catalog_link)
-      {
-        catalog: catalog_link.catalog,
-        catalogRecordId: catalog_link.catalog_record_id,
-        refresh: catalog_link.refresh
-      }.tap do |link_hash|
-        if catalog_link.respond_to?(:part_label) && catalog_link.part_label.present?
-          link_hash[:partLabel] = catalog_link.part_label
-        end
-        if catalog_link.respond_to?(:sort_key) && catalog_link.sort_key.present?
-          link_hash[:sortKey] = catalog_link.sort_key
-        end
-      end.compact
+    def build_existing_folio_catalog_links
+      existing_catalog_links_for('folio').filter_map do |existing_link|
+        next if cocina_model.find_folio_catalog_link(catalog_record_id: existing_link.catalogRecordId).present?
+
+        {
+          catalog: 'previous folio',
+          catalogRecordId: existing_link.catalogRecordId,
+          refresh: false
+        }
+      end
+    end
+
+    def existing_catalog_links_for(catalog)
+      cocina_object.identification.catalogLinks.select { |link| link.catalog == catalog }
     end
   end
 end

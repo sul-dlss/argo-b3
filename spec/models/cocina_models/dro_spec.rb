@@ -55,7 +55,7 @@ RSpec.describe CocinaModels::Dro do
     end
 
     context 'when updating with folio catalog link attributes' do
-      let(:attributes) { { folio_catalog_links_attributes: [{ catalog_record_id: 'in11403803', refresh: true }] } }
+      let(:attributes) { { folio_catalog_links_attributes: [{ catalog_record_id: 'in11403803' }] } }
 
       it 'updates the folio catalog links' do
         dro.update(attributes)
@@ -539,12 +539,34 @@ RSpec.describe CocinaModels::Dro do
   describe 'validate catalog links' do
     context 'when a folio catalog link has an invalid catalog_record_id' do
       before do
-        dro.folio_catalog_links_attributes = [{ catalog_record_id: '11403803', refresh: false }]
+        dro.folio_catalog_links_attributes = [{ catalog_record_id: '11403803' }]
       end
 
       it 'is not valid' do
         expect(dro).not_to be_valid
         expect(dro.errors[:'folio_catalog_links[0].catalog_record_id']).to be_present
+      end
+    end
+
+    context 'when sort_key is present without part_label' do
+      before do
+        dro.catalog_link_sort_key = 'vol. 1'
+      end
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:catalog_link_sort_key]).to be_present
+      end
+    end
+
+    context 'when sort_key and part_label are both present' do
+      before do
+        dro.catalog_link_part_label = 'vol. 1'
+        dro.catalog_link_sort_key = 'vol. 1'
+      end
+
+      it 'is valid' do
+        expect(dro).to be_valid
       end
     end
   end
