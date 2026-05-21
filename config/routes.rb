@@ -131,6 +131,7 @@ Rails.application.routes.draw do
     resource :add_workflow, only: %i[new create], controller: 'add_workflow'
     resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
     resource :close_version, only: %i[new create], controller: 'close_version'
+    resource :export_catalog_data, only: %i[new create], controller: 'export_catalog_data'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
     resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
     resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
