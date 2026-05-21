@@ -18,6 +18,9 @@ module CocinaModels
     validates :source_id, presence: true
     validates :source_id, format: { with: /\A.+:.+\z/ }
 
+    attribute :barcode, :string
+    validate :validate_barcode
+
     # Access fields
     attribute :use_and_reproduction_statement, :string
     attribute :license, :string
@@ -145,6 +148,22 @@ module CocinaModels
       Array(view).include?(embargo_view) &&
         Array(download).include?(embargo_download) &&
         Array(location).include?(embargo_location)
+    end
+
+    BARCODE_FORMATS = [
+      /^2050[0-9]{7}$/,
+      /^245[0-9]{8}$/,
+      /^[0-9]+-[0-9]+$/,
+      /^36105[0-9]{9}$/,
+      /^405[0-9]+$/
+    ].freeze
+    private_constant :BARCODE_FORMATS
+
+    def validate_barcode
+      return if barcode.blank?
+      return if BARCODE_FORMATS.any? { |pattern| pattern.match?(barcode) }
+
+      errors.add(:barcode, 'is not a valid barcode')
     end
   end
 end

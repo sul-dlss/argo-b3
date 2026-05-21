@@ -12,6 +12,7 @@ module CocinaModelMappers
         embargo_view: cocina_object.access.embargo&.view,
         embargo_download: cocina_object.access.embargo&.download,
         embargo_location: cocina_object.access.embargo&.location,
+        barcode: cocina_object.identification.barcode,
         content_type: cocina_object.type,
         viewing_direction: cocina_object.structural.hasMemberOrders&.first&.viewingDirection
       )

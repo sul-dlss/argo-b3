@@ -10,6 +10,7 @@ module CocinaObjectMutators
         new_cocina_props[:access][:view] = cocina_model.access_view
         new_cocina_props[:access][:download] = cocina_model.access_download
         new_cocina_props[:access][:location] = cocina_model.access_location
+        new_cocina_props[:identification][:barcode] = cocina_model.barcode.presence
         new_cocina_props[:type] = cocina_model.content_type
         new_cocina_props[:structural][:hasMemberOrders] = build_member_orders
 
