@@ -62,7 +62,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_CHECKSUM_REPORT = Config.new(
     label: 'Download checksum report',
-    help_text: 'Download checksums of files in objects (as csv).'
+    help_text: 'Download checksums of files in objects (as csv).',
+    export_filename: 'checksum_report.csv',
+    export_label: 'Checksum report',
+    job: BulkActions::ExportChecksumReportJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_checksum_report_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_COCINA_JSON = Config.new(
