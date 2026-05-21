@@ -49,6 +49,7 @@ gem 'dry-monads'
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
+gem 'preservation-client', '~> 7.0'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
 gem 'rsolr'
