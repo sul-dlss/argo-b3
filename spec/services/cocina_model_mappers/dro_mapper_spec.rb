@@ -50,6 +50,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
         embargo_view:,
         embargo_download:,
         embargo_location:,
+        barcode: nil,
         content_type: cocina_object.type,
         viewing_direction: nil,
         folio_catalog_links_attributes: []
@@ -107,6 +108,19 @@ RSpec.describe CocinaModelMappers::DroMapper do
           catalog_link_part_label: 'vol. 1',
           catalog_link_sort_key: 'vol. 00001'
         )
+      end
+    end
+
+    context 'when the cocina object has a barcode' do
+      let(:barcode) { '36105010362304' }
+      let(:cocina_object) do
+        build(:dro_with_metadata, source_id:).new(
+          identification: { sourceId: source_id, barcode: }
+        )
+      end
+
+      it 'maps the barcode' do
+        expect(result).to include(barcode:)
       end
     end
 

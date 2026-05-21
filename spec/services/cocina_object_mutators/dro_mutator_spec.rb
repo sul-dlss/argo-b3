@@ -261,4 +261,14 @@ RSpec.describe CocinaObjectMutators::DroMutator do
       end
     end
   end
+
+  describe 'barcode' do
+    context 'when the cocina model has a barcode' do
+      before { cocina_model.barcode = '36105010362304' }
+
+      it 'writes the barcode to the DROWithMetadata identification' do
+        expect(result.identification.barcode).to eq('36105010362304')
+      end
+    end
+  end
 end
