@@ -13,17 +13,16 @@ module CocinaModelMappers
     end
 
     # @return [Hash] the mapped attributes
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       {
         source_id: cocina_object.identification.sourceId,
         use_and_reproduction_statement: cocina_object.access.useAndReproductionStatement,
         license: cocina_object.access.license,
         copyright: cocina_object.access.copyright,
-        symphony_catalog_links_attributes: symphony_catalog_link_attributes_for('symphony'),
-        previous_symphony_catalog_links_attributes: symphony_catalog_link_attributes_for('previous symphony'),
-        folio_catalog_links_attributes: folio_catalog_link_attributes_for('folio'),
-        previous_folio_catalog_links_attributes: folio_catalog_link_attributes_for('previous folio')
-
+        folio_catalog_links_attributes: folio_catalog_link_attributes,
+        catalog_link_refresh: refreshing_folio_catalog_link&.refresh,
+        catalog_link_part_label: refreshing_folio_catalog_link&.partLabel,
+        catalog_link_sort_key: refreshing_folio_catalog_link&.sortKey
       }.compact
     end
 
@@ -31,28 +30,23 @@ module CocinaModelMappers
 
     attr_reader :cocina_object
 
-    def symphony_catalog_link_attributes_for(catalog)
-      links_for(catalog).map do |catalog_link|
-        {
-          catalog_record_id: catalog_link.catalogRecordId,
-          refresh: catalog_link.refresh
-        }
+    def folio_catalog_links
+      @folio_catalog_links ||= Array(cocina_object.identification&.catalogLinks).select do |link|
+        link.catalog == 'folio'
       end
     end
 
-    def folio_catalog_link_attributes_for(catalog)
-      links_for(catalog).map do |catalog_link|
-        {
-          catalog_record_id: catalog_link.catalogRecordId,
-          refresh: catalog_link.refresh,
-          part_label: catalog_link.partLabel,
-          sort_key: catalog_link.sortKey
-        }
-      end
+    def refreshing_folio_catalog_link
+      # There should only be one.
+      @refreshing_folio_catalog_link ||= folio_catalog_links.find(&:refresh)
     end
 
-    def links_for(catalog)
-      (cocina_object.identification&.catalogLinks || []).select { |catalog_link| catalog_link.catalog == catalog }
+    def folio_catalog_link_attributes
+      # Refreshing catalog link goes first if there is one.
+      ordered_links = [refreshing_folio_catalog_link].compact + (folio_catalog_links - [refreshing_folio_catalog_link])
+      ordered_links.map do |link|
+        { catalog_record_id: link.catalogRecordId }
+      end
     end
   end
 end

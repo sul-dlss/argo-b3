@@ -10,7 +10,7 @@ module BulkActions
         return unless check_object_type?(allow_admin_policy: false)
 
         return failure!(message: 'Does not have a Folio Instance HRID') if folio_catalog_link&.catalog_record_id.blank?
-        return failure!(message: 'Refresh is set to false') unless folio_catalog_link&.refresh
+        return failure!(message: 'Refresh is set to false') unless cocina_model.catalog_link_refresh?
 
         open_new_version_if_needed!(description: 'Refreshed metadata from FOLIO')
 

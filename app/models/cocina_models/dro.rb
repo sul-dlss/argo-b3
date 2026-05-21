@@ -3,6 +3,8 @@
 module CocinaModels
   # Model for a Cocina DRO object.
   class Dro < Base
+    include CatalogLinksConcern
+
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to initialize this model with
     def initialize(cocina_object)
       unless cocina_object.is_a?(Cocina::Models::DROWithMetadata)
@@ -11,12 +13,6 @@ module CocinaModels
 
       super
     end
-
-    has_many :symphony_catalog_links, class_name: 'CocinaModels::SymphonyCatalogLink', allow_destroy: true
-    has_many :previous_symphony_catalog_links, class_name: 'CocinaModels::PreviousSymphonyCatalogLink',
-                                               allow_destroy: true
-    has_many :folio_catalog_links, class_name: 'CocinaModels::FolioCatalogLink', allow_destroy: true
-    has_many :previous_folio_catalog_links, class_name: 'CocinaModels::PreviousFolioCatalogLink', allow_destroy: true
 
     attribute :source_id, :string
     validates :source_id, presence: true

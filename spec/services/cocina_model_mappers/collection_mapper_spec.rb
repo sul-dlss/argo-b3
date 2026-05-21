@@ -11,7 +11,10 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
         access: { view: },
         identification: {
           sourceId: source_id,
-          catalogLinks: [{ catalog: 'symphony', catalogRecordId: '12345', refresh: true }]
+          catalogLinks: [{
+            catalog: 'folio', catalogRecordId: 'in11403803', refresh: true, partLabel: 'Part 1',
+            sortKey: '001'
+          }]
         }
       )
     end
@@ -22,12 +25,12 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
       expect(result).to eq(
         source_id:,
         access_view: view,
-        symphony_catalog_links_attributes: [
-          { catalog_record_id: '12345', refresh: true }
+        folio_catalog_links_attributes: [
+          { catalog_record_id: 'in11403803' }
         ],
-        previous_symphony_catalog_links_attributes: [],
-        folio_catalog_links_attributes: [],
-        previous_folio_catalog_links_attributes: []
+        catalog_link_refresh: true,
+        catalog_link_part_label: 'Part 1',
+        catalog_link_sort_key: '001'
       )
     end
   end
