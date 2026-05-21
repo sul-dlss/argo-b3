@@ -87,7 +87,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_MODS = Config.new(
     label: 'Download descriptive metadata as MODS XML',
-    help_text: 'Download descriptive metadata for objects.'
+    help_text: 'Download descriptive metadata for objects.',
+    export_filename: 'mods_export.zip',
+    export_label: 'MODS XML',
+    job: BulkActions::ExportModsJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_mods_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_STRUCTURAL_METADATA = Config.new(
