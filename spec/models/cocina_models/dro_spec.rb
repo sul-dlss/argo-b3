@@ -549,6 +549,39 @@ RSpec.describe CocinaModels::Dro do
     end
   end
 
+  describe 'barcode' do
+    context 'when barcode is blank' do
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when barcode is a valid standard barcode' do
+      before { dro.barcode = '36105010362304' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when barcode is a valid business barcode' do
+      before { dro.barcode = '20503740296' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when barcode is invalid' do
+      before { dro.barcode = 'not-a-barcode' }
+
+      it 'is not valid and adds a barcode error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:barcode]).to include('is not a valid barcode')
+      end
+    end
+  end
+
   # ActiveModel::Lint::Tests expects this method name
   def model
     dro
