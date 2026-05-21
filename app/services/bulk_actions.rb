@@ -57,7 +57,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_CATALOG_DATA = Config.new(
     label: 'Export FOLIO Instance HRIDs, barcodes, and serials metadata',
-    help_text: 'Download FOLIO Instance HRIDs and barcodes as CSV (comma-separated values) for selected druids.'
+    help_text: 'Download FOLIO Instance HRIDs and barcodes as CSV (comma-separated values) for selected druids.',
+    export_filename: 'catalog_data.csv',
+    export_label: 'Catalog data',
+    job: BulkActions::ExportCatalogDataJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_catalog_data_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_CHECKSUM_REPORT = Config.new(
