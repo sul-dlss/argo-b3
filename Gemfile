@@ -40,6 +40,7 @@ gem 'image_processing', '~> 1.2'
 
 # Additional gems
 gem 'action_policy'
+gem 'barby' # generates barcodes; used in TracksheetService
 gem 'blanks' # ActiveRecord-like forms.
 gem 'cocina_display'
 gem 'config'
@@ -49,10 +50,12 @@ gem 'dry-monads'
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
+gem 'prawn', '~> 1'  # PDF generation; used in TracksheetService
+gem 'prawn-table'    # table support for Prawn PDFs
 gem 'preservation-client', '~> 7.0'
+gem 'purl_fetcher-client', '~> 2.1'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
-gem 'purl_fetcher-client', '~> 2.1'
 gem 'rsolr'
 gem 'rubyzip'
 gem 'sdr_view_components'
