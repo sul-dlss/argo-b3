@@ -127,7 +127,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_CATALOG_DATA = Config.new(
     label: 'Import FOLIO Instance HRIDs, barcodes, and serials metadata',
-    help_text: 'Adds or updates Folio Instance HRIDs and/or barcodes associated with objects.'
+    help_text: 'Adds or updates Folio Instance HRIDs and/or barcodes associated with objects.',
+    job: BulkActions::ImportCatalogDataJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_catalog_data_path),
+    form: BulkActions::ImportCatalogDataForm
   )
 
   IMPORT_DESCRIPTIVE_METADATA = Config.new(
