@@ -138,6 +138,7 @@ Rails.application.routes.draw do
     resource :export_mods, only: %i[new create], controller: 'export_mods'
     resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
     resource :export_tags, only: %i[new create], controller: 'export_tags'
+    resource :import_catalog_data, only: %i[new create], controller: 'import_catalog_data'
     resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
     resource :manage_embargo, only: %i[new create], controller: 'manage_embargo'
     resource :manage_content_type, only: %i[new create], controller: 'manage_content_type'

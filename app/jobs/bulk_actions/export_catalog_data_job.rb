@@ -24,8 +24,14 @@ module BulkActions
       private
 
       def catalog_data
-        link = cocina_model.folio_catalog_links.first
-        [link&.catalog_record_id, link&.refresh, link&.part_label, link&.sort_key, cocina_model.try(:barcode)]
+        catalog_record_id = cocina_model.folio_catalog_links.first&.catalog_record_id
+        [
+          catalog_record_id,
+          catalog_record_id.present? ? cocina_model.catalog_link_refresh : nil,
+          cocina_model.catalog_link_part_label,
+          cocina_model.catalog_link_sort_key,
+          cocina_model.try(:barcode)
+        ]
       end
     end
   end
