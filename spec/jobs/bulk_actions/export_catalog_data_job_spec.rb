@@ -115,7 +115,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
-      expect(log.string).to include "Failed Sdr::Repository::NotFoundResponse Object not found: #{druid} for #{druid}"
+      expect(log.string).to include "Sdr::Repository::NotFoundResponse Object not found: #{druid} for #{druid}"
     end
   end
 end

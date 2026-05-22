@@ -19,6 +19,7 @@ module CocinaModels
     validates :source_id, format: { with: /\A.+:.+\z/ }
 
     attribute :barcode, :string
+    normalizes_whitespace :barcode
     validate :validate_barcode
 
     # Access fields
@@ -160,7 +161,7 @@ module CocinaModels
     private_constant :BARCODE_FORMATS
 
     def validate_barcode
-      return if barcode.blank?
+      return if barcode.nil?
       return if BARCODE_FORMATS.any? { |pattern| pattern.match?(barcode) }
 
       errors.add(:barcode, 'is not a valid barcode')

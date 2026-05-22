@@ -572,9 +572,18 @@ RSpec.describe CocinaModels::Dro do
   end
 
   describe 'barcode' do
-    context 'when barcode is blank' do
+    context 'when barcode is nil' do
       it 'is valid' do
         expect(dro).to be_valid
+      end
+    end
+
+    context 'when barcode is blank' do
+      before { dro.barcode = ' ' }
+
+      it 'is normalized to nil and is valid' do
+        expect(dro).to be_valid
+        expect(dro.barcode).to be_nil
       end
     end
 
