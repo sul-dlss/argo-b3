@@ -5,8 +5,8 @@ module DescriptiveCsv
   class Import
     include Dry::Monads[:result]
 
-    class_attribute :permitted_types, default: Cocina::Models::Validators::DescriptionTypesValidator.new(nil, nil)
-                                                                                                    .send(:types_yaml).values.flatten.pluck('value') # rubocop:disable Layout/LineLength
+    class_attribute :permitted_types, default: Cocina::Models::Validators::DescriptionTypesVisitorValidator.new
+                                                                                                           .send(:types_yaml).values.flatten.pluck('value') # rubocop:disable Layout/LineLength
 
     def self.import(csv_row:)
       new(csv_row:).import

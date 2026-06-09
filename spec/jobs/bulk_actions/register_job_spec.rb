@@ -52,7 +52,7 @@ RSpec.describe BulkActions::RegisterJob do
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(log).to have_received(:puts)
-        .with(/.*does not match pattern:\s+\^druid:\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{3\}\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{4\}\$/) # rubocop:disable Layout/LineLength
+        .with(/.*does not match "\^druid:\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{3\}\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{4\}\$"/)
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
     end
