@@ -279,7 +279,7 @@ GEM
     herb (0.10.1-x86_64-darwin)
     herb (0.10.1-x86_64-linux-gnu)
     herb (0.10.1-x86_64-linux-musl)
-    honeybadger (6.7.0)
+    honeybadger (6.9.0)
       logger
       ostruct
     htmlbeautifier (1.4.3)
@@ -372,10 +372,10 @@ GEM
       json
       nokogiri
       nokogiri-happymapper
-    msgpack (1.8.1)
+    msgpack (1.8.3)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    net-imap (0.6.4)
+    net-imap (0.6.4.1)
       date
       net-protocol
     net-pop (0.1.2)
@@ -589,7 +589,7 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
-    rubyzip (3.3.1)
+    rubyzip (3.4.0)
     sdr_view_components (0.4.2)
       rails (~> 8.0)
       view_component
@@ -755,4 +755,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-  4.0.13
+  4.0.14
