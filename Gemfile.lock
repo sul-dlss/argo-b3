@@ -101,6 +101,8 @@ GEM
       activesupport (>= 6.0)
     bootsnap (1.24.6)
       msgpack (~> 1.2)
+    brakeman (8.0.5)
+      racc
     builder (3.3.0)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -695,6 +697,7 @@ DEPENDENCIES
   barby
   blanks
   bootsnap
+  brakeman
   bundler-audit
   capistrano-passenger
   capistrano-rails
