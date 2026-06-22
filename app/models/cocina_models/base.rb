@@ -54,6 +54,16 @@ module CocinaModels
       is_a?(AdminPolicy)
     end
 
+    def changed?
+      # This allows subclasses to track changes on associated objects (e.g., CatalogLinks).
+      super || tracked_associations_changed?
+    end
+
+    # Subclasses can override this.
+    def tracked_associations_changed?
+      false
+    end
+
     private
 
     # @return [Hash] the attributes for initializing the model, to be implemented by subclasses
