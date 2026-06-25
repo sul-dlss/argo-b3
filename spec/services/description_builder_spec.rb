@@ -8,20 +8,50 @@ RSpec.describe DescriptionBuilder do
   let(:existing) { { title: [{ value: 'Original title' }] } }
 
   describe '#build' do
-    it 'falls back to existing values when submitted fields are all blank' do
-      result = builder.build({ title: [{ value: '' }] })
-      expect(result[:title]).to eq([{ value: 'Original title' }])
+    it 'preserves existing fields the editor does not manage' do
+      existing[:purl] = 'https://purl.stanford.edu/bc123df4567'
+      result = builder.build({ title: [{ value: 'New title' }] })
+      expect(result[:purl]).to eq('https://purl.stanford.edu/bc123df4567')
     end
 
-    it 'preserves existing fields not present in submitted params' do
+    it 'removes a managed field when all of its items have been deleted' do
       existing[:note] = [{ value: 'Existing note', type: 'abstract' }]
       result = builder.build({ title: [{ value: 'New title' }] })
-      expect(result[:note]).to eq([{ value: 'Existing note', type: 'abstract' }])
+      expect(result).not_to have_key(:note)
+    end
+
+    it 'removes a field when its submitted items are all blank' do
+      result = builder.build({ title: [{ value: '' }] })
+      expect(result).not_to have_key(:title)
     end
 
     it 'removes nil values from the result' do
       result = builder.build({ title: [{ value: 'A title' }] })
       expect(result).not_to have_key(:note)
+    end
+  end
+
+  describe 'deleting the last item of a field' do
+    it 'removes the form when its only item is deleted' do
+      existing[:form] = [{ value: 'text', type: 'resource type' }]
+      expect(builder.build({ title: [{ value: 'A title' }] })).not_to have_key(:form)
+    end
+
+    it 'removes the subject when its only item is deleted' do
+      existing[:subject] = [{ value: 'History', type: 'topic' }]
+      expect(builder.build({ title: [{ value: 'A title' }] })).not_to have_key(:subject)
+    end
+
+    it 'removes the language when its only item is deleted' do
+      existing[:language] = [{ code: 'eng' }]
+      expect(builder.build({ title: [{ value: 'A title' }] })).not_to have_key(:language)
+    end
+
+    it 'removes the last physical location while keeping a remaining access contact' do
+      existing[:access] = { physicalLocation: [{ value: 'Stacks' }],
+                            accessContact: [{ value: 'archivist@example.edu' }] }
+      result = builder.build({ access: { access_contact: [{ value: 'archivist@example.edu' }] } })
+      expect(result[:access]).to eq({ accessContact: [{ value: 'archivist@example.edu' }] })
     end
   end
 
@@ -82,7 +112,7 @@ RSpec.describe DescriptionBuilder do
         result = builder.build({
                                  title: [{ struct_parts: [{ value: '', type: '' }], type: '' }]
                                })
-        expect(result[:title]).to eq([{ value: 'Original title' }])
+        expect(result).not_to have_key(:title)
       end
 
       it 'merges _original to preserve unexposed fields' do
@@ -104,7 +134,7 @@ RSpec.describe DescriptionBuilder do
 
       it 'drops the title when raw JSON is invalid' do
         result = builder.build({ title: [{ _raw_json: '{invalid' }] })
-        expect(result[:title]).to eq([{ value: 'Original title' }])
+        expect(result).not_to have_key(:title)
       end
     end
   end
@@ -208,6 +238,19 @@ RSpec.describe DescriptionBuilder do
     it 'drops contributors with blank name' do
       result = builder.build({ contributor: [{ name_value: '', type: 'person' }] })
       expect(result[:contributor]).to be_nil
+    end
+
+    context 'with a newly added item whose _original serializes to "null"' do
+      it 'builds the contributor instead of dropping or raising' do
+        result = builder.build({
+                                 contributor: [{ name_value: 'Summers, Ed', type: 'person',
+                                                 role_value: 'author', _original: 'null' }]
+                               })
+        contributor = result[:contributor].first
+        expect(contributor[:name]).to eq([{ value: 'Summers, Ed' }])
+        expect(contributor[:type]).to eq('person')
+        expect(contributor[:role]).to eq([{ value: 'author' }])
+      end
     end
   end
 
@@ -384,6 +427,16 @@ RSpec.describe DescriptionBuilder do
       raw = { type: 'broadcast', parallelEvent: [] }.to_json
       result = builder.build({ event: [{ _raw_json: raw }] })
       expect(result[:event].first[:type]).to eq('broadcast')
+    end
+
+    context 'with a newly added item whose _original serializes to "null"' do
+      it 'builds the event instead of raising' do
+        result = builder.build({
+                                 event: [{ type: 'publication', date_value: '1978', _original: 'null' }]
+                               })
+        expect(result[:event].first[:type]).to eq('publication')
+        expect(result[:event].first[:date]).to eq([{ value: '1978' }])
+      end
     end
   end
 

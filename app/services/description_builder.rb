@@ -19,16 +19,20 @@ class DescriptionBuilder
     related_resources = submitted[:related_resource]&.filter_map { |r| build_related_resource(r) }
     access = build_access(submitted[:access])
 
+    # The editor renders every section pre-populated with all existing items, so the
+    # submitted form is the authoritative state for these fields. An empty section means
+    # the user deleted all its items, so fall through to nil (compact drops the key) rather
+    # than restoring @existing. Unexposed fields are preserved by merging into @existing.
     @existing.merge(
-      title: titles.presence || @existing[:title],
-      note: notes.presence || @existing[:note],
-      language: languages.presence || @existing[:language],
-      contributor: contributors.presence || @existing[:contributor],
-      subject: subjects.presence || @existing[:subject],
-      form: forms.presence || @existing[:form],
-      event: events.presence || @existing[:event],
-      relatedResource: related_resources.presence || @existing[:relatedResource],
-      access: access || @existing[:access]
+      title: titles.presence,
+      note: notes.presence,
+      language: languages.presence,
+      contributor: contributors.presence,
+      subject: subjects.presence,
+      form: forms.presence,
+      event: events.presence,
+      relatedResource: related_resources.presence,
+      access:
     ).compact
   end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -72,8 +76,7 @@ class DescriptionBuilder
     return safe_parse_json(params[:_raw_json]) if params[:_raw_json].present?
     return nil if params[:name_value].blank?
 
-    base = params[:_original].present? ? safe_parse_json(params[:_original]) : {}
-    return nil if base.nil?
+    base = params[:_original].present? ? (safe_parse_json(params[:_original]) || {}) : {}
 
     result = base.merge(name: [build_contributor_name(params)])
     result[:type] = params[:type] if params[:type].present?
@@ -217,7 +220,6 @@ class DescriptionBuilder
   end
   # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
   def build_access(params)
     return nil if params.blank?
 
@@ -226,14 +228,14 @@ class DescriptionBuilder
     access_contacts = params[:access_contact]&.filter_map { |ac| compact_entry(ac, required: :value) }
 
     existing_access.merge(
-      physicalLocation: physical_locations.presence || existing_access[:physicalLocation],
-      accessContact: access_contacts.presence || existing_access[:accessContact]
+      physicalLocation: physical_locations.presence,
+      accessContact: access_contacts.presence
     ).compact.presence
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def safe_parse_json(str)
-    JSON.parse(str).deep_symbolize_keys
+    parsed = JSON.parse(str)
+    parsed.respond_to?(:deep_symbolize_keys) ? parsed.deep_symbolize_keys : nil
   rescue JSON::ParserError
     nil
   end

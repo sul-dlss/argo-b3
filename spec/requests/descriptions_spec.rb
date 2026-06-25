@@ -80,17 +80,30 @@ RSpec.describe 'Editing description' do
         expect(Sdr::VersionService).to have_received(:close).with(druid:)
       end
 
-      it 'opens a version when the object version is closed' do
-        allow(Sdr::VersionService).to receive(:open?).and_return(false)
-        allow(Sdr::VersionService).to receive(:open)
+      context 'when the object version is closed' do
+        let(:opened_object) { cocina_object.new(version: cocina_object.version + 1) }
 
-        patch object_description_path(object_druid: druid), params: description_params
+        before do
+          allow(Sdr::VersionService).to receive_messages(open?: false, open: opened_object)
+        end
 
-        expect(Sdr::VersionService).to have_received(:open).with(
-          druid:,
-          description: 'Descriptive metadata edited via web form',
-          opening_user_name: admin_user.sunetid
-        )
+        it 'opens a new version' do
+          patch object_description_path(object_druid: druid), params: description_params
+
+          expect(Sdr::VersionService).to have_received(:open).with(
+            druid:,
+            description: 'Descriptive metadata edited via web form',
+            opening_user_name: admin_user.sunetid
+          )
+        end
+
+        it 'updates the newly opened version rather than the stale one' do
+          patch object_description_path(object_druid: druid), params: description_params
+
+          expect(Sdr::Repository).to have_received(:update) do |args|
+            expect(args[:cocina_object].version).to eq(opened_object.version)
+          end
+        end
       end
 
       it 'does not close the version if it is not closeable' do

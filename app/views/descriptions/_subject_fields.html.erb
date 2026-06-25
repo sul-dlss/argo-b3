@@ -61,7 +61,7 @@
 
   <% elsif curated_struct %>
     <%# Flat structuredValue subject (e.g. LCSH compound heading) %>
-    <input type="hidden" name="description[subject][][_struct_original]" value="<%= subject.to_json %>">
+    <input type="hidden" name="description[subject][][_struct_original]" value="<%= subject.to_h.to_json %>">
     <% struct_parts.each do |part| %>
       <div class="row g-2 align-items-center mb-1">
         <div class="col">
