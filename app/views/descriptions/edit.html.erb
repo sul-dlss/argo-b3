@@ -1,3 +1,7 @@
+<%# The .container is ignored when this frame loads inside the object show page (Turbo extracts %>
+<%# only the matching turbo-frame); it supplies the page margin when the form re-renders as a %>
+<%# full page after a save error, since the form breaks out to _top. %>
+<div class="container">
 <%= turbo_frame_tag(@cocina_object.externalIdentifier, 'description') do %>
 <div class="mt-3"
      data-controller="description-editor"
@@ -378,3 +382,4 @@
   <% end %>
 </div>
 <% end %>
+</div>

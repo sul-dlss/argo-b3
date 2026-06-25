@@ -23,9 +23,8 @@ class DescriptionsController < ApplicationController
 
   def edit
     authorize! @cocina_object, with: ObjectPolicy, to: :edit_description?
-    open_version_if_needed!
-  rescue Sdr::Repository::Error
-    # If pre-opening fails, save will attempt it again
+    # A version is opened at save time, not on display, to avoid creating dangling
+    # versions when the edit form is loaded but never submitted.
   end
 
   # rubocop:disable Metrics/AbcSize
@@ -87,9 +86,11 @@ class DescriptionsController < ApplicationController
   def open_version_if_needed!
     return if Sdr::VersionService.open?(druid: @cocina_object.externalIdentifier)
 
-    Sdr::VersionService.open(druid: @cocina_object.externalIdentifier,
-                             description: 'Descriptive metadata edited via web form',
-                             opening_user_name: current_user.sunetid)
+    # Opening creates a new version; replace @cocina_object with the returned object so a
+    # subsequent update sends the new version and lock rather than the now-stale ones.
+    @cocina_object = Sdr::VersionService.open(druid: @cocina_object.externalIdentifier,
+                                              description: 'Descriptive metadata edited via web form',
+                                              opening_user_name: current_user.sunetid)
   rescue Dor::Services::Client::Error => e
     raise Sdr::Repository::Error, "Opening version failed: #{e.message}"
   end
