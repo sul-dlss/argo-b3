@@ -34,7 +34,7 @@
         <select class="form-select" name="description[subject][][type]" aria-label="Subject type">
           <option value="topic"           <%= 'selected' if subject&.dig(:type) == 'topic' %>>Topic</option>
           <option value="place"           <%= 'selected' if subject&.dig(:type) == 'place' %>>Place</option>
-          <option value="temporal"        <%= 'selected' if subject&.dig(:type) == 'temporal' %>>Temporal</option>
+          <option value="time"            <%= 'selected' if subject&.dig(:type) == 'time' %>>Temporal</option>
           <option value="person"          <%= 'selected' if subject&.dig(:type) == 'person' %>>Person</option>
           <option value="organization"    <%= 'selected' if subject&.dig(:type) == 'organization' %>>Organization</option>
           <option value="genre"           <%= 'selected' if subject&.dig(:type) == 'genre' %>>Genre</option>
@@ -79,7 +79,7 @@
             <option value="">-- type --</option>
             <option value="topic"           <%= 'selected' if part[:type] == 'topic' %>>Topic</option>
             <option value="place"           <%= 'selected' if part[:type] == 'place' %>>Place</option>
-            <option value="temporal"        <%= 'selected' if part[:type] == 'temporal' %>>Temporal</option>
+            <option value="time"            <%= 'selected' if part[:type] == 'time' %>>Temporal</option>
             <option value="person"          <%= 'selected' if part[:type] == 'person' %>>Person</option>
             <option value="organization"    <%= 'selected' if part[:type] == 'organization' %>>Organization</option>
             <option value="genre"           <%= 'selected' if part[:type] == 'genre' %>>Genre</option>
