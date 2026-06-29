@@ -7,7 +7,7 @@ gem 'rails', '~> 8.1.0'
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem 'propshaft'
 # Use postgresql as the database for Active Record
-gem 'pg', '~> 1.1'
+gem 'pg'
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '>= 5.0'
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -36,7 +36,7 @@ gem 'solid_queue'
 gem 'bootsnap', require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem 'image_processing', '~> 1.2'
+gem 'image_processing'
 
 # Additional gems
 gem 'action_policy'
@@ -45,15 +45,15 @@ gem 'blanks' # ActiveRecord-like forms.
 gem 'cocina_display'
 gem 'config'
 gem 'csv'
-gem 'dor-services-client', '~> 15.1'
+gem 'dor-services-client'
 gem 'dry-monads'
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
 gem 'prawn', '~> 1'  # PDF generation; used in TracksheetService
 gem 'prawn-table'    # table support for Prawn PDFs
-gem 'preservation-client', '~> 7.0'
-gem 'purl_fetcher-client', '~> 2.1'
+gem 'preservation-client'
+gem 'purl_fetcher-client'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
 gem 'rsolr'
