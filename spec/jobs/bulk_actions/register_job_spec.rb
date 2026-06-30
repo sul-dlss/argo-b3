@@ -12,13 +12,14 @@ RSpec.describe BulkActions::RegisterJob do
   let(:user_name) { bulk_action.user.sunetid }
 
   let(:cocina_object) do
-    build(:dro_with_metadata, id: 'druid:df123df4567', label: 'My object')
+    build(:dro_with_metadata, id: 'druid:df123df4567')
       .new(identification: {
              barcode: '36105010101010',
              catalogLinks: [{ catalog: 'folio',
                               catalogRecordId: 'in12345', refresh: true }],
              sourceId: 'foo:bar1'
-           })
+           },
+           label: 'My object')
   end
 
   let(:csv_string) do
