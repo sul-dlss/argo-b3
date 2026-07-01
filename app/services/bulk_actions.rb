@@ -112,7 +112,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TRACKING_SHEETS = Config.new(
     label: 'Download tracking sheets',
-    help_text: 'Download PDF tracking sheets of objects.'
+    help_text: 'Download PDF tracking sheets of objects.',
+    export_filename: 'tracking_sheets.pdf',
+    export_label: 'Tracking sheets',
+    job: BulkActions::ExportTrackingSheetsJob,
+    path_helper: to_path_helper(:new_bulk_actions_export_tracking_sheets_path),
+    form: BulkActions::BasicForm
   )
 
   EXPORT_TAGS = Config.new(

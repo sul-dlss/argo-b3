@@ -6,12 +6,12 @@ RSpec.describe TracksheetService do
   let(:druid) { 'druid:bc123df4567' }
   let(:solr_doc) { { Search::Fields::ID => druid, Search::Fields::TITLE => title } }
   let(:presenter) { SolrDocPresenter.new(solr_doc:) }
-  let(:instance) { described_class.new(solr_doc_presenter: presenter) }
+  let(:instance) { described_class.new(solr_doc_presenters: [presenter]) }
   let(:title) { 'Test title' }
 
   # NOTE: expectations use "include" rather than "eq" because doc_to_table appends a timestamp row
   describe '#doc_to_table' do
-    subject(:call) { instance.send(:doc_to_table) }
+    subject(:call) { instance.send(:doc_to_table, presenter) }
 
     context 'when normal length title' do
       it 'includes the title as the object label' do
