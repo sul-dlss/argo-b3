@@ -184,6 +184,12 @@ module Search
       exclude: true
     )
 
+    FORMATS = Config.with_defaults(
+      form_field: :formats,
+      field: Search::Fields::FORMATS,
+      limit: 100
+    )
+
     GENRES = Config.with_defaults(
       form_field: :genres,
       field: Search::Fields::GENRES,
@@ -287,12 +293,6 @@ module Search
         ever: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::ALL}",
         never: "-#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::ALL}"
       }
-    )
-
-    SW_FORMATS = Config.with_defaults(
-      form_field: :sw_formats,
-      field: Search::Fields::SW_FORMATS,
-      limit: 100
     )
 
     TAGS = Config.with_defaults(
