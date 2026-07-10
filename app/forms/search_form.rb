@@ -22,6 +22,7 @@ class SearchForm < ApplicationForm
   attribute :embargo_release_date_from, :date, default: nil
   attribute :embargo_release_date_to, :date, default: nil
   attribute :file_roles, array: true, default: -> { [] }
+  attribute :formats, array: true, default: -> { [] }
   attribute :genres, array: true, default: -> { [] }
   attribute :identifiers, array: true, default: -> { [] }
   attribute :languages, array: true, default: -> { [] }
@@ -48,7 +49,6 @@ class SearchForm < ApplicationForm
   attribute :released_to_earthworks, array: true, default: -> { [] }
   attribute :released_to_purl_sitemap, array: true, default: -> { [] }
   attribute :released_to_searchworks, array: true, default: -> { [] }
-  attribute :sw_formats, array: true, default: -> { [] }
   attribute :tags, array: true, default: -> { [] }
   attribute :tickets, array: true, default: -> { [] }
   attribute :topics, array: true, default: -> { [] }
