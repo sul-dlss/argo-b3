@@ -45,23 +45,19 @@ class RegistrationCsvConverter
     Failure(e)
   end
 
-  def model_params(row)
+  def model_params(row) # rubocop:disable Metrics/AbcSize
     {
       type: content_type(row),
       version: 1,
-      label: label(row),
       administrative: administrative(row),
       identification: identification(row)
     }.tap do |model_params|
       model_params[:structural] = structural(row)
       model_params[:access] = access(row)
+      model_params[:description] = description(row)
       project_name = params[:project_name] || row['project_name']
       model_params[:administrative][:partOfProject] = project_name if project_name.present?
     end
-  end
-
-  def label(row)
-    row['folio_instance_hrid'] ? row['label'] : row.fetch('label')
   end
 
   def administrative(row)
@@ -143,6 +139,12 @@ class RegistrationCsvConverter
       structural[:isMemberOf] = [collection] if collection
       reading_order = params[:reading_order] || row['reading_order']
       structural[:hasMemberOrders] = [{ viewingDirection: reading_order }] if reading_order.present?
+    end
+  end
+
+  def description(row)
+    {}.tap do |description|
+      description[:title] = [{ value: row['title'] }]
     end
   end
 

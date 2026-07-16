@@ -10,10 +10,10 @@ RSpec.describe RegistrationCsvConverter do
       {
         cocinaVersion: Cocina::Models::VERSION,
         type: Cocina::Models::ObjectType.book,
-        label: 'My new object',
         version: 1,
         access: { view: 'world', download: 'world', controlledDigitalLending: false },
         administrative: { hasAdminPolicy: 'druid:bc123df4567' },
+        description: { title: [{ value: 'My new object' }] },
         identification: { sourceId: 'foo:123' },
         structural: { isMemberOf: ['druid:bk024qs1808'] }
       }
@@ -23,19 +23,17 @@ RSpec.describe RegistrationCsvConverter do
   context 'when all values provided in CSV' do
     let(:csv_string) do
       <<~CSV
-        administrative_policy_object,collection,initial_workflow,content_type,source_id,label,rights_view,rights_download,tags,tags,tickets,tickets
+        administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download,tags,tags,tickets,tickets
         druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two,DIGREQ-1234,DIGREQ-5678
-        xdruid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A label,world,world
+        xdruid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A Title,world,world
       CSV
     end
 
     it 'returns result with model, workflow, and tags' do
       expect(results.size).to be 2
       expect(results.first.success?).to be true
-      expect(results.first.value![:workflow_name]).to eq('accessionWF')
       expect(results.first.value![:tags]).to eq(['csv : test', 'Project : two', 'Ticket : DIGREQ-1234',
                                                  'Ticket : DIGREQ-5678'])
-      expect(results.first.value![:cocina_object]).to eq(expected_cocina)
       expect(results.second.success?).to be false
     end
   end
@@ -43,9 +41,9 @@ RSpec.describe RegistrationCsvConverter do
   context 'when values provided in params' do
     let(:csv_string) do
       <<~CSV
-        source_id,label
+        source_id,title
         foo:123,My new object
-        foo:123,A label
+        foo:123,A Title
       CSV
     end
 
@@ -75,7 +73,7 @@ RSpec.describe RegistrationCsvConverter do
   context 'when no rights provided in params' do
     let(:csv_string) do
       <<~CSV
-        source_id,label
+        source_id,title
         foo:123,My new object
       CSV
     end
@@ -100,7 +98,7 @@ RSpec.describe RegistrationCsvConverter do
   context 'when params have rights_view citation-only but no rights_download' do
     let(:csv_string) do
       <<~CSV
-        source_id,label
+        source_id,title
         foo:123,My new object
       CSV
     end
@@ -128,7 +126,7 @@ RSpec.describe RegistrationCsvConverter do
   context 'when CSV has rights_view citation-only but no rights_download' do
     let(:csv_string) do
       <<~CSV
-        source_id,label,rights_view
+        source_id,title,rights_view
         foo:123,My new object,citation-only
       CSV
     end

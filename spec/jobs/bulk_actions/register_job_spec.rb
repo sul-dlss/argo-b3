@@ -24,7 +24,7 @@ RSpec.describe BulkActions::RegisterJob do
 
   let(:csv_string) do
     <<~CSV
-      administrative_policy_object,collection,initial_workflow,content_type,source_id,label,rights_view,rights_download,tags,tags
+      administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download,tags,tags
       druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two
       druid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A label,world,world
     CSV
@@ -62,7 +62,7 @@ RSpec.describe BulkActions::RegisterJob do
   context 'when registration fails' do
     let(:csv_string) do
       <<~CSV
-        administrative_policy_object,initial_workflow,content_type,source_id,label,rights_view,rights_download,tags,tags
+        administrative_policy_object,initial_workflow,content_type,source_id,title,rights_view,rights_download,tags,tags
         druid:bc123df4567,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two
       CSV
     end
@@ -98,7 +98,7 @@ RSpec.describe BulkActions::RegisterJob do
               user_name:)
       expect(log).to have_received(:puts).with(/Registration successful for druid:df123df4567/).twice
       expect(bulk_action.druid_count_success).to eq 2
-      expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Label\ndf123df4567,36105010101010,in12345,foo:bar1,My object\ndf123df4567,36105010101010,in12345,foo:bar1,My object\n") # rubocop:disable Layout/LineLength
+      expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\n") # rubocop:disable Layout/LineLength
     end
   end
 
@@ -106,9 +106,9 @@ RSpec.describe BulkActions::RegisterJob do
     # Params are provided from registration page (not bulk action page)
     let(:csv_string) do
       <<~CSV
-        source_id,label
+        source_id,title
         foo:123,My new object
-        foo:123,A label
+        foo:123,A title
       CSV
     end
 
@@ -141,9 +141,9 @@ RSpec.describe BulkActions::RegisterJob do
   context 'with valid view:stanford, download:none, and rights_controlledDigitalLending:true' do
     let(:csv_string) do
       <<~CSV
-        administrative_policy_object,collection,initial_workflow,content_type,source_id,label,rights_view,rights_download,rights_controlledDigitalLending,tags,tags
+        administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download,rights_controlledDigitalLending,tags,tags
         druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,stanford,none,true,csv : test,Project : two
-        druid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A label,stanford,none,true
+        druid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A title,stanford,none,true
       CSV
     end
 
