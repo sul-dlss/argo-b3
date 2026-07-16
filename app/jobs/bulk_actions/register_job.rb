@@ -3,7 +3,7 @@
 module BulkActions
   # Job to register objects from a CSV file
   class RegisterJob < BaseJob
-    HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Label'].freeze
+    HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Title'].freeze
 
     def perform(bulk_action:, csv_file:, **register_params)
       @csv_file = csv_file
@@ -69,13 +69,13 @@ module BulkActions
         export_file << row
       end
 
-      def row
+      def row # rubocop:disable Metrics/AbcSize
         [
           DruidSupport.bare_druid_from(cocina_object.externalIdentifier),
           cocina_object.identification.barcode,
           cocina_object.identification.catalogLinks.first&.catalogRecordId,
           cocina_object.identification.sourceId,
-          cocina_object.label
+          Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title)
         ]
       end
 
