@@ -8,7 +8,7 @@ RSpec.describe PurlPreviewService do
   let(:cocina_hash) do
     {
       externalIdentifier: 'druid:bc123cd4567',
-      label: 'Test object'
+      description: { title: [{ value: 'Test object' }] }
     }
   end
   let(:response) { instance_double(Faraday::Response, success?: success, status:, body: response_body) }
