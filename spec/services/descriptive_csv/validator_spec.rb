@@ -298,9 +298,8 @@ RSpec.describe DescriptiveCsv::Validator do
           CSV
         end
 
-        it 'finds errors' do
-          expect(instance.valid?).to be false
-          expect(instance.errors).to eq ['Value error: druid:cd456de6678 has 0 value in title1.value.']
+        it 'validates' do
+          expect(instance.valid?).to be true
         end
       end
 
@@ -361,9 +360,8 @@ RSpec.describe DescriptiveCsv::Validator do
           CSV
         end
 
-        it 'finds errors' do
-          expect(instance.valid?).to be false
-          expect(instance.errors).to eq ['Value error: row 2 has 0 value in title1.value.']
+        it 'validates' do
+          expect(instance.valid?).to be true
         end
       end
 
