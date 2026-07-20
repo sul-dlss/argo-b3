@@ -145,7 +145,6 @@ module Search
         #{ID}
         druid_bare_ssi
         druid_prefixed_ssi
-        obj_label_tesim
         identifier_ssim
         identifier_tesim
         barcode_id_ssimdv

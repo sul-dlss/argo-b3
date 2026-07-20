@@ -18,15 +18,14 @@ RSpec.describe BulkActions::RegisterJob do
              catalogLinks: [{ catalog: 'folio',
                               catalogRecordId: 'in12345', refresh: true }],
              sourceId: 'foo:bar1'
-           },
-           label: 'My object')
+           })
   end
 
   let(:csv_string) do
     <<~CSV
       administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download,tags,tags
       druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two
-      druid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A label,world,world
+      druid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A title,world,world
     CSV
   end
 
@@ -43,7 +42,7 @@ RSpec.describe BulkActions::RegisterJob do
   context 'when parsing fails' do
     let(:csv_string) do
       <<~CSV
-        administrative_policy_object,initial_workflow,content_type,source_id,label,rights_view,rights_download
+        administrative_policy_object,initial_workflow,content_type,source_id,title,rights_view,rights_download
         druid:123,accessionWF,book,foo:123,My new object,world,world
       CSV
     end

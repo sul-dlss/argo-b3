@@ -37,7 +37,7 @@ RSpec.describe CsvUpload::Validator do
     let(:required_headers) { %w[source_id] }
     let(:csv) do
       <<~CSV
-        barcode,  ,source_id,label
+        barcode,  ,source_id,title
         ,,not:blank001,not blank
         ,,not:blank002,blank rows below this line
         ,,,,
