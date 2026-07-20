@@ -1,0 +1,97 @@
+# Name of your application. Used to uniquely configure containers.
+service: argo-b3
+
+# Name of the container image.
+image: suldlss/argo-b3
+
+# Credentials for your image host. Using Kamal's local registry mode: Kamal
+# runs and manages the registry container itself (`kamal registry setup`),
+# tunneled to each server over SSH, so no login credentials are needed.
+registry:
+  server: localhost:5555
+
+# Configure builder setup. Destination-specific config (config/deploy.<destination>.yml)
+# points `remote` at the deploy target itself, for a native (non-QEMU) amd64 build.
+builder:
+  arch: amd64
+
+logging:
+  driver: json-file
+  options:
+    max-size: "100m"
+    max-file: "5"
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console -e p"
+  db: app exec --interactive --reuse "bin/rails db -e p"
+  shell: app exec --interactive --reuse "bash"
+  ssh: server exec -i "bash"
+
+# Apache (with Shibboleth SSO) already handles SSL termination and reverse
+# proxying on every deploy target -- it proxies to localhost:3000. kamal-proxy
+# is still used (left enabled for the primary "web" role), but rebound to
+# plain HTTP on 3000 instead of its default 80/443 (which Apache already
+# owns) -- this lets kamal-proxy do its normal zero-downtime container swap
+# over the internal "kamal" network, without the app container needing to
+# publish (and collide on) a host port.
+proxy:
+  ssl: false
+  run:
+    http_port: 3000
+    https_port: 3001 # unused (ssl disabled), just must not collide with Apache's 443
+
+# Kamal always attaches app containers to its own "kamal" bridge network (no
+# config to disable that), so host networking isn't possible: instead we
+# reach each host's local Postgres via host.docker.internal. Destination-specific
+# config (config/deploy.<destination>.yml) adds each role's `hosts:`.
+servers:
+  web:
+    options:
+      add-host: "host.docker.internal:host-gateway"
+  # Runs SolidQueue standalone (bin/jobs) rather than in-Puma, so it registers
+  # its own graceful-shutdown signal handlers (see solid_queue/supervisor/signals.rb)
+  # and can drain in-flight jobs on its own timeline, independent of the web
+  # role -- analogous to Sidekiq's hotswap deploys.
+  job:
+    cmd: bin/jobs
+    stop_timeout: <%= ENV.fetch("SOLID_QUEUE_SHUTDOWN_TIMEOUT", 86400) %>
+    options:
+      add-host: "host.docker.internal:host-gateway"
+
+ssh:
+  user: lyberadmin
+<% if ENV["KAMAL_SSH_KEY_PATH"] -%>
+  keys:
+    - <%= ENV["KAMAL_SSH_KEY_PATH"] %>
+<% end -%>
+
+# Bind-mount host paths for durable bulk action output and Rails log output (for host-level log shipping).
+volumes:
+  - "/workspace/bulk:/workspace/bulk"
+  - "/var/log/argo:/var/log/argo"
+
+env:
+  clear:
+    DATABASE_USERNAME: lyberadmin
+    DATABASE_HOSTNAME: host.docker.internal
+
+    SETTINGS__BULK_ACTIONS__DIRECTORY: /workspace/bulk
+    RAILS_LOG_TO_FILE: /var/log/argo/production.log
+
+    # Governs how long SolidQueue's supervisor waits for in-flight jobs to
+    # finish on shutdown (see config/initializers/solid_queue.rb); the job
+    # role's stop_timeout above is set to match, so Docker's SIGKILL doesn't
+    # cut the graceful drain short.
+    SOLID_QUEUE_SHUTDOWN_TIMEOUT: <%= ENV.fetch("SOLID_QUEUE_SHUTDOWN_TIMEOUT", 86400) %>
+  secret:
+    - HONEYBADGER_API_KEY
+    - SECRET_KEY_BASE
+    - SETTINGS__DOR_SERVICES__TOKEN
+    - SETTINGS__PRESERVATION_CATALOG__TOKEN
+    - DATABASE_PASSWORD
+
+# Destination-specific configuration (hosts, builder.remote, and the env vars
+# that vary per environment: SETTINGS__SOLR__URL, SETTINGS__DOR_SERVICES__URL,
+# SETTINGS__PRESERVATION_CATALOG__URL, HONEYBADGER_ENV) lives in
+# config/deploy.<destination>.yml, e.g. config/deploy.qa.yml. Run with:
+#   bin/kamal deploy -d qa

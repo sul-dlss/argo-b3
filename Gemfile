@@ -10,6 +10,8 @@ gem 'propshaft'
 gem 'pg'
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '>= 5.0'
+# HTTP/2 proxy for Puma, for X-Sendfile asset serving and HTTP caching [https://github.com/basecamp/thruster]
+gem 'thruster', require: false
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem 'importmap-rails'
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
@@ -104,4 +106,5 @@ group :deployment do
   gem 'capistrano-passenger', require: false
   gem 'capistrano-rails', require: false
   gem 'dlss-capistrano', require: false
+  gem 'kamal', require: false
 end

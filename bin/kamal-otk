@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Deploys via Kamal using a one-time SSH key, analogous to capistrano-one_time_key
+# (https://github.com/cbeer/capistrano-one_time_key). Generates a fresh, passphrase-less
+# keypair, adds the public key to each target host's ~/.ssh/authorized_keys (relying on
+# whatever trusted channel -- e.g. Kerberos/ksu -- already lets that connection succeed),
+# runs `bin/kamal` using that key, then always removes it from authorized_keys.
+#
+# The key is both configured via config/deploy.<destination>.yml's `ssh.keys` (read from
+# KAMAL_SSH_KEY_PATH) and loaded into a scratch ssh-agent: Kamal's remote-builder port
+# forwarding (lib/kamal/cli/build.rb#remote_builder_ssh_options) builds its own SSH options
+# from the `builder.remote` URI and doesn't include configured keys, so it only succeeds
+# via agent-based auth.
+#
+# Usage: bin/kamal-otk DESTINATION [kamal args...]
+
+require 'bundler/setup'
+require 'kamal'
+require 'pathname'
+require 'securerandom'
+require 'tmpdir'
+
+destination = ARGV.shift
+if destination.nil?
+  warn 'Usage: bin/kamal-otk [destination, e.g., qa] [kamal args...]'
+  exit 1
+end
+
+config = Kamal::Configuration.create_from(config_file: Pathname.new('config/deploy.yml'), destination: destination)
+hosts = config.roles.flat_map(&:hosts).uniq
+user = config.ssh.user
+
+def ssh_exec!(user, host, command)
+  system('ssh', "#{user}@#{host}", command, exception: true)
+end
+
+# Same mechanism as dlss-capistrano's controlmaster:setup/:start tasks:
+# https://github.com/sul-dlss/dlss-capistrano/blob/main/lib/dlss/capistrano/tasks/control_master.rake
+def ensure_controlmaster!
+  return unless ENV.fetch('USE_CAPISTRANO_CONTROLMASTER', false) == 'true'
+
+  controlmaster_host = ENV.fetch('CONTROLMASTER_HOST', 'dlss-jump')
+  controlmaster_socket = ENV.fetch('CONTROLMASTER_SOCKET', '~/.ssh/%r@%h:%p')
+
+  return if system('ssh', '-O', 'check', '-S', controlmaster_socket, controlmaster_host)
+
+  system('ssh', '-f', '-N', '-S', controlmaster_socket, controlmaster_host, exception: true)
+end
+
+ensure_controlmaster!
+
+Dir.mktmpdir do |dir|
+  key_path = File.join(dir, 'deploy_otk')
+  comment = "kamal-otk-#{SecureRandom.hex(6)}"
+
+  system('ssh-keygen', '-q', '-t', 'ed25519', '-f', key_path, '-N', '', '-C', comment, exception: true)
+  public_key = File.read("#{key_path}.pub").strip
+
+  add_key_command = "mkdir -p ~/.ssh && chmod 700 ~/.ssh && " \
+                     "touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && " \
+                     "echo '#{public_key}' >> ~/.ssh/authorized_keys"
+
+  hosts.each { |host| ssh_exec!(user, host, add_key_command) }
+
+  agent_pid = nil
+  begin
+    `ssh-agent -s`.each_line do |line|
+      ENV[Regexp.last_match(1)] = Regexp.last_match(2) if line =~ /^(SSH_AUTH_SOCK|SSH_AGENT_PID)=([^;]+);/
+    end
+    agent_pid = ENV['SSH_AGENT_PID']
+    system('ssh-add', key_path, exception: true)
+
+    ENV['KAMAL_SSH_KEY_PATH'] = key_path
+    system('bin/kamal', *ARGV, '-d', destination, exception: true)
+  ensure
+    system('ssh-agent', '-k') if agent_pid
+
+    # Best-effort cleanup: don't let a removal failure mask the deploy's own result.
+    remove_key_command = "sed -i.bak -e '/#{comment}$/d' ~/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys.bak"
+    hosts.each do |host|
+      system('ssh', "#{user}@#{host}", remove_key_command) ||
+        warn("Failed to remove one-time key from #{host}; remove #{comment} from ~/.ssh/authorized_keys manually.")
+    end
+  end
+end

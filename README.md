@@ -76,9 +76,86 @@ A dashboard for SolidQueue background jobs is available at http://localhost:3000
 
 In development, available at http://localhost:3000/lookbook
 
-## Deployment
+## Deployment with Kamal
+* See `--hosts` to run only on specific hosts.
+* See `--roles` to run only for specific roles (e.g., `web` or `job`)
 
-NOTE: The application is deployed continuously by our on-prem Jenkins service (`sul-ci-prod`) to the `poc` environment on every merge to `main`. See `Jenkinsfile` for how that is wired up.
+Note:
+* Honeybadger deploy notifications are performs in `.kamal/hooks/post-deploy`.
+* Secrets are retrieved directly using the Vault CLI. See `.kamal/secrets-common` and environment specific secrets files.
+* The Dockerfile configures the lyberadmin (50:503) user to match the host server.
+* `/workspace/bulk` and `/var/log/argo` are shared with the containers.
+* The docker image is build on the host server (AMD64) to avoid emulation on the developer Mac.
+
+
+### Deploy
+```
+bin/kamal-otk qa deploy
+```
+
+This will build and deploy the local, committed code.
+
+#### Rollback
+```
+bin/kamal-otk qa app containers -q
+bin/kamal-otk qa rollback e5d9d7c2b898289dfbc5f7f1334140d984eedae4
+```
+
+Use `app containers -q` to get the image ids of the containers to roll back to.
+
+#### Stop / start
+```
+bin/kamal-otk qa app stop
+bin/kamal-otk qa app start
+```
+
+#### Maintenance
+```
+bin/kamal-otk qa app maintenance --message "Wait for it..."
+bin/kamal-otk qa app live
+```
+
+### Monitoring
+
+#### App status
+```
+bin/kamal-otk qa details
+```
+
+#### Container status
+```
+bin/kamal-otk qa app containers
+```
+
+#### Deployed version
+```
+bin/kamal-otk qa app version
+```
+
+#### Logs
+```
+bin/kamal-otk qa app logs -f 
+```
+
+* For log filtering options, see `bin/kamal-otk qa app logs --help` for log filtering options.
+* For log rotation, see `logging` in `deploy.yml`.
+* The application also logs to `/var/log`.
+
+### Interacting
+See https://kamal-deploy.org/docs/commands/running-commands-on-servers/
+
+#### With the server
+```
+bin/kamal-otk qa ssh
+bin/kamal-otk qa server exec "docker -v"
+```
+
+#### With a container
+```
+bin/kamal-otk qa console
+bin/kamal-otk qa db
+bin/kamal-otk qa shell
+```
 
 ## Testing
 

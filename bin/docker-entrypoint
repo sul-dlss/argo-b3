@@ -1,5 +1,22 @@
 #!/bin/bash -e
 
+# On host reboot, Docker restarts previously-running containers (--restart
+# unless-stopped) as soon as the daemon is up, with no guarantee the local
+# Postgres is actually accepting connections yet -- wait for it here rather
+# than racing (affects both the web role's db:prepare below and the job
+# role's bin/jobs, which needs the DB too but has no wait of its own).
+POSTGRES_WAIT_RETRIES="${POSTGRES_WAIT_RETRIES:-60}"
+postgres_wait_attempts=0
+until pg_isready -h "${DATABASE_HOSTNAME:-localhost}" -p "${DATABASE_PORT:-5432}" -q; do
+  postgres_wait_attempts=$((postgres_wait_attempts + 1))
+  if [ "$postgres_wait_attempts" -ge "$POSTGRES_WAIT_RETRIES" ]; then
+    echo "Postgres at ${DATABASE_HOSTNAME:-localhost}:${DATABASE_PORT:-5432} not available after ${POSTGRES_WAIT_RETRIES}s, giving up." >&2
+    exit 1
+  fi
+  echo "Waiting for Postgres at ${DATABASE_HOSTNAME:-localhost}:${DATABASE_PORT:-5432}..."
+  sleep 1
+done
+
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
