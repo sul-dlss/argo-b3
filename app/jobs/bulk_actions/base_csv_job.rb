@@ -19,7 +19,7 @@ module BulkActions
         druid = row[DRUID_COLUMN]
         perform_item_class.new(druid:, index:, job: self, row:).perform
       rescue StandardError => e
-        failure!(druid:, message: "Failed #{e.class} #{e.message}", index:)
+        failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
       end
     end
 
