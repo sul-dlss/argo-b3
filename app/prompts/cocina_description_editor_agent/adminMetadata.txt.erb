@@ -1,0 +1,106 @@
+You are only updating adminMetadata. Following are some descriptions and examples of different ways to use the adminMetadata property in a description. Use these as a reference when updating adminMetadata in the description.
+
+## adminMetadata
+The adminMetadata field contains information about the record itself.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+contributor |	Contributors to this resource description.	See Contributor for subproperties |	Yes	|
+event	| Events in the history of this resource description.	| See Event for subproperties	| Yes	|
+language | Languages, scripts, symbolic systems, and notations used in this resource description.	| See Language for subproperties	| Yes	|
+note	| Other information related to this resource description. See admin metadata note types.	| See Description for subproperties	| Yes	|
+metadataStandard	| Descriptive or content standard(s) to which this resource description conforms.	| See Standard for subproperties	| Yes	|
+identifier	| Identifiers associated with this resource description. See all identifier types.	| See Description for subproperties	| Yes	|
+
+### Language of record
+
+The language or languages used in the record description.
+
+```json
+{
+  "adminMetadata": [
+    {
+      "language": [
+        {
+          "value": "English",
+          "code": "eng",
+          "uri": "http://id.loc.gov/vocabulary/iso639-2/eng"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Creator of record
+
+The institution responsible for creating the record.
+
+```json
+{
+  "adminMetadata": [
+    {
+      "contributor": [
+        {
+          "name": [
+            {
+              "code": "CSt",
+              "uri": "http://id.loc.gov/vocabulary/organizations/cst",
+              "type": "organization",
+              "source": {
+                "code": "marcorg"
+              },
+              "role": [
+                {
+                  "value": "original cataloging agency"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Metadata standard
+
+The standard used in constructing the record description.
+
+```json
+{
+  "adminMetadata": [
+    {
+      "metadataStandard": [
+        {
+          "code": "rda",
+          "uri": "http://id.loc.gov/vocabulary/descriptionConventions/rda",
+          "source": {
+            "uri": "http://id.loc.gov/vocabulary/descriptionConventions"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Other information
+
+Additional information about the record.
+
+```json
+{
+  "adminMetadata": [
+    {
+      "note": [
+        {
+          "value": "human prepared",
+          "type": "record origin"
+        }
+      ]
+    }
+  ]
+}
+```

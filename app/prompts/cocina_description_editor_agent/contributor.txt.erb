@@ -1,0 +1,309 @@
+You are only updating contributors. Following are some descriptions and examples of different ways to use the contributor property in a description. Use these as a reference when updating contributor in the description.
+
+## "contributor" model
+The contributor is a real world object that may be associated with multiple name strings. At least one name is required per contributor and the contributor should have a type.
+
+| Property | Definition | Value type | Repeatable |
+| --- | --- | --- | --- |
+| name | Names associated with a contributor. Contributor name types must be from the "contributor.name" controlled list and multipart name types must be from the "contributor.name.structuredValue" controlled list. | Object ("description" model) | Yes |
+| type | Entity type of the contributor (person, organization, etc.). Contributor types must be from the "contributor" controlled list. | String | No |
+| status | Status of the contributor relative to other parallel contributors (e.g. the primary author among a group of contributors). Use "primary" to indicate preferred status. | String | No |
+| role | Relationships of the contributor to the resource or to an event in its history. | Object ("description" model) | Yes |
+| identifier | Identifiers and URIs associated with the contributor entity. Contributor identifier types must be from the "contributor.identifier" controlled list. | Object ("description" model) | Yes |
+| affiliation | Institutional or other affiliation associated with a contributor. | Object ("description" model) | Yes |
+| note | Other information associated with the contributor. Contributor note types must be from the "contributor.note" controlled list. | Object ("description" model) | Yes |
+| valueAt | URL or other pointer to the location of the contributor information. | String | No |
+
+
+### Basic contributor with name and contributor type
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Dorothy L. Sayers"
+        }
+      ],
+      "type": "person"
+    }
+  ]
+}
+```
+
+Contributor types must be from the "contributor" controlled list.
+
+### Contributor names with name types
+
+In addition to the contributor type, name values may have types as well to distinguish them from other names of the contributor.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Dorothy L. Sayers",
+          "type": "display"
+        },
+        {
+          "value": "Dorothy Leigh Sayers",
+          "type": "alternative"
+        }
+      ],
+      "type": "person"
+    }
+  ]
+}
+```
+
+Contributor name types must be from the "contributor.name" controlled list.
+
+### Multipart contributor name
+
+A name may be split into component parts and each part given a type using structuredValue.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "structuredValue": [
+            {
+              "value": "Sayers",
+              "type": "surname"
+            },
+            {
+              "value": "Dorothy L.",
+              "type": "forename"
+            }
+          ]
+        }
+      ],
+      "type": "person"
+    }
+  ]
+}
+```
+
+Contributor name part types must be from the "contributor.name.structuredValue" controlled list.
+
+### Contributor with role
+
+#### Single role
+
+The role is associated with the contributor, not the name. See MARC relator terms for role terms, codes, and URIs.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Dorothy L. Sayers"
+        }
+      ],
+      "type": "person",
+      "role": [
+        {
+          "value": "author",
+          "code": "aut",
+          "uri": "http://id.loc.gov/vocabulary/relators/aut",
+          "source": {
+            "code": "marcrelator"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Multiple roles
+
+One contributor may have multiple roles.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Dorothy L. Sayers"
+        }
+      ],
+      "type": "person",
+      "role": [
+        {
+          "value": "author of introduction"
+        },
+        {
+          "value": "editor"
+        }
+       ]
+    }
+  ]
+}
+```
+
+### Contributor or name with status
+
+#### Contributor status
+
+At the contributor level, a status of "primary" indicates that the contributor is the agent primarily responsible for the resource.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Dorothy L. Sayers"
+        }
+      ],
+      "type": "person",
+      "status": "primary"
+    },
+    {
+      "name": [
+        {
+          "value": "Muriel St. Clare Byrne"
+        }
+      ],
+      "type": "person"
+    }
+  ]
+}
+```
+
+#### Contributor name status
+
+At the name level, a status of "primary" indicates that the name is the preferred form for the contributor.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Sayers, Dorothy L.",
+          "status": "primary"
+        },
+        {
+          "value": "Sayers, Dorothy Leigh"
+        }
+      ],
+      "type": "person"
+    }
+  ]
+}
+```
+
+Status may be present at both levels.
+
+### Contributor with affiliation
+
+The affiliation is associated with the contributor as it is an attribute of the person or organization.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Sayers, Dorothy L."
+        }
+      ],
+      "type": "person",
+      "affiliation": [
+        {
+          "value": "Oxford University"
+        }
+       ]
+     }
+   ]
+}
+```
+
+### Contributor with identifier
+
+Identifiers for the agent as an entity, such as ORCID and Wikidata, are associated with the contributor.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Sayers, Dorothy L.",
+          "type": "person",
+          "identifier": [
+            {
+              "uri": "https://www.wikidata.org/wiki/Q106740",
+              "source": {
+                "code": "wikidata"
+              }
+            }
+            ]
+          }
+       ]
+     },
+      {
+        "name": [
+          {
+            "value": "Moulton, Mo",
+            "type": "person",
+            "identifier": [
+              {
+                "uri": "https://orcid.org/0000-0001-7028-6233",
+                "type": "ORCID"
+              }
+            ]
+          }
+   ]
+      }
+  ]
+}
+```
+
+Contributor name part types must be from the "identifier" controlled list.
+
+### Contributor with name authority
+
+Identifiers for an authorized name string, such as LCNAF, are associated with the name. The entered name should match the authorized form. See name authority source codes.
+
+```json
+{
+  "contributor": [
+    {
+      "name": [
+        {
+          "value": "Sayers, Dorothy L. (Dorothy Leigh), 1893-1957",
+          "uri": "https://id.loc.gov/authorities/names/n79046044",
+          "source": {
+            "code": "naf"
+          },
+          "type": "person"
+        }
+       ]
+     }
+   ]
+}
+```
+
+## "contributor.name" controlled list
+<%= TypesControlledListTool.new.execute(name: "contributor.name") %>
+
+## "contributor.name.structuredValue" controlled list
+<%= TypesControlledListTool.new.execute(name: "contributor.name.structuredValue") %>
+
+## "contributor" controlled list
+<%= TypesControlledListTool.new.execute(name: "contributor") %>
+
+## "contributor.identifier" controlled list
+<%= TypesControlledListTool.new.execute(name: "contributor.identifier") %>
+
+## "contributor.note" controlled list
+<%= TypesControlledListTool.new.execute(name: "contributor.note") %>
