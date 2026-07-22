@@ -51,8 +51,8 @@ RSpec.describe BulkActions::ReindexJob do
         expect(bulk_action.druid_count_fail).to eq 2
 
         expect(log.string).to include "Reindex successful for #{druids[0]}"
-        expect(log.string).to include "Failed StandardError StandardError for #{druids[1]}"
-        expect(log.string).to include 'Failed Dor::Services::Client::ConnectionFailed ' \
+        expect(log.string).to include "Error: StandardError StandardError for #{druids[1]}"
+        expect(log.string).to include 'Error: Dor::Services::Client::ConnectionFailed ' \
                                       "Dor::Services::Client::ConnectionFailed for #{druids[2]}"
       end
     end

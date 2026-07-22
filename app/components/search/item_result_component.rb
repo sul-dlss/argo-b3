@@ -24,8 +24,9 @@ module Search
     end
 
     def admin_policy_values
+      # Pre-fetch here breaks tests because can be triggered unintentionally.
       [helpers.link_to(result.apo_title, object_path(druid: result.apo_druid),
-                       data: { turbo_frame: '_top' })]
+                       data: { turbo_frame: '_top', turbo_prefetch: !Rails.env.test? })]
     end
 
     def collections_values
@@ -65,7 +66,7 @@ module Search
     def collection_links
       result.collection_druids.map.with_index do |collection_druid, index|
         helpers.link_to(result.collection_titles[index], object_path(druid: collection_druid),
-                        data: { turbo_frame: '_top' })
+                        data: { turbo_frame: '_top', turbo_prefetch: false })
       end
     end
 

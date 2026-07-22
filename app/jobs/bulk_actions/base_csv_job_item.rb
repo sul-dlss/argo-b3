@@ -13,11 +13,11 @@ module BulkActions
     attr_reader :row
 
     def success!(message:)
-      job.success!(druid:, message:, index:)
+      job.success!(druid:, message: "Success: #{message}", index:)
     end
 
     def failure!(message:)
-      job.failure!(druid:, message:, index:)
+      job.failure!(druid:, message: "Error: #{message}", index:)
     end
   end
 end

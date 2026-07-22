@@ -26,12 +26,12 @@ module BulkActions
 
     # Indicate that the action was successful.
     def success!(message: nil)
-      job.success!(druid:, message:)
+      job.success!(druid:, message: "Success: #{message}")
     end
 
     # Indicate that the action failed.
     def failure!(message:)
-      job.failure!(druid:, message:)
+      job.failure!(druid:, message: "Error: #{message}")
     end
 
     def cocina_object
