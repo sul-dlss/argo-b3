@@ -8,15 +8,16 @@ module DescriptiveCsv
     class_attribute :permitted_types, default: Cocina::Models::Validators::DescriptionTypesVisitorValidator.new
                                                                                                            .send(:types_yaml).values.flatten.pluck('value') # rubocop:disable Layout/LineLength
 
-    def self.import(csv_row:)
-      new(csv_row:).import
+    def self.import(csv_row:, druid:)
+      new(csv_row:, druid:).import
     end
 
-    def initialize(csv_row:)
+    def initialize(csv_row:, druid:)
       @csv_row = csv_row
+      @druid = druid
     end
 
-    def import
+    def import # rubocop: disable Metrics/AbcSize
       params = {}
 
       # The source_id and druid are only there for the user to reference and should be ignored for data processing
@@ -27,6 +28,8 @@ module DescriptiveCsv
       headers.each do |address|
         visit(params, split_address(address), @csv_row[address]) if @csv_row[address]
       end
+
+      params[:purl] = Cocina::Models::Mapping::Purl.for(druid: @druid)
 
       Success(ImportFilter.filter(compact_params(params)))
     rescue Cocina::Models::ValidationError => e
