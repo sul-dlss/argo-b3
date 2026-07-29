@@ -224,3 +224,29 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 5. Add a controller for the bulk action that is a subclass of `BulkActionApplicationController`.
 6. Add a `new.html.erb` view.
 7. Add a system test. (The job can be stubbed out.)
+
+## Conventions
+
+### Dates / times
+All dates / times should be rendered in one of the formats defined in `en.yml` and in the "Pacific Time (US & Canada)" time zone.
+
+See the `format_datetime` helper.
+
+### Notifications
+
+#### Error notifications
+The user should be notified of errors using a danger alert.
+
+The danger alert can be triggered with a `flash[:danger]`.
+
+#### Informational notifications
+The user should be notified of informational messages (e.g., status updates, success) using disappearing toasts.
+
+Toasts can be triggered with `flash[:toast]` or by broadcasting to the `notifications` channel:
+```
+component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed",
+                                                                  disappearing: true)
+      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
+                                                target: 'toast-container',
+                                                html: ApplicationController.render(component, layout: false))
+```
