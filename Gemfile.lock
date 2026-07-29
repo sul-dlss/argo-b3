@@ -134,7 +134,7 @@ GEM
     capybara-lockstep (2.3.1)
       activesupport (>= 7.0)
       capybara (>= 3.0)
-    cocina-models (0.130.0)
+    cocina-models (0.132.0)
       activesupport
       cocina_display
       deprecation
@@ -190,9 +190,9 @@ GEM
       capistrano-one_time_key (>= 0.2.0)
       capistrano-shared_configs
       ed25519
-    dor-services-client (15.65.0)
+    dor-services-client (15.66.0)
       activesupport (>= 7.0.0)
-      cocina-models (~> 0.130.0)
+      cocina-models (~> 0.132.0)
       deprecation
       faraday (~> 2.0)
       faraday-retry
