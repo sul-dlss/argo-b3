@@ -82,6 +82,8 @@ class ObjectsController < ApplicationController
     @verified_druid ||= verify_token(params[:druid])
   end
 
+  # Note that this is a "live" solr document built from latest DSA data.
+
   def fetch_solr_doc(druid)
     Rails.cache.fetch("objects/solr-doc/#{druid}", expires_in: 10.seconds) do
       Sdr::Repository.find_solr(druid:)
