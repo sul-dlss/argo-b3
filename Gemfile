@@ -50,7 +50,7 @@ gem 'dry-monads'
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
-gem 'prawn', '~> 1'  # PDF generation; used in TracksheetService
+gem 'prawn', '~> 2'  # PDF generation; used in TracksheetService
 gem 'prawn-table'    # table support for Prawn PDFs
 gem 'preservation-client'
 gem 'purl_fetcher-client'
