@@ -9,6 +9,18 @@ RSpec.describe TracksheetService do
   let(:instance) { described_class.new(solr_doc_presenter: presenter) }
   let(:title) { 'Test title' }
 
+  describe '#call' do
+    subject(:pdf) { instance.call }
+
+    context 'when the title contains UTF-8 characters' do
+      let(:title) { 'آرغو' }
+
+      it 'renders the PDF' do
+        expect { pdf.render }.not_to raise_error
+      end
+    end
+  end
+
   # NOTE: expectations use "include" rather than "eq" because doc_to_table appends a timestamp row
   describe '#doc_to_table' do
     subject(:call) { instance.send(:doc_to_table) }
