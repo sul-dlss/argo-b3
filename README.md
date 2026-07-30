@@ -6,6 +6,24 @@
 
 ## Development
 
+### Running the application
+
+```
+bin/setup
+```
+
+Note that `bin/setup` will create the database, run yarn, and perform other setup tasks.
+
+The roles, email address, and name of the test user can be provided in environment variables. Defaults are set in `bin/dev`.
+
+### Using resources from deployed environments
+
+To avoid having to bootstrap local resources or to test with real objects, sometimes it is useful to point the local development environment at deployed resources (e.g., Solr, DSA).
+
+Any of the below approaches can be combined (and usually will be).
+
+#### Solr
+
 To connect to production Solr
 
 ```
@@ -18,14 +36,23 @@ SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_qa bin/setup
 ```
 to connect to the Argo QA solr index. (Alternatively, you can connect to the stage solr index with `argo_stage` or production with `argo_prod`.)
 
-You can also connect to a deployed DSA. First, obtain a token for the DSA instance and then:
+#### DSA
+Obtain a token for the DSA instance and then:
 ```
 SETTINGS__DOR_SERVICES__URL='https://dor-services-qa-lb.stanford.edu' SETTINGS__DOR_SERVICES__TOKEN=hbGcifaketokenOiJIUzI1NiJ9.jbvl5uai9y2MF7_nFqYrcewO4uKJ8tLY2A69b bin/setup
 ```
 
-Note that `bin/setup` will create the database, run yarn, and perform other setup tasks.
+#### PresCat
+Obtain a token for the PresCat instance and then:
 
-The roles, email address, and name of the test user can be provided in environment variables. Defaults are set in `bin/dev`.
+```
+SETTINGS__PRESERVATION_CATALOG__URL='https://preservation-catalog-qa.stanford.edu' SETTINGS__PRESERVATION_CATALOG__TOKEN='fgJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.FhjtP5vOd1xIX7h6oRBNZrf' bin/setup
+```
+
+#### Other
+```
+SETTINGS__PURL_FETCHER__URL='https://purl-fetcher-stage.stanford.edu' SETTINGS__STACKS__URL='https://stacks-stage.stanford.edu/image' bin/setup
+```
 
 ### Linters
 
@@ -224,3 +251,29 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 5. Add a controller for the bulk action that is a subclass of `BulkActionApplicationController`.
 6. Add a `new.html.erb` view.
 7. Add a system test. (The job can be stubbed out.)
+
+## Conventions
+
+### Dates / times
+All dates / times should be rendered in one of the formats defined in `en.yml` and in the "Pacific Time (US & Canada)" time zone.
+
+See the `format_datetime` helper.
+
+### Notifications
+
+#### Error notifications
+The user should be notified of errors using a danger alert.
+
+The danger alert can be triggered with a `flash[:danger]`.
+
+#### Informational notifications
+The user should be notified of informational messages (e.g., status updates, success) using disappearing toasts.
+
+Toasts can be triggered with `flash[:toast]` or by broadcasting to the `notifications` channel:
+```
+component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed",
+                                                                  disappearing: true)
+      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
+                                                target: 'toast-container',
+                                                html: ApplicationController.render(component, layout: false))
+```
