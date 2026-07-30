@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+
+# Notifies Honeybadger of a deploy (or rollback).
+
+# These environment variables are available:
+# KAMAL_RECORDED_AT
+# KAMAL_PERFORMER
+# KAMAL_VERSION
+# KAMAL_HOSTS
+# KAMAL_ROLES (if set)
+# KAMAL_DESTINATION (if set)
+# KAMAL_RUNTIME
+# KAMAL_COMMAND
+# KAMAL_SUBCOMMAND
+
+set -e
+
+REPO_URL=$(git config --get remote.origin.url)
+API_KEY=$(vault kv get -field=content puppet/application/argo-b3/honeybadger-api-key)
+
+curl --no-progress-meter --data \
+  "deploy[environment]=${KAMAL_DESTINATION}&deploy[local_username]=$(whoami)&deploy[revision]=${KAMAL_VERSION}&deploy[repository]=${REPO_URL}&api_key=${API_KEY}" \
+  https://api.honeybadger.io/v1/deploys
+
+echo "Honeybadger notification complete."

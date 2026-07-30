@@ -1,0 +1,25 @@
+# Deploy to the qa server.
+servers:
+  web:
+    hosts:
+      - argo-b3-qa-a.stanford.edu
+  job:
+    hosts:
+      - argo-b3-qa-a.stanford.edu
+
+# Build natively on the deploy target itself (already has Docker via Puppet)
+# rather than emulating amd64 via QEMU on an arm64 developer laptop.
+builder:
+  remote: ssh://lyberadmin@argo-b3-qa-a.stanford.edu
+
+env:
+  clear:
+    SETTINGS__SOLR__URL: https://sul-solr.stanford.edu/solr/argo_qa
+    SETTINGS__DOR_SERVICES__URL: https://dor-services-qa-lb.stanford.edu
+    SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-qa.stanford.edu
+    SETTINGS__STACKS__URL: https://stacks-stage.stanford.edu/image
+    SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-stage.stanford.edu
+    SETTINGS__ARGO__URL: https://argo-qa.stanford.edu
+    SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
+
+    HONEYBADGER_ENV: qa
