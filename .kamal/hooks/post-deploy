@@ -1,9 +1,7 @@
 #!/usr/bin/env sh
 
-# Notifies Honeybadger of a deploy (or rollback), analogous to the
-# dlss-capistrano-docker honeybadger.rake task:
-# https://github.com/sul-dlss/dlss-capistrano-docker/blob/main/lib/dlss/docker/capistrano/tasks/honeybadger.rake
-#
+# Notifies Honeybadger of a deploy (or rollback).
+
 # These environment variables are available:
 # KAMAL_RECORDED_AT
 # KAMAL_PERFORMER

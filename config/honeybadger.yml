@@ -3,7 +3,7 @@
 
 # api_key: 'value lives in vault and is injected via env variable'
 
-# env: 'value is configured via capistrano config'
+# env: 'value is configured via environment variable'
 
 # The absolute path to your project folder.
 root: "<%= Rails.root.to_s %>"

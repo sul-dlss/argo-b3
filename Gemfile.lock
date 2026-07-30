@@ -79,8 +79,6 @@ GEM
       uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    airbrussh (1.6.2)
-      sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.3)
     attr_extras (7.1.0)
     barby (0.7.0)
@@ -107,21 +105,6 @@ GEM
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
       thor (~> 1.0)
-    capistrano (3.20.1)
-      airbrussh (>= 1.0.0)
-      i18n
-      rake (>= 10.0.0)
-      sshkit (>= 1.9.0)
-    capistrano-bundler (2.2.0)
-      capistrano (~> 3.1)
-    capistrano-one_time_key (0.2.0)
-      capistrano (~> 3.0)
-    capistrano-passenger (0.2.1)
-      capistrano (~> 3.0)
-    capistrano-rails (1.7.0)
-      capistrano (~> 3.1)
-      capistrano-bundler (>= 1.1, < 3)
-    capistrano-shared_configs (0.2.2)
     capybara (3.40.0)
       addressable
       matrix
@@ -184,12 +167,6 @@ GEM
     deprecation (1.1.0)
       activesupport
     diff-lcs (1.6.2)
-    dlss-capistrano (6.1.1)
-      bcrypt_pbkdf
-      capistrano (~> 3.0)
-      capistrano-one_time_key (>= 0.2.0)
-      capistrano-shared_configs
-      ed25519
     dor-services-client (15.66.0)
       activesupport (>= 7.0.0)
       cocina-models (~> 0.132.0)
@@ -709,8 +686,6 @@ DEPENDENCIES
   bootsnap
   brakeman
   bundler-audit
-  capistrano-passenger
-  capistrano-rails
   capybara
   capybara-lockstep
   cocina-models
@@ -720,7 +695,6 @@ DEPENDENCIES
   csv
   cyperful
   debug
-  dlss-capistrano
   dor-services-client
   dry-monads
   erb_lint
