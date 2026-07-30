@@ -81,7 +81,7 @@ In development, available at http://localhost:3000/lookbook
 * See `--roles` to run only for specific roles (e.g., `web` or `job`)
 
 Note:
-* Honeybadger deploy notifications are performs in `.kamal/hooks/post-deploy`.
+* Honeybadger deploy notifications are performed in `.kamal/hooks/post-deploy`.
 * Secrets are retrieved directly using the Vault CLI. See `.kamal/secrets-common` and environment specific secrets files.
 * The Dockerfile configures the lyberadmin (50:503) user to match the host server.
 * `/workspace/bulk` and `/var/log/argo` are shared with the containers.
@@ -137,7 +137,7 @@ bin/kamal-otk qa app version
 bin/kamal-otk qa app logs -f 
 ```
 
-* For log filtering options, see `bin/kamal-otk qa app logs --help` for log filtering options.
+* For log filtering options, see `bin/kamal-otk qa app logs --help`.
 * For log rotation, see `logging` in `deploy.yml`.
 * The application also logs to `/var/log`.
 
