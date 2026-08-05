@@ -27,23 +27,26 @@ class TracksheetService
     new(...).call
   end
 
-  # @param solr_doc_presenter [SolrDocPresenter] presenter for the object to render
-  def initialize(solr_doc_presenter:)
-    @solr_doc_presenter = solr_doc_presenter
+  # @param solr_doc_presenters [Array<SolrDocPresenter>] presenters for the object to render
+  def initialize(solr_doc_presenters:)
+    @solr_doc_presenters = solr_doc_presenters
   end
 
   # @return [Prawn::Document] single-page PDF tracking sheet
   def call
-    pdf = Prawn::Document.new(page_size: [5.5.in, 8.5.in])
-    register_fonts(pdf)
-    pdf.font(FONT_FAMILY)
-    generate_tracking_sheet(pdf)
-    pdf
+    Prawn::Document.new(page_size: [5.5.in, 8.5.in]).tap do |pdf|
+      register_fonts(pdf)
+      pdf.font(FONT_FAMILY)
+      solr_doc_presenters.each_with_index do |solr_doc_presenter, index|
+        generate_tracking_sheet(solr_doc_presenter, pdf)
+        pdf.start_new_page unless index + 1 == solr_doc_presenters.length
+      end
+    end
   end
 
   private
 
-  attr_reader :solr_doc_presenter
+  attr_reader :solr_doc_presenters
 
   # Registers the vendored TrueType font family with the PDF document so that
   # UTF-8 text can be rendered.
@@ -55,7 +58,7 @@ class TracksheetService
     )
   end
 
-  def generate_tracking_sheet(pdf) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  def generate_tracking_sheet(solr_doc_presenter, pdf) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     bc_width = 2.25.in
     bc_height = 0.75.in
 
@@ -75,7 +78,7 @@ class TracksheetService
     pdf.y -= 0.5.in
 
     pdf.font(FONT_FAMILY, size: 10)
-    pdf.table(doc_to_table, column_widths: [120, 204], cell_style: { borders: [], padding: [0, 6, 0, 0] })
+    pdf.table(doc_to_table(solr_doc_presenter), column_widths: [100, 224], cell_style: { borders: [], padding: 0.pt })
 
     pdf.y -= 0.5.in
 
@@ -106,7 +109,7 @@ class TracksheetService
   end
 
   # @return [Array<Array<String>>] table data suitable for Prawn's pdf.table
-  def doc_to_table # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
+  def doc_to_table(solr_doc_presenter) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
     table_data = []
 
     table_data.push(['Object Label:', normalize(solr_doc_presenter.title).truncate(110)])
