@@ -66,8 +66,6 @@ To run linters individually, run which ones you need:
 * JavaScript code: `yarn run lint` (add `--fix` flag to autocorrect violations)
 * SCSS stylesheets: `yarn run stylelint` (add `--fix` flag to autocorrect violations)
 
-Alternatively, use the `/lint` agent skill to assist with fixing linting errors.
-
 ### Background Jobs UI
 
 A dashboard for SolidQueue background jobs is available at http://localhost:3000/jobs
