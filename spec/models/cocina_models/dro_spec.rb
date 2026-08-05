@@ -163,7 +163,8 @@ RSpec.describe CocinaModels::Dro do
     context 'when the object has not been persisted' do
       let(:new_dro) do
         described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
-                            access_view: 'world', access_download: 'world')
+                            access_view: 'world', access_download: 'world',
+                            admin_policy_druid: 'druid:hv992ry2431')
       end
       let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
       let(:registered_cocina_object) { build(:dro_with_metadata) }
@@ -180,6 +181,35 @@ RSpec.describe CocinaModels::Dro do
         expect(new_dro.persisted?).to be true
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false
+      end
+    end
+
+    context 'when building the real request cocina object' do
+      let(:new_dro) do
+        described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
+                            access_view: 'world', access_download: 'world',
+                            admin_policy_druid: 'druid:hv992ry2431')
+      end
+      let(:registered_cocina_object) { build(:dro_with_metadata) }
+
+      before do
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'constructs and registers a valid Cocina::Models::RequestDRO' do
+        new_dro.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          request_cocina_object = args[:request_cocina_object]
+          expect(request_cocina_object).to be_a(Cocina::Models::RequestDRO)
+          expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.book)
+          expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
+          expect(request_cocina_object.administrative.hasAdminPolicy).to eq('druid:hv992ry2431')
+          expect(request_cocina_object.access.view).to eq('world')
+          expect(request_cocina_object.access.download).to eq('world')
+
+          expect(args[:user_name]).to eq(user_name)
+        end
       end
     end
   end
@@ -495,6 +525,25 @@ RSpec.describe CocinaModels::Dro do
 
       it 'skips embargo validation' do
         expect(dro).to be_valid
+      end
+    end
+  end
+
+  describe 'admin_policy_druid' do
+    context 'when initialized from a cocina object' do
+      let(:cocina_object) { build(:dro_with_metadata, admin_policy_id: 'druid:bc123df4567') }
+
+      it 'maps admin_policy_druid from the cocina object administrative.hasAdminPolicy' do
+        expect(dro.admin_policy_druid).to eq('druid:bc123df4567')
+      end
+    end
+
+    context 'when admin_policy_druid is blank' do
+      before { dro.admin_policy_druid = nil }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:admin_policy_druid]).to include("can't be blank")
       end
     end
   end

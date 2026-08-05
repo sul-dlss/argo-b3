@@ -110,6 +110,22 @@ module CocinaModels
       CocinaObjectMutators::DroMutator.call(cocina_object: previous_cocina_object, cocina_model: self)
     end
 
+    def request_cocina_object
+      # This is the minimal props to create a valid RequestDRO.
+      # The rest will be filled in by the mutator.
+      cocina_request_object = Cocina::Models.build_request(
+        {
+          type: content_type,
+          identification: { sourceId: source_id },
+          administrative: { hasAdminPolicy: admin_policy_druid },
+          # Stubbing this out for now.
+          description: { title: [{ value: 'Test Title' }] }
+        },
+        validate: false
+      )
+      CocinaObjectMutators::DroMutator.call(cocina_object: cocina_request_object, cocina_model: self)
+    end
+
     def viewing_direction_only_for_applicable_content_types
       return if viewing_direction.blank?
       return if Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS.include?(content_type)

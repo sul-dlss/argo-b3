@@ -17,6 +17,10 @@ module CocinaModels
     attr_reader :external_identifier, :previous_cocina_object
     alias druid external_identifier
 
+    # All objects have an admin policy
+    attribute :admin_policy_druid, :string
+    validates :admin_policy_druid, presence: true
+
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
     # @raise [Sdr::Repository::Error] if there is an error updating the object

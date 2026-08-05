@@ -53,7 +53,8 @@ RSpec.describe CocinaModelMappers::DroMapper do
         barcode: nil,
         content_type: cocina_object.type,
         viewing_direction: nil,
-        folio_catalog_links_attributes: []
+        folio_catalog_links_attributes: [],
+        admin_policy_druid: cocina_object.administrative.hasAdminPolicy
       )
     end
 
