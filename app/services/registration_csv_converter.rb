@@ -37,8 +37,8 @@ class RegistrationCsvConverter
   end
 
   def convert_row(row)
-    cocina_object = Cocina::Models::RequestDRO.new(model_params(row))
-    Success(cocina_object:,
+    request_cocina_object = Cocina::Models::RequestDRO.new(model_params(row))
+    Success(request_cocina_object:,
             workflow_name: params[:initial_workflow] || row.fetch('initial_workflow'),
             tags: tags(row) + ticket_tags(row))
   rescue Cocina::Models::ValidationError => e

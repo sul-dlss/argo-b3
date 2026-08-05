@@ -6,11 +6,11 @@ RSpec.describe CocinaModels::Dro do
   include ActiveModel::Lint::Tests
   include ActiveSupport::Testing::Assertions
 
-  subject(:dro) { described_class.new(cocina_object) }
+  subject(:dro) { described_class.build_from_cocina_object(cocina_object) }
 
   let(:cocina_object) { build(:dro_with_metadata) }
 
-  describe '#initialize' do
+  describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::DROWithMetadata' do
       it 'initializes with a Cocina::Models::DROWithMetadata' do
         expect(dro.external_identifier).to eq(cocina_object.externalIdentifier)
@@ -33,6 +33,19 @@ RSpec.describe CocinaModels::Dro do
         expect(dro.folio_catalog_links.count).to eq(1)
         expect(dro.folio_catalog_links.first.catalog_record_id).to eq('in11403803')
       end
+    end
+  end
+
+  describe '#initialize' do
+    subject(:dro) { described_class.new(source_id: 'new:source-id') }
+
+    it 'builds a new, unpersisted model from a hash of attributes' do
+      expect(dro.source_id).to eq('new:source-id')
+      expect(dro.previous_cocina_object).to be_nil
+      expect(dro.external_identifier).to be_nil
+      expect(dro.persisted?).to be false
+      expect(dro.to_param).to be_nil
+      expect(dro.to_key).to be_nil
     end
   end
 
@@ -127,6 +140,48 @@ RSpec.describe CocinaModels::Dro do
         end
       end
     end
+
+    context 'when the object has not been persisted' do
+      subject(:dro) { described_class.new(source_id: 'new:source-id') }
+
+      it 'raises' do
+        expect { dro.save!(user_name:) }.to raise_error(/has not been persisted/)
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+  end
+
+  describe '#create!' do
+    let(:user_name) { 'test_user' }
+
+    context 'when the object has already been persisted' do
+      it 'raises' do
+        expect { dro.create!(user_name:) }.to raise_error(/already been persisted/)
+      end
+    end
+
+    context 'when the object has not been persisted' do
+      let(:new_dro) do
+        described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
+                            access_view: 'world', access_download: 'world')
+      end
+      let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
+      let(:registered_cocina_object) { build(:dro_with_metadata) }
+
+      before do
+        allow(new_dro).to receive(:request_cocina_object).and_return(request_cocina_object)
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'registers the object and repopulates the model' do
+        new_dro.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register).with(request_cocina_object:, user_name:)
+        expect(new_dro.persisted?).to be true
+        expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
+        expect(new_dro.changed?).to be false
+      end
+    end
   end
 
   describe 'change tracking' do
@@ -140,7 +195,7 @@ RSpec.describe CocinaModels::Dro do
 
     it 'tracks changes to a nested folio catalog link attribute' do
       cocina_object_with_link = build(:dro_with_metadata, folio_instance_hrids: ['in11403803'])
-      dro_with_link = described_class.new(cocina_object_with_link)
+      dro_with_link = described_class.build_from_cocina_object(cocina_object_with_link)
       folio_link = dro_with_link.folio_catalog_links.first
       expect(folio_link.changed?).to be false
       folio_link.catalog_record_id = 'in99999999'

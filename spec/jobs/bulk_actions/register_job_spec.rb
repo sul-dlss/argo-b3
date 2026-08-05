@@ -86,12 +86,12 @@ RSpec.describe BulkActions::RegisterJob do
       job.perform_now
 
       expect(Sdr::Repository).to have_received(:register)
-        .with(cocina_object: Cocina::Models::RequestDRO,
+        .with(request_cocina_object: Cocina::Models::RequestDRO,
               tags: ['csv : test', 'Project : two'],
               workflow_name: 'accessionWF',
               user_name:)
       expect(Sdr::Repository).to have_received(:register)
-        .with(cocina_object: Cocina::Models::RequestDRO,
+        .with(request_cocina_object: Cocina::Models::RequestDRO,
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)
@@ -128,7 +128,7 @@ RSpec.describe BulkActions::RegisterJob do
       job.perform_now
 
       expect(Sdr::Repository).to have_received(:register)
-        .with(cocina_object: Cocina::Models::RequestDRO,
+        .with(request_cocina_object: Cocina::Models::RequestDRO,
               tags: ['csv : test', 'Project : two'],
               workflow_name: 'accessionWF',
               user_name:).twice
@@ -150,12 +150,12 @@ RSpec.describe BulkActions::RegisterJob do
       job.perform_now
 
       expect(Sdr::Repository).to have_received(:register)
-        .with(cocina_object: Cocina::Models::RequestDRO,
+        .with(request_cocina_object: Cocina::Models::RequestDRO,
               tags: ['csv : test', 'Project : two'],
               workflow_name: 'accessionWF',
               user_name:)
       expect(Sdr::Repository).to have_received(:register)
-        .with(cocina_object: Cocina::Models::RequestDRO,
+        .with(request_cocina_object: Cocina::Models::RequestDRO,
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)

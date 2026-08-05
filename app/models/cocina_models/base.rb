@@ -9,11 +9,9 @@ module CocinaModels
     alias update assign_attributes
 
     # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata]
-    def initialize(cocina_object)
-      @external_identifier = cocina_object.externalIdentifier
-      @previous_cocina_object = cocina_object
-      super(**model_attrs_for(cocina_object))
-      changes_applied
+    # @return [Base] a new instance built from the given Cocina object
+    def self.build_from_cocina_object(cocina_object)
+      new.tap { |instance| instance.send(:assign_from_cocina_object, cocina_object) }
     end
 
     attr_reader :external_identifier, :previous_cocina_object
@@ -24,11 +22,24 @@ module CocinaModels
     # @raise [Sdr::Repository::Error] if there is an error updating the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
     def save!(user_name:, description: nil)
+      raise 'Cannot save an object that has not been persisted; call #create! instead' unless persisted?
       return unless changed?
 
       validate!
       Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
       changes_applied
+    end
+
+    # @param [String] user_name the sunetid of the user performing the action
+    # @raise [RuntimeError] if the object has already been persisted
+    # @raise [Sdr::Repository::Error] if there is an error registering the object
+    # @raise [ActiveModel::ValidationError] if the model is invalid
+    def create!(user_name:)
+      raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
+
+      validate!
+      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:)
+      assign_from_cocina_object(registered_cocina_object)
     end
 
     def to_param
@@ -40,7 +51,7 @@ module CocinaModels
     end
 
     def persisted?
-      true
+      previous_cocina_object.present?
     end
 
     def dro?
@@ -67,6 +78,13 @@ module CocinaModels
 
     private
 
+    def assign_from_cocina_object(cocina_object)
+      @external_identifier = cocina_object.externalIdentifier
+      @previous_cocina_object = cocina_object
+      assign_attributes(model_attrs_for(cocina_object))
+      changes_applied
+    end
+
     # @return [Hash] the attributes for initializing the model, to be implemented by subclasses
     def model_attrs_for(cocina_object)
       raise NotImplementedError,
@@ -78,6 +96,14 @@ module CocinaModels
     def mutated_cocina_object
       raise NotImplementedError, 'Subclasses must implement #mutated_cocina_object to return a new Cocina object ' \
                                  'based on the model attributes'
+    end
+
+    # @return [Cocina::Models::RequestDRO, Cocina::Models::RequestCollection, Cocina::Models::RequestAdminPolicy]
+    #   the new request Cocina object based on the model attributes, to be implemented by subclasses
+    def request_cocina_object
+      raise NotImplementedError,
+            'Subclasses must implement #request_cocina_object to return a new request Cocina object ' \
+            'based on the model attributes'
     end
   end
 end

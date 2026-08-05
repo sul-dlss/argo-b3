@@ -10,11 +10,11 @@ module CocinaModels
     def self.build(cocina_object)
       case cocina_object
       when Cocina::Models::DROWithMetadata
-        Dro.new(cocina_object)
+        Dro.build_from_cocina_object(cocina_object)
       when Cocina::Models::CollectionWithMetadata
-        Collection.new(cocina_object)
+        Collection.build_from_cocina_object(cocina_object)
       when Cocina::Models::AdminPolicyWithMetadata
-        AdminPolicy.new(cocina_object)
+        AdminPolicy.build_from_cocina_object(cocina_object)
       else
         raise ArgumentError, 'Unexpected cocina object type'
       end
