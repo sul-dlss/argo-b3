@@ -4,6 +4,7 @@ module CocinaModels
   # Base model for a Cocina object.
   class Base < Blanks::Base
     include ActiveModel::AttributeAssignment
+    include NormalizationConcern
 
     alias update assign_attributes
 
@@ -52,6 +53,16 @@ module CocinaModels
 
     def admin_policy?
       is_a?(AdminPolicy)
+    end
+
+    def changed?
+      # This allows subclasses to track changes on associated objects (e.g., CatalogLinks).
+      super || tracked_associations_changed?
+    end
+
+    # Subclasses can override this.
+    def tracked_associations_changed?
+      false
     end
 
     private

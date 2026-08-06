@@ -20,6 +20,18 @@ module CocinaModels
 
       def catalog_link_refresh? = catalog_link_refresh
 
+      def folio_catalog_links_changed?
+        existing_catalog_record_ids = Array(previous_cocina_object.identification&.catalogLinks)
+                                      .filter_map { |link| link.catalogRecordId if link.catalog == 'folio' }
+
+        folio_catalog_links.map(&:catalog_record_id).sort != existing_catalog_record_ids.sort
+      end
+
+      # This bubbles up changes to the parent objects.
+      def tracked_associations_changed?
+        super || folio_catalog_links_changed?
+      end
+
       private
 
       def sort_key_requires_part_label
