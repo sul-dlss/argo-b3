@@ -15,7 +15,6 @@
   <% end %>
 
   <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-3', variant: :underline) do |component| %>
-
     <% component.with_tab(id: 'details-tab', pane_id: 'details-pane', label: 'Details', active: true) %>
     <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
     <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
@@ -25,6 +24,7 @@
     <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina Model') %>
     <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'Solr Document') %>
     <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'PURL Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
+    <% component.with_tab(id: 'description-edit-tab', pane_id: 'description-edit-pane', label: 'Edit description') %>
 
     <%= component.with_pane(id: 'details-pane', tab_id: 'details-tab', active: true) do %>
       <%= turbo_frame_tag(@solr_doc.druid, 'details', src: details_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
@@ -74,6 +74,12 @@
         <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
     <% end %>
+    <% end %>
+
+    <%= component.with_pane(id: 'description-edit-pane', tab_id: 'description-edit-tab') do %>
+      <%= turbo_frame_tag(@solr_doc.druid, 'description', src: edit_object_description_path(object_druid: @solr_doc.druid)) do %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

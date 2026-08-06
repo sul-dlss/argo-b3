@@ -12,4 +12,8 @@ class ObjectPolicy < ApplicationPolicy
   def edit?
     false
   end
+
+  def edit_description?
+    admin?
+  end
 end
