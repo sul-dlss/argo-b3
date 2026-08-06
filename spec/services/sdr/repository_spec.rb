@@ -142,4 +142,55 @@ RSpec.describe Sdr::Repository do
       end
     end
   end
+
+  describe '#accession' do
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, close: true) }
+    let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
+    let(:version_description) { 'a new version' }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    end
+
+    context 'when successful' do
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(druid:, user_name:, version_description:)
+
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: version_description,
+                                                             lane_id: 'high')
+      end
+    end
+
+    context 'when no version_description or lane_id is given' do
+      it 'closes the version with defaults' do
+        described_class.accession(druid:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: nil,
+                                                             lane_id: 'high')
+      end
+    end
+
+    context 'when a lane_id is given' do
+      it 'closes the version with the given lane_id' do
+        described_class.accession(druid:, user_name:, lane_id: 'low')
+
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: nil,
+                                                             lane_id: 'low')
+      end
+    end
+
+    context 'when accessioning fails' do
+      before do
+        allow(version_client).to receive(:close).and_raise(Dor::Services::Client::Error, 'Failed to close version')
+      end
+
+      it 'raises' do
+        expect { described_class.accession(druid:, user_name:) }.to raise_error(Sdr::Repository::Error)
+      end
+    end
+  end
 end

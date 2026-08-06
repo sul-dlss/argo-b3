@@ -118,8 +118,7 @@ module CocinaModels
           type: content_type,
           identification: { sourceId: source_id },
           administrative: { hasAdminPolicy: admin_policy_druid },
-          # Stubbing this out for now.
-          description: { title: [{ value: 'Test Title' }] }
+          description: description_hash
         },
         validate: false
       )

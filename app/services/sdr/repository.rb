@@ -63,5 +63,20 @@ module Sdr
     rescue Dor::Services::Client::Error => e
       raise Error, "Registration failed: #{e.message}"
     end
+
+    # @param [String] druid the druid of the object
+    # @param [String] user_name the sunetid of the user performing the action
+    # @param [String,nil] version_description the description of the version or nil to leave unchanged
+    # @param [String] lane_id the lane to use for accessioning, defaults to 'high'
+    # @raise [Error] if there is an error initiating accession
+    def self.accession(druid:, user_name:, version_description: nil, lane_id: 'high')
+      # Close the version, which will also start accessioning
+      Dor::Services::Client.object(druid)
+                           .version.close(user_name:,
+                                          description: version_description,
+                                          lane_id:)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Initiating accession failed: #{e.message}"
+    end
   end
 end

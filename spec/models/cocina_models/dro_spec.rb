@@ -87,9 +87,15 @@ RSpec.describe CocinaModels::Dro do
 
     context 'with valid and changed attributes' do
       let(:new_source_id) { 'changed:source-id' }
+      let(:new_description_hash) do
+        {
+          title: [{ value: 'Changed Title' }]
+        }
+      end
 
       before do
         dro.source_id = new_source_id
+        dro.description_hash = new_description_hash
       end
 
       it 'saves the model successfully' do
@@ -99,6 +105,7 @@ RSpec.describe CocinaModels::Dro do
           expect(new_cocina_object).to be_a(Cocina::Models::DROWithMetadata)
           expect(new_cocina_object.lock).to eq(cocina_object.lock)
           expect(new_cocina_object.identification.sourceId).to eq(new_source_id)
+          expect(new_cocina_object.description.title.first.value).to eq('Changed Title')
 
           expect(args[:user_name]).to eq(user_name)
           expect(args[:description]).to eq(description)
@@ -177,10 +184,36 @@ RSpec.describe CocinaModels::Dro do
       it 'registers the object and repopulates the model' do
         new_dro.create!(user_name:)
 
-        expect(Sdr::Repository).to have_received(:register).with(request_cocina_object:, user_name:)
+        expect(Sdr::Repository).to have_received(:register)
+          .with(request_cocina_object:, user_name:)
         expect(new_dro.persisted?).to be true
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false
+      end
+
+      context 'when accession is true' do
+        before do
+          allow(Sdr::Repository).to receive(:accession)
+        end
+
+        it 'accessions the registered object' do
+          new_dro.create!(user_name:, accession: true)
+
+          expect(Sdr::Repository).to have_received(:accession)
+            .with(druid: registered_cocina_object.externalIdentifier, user_name:)
+        end
+      end
+
+      context 'when accession is false' do
+        before do
+          allow(Sdr::Repository).to receive(:accession)
+        end
+
+        it 'does not accession the registered object' do
+          new_dro.create!(user_name:, accession: false)
+
+          expect(Sdr::Repository).not_to have_received(:accession)
+        end
       end
     end
 

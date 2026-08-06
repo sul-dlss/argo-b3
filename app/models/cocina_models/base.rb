@@ -17,6 +17,8 @@ module CocinaModels
     attr_reader :external_identifier, :previous_cocina_object
     alias druid external_identifier
 
+    attribute :description_hash, default: -> { { title: [{ value: ':auto' }] } }
+
     # All objects have an admin policy
     attribute :admin_policy_druid, :string
     validates :admin_policy_druid, presence: true
@@ -35,14 +37,16 @@ module CocinaModels
     end
 
     # @param [String] user_name the sunetid of the user performing the action
+    # @param [Boolean] accession whether to accession the object after registering it
     # @raise [RuntimeError] if the object has already been persisted
     # @raise [Sdr::Repository::Error] if there is an error registering the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def create!(user_name:)
+    def create!(user_name:, accession: false)
       raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
 
       validate!
       registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:)
+      Sdr::Repository.accession(druid: registered_cocina_object.externalIdentifier, user_name:) if accession
       assign_from_cocina_object(registered_cocina_object)
     end
 

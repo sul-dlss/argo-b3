@@ -33,6 +33,11 @@ module CocinaObjectMutators
 
     def build_new_cocina_props # rubocop:disable Metrics/AbcSize
       source_props.tap do |new_cocina_props|
+        new_cocina_props[:description] = cocina_model.description_hash
+        unless request_object?
+          new_cocina_props[:description][:purl] =
+            Cocina::Models::Mapping::Purl.for(druid: cocina_model.druid)
+        end
         new_cocina_props[:identification] ||= {}
         new_cocina_props[:identification][:sourceId] = cocina_model.source_id
         new_cocina_props[:access] ||= {}

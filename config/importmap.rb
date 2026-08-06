@@ -12,3 +12,6 @@ pin 'stimulus-autocomplete' # @3.1.0
 pin '@andypf/json-viewer', to: '@andypf--json-viewer.js' # @2.4.0
 pin 'sdr_view_components/toast_controller', to: 'sdr_view_components/toast_controller.js'
 pin 'sdr_view_components/tab_select_controller', to: 'sdr_view_components/tab_select_controller.js'
+pin 'sdr_view_components/tab_error_controller', to: 'sdr_view_components/tab_error_controller.js'
+pin 'sdr_view_components/tab_link_controller', to: 'sdr_view_components/tab_link_controller.js'
+pin 'sdr_view_components/tab_nav_controller', to: 'sdr_view_components/tab_nav_controller.js'

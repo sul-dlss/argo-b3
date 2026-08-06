@@ -52,3 +52,7 @@ $item-color: rgb(#{$item-color-rgb});
   color: rgb(var(--stanford-archway-dark-rgb)) !important;
 }
  
+.required {
+  font-weight: $font-weight-bold;
+  color: var(--stanford-poppy-dark);
+}
