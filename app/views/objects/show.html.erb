@@ -45,6 +45,7 @@
       <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled', classes: 'mb-1') %>
       <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Decommission', variant: 'outline-primary disabled', classes: 'mb-1') %>
     </div>
+
     <div class="col-xl-10 col-lg-12">
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
@@ -85,7 +86,7 @@
         </div>
       </div>
 
-      <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', variant: :underline, collapse_below: :xl) do |component| %>
+      <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
         <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') if @solr_doc.dro? %>

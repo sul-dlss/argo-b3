@@ -18,10 +18,29 @@
     }
   }
 
+  .use-access-copyright-section .card {
+    background-color: rgb(var(--stanford-fog-light-rgb));
+    border: 0;
+    max-width: 300px;
+    width: 100%;
+  }
+
   .nav-underline .nav-link {
     width: fit-content;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  // So that when the tables are stacked, there isn't extra space.
+  .split-table caption {
+    padding: 0;
+  }
+
+  // So that when the tables are stacked, there isn't a border below caption.
+  .split-table-right caption {
+    @include media-breakpoint-down(xl) {
+      border-bottom: 0;
+    }
   }
 }
 

@@ -22,7 +22,6 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
       expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy'))
         .to have_link('University Archives', href: "/objects/#{apo_druid}")
-      expect(page).to have_css "svg[aria-label='Placeholder: Responsive image']", text: 'Test Title'
       expect(page).to have_table_value('item-result-ab123cd4567', 'Content Type', 'book')
       expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
       expect(find_table_value_cell('item-result-ab123cd4567', 'Old Argo'))

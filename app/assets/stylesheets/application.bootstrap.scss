@@ -29,7 +29,10 @@ $item-color: rgb(#{$item-color-rgb});
 
 // left navigation on dashboard and object show pages
 .left-nav {
-  background-color: rgb(var(--stanford-fog-light-rgb));
+  // Only render background color on xl or above
+  @include media-breakpoint-up(xl) {
+    background-color: rgb(var(--stanford-fog-light-rgb));
+  }
 
   .btn {
     width: 100%;
@@ -43,3 +46,9 @@ $item-color: rgb(#{$item-color-rgb});
     border-top: $border-width solid $border-color !important;
   }
 }
+
+.nav-underline .nav-link.active {
+  border-bottom: 3px solid rgb(var(--stanford-archway-dark-rgb)) !important;
+  color: rgb(var(--stanford-archway-dark-rgb)) !important;
+}
+ 

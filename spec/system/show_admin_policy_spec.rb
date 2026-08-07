@@ -57,12 +57,12 @@ RSpec.describe 'Show admin policy' do
     expect(page).to have_css('h1', text: original_title)
 
     # Tabs
-    expect(page).to have_css('.nav-link.active', text: 'Details')
+    expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
-    expect(page).to have_css('.nav-link', text: 'Cocina Model')
-    expect(page).to have_css('.nav-link', text: 'Solr Document')
+    expect(page).to have_css('.nav-link', text: 'Cocina JSON')
+    expect(page).to have_css('.nav-link', text: 'SOLR doc')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
@@ -73,13 +73,15 @@ RSpec.describe 'Show admin policy' do
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
 
-    # Tags table
-    expect(page).to have_table_caption('tags-table', 'Tags')
-    expect(page).to have_table_value('tags-table', 'Tags', 'Registered By : jdoe, Remediated By : labtech')
-    expect(page).to have_table_value('tags-table', 'Tickets', 'TESTREQ-1')
+    # Tags card
+    within('.card', text: 'Tags') do
+      expect(page).to have_css('li', text: 'TESTREQ-1')
+      expect(page).to have_css('li', text: 'Registered By : jdoe')
+      expect(page).to have_css('li', text: 'Remediated By : labtech')
+    end
 
     # Cocina model tab
-    click_button 'Cocina Model'
+    click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
     expect(page).to have_css('andypf-json-viewer', text: 'druid')
     expect(page).to have_css('andypf-json-viewer', text: original_title)

@@ -1,25 +1,35 @@
 <%= turbo_frame_tag(@solr_doc.druid, 'overview') do %>
-  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
-    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
-    <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
-    <% component.with_row(label: 'Content type', value: @solr_doc.content_type.titleize) %>
-    <% component.with_row(label: 'Admin policy') do |row_component| %>
-      <% row_component.with_cell do %>
-        <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
-        <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-        (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+  <div class="row mb-5">
+    <div class="col-xl-6 col-12">
+      <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table-left', classes: 'mb-0 mb-xl-3 split-table') do |component| %>
+        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
+        <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
+        <% component.with_row(label: 'Content type', value: @solr_doc.content_type.titleize) %>
       <% end %>
-    <% end %>
-    <% component.with_row(label: 'Collection') do |row_component| %>
-      <% row_component.with_cell do %>
-        <% @solr_doc.collection_druids.each_with_index do |collection_druid, index| %>
-          <%= link_to @solr_doc.collection_titles[index], object_path(druid: collection_druid) %>
-          <% search_form = SearchForm.new(collection_titles: [@solr_doc.collection_titles[index]]) %>
-          (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
+    </div>
+
+    <div class="col-xl-6 col-12">
+      <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table-right', classes: 'split-table split-table-right') do |component| %>
+        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3 invisible d-none d-xl-block', text: 'Overview, continued', 'aria-hidden': true) %><% end %>
+        <% component.with_row(label: 'Admin policy') do |row_component| %>
+          <% row_component.with_cell do %>
+            <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+            <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+            (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+          <% end %>
+        <% end %>
+        <% component.with_row(label: 'Collection') do |row_component| %>
+          <% row_component.with_cell do %>
+            <% @solr_doc.collection_druids.each_with_index do |collection_druid, index| %>
+              <%= link_to @solr_doc.collection_titles[index], object_path(druid: collection_druid) %>
+              <% search_form = SearchForm.new(collection_titles: [@solr_doc.collection_titles[index]]) %>
+              (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
+            <% end %>
+          <% end %>
         <% end %>
       <% end %>
-    <% end %>
-  <% end %>
+    </div>
+  </div>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'identification-table', classes: 'mb-5') do |component| %>
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Identification') %><% end %>
@@ -34,10 +44,29 @@
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Access') %><% end %>
     <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
     <% component.with_row(label: 'Embargo', value: @cocina_model.embargo) %>
-    <% component.with_row(label: 'Copyright', value: @cocina_model.copyright) %>
     <% component.with_row(label: 'License', value: @cocina_model.license) %>
-    <% component.with_row(label: 'Use and reproduction', value: @cocina_model.use_and_reproduction_statement) %>
   <% end %>
 
-  <%= render Show::TagsTableComponent.new(tags: @solr_doc.other_tags, tickets: @solr_doc.tickets) %>
+  <div class="use-access-copyright-section d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
+    <div class="flex-fill">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Use and reproduction</h2>
+          <p class="card-text">
+            <%= @cocina_model.use_and_reproduction_statement %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="show-details-box flex-fill">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Copyright</h2>
+          <p class="card-text">
+            <%= @cocina_model.copyright %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 <% end %>

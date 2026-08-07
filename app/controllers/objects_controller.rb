@@ -95,7 +95,7 @@ class ObjectsController < ApplicationController
     cache_key = "objects/cocina-hash/#{druid}"
     Rails.cache.fetch(cache_key, expires_in: 10.seconds) do
       cocina_object = Sdr::Repository.find(druid:)
-      CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h)
+      CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h, preserve_keys: [:label])
     end
   end
 
