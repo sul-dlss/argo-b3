@@ -11,3 +11,4 @@ pin 'bootstrap', to: 'bootstrap.bundle.min.js'
 pin 'stimulus-autocomplete' # @3.1.0
 pin '@andypf/json-viewer', to: '@andypf--json-viewer.js' # @2.4.0
 pin 'sdr_view_components/toast_controller', to: 'sdr_view_components/toast_controller.js'
+pin 'sdr_view_components/tab_select_controller', to: 'sdr_view_components/tab_select_controller.js'

@@ -1,5 +1,6 @@
 // Colors for object types
-$item-color: rgb(var(--stanford-illuminating-light-rgb));
+$item-color-rgb: var(--stanford-illuminating-light-rgb);
+$item-color: rgb(#{$item-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';

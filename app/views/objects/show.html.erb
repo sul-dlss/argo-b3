@@ -3,7 +3,7 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: 'container object-show mb-4', data: {
+<%= tag.div class: 'container object-show object-type-item mb-4', data: {
       controller: 'cocina-model-show',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
       cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
@@ -11,7 +11,7 @@
   <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
 
   <div class="d-flex flex-column d-xl-block">
-    <div class="object-type object-type-item fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
+    <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
       item
     </div>
 
@@ -46,17 +46,46 @@
       <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Decommission', variant: 'outline-primary disabled', classes: 'mb-1') %>
     </div>
     <div class="col-xl-10 col-lg-12">
-      <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-3', variant: :underline) do |component| %>
+      <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
+        <div class="show-box flex-fill">
+          <div class="border object-type-border object-type-bg-light card">
+            <div class="card-body">
+              <h2 class="card-title">Draft, not deposited</h2>
+              <ul class="card-text">
+                <li>Edit item details</li>
+                <li>Manage files</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="show-box flex-fill">
+          <div class="border object-type-border object-type-bg-light card">
+            <div class="card-body">
+              <h2 class="card-title">Released to</h2>
+              <ul class="card-text">
+                <li>SearchWorks</li>
+                <li>EarthWorks</li>
+                <li>PURL Sitemap</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="show-box flex-fill">
+          <div class="border object-type-border object-type-bg-light card">
+            <div class="card-body">
+              <h2 class="card-title">Tags</h2>
+              <ul class="card-text">
+                <!-- Placeholder -- these aren't the right list of tags. -->
+                <% (Array(@solr_doc.tickets) + Array(@solr_doc.other_tags)).each do |tag| %>
+                  <li><%= tag %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <!-- Overview -->
-<!-- Description preview -->
-<!-- Files -->
-<!-- History -->
-<!-- Cocina JSON -->
-<!-- Events -->
-<!-- Technical metadata -->
-<!-- SOLR doc -->
-
+      <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', variant: :underline, collapse_below: :xl) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
         <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') if @solr_doc.dro? %>

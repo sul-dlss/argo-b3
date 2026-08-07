@@ -1,6 +1,15 @@
 // Object show page
 .object-show {
-  .object-type {
+  .show-box {
+    max-width: 300px;
+
+    > .border {
+      height: 180px;
+      overflow-y: auto;
+    }
+  }
+
+  .object-type-badge {
     width: 240px;
     height: 38px;
 
@@ -13,5 +22,21 @@
     width: fit-content;
     padding-left: 10px;
     padding-right: 10px;
+  }
+}
+
+.object-type-item {
+  .object-type-bg {
+    background-color: $item-color;
+
+  }
+
+  .object-type-bg-light {
+    background-color: rgba(#{$item-color-rgb}, 0.1);
+
+  }
+
+  .border.object-type-border {
+    --bs-border-color: #{$item-color};
   }
 }

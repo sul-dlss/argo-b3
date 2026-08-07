@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/sul-dlss/sdr_view_components.git
+  revision: a4b20d6d769731e61fe50fa3ac403e94008907ae
+  branch: collapsible_tab_list
+  specs:
+    sdr_view_components (0.5.0)
+      rails (~> 8.0)
+      view_component
+      zeitwerk
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -579,10 +589,6 @@ GEM
     ruby-next-core (1.2.1)
     ruby-progressbar (1.13.0)
     rubyzip (3.4.1)
-    sdr_view_components (0.4.2)
-      rails (~> 8.0)
-      view_component
-      zeitwerk
     securerandom (0.4.1)
     selenium-webdriver (4.46.0)
       base64 (~> 0.2)
@@ -730,7 +736,7 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rspec_rails
   rubyzip
-  sdr_view_components
+  sdr_view_components!
   selenium-webdriver
   simplecov
   solid_cable
