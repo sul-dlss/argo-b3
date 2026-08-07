@@ -1,4 +1,4 @@
-<%= turbo_frame_tag(@solr_doc.druid, 'details') do %>
+<%= turbo_frame_tag(@solr_doc.druid, 'overview') do %>
     <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
       <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
       <% component.with_row(label: 'Object type', value: 'Admin policy') %>

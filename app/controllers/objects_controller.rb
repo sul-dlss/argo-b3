@@ -2,7 +2,7 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
-  skip_verify_authorized only: %i[show_json show_workflows show_details show_header show_versions
+  skip_verify_authorized only: %i[show_json show_workflows show_overview show_header show_versions
                                   show_purl_preview show_solr_doc]
 
   include TokenConcern
@@ -14,6 +14,8 @@ class ObjectsController < ApplicationController
   # Thus, the signing / verification acts as authorization for those endpoints.
   self.token_purpose = 'show'
 
+  # Note that for the purposes of rendering show pages, both @solr_doc or @cocina_models
+  # provide the latest object data. (This is a "live" solr document, not the possibly dated version stored in Solr.)
   def show
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(params[:druid]))
     authorize! @solr_doc, with: ObjectPolicy
@@ -28,18 +30,18 @@ class ObjectsController < ApplicationController
     render layout: false
   end
 
-  def show_details
+  def show_overview
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
     @cocina_model = CocinaModels::PresenterFactory.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
 
     case @solr_doc.object_type
     when 'collection'
-      render :show_collection_details, layout: false
+      render :show_collection_overview, layout: false
     when 'admin_policy'
-      render :show_admin_policy_details, layout: false
+      render :show_admin_policy_overview, layout: false
     else
       # This also includes agreements and virtual objects.
-      render :show_dro_details, layout: false
+      render :show_dro_overview, layout: false
     end
   end
 
@@ -83,7 +85,6 @@ class ObjectsController < ApplicationController
   end
 
   # Note that this is a "live" solr document built from latest DSA data.
-
   def fetch_solr_doc(druid)
     Rails.cache.fetch("objects/solr-doc/#{druid}", expires_in: 10.seconds) do
       Sdr::Repository.find_solr(druid:)

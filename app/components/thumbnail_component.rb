@@ -4,34 +4,34 @@
 class ThumbnailComponent < ApplicationComponent
   include ActionView::Helpers::TextHelper
 
-  def initialize(result:)
+  def initialize(result:, dimension: 400, classes: [])
     @result = result
+    @dimension = dimension
+    @classes = classes
     super()
   end
 
-  attr_reader :result
+  attr_reader :result, :dimension
 
-  def show_thumbnail?
-    thumbnail_url.present?
+  def render?
+    result.first_shelved_image.present?
   end
 
-  def placeholder_text
-    truncate(citation, length: 246, omission: '…')
+  def call
+    image_tag thumbnail_url, class: classes, alt: ''
   end
 
   private
 
-  def citation
-    CitationPresenter.new(result:, italicize: false).call
+  def classes
+    merge_classes('thumbnail', @classes)
   end
 
   def thumbnail_file_id
-    File.basename(result.first_shelved_image, '.*') if result.first_shelved_image
+    File.basename(result.first_shelved_image, '.*')
   end
 
   def thumbnail_url
-    return nil unless thumbnail_file_id
-
-    "#{Settings.stacks.url}/iiif/#{result.bare_druid}%2F#{ERB::Util.url_encode(thumbnail_file_id)}/full/!400,400/0/default.jpg"
+    "#{Settings.stacks.url}/iiif/#{result.bare_druid}%2F#{ERB::Util.url_encode(thumbnail_file_id)}/full/!#{dimension},#{dimension}/0/default.jpg"
   end
 end

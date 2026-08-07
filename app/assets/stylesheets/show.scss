@@ -1,4 +1,17 @@
-// Styles for the show page
-.nav-underline .nav-link {
-  width: 8.5rem;
+// Object show page
+.object-show {
+  .object-type {
+    width: 240px;
+    height: 38px;
+
+    &.object-type-item {
+      background-color: $item-color;
+    }
+  }
+
+  .nav-underline .nav-link {
+    width: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }

@@ -37,4 +37,4 @@ purl_fetcher:
   url: "https://purl-fetcher.stanford.edu"
 
 component_library:
-  url: "https://cdn.jsdelivr.net/gh/sul-dlss/component-library@v2025-09-11"
+  url: "https://cdn.jsdelivr.net/gh/sul-dlss/component-library@v2026-08-06"
