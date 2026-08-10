@@ -66,7 +66,7 @@ RSpec.describe RegistrationCsvConverter do
       expect(results.first.value![:workflow_name]).to eq('accessionWF')
       expect(results.first.value![:tags]).to eq(['csv : test', 'Project : two', 'Ticket : DIGREQ-1234',
                                                  'Ticket : DIGREQ-5678'])
-      expect(results.first.value![:cocina_object]).to eq(expected_cocina)
+      expect(results.first.value![:request_cocina_object]).to eq(expected_cocina)
     end
   end
 
@@ -91,7 +91,7 @@ RSpec.describe RegistrationCsvConverter do
     it 'uses default rights' do
       expect(results.size).to be 1
       expect(results.first.success?).to be true
-      expect(results.first.value![:cocina_object]).to eq(expected_cocina.new(access: {}))
+      expect(results.first.value![:request_cocina_object]).to eq(expected_cocina.new(access: {}))
     end
   end
 
@@ -117,7 +117,7 @@ RSpec.describe RegistrationCsvConverter do
     it 'returns result with access citation-only model' do
       expect(results.size).to be 1
       expect(results.first.success?).to be true
-      expect(results.first.value![:cocina_object])
+      expect(results.first.value![:request_cocina_object])
         .to eq(expected_cocina.new(access: { 'view' => 'citation-only',
                                              'download' => 'none' }))
     end
@@ -144,7 +144,7 @@ RSpec.describe RegistrationCsvConverter do
     it 'returns result with access citation-only model' do
       expect(results.size).to be 1
       expect(results.first.success?).to be true
-      expect(results.first.value![:cocina_object])
+      expect(results.first.value![:request_cocina_object])
         .to eq(expected_cocina.new(access: { 'view' => 'citation-only',
                                              'download' => 'none' }))
     end

@@ -12,6 +12,7 @@ module CocinaObjectMutators
         new_cocina_props[:access][:location] = cocina_model.access_location
         new_cocina_props[:identification][:barcode] = cocina_model.barcode.presence
         new_cocina_props[:type] = cocina_model.content_type
+        new_cocina_props[:structural] ||= {}
         new_cocina_props[:structural][:hasMemberOrders] = build_member_orders
 
         update_embargo(new_cocina_props[:access])

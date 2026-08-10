@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe CocinaModels::Collection do
-  subject(:collection) { described_class.new(cocina_object) }
+  subject(:collection) { described_class.build_from_cocina_object(cocina_object) }
 
   let(:cocina_object) { build(:collection_with_metadata) }
 
-  describe '#initialize' do
+  describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::CollectionWithMetadata' do
       it 'initializes with a Cocina::Models::CollectionWithMetadata' do
         expect(collection.external_identifier).to eq(cocina_object.externalIdentifier)
@@ -51,6 +51,25 @@ RSpec.describe CocinaModels::Collection do
           expect(args[:description]).to eq(description)
         end
         expect(collection.changed?).to be false
+      end
+    end
+
+    context 'when the object has not been persisted' do
+      subject(:collection) { described_class.new(source_id: 'new:source-id') }
+
+      it 'raises' do
+        expect { collection.save!(user_name:) }.to raise_error(/has not been persisted/)
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+  end
+
+  describe '#create!' do
+    let(:user_name) { 'test_user' }
+
+    context 'when the object has already been persisted' do
+      it 'raises' do
+        expect { collection.create!(user_name:) }.to raise_error(/already been persisted/)
       end
     end
   end

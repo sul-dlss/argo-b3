@@ -6,7 +6,7 @@ RSpec.describe CocinaObjectMutators::DroMutator do
   subject(:result) { described_class.call(cocina_object:, cocina_model:) }
 
   let(:cocina_object) { build(:dro_with_metadata) }
-  let(:cocina_model) { CocinaModels::Dro.new(cocina_object) }
+  let(:cocina_model) { CocinaModels::Dro.build_from_cocina_object(cocina_object) }
 
   context 'when the cocina model has an updated content_type' do
     let(:new_content_type) { Cocina::Models::ObjectType.book }

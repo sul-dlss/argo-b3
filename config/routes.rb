@@ -171,6 +171,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :items, only: %i[new create]
+
   namespace :admin do
     get 'groups'
   end

@@ -54,4 +54,18 @@ en:
       never: "Not released"
       has_orcids: 'Has contributor ORCIDs'
       has_doi: 'Has DOI'
-  
+  edit:
+    items:
+      new:
+        title: "Register and deposit an item"
+      tabs:
+        deposit: "Deposit"
+        details: "Item details"
+        rights: "APO, collection, rights"        
+      fields:
+        admin_policy_druid:
+          label: "APO"
+        source_id:
+          label: "Source ID"
+        title:
+          label: "Title"

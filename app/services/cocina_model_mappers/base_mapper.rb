@@ -22,7 +22,8 @@ module CocinaModelMappers
         folio_catalog_links_attributes: folio_catalog_link_attributes,
         catalog_link_refresh: refreshing_folio_catalog_link&.refresh,
         catalog_link_part_label: refreshing_folio_catalog_link&.partLabel,
-        catalog_link_sort_key: refreshing_folio_catalog_link&.sortKey
+        catalog_link_sort_key: refreshing_folio_catalog_link&.sortKey,
+        admin_policy_druid: cocina_object.administrative.hasAdminPolicy
       }.compact
     end
 

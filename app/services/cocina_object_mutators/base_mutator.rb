@@ -7,7 +7,8 @@ module CocinaObjectMutators
       new(...).call
     end
 
-    # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata]
+    # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata,
+    #   Cocina::Models::RequestDRO, Cocina::Models::RequestCollection]
     # @param cocina_model [CocinaModels::Dro, CocinaModels::Collection]
     def initialize(cocina_object:, cocina_model:)
       @cocina_object = cocina_object
@@ -17,6 +18,8 @@ module CocinaObjectMutators
     def call
       new_cocina_props = build_new_cocina_props
 
+      return Cocina::Models.build_request(new_cocina_props) if request_object?
+
       Cocina::Models.with_metadata(Cocina::Models.build(new_cocina_props), cocina_object.lock)
     end
 
@@ -24,14 +27,31 @@ module CocinaObjectMutators
 
     attr_reader :cocina_object, :cocina_model
 
+    def request_object?
+      cocina_object.is_a?(Cocina::Models::RequestDRO) || cocina_object.is_a?(Cocina::Models::RequestCollection)
+    end
+
     def build_new_cocina_props # rubocop:disable Metrics/AbcSize
-      Cocina::Models.without_metadata(cocina_object).to_h.tap do |new_cocina_props|
+      source_props.tap do |new_cocina_props|
+        new_cocina_props[:description] = cocina_model.description_hash
+        unless request_object?
+          new_cocina_props[:description][:purl] =
+            Cocina::Models::Mapping::Purl.for(druid: cocina_model.druid)
+        end
+        new_cocina_props[:identification] ||= {}
         new_cocina_props[:identification][:sourceId] = cocina_model.source_id
+        new_cocina_props[:access] ||= {}
         new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement
         new_cocina_props[:access][:license] = cocina_model.license
         new_cocina_props[:access][:copyright] = cocina_model.copyright
         new_cocina_props[:identification][:catalogLinks] = build_catalog_links
       end
+    end
+
+    def source_props
+      return cocina_object.to_h if request_object?
+
+      Cocina::Models.without_metadata(cocina_object).to_h
     end
 
     def build_catalog_links
@@ -71,7 +91,7 @@ module CocinaObjectMutators
     end
 
     def existing_catalog_links_for(catalog)
-      cocina_object.identification.catalogLinks.select { |link| link.catalog == catalog }
+      cocina_object.identification&.catalogLinks&.select { |link| link.catalog == catalog } || []
     end
   end
 end

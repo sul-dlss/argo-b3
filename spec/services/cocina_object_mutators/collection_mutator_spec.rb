@@ -6,7 +6,7 @@ RSpec.describe CocinaObjectMutators::CollectionMutator do
   subject(:result) { described_class.call(cocina_object:, cocina_model:) }
 
   let(:cocina_object) { build(:collection_with_metadata) }
-  let(:cocina_model) { CocinaModels::Collection.new(cocina_object) }
+  let(:cocina_model) { CocinaModels::Collection.build_from_cocina_object(cocina_object) }
 
   context 'when the cocina model has an updated source_id' do
     let(:new_source_id) { 'new:source-id' }

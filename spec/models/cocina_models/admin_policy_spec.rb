@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe CocinaModels::AdminPolicy do
-  subject(:admin_policy) { described_class.new(cocina_object) }
+  subject(:admin_policy) { described_class.build_from_cocina_object(cocina_object) }
 
   let(:cocina_object) { build(:admin_policy_with_metadata) }
 
-  describe '#initialize' do
+  describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::AdminPolicyWithMetadata' do
       it 'initializes with a Cocina::Models::AdminPolicyWithMetadata' do
         expect(admin_policy.external_identifier).to eq(cocina_object.externalIdentifier)

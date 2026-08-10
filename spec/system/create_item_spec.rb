@@ -1,0 +1,93 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'Create an item' do
+  let!(:user) { create(:user) }
+
+  let(:apo_druid) { generate(:unique_druid) }
+  let(:apo_title) { 'My APO' }
+
+  before do
+    sign_in user
+
+    allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
+  end
+
+  context 'when valid' do
+    let(:registered_cocina_object) { build(:dro_with_metadata) }
+    let(:druid) { registered_cocina_object.externalIdentifier }
+
+    let(:object_client) do
+      instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                     user_version: user_version_client)
+    end
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: []) }
+    let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
+    let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
+
+    before do
+      allow(Sdr::Repository).to receive(:accession)
+      allow(Sdr::Repository).to receive_messages(register: registered_cocina_object, find: registered_cocina_object,
+                                                 find_solr: build(:solr_item, druid:, title: 'The Title'))
+      allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
+      allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
+      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    end
+
+    it 'registers a valid cocina model and starts accessioning' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      # click_button('Deposit') is ambiguous: the Deposit tab and the submit button share the same label.
+      find('button[type="submit"]', text: 'Deposit').click # rubocop:disable Capybara/SpecificActions
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Item registered and deposit started.')
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        request_cocina_object = args[:request_cocina_object]
+        expect(request_cocina_object).to be_a(Cocina::Models::RequestDRO)
+        expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.object)
+        expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
+        expect(request_cocina_object.administrative.hasAdminPolicy).to eq(apo_druid)
+        expect(request_cocina_object.description.title.first.value).to eq('The Title')
+        expect(request_cocina_object.access.view).to eq('world')
+        expect(request_cocina_object.access.download).to eq('world')
+
+        expect(args[:user_name]).to eq(user.sunetid)
+      end
+
+      expect(Sdr::Repository).to have_received(:accession).with(druid:, user_name: user.sunetid)
+    end
+  end
+
+  context 'when invalid' do
+    before do
+      allow(Sdr::Repository).to receive(:register)
+      allow(Sdr::Repository).to receive(:accession)
+    end
+
+    it 'shows a validation error and does not register or accession' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      # Leaving Title blank.
+
+      find_by_id('deposit-tab').click
+      # click_button('Deposit') is ambiguous: the Deposit tab and the submit button share the same label.
+      find('button[type="submit"]', text: 'Deposit').click # rubocop:disable Capybara/SpecificActions
+
+      expect(page).to have_invalid_feedback('Title', "can't be blank")
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+  end
+end

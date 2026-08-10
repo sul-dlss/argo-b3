@@ -5,8 +5,8 @@ module CocinaModels
   class Dro < Base
     include CatalogLinksConcern
 
-    # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to initialize this model with
-    def initialize(cocina_object)
+    # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build this model from
+    def self.build_from_cocina_object(cocina_object)
       unless cocina_object.is_a?(Cocina::Models::DROWithMetadata)
         raise ArgumentError, 'Expected a Cocina::Models::DROWithMetadata'
       end
@@ -108,6 +108,21 @@ module CocinaModels
 
     def mutated_cocina_object
       CocinaObjectMutators::DroMutator.call(cocina_object: previous_cocina_object, cocina_model: self)
+    end
+
+    def request_cocina_object
+      # This is the minimal props to create a valid RequestDRO.
+      # The rest will be filled in by the mutator.
+      cocina_request_object = Cocina::Models.build_request(
+        {
+          type: content_type,
+          identification: { sourceId: source_id },
+          administrative: { hasAdminPolicy: admin_policy_druid },
+          description: description_hash
+        },
+        validate: false
+      )
+      CocinaObjectMutators::DroMutator.call(cocina_object: cocina_request_object, cocina_model: self)
     end
 
     def viewing_direction_only_for_applicable_content_types

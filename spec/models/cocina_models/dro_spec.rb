@@ -6,11 +6,11 @@ RSpec.describe CocinaModels::Dro do
   include ActiveModel::Lint::Tests
   include ActiveSupport::Testing::Assertions
 
-  subject(:dro) { described_class.new(cocina_object) }
+  subject(:dro) { described_class.build_from_cocina_object(cocina_object) }
 
   let(:cocina_object) { build(:dro_with_metadata) }
 
-  describe '#initialize' do
+  describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::DROWithMetadata' do
       it 'initializes with a Cocina::Models::DROWithMetadata' do
         expect(dro.external_identifier).to eq(cocina_object.externalIdentifier)
@@ -33,6 +33,19 @@ RSpec.describe CocinaModels::Dro do
         expect(dro.folio_catalog_links.count).to eq(1)
         expect(dro.folio_catalog_links.first.catalog_record_id).to eq('in11403803')
       end
+    end
+  end
+
+  describe '#initialize' do
+    subject(:dro) { described_class.new(source_id: 'new:source-id') }
+
+    it 'builds a new, unpersisted model from a hash of attributes' do
+      expect(dro.source_id).to eq('new:source-id')
+      expect(dro.previous_cocina_object).to be_nil
+      expect(dro.external_identifier).to be_nil
+      expect(dro.persisted?).to be false
+      expect(dro.to_param).to be_nil
+      expect(dro.to_key).to be_nil
     end
   end
 
@@ -74,9 +87,15 @@ RSpec.describe CocinaModels::Dro do
 
     context 'with valid and changed attributes' do
       let(:new_source_id) { 'changed:source-id' }
+      let(:new_description_hash) do
+        {
+          title: [{ value: 'Changed Title' }]
+        }
+      end
 
       before do
         dro.source_id = new_source_id
+        dro.description_hash = new_description_hash
       end
 
       it 'saves the model successfully' do
@@ -86,6 +105,7 @@ RSpec.describe CocinaModels::Dro do
           expect(new_cocina_object).to be_a(Cocina::Models::DROWithMetadata)
           expect(new_cocina_object.lock).to eq(cocina_object.lock)
           expect(new_cocina_object.identification.sourceId).to eq(new_source_id)
+          expect(new_cocina_object.description.title.first.value).to eq('Changed Title')
 
           expect(args[:user_name]).to eq(user_name)
           expect(args[:description]).to eq(description)
@@ -127,6 +147,104 @@ RSpec.describe CocinaModels::Dro do
         end
       end
     end
+
+    context 'when the object has not been persisted' do
+      subject(:dro) { described_class.new(source_id: 'new:source-id') }
+
+      it 'raises' do
+        expect { dro.save!(user_name:) }.to raise_error(/has not been persisted/)
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+  end
+
+  describe '#create!' do
+    let(:user_name) { 'test_user' }
+
+    context 'when the object has already been persisted' do
+      it 'raises' do
+        expect { dro.create!(user_name:) }.to raise_error(/already been persisted/)
+      end
+    end
+
+    context 'when the object has not been persisted' do
+      let(:new_dro) do
+        described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
+                            access_view: 'world', access_download: 'world',
+                            admin_policy_druid: 'druid:hv992ry2431')
+      end
+      let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
+      let(:registered_cocina_object) { build(:dro_with_metadata) }
+
+      before do
+        allow(new_dro).to receive(:request_cocina_object).and_return(request_cocina_object)
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'registers the object and repopulates the model' do
+        new_dro.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register)
+          .with(request_cocina_object:, user_name:)
+        expect(new_dro.persisted?).to be true
+        expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
+        expect(new_dro.changed?).to be false
+      end
+
+      context 'when accession is true' do
+        before do
+          allow(Sdr::Repository).to receive(:accession)
+        end
+
+        it 'accessions the registered object' do
+          new_dro.create!(user_name:, accession: true)
+
+          expect(Sdr::Repository).to have_received(:accession)
+            .with(druid: registered_cocina_object.externalIdentifier, user_name:)
+        end
+      end
+
+      context 'when accession is false' do
+        before do
+          allow(Sdr::Repository).to receive(:accession)
+        end
+
+        it 'does not accession the registered object' do
+          new_dro.create!(user_name:, accession: false)
+
+          expect(Sdr::Repository).not_to have_received(:accession)
+        end
+      end
+    end
+
+    context 'when building the real request cocina object' do
+      let(:new_dro) do
+        described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
+                            access_view: 'world', access_download: 'world',
+                            admin_policy_druid: 'druid:hv992ry2431')
+      end
+      let(:registered_cocina_object) { build(:dro_with_metadata) }
+
+      before do
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'constructs and registers a valid Cocina::Models::RequestDRO' do
+        new_dro.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          request_cocina_object = args[:request_cocina_object]
+          expect(request_cocina_object).to be_a(Cocina::Models::RequestDRO)
+          expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.book)
+          expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
+          expect(request_cocina_object.administrative.hasAdminPolicy).to eq('druid:hv992ry2431')
+          expect(request_cocina_object.access.view).to eq('world')
+          expect(request_cocina_object.access.download).to eq('world')
+
+          expect(args[:user_name]).to eq(user_name)
+        end
+      end
+    end
   end
 
   describe 'change tracking' do
@@ -140,7 +258,7 @@ RSpec.describe CocinaModels::Dro do
 
     it 'tracks changes to a nested folio catalog link attribute' do
       cocina_object_with_link = build(:dro_with_metadata, folio_instance_hrids: ['in11403803'])
-      dro_with_link = described_class.new(cocina_object_with_link)
+      dro_with_link = described_class.build_from_cocina_object(cocina_object_with_link)
       folio_link = dro_with_link.folio_catalog_links.first
       expect(folio_link.changed?).to be false
       folio_link.catalog_record_id = 'in99999999'
@@ -440,6 +558,25 @@ RSpec.describe CocinaModels::Dro do
 
       it 'skips embargo validation' do
         expect(dro).to be_valid
+      end
+    end
+  end
+
+  describe 'admin_policy_druid' do
+    context 'when initialized from a cocina object' do
+      let(:cocina_object) { build(:dro_with_metadata, admin_policy_id: 'druid:bc123df4567') }
+
+      it 'maps admin_policy_druid from the cocina object administrative.hasAdminPolicy' do
+        expect(dro.admin_policy_druid).to eq('druid:bc123df4567')
+      end
+    end
+
+    context 'when admin_policy_druid is blank' do
+      before { dro.admin_policy_druid = nil }
+
+      it 'is not valid' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:admin_policy_druid]).to include("can't be blank")
       end
     end
   end

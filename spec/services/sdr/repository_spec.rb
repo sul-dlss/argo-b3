@@ -96,7 +96,7 @@ RSpec.describe Sdr::Repository do
   end
 
   describe '#register' do
-    let(:cocina_object) { instance_double(Cocina::Models::RequestDRO) }
+    let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
     let(:registered_cocina_object) { instance_double(Cocina::Models::DRO, externalIdentifier: druid) }
 
     let(:objects_client) { instance_double(Dor::Services::Client::Objects, register: registered_cocina_object) }
@@ -113,13 +113,22 @@ RSpec.describe Sdr::Repository do
 
     context 'when successful' do
       it 'registers with SDR, creates tags, and creates initial workflow' do
-        expect(described_class.register(cocina_object:, user_name:, workflow_name:,
+        expect(described_class.register(request_cocina_object:, user_name:, workflow_name:,
                                         tags:)).to eq(registered_cocina_object)
 
-        expect(objects_client).to have_received(:register).with(params: cocina_object, user_name:)
+        expect(objects_client).to have_received(:register).with(params: request_cocina_object, user_name:)
         expect(Dor::Services::Client).to have_received(:object).with(druid)
         expect(administrative_tags_client).to have_received(:create).with(tags:)
         expect(workflow_client).to have_received(:create).with(version: '1')
+      end
+    end
+
+    context 'when no workflow_name is given' do
+      it 'registers with SDR and does not create a workflow' do
+        expect(described_class.register(request_cocina_object:, user_name:)).to eq(registered_cocina_object)
+
+        expect(objects_client).to have_received(:register).with(params: request_cocina_object, user_name:)
+        expect(workflow_client).not_to have_received(:create)
       end
     end
 
@@ -129,7 +138,58 @@ RSpec.describe Sdr::Repository do
       end
 
       it 'raises' do
-        expect { described_class.register(cocina_object:, user_name:, workflow_name:) }.to raise_error(Sdr::Repository::Error)
+        expect { described_class.register(request_cocina_object:, user_name:, workflow_name:) }.to raise_error(Sdr::Repository::Error)
+      end
+    end
+  end
+
+  describe '#accession' do
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, close: true) }
+    let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
+    let(:version_description) { 'a new version' }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    end
+
+    context 'when successful' do
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(druid:, user_name:, version_description:)
+
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: version_description,
+                                                             lane_id: 'high')
+      end
+    end
+
+    context 'when no version_description or lane_id is given' do
+      it 'closes the version with defaults' do
+        described_class.accession(druid:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: nil,
+                                                             lane_id: 'high')
+      end
+    end
+
+    context 'when a lane_id is given' do
+      it 'closes the version with the given lane_id' do
+        described_class.accession(druid:, user_name:, lane_id: 'low')
+
+        expect(version_client).to have_received(:close).with(user_name:,
+                                                             description: nil,
+                                                             lane_id: 'low')
+      end
+    end
+
+    context 'when accessioning fails' do
+      before do
+        allow(version_client).to receive(:close).and_raise(Dor::Services::Client::Error, 'Failed to close version')
+      end
+
+      it 'raises' do
+        expect { described_class.accession(druid:, user_name:) }.to raise_error(Sdr::Repository::Error)
       end
     end
   end

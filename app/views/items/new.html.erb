@@ -1,0 +1,51 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.items.new.title'), classes: 'mb-3') %>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @item_form, id: form_id, url: items_path) %>
+
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.details'), tab_name: :details, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.rights'), tab_name: :rights, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.deposit'), tab_name: :deposit, mark_required: true) %>
+
+    <% form_with(model: @item_form, url: items_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
+                                                                          label: t('edit.items.tabs.details'),
+                                                                          mark_required: true)) do %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :source_id,
+                                                                    label_text: t('edit.items.fields.source_id.label'),
+                                                                    label_mark_required: true,
+                                                                    label_classes: 'fw-bold',
+                                                                    container_classes: 'mb-3') %>
+
+        <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :title,
+                                                                   label_text: t('edit.items.fields.title.label'),
+                                                                   label_mark_required: true,
+                                                                   label_classes: 'fw-bold',
+                                                                   container_classes: 'mb-3') %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
+                                                                          label: t('edit.items.tabs.rights'),
+                                                                          mark_required: true)) do %>
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :admin_policy_druid,
+                                                                        options: @apo_options,
+                                                                        label_text: t('edit.items.fields.admin_policy_druid.label'),
+                                                                        label_mark_required: true,
+                                                                        label_classes: 'fw-bold') %>
+      <% end %>
+
+            <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                                label: t('edit.items.tabs.deposit'),
+                                                                                mark_required: true)) do %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                label: 'Deposit',
+                form_id: form.id
+              ) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+</div>
