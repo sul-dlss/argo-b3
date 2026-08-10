@@ -23,7 +23,7 @@ logging:
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console -e p"
-  db: app exec --interactive --reuse "bin/rails db -e p"
+  db: app exec --interactive --reuse "bash -c 'echo Password $DATABASE_PASSWORD && bin/rails db -e p'"
   shell: app exec --interactive --reuse "bash"
   ssh: server exec -i "bash"
 
