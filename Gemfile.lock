@@ -131,7 +131,7 @@ GEM
       super_diff
       thor
       zeitwerk (~> 2.1)
-    cocina_display (2.10.0)
+    cocina_display (2.11.0)
       activesupport (>= 7)
       edtf (~> 3.2)
       geo_coord (~> 0.2)
@@ -579,7 +579,7 @@ GEM
     ruby-next-core (1.2.1)
     ruby-progressbar (1.13.0)
     rubyzip (3.4.1)
-    sdr_view_components (0.4.2)
+    sdr_view_components (0.6.0)
       rails (~> 8.0)
       view_component
       zeitwerk

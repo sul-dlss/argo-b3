@@ -152,32 +152,32 @@ RSpec.describe 'Show DRO' do
     expect(page).to have_link('← Back to search', href: /search\?page=5&query=test/)
 
     # Tabs
-    expect(page).to have_css('.nav-link.active', text: 'Details')
+    expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
-    expect(page).to have_css('.nav-link', text: 'Content')
+    expect(page).to have_css('.nav-link', text: 'Files')
     expect(page).to have_css('.nav-link', text: 'Technical metadata')
-    expect(page).to have_css('.nav-link', text: 'Cocina Model')
-    expect(page).to have_css('.nav-link', text: 'PURL Description Preview')
+    expect(page).to have_css('.nav-link', text: 'Cocina JSON')
+    expect(page).to have_css('.nav-link', text: 'Description Preview')
 
     # Overview table
-    expect(page).to have_table_caption('overview-table', 'Overview')
-    expect(page).to have_table_value('overview-table', 'Object type', 'Item')
-    expect(page).to have_table_value('overview-table', 'Content type', 'Book')
-    within(find_table_value_cell('overview-table', 'Admin policy')) do
+    expect(page).to have_table_caption('overview-table-left', 'Overview')
+    expect(page).to have_table_value('overview-table-left', 'Object type', 'Item')
+    expect(page).to have_table_value('overview-table-left', 'Content type', 'Book')
+    within(find_table_value_cell('overview-table-right', 'Admin policy')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
-    within(find_table_value_cell('overview-table', 'Collection')) do
+    within(find_table_value_cell('overview-table-right', 'Collection')) do
       expect(page).to have_link('My Collection', href: "/objects/#{collection_druid}")
       expect(page).to have_link('All objects with this collection',
                                 href: '/search?collection_titles%5B%5D=My+Collection&page=1')
     end
 
     # Thumbnail
-    expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!400,400/0/default.jpg"]') # rubocop:disable Layout/LineLength
+    expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!160,160/0/default.jpg"]') # rubocop:disable Layout/LineLength
 
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
@@ -190,18 +190,26 @@ RSpec.describe 'Show DRO' do
     # Access table
     expect(page).to have_table_caption('access-table', 'Access')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
-    expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
-    expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
     expect(page).to have_table_value('access-table', 'Embargo', 'June 15, 2040 12:00 PM - View: World, Download: World')
 
-    # Tags table
-    expect(page).to have_table_caption('tags-table', 'Tags')
-    expect(page).to have_table_value('tags-table', 'Tags', 'Registered By : jdoe, Remediated By : labtech')
-    expect(page).to have_table_value('tags-table', 'Tickets', 'TESTREQ-1')
+    # Use and reproduction / Copyright cards
+    within('.card', text: 'Use and reproduction') do
+      expect(page).to have_css('.card-text', text: 'My use statement')
+    end
+    within('.card', text: 'Copyright') do
+      expect(page).to have_css('.card-text', text: 'My copyright statement')
+    end
+
+    # Tags card
+    within('.card', text: 'Tags') do
+      expect(page).to have_css('li', text: 'TESTREQ-1')
+      expect(page).to have_css('li', text: 'Registered By : jdoe')
+      expect(page).to have_css('li', text: 'Remediated By : labtech')
+    end
 
     # Cocina model tab
-    click_button 'Cocina Model'
+    click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
     expect(page).to have_css('andypf-json-viewer', text: druid)
     expect(page).to have_css('andypf-json-viewer', text: original_title)
@@ -272,7 +280,7 @@ RSpec.describe 'Show DRO' do
     expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
 
     # PURL preview tab
-    click_button 'PURL Description Preview'
+    click_button 'Description Preview'
     expect(page).to have_css('p', text: 'preview')
 
     # Update the object and look for changes.
@@ -290,13 +298,17 @@ RSpec.describe 'Show DRO' do
 
     expect(page).to have_css('h1', text: updated_title, wait: 15)
 
-    click_button 'Details'
+    click_button 'Overview'
     expect(page).to have_table_value('access-table', 'Access rights', 'View: World, Download: World')
-    expect(page).to have_table_value('access-table', 'Copyright', 'My updated copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
-    expect(page).to have_table_value('access-table', 'Use and reproduction', 'My updated use statement')
+    within('.card', text: 'Use and reproduction') do
+      expect(page).to have_css('.card-text', text: 'My updated use statement')
+    end
+    within('.card', text: 'Copyright') do
+      expect(page).to have_css('.card-text', text: 'My updated copyright statement')
+    end
 
-    click_button 'Cocina Model'
+    click_button 'Cocina JSON'
     expect(page).to have_css('andypf-json-viewer', text: updated_title)
 
     click_button 'Workflows'

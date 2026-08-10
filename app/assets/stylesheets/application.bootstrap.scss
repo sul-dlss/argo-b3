@@ -1,3 +1,7 @@
+// Colors for object types
+$item-color-rgb: var(--stanford-illuminating-light-rgb);
+$item-color: rgb(#{$item-color-rgb});
+
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
 @import 'bl_facets';
@@ -22,3 +26,29 @@
   border-radius: 4px;
   border-style: solid;
 }
+
+// left navigation on dashboard and object show pages
+.left-nav {
+  // Only render background color on xl or above
+  @include media-breakpoint-up(xl) {
+    background-color: rgb(var(--stanford-fog-light-rgb));
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 195px;
+  }
+}
+
+// Only render a top border on xl or above
+@include media-breakpoint-up(xl) {
+  .border-top-xl {
+    border-top: $border-width solid $border-color !important;
+  }
+}
+
+.nav-underline .nav-link.active {
+  border-bottom: 3px solid rgb(var(--stanford-archway-dark-rgb)) !important;
+  color: rgb(var(--stanford-archway-dark-rgb)) !important;
+}
+ 

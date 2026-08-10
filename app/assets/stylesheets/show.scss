@@ -1,4 +1,61 @@
-// Styles for the show page
-.nav-underline .nav-link {
-  width: 8.5rem;
+// Object show page
+.object-show {
+  .show-box {
+    max-width: 300px;
+
+    > .border {
+      height: 180px;
+      overflow-y: auto;
+    }
+  }
+
+  .object-type-badge {
+    width: 240px;
+    height: 38px;
+
+    &.object-type-item {
+      background-color: $item-color;
+    }
+  }
+
+  .use-access-copyright-section .card {
+    background-color: rgb(var(--stanford-fog-light-rgb));
+    border: 0;
+    max-width: 300px;
+    width: 100%;
+  }
+
+  .nav-underline .nav-link {
+    width: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  // So that when the tables are stacked, there isn't extra space.
+  .split-table caption {
+    padding: 0;
+  }
+
+  // So that when the tables are stacked, there isn't a border below caption.
+  .split-table-right caption {
+    @include media-breakpoint-down(xl) {
+      border-bottom: 0;
+    }
+  }
+}
+
+.object-type-item {
+  .object-type-bg {
+    background-color: $item-color;
+
+  }
+
+  .object-type-bg-light {
+    background-color: rgba(#{$item-color-rgb}, 0.1);
+
+  }
+
+  .border.object-type-border {
+    --bs-border-color: #{$item-color};
+  }
 }
