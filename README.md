@@ -175,7 +175,7 @@ let!(:solr_doc) { create(:solr_item) }
 bin/parallel_rspec
 ```
 
-Before running the first time: `bin/rake parallel:prepare`
+Before running the first time: `bin/rake parallel:prepare parallel:seed`
 After a migration: `bin/rake parallel:migrate`
 
 ## Models

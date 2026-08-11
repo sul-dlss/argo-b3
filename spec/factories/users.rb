@@ -7,7 +7,7 @@ FactoryBot.define do
     groups { ['sdr:argo-access'] }
 
     trait :admin do
-      groups { ['sdr:argo-access', ApplicationPolicy::ADMIN_GROUP] }
+      groups { ['sdr:argo-access', AuthenticationHelpers::ADMIN_GROUP] }
     end
   end
 end
