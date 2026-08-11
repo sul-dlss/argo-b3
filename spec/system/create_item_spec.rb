@@ -35,7 +35,7 @@ RSpec.describe 'Create an item' do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     end
 
-    it 'registers a valid cocina model and starts accessioning' do
+    it 'registers a valid cocina object' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
@@ -45,11 +45,10 @@ RSpec.describe 'Create an item' do
       select apo_title, from: 'APO'
 
       find_by_id('deposit-tab').click
-      # click_button('Deposit') is ambiguous: the Deposit tab and the submit button share the same label.
-      find('button[type="submit"]', text: 'Deposit').click # rubocop:disable Capybara/SpecificActions
+      click_button('Register only')
 
       expect(page).to have_current_path("/objects/#{druid}")
-      expect(page).to have_toast('Item registered and deposit started.')
+      expect(page).to have_toast('Item registered.')
 
       expect(Sdr::Repository).to have_received(:register) do |args|
         request_cocina_object = args[:request_cocina_object]
@@ -64,7 +63,7 @@ RSpec.describe 'Create an item' do
         expect(args[:user_name]).to eq(user.sunetid)
       end
 
-      expect(Sdr::Repository).to have_received(:accession).with(druid:, user_name: user.sunetid)
+      expect(Sdr::Repository).not_to have_received(:accession)
     end
   end
 
@@ -81,8 +80,7 @@ RSpec.describe 'Create an item' do
       # Leaving Title blank.
 
       find_by_id('deposit-tab').click
-      # click_button('Deposit') is ambiguous: the Deposit tab and the submit button share the same label.
-      find('button[type="submit"]', text: 'Deposit').click # rubocop:disable Capybara/SpecificActions
+      click_button('Register only')
 
       expect(page).to have_invalid_feedback('Title', "can't be blank")
 

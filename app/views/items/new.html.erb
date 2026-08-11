@@ -30,20 +30,23 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
                                                                           label: t('edit.items.tabs.rights'),
                                                                           mark_required: true)) do %>
-          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :admin_policy_druid,
-                                                                        options: @apo_options,
-                                                                        label_text: t('edit.items.fields.admin_policy_druid.label'),
-                                                                        label_mark_required: true,
-                                                                        label_classes: 'fw-bold') %>
+        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :admin_policy_druid,
+                                                                      options: @apo_options,
+                                                                      label_text: t('edit.items.fields.admin_policy_druid.label'),
+                                                                      label_mark_required: true,
+                                                                      label_classes: 'fw-bold') %>
       <% end %>
 
-            <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
-                                                                                label: t('edit.items.tabs.deposit'),
-                                                                                mark_required: true)) do %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.items.tabs.deposit'),
+                                                                          mark_required: true)) do %>
+        <div class="d-flex justify-content-end">
           <%= render SdrViewComponents::Forms::SubmitComponent.new(
-                label: 'Deposit',
-                form_id: form.id
+                label: t('edit.items.new.buttons.register'),
+                form_id: form.id,
+                variant: 'outline-primary'
               ) %>
+        </div>
       <% end %>
     <% end %>
   <% end %>

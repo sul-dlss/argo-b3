@@ -57,9 +57,13 @@ en:
   edit:
     items:
       new:
-        title: "Register and deposit an item"
+        title: "Register an item"
+        buttons:
+          register: 'Register only'
+        toasts:
+          register: 'Item registered.'
       tabs:
-        deposit: "Deposit"
+        deposit: "Register"
         details: "Item details"
         rights: "APO, collection, rights"        
       fields:
