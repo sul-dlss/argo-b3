@@ -15,8 +15,8 @@ class ItemsController < ApplicationController
     @item_form = ItemForm.new(item_form_params)
 
     if @item_form.valid?
-      @item_form.create!(user_name: current_user.sunetid, accession: true)
-      flash[:toast] = 'Item registered and deposit started.'
+      @item_form.create!(user_name: current_user.sunetid)
+      flash[:toast] = t('edit.items.new.toasts.register')
       redirect_to object_path(@item_form.druid)
     else
       set_apo_options
