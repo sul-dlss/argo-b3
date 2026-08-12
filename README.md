@@ -54,6 +54,15 @@ SETTINGS__PRESERVATION_CATALOG__URL='https://preservation-catalog-qa.stanford.ed
 SETTINGS__PURL_FETCHER__URL='https://purl-fetcher-stage.stanford.edu' SETTINGS__STACKS__URL='https://stacks-stage.stanford.edu/image' bin/setup
 ```
 
+### Development script for running locally connecting to remote services
+
+For running code in localhost pointing to real data on a server environment, `bin/dev-server` will facilitate the setup described above.
+
+1. Ensure you are on VPN, have a valid kerberos ticket, and have your jumphost open (SSH into any server first to get it setup).
+2. Runing `bin/dev-server` sets up the solr tunnel in the background, configures the environment varaibles for connection to qa/stage/prod services, and starts the localhost server.
+3. For the DSA and Prescat tokens, you can pass these into the bin script as described above, or setup a .env file in the root of the app, and put the tokens there as env variables.  The .env file will be gitignored and picked up by the `bin/dev-server` script.
+
+
 ### Linters
 
 To run all configured linters, run `bin/rake lint`.
@@ -132,7 +141,7 @@ bin/kamal-otk qa app version
 
 #### Logs
 ```
-bin/kamal-otk qa app logs -f 
+bin/kamal-otk qa app logs -f
 ```
 
 * For log filtering options, see `bin/kamal-otk qa app logs --help`.

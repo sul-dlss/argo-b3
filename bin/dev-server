@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+#
+# Opens an SSH tunnel to server Solr and starts bin/setup pointed at it, along
+# with DSA, PresCat, stacks, and purl-fetcher pointed at the same environment.
+#
+# Usage: bin/dev-server [qa|stage|prod]
+# Defaults to qa.
+#
+# DSA and PresCat require tokens that this script does not hardcode. Put them
+# in an .env file in the project root (SETTINGS__DOR_SERVICES__TOKEN
+# and/or SETTINGS__PRESERVATION_CATALOG__TOKEN) and they'll be picked up
+# automatically, or export them yourself before running. The same .env file
+# can also override any of the SETTINGS__*__URL vars below, in case you need
+# a URL that doesn't match the qa/stage/prod pattern for a given service.
+
+set -e
+
+if [ -f .env ]; then
+  set -a
+  . ./.env
+  set +a
+fi
+
+INDEX="${1:-qa}" # default to qa
+
+ssh -N -T -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu &
+TUNNEL_PID=$!
+
+trap 'kill "$TUNNEL_PID" 2>/dev/null' EXIT
+
+# give the tunnel a moment to establish before hitting it
+sleep 2
+
+export SETTINGS__SOLR__URL="${SETTINGS__SOLR__URL:-http://localhost:8990/solr/argo_${INDEX}}"
+export SETTINGS__DOR_SERVICES__URL="${SETTINGS__DOR_SERVICES__URL:-https://dor-services-${INDEX}-lb.stanford.edu}"
+export SETTINGS__PRESERVATION_CATALOG__URL="${SETTINGS__PRESERVATION_CATALOG__URL:-https://preservation-catalog-${INDEX}.stanford.edu}"
+export SETTINGS__STACKS__URL="${SETTINGS__STACKS__URL:-https://stacks-${INDEX}.stanford.edu/image}"
+export SETTINGS__PURL_FETCHER__URL="${SETTINGS__PURL_FETCHER__URL:-https://purl-fetcher-${INDEX}.stanford.edu}"
+
+bin/setup
