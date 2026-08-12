@@ -78,5 +78,24 @@ module Sdr
     rescue Dor::Services::Client::Error => e
       raise Error, "Initiating accession failed: #{e.message}"
     end
+
+    # @param [String] druid the druid of the object
+    # @param [String] user_name the sunetid of the user performing the action
+    # @param [String] release_target Searchworks, Earthworks, or PURL sitemap
+    # @param [Boolean] release false to not release the object
+    # @param [String] release_what self or collection
+    # @param [String] lane_id lane to using for releaseWF (high, default, or low) if object has been published
+    def self.create_release_tag(druid:, user_name:, release_target:, release:, release_what: 'self', lane_id: 'high') # rubocop:disable Metrics/ParameterLists
+      new_tag = Dor::Services::Client::ReleaseTag.new(
+        **{ to: release_target }.compact, # "to" must be omitted when nil.
+        who: user_name,
+        what: release_what,
+        release:,
+        date: DateTime.now.utc.iso8601
+      )
+      Dor::Services::Client.object(druid).release_tags.create(tag: new_tag, lane_id:)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Creating release tag failed: #{e.message}"
+    end
   end
 end

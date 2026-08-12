@@ -193,4 +193,65 @@ RSpec.describe Sdr::Repository do
       end
     end
   end
+
+  describe '#create_release_tag' do
+    let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, create: true) }
+    let(:object_client) { instance_double(Dor::Services::Client::Object, release_tags: release_tags_client) }
+    let(:release_target) { 'Searchworks' }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    end
+
+    context 'when successful' do
+      it 'creates a release tag' do
+        described_class.create_release_tag(druid:, user_name:, release_target:, release: true)
+
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(release_tags_client).to have_received(:create) do |tag:, lane_id:|
+          expect(tag.who).to eq(user_name)
+          expect(tag.what).to eq('self')
+          expect(tag.to).to eq(release_target)
+          expect(tag.release).to be(true)
+          expect(lane_id).to eq('high')
+        end
+      end
+    end
+
+    context 'when release_what and lane_id are given' do
+      it 'creates a release tag with the given release_what and lane_id' do
+        described_class.create_release_tag(druid:, user_name:, release_target:, release: false,
+                                           release_what: 'collection', lane_id: 'low')
+
+        expect(release_tags_client).to have_received(:create) do |tag:, lane_id:|
+          expect(tag.what).to eq('collection')
+          expect(tag.release).to be(false)
+          expect(lane_id).to eq('low')
+        end
+      end
+    end
+
+    context 'when release_target is nil' do
+      it 'creates a release tag without a to' do
+        described_class.create_release_tag(druid:, user_name:, release_target: nil, release: false)
+
+        expect(release_tags_client).to have_received(:create) do |tag:, lane_id:|
+          expect(tag.to).to be_nil
+          expect(lane_id).to eq('high')
+        end
+      end
+    end
+
+    context 'when creating the release tag fails' do
+      before do
+        allow(release_tags_client).to receive(:create).and_raise(Dor::Services::Client::Error, 'Failed to create tag')
+      end
+
+      it 'raises' do
+        expect do
+          described_class.create_release_tag(druid:, user_name:, release_target:, release: true)
+        end.to raise_error(Sdr::Repository::Error)
+      end
+    end
+  end
 end

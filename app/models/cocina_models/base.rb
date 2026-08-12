@@ -37,16 +37,14 @@ module CocinaModels
     end
 
     # @param [String] user_name the sunetid of the user performing the action
-    # @param [Boolean] accession whether to accession the object after registering it
     # @raise [RuntimeError] if the object has already been persisted
     # @raise [Sdr::Repository::Error] if there is an error registering the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def create!(user_name:, accession: false)
+    def create!(user_name:)
       raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
 
       validate!
       registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:)
-      Sdr::Repository.accession(druid: registered_cocina_object.externalIdentifier, user_name:) if accession
       assign_from_cocina_object(registered_cocina_object)
     end
 
@@ -82,6 +80,17 @@ module CocinaModels
     # Subclasses can override this.
     def tracked_associations_changed?
       false
+    end
+
+    # Overrides Blanks::Base#valid? to always validate nested forms (e.g., release_tags),
+    # even when this form's own attributes are invalid.
+    # See https://github.com/joshmn/blanks/pull/1
+    def valid?(context = nil)
+      run_callbacks :validation do
+        own_valid = ActiveModel::Validations.instance_method(:valid?).bind_call(self, context)
+        nested_valid = nested_forms_valid?
+        own_valid & nested_valid
+      end
     end
 
     private

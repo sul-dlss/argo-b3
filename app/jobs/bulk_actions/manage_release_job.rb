@@ -5,13 +5,12 @@ module BulkActions
   class ManageReleaseJob < DruidsJob
     def perform(bulk_action:, druids:, to:, release:, what: 'self')
       @release_to = to
-      @who = who
       @what = what
       @release = release
       super
     end
 
-    attr_reader :release_to, :who, :what, :release
+    attr_reader :release_to, :what, :release
 
     # Manage release for a single object
     class JobItem < BaseJobItem
@@ -24,23 +23,10 @@ module BulkActions
           return failure!(message: 'Object has never been published and cannot be released')
         end
 
-        object_client.release_tags.create(tag: new_tag, lane_id: 'low')
+        Sdr::Repository.create_release_tag(druid:, user_name: user_id, release_target: release_to,
+                                           release:, release_what: what, lane_id: 'low')
 
         success!(message: 'Workflow creation successful')
-      end
-
-      def object_client
-        @object_client ||= Dor::Services::Client.object(druid)
-      end
-
-      def new_tag
-        Dor::Services::Client::ReleaseTag.new(
-          to: release_to,
-          who: user_id,
-          what:,
-          release:,
-          date: DateTime.now.utc.iso8601
-        )
       end
     end
   end

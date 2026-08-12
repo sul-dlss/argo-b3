@@ -33,6 +33,10 @@ en:
       long: "%B %d, %Y %I:%M %p"
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
+  release_tags:
+    earthworks: "EarthWorks"
+    purl_sitemap: "Search engines"
+    searchworks: "SearchWorks"
   search:
     # If not provided, will use humanized field name
     facets:
@@ -63,9 +67,21 @@ en:
         toasts:
           register: 'Item registered.'
       tabs:
-        deposit: "Register"
-        details: "Item details"
-        rights: "APO, collection, rights"        
+        deposit: 
+          label: "Register"
+          help_text: >-
+            Complete registration of your item. Choose 'Register and add files' to proceed with your deposit. If you're not
+            ready to deposit your item, choose 'Register only' to return to it later.
+        details: 
+          label: "Item details"
+        release: 
+          label: "Release"
+          pane: "Manage release"
+          help_text: >-
+            Content will be released as soon as you deposit this item. If you want to add descriptive metadata after deposit
+            but before release, you should choose 'Do not release.'
+        rights: 
+          label: "APO, collection, rights"
       fields:
         admin_policy_druid:
           label: "APO"
