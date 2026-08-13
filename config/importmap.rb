@@ -15,3 +15,5 @@ pin 'sdr_view_components/tab_select_controller', to: 'sdr_view_components/tab_se
 pin 'sdr_view_components/tab_error_controller', to: 'sdr_view_components/tab_error_controller.js'
 pin 'sdr_view_components/tab_link_controller', to: 'sdr_view_components/tab_link_controller.js'
 pin 'sdr_view_components/tab_nav_controller', to: 'sdr_view_components/tab_nav_controller.js'
+pin 'dropzone' # @6.0.0
+pin 'just-extend' # @5.1.1 (dropzone dependency)
