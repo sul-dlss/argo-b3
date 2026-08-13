@@ -361,3 +361,16 @@ component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_actio
                                                 target: 'toast-container',
                                                 html: ApplicationController.render(component, layout: false))
 ```
+
+## Design
+Where ever possible design components from the [DLSS component style library](https://github.com/sul-dlss/component-library/) and view components from [SDR View Components](https://github.com/sul-dlss/sdr_view_components) should be re-used.
+
+### Responsive design
+In general, alternate viewports are supported for "show" pages (e.g., dashboard, object show page) not "form" pages (e.g., single item creation).
+
+All pages should use the default container: `<div class="container">`.
+
+Pages are designed for the following breakpoints / devices:
+* `xxl` and `xl`: Monitor
+* `lg` and `md`: Tablet
+* `sm` and `xs`: Phone
