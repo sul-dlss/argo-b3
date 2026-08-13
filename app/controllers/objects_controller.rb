@@ -37,7 +37,7 @@ class ObjectsController < ApplicationController
     case @solr_doc.object_type
     when 'collection'
       render :show_collection_overview, layout: false
-    when 'admin_policy'
+    when 'adminPolicy'
       render :show_admin_policy_overview, layout: false
     else
       # This also includes agreements and virtual objects.
