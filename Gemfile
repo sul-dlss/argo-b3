@@ -52,6 +52,7 @@ gem 'dry-monads'
 gem 'honeybadger'
 gem 'mission_control-jobs'
 gem 'okcomputer'
+gem 'positioning' # For ordering ContentFileSets and ContentFiles
 gem 'prawn', '~> 2'  # PDF generation; used in TracksheetService
 gem 'prawn-table'    # table support for Prawn PDFs
 gem 'preservation-client'

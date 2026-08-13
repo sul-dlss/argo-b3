@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_13_125653) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_bulk_actions_on_user_id"
+  end
+
+  create_table "content_file_sets", force: :cascade do |t|
+    t.bigint "content_id", null: false
+    t.datetime "created_at", null: false
+    t.string "external_identifier"
+    t.string "file_set_type", null: false
+    t.string "label", null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_id", "position"], name: "index_content_file_sets_on_content_id_and_position", unique: true
+    t.index ["content_id"], name: "index_content_file_sets_on_content_id"
+  end
+
+  create_table "content_files", force: :cascade do |t|
+    t.string "basename", null: false
+    t.bigint "content_file_set_id", null: false
+    t.boolean "corrected_for_accessibility", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "download", null: false
+    t.string "external_identifier"
+    t.string "extname", null: false
+    t.string "file_location", null: false
+    t.string "filepath", null: false
+    t.integer "height"
+    t.string "label", null: false
+    t.string "language_tag"
+    t.string "location"
+    t.string "md5_digest"
+    t.string "mime_type"
+    t.string "path_parts", default: [], null: false, array: true
+    t.integer "position", null: false
+    t.boolean "preserve", null: false
+    t.boolean "publish", null: false
+    t.boolean "sdr_generated_text", default: false, null: false
+    t.string "sha1_digest"
+    t.boolean "shelve", null: false
+    t.bigint "size"
+    t.datetime "updated_at", null: false
+    t.string "use"
+    t.string "view", null: false
+    t.integer "width"
+    t.index ["content_file_set_id", "position"], name: "index_content_files_on_content_file_set_id_and_position", unique: true
+    t.index ["content_file_set_id"], name: "index_content_files_on_content_file_set_id"
+  end
+
+  create_table "contents", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "druid", null: false
+    t.string "lock", null: false
+    t.datetime "updated_at", null: false
+    t.index ["druid", "lock"], name: "index_contents_on_druid_and_lock", unique: true
   end
 
   create_table "permissions", force: :cascade do |t|
@@ -47,4 +99,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
   end
 
   add_foreign_key "bulk_actions", "users"
+  add_foreign_key "content_file_sets", "contents"
+  add_foreign_key "content_files", "content_file_sets"
 end

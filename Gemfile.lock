@@ -420,6 +420,9 @@ GEM
     pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
     pg (1.6.3-x86_64-linux-musl)
+    positioning (0.4.8)
+      activerecord (>= 6.1)
+      activesupport (>= 6.1)
     pp (0.6.4)
       prettyprint
     prawn (2.5.0)
@@ -711,6 +714,7 @@ DEPENDENCIES
   overmind
   parallel_tests
   pg
+  positioning
   prawn (~> 2)
   prawn-table
   preservation-client
