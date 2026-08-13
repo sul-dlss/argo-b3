@@ -11,7 +11,7 @@ class SolrDocPresenter < SearchResults::Item
   end
 
   def admin_policy?
-    object_type == 'admin_policy'
+    object_type == 'adminPolicy'
   end
 
   def dro?
