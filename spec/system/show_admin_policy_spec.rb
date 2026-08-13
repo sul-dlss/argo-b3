@@ -21,7 +21,7 @@ RSpec.describe 'Show admin policy' do
   def build_solr_doc(title:)
     {
       Search::Fields::ID => druid,
-      Search::Fields::OBJECT_TYPES => ['admin_policy'],
+      Search::Fields::OBJECT_TYPES => ['adminPolicy'],
       Search::Fields::TITLE => title,
       Search::Fields::APO_DRUID => [apo_druid],
       Search::Fields::APO_TITLE => ['My APO'],
