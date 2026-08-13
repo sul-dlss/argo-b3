@@ -1,0 +1,28 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.contents.edit.title')) %>
+
+  <p class="mb-4"><%= @solr_doc.title %></p>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @content, id: form_id) %>
+
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :add_files) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.contents.tabs.add_files.label'), tab_name: :add_files) %>
+    <% tab_list.with_tab(label: t('edit.contents.tabs.manage_files.label'), tab_name: :manage_files) %>
+    <% tab_list.with_tab(label: t('edit.contents.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
+
+    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
+                                                                        label: t('edit.contents.tabs.add_files.label'))) do %>
+                                                                          <% end %>
+    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :manage_files,
+                                                                        label: t('edit.contents.tabs.manage_files.label'))) do %>
+    <% end %>
+
+    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                        label: t('edit.contents.tabs.deposit.label'),
+                                                                        mark_required: true)) do %>
+    <% end %>
+
+  <% end %>
+</div>
