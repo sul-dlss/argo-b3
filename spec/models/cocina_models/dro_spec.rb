@@ -190,31 +190,6 @@ RSpec.describe CocinaModels::Dro do
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false
       end
-
-      context 'when accession is true' do
-        before do
-          allow(Sdr::Repository).to receive(:accession)
-        end
-
-        it 'accessions the registered object' do
-          new_dro.create!(user_name:, accession: true)
-
-          expect(Sdr::Repository).to have_received(:accession)
-            .with(druid: registered_cocina_object.externalIdentifier, user_name:)
-        end
-      end
-
-      context 'when accession is false' do
-        before do
-          allow(Sdr::Repository).to receive(:accession)
-        end
-
-        it 'does not accession the registered object' do
-          new_dro.create!(user_name:, accession: false)
-
-          expect(Sdr::Repository).not_to have_received(:accession)
-        end
-      end
     end
 
     context 'when building the real request cocina object' do

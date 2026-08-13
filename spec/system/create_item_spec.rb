@@ -27,8 +27,8 @@ RSpec.describe 'Create an item' do
     let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
 
     before do
-      allow(Sdr::Repository).to receive(:accession)
-      allow(Sdr::Repository).to receive_messages(register: registered_cocina_object, find: registered_cocina_object,
+      allow(Sdr::Repository).to receive_messages(accession: nil, create_release_tag: nil,
+                                                 register: registered_cocina_object, find: registered_cocina_object,
                                                  find_solr: build(:solr_item, druid:, title: 'The Title'))
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
@@ -43,6 +43,10 @@ RSpec.describe 'Create an item' do
 
       find_by_id('rights-tab').click
       select apo_title, from: 'APO'
+
+      find_by_id('release-tab').click
+      choose 'Release to:'
+      check 'SearchWorks'
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -64,6 +68,9 @@ RSpec.describe 'Create an item' do
       end
 
       expect(Sdr::Repository).not_to have_received(:accession)
+
+      expect(Sdr::Repository).to have_received(:create_release_tag)
+        .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
     end
   end
 
@@ -73,16 +80,22 @@ RSpec.describe 'Create an item' do
       allow(Sdr::Repository).to receive(:accession)
     end
 
-    it 'shows a validation error and does not register or accession' do
+    it 'shows validation errors and does not register or accession' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
       # Leaving Title blank.
 
+      find_by_id('release-tab').click
+      choose 'Release to:'
+
       find_by_id('deposit-tab').click
       click_button('Register only')
 
       expect(page).to have_invalid_feedback('Title', "can't be blank")
+
+      find_by_id('release-tab').click
+      expect(page).to have_css('.invalid-feedback', text: 'At least one target must be selected')
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(Sdr::Repository).not_to have_received(:accession)

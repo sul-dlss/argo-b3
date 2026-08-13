@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Disable/enable associated inputs based on radio button selection
 // Borrowed from H3.
+// Mark the radio buttons with: <input data-radio-target="radio" data-action="radio#toggle" type="radio" ></input>
 export default class extends Controller {
   static targets = ['radio']
   connect () {

@@ -20,13 +20,11 @@ RSpec.describe BulkActions::ManageReleaseJob do
       allow(job_item).to receive_messages(check_update_ability?: true, cocina_object:)
     end
   end
-  let(:object_client) { instance_double(Dor::Services::Client::Object, release_tags: release_tags_client) }
-  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, create: true) }
 
   before do
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(Sdr::WorkflowService).to receive(:published?).and_return(true)
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    allow(Sdr::Repository).to receive(:create_release_tag)
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
 
@@ -35,8 +33,9 @@ RSpec.describe BulkActions::ManageReleaseJob do
 
     expect(job_item).to have_received(:check_update_ability?)
     expect(Sdr::WorkflowService).to have_received(:published?).with(druid:)
-    expect(release_tags_client).to have_received(:create)
-      .with(tag: an_instance_of(Dor::Services::Client::ReleaseTag), lane_id: 'low')
+    expect(Sdr::Repository).to have_received(:create_release_tag)
+      .with(druid:, user_name: job_item.user_id, release_target: 'SEARCHWORKS', release: true, release_what: 'self',
+            lane_id: 'low')
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)
@@ -52,7 +51,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
       job.perform_now
 
       expect(Sdr::WorkflowService).not_to have_received(:published?)
-      expect(release_tags_client).not_to have_received(:create)
+      expect(Sdr::Repository).not_to have_received(:create_release_tag)
     end
   end
 
@@ -64,7 +63,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
     it 'does not release the object' do
       job.perform_now
 
-      expect(release_tags_client).not_to have_received(:create)
+      expect(Sdr::Repository).not_to have_received(:create_release_tag)
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)

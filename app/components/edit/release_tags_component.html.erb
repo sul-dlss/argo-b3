@@ -1,0 +1,54 @@
+<div data-controller="radio">
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :release_choice,
+        input_value: ReleaseTagsForm::NO_RELEASE,
+        label_text: 'Use collection level settings',
+        # Disabling until collections are implemented.
+        input_disabled: true,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'mb-2'
+      ) %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :release_choice,
+        input_value: ReleaseTagsForm::RELEASE_TO_TARGETS,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        label_text: 'Release to:',
+        container_classes: 'mb-2'
+      ) do |component| %>
+      <% component.with_additional_container_content do %>
+        <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+              form:,
+              field_name: :searchworks_target,
+              label_text: t('release_tags.searchworks')
+            ) %>
+
+        <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+              form:,
+              field_name: :earthworks_target,
+              label_text: t('release_tags.earthworks'),
+              help_text: 'Requires geo coordinates or release will not be successful.',
+              help_classes: 'mb-0',
+              variant: :help_text_below
+            ) %>
+
+        <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+              form:,
+              field_name: :purl_sitemap_target,
+              label_text: t('release_tags.purl_sitemap')
+            ) %>
+
+        <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :release_targets) %>
+        <% end %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :release_choice,
+        input_value: ReleaseTagsForm::NO_RELEASE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        label_text: 'Do not release.'
+      ) %>
+</div>

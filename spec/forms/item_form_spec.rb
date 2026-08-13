@@ -50,6 +50,33 @@ RSpec.describe ItemForm do
     end
   end
 
+  describe 'release_tags' do
+    context 'when valid' do
+      it 'is valid' do
+        expect(item_form).to be_valid
+      end
+    end
+
+    context 'when invalid' do
+      before do
+        item_form.release_tags.release_choice = ReleaseTagsForm::RELEASE_TO_TARGETS
+      end
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.release_tags.errors[:release_targets]).to include('At least one target must be selected')
+      end
+    end
+  end
+
+  describe '.permitted_params' do
+    it 'includes nested release_tags_attributes' do
+      expect(described_class.permitted_params).to include(
+        release_tags_attributes: ReleaseTagsForm.permitted_params
+      )
+    end
+  end
+
   describe 'populate_description_hash' do
     context 'when title is present' do
       it 'sets description_hash from title on validation' do

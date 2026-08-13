@@ -12,9 +12,7 @@ module PermittedParamsConcern
 
     # Use in controllers to validate expected parameters for forms
     def permitted_params
-      user_editable_attributes.tap do |attrs|
-        attrs << nested_attributes if defined?(nested_attributes)
-      end
+      user_editable_attributes + nested_association_attributes
     end
 
     private
@@ -25,6 +23,18 @@ module PermittedParamsConcern
         # This approach is based on the assumption that every attribute will
         # have a type EXCEPT for arrays.
         type_for_attribute(attribute_name).type.nil? ? { attribute_name => [] } : attribute_name
+      end
+    end
+
+    # Associations whose target class does not include PermittedParamsConcern are not
+    # user-editable via forms (e.g., associations that are structural/internal to the
+    # underlying Cocina model) and are skipped.
+    def nested_association_attributes
+      associations.filter_map do |association_name, association|
+        target_class = association[:class_name].constantize
+        next unless target_class.respond_to?(:permitted_params)
+
+        { "#{association_name}_attributes": target_class.permitted_params }
       end
     end
   end

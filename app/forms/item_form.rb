@@ -9,7 +9,20 @@ class ItemForm < CocinaModels::Dro
   normalizes :title, with: ->(title) { title.strip }
   validates :title, presence: true
 
+  has_one :release_tags
+
   before_validation :populate_description_hash, if: -> { title.present? }
+
+  def initialize(attributes = {})
+    super
+    build_release_tags unless release_tags
+  end
+
+  def create!(user_name:)
+    super
+
+    release_tags.create!(druid:, user_name:)
+  end
 
   private
 
