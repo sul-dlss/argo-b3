@@ -21,6 +21,7 @@ workflows:
           context: dlss
           install-chrome: true
           parallelism: 4
+          db-prepare-command: db:reset
           before-test:
             - run:
                 name: Set Docker API version

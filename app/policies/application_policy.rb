@@ -2,8 +2,6 @@
 
 # Base class for application policies
 class ApplicationPolicy < ActionPolicy::Base
-  ADMIN_GROUP = 'sdr:administrator-role'
-
   pre_check :allow_admins
 
   def allow_admins
@@ -13,6 +11,13 @@ class ApplicationPolicy < ActionPolicy::Base
   private
 
   def admin?
-    user.groups.include?(ADMIN_GROUP)
+    user.groups.intersect?(admin_workgroups)
+  end
+
+  def admin_workgroups
+    # This is the simplest possible form of caching on the assumption
+    # that admin groups will rarely (if ever) be changing.
+    # Changing would require a restart of the app.
+    @@admin_workgroups ||= Permission.permission_type_admin.pluck(:workgroup) # rubocop:disable Style/ClassVars
   end
 end

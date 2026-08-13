@@ -2,6 +2,8 @@
 
 # Helpers to assist with authentication.
 module AuthenticationHelpers
+  ADMIN_GROUP = 'sdr:argo_administrators'
+
   # Used by login and logout tests.
   def authentication_headers_for(user)
     {
