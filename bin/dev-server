@@ -23,6 +23,19 @@ fi
 
 INDEX="${1:-qa}" # default to qa
 
+# check for dlss-capistrano's controlmaster:setup/:start tasks:
+# https://github.com/sul-dlss/dlss-capistrano/blob/main/lib/dlss/capistrano/tasks/control_master.rake
+ensure_controlmaster() {
+  controlmaster_host="${CONTROLMASTER_HOST:-dlss-jump}"
+  controlmaster_socket="${CONTROLMASTER_SOCKET:-~/.ssh/%r@%h:%p}"
+
+  ssh -O check -S "$controlmaster_socket" "$controlmaster_host" && return 0
+
+  ssh -f -N -S "$controlmaster_socket" "$controlmaster_host"
+}
+
+ensure_controlmaster
+
 ssh -N -T -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu &
 TUNNEL_PID=$!
 
