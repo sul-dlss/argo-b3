@@ -45,6 +45,7 @@ gem 'action_policy'
 gem 'barby' # generates barcodes; used in TracksheetService
 gem 'blanks' # ActiveRecord-like forms.
 gem 'cocina_display'
+gem 'cocina-models'
 gem 'config'
 gem 'csv'
 gem 'dor-services-client'
@@ -96,7 +97,6 @@ end
 group :test do
   gem 'capybara'
   gem 'capybara-lockstep'
-  gem 'cocina-models' # only need RSpec matchers here
   gem 'cyperful', require: false
   gem 'selenium-webdriver'
   gem 'webmock'
