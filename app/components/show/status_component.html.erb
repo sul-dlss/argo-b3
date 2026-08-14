@@ -1,0 +1,27 @@
+<div class="border object-type-border object-type-bg-light card">
+  <div class="card-body">
+    <h2 class="card-title">
+      <% if status == :deposited %>
+        <i class="bi bi-check-circle-fill text-success me-2" aria-hidden="true"></i>
+      <% elsif status == :error %>
+        <i class="bi bi-exclamation-triangle-fill text-danger me-2" aria-hidden="true"></i>
+      <% end %>
+      <%= heading %>
+    </h2>
+
+    <% case status %>
+    <% when :deposited, :draft %>
+      <ul class="card-text">
+        <li><%= link_to I18n.t('show.status.actions.edit_item_details'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
+        <li><%= link_to I18n.t('show.status.actions.manage_files'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
+        <li><%= link_to I18n.t('show.status.actions.manage_description'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
+      </ul>
+    <% when :depositing %>
+      <p class="card-text"><%= I18n.t('show.status.depositing.body') %></p>
+    <% when :error %>
+      <% workflow_error_messages.each do |workflow_error_message| %>
+        <p class="card-text"><%= workflow_error_message %></p>
+      <% end %>
+    <% end %>
+  </div>
+</div>

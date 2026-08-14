@@ -14,7 +14,10 @@ RSpec.describe 'Show admin policy' do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
                                                    user_version: user_version_client)
   end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: []) }
+  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
+  let(:version_status) do
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
+  end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
 
@@ -56,6 +59,10 @@ RSpec.describe 'Show admin policy' do
 
     expect(page).to have_css('h1', text: original_title)
     expect(page).to have_css('.object-show.object-type-apo .object-type-badge', text: 'APO')
+
+    # Status box
+    expect(page).to have_css('h2', text: 'Depositing...')
+    expect(page).to have_text('Actions unavailable until deposit is complete.')
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')

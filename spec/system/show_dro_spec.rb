@@ -23,7 +23,12 @@ RSpec.describe 'Show DRO' do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
                                                    user_version: user_version_client)
   end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory) }
+  let(:version_client) do
+    instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)
+  end
+  let(:version_status) do
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: true)
+  end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones) }
 
@@ -149,6 +154,10 @@ RSpec.describe 'Show DRO' do
 
     expect(page).to have_css('h1', text: original_title)
     expect(page).to have_css('.object-show.object-type-item .object-type-badge', text: 'ITEM')
+
+    # Status box
+    expect(page).to have_css('h2', text: 'Deposited')
+    expect(page).to have_css('h2 i.bi-check-circle-fill')
 
     expect(page).to have_link('← Back to search', href: /search\?page=5&query=test/)
 
