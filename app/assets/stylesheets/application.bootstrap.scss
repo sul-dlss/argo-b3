@@ -1,6 +1,14 @@
 // Colors for object types
 $item-color-rgb: var(--stanford-illuminating-light-rgb);
 $item-color: rgb(#{$item-color-rgb});
+$collection-color-rgb: var(--stanford-poppy-light-rgb);
+$collection-color: rgb(#{$collection-color-rgb});
+$admin-policy-color-rgb: var(--stanford-sky-light-rgb);
+$admin-policy-color: rgb(#{$admin-policy-color-rgb});
+$agreement-color-rgb: var(--stanford-palo-verde-light-rgb);
+$agreement-color: rgb(#{$agreement-color-rgb});
+$virtual-object-color-rgb: var(--stanford-olive-light-rgb);
+$virtual-object-color: rgb(#{$virtual-object-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';

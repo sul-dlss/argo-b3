@@ -148,6 +148,7 @@ RSpec.describe 'Show DRO' do
     visit "/objects/#{druid}"
 
     expect(page).to have_css('h1', text: original_title)
+    expect(page).to have_css('.object-show.object-type-item .object-type-badge', text: 'ITEM')
 
     expect(page).to have_link('← Back to search', href: /search\?page=5&query=test/)
 

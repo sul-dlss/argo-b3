@@ -55,6 +55,7 @@ RSpec.describe 'Show admin policy' do
     visit "/objects/#{druid}"
 
     expect(page).to have_css('h1', text: original_title)
+    expect(page).to have_css('.object-show.object-type-apo .object-type-badge', text: 'APO')
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')

@@ -3,7 +3,7 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: 'container object-show object-type-item mb-4', data: {
+<%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
       controller: 'cocina-model-show',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
       cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
@@ -12,7 +12,7 @@
 
   <div class="d-flex flex-column d-xl-block">
     <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
-      item
+      <%= @solr_doc.object_type_label %>
     </div>
 
     <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: '_top', class: 'order-1') do %>
