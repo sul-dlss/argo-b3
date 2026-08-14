@@ -715,6 +715,23 @@ RSpec.describe CocinaModels::Dro do
       end
     end
 
+    context 'when barcode is a valid California Historical Society barcode' do
+      before { dro.barcode = '405000111956' }
+
+      it 'is valid' do
+        expect(dro).to be_valid
+      end
+    end
+
+    context 'when barcode is a California Historical Society barcode with an invalid length' do
+      before { dro.barcode = '40500011195' }
+
+      it 'is not valid and adds a barcode error' do
+        expect(dro).not_to be_valid
+        expect(dro.errors[:barcode]).to include('is not a valid barcode')
+      end
+    end
+
     context 'when barcode is invalid' do
       before { dro.barcode = 'not-a-barcode' }
 
