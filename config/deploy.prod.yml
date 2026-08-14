@@ -20,4 +20,6 @@ env:
     SETTINGS__STACKS__URL: https://stacks-stage.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
 
+    DATABASE_HOSTNAME: argo-b3-db-prod-a
+
     HONEYBADGER_ENV: prod

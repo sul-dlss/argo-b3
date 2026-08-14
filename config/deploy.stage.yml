@@ -22,4 +22,6 @@ env:
     SETTINGS__ARGO__URL: https://argo-stage.stanford.edu
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
 
+    DATABASE_HOSTNAME: argo-b3-db-stage-a
+
     HONEYBADGER_ENV: stage
