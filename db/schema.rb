@@ -120,9 +120,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
   create_table "contents", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "druid", null: false
+    t.boolean "immutable", default: true, null: false
     t.string "lock", null: false
+    t.string "staging_state", default: "staging_not_in_progress", null: false
     t.datetime "updated_at", null: false
-    t.index ["druid", "lock"], name: "index_contents_on_druid_and_lock", unique: true
+    t.index ["druid", "lock", "immutable"], name: "index_contents_on_druid_and_lock_and_immutable", unique: true
   end
 
   create_table "messages", force: :cascade do |t|

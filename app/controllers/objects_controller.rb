@@ -3,7 +3,7 @@
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_header show_versions
-                                  show_purl_preview show_solr_doc]
+                                  show_purl_preview show_solr_doc show_files]
 
   include TokenConcern
 
@@ -78,6 +78,12 @@ class ObjectsController < ApplicationController
     render layout: false
   end
 
+  def show_files
+    @content = fetch_content(verified_druid)
+
+    render layout: false
+  end
+
   private
 
   def verified_druid
@@ -108,5 +114,11 @@ class ObjectsController < ApplicationController
   rescue PurlPreviewService::Error => e
     Honeybadger.notify(e, context: { cocina_hash: })
     nil
+  end
+
+  def fetch_content(druid)
+    cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid))
+    Content.find_by(druid:, lock: cocina_object.lock, immutable: true) ||
+      Contents::Builder.call(cocina_object:)
   end
 end

@@ -62,6 +62,7 @@ gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 gem 'rsolr'
 gem 'rubyzip'
 gem 'sdr_view_components'
+gem 'state_machines-activerecord'
 gem 'view_component'
 
 group :development, :test do

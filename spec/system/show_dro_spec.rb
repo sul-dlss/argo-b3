@@ -78,9 +78,36 @@ RSpec.describe 'Show DRO' do
   end
 
   def build_cocina_object(title:, access: {})
+    file_access = { view: access.fetch(:view, 'dark'), download: access.fetch(:download, 'none') }
+    file_shelve = file_access[:view] != 'dark'
+
     build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
       .new(
-        structural: { isMemberOf: [collection_druid] },
+        structural: {
+          isMemberOf: [collection_druid],
+          contains: [
+            {
+              type: Cocina::Models::FileSetType.file,
+              externalIdentifier: 'https://cocina.sul.stanford.edu/fileSet/1',
+              label: 'Object 1',
+              version: 1,
+              structural: {
+                contains: [
+                  {
+                    type: Cocina::Models::ObjectType.file,
+                    externalIdentifier: 'https://cocina.sul.stanford.edu/file/1',
+                    label: 'File 1',
+                    filename: 'rr624wq8610_00_0001.jp2',
+                    version: 1,
+                    hasMessageDigests: [],
+                    access: file_access,
+                    administrative: { publish: true, sdrPreserve: true, shelve: file_shelve }
+                  }
+                ]
+              }
+            }
+          ]
+        },
         description: {
           title: [{ value: title }],
           purl: 'https://purl.stanford.edu/bb123cd4567'
@@ -278,6 +305,10 @@ RSpec.describe 'Show DRO' do
     expect(cells[2]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[3]).to have_text('March 31, 2021 01:23 PM')
     expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
+
+    # Files tab
+    click_button 'Files'
+    expect(page).to have_css('li', text: 'rr624wq8610_00_0001.jp2')
 
     # PURL preview tab
     click_button 'Description Preview'

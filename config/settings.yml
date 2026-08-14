@@ -41,3 +41,5 @@ component_library:
 
 file_upload:
   max_filesize: 10000 # 10GB
+
+staging_location: '/sdr-deposit-staging'

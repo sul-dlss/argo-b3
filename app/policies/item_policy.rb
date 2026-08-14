@@ -2,6 +2,8 @@
 
 # Policy for items.
 class ItemPolicy < ApplicationPolicy
+  alias_rule :update?, to: :edit?
+
   def new?
     true
   end
@@ -11,10 +13,6 @@ class ItemPolicy < ApplicationPolicy
   end
 
   def edit?
-    true
-  end
-
-  def update?
     true
   end
 end

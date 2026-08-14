@@ -2,6 +2,10 @@
 
 # Controller for items (DRO)
 class ItemsController < ApplicationController
+  # Values for submit buttons
+  DEPOSIT_VALUE = 'deposit'
+  DRAFT_VALUE = 'draft'
+
   def new
     authorize! with: ItemPolicy
 
@@ -22,6 +26,17 @@ class ItemsController < ApplicationController
       set_apo_options
       render :new, status: :unprocessable_content
     end
+  end
+
+  def update
+    cocina_object = Sdr::Repository.find(druid:)
+    authorize! cocina_object, with: ItemPolicy
+
+    content = Content.find_by(druid: cocina_object.externalIdentifier,
+                              lock: cocina_object.lock,
+                              immutable: false)
+    content.staging_started!
+    StageFilesJob.perform_later(content:, accession: params[:commit] == DEPOSIT_VALUE, user_id: current_user.sunetid)
   end
 
   private

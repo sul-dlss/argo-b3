@@ -3,7 +3,6 @@
 # Policy for digital objects.
 class ObjectPolicy < ApplicationPolicy
   alias_rule :show_json?, to: :show?
-
   def show?
     true
   end

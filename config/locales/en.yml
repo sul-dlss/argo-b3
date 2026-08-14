@@ -62,6 +62,9 @@ en:
     contents:
       edit:
         title: "Manage files"
+        buttons:
+          deposit: "Deposit"
+          draft: "Save as draft"
       tabs:
         add_files:
           label: "Add files"

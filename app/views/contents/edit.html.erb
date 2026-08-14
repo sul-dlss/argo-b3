@@ -48,6 +48,12 @@
     <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
                                                                         label: t('edit.contents.tabs.deposit.label'),
                                                                         mark_required: true)) do %>
+      <div class="d-flex justify-content-end">
+        <%= form_with url: item_path(@content.druid) do %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ItemsController::DRAFT_VALUE, variant: 'outline-primary me-2') %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ItemsController::DEPOSIT_VALUE) %>
+        <% end %>
+      </div>
     <% end %>
 
   <% end %>

@@ -48,8 +48,16 @@ RSpec.describe Contents::Builder do
 
     it 'creates a Content with no ContentFileSets' do
       expect(content).to be_a(Content)
-      expect(content).to have_attributes(druid:, lock: 'abc123')
+      expect(content).to have_attributes(druid:, lock: 'abc123', immutable: true)
       expect(content.content_file_sets).to be_empty
+    end
+
+    context 'when immutable is false' do
+      subject(:content) { described_class.call(cocina_object:, immutable: false) }
+
+      it 'creates a Content that is not immutable' do
+        expect(content).to have_attributes(immutable: false)
+      end
     end
   end
 
@@ -168,7 +176,7 @@ RSpec.describe Contents::Builder do
     end
 
     it 'creates a Content with ContentFileSets and ContentFiles' do
-      expect(content).to have_attributes(druid:, lock: 'abc123')
+      expect(content).to have_attributes(druid:, lock: 'abc123', immutable: true)
 
       file_sets = content.content_file_sets.sort_by(&:position)
       expect(file_sets.size).to eq(2)

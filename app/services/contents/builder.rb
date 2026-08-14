@@ -15,15 +15,17 @@ module Contents
     end
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build Content for
-    def initialize(cocina_object:)
+    # @param immutable [Boolean] true if the Content should be marked as non-changing
+    def initialize(cocina_object:, immutable: true)
       @cocina_object = cocina_object
+      @immutable = immutable
     end
 
     # @return [Content] the persisted Content built from the Cocina object's structural metadata
     def call
       # `insert_all` is being used for efficient DB updates (instead of many small updates)
       ActiveRecord::Base.transaction do
-        content = Content.create!(druid: cocina_object.externalIdentifier, lock: cocina_object.lock)
+        content = Content.create!(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable:)
         file_set_pairs = build_content_file_sets(content:)
         binary_ids_by_filepath = build_content_file_binaries(content:, file_set_pairs:)
         build_content_files(file_set_pairs:, binary_ids_by_filepath:)
@@ -33,7 +35,7 @@ module Contents
 
     private
 
-    attr_reader :cocina_object
+    attr_reader :cocina_object, :immutable
 
     def cocina_file_sets
       Array(cocina_object.structural&.contains)
