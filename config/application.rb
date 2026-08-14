@@ -51,5 +51,7 @@ module ArgoB3
     ActionView::Base.field_error_proc = proc do |html_tag, _instance|
       html_tag.gsub(/(form-control|form-check-input|form-select)/, '\1 is-invalid').html_safe # rubocop:disable Rails/OutputSafety
     end
+
+    config.action_dispatch.rescue_responses['Sdr::Repository::NotFoundResponse'] = :not_found
   end
 end
