@@ -41,22 +41,31 @@ RSpec.describe CocinaObjectMutators::StructuralMutator do
                                 external_identifier: 'https://cocina.sul.stanford.edu/fileSet/second')
     end
 
+    let(:first_content_file_binary) do
+      create(:content_file_binary, content:, filepath: 'folder1/image1.tif',
+                                   size: 12_345, md5_digest: 'md5digest', sha1_digest: 'sha1digest',
+                                   file_location: 'deposited')
+    end
+    let(:second_content_file_binary) do
+      create(:content_file_binary, content:, filepath: 'image2.tif',
+                                   size: 543, md5_digest: 'md5digest2', sha1_digest: 'sha1digest2',
+                                   file_location: 'deposited')
+    end
+
     before do
-      create(:content_file, content_file_set: first_content_file_set, position: 1,
-                            label: 'Image 1 file', filepath: 'folder1/image1.tif',
+      create(:content_file, content_file_set: first_content_file_set, content_file_binary: first_content_file_binary,
+                            position: 1, label: 'Image 1 file',
                             external_identifier: 'https://cocina.sul.stanford.edu/file/first',
-                            size: 12_345, mime_type: 'image/tiff', md5_digest: 'md5digest', sha1_digest: 'sha1digest',
-                            file_location: 'deposited',
+                            mime_type: 'image/tiff',
                             language_tag: 'en', use: 'transcription',
                             sdr_generated_text: true, corrected_for_accessibility: true,
                             view: 'location-based', download: 'location-based', location: 'music',
                             publish: true, preserve: false, shelve: true,
                             height: 5833, width: 4001)
-      create(:content_file, content_file_set: second_content_file_set, position: 1,
-                            label: 'Page 1 file', filepath: 'image2.tif',
+      create(:content_file, content_file_set: second_content_file_set, content_file_binary: second_content_file_binary,
+                            position: 1, label: 'Page 1 file',
                             external_identifier: 'https://cocina.sul.stanford.edu/file/second',
-                            size: 543, mime_type: 'image/tiff', md5_digest: 'md5digest2', sha1_digest: 'sha1digest2',
-                            file_location: 'deposited',
+                            mime_type: 'image/tiff',
                             view: 'world', download: 'world', publish: false, preserve: true, shelve: false)
     end
 
@@ -115,8 +124,7 @@ RSpec.describe CocinaObjectMutators::StructuralMutator do
 
     before do
       create(:content_file, content_file_set:, external_identifier: 'https://cocina.sul.stanford.edu/file/first',
-                            size: 543, mime_type: 'image/tiff', md5_digest: 'md5digest', sha1_digest: 'sha1digest',
-                            file_location: 'deposited')
+                            mime_type: 'image/tiff')
     end
 
     it 'raises' do
@@ -131,16 +139,38 @@ RSpec.describe CocinaObjectMutators::StructuralMutator do
     let(:content_file_set) do
       create(:content_file_set, content:, external_identifier: 'https://cocina.sul.stanford.edu/fileSet/first')
     end
-    let(:content_file) { create(:content_file, content_file_set:, external_identifier: nil, file_location: 'attached') }
+    let(:content_file) { create(:content_file, content_file_set:, external_identifier: nil, mime_type: nil) }
 
     before { content_file }
 
     it 'raises with the errors for the invalid ContentFile' do
       expect { mutated_cocina_object }.to raise_error(ActiveRecord::RecordInvalid) do |error|
         expect(error.record).to eq(content_file)
+        expect(error.message).to include("External identifier can't be blank", "Mime type can't be blank")
+      end
+    end
+  end
+
+  context 'when a ContentFileBinary is not valid for deposit' do
+    let(:content) { create(:content) }
+    let(:content_file_set) do
+      create(:content_file_set, content:, external_identifier: 'https://cocina.sul.stanford.edu/fileSet/first')
+    end
+    let(:content_file_binary) { create(:content_file_binary, content:, file_location: 'attached') }
+    let(:content_file) do
+      create(:content_file, content_file_set:, content_file_binary:,
+                            external_identifier: 'https://cocina.sul.stanford.edu/file/first',
+                            mime_type: 'image/tiff')
+    end
+
+    before { content_file }
+
+    it 'raises with the errors for the invalid ContentFileBinary' do
+      expect { mutated_cocina_object }.to raise_error(ActiveRecord::RecordInvalid) do |error|
+        expect(error.record).to eq(content_file_binary)
         expect(error.message).to include(
-          "External identifier can't be blank", "Mime type can't be blank", "Size can't be blank",
-          "Md5 digest can't be blank", "Sha1 digest can't be blank", 'File location is not included in the list'
+          "Size can't be blank", "Md5 digest can't be blank", "Sha1 digest can't be blank",
+          'File location is not included in the list'
         )
       end
     end

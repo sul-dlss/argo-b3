@@ -29,11 +29,7 @@ module CocinaModels
     # @param cocina_hash [Hash] a hash representing a Cocina model with metadata
     # @return [CocinaModels::DroPresenter, CocinaModels::CollectionPresenter, CocinaModels::AdminPolicyPresenter]
     def self.build_from_cocina_hash(cocina_hash)
-      created = cocina_hash.delete(:created)
-      modified = cocina_hash.delete(:modified)
-      lock = cocina_hash.delete(:lock)
-      cocina_object = Cocina::Models.build(cocina_hash, validate: false)
-      cocina_object_with_metadata = Cocina::Models.with_metadata(cocina_object, lock, created:, modified:)
+      cocina_object_with_metadata = CocinaSupport.build_from_cocina_hash(cocina_hash)
       build_from_cocina_object(cocina_object_with_metadata)
     end
   end

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module Contents
-  # Builds a Content (with its ContentFileSets and ContentFiles) from a Cocina object's structural metadata.
+  # Builds a Content (with its ContentFileSets, ContentFileBinaries, and ContentFiles) from a Cocina
+  # object's structural metadata. Cocina files that share the same filename within the Content are
+  # deduplicated into a single ContentFileBinary, referenced by multiple ContentFiles.
   class Builder
     FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
 
@@ -23,7 +25,8 @@ module Contents
       ActiveRecord::Base.transaction do
         content = Content.create!(druid: cocina_object.externalIdentifier, lock: cocina_object.lock)
         file_set_pairs = build_content_file_sets(content:)
-        build_content_files(file_set_pairs:)
+        binary_ids_by_filepath = build_content_file_binaries(content:, file_set_pairs:)
+        build_content_files(file_set_pairs:, binary_ids_by_filepath:)
         content
       end
     end
@@ -62,10 +65,49 @@ module Contents
       }
     end
 
-    def build_content_files(file_set_pairs:)
+    # @return [Hash<String, Integer>] the id of the newly-inserted ContentFileBinary for each distinct filename
+    #   referenced by the Cocina object's file sets
+    def cocina_files_by_filepath(file_set_pairs:)
+      file_set_pairs.each_with_object({}) do |(cocina_file_set, _id), memo|
+        Array(cocina_file_set.structural&.contains).each do |cocina_file|
+          memo[cocina_file.filename] ||= cocina_file
+        end
+      end
+    end
+
+    def build_content_file_binaries(content:, file_set_pairs:)
+      cocina_files_by_filepath = cocina_files_by_filepath(file_set_pairs:)
+
+      return {} if cocina_files_by_filepath.empty?
+
+      filepaths = cocina_files_by_filepath.keys
+      attrs = cocina_files_by_filepath.map do |filepath, cocina_file|
+        content_file_binary_attrs(content:, filepath:, cocina_file:)
+      end
+
+      ids = attrs.each_slice(BATCH_SIZE).flat_map do |batch|
+        ContentFileBinary.insert_all!(batch, returning: [:id]).rows.flatten # rubocop:disable Rails/SkipsModelValidations
+      end
+
+      filepaths.zip(ids).to_h
+    end
+
+    def content_file_binary_attrs(content:, filepath:, cocina_file:)
+      {
+        content_id: content.id,
+        file_location: 'deposited',
+        filepath:,
+        **filepath_attributes(filepath:),
+        **message_digest_attributes(cocina_file:),
+        size: cocina_file.size
+      }
+    end
+
+    def build_content_files(file_set_pairs:, binary_ids_by_filepath:)
       attrs = file_set_pairs.flat_map do |cocina_file_set, content_file_set_id|
         Array(cocina_file_set.structural&.contains).each_with_index.map do |cocina_file, index|
-          content_file_attrs(content_file_set_id:, cocina_file:, position: index + 1)
+          content_file_binary_id = binary_ids_by_filepath.fetch(cocina_file.filename)
+          content_file_attrs(content_file_set_id:, content_file_binary_id:, cocina_file:, position: index + 1)
         end
       end
 
@@ -76,22 +118,18 @@ module Contents
       end
     end
 
-    def content_file_attrs(content_file_set_id:, cocina_file:, position:)
+    def content_file_attrs(content_file_set_id:, content_file_binary_id:, cocina_file:, position:)
       {
         content_file_set_id:,
+        content_file_binary_id:,
         position:,
-        file_location: 'deposited',
         label: cocina_file.label,
-        filepath: cocina_file.filename,
         external_identifier: cocina_file.externalIdentifier,
-        size: cocina_file.size,
         mime_type: cocina_file.hasMimeType,
         language_tag: cocina_file.languageTag,
         use: cocina_file.use,
         sdr_generated_text: cocina_file.sdrGeneratedText,
         corrected_for_accessibility: cocina_file.correctedForAccessibility,
-        **filepath_attributes(filepath: cocina_file.filename),
-        **message_digest_attributes(cocina_file:),
         **access_attributes(cocina_file:),
         **administrative_attributes(cocina_file:),
         **presentation_attributes(cocina_file:)

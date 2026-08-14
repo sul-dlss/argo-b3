@@ -38,6 +38,9 @@ module CocinaObjectMutators
 
         content_file_set.content_files.each do |content_file|
           raise ActiveRecord::RecordInvalid, content_file unless content_file.valid?(:deposit)
+          unless content_file.content_file_binary.valid?(:deposit)
+            raise ActiveRecord::RecordInvalid, content_file.content_file_binary
+          end
         end
       end
     end

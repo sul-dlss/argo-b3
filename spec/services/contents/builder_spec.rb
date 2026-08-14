@@ -327,4 +327,123 @@ RSpec.describe Contents::Builder do
       expect(files.map(&:filepath)).to eq(['qr773tm1060_0001.tiff', 'qr773tm1060_0002.tiff'])
     end
   end
+
+  context 'with the same filename referenced from multiple file sets' do
+    let(:json) do
+      <<~JSON
+        {
+          "type": "#{Cocina::Models::ObjectType.image}",
+          "externalIdentifier": "#{druid}",
+          "version": 1,
+          "access": {
+            "view": "world",
+            "download": "world"
+          },
+          "administrative": {
+            "hasAdminPolicy": "druid:fh940mz2717"
+          },
+          "description": {
+            "title": [
+              {
+                "value": "dood"
+              }
+            ],
+            "purl": "https://purl.stanford.edu/qr773tm1060",
+            "access": {
+              "digitalRepository": [
+                {
+                  "value": "Stanford Digital Repository"
+                }
+              ]
+            }
+          },
+          "identification": {
+            "sourceId": "foo:129"
+          },
+          "structural": {
+            "contains": [
+              {
+                "type": "#{Cocina::Models::FileSetType.image}",
+                "externalIdentifier": "https://cocina.sul.stanford.edu/fileSet/e43590ae-abf9-4a5c-88f2-a8627969dc23",
+                "label": "Image 1",
+                "version": 1,
+                "structural": {
+                  "contains": [
+                    {
+                      "type": "#{Cocina::Models::ObjectType.file}",
+                      "externalIdentifier": "https://cocina.sul.stanford.edu/file/de24d694-2fe8-41a5-9113-ae6adf4506fd",
+                      "label": "Image 1 file",
+                      "filename": "qr773tm1060_0001.tiff",
+                      "size": 22454748,
+                      "version": 1,
+                      "hasMessageDigests": [
+                        {
+                          "type": "sha1",
+                          "digest": "ff66b3b3dc3ef733d39e949549791ff78754871b"
+                        }
+                      ],
+                      "access": {
+                        "view": "world",
+                        "download": "world"
+                      },
+                      "administrative": {
+                        "publish": true,
+                        "sdrPreserve": false,
+                        "shelve": true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "#{Cocina::Models::FileSetType.page}",
+                "externalIdentifier": "https://cocina.sul.stanford.edu/fileSet/a45774e4-ac26-425a-b40e-f5e247135843",
+                "label": "Page 1",
+                "version": 1,
+                "structural": {
+                  "contains": [
+                    {
+                      "type": "#{Cocina::Models::ObjectType.file}",
+                      "externalIdentifier": "https://cocina.sul.stanford.edu/file/86de37bc-b930-49ac-936b-15e8db7af88e",
+                      "label": "Page 1 file",
+                      "filename": "qr773tm1060_0001.tiff",
+                      "size": 22454748,
+                      "version": 1,
+                      "hasMessageDigests": [
+                        {
+                          "type": "sha1",
+                          "digest": "ff66b3b3dc3ef733d39e949549791ff78754871b"
+                        }
+                      ],
+                      "access": {
+                        "view": "world",
+                        "download": "world"
+                      },
+                      "administrative": {
+                        "publish": false,
+                        "sdrPreserve": true,
+                        "shelve": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      JSON
+    end
+
+    it 'creates a single ContentFileBinary shared by a ContentFile in each file set' do
+      expect(content.content_file_binaries.size).to eq(1)
+
+      content_file_binary = content.content_file_binaries.sole
+      expect(content_file_binary.filepath).to eq('qr773tm1060_0001.tiff')
+
+      file_sets = content.content_file_sets.sort_by(&:position)
+      expect(file_sets.map { |file_set| file_set.content_files.sole.content_file_binary }).to all(
+        eq(content_file_binary)
+      )
+    end
+  end
 end

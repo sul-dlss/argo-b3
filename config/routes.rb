@@ -173,7 +173,7 @@ Rails.application.routes.draw do
 
   resources :items, only: %i[new create]
 
-  resources :contents, only: %i[edit update], param: :druid
+  resources :contents, only: %i[edit update show]
 
   namespace :admin do
     get 'groups'

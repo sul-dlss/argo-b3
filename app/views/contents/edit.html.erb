@@ -15,14 +15,12 @@
     <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
                                                                         label: t('edit.contents.tabs.add_files.label'))) do %>
       <%= turbo_frame_tag @content, 'edit' do %>
-        <%= form_with model: @content, data: {
+        <%= form_with model: @content, 
+          url: content_path(@content_token),
+          data: {
               controller: 'dropzone',
               dropzone_max_filesize_value: Settings.file_upload.max_filesize,
-              dropzone_dropzone_files_outlet: '.dropzone-files',
-              dropzone_sdr_tab_error_outlet: '.tab-error',
-              dropzone_form_error_outlet: '.form-error',
-              dropzone_disableable_outlet: '.disableable',
-              action: 'change->unsaved-changes#changed'
+              dropzone_dropzone_files_outlet: '.dropzone-files'
             }, id: 'file-dropzone', class: 'dropzone mb-3' do |form| %>
             <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
               <span data-dropzone-target="folderAlertText"></span>
@@ -42,6 +40,9 @@
                                                                           <% end %>
     <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :manage_files,
                                                                         label: t('edit.contents.tabs.manage_files.label'))) do %>
+      <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+      <% end %>
     <% end %>
 
     <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,

@@ -2,17 +2,10 @@ class CreateContentFile < ActiveRecord::Migration[8.1]
   def change
     create_table :content_files do |t|
       t.belongs_to :content_file_set, null: false, foreign_key: true
+      t.belongs_to :content_file_binary, null: false, foreign_key: true
       t.integer :position, null: false
-      t.string :file_location, null: false
       t.string :label, null: false
-      t.string :filepath, null: false
-      t.string :basename, null: false
-      t.string :extname, null: false
-      t.string :path_parts, array: true, null: false, default: []
       t.string :external_identifier
-      t.bigint :size
-      t.string :md5_digest
-      t.string :sha1_digest
       t.string :mime_type
       t.string :language_tag
       t.string :use
@@ -28,6 +21,7 @@ class CreateContentFile < ActiveRecord::Migration[8.1]
       t.integer :width
       t.timestamps
       t.index [:content_file_set_id, :position], unique: true
+      t.index [:content_file_set_id, :content_file_binary_id], unique: true
     end
   end
 end
