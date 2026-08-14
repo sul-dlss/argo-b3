@@ -65,6 +65,7 @@ RSpec.describe 'Show collection' do
     visit "/objects/#{druid}"
 
     expect(page).to have_css('h1', text: original_title)
+    expect(page).to have_css('.object-show.object-type-collection .object-type-badge', text: 'COLLECTION')
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')

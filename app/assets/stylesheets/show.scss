@@ -12,10 +12,6 @@
   .object-type-badge {
     width: 240px;
     height: 38px;
-
-    &.object-type-item {
-      background-color: $item-color;
-    }
   }
 
   .use-access-copyright-section .card {
@@ -44,18 +40,36 @@
   }
 }
 
-.object-type-item {
+@mixin object-type-colors($color, $color-rgb) {
   .object-type-bg {
-    background-color: $item-color;
-
+    background-color: $color;
   }
 
   .object-type-bg-light {
-    background-color: rgba(#{$item-color-rgb}, 0.1);
-
+    background-color: rgba(#{$color-rgb}, 0.1);
   }
 
   .border.object-type-border {
-    --bs-border-color: #{$item-color};
+    --bs-border-color: #{$color};
   }
+}
+
+.object-type-item {
+  @include object-type-colors($item-color, $item-color-rgb);
+}
+
+.object-type-collection {
+  @include object-type-colors($collection-color, $collection-color-rgb);
+}
+
+.object-type-apo {
+  @include object-type-colors($admin-policy-color, $admin-policy-color-rgb);
+}
+
+.object-type-agreement {
+  @include object-type-colors($agreement-color, $agreement-color-rgb);
+}
+
+.object-type-virtual-object {
+  @include object-type-colors($virtual-object-color, $virtual-object-color-rgb);
 }
