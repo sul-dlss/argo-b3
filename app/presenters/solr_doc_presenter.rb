@@ -3,11 +3,11 @@
 # Presenter for a single Solr search result document.
 class SolrDocPresenter < SearchResults::Item
   OBJECT_TYPES = {
-    'item' => { label: 'Item', css_class: 'item' },
-    'collection' => { label: 'Collection', css_class: 'collection' },
-    'adminPolicy' => { label: 'APO', css_class: 'apo' },
-    'agreement' => { label: 'Agreement', css_class: 'agreement' },
-    'virtual object' => { label: 'Virtual object', css_class: 'virtual-object' }
+    'item' => { label: 'Item', css_class: 'object-type-item' },
+    'collection' => { label: 'Collection', css_class: 'object-type-collection' },
+    'adminPolicy' => { label: 'APO', css_class: 'object-type-apo' },
+    'agreement' => { label: 'Agreement', css_class: 'object-type-agreement' },
+    'virtual object' => { label: 'Virtual object', css_class: 'object-type-virtual-object' }
   }.freeze
 
   def to_param

@@ -3,7 +3,7 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: "container object-show object-type-#{@solr_doc.object_type_class} mb-4", data: {
+<%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
       controller: 'cocina-model-show',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
       cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
