@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Helper methods for supporting caching
 class CacheSupport
   # @return [Hash] hash for cocina object with blanks removed

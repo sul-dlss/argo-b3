@@ -42,8 +42,8 @@ class ContentsController < ApplicationController
   private
 
   def find_or_create_content(cocina_object:)
-    Content.find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock) ||
-      Contents::Builder.call(cocina_object:)
+    Content.find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false) ||
+      Contents::Builder.call(cocina_object:, immutable: false)
   end
 
   def fetch_solr_doc(druid:)

@@ -6,7 +6,6 @@ class CreateContentFile < ActiveRecord::Migration[8.1]
       t.integer :position, null: false
       t.string :label, null: false
       t.string :external_identifier
-      t.string :mime_type
       t.string :language_tag
       t.string :use
       t.boolean :sdr_generated_text, null: false, default: false

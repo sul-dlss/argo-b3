@@ -9,9 +9,9 @@ class ContentFile < ApplicationRecord
   positioned on: :content_file_set
 
   delegate :filepath, :basename, :extname, :path_parts, :size, :md5_digest, :sha1_digest,
-           :file_location, :file, :filename, to: :content_file_binary
+           :file_location, :file, :filename, :mime_type, to: :content_file_binary
 
   # The deposit validation scope validates that the File can be updated in SDR.
   # In earlier parts of the flow for managing files, some of these fields may not be populated / in correct state.
-  validates :external_identifier, :mime_type, presence: true, on: :deposit
+  validates :external_identifier, presence: true, on: :deposit
 end

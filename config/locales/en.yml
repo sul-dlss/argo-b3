@@ -79,6 +79,8 @@ en:
           register: 'Register only'
         toasts:
           register: 'Item registered.'
+          staging_started: 'Staging started'
+          staging_completed: 'Staging completed'
       tabs:
         deposit: 
           label: "Register"

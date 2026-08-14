@@ -9,3 +9,5 @@ reload_intervals:
   cocina_model_stagger: 5
   bulk_actions_history: 500
   workflow_grid: 500
+
+staging_location: 'tmp/workspace'

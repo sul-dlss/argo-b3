@@ -29,6 +29,7 @@ class ItemsController < ApplicationController
   end
 
   def update
+    druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     authorize! cocina_object, with: ItemPolicy
 
@@ -36,7 +37,9 @@ class ItemsController < ApplicationController
                               lock: cocina_object.lock,
                               immutable: false)
     content.staging_started!
-    StageFilesJob.perform_later(content:, accession: params[:commit] == DEPOSIT_VALUE, user_id: current_user.sunetid)
+    StageFilesJob.perform_later(content:, accession: params[:commit] == DEPOSIT_VALUE, user: current_user)
+    flash[:toast] = t('edit.items.new.toasts.staging_started')
+    redirect_to object_path(druid)
   end
 
   private

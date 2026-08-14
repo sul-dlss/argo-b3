@@ -27,6 +27,7 @@ RSpec.describe ContentFileBinary do
         size: 12_345,
         md5_digest: 'b6ce12a1dd5db09f10b51659c83f90a3',
         sha1_digest: 'ff66b3b3dc3ef733d39e949549791ff78754871b',
+        mime_type: 'image/tiff',
         file_location: 'deposited'
       }
     end
@@ -36,14 +37,15 @@ RSpec.describe ContentFileBinary do
       expect(build(:content_file_binary, **deposit_ready_attributes, file_location: 'stage')).to be_valid(:deposit)
     end
 
-    it 'is invalid without size, md5_digest, or sha1_digest' do
+    it 'is invalid without size, md5_digest, sha1_digest, or mime_type' do
       content_file_binary = build(:content_file_binary, **deposit_ready_attributes,
-                                                         size: nil, md5_digest: nil, sha1_digest: nil)
+                                                         size: nil, md5_digest: nil, sha1_digest: nil, mime_type: nil)
 
       expect(content_file_binary).not_to be_valid(:deposit)
       expect(content_file_binary.errors[:size]).to include("can't be blank")
       expect(content_file_binary.errors[:md5_digest]).to include("can't be blank")
       expect(content_file_binary.errors[:sha1_digest]).to include("can't be blank")
+      expect(content_file_binary.errors[:mime_type]).to include("can't be blank")
     end
 
     it 'is invalid when file_location is not deposited or stage' do

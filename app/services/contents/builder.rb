@@ -101,7 +101,8 @@ module Contents
         filepath:,
         **filepath_attributes(filepath:),
         **message_digest_attributes(cocina_file:),
-        size: cocina_file.size
+        size: cocina_file.size,
+        mime_type: cocina_file.hasMimeType
       }
     end
 
@@ -127,7 +128,6 @@ module Contents
         position:,
         label: cocina_file.label,
         external_identifier: cocina_file.externalIdentifier,
-        mime_type: cocina_file.hasMimeType,
         language_tag: cocina_file.languageTag,
         use: cocina_file.use,
         sdr_generated_text: cocina_file.sdrGeneratedText,

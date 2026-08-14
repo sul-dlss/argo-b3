@@ -22,11 +22,16 @@ class ContentFileBinary < ApplicationRecord
 
   # The deposit validation scope validates that the binary can be updated in SDR.
   # In earlier parts of the flow for managing files, some of these fields may not be populated / in correct state.
-  validates :size, :md5_digest, :sha1_digest, presence: true, on: :deposit
+  validates :size, :md5_digest, :sha1_digest, :mime_type, presence: true, on: :deposit
   validates :file_location, inclusion: { in: %w[stage deposited] }, on: :deposit
 
   def filename
     FilenameSupport.filename(filepath:)
+  end
+
+  def filepath_on_disk
+    # Globus and mount to be added.
+    ActiveStorageSupport.filepath_for_blob(file.blob)
   end
 
   private

@@ -706,6 +706,7 @@ DEPENDENCIES
   cyperful
   debug
   dor-services-client
+  druid-tools
   dry-monads
   erb_lint
   factory_bot_rails
@@ -716,6 +717,7 @@ DEPENDENCIES
   jbuilder
   kamal
   lookbook
+  marcel
   mission_control-jobs
   okcomputer
   overmind

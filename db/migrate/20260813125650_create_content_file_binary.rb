@@ -10,6 +10,7 @@ class CreateContentFileBinary < ActiveRecord::Migration[8.1]
       t.bigint :size
       t.string :md5_digest
       t.string :sha1_digest
+      t.string :mime_type
       t.timestamps
       t.index [:content_id, :filepath], unique: true
     end

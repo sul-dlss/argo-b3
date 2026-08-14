@@ -48,8 +48,10 @@ gem 'cocina_display'
 gem 'config'
 gem 'csv'
 gem 'dor-services-client'
+gem 'druid-tools'
 gem 'dry-monads'
 gem 'honeybadger'
+gem 'marcel' # For MIME type detection
 gem 'mission_control-jobs'
 gem 'okcomputer'
 gem 'positioning' # For ordering ContentFileSets and ContentFiles

@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
     t.string "file_location", null: false
     t.string "filepath", null: false
     t.string "md5_digest"
+    t.string "mime_type"
     t.string "path_parts", default: [], null: false, array: true
     t.string "sha1_digest"
     t.bigint "size"
@@ -101,7 +102,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
     t.string "label", null: false
     t.string "language_tag"
     t.string "location"
-    t.string "mime_type"
     t.integer "position", null: false
     t.boolean "preserve", null: false
     t.boolean "publish", null: false
