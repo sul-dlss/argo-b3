@@ -166,18 +166,9 @@ module CocinaModels
         Array(location).include?(embargo_location)
     end
 
-    BARCODE_FORMATS = [
-      /^2050[0-9]{7}$/,
-      /^245[0-9]{8}$/,
-      /^[0-9]+-[0-9]+$/,
-      /^36105[0-9]{9}$/,
-      /^405[0-9]+$/
-    ].freeze
-    private_constant :BARCODE_FORMATS
-
     def validate_barcode
       return if barcode.nil?
-      return if BARCODE_FORMATS.any? { |pattern| pattern.match?(barcode) }
+      return if Cocina::Models::Barcode.valid?(barcode)
 
       errors.add(:barcode, 'is not a valid barcode')
     end
