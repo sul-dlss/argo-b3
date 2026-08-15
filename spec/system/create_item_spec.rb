@@ -22,7 +22,10 @@ RSpec.describe 'Create an item' do
       instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
                                                      user_version: user_version_client)
     end
-    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: []) }
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
+    let(:version_status) do
+      instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: false)
+    end
     let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
     let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
 
