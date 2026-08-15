@@ -30,16 +30,11 @@ fi
 
 # db and redis are the only local containers this script needs; Solr, DSA,
 # and PresCat are tunneled to the remote server environment instead.
-ensure_docker_services() {
-  if ! docker info >/dev/null 2>&1; then
-    echo "Docker does not appear to be running. Please start Docker and try again." >&2
-    exit 1
-  fi
-
-  docker compose up -d db redis
-}
-
-ensure_docker_services
+if ! docker info >/dev/null 2>&1; then
+  echo "Docker does not appear to be running. Please start Docker and try again." >&2
+  exit 1
+fi
+docker compose up -d db redis
 
 # check for dlss-capistrano's controlmaster:setup/:start tasks:
 # https://github.com/sul-dlss/dlss-capistrano/blob/main/lib/dlss/capistrano/tasks/control_master.rake

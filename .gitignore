@@ -47,6 +47,3 @@ config/environments/*.local.yml
 /coverage
 
 .ruby-version
-
-# Ignore local Claude Code settings (personal permission approvals, etc.).
-.claude/settings.local.json
