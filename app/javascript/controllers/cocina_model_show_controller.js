@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
 
 const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordion-collapse']
 
 // Controller for the Cocina model show page.
 export default class extends Controller {
   static values = {
-    interval: Number,
-    stagger: Number
+    interval: Number
   }
 
   connect () {
@@ -16,14 +16,9 @@ export default class extends Controller {
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
 
     this.href = window.location.href
-    this.frameReloadTimeouts = []
     if (this.reloadTimeout) return
 
-    // Use a single recursive timer so each refresh cycle waits for the prior
-    // staggered frame reloads to be scheduled before starting the next cycle.
-    // Reloads are staggered to allow the Solr docs to be cached after the first request
-    // and to reduce bursts of requests when multiple frames are present.
-    this.scheduleReloadCycle()
+    this.scheduleReload()
   }
 
   disconnect () {
@@ -31,10 +26,6 @@ export default class extends Controller {
       clearTimeout(this.reloadTimeout)
       this.reloadTimeout = null
     }
-
-    // Clear any pending staggered frame reloads when leaving the page.
-    this.frameReloadTimeouts.forEach((timeoutId) => clearTimeout(timeoutId))
-    this.frameReloadTimeouts = []
 
     document.removeEventListener('turbo:before-morph-attribute', this.preserveTab)
     document.removeEventListener('turbo:before-fetch-response', this.handleFrameResponse)
@@ -51,26 +42,19 @@ export default class extends Controller {
     }
   }
 
-  scheduleReloadCycle = () => {
-    const frames = Array.from(document.querySelectorAll('turbo-frame'))
-    const cycleDelay = this.intervalValue + (Math.max(frames.length - 1, 0) * this.staggerValue)
-
+  // Refreshes the whole page (via Turbo's morph-based page refresh) on each interval, rather than
+  // reloading each turbo frame individually. The show action refreshes the solr doc / cocina hash
+  // caches only when the object's lock has changed, so this single request is what drives every
+  // frame (each tagged `refresh="morph"`) to reload off of already-warm caches, without needing to
+  // stagger the frame reloads to avoid bursts of requests.
+  scheduleReload = () => {
     this.reloadTimeout = setTimeout(() => {
-      if (this.href !== window.location.href) return
+      if (this.href === window.location.href && document.visibilityState === 'visible') {
+        Turbo.session.refresh(this.href)
+      }
 
-      this.frameReloadTimeouts = []
-
-      // Reload frames one at a time to spread out requests and reduce bursts.
-      frames.forEach((frame, index) => {
-        const timeoutId = setTimeout(() => {
-          if (document.visibilityState === 'visible') frame.reload()
-        }, index * this.staggerValue)
-
-        this.frameReloadTimeouts.push(timeoutId)
-      })
-
-      this.scheduleReloadCycle()
-    }, cycleDelay)
+      this.scheduleReload()
+    }, this.intervalValue)
   }
 
   // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent

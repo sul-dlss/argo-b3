@@ -12,6 +12,7 @@ RSpec.describe 'Show object' do
   describe 'GET /objects/:druid' do
     context 'when the object is not found' do
       before do
+        allow(Sdr::Repository).to receive(:lock).with(druid:).and_return('v1')
         allow(Sdr::Repository).to receive(:find_solr).with(druid:).and_raise(Sdr::Repository::NotFoundResponse)
       end
 

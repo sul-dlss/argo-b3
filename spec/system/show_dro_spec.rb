@@ -21,7 +21,7 @@ RSpec.describe 'Show DRO' do
 
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   user_version: user_version_client)
+                                                   user_version: user_version_client, lock: 'lock1')
   end
   let(:version_client) do
     instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)

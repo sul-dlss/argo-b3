@@ -11,7 +11,7 @@ RSpec.describe 'Manage files' do
 
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   user_version: user_version_client)
+                                                   user_version: user_version_client, lock: 'abc123')
   end
   let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
   let(:version_status) do
