@@ -3,6 +3,8 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
+<%= turbo_stream_from 'objects', @solr_doc.druid %>
+
 <%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
       controller: 'cocina-model-show',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
@@ -113,7 +115,9 @@
 
         <% if @solr_doc.dro? %>
           <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
-            <p>Not implemented yet</p>
+            <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+              <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+            <% end %>
           <% end %>
         <% end %>
 
