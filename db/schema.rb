@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "bulk_actions", force: :cascade do |t|
     t.string "action_type", null: false
@@ -25,6 +53,71 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_bulk_actions_on_user_id"
+  end
+
+  create_table "content_file_binaries", force: :cascade do |t|
+    t.string "basename", null: false
+    t.bigint "content_id", null: false
+    t.datetime "created_at", null: false
+    t.string "extname", null: false
+    t.string "file_location", null: false
+    t.string "filepath", null: false
+    t.string "md5_digest"
+    t.string "mime_type"
+    t.string "path_parts", default: [], null: false, array: true
+    t.string "sha1_digest"
+    t.bigint "size"
+    t.datetime "updated_at", null: false
+    t.index ["content_id", "filepath"], name: "index_content_file_binaries_on_content_id_and_filepath", unique: true
+    t.index ["content_id"], name: "index_content_file_binaries_on_content_id"
+  end
+
+  create_table "content_file_sets", force: :cascade do |t|
+    t.bigint "content_id", null: false
+    t.datetime "created_at", null: false
+    t.string "external_identifier"
+    t.string "file_set_type", null: false
+    t.string "label", null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_id", "position"], name: "index_content_file_sets_on_content_id_and_position", unique: true
+    t.index ["content_id"], name: "index_content_file_sets_on_content_id"
+  end
+
+  create_table "content_files", force: :cascade do |t|
+    t.bigint "content_file_binary_id", null: false
+    t.bigint "content_file_set_id", null: false
+    t.boolean "corrected_for_accessibility", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "download", null: false
+    t.string "external_identifier"
+    t.integer "height"
+    t.string "label", null: false
+    t.string "language_tag"
+    t.string "location"
+    t.integer "position", null: false
+    t.boolean "preserve", null: false
+    t.boolean "publish", null: false
+    t.boolean "sdr_generated_text", default: false, null: false
+    t.boolean "shelve", null: false
+    t.datetime "updated_at", null: false
+    t.string "use"
+    t.string "view", null: false
+    t.integer "width"
+    t.index ["content_file_binary_id"], name: "index_content_files_on_content_file_binary_id"
+    t.index ["content_file_set_id", "content_file_binary_id"], name: "idx_on_content_file_set_id_content_file_binary_id_6042d030c0", unique: true
+    t.index ["content_file_set_id", "position"], name: "index_content_files_on_content_file_set_id_and_position", unique: true
+    t.index ["content_file_set_id"], name: "index_content_files_on_content_file_set_id"
+  end
+
+  create_table "contents", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "druid", null: false
+    t.boolean "immutable", default: true, null: false
+    t.string "lock", null: false
+    t.string "staging_state", default: "staging_not_in_progress", null: false
+    t.datetime "updated_at", null: false
+    t.index ["druid", "lock", "immutable"], name: "index_contents_on_druid_and_lock_and_immutable", unique: true
   end
 
   create_table "permissions", force: :cascade do |t|
@@ -46,5 +139,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_09_212959) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bulk_actions", "users"
+  add_foreign_key "content_file_binaries", "contents"
+  add_foreign_key "content_file_sets", "contents"
+  add_foreign_key "content_files", "content_file_binaries"
+  add_foreign_key "content_files", "content_file_sets"
 end
