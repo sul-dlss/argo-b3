@@ -59,6 +59,14 @@ en:
       has_orcids: 'Has contributor ORCIDs'
       has_doi: 'Has DOI'
   edit:
+    contents:
+      edit:
+        title: "Manage files"
+      tabs:
+        add_files:
+          label: "Add files"
+        manage_files:
+          label: "Manage files"
     items:
       new:
         title: "Register an item"
