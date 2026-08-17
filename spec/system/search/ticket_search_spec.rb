@@ -13,7 +13,7 @@ RSpec.describe 'Project search', :solr do
   end
 
   it 'returns ticket search results' do
-    visit root_path
+    visit search_path
 
     find_search_field.fill_in(with: 'TESTREQ-0')
     click_button('Search')

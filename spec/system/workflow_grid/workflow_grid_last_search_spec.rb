@@ -15,7 +15,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
   end
 
   it 'show only items from last search in the workflow grid' do
-    visit root_path
+    visit search_path
 
     find_search_field.fill_in(with: 'twain')
     click_button('Search')

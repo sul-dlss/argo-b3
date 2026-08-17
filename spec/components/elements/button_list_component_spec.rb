@@ -16,8 +16,8 @@ RSpec.describe Elements::ButtonListComponent, type: :component do
 
       expect(page).to have_css('h2', text: 'Actions')
       expect(page).to have_css('small', text: '(does not require new version)')
-      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary mb-1')
-      expect(page).to have_button('Republish', class: 'btn btn-outline-primary mb-1')
+      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary')
+      expect(page).to have_button('Republish', class: 'btn btn-outline-primary')
     end
 
     it 'defaults button classes to mb-1' do
@@ -25,7 +25,7 @@ RSpec.describe Elements::ButtonListComponent, type: :component do
         component.with_button(link: '/reindex', label: 'Reindex', variant: 'outline-primary')
       end
 
-      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary mb-1')
+      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary')
     end
 
     it 'allows overriding button classes' do

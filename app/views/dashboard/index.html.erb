@@ -1,0 +1,80 @@
+<%= content_for :title, 'Dashboard' %>
+
+<div class="container mt-3">
+  <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
+    <% layout.with_top_content do %>
+      <div class="row">
+        <div class="col-xl-2 col-lg-12 pt-3">
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Argo dashboard') %>
+        </div>
+
+        <div class="col-xl-10 col-lg-12">
+          <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, dismissible: true) do %>
+            Welcome to the new Argo application! View a demo of enhancements that have been developed.
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <% layout.with_left_content do %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: 'Go to a druid') %>
+      <%= form_with model: GoToDruidForm.new, url: '#', class: 'mb-5' do |form| %>
+          <div class="d-flex">
+            <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
+                                                                        field_name: :druid,
+                                                                        label_hidden: true,
+                                                                        input_placeholder: 'Enter druid here') %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Go', classes: 'ms-2', style: 'width: fit-content;') %>
+          </div>
+      <% end %>
+
+      <%= render Elements::ButtonListComponent.new(title: 'Register & deposit single object') do |component| %>
+        <% component.with_button(link: '#', label: 'Item', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'Collection', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'APO', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'Agreement', variant: 'outline-primary disabled') %>
+      <% end %>
+
+      <%= render Elements::ButtonListComponent.new(title: 'Register or deposit multiple items', classes: 'mt-4') do |component| %>
+        <% component.with_button(link: '#', label: 'Register multiple items', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'Deposit multiple items', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary disabled') %>
+      <% end %>
+
+      <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
+        <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary disabled') if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+        <% component.with_button(link: '#', label: 'Impersonate', variant: 'outline-primary disabled') if allowed_to?(:impersonate?, nil, with: AdminPolicy) %>
+      <% end %>
+    <% end %>
+    <% layout.with_main_content do %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'My recent activity', classes: 'mt-3') %>
+
+      <%= render SdrViewComponents::Tables::TableComponent.new(classes: 'mb-5', responsive: true) do |component| %>
+        <% component.with_caption do %>
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Recent objects') %>
+        <% end %>
+        <% component.with_header(label: 'Title') %>
+        <% component.with_header(label: 'Druid') %>
+        <% component.with_header(label: 'Object type') %>
+        <% component.with_header(label: 'Tags') %>
+        <% component.with_row(values: ['Wiedoeft, Rudy Liver and bacon: fox trot: Emerson Records, New York...', 'bb234ab1234', 'Item', 'Project : Riegler-Deutsch Index']) %>
+        <% component.with_row(values: ['1947 Partition', 'bb234ab123', 'APO', nil]) %>
+      <% end %>
+
+      <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Pinned searches', classes: 'mb-5', responsive: true) do |component| %>
+        <% component.with_header(label: 'Search') %>
+        <% component.with_header(label: 'Unpin') %>
+        <% component.with_row(values: ['heart mountain; Exclude Google Books > Yes; Collection > James Omura papers: 1912-1995', nil]) %>
+      <% end %>
+
+      <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Pinned items', responsive: true) do |component| %>
+        <% component.with_header(label: 'Title') %>
+        <% component.with_header(label: 'Druid') %>
+        <% component.with_header(label: 'Collection') %>
+        <% component.with_header(label: 'APO') %>
+        <% component.with_header(label: 'Unpin') %>
+        <% component.with_row(values: ['Mendelssohn-Bartholdy, Felix, 1809-1847 Frühlingslied : Lieder ohne Worte : op. 62, no. 6: Animatic, [Leipzig, Germany]', 'bb234ab1239', 'Classical Music Collection', 'ARS', nil]) %>
+        <% component.with_row(values: ['Scholarly article dataset', 'bb234ab1230', 'Dataset collection', 'GIS Datasets CC-BY SA 4.0|', nil]) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
