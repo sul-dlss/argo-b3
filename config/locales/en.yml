@@ -58,6 +58,21 @@ en:
       never: "Not released"
       has_orcids: 'Has contributor ORCIDs'
       has_doi: 'Has DOI'
+  show:
+    status:
+      deposited:
+        heading: "Deposited"
+      draft:
+        heading: "Draft, not deposited"
+      depositing:
+        heading: "Depositing..."
+        body: "Actions unavailable until deposit is complete."
+      error:
+        heading: "Error"
+      actions:
+        edit_item_details: "Edit item details"
+        manage_files: "Manage files"
+        manage_description: "Manage description"
   edit:
     contents:
       edit:
