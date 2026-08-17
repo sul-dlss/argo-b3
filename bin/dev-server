@@ -7,24 +7,24 @@
 # Defaults to qa.
 #
 # DSA and PresCat require tokens that this script does not hardcode. Put them
-# in an .env file in the project root (SETTINGS__DOR_SERVICES__TOKEN
+# in an .env-server file in the project root (SETTINGS__DOR_SERVICES__TOKEN
 # and/or SETTINGS__PRESERVATION_CATALOG__TOKEN) and they'll be picked up
-# automatically, or export them yourself before running. The same .env file
+# automatically, or export them yourself before running. The same .env-server file
 # can also override any of the SETTINGS__*__URL vars below, in case you need
 # a URL that doesn't match the qa/stage/prod pattern for a given service.
 
 set -e
 
-if [ -f .env ]; then
+if [ -f .env-server ]; then
   set -a
-  . ./.env
+  . ./.env-server
   set +a
 fi
 
 SERVER_ENV="${1:-qa}" # default to qa
 
 if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATALOG__TOKEN" ]; then
-  echo "SETTINGS__DOR_SERVICES__TOKEN and SETTINGS__PRESERVATION_CATALOG__TOKEN must be set (e.g. in .env)." >&2
+  echo "SETTINGS__DOR_SERVICES__TOKEN and SETTINGS__PRESERVATION_CATALOG__TOKEN must be set (e.g. in .env-server)." >&2
   exit 1
 fi
 
@@ -49,7 +49,7 @@ ensure_controlmaster() {
 
 ensure_controlmaster
 
-ssh -N -T -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu &
+ssh -N -T -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-b3-prod-a.stanford.edu &
 TUNNEL_PID=$!
 
 trap 'kill "$TUNNEL_PID" 2>/dev/null' EXIT
