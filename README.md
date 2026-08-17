@@ -6,9 +6,12 @@
 
 ## Development
 
+Be sure to have installed at least the version of Ruby noted in the [Dockerfile](https://github.com/sul-dlss/argo-b3/blob/main/Dockerfile) and the version of node indicated in [`.node-version`](https://github.com/sul-dlss/argo-b3/blob/main/.node-version).
+
 ### Running the application
 
 ```
+docker compose up -d
 bin/setup
 ```
 
@@ -18,32 +21,32 @@ The roles, email address, and name of the test user can be provided in environme
 
 ### Using resources from deployed environments
 
-To avoid having to bootstrap local resources or to test with real objects, sometimes it is useful to point the local development environment at deployed resources (e.g., Solr, DSA).
+To avoid having to bootstrap local resources or to test with real objects, sometimes it is useful to point the local development environment at deployed resources (e.g., Solr, DSA). Note that these connections are read/write, so be cautious with interactions with deployed environments, especially prod.
 
 Any of the below approaches can be combined (and usually will be).
 
 #### Solr
 
-To connect to production Solr
+To connect to production Solr (there is only a production environment for Solr):
 
 ```
-ssh -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-prod-02.stanford.edu
+ssh -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-b3-prod-a.stanford.edu
 ```
 
 In a separate terminal window:
 ```
 SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_qa bin/setup
 ```
-to connect to the Argo QA solr index. (Alternatively, you can connect to the stage solr index with `argo_stage` or production with `argo_prod`.)
+to connect to the Argo QA Solr index. (Alternatively, you can connect to the stage Solr index with `argo_stage` or production with `argo_prod`.)
 
 #### DSA
-Obtain a token for the DSA instance and then:
+[Obtain a token for the DSA instance](https://github.com/sul-dlss/dor-services-app#authentication) and then:
 ```
 SETTINGS__DOR_SERVICES__URL='https://dor-services-qa-lb.stanford.edu' SETTINGS__DOR_SERVICES__TOKEN=hbGcifaketokenOiJIUzI1NiJ9.jbvl5uai9y2MF7_nFqYrcewO4uKJ8tLY2A69b bin/setup
 ```
 
 #### PresCat
-Obtain a token for the PresCat instance and then:
+[Obtain a token for the PresCat instance](https://github.com/sul-dlss/preservation_catalog#authn) and then:
 
 ```
 SETTINGS__PRESERVATION_CATALOG__URL='https://preservation-catalog-qa.stanford.edu' SETTINGS__PRESERVATION_CATALOG__TOKEN='fgJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.FhjtP5vOd1xIX7h6oRBNZrf' bin/setup
