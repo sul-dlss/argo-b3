@@ -1,0 +1,5 @@
+<%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: title) %>
+<% if help_text.present? %>
+  <p><small><%= help_text %></small></p>
+<% end %>
+<% buttons.each do |button| %><%= button %><% end %>

@@ -28,24 +28,29 @@
         <%= render ThumbnailComponent.new(result: @solr_doc, dimension: 160, classes: 'mb-4') %>
       </div>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: 'Actions') %>
-      <p><small>(does not require new version)</small></p>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Reindex', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Republish', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Add workflow', variant: 'outline-primary disabled', classes: 'mb-1') %>
+      <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
+        <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Add workflow', variant: 'outline-primary disabled') %>
+      <% end %>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0 mt-4', text: 'Edit') %>
-      <p><small>(requires new version)</small></p>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage files', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage description', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Text extraction', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Apply APO defaults', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage embargo', variant: 'outline-primary disabled', classes: 'mb-1') %>
+      <div class="mt-4">
+        <%= render Elements::ButtonListComponent.new(title: 'Edit', help_text: '(requires new version)') do |component| %>
+          <% component.with_button(link: '/', label: 'Manage files', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Manage description', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Text extraction', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Apply APO defaults', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Manage embargo', variant: 'outline-primary disabled') %>
+        <% end %>
+      </div>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0 mt-4', text: 'Discard') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Purge item', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Decommission', variant: 'outline-primary disabled', classes: 'mb-1') %>
+      <div class="mt-4">
+        <%= render Elements::ButtonListComponent.new(title: 'Discard') do |component| %>
+          <% component.with_button(link: '/', label: 'Purge item', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled') %>
+          <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary disabled') %>
+        <% end %>
+      </div>
     <% end %>
 
     <% layout.with_main_content do %>
