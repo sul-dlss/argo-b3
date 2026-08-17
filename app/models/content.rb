@@ -12,6 +12,8 @@ class Content < ApplicationRecord
   has_many :content_files, through: :content_file_sets
   has_many :content_file_binaries, inverse_of: :content, dependent: :destroy
 
+  scope :with_structural_associations, -> { includes(content_file_sets: { content_files: :content_file_binary }) }
+
   state_machine :staging_state, initial: :staging_not_in_progress do
     event :staging_started do
       transition staging_not_in_progress: :staging

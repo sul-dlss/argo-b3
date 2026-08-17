@@ -38,3 +38,8 @@ purl_fetcher:
 
 component_library:
   url: "https://cdn.jsdelivr.net/gh/sul-dlss/component-library@v2026-08-06"
+
+file_upload:
+  max_filesize: 10000 # 10GB
+
+staging_location: '/sdr-deposit-staging'
