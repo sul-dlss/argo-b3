@@ -12,6 +12,7 @@ $virtual-object-color: rgb(#{$virtual-object-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+@import 'dropzone';
 @import 'bl_facets';
 @import 'search';
 @import 'show';

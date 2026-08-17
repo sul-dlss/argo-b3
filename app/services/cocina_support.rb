@@ -15,4 +15,14 @@ class CocinaSupport
   rescue Cocina::Models::Error => e
     Failure(e.message)
   end
+
+  # @param cocina_hash [Hash] a hash representing a Cocina model with metadata
+  # @return [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata, Cocina::Models::AdminPolicyWithMetadata]
+  def self.build_from_cocina_hash(cocina_hash)
+    created = cocina_hash.delete(:created)
+    modified = cocina_hash.delete(:modified)
+    lock = cocina_hash.delete(:lock)
+    cocina_object = Cocina::Models.build(cocina_hash, validate: false)
+    Cocina::Models.with_metadata(cocina_object, lock, created:, modified:)
+  end
 end
