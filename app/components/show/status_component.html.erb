@@ -1,16 +1,16 @@
 <%= render Show::BoxComponent.new(heading:) do %>
   <% case status %>
   <% when :deposited, :draft %>
-    <ul class="card-text">
+    <ul>
       <li><%= link_to I18n.t('show.status.actions.edit_item_details'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
       <li><%= link_to I18n.t('show.status.actions.manage_files'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
       <li><%= link_to I18n.t('show.status.actions.manage_description'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
     </ul>
   <% when :depositing %>
-    <p class="card-text"><%= I18n.t('show.status.depositing.body') %></p>
+    <p><%= I18n.t('show.status.depositing.body') %></p>
   <% when :error %>
     <% workflow_error_messages.each do |workflow_error_message| %>
-      <p class="card-text"><%= workflow_error_message %></p>
+      <p><%= workflow_error_message %></p>
     <% end %>
   <% end %>
 <% end %>

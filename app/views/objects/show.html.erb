@@ -53,7 +53,7 @@
         </div>
         <div class="show-box flex-fill">
           <%= render Show::BoxComponent.new(heading: 'Released to') do %>
-            <ul class="card-text">
+            <ul>
               <li>SearchWorks</li>
               <li>EarthWorks</li>
               <li>PURL Sitemap</li>
@@ -62,7 +62,7 @@
         </div>
         <div class="show-box flex-fill">
           <%= render Show::BoxComponent.new(heading: 'Tags') do %>
-            <ul class="card-text">
+            <ul>
               <!-- Placeholder -- these aren't the right list of tags. -->
               <% (Array(@solr_doc.tickets) + Array(@solr_doc.other_tags)).each do |tag| %>
                 <li><%= tag %></li>
