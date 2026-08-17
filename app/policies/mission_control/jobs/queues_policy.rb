@@ -10,7 +10,7 @@ module MissionControl
       alias_rule :index?, :create?, :new?, to: :manage?
 
       def manage?
-        admin?
+        admin? || Rails.env.development?
       end
     end
   end

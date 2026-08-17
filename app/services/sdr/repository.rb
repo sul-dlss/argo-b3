@@ -87,7 +87,7 @@ module Sdr
     # @param [String] lane_id lane to using for releaseWF (high, default, or low) if object has been published
     def self.create_release_tag(druid:, user_name:, release_target:, release:, release_what: 'self', lane_id: 'high') # rubocop:disable Metrics/ParameterLists
       new_tag = Dor::Services::Client::ReleaseTag.new(
-        **{ to: release_target }.compact, # "to" must be omitted when nil.
+        to: release_target || '', # "to" must be a string; released_to is NOT NULL in DSA DB.
         who: user_name,
         what: release_what,
         release:,

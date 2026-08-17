@@ -232,11 +232,11 @@ RSpec.describe Sdr::Repository do
     end
 
     context 'when release_target is nil' do
-      it 'creates a release tag without a to' do
+      it 'creates a release tag with a blank to' do
         described_class.create_release_tag(druid:, user_name:, release_target: nil, release: false)
 
         expect(release_tags_client).to have_received(:create) do |tag:, lane_id:|
-          expect(tag.to).to be_nil
+          expect(tag.to).to eq('')
           expect(lane_id).to eq('high')
         end
       end
