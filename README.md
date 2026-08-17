@@ -61,9 +61,9 @@ SETTINGS__PURL_FETCHER__URL='https://purl-fetcher-stage.stanford.edu' SETTINGS__
 
 For running code in localhost pointing to real data on a server environment, `bin/dev-server` will facilitate the setup described above.
 
-1. Ensure you are on VPN and have a valid kerberos ticket.
-2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server.  The script can be passed a parameter of "stage", "qa" or "prod" and will auto-configure the service URLs (e.g. `bin/dev-server stage`).  It defaults to "qa" if none passed.
-3. For the DSA and Prescat tokens, you can pass these into the bin script via env variables as described above, or setup a .env file in the root of the app, and put the tokens there as env variables.  The .env file will be gitignored and picked up by the `bin/dev-server` script. The .env file can also contain the service URLs as env variables if you do not want them automatically configured by the script.
+1. Ensure you are on VPN, have a valid kerberos ticket, and docker desktop client is running.
+2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, ensures required docker containers are up, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server.  The script can be passed a parameter of "stage", "qa" or "prod" and will auto-configure the service URLs (e.g. `bin/dev-server stage`).  It defaults to "qa" if no environment is passed.
+3. In order to authenticate with DSA and Prescat (to display and edit objects),, you will need valid DSA and Prescat tokens for the remote environments you are connected to.  While you can pass these into the bin script via env variables as described in the sections above, it is easier to setup a `.env-server` file in the root of the app, and put the tokens in there as env variables.  The `.env-server` file will be gitignored and automatically picked up by the `bin/dev-server` script. The `.env-server` file can also contain the service URLs as env variables if you do not want them automatically configured by the script.  If the tokens are different per environment (e.g. stage vs qa vs prod), you will need to change them in the `.env-server` file (e.g. comment/uncomment out as needed) before starting `bin/dev-server`.
 
 
 ### Linters
