@@ -49,10 +49,13 @@ gem 'cocina-models'
 gem 'config'
 gem 'csv'
 gem 'dor-services-client'
+gem 'druid-tools'
 gem 'dry-monads'
 gem 'honeybadger'
+gem 'marcel' # For MIME type detection
 gem 'mission_control-jobs'
 gem 'okcomputer'
+gem 'positioning' # For ordering ContentFileSets and ContentFiles
 gem 'prawn', '~> 2'  # PDF generation; used in TracksheetService
 gem 'prawn-table'    # table support for Prawn PDFs
 gem 'preservation-client'
@@ -62,6 +65,7 @@ gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 gem 'rsolr'
 gem 'rubyzip'
 gem 'sdr_view_components'
+gem 'state_machines-activerecord'
 gem 'view_component'
 
 group :development, :test do
