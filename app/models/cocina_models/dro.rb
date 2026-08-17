@@ -4,6 +4,7 @@ module CocinaModels
   # Model for a Cocina DRO object.
   class Dro < Base
     include CatalogLinksConcern
+    include AccessConcern
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build this model from
     def self.build_from_cocina_object(cocina_object)
@@ -22,16 +23,6 @@ module CocinaModels
     normalizes_whitespace :barcode
     validate :validate_barcode
 
-    # Access fields
-    attribute :use_and_reproduction_statement, :string
-    attribute :license, :string
-    attribute :copyright, :string
-    attribute :access_view, :string
-    attribute :access_download, :string
-    attribute :access_location, :string
-    # Note that the error is reported on :access, not :access_view, :access_download, or :access_location
-    validate :validate_access
-
     # Embargo fields
     attribute :embargo_release_date, :datetime
     attribute :embargo_view, :string
@@ -47,30 +38,6 @@ module CocinaModels
     validates :content_type, inclusion: { in: Cocina::Models::DRO::TYPES }
     validates :viewing_direction, inclusion: { in: Constants::VIEWING_DIRECTIONS }, allow_nil: true
     validate :viewing_direction_only_for_applicable_content_types
-
-    def dark_access?
-      match_access?(view: 'dark', download: 'none')
-    end
-
-    def citation_only_access?
-      match_access?(view: 'citation-only', download: 'none')
-    end
-
-    def location_based_access?
-      match_access?(view: 'location-based', download: %w[location-based none], location: Constants::ACCESS_LOCATIONS)
-    end
-
-    def location_based_download_access?
-      match_access?(view: %w[stanford world], download: 'location-based', location: Constants::ACCESS_LOCATIONS)
-    end
-
-    def stanford_access?
-      match_access?(view: 'stanford', download: 'stanford')
-    end
-
-    def world_access?
-      match_access?(view: 'world', download: %w[world stanford none])
-    end
 
     def embargo_dark_access?
       match_embargo_access?(view: 'dark', download: 'none')
@@ -132,17 +99,6 @@ module CocinaModels
       errors.add(:viewing_direction, 'is only valid for book and image content types')
     end
 
-    def validate_access
-      return if dark_access? ||
-                citation_only_access? ||
-                location_based_access? ||
-                location_based_download_access? ||
-                stanford_access? ||
-                world_access?
-
-      errors.add(:access, 'is not valid')
-    end
-
     def validate_embargo_access
       return if embargo_dark_access? ||
                 embargo_citation_only_access? ||
@@ -152,12 +108,6 @@ module CocinaModels
                 embargo_world_access?
 
       errors.add(:embargo_access, 'is not valid')
-    end
-
-    def match_access?(view:, download:, location: [nil])
-      Array(view).include?(access_view) &&
-        Array(download).include?(access_download) &&
-        Array(location).include?(access_location)
     end
 
     def match_embargo_access?(view:, download:, location: [nil])
