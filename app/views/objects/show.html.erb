@@ -3,6 +3,8 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
+<%= turbo_stream_from 'objects', @solr_doc.druid %>
+
 <%= tag.div class: 'container object-show object-type-item mb-4', data: {
       controller: 'cocina-model-show',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,

@@ -42,10 +42,12 @@ services:
       SETTINGS__REDIS_URL: redis://redis:6379/
       SETTINGS__ROBOTS_REDIS_URL: redis://redis:6379/
       SETTINGS__RELEASE__PURL_BASE_URL: https://sul-purl-stage.stanford.edu
+      SETTINGS__SOLR__URL: http://solr:8983/solr/argo
     depends_on:
       - db
       - suri
       - redis
+      - solr
 
   suri:
     image: suldlss/suri-rails:latest

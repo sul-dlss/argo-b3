@@ -62,6 +62,14 @@ For running code in localhost pointing to real data on a server environment, `bi
 2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server.  The script can be passed a parameter of "stage", "qa" or "prod" and will auto-configure the service URLs (e.g. `bin/dev-server stage`).  It defaults to "qa" if none passed.
 3. For the DSA and Prescat tokens, you can pass these into the bin script via env variables as described above, or setup a .env file in the root of the app, and put the tokens there as env variables.  The .env file will be gitignored and picked up by the `bin/dev-server` script. The .env file can also contain the service URLs as env variables if you do not want them automatically configured by the script.
 
+### Bootstrapping objects
+When running with local (Docker) resources, it is useful to bootstrap objects for development.
+
+#### Bootstrapping APOs
+```
+bin/rake development:bootstrap_apo\["My APO"\]
+druid:cq092gy0307
+```
 
 ### Linters
 

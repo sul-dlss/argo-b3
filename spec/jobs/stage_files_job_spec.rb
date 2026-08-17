@@ -25,6 +25,7 @@ RSpec.describe StageFilesJob do
     attached_content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
     deposited_content_file_binary
 
+    allow(Contents::ExternalIdentifierMinter).to receive(:call)
     allow(Contents::Analyzer).to receive(:call)
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(CocinaObjectMutators::StructuralMutator).to receive(:call)
@@ -33,6 +34,7 @@ RSpec.describe StageFilesJob do
       .with(cocina_object: mutated_cocina_object, user_name: user.sunetid).and_return(updated_cocina_object)
     allow(Sdr::Repository).to receive(:accession)
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
+    allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
   end
 
   after do
@@ -40,6 +42,12 @@ RSpec.describe StageFilesJob do
   end
 
   describe '#perform' do
+    it 'mints external identifiers for the content' do
+      job.perform(content:, user:)
+
+      expect(Contents::ExternalIdentifierMinter).to have_received(:call).with(content:)
+    end
+
     it 'analyzes only the attached content file binaries' do
       job.perform(content:, user:)
 
@@ -52,6 +60,13 @@ RSpec.describe StageFilesJob do
 
       expect(File.binread(staging_filepath)).to eq(attached_content_file_binary.file.download)
       expect(File.exist?(StagingSupport.staging_filepath(druid:, filepath: 'image2.tif'))).to be false
+    end
+
+    it 'updates the file location of staged content file binaries to stage' do
+      job.perform(content:, user:)
+
+      expect(attached_content_file_binary.reload.file_location).to eq('stage')
+      expect(deposited_content_file_binary.reload.file_location).to eq('deposited')
     end
 
     it 'updates SDR with the mutated structural metadata' do
@@ -80,6 +95,12 @@ RSpec.describe StageFilesJob do
         .with('notifications', user, target: 'toast-container', html: kind_of(String))
     end
 
+    it 'broadcasts a refresh to the object' do
+      job.perform(content:, user:)
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('objects', druid)
+    end
+
     it 'does not accession the object' do
       job.perform(content:, user:)
 
@@ -97,9 +118,10 @@ RSpec.describe StageFilesJob do
     context "when the content's lock does not match the current cocina object's lock" do
       let(:content) { create(:content, druid:, lock: 'stale-lock', staging_state: 'staging') }
 
-      it 'raises without analyzing, staging, or updating SDR' do
+      it 'raises without minting identifiers, analyzing, staging, or updating SDR' do
         expect { job.perform(content:, user:) }.to raise_error(/Lock mismatch for #{druid}/)
 
+        expect(Contents::ExternalIdentifierMinter).not_to have_received(:call)
         expect(Contents::Analyzer).not_to have_received(:call)
         expect(Sdr::Repository).not_to have_received(:update)
         expect(File.exist?(staging_filepath)).to be false
