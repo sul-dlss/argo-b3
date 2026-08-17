@@ -28,6 +28,14 @@ if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATA
   exit 1
 fi
 
+# db and redis are the only local containers this script needs; Solr, DSA,
+# and PresCat are tunneled to the remote server environment instead.
+if ! docker info >/dev/null 2>&1; then
+  echo "Docker does not appear to be running. Please start Docker and try again." >&2
+  exit 1
+fi
+docker compose up -d db redis
+
 # check for dlss-capistrano's controlmaster:setup/:start tasks:
 # https://github.com/sul-dlss/dlss-capistrano/blob/main/lib/dlss/capistrano/tasks/control_master.rake
 ensure_controlmaster() {
