@@ -2,8 +2,6 @@
   <%= component.with_label_content do %>
     <% if query? %>
       <%= value_label %>
-    <% elsif include_google_books? %>
-      <%= field_label %>
     <% else %>
       <%= field_label %>
       <span class="selected-item-separator">❯</span>

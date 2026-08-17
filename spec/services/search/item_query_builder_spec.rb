@@ -10,7 +10,8 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct query parts' do
       result = described_class.call(search_form:)
-      expect(result).to include(fq: ['-governed_by_ssim:"druid:bf569gy6501"'], 'q.alt': '*:*', defType: 'dismax')
+      expect(result).to include('q.alt': '*:*', defType: 'dismax')
+      expect(result).not_to have_key(:fq)
       expect(result).to have_key(:qf)
     end
   end
@@ -30,15 +31,6 @@ RSpec.describe Search::ItemQueryBuilder do
     it 'includes debugQuery in the result' do
       result = described_class.call(search_form:)
       expect(result).to include(debugQuery: true)
-    end
-  end
-
-  context 'with google books included' do
-    let(:search_form) { SearchForm.new(include_google_books: true) }
-
-    it 'does not exclude google books from the filter queries' do
-      result = described_class.call(search_form:)
-      expect(Array(result[:fq])).not_to include('-governed_by_ssim:"druid:bf569gy6501"')
     end
   end
 

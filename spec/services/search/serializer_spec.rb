@@ -7,7 +7,6 @@ RSpec.describe Search::Serializer do
 
   let(:search_form) do
     SearchForm.new(query: 'test query',
-                   include_google_books: true,
                    object_types: %w[item collection],
                    content_types: ['image'],
                    access_rights_exclude: ['dark'],
@@ -22,11 +21,10 @@ RSpec.describe Search::Serializer do
                    registered_date_to: '2022-02-01')
   end
   let(:query) { 'test query' }
-  let(:include_google_books) { false }
 
   it 'returns the query as a string' do
     expect(serialized_query)
-      .to eq('"test query" AND include Google Books AND ' \
+      .to eq('"test query" AND ' \
              'Access rights: NOT "dark" AND ' \
              'Content types: "image" AND ' \
              'Earliest accessioned: "Last week" AND ' \

@@ -14,7 +14,6 @@ module Search
 
     def label
       return value_label if query?
-      return field_label if include_google_books?
 
       "#{field_label} > #{value_label}"
     end
@@ -25,10 +24,6 @@ module Search
 
     def query?
       form_field == 'query'
-    end
-
-    def include_google_books?
-      form_field == 'include_google_books'
     end
 
     private

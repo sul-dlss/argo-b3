@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe FormSerializer do
-  let(:form) { SearchForm.new(query: 'test', include_google_books: true, object_types: %w[collection item]) }
+  let(:form) { SearchForm.new(query: 'test', object_types: %w[collection item]) }
 
   it 'serializes and deserializes an ApplicationForm' do
     serialized = described_class.serialize(form)

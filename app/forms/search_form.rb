@@ -5,7 +5,6 @@ class SearchForm < ApplicationForm
   include NormalizationConcern
 
   attribute :query, :string
-  attribute :include_google_books, :boolean, default: false
   attribute :page, :integer, default: 1
   attribute :debug, :boolean, default: false
   attribute :sort, :string
@@ -60,7 +59,7 @@ class SearchForm < ApplicationForm
   attribute :wps_workflows, array: true, default: -> { [] }
 
   def blank?
-    attributes.except('include_google_books', 'page', 'debug', 'sort').values.all?(&:blank?)
+    attributes.except('page', 'debug', 'sort').values.all?(&:blank?)
   end
 
   # @return [hash] this form's attributes merged with new_attrs
@@ -118,14 +117,13 @@ class SearchForm < ApplicationForm
   end
 
   def facet_attributes
-    attributes.except('include_google_books', 'page', 'debug', 'query', 'sort')
+    attributes.except('page', 'debug', 'query', 'sort')
   end
 
   # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
   def current_filters
     @current_filters ||= [].tap do |filters|
       filters << ['query', query] if query.present?
-      filters << ['include_google_books', true] if include_google_books
       facet_attributes.each do |attr_name, values|
         Array(values).map do |value|
           filters << [attr_name, value]

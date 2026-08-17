@@ -46,7 +46,6 @@ en:
       earliest_accessioned_date_from: 'Earliest accessioned from'
       earliest_accessioned_date_to: 'Earliest accessioned to'
       formats: "Formats"
-      include_google_books: "Include Google Books"
       mimetypes: "MIME types"
       mods_resource_types: "MODS resource types"
       released_to_earthworks: "Released to Earthworks"

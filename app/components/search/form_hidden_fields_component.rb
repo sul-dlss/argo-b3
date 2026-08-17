@@ -20,9 +20,5 @@ module Search
     def query_hidden_field?
       search_form.query.present? && form_field != 'query'
     end
-
-    def include_google_books_hidden_field?
-      search_form.include_google_books && form_field != 'include_google_books'
-    end
   end
 end

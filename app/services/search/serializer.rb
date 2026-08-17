@@ -14,7 +14,7 @@ module Search
     end
 
     def call
-      (query_parts + include_google_book_parts + facet_parts).join(' AND ')
+      (query_parts + facet_parts).join(' AND ')
     end
 
     private
@@ -23,12 +23,6 @@ module Search
 
     def query_parts
       [quote(search_form.query)].compact_blank
-    end
-
-    def include_google_book_parts
-      return [] unless search_form.include_google_books
-
-      ['include Google Books']
     end
 
     def facet_parts

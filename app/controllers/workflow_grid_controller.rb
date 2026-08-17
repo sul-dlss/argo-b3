@@ -54,15 +54,12 @@ class WorkflowGridController < ApplicationController
   def set_search_form_for_scope
     # It is already set to last search form if scope is last_search
     @search_form = SearchForm.new if @scope == 'all'
-    @search_form = SearchForm.new(include_google_books: true) if @scope == 'all_gb'
   end
 
   def set_scope
     # Scope is provided by the scope param or a default is selected based on whether there is a last search cookie.
     @scope = if (params[:scope] == 'last_search' || params[:scope].blank?) && @last_search_form.present?
                'last_search'
-             elsif params[:scope] == 'all_gb'
-               'all_gb'
              else
                'all'
              end

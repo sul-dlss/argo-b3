@@ -66,7 +66,7 @@ module Search
 
     attr_reader :search_form
 
-    def filter_queries # rubocop:disable Metrics/AbcSize
+    def filter_queries
       [].tap do |queries|
         FACETS.each do |facet_config|
           if facet_config.dynamic_facet.present?
@@ -76,7 +76,6 @@ module Search
             queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
           end
         end
-        queries << "-#{APO_DRUID}:\"#{Settings.google_books_apo}\"" unless search_form.include_google_books
       end.compact
     end
 

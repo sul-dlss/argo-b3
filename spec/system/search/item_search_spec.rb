@@ -9,7 +9,6 @@ RSpec.describe 'Item search', :solr do
   before do
     stub_const('Searchers::Item::PER_PAGE', 5)
     create_list(:solr_item, 10)
-    create(:solr_item, :google_book)
     create_list(:solr_collection, 4)
     sign_in(create(:user))
   end
@@ -78,35 +77,6 @@ RSpec.describe 'Item search', :solr do
           click_link_or_button('Sort by Relevance')
           expect(page).to have_css('.dropdown-item', text: 'Relevance')
           expect(page).to have_css('.dropdown-item', text: 'Druid')
-        end
-      end
-    end
-
-    context 'when google books are included' do
-      it 'shows google books results' do
-        visit search_path
-
-        find_search_field.fill_in(with: 'Item')
-        click_button('Search')
-
-        within(find_item_results_section) do
-          expect(page).to have_result_count(11)
-        end
-
-        check('Include Google Books')
-
-        expect(page).to have_current_filter('Include Google Books')
-
-        within(find_item_results_section) do
-          expect(page).to have_result_count(12)
-        end
-
-        uncheck('Include Google Books')
-
-        expect(page).not_to have_current_filter('Include Google Books')
-
-        within(find_item_results_section) do
-          expect(page).to have_result_count(11)
         end
       end
     end

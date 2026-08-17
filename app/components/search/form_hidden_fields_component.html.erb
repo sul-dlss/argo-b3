@@ -1,5 +1,4 @@
 <%= form_builder.hidden_field :query if query_hidden_field? %>
-<%= form_builder.hidden_field :include_google_books if include_google_books_hidden_field? %>
 
 <% search_form.facet_attributes.each do |attr_name, values| %>
   <% Array(values).each do |value| %>
