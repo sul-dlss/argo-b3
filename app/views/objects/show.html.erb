@@ -49,32 +49,26 @@
     <div class="col-xl-10 col-lg-12">
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
-          <%= render Show::StatusComponent.new(document: @solr_doc) %>
+          <%= render Show::StatusComponent.new(document: @solr_doc, version_service: @version_service) %>
         </div>
         <div class="show-box flex-fill">
-          <div class="border object-type-border object-type-bg-light card">
-            <div class="card-body">
-              <h2 class="card-title">Released to</h2>
-              <ul class="card-text">
-                <li>SearchWorks</li>
-                <li>EarthWorks</li>
-                <li>PURL Sitemap</li>
-              </ul>
-            </div>
-          </div>
+          <%= render Show::BoxComponent.new(heading: 'Released to') do %>
+            <ul class="card-text">
+              <li>SearchWorks</li>
+              <li>EarthWorks</li>
+              <li>PURL Sitemap</li>
+            </ul>
+          <% end %>
         </div>
         <div class="show-box flex-fill">
-          <div class="border object-type-border object-type-bg-light card">
-            <div class="card-body">
-              <h2 class="card-title">Tags</h2>
-              <ul class="card-text">
-                <!-- Placeholder -- these aren't the right list of tags. -->
-                <% (Array(@solr_doc.tickets) + Array(@solr_doc.other_tags)).each do |tag| %>
-                  <li><%= tag %></li>
-                <% end %>
-              </ul>
-            </div>
-          </div>
+          <%= render Show::BoxComponent.new(heading: 'Tags') do %>
+            <ul class="card-text">
+              <!-- Placeholder -- these aren't the right list of tags. -->
+              <% (Array(@solr_doc.tickets) + Array(@solr_doc.other_tags)).each do |tag| %>
+                <li><%= tag %></li>
+              <% end %>
+            </ul>
+          <% end %>
         </div>
       </div>
 

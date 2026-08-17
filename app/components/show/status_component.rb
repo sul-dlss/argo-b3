@@ -3,12 +3,18 @@
 module Show
   # Component for rendering the deposit status box on the show page.
   class StatusComponent < ApplicationComponent
-    def initialize(document:)
+    STATUS_ICONS = {
+      deposited: 'bi-check-circle-fill text-success',
+      error: 'bi-exclamation-triangle-fill text-danger'
+    }.freeze
+
+    def initialize(document:, version_service:)
       @document = document
+      @version_service = version_service
       super()
     end
 
-    attr_reader :document
+    attr_reader :document, :version_service
 
     delegate :workflow_errors, to: :document
 
@@ -21,7 +27,10 @@ module Show
     end
 
     def heading
-      I18n.t("show.status.#{status}.heading")
+      label = I18n.t("show.status.#{status}.heading")
+      return label unless icon_class
+
+      safe_join([tag.i(class: "#{icon_class} me-2", aria: { hidden: true }), label], ' ')
     end
 
     def workflow_error_messages
@@ -30,14 +39,14 @@ module Show
 
     private
 
+    def icon_class
+      STATUS_ICONS[status]
+    end
+
     # See https://github.com/sul-dlss/argo/blob/main/app/helpers/value_helper.rb#L6-L9
     def format_workflow_error(workflow_error)
       _workflow, step, message = workflow_error.split(':', 3)
       "#{step} : #{message}"
-    end
-
-    def version_service
-      @version_service ||= Sdr::VersionService.new(druid: document.druid)
     end
   end
 end

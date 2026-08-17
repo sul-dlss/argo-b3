@@ -3,24 +3,17 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(document:) }
+  subject(:component) { described_class.new(document:, version_service:) }
 
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
   let(:druid) { 'druid:bc123df4567' }
   let(:workflow_errors) { [] }
 
-  let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, status: version_status) }
-  let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: accessioning,
-                                                                         closed?: closed)
+  let(:version_service) do
+    instance_double(Sdr::VersionService, accessioning?: accessioning, closed?: closed)
   end
   let(:closed) { false }
   let(:accessioning) { false }
-
-  before do
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
-  end
 
   context 'when the version is open' do
     it 'renders the draft status' do
