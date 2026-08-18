@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_191652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -130,6 +130,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
     t.index ["workgroup", "permission_type", "target_druid"], name: "idx_on_workgroup_permission_type_target_druid_05a2ba0d8f", unique: true, nulls_not_distinct: true
   end
 
+  create_table "pinned_objects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "druid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "druid"], name: "index_pinned_objects_on_user_id_and_druid", unique: true
+    t.index ["user_id"], name: "index_pinned_objects_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -146,4 +155,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_125042) do
   add_foreign_key "content_file_sets", "contents"
   add_foreign_key "content_files", "content_file_binaries"
   add_foreign_key "content_files", "content_file_sets"
+  add_foreign_key "pinned_objects", "users"
 end
