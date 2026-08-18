@@ -25,8 +25,7 @@ RSpec.describe SearchForm do
       subject(:form) do
         described_class.new(
           query: '',
-          page: 2,
-          include_google_books: true
+          page: 2
         )
       end
 
@@ -59,7 +58,7 @@ RSpec.describe SearchForm do
   describe '#with_attributes' do
     subject(:form) { described_class.new(query: 'test', object_types: ['DRO'], page: 1, projects: ['Google Books']) }
 
-    let(:new_attrs) { { object_types: ['Collection'], include_google_books: true, page: 2, projects: nil } }
+    let(:new_attrs) { { object_types: ['Collection'], page: 2, projects: nil } }
 
     it 'merges array attributes and overrides scalar attributes' do
       expect(form.with_attributes(new_attrs))
@@ -67,7 +66,6 @@ RSpec.describe SearchForm do
                  'query' => 'test',
                  'object_types' => %w[DRO Collection],
                  'page' => 2,
-                 'include_google_books' => true,
                  'projects' => ['Google Books']
                })
     end
@@ -138,7 +136,7 @@ RSpec.describe SearchForm do
       end
 
       it 'returns false for scalar attributes' do
-        expect(form.selected?(key: 'include_google_books')).to be false
+        expect(form.selected?(key: 'debug')).to be false
       end
 
       it 'returns false for non-existent attributes' do
@@ -149,10 +147,10 @@ RSpec.describe SearchForm do
 
   describe '#current_filters' do
     context 'when attributes are set' do
-      subject(:form) { described_class.new(query: 'test', include_google_books: true) }
+      subject(:form) { described_class.new(query: 'test') }
 
       it 'returns current filters as attribute name/value pairs' do
-        expect(form.current_filters).to eq([%w[query test], ['include_google_books', true]])
+        expect(form.current_filters).to eq([%w[query test]])
       end
     end
 

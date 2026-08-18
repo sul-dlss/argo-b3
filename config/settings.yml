@@ -10,8 +10,6 @@ reload_intervals:
 argo:
   url: https://argo.stanford.edu
 
-google_books_apo: 'druid:bf569gy6501'
-
 dor_services:
   url: "http://localhost:3003"
   # To generate the token: docker-compose run dor-services-app rake generate_token

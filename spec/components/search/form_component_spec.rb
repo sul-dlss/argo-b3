@@ -13,7 +13,6 @@ RSpec.describe Search::FormComponent, type: :component do
 
       expect(page).to have_css("form[action='/search']")
       expect(page).to have_field('Search for', type: :search, with: 'test')
-      expect(page).to have_field('Include Google Books', type: :checkbox, checked: false)
       expect(page).to have_select('Select object type', with_options: ['All object types', 'Item', 'Collection'])
       expect(page).to have_button('Search')
     end

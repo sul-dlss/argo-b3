@@ -25,7 +25,6 @@ RSpec.describe 'Workflow grid with all scope', :solr do
     click_link('Workflow grid')
 
     expect(page).to have_field('All items', checked: false)
-    expect(page).to have_field('All items including Google Books', checked: false)
     expect(page).to have_field('From last search', checked: true, disabled: false)
     expect(page).to have_text('2 items for: "twain"')
 

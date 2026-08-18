@@ -9,11 +9,6 @@
       </div>
 
       <div class="form-check">
-        <%= form.radio_button :scope, 'all_gb', class: 'form-check-input', checked: @scope == 'all_gb' %>
-        <%= form.label :scope_all_gb, 'All items including Google Books', class: 'form-check-label' %>
-      </div>
-
-      <div class="form-check">
         <%= form.radio_button :scope, 'last_search', class: 'form-check-input', disabled: !defined?(@last_search_form), checked: @scope == 'last_search' %>
         <%= form.label :scope_last_search, 'From last search', class: 'form-check-label' %>
 

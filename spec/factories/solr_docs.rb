@@ -95,12 +95,6 @@ FactoryBot.define do
       Search::SolrFactory.call.commit
     end
 
-    trait :google_book do
-      transient do
-        apo_druid { Settings.google_books_apo }
-      end
-    end
-
     trait :agreement do
       transient do
         object_type { 'agreement' }
