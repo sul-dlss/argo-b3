@@ -118,12 +118,12 @@ RSpec.describe SolrDocPresenter do
     end
   end
 
-  describe '#purl?' do
+  describe '#dro_or_collection?' do
     context 'when the object type is item' do
       let(:object_type) { 'item' }
 
       it 'returns true' do
-        expect(presenter.purl?).to be true
+        expect(presenter.dro_or_collection?).to be true
       end
     end
 
@@ -131,7 +131,7 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'collection' }
 
       it 'returns true' do
-        expect(presenter.purl?).to be true
+        expect(presenter.dro_or_collection?).to be true
       end
     end
 
@@ -139,7 +139,7 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'virtual object' }
 
       it 'returns true' do
-        expect(presenter.purl?).to be true
+        expect(presenter.dro_or_collection?).to be true
       end
     end
 
@@ -147,7 +147,7 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'adminPolicy' }
 
       it 'returns false' do
-        expect(presenter.purl?).to be false
+        expect(presenter.dro_or_collection?).to be false
       end
     end
 
@@ -155,7 +155,7 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'agreement' }
 
       it 'returns false' do
-        expect(presenter.purl?).to be false
+        expect(presenter.dro_or_collection?).to be false
       end
     end
   end

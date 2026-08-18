@@ -42,8 +42,8 @@ class SolrDocPresenter < SearchResults::Item
     !collection? && !admin_policy? && !agreement?
   end
 
-  # items with a purl page
-  def purl?
+  # items with a purl page/description overviews
+  def dro_or_collection?
     dro? || collection?
   end
 end
