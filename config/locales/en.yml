@@ -77,18 +77,26 @@ en:
     contents:
       edit:
         title: "Manage files"
+        buttons:
+          deposit: "Deposit"
+          draft: "Save as draft"
       tabs:
         add_files:
           label: "Add files"
         manage_files:
           label: "Manage files"
+        deposit:
+          label: "Deposit"
     items:
       new:
         title: "Register an item"
         buttons:
           register: 'Register only'
+          register_add_files: 'Register and add files'
         toasts:
           register: 'Item registered.'
+          staging_started: 'Staging started'
+          staging_completed: 'Staging completed'
       tabs:
         deposit: 
           label: "Register"

@@ -3,7 +3,7 @@
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_header show_versions
-                                  show_purl_preview show_solr_doc]
+                                  show_purl_preview show_solr_doc show_files]
 
   include TokenConcern
 
@@ -79,6 +79,12 @@ class ObjectsController < ApplicationController
     render layout: false
   end
 
+  def show_files
+    @content = fetch_content(verified_druid)
+
+    render layout: false
+  end
+
   private
 
   def verified_druid
@@ -96,7 +102,7 @@ class ObjectsController < ApplicationController
     cache_key = "objects/cocina-hash/#{druid}"
     Rails.cache.fetch(cache_key, expires_in: 10.seconds) do
       cocina_object = Sdr::Repository.find(druid:)
-      CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h, preserve_keys: [:label])
+      CacheSupport.cacheable_cocina_object(cocina_object:)
     end
   end
 
@@ -109,5 +115,11 @@ class ObjectsController < ApplicationController
   rescue PurlPreviewService::Error => e
     Honeybadger.notify(e, context: { cocina_hash: })
     nil
+  end
+
+  def fetch_content(druid)
+    cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid))
+    Content.find_by(druid:, lock: cocina_object.lock, immutable: true) ||
+      Contents::Builder.call(cocina_object:)
   end
 end

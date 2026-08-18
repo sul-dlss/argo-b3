@@ -168,10 +168,11 @@ Rails.application.routes.draw do
       get 'versions', to: 'objects#show_versions'
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
+      get 'files', to: 'objects#show_files'
     end
   end
 
-  resources :items, only: %i[new create]
+  resources :items, only: %i[new create update]
 
   resources :contents, only: %i[edit update show]
 

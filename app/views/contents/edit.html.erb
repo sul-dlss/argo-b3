@@ -10,6 +10,7 @@
   <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :add_files) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.add_files.label'), tab_name: :add_files) %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.manage_files.label'), tab_name: :manage_files) %>
+    <% tab_list.with_tab(label: t('edit.contents.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
     <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
                                                                         label: t('edit.contents.tabs.add_files.label'))) do %>
@@ -42,6 +43,17 @@
       <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
         <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
       <% end %>
+    <% end %>
+
+    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                        label: t('edit.contents.tabs.deposit.label'),
+                                                                        mark_required: true)) do %>
+      <div class="d-flex justify-content-end">
+        <%= form_with url: item_path(@content.druid), method: :patch do %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ItemsController::DRAFT_VALUE, variant: 'outline-primary', classes: 'me-2') %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ItemsController::DEPOSIT_VALUE) %>
+        <% end %>
+      </div>
     <% end %>
 
   <% end %>

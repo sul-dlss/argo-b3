@@ -75,6 +75,25 @@ RSpec.describe 'Create an item' do
       expect(Sdr::Repository).to have_received(:create_release_tag)
         .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
     end
+
+    it 'registers and redirects to add files' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      click_button('Register and add files')
+
+      expect(page).to have_current_path(edit_content_path(druid))
+      expect(page).to have_toast('Item registered.')
+
+      expect(Sdr::Repository).to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
   end
 
   context 'when invalid' do

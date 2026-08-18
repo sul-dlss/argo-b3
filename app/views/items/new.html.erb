@@ -53,8 +53,15 @@
                                                                           mark_required: true)) do %>
         <div class="d-flex justify-content-end">
           <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                label: t('edit.items.new.buttons.register_add_files'),
+                form_id: form.id,
+                value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
+                classes: 'me-2'
+              ) %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(
                 label: t('edit.items.new.buttons.register'),
                 form_id: form.id,
+                value: ItemsController::DRAFT_VALUE,
                 variant: 'outline-primary'
               ) %>
         </div>

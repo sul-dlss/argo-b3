@@ -1,0 +1,7 @@
+<%= turbo_frame_tag(@content.druid, 'files') do %>
+  <ul>
+    <% @content.content_file_binaries.each do |content_file_binary| %>
+      <li><%= content_file_binary.filepath %></li>
+    <% end %>
+  </ul>
+<% end %>
