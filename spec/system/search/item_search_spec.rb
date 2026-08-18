@@ -16,7 +16,7 @@ RSpec.describe 'Item search', :solr do
 
   context 'when a single page of results' do
     it 'returns search results' do
-      visit root_path
+      visit search_path
 
       expect(page).to have_css('.alert', text: 'Welcome to Argo-B3.')
 
@@ -33,7 +33,7 @@ RSpec.describe 'Item search', :solr do
 
     context 'when multiple pages of results' do
       it 'paginates results' do
-        visit root_path
+        visit search_path
 
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
@@ -71,7 +71,7 @@ RSpec.describe 'Item search', :solr do
       end
 
       it 'verifies sort options' do
-        visit root_path
+        visit search_path
 
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
@@ -86,7 +86,7 @@ RSpec.describe 'Item search', :solr do
 
     context 'when google books are included' do
       it 'shows google books results' do
-        visit root_path
+        visit search_path
 
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
@@ -115,7 +115,7 @@ RSpec.describe 'Item search', :solr do
 
     context 'when query is blank' do
       it 'does not return any results' do
-        visit root_path
+        visit search_path
 
         find_search_field.fill_in(with: '')
         click_button('Search')

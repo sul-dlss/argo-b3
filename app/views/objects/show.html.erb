@@ -8,45 +8,48 @@
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
       cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
     } do %>
-  <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
+  <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
+    <% layout.with_top_content do %>
+      <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
 
-  <div class="d-flex flex-column d-xl-block">
-    <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
-      <%= @solr_doc.object_type_label %>
-    </div>
+      <div class="d-flex flex-column d-xl-block">
+        <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
+          <%= @solr_doc.object_type_label %>
+        </div>
 
-    <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: '_top', class: 'order-1') do %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-xl-4 mb-3') %>
+        <%= turbo_frame_tag(@solr_doc.druid, 'header', src: header_object_path(druid: @druid_token), refresh: 'morph', target: '_top', class: 'order-1') do %>
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-xl-4 mb-3') %>
+        <% end %>
+      </div>
     <% end %>
-  </div>
 
-  <div class="row border-top-xl">
-    <div class="col-xl-2 col-lg-12 left-nav pt-3">
+    <% layout.with_left_content do %>
       <div class="text-xl-center">
         <%= render ThumbnailComponent.new(result: @solr_doc, dimension: 160, classes: 'mb-4') %>
       </div>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: 'Actions') %>
-      <p><small>(does not require new version)</small></p>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Reindex', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Republish', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Add workflow', variant: 'outline-primary disabled', classes: 'mb-1') %>
+      <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
+        <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Add workflow', variant: 'outline-primary disabled') %>
+      <% end %>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0 mt-4', text: 'Edit') %>
-      <p><small>(requires new version)</small></p>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage files', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage description', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Text extraction', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Apply APO defaults', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Manage embargo', variant: 'outline-primary disabled', classes: 'mb-1') %>
+      <%= render Elements::ButtonListComponent.new(title: 'Edit', help_text: '(requires new version)', classes: 'mt-4') do |component| %>
+        <% component.with_button(link: '/', label: 'Manage files', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Manage description', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Text extraction', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Apply APO defaults', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Manage embargo', variant: 'outline-primary disabled') %>
+      <% end %>
 
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0 mt-4', text: 'Discard') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Purge item', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled', classes: 'mb-1') %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: '/', label: 'Decommission', variant: 'outline-primary disabled', classes: 'mb-1') %>
-    </div>
+      <%= render Elements::ButtonListComponent.new(title: 'Discard', classes: 'mt-4') do |component| %>
+        <% component.with_button(link: '/', label: 'Purge item', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary disabled') %>
+      <% end %>
+    <% end %>
 
-    <div class="col-xl-10 col-lg-12">
+    <% layout.with_main_content do %>
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
           <%= render Show::StatusComponent.new(document: @solr_doc, version_service: @version_service) %>
@@ -135,6 +138,6 @@
           <% end %>
         <% end %>
       <% end %>
-    </div>
-  </div>
+    <% end %>
+  <% end %>
 <% end %>

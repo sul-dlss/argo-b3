@@ -14,7 +14,7 @@ RSpec.describe 'Report by druids', :solr do
   end
 
   it 'returns a report' do
-    visit root_path
+    visit search_path
 
     find_search_field.fill_in(with: 'test')
     click_button('Search')

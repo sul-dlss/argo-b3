@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   get '/test_login/:id', to: 'authentication#test_login', as: 'test_login', param: :id if Rails.env.test?
 
   # Defines the root path route ("/")
-  root 'search#show'
+  root 'dashboard#index'
 
   # resource :home, only: [:show], controller: 'home'
 

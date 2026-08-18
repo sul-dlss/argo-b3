@@ -9,7 +9,7 @@ RSpec.describe 'Project search', :solr do
   end
 
   it 'returns project tag search results' do
-    visit root_path
+    visit search_path
 
     find_search_field.fill_in(with: '2a')
     click_button('Search')
