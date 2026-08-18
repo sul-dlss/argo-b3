@@ -1,6 +1,4 @@
-<%= content_for :title, 'Home page' %>
-
-<%= render Search::FormComponent.new(search_form: @search_form, url: search_path) %>
+<%= content_for :title, 'Search page' %>
 
 <%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
 

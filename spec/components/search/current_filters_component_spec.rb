@@ -24,7 +24,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
       expect(page).to have_css('li', text: /Object types\s+❯\s+item/)
       expect(page).to have_css('li', text: /Object types\s+❯\s+collection/)
       expect(page).to have_css('li', text: /Projects\s+❯\s+Project 1/)
-      expect(page).to have_link('Clear all', href: '/')
+      expect(page).to have_link('Clear all', href: '/search')
     end
   end
 

@@ -66,3 +66,7 @@ $virtual-object-color: rgb(#{$virtual-object-color-rgb});
   font-weight: $font-weight-bold;
   color: var(--stanford-poppy-dark);
 }
+
+.search-bar {
+  background-color: var(--stanford-20-black);
+}

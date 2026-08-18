@@ -73,6 +73,10 @@ def find_facet_more_link(facet_label)
 end
 
 def find_search_field
-  # This matches the search field on home page or items search page.
-  find_field('Search for items')
+  # This matches the search field in header.
+  find_field('Search for')
+end
+
+def find_object_type_field
+  find_field('Select object type')
 end

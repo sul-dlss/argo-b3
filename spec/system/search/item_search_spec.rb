@@ -124,6 +124,22 @@ RSpec.describe 'Item search', :solr do
       end
     end
 
+    context 'when selecting an object type from the search bar' do
+      it 'filters results by the selected object type' do
+        visit search_path
+
+        find_search_field.fill_in(with: 'Test')
+        find_object_type_field.select('Collection')
+        click_button('Search')
+
+        expect(page).to have_current_filter('Object types', 'collection')
+        within(find_item_results_section) do
+          expect(page).to have_result_count(5)
+          expect(page).to have_item_result(collection_doc)
+        end
+      end
+    end
+
     context 'when there is a current filter' do
       it 'applies the current filter when searching' do
         visit search_path('object_types[]': 'collection')
