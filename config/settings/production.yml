@@ -1,0 +1,7 @@
+bulk_actions:
+  directory: "/workspace/bulk"
+
+file_upload:
+  directory: "/data/argo-files"
+
+staging_location: '/sdr-deposit-staging'

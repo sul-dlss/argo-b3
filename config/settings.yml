@@ -38,5 +38,6 @@ component_library:
 
 file_upload:
   max_filesize: 10000 # 10GB
+  directory: "tmp/argo-files"
 
-staging_location: '/sdr-deposit-staging'
+staging_location: 'tmp/sdr-deposit-staging'

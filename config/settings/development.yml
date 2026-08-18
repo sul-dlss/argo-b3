@@ -3,5 +3,3 @@ solr:
 
 feature_flags:
   bulk_actions: true
-
-staging_location: 'tmp/sdr-deposit-staging'
