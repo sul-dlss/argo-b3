@@ -46,6 +46,12 @@
       <% end %>
     <% end %>
     <% layout.with_main_content do %>
+      <% if Rails.env.development? %>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(title: 'Development environment connections', dismissible: true, variant: :note, classes: 'mt-2') do %>
+          <p>Solr: <%= Settings.solr.url %> | DSA: <%= Settings.dor_services.url %></p>
+        <% end %>
+      <% end %>
+
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'My recent activity', classes: 'mt-3') %>
 
       <%= render SdrViewComponents::Tables::TableComponent.new(classes: 'mb-5', responsive: true) do |component| %>
