@@ -69,13 +69,15 @@ ssh:
 volumes:
   - "/workspace/bulk:/workspace/bulk"
   - "/var/log/argo:/var/log/argo"
+  - "/sdr-deposit-staging:/sdr-deposit-staging"
+  - "/globus:/globus"
+  - "/data/argo-files:/data/argo-files"
 
 env:
   clear:
     DATABASE_USERNAME: lyberadmin
     DATABASE_HOSTNAME: host.docker.internal
 
-    SETTINGS__BULK_ACTIONS__DIRECTORY: /workspace/bulk
     RAILS_LOG_TO_FILE: /var/log/argo/production.log
 
     # Governs how long SolidQueue's supervisor waits for in-flight jobs to
