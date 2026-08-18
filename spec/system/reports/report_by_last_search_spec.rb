@@ -21,7 +21,8 @@ RSpec.describe 'Report by druids', :solr do
 
     expect(page).to have_result_count(3)
 
-    click_link('Report')
+    click_button('Reports')
+    click_link('Custom report')
 
     # Report by last search is selected
     expect(page).to have_field('From last search', type: 'radio', checked: true)

@@ -8,11 +8,11 @@ class ApplicationPolicy < ActionPolicy::Base
     allow! if admin?
   end
 
-  private
-
   def admin?
     user.groups.intersect?(admin_workgroups)
   end
+
+  private
 
   def admin_workgroups
     # This is the simplest possible form of caching on the assumption
