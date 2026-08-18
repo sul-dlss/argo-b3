@@ -22,7 +22,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
 
     expect(page).to have_result_count(2)
 
-    click_link('Workflow grid')
+    click_link('Workflow status')
 
     expect(page).to have_field('All items', checked: false)
     expect(page).to have_field('All items including Google Books', checked: false)

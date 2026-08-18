@@ -4,18 +4,68 @@
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: logged_in_text) %>
   <% end %>
   <%= header.with_secondary_navigation_link do %>
-    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Search', path: root_path) %>
-    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Report', path: report_path) %>
-    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow grid', path: workflow_grid_path) %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>
     <% if Settings.feature_flags.bulk_actions %>
       <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
         <% dropdown.with_item do %>
-          <%= link_to 'New', new_bulk_action_path, class: 'dropdown-item' %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Recent bulk actions', link: bulk_actions_path) %>
         <% end %>
         <% dropdown.with_item do %>
-          <%= link_to 'History', bulk_actions_path, class: 'dropdown-item' %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Bulk actions menu', link: new_bulk_action_path) %>
         <% end %>
       <% end %>
     <% end %>
+
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Register and deposit') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Single object', classes: 'h4') %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Item', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'APO', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Agreement', link: '#', disabled: true) %>
+      <% end %>
+
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Multiple items', classes: 'h4') %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items for Goobi', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Deposit multiple items', link: '#', disabled: true) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Reports') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Custom report', link: report_path) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Aggregate report', link: '#', disabled: true) %>
+      <% end %>
+    <% end %>
+
+    <% if admin? %>
+      <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Admin') do |dropdown| %>
+        <% dropdown.with_item do %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: '#', disabled: true) %>
+        <% end %>
+        <% dropdown.with_item do %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Impersonate', link: '#', disabled: true) %>
+        <% end %>
+      <% end %>
+    <% end %>
+
   <% end %>
 <% end %>
