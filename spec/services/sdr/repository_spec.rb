@@ -33,6 +33,31 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '#lock' do
+    context 'when the object is found' do
+      let(:object_client) { instance_double(Dor::Services::Client::Object, lock: 'abc123') }
+
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+      end
+
+      it 'returns the lock' do
+        expect(described_class.lock(druid:)).to eq('abc123')
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+      end
+    end
+
+    context 'when the object is not found' do
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_raise(Dor::Services::Client::NotFoundResponse)
+      end
+
+      it 'raises' do
+        expect { described_class.lock(druid:) }.to raise_error(Sdr::Repository::NotFoundResponse)
+      end
+    end
+  end
+
   describe '#find_solr' do
     context 'when the object is found' do
       let(:solr_doc) { { 'id' => druid } }

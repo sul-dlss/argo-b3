@@ -16,13 +16,24 @@ class ObjectsController < ApplicationController
 
   # Note that for the purposes of rendering show pages, both @solr_doc or @cocina_models
   # provide the latest object data. (This is a "live" solr document, not the possibly dated version stored in Solr.)
+  #
+  # The lock is fetched once here (a lightweight request) and used to decide whether the solr doc and
+  # cocina hash caches (shared with the show_* turbo frame actions below) need to be refreshed. This
+  # keeps the frame actions themselves unaware of the lock: they just read whatever is in the cache,
+  # trusting that this action (which always runs moments before them, as the parent page load) has
+  # already made it fresh.
   def show
-    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(params[:druid]))
+    druid = params[:druid]
+    lock = Sdr::Repository.lock(druid:)
+
+    @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
     authorize! @solr_doc, with: ObjectPolicy
 
+    refresh_cocina_hash(druid, lock) # Warm the cache for the other frames (e.g., overview, json, purl_preview).
+
     set_from_last_search_cookie # This provides @last_search_form
-    @druid_token = generate_token(params[:druid])
-    @version_service = Sdr::VersionService.new(druid: params[:druid])
+    @druid_token = generate_token(druid)
+    @version_service = Sdr::VersionService.new(druid:)
   end
 
   def show_header
@@ -93,17 +104,56 @@ class ObjectsController < ApplicationController
 
   # Note that this is a "live" solr document built from latest DSA data.
   def fetch_solr_doc(druid)
-    Rails.cache.fetch("objects/solr-doc/#{druid}", expires_in: 10.seconds) do
-      Sdr::Repository.find_solr(druid:)
-    end
+    Rails.cache.fetch(solr_doc_cache_key(druid), expires_in: solr_doc_cache_expires_in) do
+      { lock: nil, value: Sdr::Repository.find_solr(druid:) }
+    end.fetch(:value)
   end
 
   def fetch_cocina_hash(druid)
-    cache_key = "objects/cocina-hash/#{druid}"
-    Rails.cache.fetch(cache_key, expires_in: 10.seconds) do
-      cocina_object = Sdr::Repository.find(druid:)
-      CacheSupport.cacheable_cocina_object(cocina_object:)
-    end
+    Rails.cache.fetch(cocina_hash_cache_key(druid), expires_in: 1.hour) do
+      { lock: nil, value: compute_cocina_hash(druid) }
+    end.fetch(:value)
+  end
+
+  # Refreshes the cached solr doc if the lock has changed (or the cache is empty), used only by #show.
+  # A short TTL is kept as a safety net, since the solr doc can change independently of the lock.
+  def refresh_solr_doc(druid, lock)
+    cache_key = solr_doc_cache_key(druid)
+    cached = Rails.cache.read(cache_key)
+    return cached[:value] if cached && cached[:lock] == lock
+
+    value = Sdr::Repository.find_solr(druid:)
+    Rails.cache.write(cache_key, { lock:, value: }, expires_in: solr_doc_cache_expires_in)
+    value
+  end
+
+  # Refreshes the cached cocina hash if the lock has changed (or the cache is empty), used only by #show.
+  # The TTL here is just a safety net: freshness is driven by the lock check, not the TTL.
+  def refresh_cocina_hash(druid, lock)
+    cache_key = cocina_hash_cache_key(druid)
+    cached = Rails.cache.read(cache_key)
+    return cached[:value] if cached && cached[:lock] == lock
+
+    value = compute_cocina_hash(druid)
+    Rails.cache.write(cache_key, { lock:, value: }, expires_in: 1.hour)
+    value
+  end
+
+  def compute_cocina_hash(druid)
+    cocina_object = Sdr::Repository.find(druid:)
+    CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h, preserve_keys: [:label])
+  end
+
+  def solr_doc_cache_key(druid)
+    "objects/solr-doc/#{druid}"
+  end
+
+  def cocina_hash_cache_key(druid)
+    "objects/cocina-hash/#{druid}"
+  end
+
+  def solr_doc_cache_expires_in
+    (Settings.reload_intervals.cocina_model / 1000.0).seconds - 1.second
   end
 
   def fetch_purl_preview(cocina_hash)

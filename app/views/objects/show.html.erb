@@ -7,8 +7,7 @@
 
 <%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
       controller: 'cocina-model-show',
-      cocina_model_show_interval_value: Settings.reload_intervals.cocina_model,
-      cocina_model_show_stagger_value: Settings.reload_intervals.cocina_model_stagger
+      cocina_model_show_interval_value: Settings.reload_intervals.cocina_model
     } do %>
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>

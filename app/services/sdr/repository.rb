@@ -16,6 +16,18 @@ module Sdr
       raise NotFoundResponse, "Object not found: #{druid}"
     end
 
+    # Retrieve the current lock (optimistic concurrency token) for the object.
+    # This is a lightweight (HEAD) request that does not transfer the full Cocina object.
+    # @param [String] druid the druid of the object
+    # @return [String] the current lock
+    # @raise [Error] if there is an error retrieving the object
+    # @raise [NotFoundResponse] if the object is not found
+    def self.lock(druid:)
+      Dor::Services::Client.object(druid).lock
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
     # Retrieve the "live" solr document for the object.
     # It is recreated for the current DSA data; it is not the solr document stored in Solr.
     # @param [String] druid the druid of the object
