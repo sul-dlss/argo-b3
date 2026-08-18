@@ -29,6 +29,8 @@ RSpec.describe 'Show purl preview' do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('PURL preview is not available.')
+      expect(response.body).to include('View PURL page')
+      expect(response.body).to include("https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
       expect(PurlPreviewService).to have_received(:call).with(cocina_hash:)
       expect(Honeybadger).to have_received(:notify).with(error, context: { cocina_hash: })
     end

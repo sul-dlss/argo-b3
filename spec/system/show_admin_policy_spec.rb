@@ -64,6 +64,9 @@ RSpec.describe 'Show admin policy' do
     expect(page).to have_css('h2', text: 'Depositing...')
     expect(page).to have_text('Actions unavailable until deposit is complete.')
 
+    # No PURL link for admin policies
+    expect(page).to have_no_link('View PURL page')
+
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'Workflows')
@@ -71,6 +74,7 @@ RSpec.describe 'Show admin policy' do
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
+    expect(page).to have_no_css('.nav-link', text: 'Description Preview')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')

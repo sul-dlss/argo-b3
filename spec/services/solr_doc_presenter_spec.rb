@@ -48,9 +48,53 @@ RSpec.describe SolrDocPresenter do
     end
   end
 
+  describe '#agreement?' do
+    context 'when the object type is agreement' do
+      let(:object_type) { 'agreement' }
+
+      it 'returns true' do
+        expect(presenter.agreement?).to be true
+      end
+    end
+
+    context 'when the object type is not agreement' do
+      let(:object_type) { 'item' }
+
+      it 'returns false' do
+        expect(presenter.agreement?).to be false
+      end
+    end
+  end
+
+  describe '#virtual_object?' do
+    context 'when the object type is virtual object' do
+      let(:object_type) { 'virtual object' }
+
+      it 'returns true' do
+        expect(presenter.virtual_object?).to be true
+      end
+    end
+
+    context 'when the object type is not agreement' do
+      let(:object_type) { 'item' }
+
+      it 'returns false' do
+        expect(presenter.agreement?).to be false
+      end
+    end
+  end
+
   describe '#dro?' do
     context 'when the object type is collection' do
       let(:object_type) { 'collection' }
+
+      it 'returns false' do
+        expect(presenter.dro?).to be false
+      end
+    end
+
+    context 'when the object type is agreement' do
+      let(:object_type) { 'agreement' }
 
       it 'returns false' do
         expect(presenter.dro?).to be false
@@ -70,6 +114,48 @@ RSpec.describe SolrDocPresenter do
 
       it 'returns true' do
         expect(presenter.dro?).to be true
+      end
+    end
+  end
+
+  describe '#purl?' do
+    context 'when the object type is item' do
+      let(:object_type) { 'item' }
+
+      it 'returns true' do
+        expect(presenter.purl?).to be true
+      end
+    end
+
+    context 'when the object type is collection' do
+      let(:object_type) { 'collection' }
+
+      it 'returns true' do
+        expect(presenter.purl?).to be true
+      end
+    end
+
+    context 'when the object type is virtual object' do
+      let(:object_type) { 'virtual object' }
+
+      it 'returns true' do
+        expect(presenter.purl?).to be true
+      end
+    end
+
+    context 'when the object type is admin policy' do
+      let(:object_type) { 'adminPolicy' }
+
+      it 'returns false' do
+        expect(presenter.purl?).to be false
+      end
+    end
+
+    context 'when the object type is agreement' do
+      let(:object_type) { 'agreement' }
+
+      it 'returns false' do
+        expect(presenter.purl?).to be false
       end
     end
   end

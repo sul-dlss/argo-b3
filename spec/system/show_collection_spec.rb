@@ -82,6 +82,9 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
     expect(page).to have_css('.nav-link', text: 'Description Preview')
 
+    # PURL link in side nav
+    expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
+
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
     expect(page).to have_table_value('overview-table', 'Object type', 'Collection')
@@ -120,6 +123,8 @@ RSpec.describe 'Show collection' do
     # PURL preview tab
     click_button 'Description Preview'
     expect(page).to have_css('p', text: 'preview')
+    expect(page).to have_link('View PURL page',
+                              href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
     allow(Sdr::Repository).to receive(:find)

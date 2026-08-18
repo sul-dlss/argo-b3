@@ -30,7 +30,20 @@ class SolrDocPresenter < SearchResults::Item
     object_type == 'adminPolicy'
   end
 
+  def agreement?
+    object_type == 'agreement'
+  end
+
+  def virtual_object?
+    object_type == 'virtual object'
+  end
+
   def dro?
-    !collection? && !admin_policy?
+    !collection? && !admin_policy? && !agreement?
+  end
+
+  # items with a purl page
+  def purl?
+    dro? || collection?
   end
 end
