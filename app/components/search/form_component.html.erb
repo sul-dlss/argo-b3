@@ -1,24 +1,35 @@
-<div class="bg-light mt-2">
+<div class="search-bar">
   <nav aria-label="Search form" class="container py-2 mb-3">
-    <%= helpers.form_with model: search_form, scope: :search, url:, method: :get do |form| %>
-      <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :query) %>
+    <!-- From component library: https://sul-dlss.github.io/component-library/forms/ -->
+    <search class="search-card d-flex position-relative flex-column py-2 rounded">
+      <%= helpers.form_with model: search_form, scope: :search, url:, method: :get, class: 'search-query-form col-md-12 col-lg-8' do |form| %>
+        <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :query) %>
+        <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
+                                                                field_name: :object_types,
+                                                                text: 'Select object type',
+                                                                hidden: true) %>
+        <div class="input-group">
+          <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:,
+                                                                             field_name: :object_types,
+                                                                             classes: 'custom-select form-select search-field d-none d-md-block',
+                                                                             options: object_type_options,
+                                                                             prompt: 'All object types',
+                                                                             # Hack to use a single select (instead of multiselect) submitting to an array field.
+                                                                             name: 'search[object_types][]') %>
 
-      <div class="d-flex align-items-center">
-        <%= form.label :query, label, class: 'form-label fw-bold w-auto me-2 mb-0' %>
-
-        <div class="input-group w-auto">
-          <span class="input-group-text bg-white my-2">
-            <i class="bi bi-search"></i>
-          </span>
-
-          <%= form.text_field :query, class: 'form-control border-start-0 border-end-0 my-2', style: 'width: 400px;' %>
-
-          <span class="input-group-text bg-white my-2 pe-2">
-            <%= form.submit 'Search', class: 'btn btn-primary' %>
-          </span>
+          <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
+                                                                  field_name: :query,
+                                                                  text: 'Search for',
+                                                                  hidden: true) %>
+          <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(form:,
+                                                                           field_name: :query,
+                                                                           placeholder: 'Search by keyword',
+                                                                           classes: 'search-q q form-control',
+                                                                           type: 'search') %>
+          <button class="btn btn-primary search-btn" type="submit" id="search"><span class="submit-search-text">Search</span></button>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </search>
 
     <%= helpers.form_with model: search_form, scope: :search, url:, method: :get, data: { controller: 'form-submit' } do |form| %>
       <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :include_google_books) %>

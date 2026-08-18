@@ -11,10 +11,14 @@ module Search
 
     attr_reader :search_form, :url
 
-    def label
-      return 'Search for items:' if search_form.facets_selected?
-
-      'Search for items, tags, projects or tickets:'
+    def object_type_options
+      [
+        %w[Agreement agreement],
+        %w[APO adminPolicy],
+        %w[Collection collection],
+        %w[Item item],
+        ['Virtual object', 'virtual object']
+      ]
     end
   end
 end
