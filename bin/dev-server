@@ -57,10 +57,18 @@ trap 'kill "$TUNNEL_PID" 2>/dev/null' EXIT
 # give the tunnel a moment to establish before hitting it
 sleep 2
 
+
+# stacks and purl-fetcher have no qa environment of their own; qa falls back to stage.
+if [ "$SERVER_ENV" = "qa" ]; then
+  PURL_ENV="stage"
+else
+  PURL_ENV="$SERVER_ENV"
+fi
+
 export SETTINGS__SOLR__URL="${SETTINGS__SOLR__URL:-http://localhost:8990/solr/argo_${SERVER_ENV}}"
 export SETTINGS__DOR_SERVICES__URL="${SETTINGS__DOR_SERVICES__URL:-https://dor-services-${SERVER_ENV}-lb.stanford.edu}"
 export SETTINGS__PRESERVATION_CATALOG__URL="${SETTINGS__PRESERVATION_CATALOG__URL:-https://preservation-catalog-${SERVER_ENV}.stanford.edu}"
-export SETTINGS__STACKS__URL="${SETTINGS__STACKS__URL:-https://stacks-${SERVER_ENV}.stanford.edu/image}"
-export SETTINGS__PURL_FETCHER__URL="${SETTINGS__PURL_FETCHER__URL:-https://purl-fetcher-${SERVER_ENV}.stanford.edu}"
+export SETTINGS__STACKS__URL="${SETTINGS__STACKS__URL:-https://stacks-${PURL_ENV}.stanford.edu/image}"
+export SETTINGS__PURL_FETCHER__URL="${SETTINGS__PURL_FETCHER__URL:-https://purl-fetcher-${PURL_ENV}.stanford.edu}"
 
 bin/setup
