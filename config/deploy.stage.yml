@@ -19,6 +19,7 @@ env:
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-stage.stanford.edu
     SETTINGS__STACKS__URL: https://stacks-stage.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-stage.stanford.edu
+    SETTINGS__PURL__URL: https://sul-purl-stage.stanford.edu
     SETTINGS__ARGO__URL: https://argo-stage.stanford.edu
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
 

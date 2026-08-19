@@ -17,7 +17,7 @@ env:
     SETTINGS__SOLR__URL: https://sul-solr.stanford.edu/solr/argo_prod
     SETTINGS__DOR_SERVICES__URL: https://dor-services-prod-lb.stanford.edu
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-prod.stanford.edu
-    SETTINGS__STACKS__URL: https://stacks-stage.stanford.edu/image
+    SETTINGS__STACKS__URL: https://stacks.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
 
     HONEYBADGER_ENV: prod
