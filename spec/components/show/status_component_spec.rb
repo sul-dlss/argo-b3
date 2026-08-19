@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(document:, version_service:) }
+  subject(:component) { described_class.new(object_status_presenter:) }
 
+  let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
   let(:druid) { 'druid:bc123df4567' }
   let(:workflow_errors) { [] }
@@ -14,6 +15,7 @@ RSpec.describe Show::StatusComponent, type: :component do
   end
   let(:closed) { false }
   let(:accessioning) { false }
+  let(:content) { nil }
 
   context 'when the version is open' do
     it 'renders the draft status' do
@@ -72,6 +74,16 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Error')
+    end
+  end
+
+  context 'when the content is staging' do
+    let(:content) { build(:content, staging_state: 'staging') }
+
+    it 'renders the staging status' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Staging files')
     end
   end
 end

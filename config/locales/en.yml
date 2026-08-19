@@ -68,6 +68,8 @@ en:
         body: "Actions unavailable until deposit is complete."
       error:
         heading: "Error"
+      staging:
+        heading: "Staging files"
       actions:
         edit_item_details: "Edit item details"
         manage_files: "Manage files"

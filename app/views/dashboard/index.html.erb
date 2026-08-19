@@ -28,21 +28,21 @@
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Register & deposit single object') do |component| %>
-        <% component.with_button(link: '#', label: 'Item', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '#', label: 'Collection', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '#', label: 'APO', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '#', label: 'Agreement', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: new_item_path, label: 'Item', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+        <% component.with_button(link: '#', label: 'Collection', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '#', label: 'APO', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '#', label: 'Agreement', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Register or deposit multiple items', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '#', label: 'Register multiple items', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '#', label: 'Deposit multiple items', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '#', label: 'Register multiple items', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '#', label: 'Deposit multiple items', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary disabled') if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
-        <% component.with_button(link: '#', label: 'Impersonate', variant: 'outline-primary disabled') if allowed_to?(:impersonate?, nil, with: AdminPolicy) %>
+        <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary', disabled: true) if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+        <% component.with_button(link: '#', label: 'Impersonate', variant: 'outline-primary', disabled: true) if allowed_to?(:impersonate?, nil, with: AdminPolicy) %>
       <% end %>
     <% end %>
     <% layout.with_main_content do %>

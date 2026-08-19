@@ -21,7 +21,7 @@
         <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Single object', classes: 'h4') %>
       <% end %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Item', link: '#', disabled: true) %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Item', link: new_item_path, disabled: !register_item?) %>
       <% end %>
       <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: '#', disabled: true) %>

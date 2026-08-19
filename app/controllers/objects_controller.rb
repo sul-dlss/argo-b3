@@ -33,7 +33,9 @@ class ObjectsController < ApplicationController
 
     set_from_last_search_cookie # This provides @last_search_form
     @druid_token = generate_token(druid)
-    @version_service = Sdr::VersionService.new(druid:)
+    version_service = Sdr::VersionService.new(druid:)
+    content = Content.find_by(druid:, lock:, immutable: false)
+    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:, content:)
   end
 
   def show_header
