@@ -9,5 +9,9 @@ FactoryBot.define do
     trait :admin do
       groups { ['sdr:argo-access', AuthenticationHelpers::ADMIN_GROUP] }
     end
+
+    trait :developer do
+      groups { ['sdr:developer'] }
+    end
   end
 end
