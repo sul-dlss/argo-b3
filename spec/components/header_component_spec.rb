@@ -70,7 +70,7 @@ RSpec.describe HeaderComponent, type: :component do
       it 'renders an enabled link for item registration' do
         render_inline(component)
 
-        expect(page).to have_css('a.dropdown-item', text: 'Item')
+        expect(page).to have_link('Item', href: '/items/new')
         expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Item')
       end
     end
