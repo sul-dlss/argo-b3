@@ -12,7 +12,7 @@ module Elements
       super()
     end
 
-    attr_reader :title, :help_text
+    attr_reader :title, :help_text, :disabled
 
     def render?
       buttons.any?

@@ -59,6 +59,30 @@ RSpec.describe HeaderComponent, type: :component do
       expect(page).to have_css('a.dropdown-item.disabled', text: 'Agreement')
     end
 
+    context 'when the user belongs to a workgroup with edit permission' do
+      let(:user) { build_stubbed(:user, name: 'Test User', groups: [workgroup]) }
+      let(:workgroup) { 'sdr:test-workgroup' }
+
+      before do
+        create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
+      end
+
+      it 'renders an enabled link for item registration' do
+        render_inline(component)
+
+        expect(page).to have_css('a.dropdown-item', text: 'Item')
+        expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Item')
+      end
+    end
+
+    context 'when the user does not belong to a workgroup with edit permission' do
+      it 'renders a disabled link for item registration' do
+        render_inline(component)
+
+        expect(page).to have_css('a.dropdown-item.disabled', text: 'Item')
+      end
+    end
+
     it 'renders disabled links for multiple item registration' do
       render_inline(component)
 

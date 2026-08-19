@@ -9,4 +9,8 @@ class HeaderComponent < ApplicationComponent
   def admin?
     helpers.allowed_to?(:admin?, nil, with: AdminPolicy)
   end
+
+  def register_item?
+    helpers.allowed_to?(:new?, nil, with: ItemPolicy)
+  end
 end

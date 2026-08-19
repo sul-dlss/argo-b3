@@ -3,13 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe 'Create an item' do
-  let!(:user) { create(:user) }
+  let(:workgroup) { 'sdr:test-workgroup' }
+  let!(:user) { create(:user, groups: [workgroup]) }
 
   let(:apo_druid) { generate(:unique_druid) }
   let(:apo_title) { 'My APO' }
 
   before do
     sign_in user
+
+    create(:permission, :edit, workgroup:, target_druid: apo_druid)
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
   end

@@ -33,23 +33,23 @@
         <p><%= link_to_purl(@solr_doc.druid) %></p>
       <% end %>
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
-        <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Add workflow', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Add workflow', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Edit', help_text: '(requires new version)', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '/', label: 'Manage files', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Manage description', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Text extraction', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Apply APO defaults', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Manage embargo', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Manage files', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Manage description', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Text extraction', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Apply APO defaults', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Manage embargo', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Discard', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '/', label: 'Purge item', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary disabled') %>
-        <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary disabled') %>
+        <% component.with_button(link: '/', label: 'Purge item', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary', disabled: true) %>
       <% end %>
     <% end %>
 
