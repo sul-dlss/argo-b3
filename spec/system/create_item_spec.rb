@@ -80,6 +80,30 @@ RSpec.describe 'Create an item' do
         .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
     end
 
+    it 'registers a valid cocina object with a generated source id' do
+      allow(SecureRandom).to receive(:uuid).and_return('11111111-1111-1111-1111-111111111111')
+
+      visit new_item_path
+
+      choose 'Enter prefix to autogenerate source ID'
+      fill_in 'Source ID prefix', with: 'new'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Item registered.')
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        request_cocina_object = args[:request_cocina_object]
+        expect(request_cocina_object.identification.sourceId).to eq('new:11111111-1111-1111-1111-111111111111')
+      end
+    end
+
     it 'registers and redirects to add files' do
       visit new_item_path
 

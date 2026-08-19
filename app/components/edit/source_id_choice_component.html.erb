@@ -1,0 +1,47 @@
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      label: t('edit.items.fields.source_id.label'),
+      mark_required: true,
+      classes: 'mb-3',
+      data: { controller: 'radio' }
+    ) do %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :source_id_choice,
+        label_text: t('edit.items.fields.source_id_choice.provided.label'),
+        input_value: ItemForm::SOURCE_ID_PROVIDED_CHOICE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'd-flex align-items-center gap-2 ps-0 mb-2',
+        input_classes: 'order-first ms-0'
+      ) do |component| %>
+    <% component.with_additional_container_content do %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+            form:,
+            field_name: :source_id,
+            label_text: t('edit.items.fields.source_id.label'),
+            label_hidden: true,
+            container_classes: 'flex-grow-1'
+          ) %>
+    <% end %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :source_id_choice,
+        label_text: t('edit.items.fields.source_id_choice.generate.label'),
+        input_value: ItemForm::SOURCE_ID_GENERATE_CHOICE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'd-flex align-items-center gap-2 ps-0',
+        input_classes: 'order-first ms-0'
+      ) do |component| %>
+    <% component.with_additional_container_content do %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+            form:,
+            field_name: :source_id_prefix,
+            label_text: t('edit.items.fields.source_id_prefix.label'),
+            label_hidden: true,
+            container_classes: 'flex-grow-1'
+          ) %>
+    <% end %>
+  <% end %>
+<% end %>
