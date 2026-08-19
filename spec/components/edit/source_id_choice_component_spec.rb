@@ -12,7 +12,7 @@ RSpec.describe Edit::SourceIdChoiceComponent, type: :component do
     it 'renders the provided state' do
       render_inline(component)
 
-      expect(page).to have_field('Enter source id', type: 'radio', checked: true)
+      expect(page).to have_field('Enter source ID', type: 'radio', checked: true)
       expect(page).to have_field('Source ID', type: 'text', with: 'sul:1234')
 
       expect(page).to have_field('Enter prefix to autogenerate source ID', type: 'radio', checked: false)
@@ -27,7 +27,7 @@ RSpec.describe Edit::SourceIdChoiceComponent, type: :component do
     it 'renders the generate state' do
       render_inline(component)
 
-      expect(page).to have_field('Enter source id', type: 'radio', checked: false)
+      expect(page).to have_field('Enter source ID', type: 'radio', checked: false)
 
       expect(page).to have_field('Enter prefix to autogenerate source ID', type: 'radio', checked: true)
       expect(page).to have_field('Source ID prefix', type: 'text', with: 'sul')

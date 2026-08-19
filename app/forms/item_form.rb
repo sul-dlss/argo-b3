@@ -19,6 +19,8 @@ class ItemForm < CocinaModels::Dro
   normalizes :source_id_prefix, with: ->(source_id_prefix) { source_id_prefix.strip.delete_suffix(':') }
   validates :source_id_prefix, presence: true, if: -> { source_id_choice == SOURCE_ID_GENERATE_CHOICE }
 
+  validate :source_id_must_be_unique, if: -> { source_id.present? }
+
   has_one :release_tags
 
   before_validation :populate_description_hash, if: -> { title.present? }
@@ -46,5 +48,11 @@ class ItemForm < CocinaModels::Dro
   def generate_source_id
     self.source_id = "#{source_id_prefix}:#{SecureRandom.uuid}"
     self.source_id_choice = SOURCE_ID_PROVIDED_CHOICE
+  end
+
+  def source_id_must_be_unique
+    return unless Sdr::Repository.source_id_exists?(source_id:)
+
+    errors.add(:source_id, 'already exists')
   end
 end

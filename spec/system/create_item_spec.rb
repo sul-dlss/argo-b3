@@ -36,7 +36,8 @@ RSpec.describe 'Create an item' do
       allow(Sdr::Repository).to receive_messages(accession: nil, create_release_tag: nil,
                                                  register: registered_cocina_object, find: registered_cocina_object,
                                                  find_solr: build(:solr_item, druid:, title: 'The Title'),
-                                                 lock: registered_cocina_object.lock)
+                                                 lock: registered_cocina_object.lock,
+                                                 source_id_exists?: false)
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
@@ -128,6 +129,7 @@ RSpec.describe 'Create an item' do
     before do
       allow(Sdr::Repository).to receive(:register)
       allow(Sdr::Repository).to receive(:accession)
+      allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
     end
 
     it 'shows validation errors and does not register or accession' do

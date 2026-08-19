@@ -76,6 +76,15 @@ module Sdr
       raise Error, "Registration failed: #{e.message}"
     end
 
+    # @param [String] source_id the source_id to check for existence
+    # @return [Boolean] true if an object with the source_id exists, false otherwise
+    def self.source_id_exists?(source_id:)
+      Dor::Services::Client.objects.find(source_id:)
+      true
+    rescue Dor::Services::Client::NotFoundResponse
+      false
+    end
+
     # @param [String] druid the druid of the object
     # @param [String] user_name the sunetid of the user performing the action
     # @param [String,nil] version_description the description of the version or nil to leave unchanged

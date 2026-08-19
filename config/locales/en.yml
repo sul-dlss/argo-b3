@@ -123,7 +123,7 @@ en:
           label: "Source ID prefix"
         source_id_choice:
           provided:
-            label: "Enter source id"
+            label: "Enter source ID"
           generate:
             label: "Enter prefix to autogenerate source ID"
         title:

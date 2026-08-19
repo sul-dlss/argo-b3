@@ -21,6 +21,10 @@ RSpec.describe ItemForm do
   let(:source_id_choice) { ItemForm::SOURCE_ID_PROVIDED_CHOICE }
   let(:source_id_prefix) { nil }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe 'title' do
     context 'when present' do
       it 'is valid' do
@@ -72,15 +76,6 @@ RSpec.describe ItemForm do
         expect(item_form).to be_valid
       end
     end
-
-    context 'when not one of the allowed choices' do
-      let(:source_id_choice) { 'invalid' }
-
-      it 'is not valid' do
-        expect(item_form).not_to be_valid
-        expect(item_form.errors[:source_id_choice]).to include('is not included in the list')
-      end
-    end
   end
 
   describe 'source_id_prefix' do
@@ -109,6 +104,35 @@ RSpec.describe ItemForm do
 
       it 'is valid' do
         expect(item_form).to be_valid
+      end
+    end
+  end
+
+  describe 'source_id' do
+    context 'when present and does not already exist' do
+      it 'is valid' do
+        expect(item_form).to be_valid
+        expect(Sdr::Repository).to have_received(:source_id_exists?).with(source_id:)
+      end
+    end
+
+    context 'when present and already exists' do
+      before do
+        allow(Sdr::Repository).to receive(:source_id_exists?).and_return(true)
+      end
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:source_id]).to include('already exists')
+      end
+    end
+
+    context 'when blank' do
+      let(:source_id) { nil }
+
+      it 'does not check for existence' do
+        item_form.valid?
+        expect(Sdr::Repository).not_to have_received(:source_id_exists?)
       end
     end
   end
