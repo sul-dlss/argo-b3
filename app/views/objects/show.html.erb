@@ -56,7 +56,7 @@
     <% layout.with_main_content do %>
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
-          <%= render Show::StatusComponent.new(document: @solr_doc, version_service: @version_service) %>
+          <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter) %>
         </div>
         <div class="show-box flex-fill">
           <%= render Show::BoxComponent.new(heading: 'Released to') do %>
