@@ -10,7 +10,11 @@ module MissionControl
       alias_rule :index?, :create?, :new?, to: :manage?
 
       def manage?
-        admin? || Rails.env.development?
+        admin? || developer? || Rails.env.development?
+      end
+
+      def developer?
+        user.groups.include?('sdr:developer')
       end
     end
   end

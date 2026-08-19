@@ -25,5 +25,16 @@ RSpec.describe 'MissionControl jobs' do
         expect(response.body).to include('Mission control - Queues')
       end
     end
+
+    context 'with developer user' do
+      let(:user) { create(:user, :developer) }
+
+      it 'renders the mission control interface' do
+        get mission_control_jobs_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Mission control - Queues')
+      end
+    end
   end
 end
