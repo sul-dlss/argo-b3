@@ -216,6 +216,9 @@ RSpec.describe 'Show DRO' do
     # Thumbnail
     expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!160,160/0/default.jpg"]') # rubocop:disable Layout/LineLength
 
+    # PURL link in side nav
+    expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
+
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
     expect(page).to have_table_value('identification-table', 'Druid', druid)
@@ -323,6 +326,8 @@ RSpec.describe 'Show DRO' do
     # PURL preview tab
     click_button 'Description Preview'
     expect(page).to have_css('p', text: 'preview')
+    expect(page).to have_link('View PURL page',
+                              href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))

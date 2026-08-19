@@ -29,6 +29,9 @@
         <%= render ThumbnailComponent.new(result: @solr_doc, dimension: 160, classes: 'mb-4') %>
       </div>
 
+      <% if @solr_doc.dro_or_collection? %>
+        <p><%= link_to_purl(@solr_doc.druid) %></p>
+      <% end %>
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
         <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary disabled') %>
         <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary disabled') %>
@@ -78,7 +81,7 @@
 
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
-        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro? || @solr_doc.collection? %>
+        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro_or_collection? %>
         <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') if @solr_doc.dro? %>
         <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
         <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
@@ -93,7 +96,7 @@
           <% end %>
         <% end %>
 
-        <% if @solr_doc.dro? || @solr_doc.collection? %>
+        <% if @solr_doc.dro_or_collection? %>
           <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
             <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
