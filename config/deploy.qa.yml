@@ -22,5 +22,7 @@ env:
     SETTINGS__PURL__URL: https://sul-purl-stage.stanford.edu
     SETTINGS__ARGO__URL: https://argo-qa.stanford.edu
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
+    
+    DATABASE_HOSTNAME: argo-b3-db-qa-a
 
     HONEYBADGER_ENV: qa
