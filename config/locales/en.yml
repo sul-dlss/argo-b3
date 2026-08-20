@@ -128,3 +128,11 @@ en:
             label: "Enter prefix to autogenerate source ID"
         title:
           label: "Title"
+  access:
+    locations:
+      spec: "Special collections"
+      music: "Music"
+      ars: "ARS"
+      art: "Art"
+      hoover: "Hoover Institute"
+      m&m: "Media and Microtext"

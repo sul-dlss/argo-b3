@@ -321,6 +321,16 @@ RSpec.describe 'Show DRO' do
 
     # Files tab
     click_button 'Files'
+
+    # Structural metadata section
+    expect(page).to have_css('h2', text: 'Structural metadata')
+    within('.file-set-card', text: 'Resource (1): file') do
+      expect(page).to have_css('.card-title', text: 'Label: Object 1')
+      expect(page).to have_css('td', text: 'rr624wq8610_00_0001.jp2')
+    end
+
+    # Files section
+    expect(page).to have_css('h2', text: 'Files')
     expect(page).to have_css('li', text: 'rr624wq8610_00_0001.jp2')
 
     # PURL preview tab

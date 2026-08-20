@@ -1,0 +1,59 @@
+<%= tag.div class: classes do %>
+  <div class="card-body">
+    <div class="card-title d-flex justify-content-between">
+      <div>
+        <span class="h3">Resource (<%= index %>):</span> <%= file_set_type %>
+      </div>
+      <% if label.present? %>
+        <div>
+          <span class="fw-bold">Label:</span> <%= label %>
+        </div>
+      <% end %>
+    </div>
+    <div class="card-body">
+      <%= render(SdrViewComponents::Tables::TableComponent.new(label: "Files for resource #{index}",
+                                                               show_label: false,
+                                                               classes: 'border')) do |component| %>
+        <% component.with_header(label: 'File name', style: 'width: 30%;') %>
+        <% component.with_header(label: 'View') %>
+        <% component.with_header(label: 'Download') %>
+        <% component.with_header(label: 'Location') %>
+        <% component.with_header(label: 'Publish') %>
+        <% component.with_header(label: 'Preserve') %>
+        <% component.with_header(label: 'Role') %>
+        <% component.with_header(label: 'Language') %>
+        <% content_file_set.content_files.each do |content_file| %>
+          <% component.with_row do |row_component| %>
+            <%= row_component.with_cell do %>
+              <%= content_file.filepath %>
+              <div class="mt-2">
+                Size: <%= helpers.number_to_human_size(content_file.size) %><% if content_file.mime_type %>; Type: <%= content_file.mime_type %> <% end %>
+              </div>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= content_file.view.capitalize %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= content_file.download&.capitalize %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= t("access.locations.#{content_file.location}") if content_file.location %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= '✔' if content_file.publish %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= '✔' if content_file.preserve %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= content_file.use&.capitalize || 'No role' %>
+            <% end %>
+            <%= row_component.with_cell do %>
+              <%= content_file.language_tag %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
