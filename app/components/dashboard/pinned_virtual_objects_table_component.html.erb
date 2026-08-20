@@ -1,0 +1,39 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(
+      empty_message: 'No virtual objects have been pinned.',
+      classes:,
+      label:,
+      responsive: true
+    ) do |component| %>
+  <% component.with_caption do %>
+    <%= label %>
+    <%= helpers.pin_icon(classes: 'pinned') %>
+  <% end %>
+  <% component.with_header(label: 'Title') %>
+  <% component.with_header(label: 'Druid') %>
+  <% component.with_header(label: 'Collection') %>
+  <% component.with_header(label: 'APO') %>
+  <% component.with_header(label: '# of constituents') %>
+  <% component.with_header(label: 'Unpin') %>
+  <% pinned_virtual_object_docs.each do |virtual_object_doc| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= title_link(virtual_object_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= virtual_object_doc.bare_druid %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: collection_link_values(virtual_object_doc)) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= apo_link(virtual_object_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= virtual_object_doc.constituents_count %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render Pin::PinnedObjectComponent.new(druid: virtual_object_doc.druid, pinned: true) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

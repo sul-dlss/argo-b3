@@ -70,3 +70,16 @@ $virtual-object-color: rgb(#{$virtual-object-color-rgb});
 .search-bar {
   background-color: var(--stanford-20-black);
 }
+
+// Pin-related
+// Note that pin colors for objects are defined in object-type-colors mixin in show.scss.
+.pin {
+  &.not-pinned {
+    color: black;
+  }
+
+  // Avoids the pin flashing a background when clicked.
+  &.btn {
+    --bs-btn-disabled-bg: transparent !important;
+  }
+}

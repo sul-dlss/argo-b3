@@ -373,5 +373,21 @@ RSpec.describe 'Show DRO' do
       expect(cells[1]).to have_text('completed')
       expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
     end
+
+    # Pinning and unpinning
+    expect(page).to have_css('.bi-pin')
+    expect(page).to have_no_css('.bi-pin-fill')
+
+    find('.bi-pin').click
+
+    expect(page).to have_toast('Pin added')
+    expect(page).to have_css('.bi-pin-fill')
+    expect(page).to have_no_css('.bi-pin')
+
+    find('.bi-pin-fill').click
+
+    expect(page).to have_toast('Pin removed')
+    expect(page).to have_css('.bi-pin')
+    expect(page).to have_no_css('.bi-pin-fill')
   end
 end
