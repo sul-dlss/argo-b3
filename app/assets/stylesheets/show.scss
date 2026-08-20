@@ -38,6 +38,10 @@
       border-bottom: 0;
     }
   }
+
+  .file-set-card {
+    background-color: var(--stanford-fog-light);
+  }
 }
 
 @mixin object-type-colors($color, $color-rgb) {

@@ -1,4 +1,8 @@
 <%= turbo_frame_tag(@content.druid, 'files') do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Structural metadata', classes: 'mb-3') %>
+  <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, classes: 'mb-2') %>
+
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Files', classes: 'mt-5 mb-3') %>
   <ul>
     <% @content.content_file_binaries.each do |content_file_binary| %>
       <li><%= content_file_binary.filepath %></li>
