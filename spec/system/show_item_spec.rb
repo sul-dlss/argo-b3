@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Show DRO' do
+RSpec.describe 'Show item' do
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
   let(:collection_druid) { 'druid:dd123cd4589' }
