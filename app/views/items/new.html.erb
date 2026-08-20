@@ -15,11 +15,7 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
                                                                           label: t('edit.items.tabs.details.label'),
                                                                           mark_required: true)) do %>
-        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :source_id,
-                                                                    label_text: t('edit.items.fields.source_id.label'),
-                                                                    label_mark_required: true,
-                                                                    label_classes: 'fw-bold',
-                                                                    container_classes: 'mb-3') %>
+        <%= render Edit::SourceIdChoiceComponent.new(form:) %>
 
         <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :title,
                                                                    label_text: t('edit.items.fields.title.label'),

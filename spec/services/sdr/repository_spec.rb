@@ -168,6 +168,30 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '.source_id_exists?' do
+    let(:source_id) { 'sul:1234' }
+    let(:objects_client) { instance_double(Dor::Services::Client::Objects, find: true) }
+
+    before do
+      allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
+    end
+
+    context 'when an object with the source_id exists' do
+      it 'returns true' do
+        expect(described_class.source_id_exists?(source_id:)).to be true
+        expect(objects_client).to have_received(:find).with(source_id:)
+      end
+    end
+
+    context 'when no object with the source_id exists' do
+      before { allow(objects_client).to receive(:find).and_raise(Dor::Services::Client::NotFoundResponse) }
+
+      it 'returns false' do
+        expect(described_class.source_id_exists?(source_id:)).to be false
+      end
+    end
+  end
+
   describe '#accession' do
     let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, close: true) }
     let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }

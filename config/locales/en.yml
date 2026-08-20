@@ -119,5 +119,12 @@ en:
           label: "APO"
         source_id:
           label: "Source ID"
+        source_id_prefix:
+          label: "Source ID prefix"
+        source_id_choice:
+          provided:
+            label: "Enter source ID"
+          generate:
+            label: "Enter prefix to autogenerate source ID"
         title:
           label: "Title"

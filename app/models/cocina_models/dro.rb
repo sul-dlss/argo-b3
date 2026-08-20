@@ -16,8 +16,9 @@ module CocinaModels
     end
 
     attribute :source_id, :string
+    normalizes_whitespace :source_id
     validates :source_id, presence: true
-    validates :source_id, format: { with: /\A.+:.+\z/ }
+    validates :source_id, format: { with: /\A.+:.+\z/ }, allow_blank: true
 
     attribute :barcode, :string
     normalizes_whitespace :barcode

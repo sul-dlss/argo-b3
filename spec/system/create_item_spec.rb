@@ -36,7 +36,8 @@ RSpec.describe 'Create an item' do
       allow(Sdr::Repository).to receive_messages(accession: nil, create_release_tag: nil,
                                                  register: registered_cocina_object, find: registered_cocina_object,
                                                  find_solr: build(:solr_item, druid:, title: 'The Title'),
-                                                 lock: registered_cocina_object.lock)
+                                                 lock: registered_cocina_object.lock,
+                                                 source_id_exists?: false)
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
@@ -80,6 +81,30 @@ RSpec.describe 'Create an item' do
         .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
     end
 
+    it 'registers a valid cocina object with a generated source id' do
+      allow(SecureRandom).to receive(:uuid).and_return('11111111-1111-1111-1111-111111111111')
+
+      visit new_item_path
+
+      choose 'Enter prefix to autogenerate source ID'
+      fill_in 'Source ID prefix', with: 'new'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Item registered.')
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        request_cocina_object = args[:request_cocina_object]
+        expect(request_cocina_object.identification.sourceId).to eq('new:11111111-1111-1111-1111-111111111111')
+      end
+    end
+
     it 'registers and redirects to add files' do
       visit new_item_path
 
@@ -104,6 +129,7 @@ RSpec.describe 'Create an item' do
     before do
       allow(Sdr::Repository).to receive(:register)
       allow(Sdr::Repository).to receive(:accession)
+      allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
     end
 
     it 'shows validation errors and does not register or accession' do
