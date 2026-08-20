@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :bulk_actions, dependent: :destroy
   has_many :pinned_objects, dependent: :destroy
   has_many :pinned_searches, dependent: :destroy
+  has_many :pinned_tags, dependent: :destroy
 
   EMAIL_SUFFIX = '@stanford.edu'
 

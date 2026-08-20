@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -149,6 +149,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_170000) do
     t.index ["user_id"], name: "index_pinned_searches_on_user_id"
   end
 
+  create_table "pinned_tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "tag", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "tag"], name: "index_pinned_tags_on_user_id_and_tag", unique: true
+    t.index ["user_id"], name: "index_pinned_tags_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -167,4 +176,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_170000) do
   add_foreign_key "content_files", "content_file_sets"
   add_foreign_key "pinned_objects", "users"
   add_foreign_key "pinned_searches", "users"
+  add_foreign_key "pinned_tags", "users"
 end
