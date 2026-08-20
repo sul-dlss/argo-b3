@@ -26,23 +26,23 @@ RSpec.describe PinnedSearch do
     end
   end
 
-  describe '.exists?' do
+  describe '.exists_by_search_form?' do
     before do
       described_class.create_from_search_form(search_form:, user:)
     end
 
     it 'returns true when the search is pinned by the user' do
-      expect(described_class.exists?(search_form:, user:)).to be true
+      expect(described_class.exists_by_search_form?(search_form:, user:)).to be true
     end
 
     it 'returns false when the search is not pinned by the user' do
-      expect(described_class.exists?(search_form:, user: create(:user))).to be false
+      expect(described_class.exists_by_search_form?(search_form:, user: create(:user))).to be false
     end
 
     it 'returns false when a different search is pinned by the user' do
       different_search_form = SearchForm.new(query: 'different')
 
-      expect(described_class.exists?(search_form: different_search_form, user:)).to be false
+      expect(described_class.exists_by_search_form?(search_form: different_search_form, user:)).to be false
     end
   end
 

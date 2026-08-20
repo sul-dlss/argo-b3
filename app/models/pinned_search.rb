@@ -16,8 +16,8 @@ class PinnedSearch < ApplicationRecord
     create(search_form_attributes: search_form.attributes, user:)
   end
 
-  def self.exists?(search_form:, user:)
-    unscoped.exists?(user:, search_form_md5: md5_for(search_form.attributes))
+  def self.exists_by_search_form?(search_form:, user:)
+    exists?(user:, search_form_md5: md5_for(search_form.attributes))
   end
 
   def self.md5_for(search_form_attributes)
