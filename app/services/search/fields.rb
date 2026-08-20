@@ -4,6 +4,8 @@ module Search
   # Constants for Solr fields
   module Fields
     ACCESS_RIGHTS = 'rights_descriptions_ssimdv'
+    AGREEMENT_DRUID = 'agreement_ssi'
+    AGREEMENT_TITLE = 'agreement_ssidv'
     APO_DRUID = 'governed_by_ssim'
     APO_TITLE = 'apo_title_ssimdv'
     AUTHOR = 'author_display_ss'

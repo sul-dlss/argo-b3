@@ -1,0 +1,35 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(
+      empty_message: 'No items have been pinned.',
+      classes:,
+      label:,
+      responsive: true
+    ) do |component| %>
+  <% component.with_caption do %>
+    <%= label %>
+    <%= helpers.pin_icon(classes: 'pinned') %>
+  <% end %>
+  <% component.with_header(label: 'Title') %>
+  <% component.with_header(label: 'Druid') %>
+  <% component.with_header(label: 'Collection') %>
+  <% component.with_header(label: 'APO') %>
+  <% component.with_header(label: 'Unpin') %>
+  <% pinned_item_docs.each do |item_doc| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= title_link(item_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= item_doc.bare_druid %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: collection_link_values(item_doc)) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= apo_link(item_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render Pin::PinnedObjectComponent.new(druid: item_doc.druid, pinned: true) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

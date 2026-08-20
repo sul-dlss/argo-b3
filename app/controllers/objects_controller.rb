@@ -40,6 +40,7 @@ class ObjectsController < ApplicationController
 
   def show_header
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
+    @pinned = PinnedObject.exists?(druid: verified_druid, user: current_user)
 
     render layout: false
   end

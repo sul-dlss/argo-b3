@@ -52,6 +52,10 @@
   .border.object-type-border {
     --bs-border-color: #{$color};
   }
+
+  .pinned {
+    color: $color;
+  }
 }
 
 .object-type-item {

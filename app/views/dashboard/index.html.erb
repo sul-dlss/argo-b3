@@ -1,5 +1,10 @@
 <%= content_for :title, 'Dashboard' %>
 
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
 <div class="container mt-3">
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
@@ -72,15 +77,19 @@
         <% component.with_row(values: ['heart mountain; Exclude Google Books > Yes; Collection > James Omura papers: 1912-1995', nil]) %>
       <% end %>
 
-      <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Pinned items', responsive: true) do |component| %>
-        <% component.with_header(label: 'Title') %>
-        <% component.with_header(label: 'Druid') %>
-        <% component.with_header(label: 'Collection') %>
-        <% component.with_header(label: 'APO') %>
-        <% component.with_header(label: 'Unpin') %>
-        <% component.with_row(values: ['Mendelssohn-Bartholdy, Felix, 1809-1847 Frühlingslied : Lieder ohne Worte : op. 62, no. 6: Animatic, [Leipzig, Germany]', 'bb234ab1239', 'Classical Music Collection', 'ARS', nil]) %>
-        <% component.with_row(values: ['Scholarly article dataset', 'bb234ab1230', 'Dataset collection', 'GIS Datasets CC-BY SA 4.0|', nil]) %>
-      <% end %>
+      <div class="mb-5">
+        <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>
+      </div>
+
+      <div class="mb-5">
+        <%= render Dashboard::PinnedCollectionsTableComponent.new(pinned_collection_docs: @pinned_collection_docs) %>
+      </div>
+
+      <div class="mb-5">
+        <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
+      </div>
+
+      <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
     <% end %>
   <% end %>
 </div>
