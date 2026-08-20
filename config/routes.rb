@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root 'dashboard#index'
+  post 'go_to_druid', to: 'dashboard#go_to_druid'
 
   # resource :home, only: [:show], controller: 'home'
 

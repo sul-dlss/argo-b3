@@ -17,7 +17,7 @@
     <% end %>
     <% layout.with_left_content do %>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: 'Go to a druid') %>
-      <%= form_with model: GoToDruidForm.new, url: '#', class: 'mb-5' do |form| %>
+      <%= form_with model: @go_to_druid_form, url: go_to_druid_path, class: 'mb-5' do |form| %>
           <div class="d-flex">
             <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
                                                                         field_name: :druid,
