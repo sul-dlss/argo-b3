@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_18_191652) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -139,6 +139,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_191652) do
     t.index ["user_id"], name: "index_pinned_objects_on_user_id"
   end
 
+  create_table "pinned_searches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "search_form_attributes", null: false
+    t.string "search_form_md5", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "search_form_md5"], name: "index_pinned_searches_on_user_id_and_search_form_md5", unique: true
+    t.index ["user_id"], name: "index_pinned_searches_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -156,4 +166,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_18_191652) do
   add_foreign_key "content_files", "content_file_binaries"
   add_foreign_key "content_files", "content_file_sets"
   add_foreign_key "pinned_objects", "users"
+  add_foreign_key "pinned_searches", "users"
 end
