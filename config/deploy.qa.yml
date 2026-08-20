@@ -21,6 +21,8 @@ env:
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-stage.stanford.edu
     SETTINGS__PURL__URL: https://sul-purl-stage.stanford.edu
     SETTINGS__ARGO__URL: https://argo-qa.stanford.edu
+    SETTINGS__SEARCHWORKS__URL: https://searchworks-preview-stage.stanford.edu
+    SETTINGS__EARTHWORKS__URL: https://earthworks-stage.stanford.edu
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
     
     DATABASE_HOSTNAME: argo-b3-db-qa-a

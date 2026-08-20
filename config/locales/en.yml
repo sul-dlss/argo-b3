@@ -74,6 +74,11 @@ en:
         edit_item_details: "Edit item details"
         manage_files: "Manage files"
         manage_description: "Manage description"
+    released_to:
+      released:
+        heading: "Released to"
+      unreleased:
+        heading: "Not released"
   edit:
     contents:
       edit:

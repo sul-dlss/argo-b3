@@ -303,4 +303,32 @@ RSpec.describe Sdr::Repository do
       end
     end
   end
+
+  describe '#release_tags' do
+    context 'when the object is found' do
+      let(:release_tags) { [instance_double(Dor::Services::Client::ReleaseTag)] }
+      let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: release_tags) }
+      let(:object_client) { instance_double(Dor::Services::Client::Object, release_tags: release_tags_client) }
+
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+      end
+
+      it 'returns the release tags' do
+        expect(described_class.release_tags(druid:)).to eq(release_tags)
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(release_tags_client).to have_received(:list).with(public: true)
+      end
+    end
+
+    context 'when the object is not found' do
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_raise(Dor::Services::Client::NotFoundResponse)
+      end
+
+      it 'raises' do
+        expect { described_class.release_tags(druid:) }.to raise_error(Sdr::Repository::NotFoundResponse)
+      end
+    end
+  end
 end

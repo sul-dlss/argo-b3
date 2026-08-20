@@ -1,0 +1,9 @@
+<%= render Show::BoxComponent.new(heading:) do %>
+  <% if release_tag_links.any? %>
+    <ul>
+      <% release_tag_links.each do |release_tag_link| %>
+        <li><%= helpers.link_to_new_tab(release_tag_link[:label], release_tag_link[:url]) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

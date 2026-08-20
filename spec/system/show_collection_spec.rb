@@ -12,6 +12,7 @@ RSpec.describe 'Show collection' do
   # Versions are tested in show_dro_spec so returning [].
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                   release_tags: release_tags_client,
                                                    user_version: user_version_client, lock: 'lock1')
   end
   let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
@@ -20,6 +21,7 @@ RSpec.describe 'Show collection' do
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
+  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
   def build_solr_doc(title:)
     {
@@ -72,6 +74,9 @@ RSpec.describe 'Show collection' do
 
     # Status box
     expect(page).to have_css('h2', text: 'Draft, not deposited')
+
+    # Released to box
+    expect(page).to have_css('h2', text: 'Not released')
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
