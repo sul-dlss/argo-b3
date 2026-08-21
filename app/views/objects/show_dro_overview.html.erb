@@ -1,35 +1,37 @@
 <%= turbo_frame_tag(@solr_doc.druid, 'overview') do %>
-  <div class="row mb-5">
-    <div class="col-xl-6 col-12">
-      <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table-left', classes: 'mb-0 mb-xl-3 split-table') do |component| %>
-        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
-        <% component.with_row(label: 'Object type', value: @solr_doc.object_type.titleize) %>
-        <% component.with_row(label: 'Content type', value: @solr_doc.content_type.titleize) %>
-      <% end %>
-    </div>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
+    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
+    <% component.with_row(label: 'Druid', value: @solr_doc.bare_druid) %>
+    <% component.with_row(label: 'Content type', value: @solr_doc.content_type.titleize) %>
+    <% component.with_row(label: 'Status', value: @solr_doc.status) %>
+    <% component.with_row(label: 'Preservation size', value: @solr_doc.human_preserved_size) %>
+    <% component.with_row(label: 'Registered', value: @solr_doc.formatted_registered_earliest_date) %>
+    <% component.with_row(label: 'Last deposited', value: @solr_doc.formatted_deposited_latest_date) %>
+  <% end %>
 
-    <div class="col-xl-6 col-12">
-      <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table-right', classes: 'split-table split-table-right') do |component| %>
-        <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3 invisible d-none d-xl-block', text: 'Overview, continued', 'aria-hidden': true) %><% end %>
-        <% component.with_row(label: 'Admin policy') do |row_component| %>
-          <% row_component.with_cell do %>
-            <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
-            <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-            (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
-          <% end %>
-        <% end %>
-        <% component.with_row(label: 'Collection') do |row_component| %>
-          <% row_component.with_cell do %>
-            <% @solr_doc.collection_druids.each_with_index do |collection_druid, index| %>
-              <%= link_to @solr_doc.collection_titles[index], object_path(druid: collection_druid) %>
-              <% search_form = SearchForm.new(collection_titles: [@solr_doc.collection_titles[index]]) %>
-              (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
-            <% end %>
-          <% end %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'apo-collection-rights-table', classes: 'mb-5') do |component| %>
+    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'APO, Collection, Rights') %><% end %>
+    <% component.with_row(label: 'Admin policy') do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+        <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+        (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+      <% end %>
+    <% end %>
+    <% component.with_row(label: 'Collection') do |row_component| %>
+      <% row_component.with_cell do %>
+        <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
+          <% collection_title = Array(@solr_doc.collection_titles)[index] %>
+          <%= link_to collection_title, object_path(druid: collection_druid) %>
+          <% search_form = SearchForm.new(collection_titles: [collection_title]) %>
+          (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
         <% end %>
       <% end %>
-    </div>
-  </div>
+    <% end %>
+    <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
+    <% component.with_row(label: 'Embargo', value: @cocina_model.embargo) %>
+    <% component.with_row(label: 'License', value: @cocina_model.license) %>
+  <% end %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'identification-table', classes: 'mb-5') do |component| %>
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Identification') %><% end %>
@@ -40,11 +42,12 @@
     <% component.with_row(label: 'DOI', value: @solr_doc.doi) %>
   <% end %>
 
-  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'access-table', classes: 'mb-5') do |component| %>
-    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Access') %><% end %>
-    <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
-    <% component.with_row(label: 'Embargo', value: @cocina_model.embargo) %>
-    <% component.with_row(label: 'License', value: @cocina_model.license) %>
+  <% if @cocina_model.catalog_link_part_label.present? || @cocina_model.catalog_link_sort_key.present? %>
+    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'folio-table', classes: 'mb-5') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Folio') %><% end %>
+      <% component.with_row(label: 'Part label', value: @cocina_model.catalog_link_part_label) %>
+      <% component.with_row(label: 'Sort key', value: @cocina_model.catalog_link_sort_key) %>
+    <% end %>
   <% end %>
 
   <div class="use-access-copyright-section d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
