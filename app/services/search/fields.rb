@@ -26,6 +26,7 @@ module Search
     FILE_ROLES = 'content_file_roles_ssimdv'
     FIRST_SHELVED_IMAGE = 'first_shelved_image_ss'
     FORMATS = 'format_ssimdv'
+    FORMATTED_DEPOSITED_LATEST_DATE = 'formatted_deposited_latest_ss'
     FORMATTED_EARLIEST_ACCESSIONED_DATE = 'formatted_accessioned_earliest_ss'
     FORMATTED_EMBARGO_RELEASE_DATE = 'formatted_embargo_release_ss'
     FORMATTED_PUBLISHED_EARLIEST_DATE = 'formatted_published_earliest_ss'
