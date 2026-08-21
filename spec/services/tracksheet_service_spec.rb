@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe TracksheetService do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:druid) { 'druid:bc123df4567' }
   let(:solr_doc) { { Search::Fields::ID => druid, Search::Fields::TITLE => title } }
   let(:presenter) { SolrDocPresenter.new(solr_doc:) }
@@ -110,8 +112,10 @@ RSpec.describe TracksheetService do
       end
     end
 
-    it 'always includes a date printed row' do
-      expect(call.map(&:first)).to include('Date Printed:')
+    it 'includes the date printed in Pacific Time' do
+      travel_to(Time.zone.parse('2026-07-29 21:56:58 UTC')) do
+        expect(call).to include(['Date Printed:', '2026-07-29 14:56:58 PT'])
+      end
     end
   end
 end

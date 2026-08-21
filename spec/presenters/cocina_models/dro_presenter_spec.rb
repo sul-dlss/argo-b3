@@ -75,7 +75,7 @@ RSpec.describe CocinaModels::DroPresenter do
       let(:embargo_download) { 'none' }
 
       it 'returns the embargo date with view and download values' do
-        expect(presenter.embargo).to eq('June 01, 2026 12:00 AM - View: World, Download: None')
+        expect(presenter.embargo).to eq('2026-06-01 - View: World, Download: None')
       end
     end
 
@@ -87,7 +87,7 @@ RSpec.describe CocinaModels::DroPresenter do
       let(:embargo_location) { 'stanford' }
 
       it 'appends the location to the embargo view access' do
-        expect(presenter.embargo).to eq('June 01, 2026 12:00 AM - View: Location (stanford), Download: None')
+        expect(presenter.embargo).to eq('2026-06-01 - View: Location (stanford), Download: None')
       end
     end
 
@@ -99,7 +99,7 @@ RSpec.describe CocinaModels::DroPresenter do
       let(:embargo_location) { 'stanford' }
 
       it 'appends the location to the embargo download access' do
-        expect(presenter.embargo).to eq('June 01, 2026 12:00 AM - View: Stanford, Download: Location (stanford)')
+        expect(presenter.embargo).to eq('2026-06-01 - View: Stanford, Download: Location (stanford)')
       end
     end
   end

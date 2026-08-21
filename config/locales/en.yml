@@ -30,7 +30,8 @@
 en:
   time:
     formats:
-      long: "%B %d, %Y %I:%M %p"
+      date_only: "%Y-%m-%d"
+      date_time: "%Y-%m-%d %H:%M:%S PT"
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
   release_tags:

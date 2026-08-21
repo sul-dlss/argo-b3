@@ -9,7 +9,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     described_class.new(bulk_actions: [bulk_action, bulk_action_with_files])
   end
 
-  let(:bulk_action) { create(:bulk_action, action_type: :reindex, description: 'Test description') }
+  let(:bulk_action) do
+    create(:bulk_action, action_type: :reindex, description: 'Test description',
+                         created_at: Time.zone.parse('2026-04-16T10:00:00Z'))
+  end
   let(:bulk_action_with_files) do
     create(:bulk_action, :with_log, :with_export,
            action_type: :export_cocina_json,
@@ -28,6 +31,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(table).to have_css('tbody tr', count: 2)
 
     bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
+    expect(bulk_action_row).to have_css('td:nth-of-type(1)', text: '2026-04-16 03:00:00 PT')
     expect(bulk_action_row).to have_css('td:nth-of-type(2)', text: BulkActions::REINDEX.label)
     expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: 'Test description')
     expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Created')

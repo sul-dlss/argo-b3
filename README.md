@@ -342,9 +342,14 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 ## Conventions
 
 ### Dates / times
-All dates / times should be rendered in one of the formats defined in `en.yml` and in the "Pacific Time (US & Canada)" time zone.
+Application-rendered dates / times should use one of these formats, which are defined in `en.yml`:
 
-See the `format_datetime` helper.
+* `date_only`: `YYYY-MM-DD` (for example, `2026-07-29`)
+* `date_time`: `YYYY-MM-DD HH:MM:SS PT` (for example, `2026-07-29 14:56:58 PT`)
+
+Use the `format_datetime` helper, which defaults to `date_time` and renders values in the "Pacific Time (US & Canada)" time zone. Pass `format: :date_only` for a date without a time. The `PT` label is intentionally used year-round while the underlying time observes daylight saving time.
+
+CSV report values are an exception because Argo receives them as preformatted values from Solr. Machine-readable dates / times, such as Solr query values, repository API values, and HTTP headers, should continue to use the format required by their protocol.
 
 ### Notifications
 
