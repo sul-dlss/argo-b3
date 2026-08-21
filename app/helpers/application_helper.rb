@@ -15,7 +15,7 @@ module ApplicationHelper
     I18n.t("search.facet_values.#{value}", default: value.to_s.humanize)
   end
 
-  def format_datetime(datetime, format: :long)
+  def format_datetime(datetime, format: :date_time)
     return if datetime.blank?
 
     I18n.l(datetime.in_time_zone('Pacific Time (US & Canada)'), format:)

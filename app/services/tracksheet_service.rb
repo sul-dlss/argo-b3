@@ -6,6 +6,8 @@ require 'barby/outputter/prawn_outputter'
 
 # Generates a Prawn PDF tracking sheet for a single digital object.
 class TracksheetService
+  include ApplicationHelper
+
   # Directory containing the vendored TrueType fonts used to render the PDF.
   # A TTF font is required (instead of Prawn's built-in AFM fonts) so that
   # titles and other metadata containing UTF-8 characters can be rendered
@@ -131,7 +133,7 @@ class TracksheetService
     barcode = solr_doc_presenter.barcodes&.first
     table_data.push(['Barcode:', barcode]) if barcode.present?
 
-    table_data.push(['Date Printed:', Time.zone.now.strftime('%c')])
+    table_data.push(['Date Printed:', format_datetime(Time.zone.now)])
     table_data
   end
 

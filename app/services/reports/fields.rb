@@ -25,7 +25,7 @@ module Reports
     ACCESSIONED_DATE = Config.new(
       field: Search::Fields::FORMATTED_EARLIEST_ACCESSIONED_DATE,
       label: 'Accessioned date',
-      help_text: 'For example: 2020-09-15 08:33:01 PM'
+      help_text: 'For example: 2020-09-15 20:33:01 PT'
     )
 
     APO_DRUID = Config.new(
@@ -103,7 +103,7 @@ module Reports
     EMBARGO_RELEASE_DATE = Config.new(
       field: Search::Fields::FORMATTED_EMBARGO_RELEASE_DATE,
       label: 'Embargo release date',
-      help_text: 'For example: 2025-12-04 04:00:00 PM'
+      help_text: 'For example: 2025-12-04'
     )
 
     FILE_COUNT = Config.new(
@@ -157,7 +157,7 @@ module Reports
     PUBLISHED_DATE = Config.new(
       field: Search::Fields::FORMATTED_PUBLISHED_EARLIEST_DATE,
       label: 'Published date',
-      help_text: 'For example: 2020-09-15 08:31:34 PM'
+      help_text: 'For example: 2020-09-15 20:31:34 PT'
     )
 
     PUBLISHER = Config.new(
@@ -181,7 +181,7 @@ module Reports
     REGISTERED_DATE = Config.new(
       field: Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE,
       label: 'Registered date',
-      help_text: 'For example: 2020-09-15 08:31:27 PM'
+      help_text: 'For example: 2020-09-15 20:31:27 PT'
     )
 
     RELEASED_TO = Config.new(

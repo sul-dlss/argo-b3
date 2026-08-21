@@ -4,10 +4,6 @@ require 'rails_helper'
 
 RSpec.describe Show::WorkflowTableComponent, type: :component do
   let(:component) { described_class.new(workflow:, version: 2, processes:) }
-  let(:formatted_datetime) do
-    I18n.l(Time.zone.parse(first_process.datetime).in_time_zone('Pacific Time (US & Canada)'), format: :long)
-  end
-
   let(:workflow) { instance_double(Dor::Services::Response::Workflow, workflow_name: 'accessionWF') }
   let(:first_process) do
     instance_double(Dor::Services::Response::Process,
@@ -43,7 +39,7 @@ RSpec.describe Show::WorkflowTableComponent, type: :component do
     expect(page).to have_css('th', text: 'Elapsed')
     expect(page).to have_css('tbody tr', text: 'accessioning-init')
     expect(page).to have_css('tbody tr', text: 'completed')
-    expect(page).to have_text('April 16, 2026 03:00')
+    expect(page).to have_text('2026-04-16 03:00:00 PT')
     expect(page).to have_text('2 minutes')
     expect(page).to have_css('td.text-danger', text: 'Error: Something went wrong')
     expect(page).to have_css('td.text-success-emphasis', text: 'Note: Retry queued')

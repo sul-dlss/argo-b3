@@ -4,6 +4,7 @@ module BulkActions
   # Superclass of all bulk action jobs
   class BaseJob < ApplicationJob
     include ActionPolicy::Behaviour
+    include ApplicationHelper
 
     attr_reader :bulk_action, :druids
 
@@ -46,7 +47,7 @@ module BulkActions
     end
 
     def log(message)
-      log_file.puts("#{Time.zone.now} #{message}")
+      log_file.puts("#{format_datetime(Time.zone.now)} #{message}")
     end
 
     # Subclasses must implement.

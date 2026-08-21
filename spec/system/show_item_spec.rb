@@ -247,7 +247,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_table_caption('access-table', 'Access')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
-    expect(page).to have_table_value('access-table', 'Embargo', 'June 15, 2040 12:00 PM - View: World, Download: World')
+    expect(page).to have_table_value('access-table', 'Embargo', '2040-06-15 - View: World, Download: World')
 
     # Use and reproduction / Copyright cards
     within('.card', text: 'Use and reproduction') do
@@ -288,7 +288,7 @@ RSpec.describe 'Show item' do
       cells = row.all('td')
       expect(cells[0]).to have_text('described')
       expect(cells[1]).to have_text('skipped')
-      expect(cells[2]).to have_text('June 21, 2023 10:36')
+      expect(cells[2]).to have_text('2023-06-21 10:36:19 PT')
       expect(cells[3]).to have_text('less than a minute')
       expect(page).to have_css('td.text-success-emphasis', text: 'Note: No descMetadata.xml was provided')
 
@@ -323,17 +323,17 @@ RSpec.describe 'Show item' do
     cells = row.all('td')
     expect(cells[0]).to have_text('Initial version')
     expect(cells[1]).to have_text('')
-    expect(cells[2]).to have_text('February 28, 2020 12:23 PM')
-    expect(cells[3]).to have_text('February 28, 2020 12:23 PM')
-    expect(cells[4]).to have_text('February 28, 2020 01:02 PM')
+    expect(cells[2]).to have_text('2020-02-28 12:23:30 PT')
+    expect(cells[3]).to have_text('2020-02-28 12:23:35 PT')
+    expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
 
     row = find_table_row('versions-table', '2')
     cells = row.all('td')
     expect(cells[0]).to have_text('Second version')
     expect(cells[1]).to have_text('1')
-    expect(cells[2]).to have_text('March 31, 2021 01:23 PM')
-    expect(cells[3]).to have_text('March 31, 2021 01:23 PM')
-    expect(cells[4]).to have_text('March 31, 2021 02:02 PM')
+    expect(cells[2]).to have_text('2021-03-31 13:23:30 PT')
+    expect(cells[3]).to have_text('2021-03-31 13:23:35 PT')
+    expect(cells[4]).to have_text('2021-03-31 14:02:03 PT')
 
     # Files tab
     click_button 'Files'

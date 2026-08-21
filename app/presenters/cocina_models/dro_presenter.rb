@@ -19,7 +19,7 @@ module CocinaModels
 
       display_view = display_view(view: embargo_view, location: embargo_location)
       display_download = display_download(download: embargo_download, location: embargo_location)
-      "#{format_datetime(embargo_release_date)} - #{display_view}, #{display_download}"
+      "#{format_datetime(embargo_release_date, format: :date_only)} - #{display_view}, #{display_download}"
     end
 
     private

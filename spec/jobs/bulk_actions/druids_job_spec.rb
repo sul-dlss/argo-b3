@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe BulkActions::DruidsJob do
+  include ActiveSupport::Testing::TimeHelpers
+
   # Setting count fields to ensure that they are reset.
   let(:bulk_action) { create(:bulk_action, druid_count_success: 100, druid_count_fail: 100, druid_count_total: 100) }
   let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222] }
@@ -10,6 +12,8 @@ RSpec.describe BulkActions::DruidsJob do
   let(:export_file) { instance_double(File, close: true) }
 
   before do
+    travel_to(Time.zone.parse('2026-07-29 21:56:58 UTC'))
+
     bulk_action_job_class = Class.new(described_class)
     stub_const('TestBulkActionJob', bulk_action_job_class)
 
@@ -44,7 +48,8 @@ RSpec.describe BulkActions::DruidsJob do
       expect(TestBulkActionJob::JobItem).to have_received(:new).with(druid: druids.second, index: 1,
                                                                      job: instance_of(TestBulkActionJob))
 
-      expect(log).to have_received(:puts).with(/Starting TestBulkActionJob for BulkAction #{bulk_action.id}/)
+      expect(log).to have_received(:puts)
+        .with("2026-07-29 14:56:58 PT Starting TestBulkActionJob for BulkAction #{bulk_action.id}")
       expect(log).to have_received(:puts).with(/Finished TestBulkActionJob for BulkAction #{bulk_action.id}/)
       expect(log).to have_received(:puts).with(/Success: Testing successful for #{druids.first}/o)
       expect(log).to have_received(:puts).with(/Error: Testing failed for #{druids.second}/o)
