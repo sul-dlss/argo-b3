@@ -28,5 +28,9 @@ module AuthenticationHelpers
   RSpec.configure do |config|
     config.include AuthenticationHelpers, type: :system
     config.include AuthenticationHelpers, type: :request
+
+    config.before do
+      create(:permission, :admin, workgroup: ADMIN_GROUP)
+    end
   end
 end
