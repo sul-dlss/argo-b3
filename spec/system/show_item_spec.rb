@@ -21,17 +21,19 @@ RSpec.describe 'Show item' do
 
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                   release_tags: release_tags_client,
                                                    user_version: user_version_client, lock: 'lock1')
   end
   let(:version_client) do
     instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)
   end
   let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: true)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: true,
+                                                                         version: 2)
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones) }
-
+  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: release_tags) }
   let(:version_inventory) do
     [
       Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
@@ -59,6 +61,15 @@ RSpec.describe 'Show item' do
       { milestone: 'published', at: '2021-03-31 21:01:20 +0000', version: '2' },
       { milestone: 'deposited', at: '2021-03-31 21:01:51 +0000', version: '2' },
       { milestone: 'accessioned', at: '2021-03-31 21:02:03 +0000', version: '2' }
+    ]
+  end
+
+  let(:release_tags) do
+    [
+      Dor::Services::Client::ReleaseTag.new(to: 'Searchworks', what: 'self', release: true,
+                                            date: '2026-08-01T21:02:03Z'),
+      Dor::Services::Client::ReleaseTag.new(to: 'PURL sitemap', what: 'self', release: true,
+                                            date: '2026-08-01T21:02:03Z')
     ]
   end
 
@@ -185,6 +196,11 @@ RSpec.describe 'Show item' do
     # Status box
     expect(page).to have_css('h2', text: 'Deposited')
     expect(page).to have_css('h2 i.bi-check-circle-fill')
+
+    # Released to box
+    expect(page).to have_css('h2', text: 'Released to')
+    expect(page).to have_link('Searchworks', href: 'https://searchworks.stanford.edu/view/a6525053')
+    expect(page).to have_link('PURL sitemap', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
 
     expect(page).to have_link('← Back to search', href: /search\?page=5&query=test/)
 

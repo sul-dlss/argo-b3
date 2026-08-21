@@ -67,6 +67,10 @@ RSpec.describe 'Show admin policy' do
     # No PURL link for admin policies
     expect(page).to have_no_link('View PURL page')
 
+    # No released to box for admin policies
+    expect(page).to have_no_css('h2', text: 'Released to')
+    expect(page).to have_no_css('h2', text: 'Not released')
+
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'Workflows')

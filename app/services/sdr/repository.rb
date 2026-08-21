@@ -118,5 +118,12 @@ module Sdr
     rescue Dor::Services::Client::Error => e
       raise Error, "Creating release tag failed: #{e.message}"
     end
+
+    # @param [String] druid the druid of the object
+    def self.release_tags(druid:)
+      Dor::Services::Client.object(druid).release_tags.list(public: true)
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object not found: #{druid}"
+    end
   end
 end

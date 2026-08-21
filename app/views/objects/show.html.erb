@@ -58,15 +58,11 @@
         <div class="show-box flex-fill">
           <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter) %>
         </div>
-        <div class="show-box flex-fill">
-          <%= render Show::BoxComponent.new(heading: 'Released to') do %>
-            <ul>
-              <li>SearchWorks</li>
-              <li>EarthWorks</li>
-              <li>PURL Sitemap</li>
-            </ul>
-          <% end %>
-        </div>
+        <% if @solr_doc.dro_or_collection? %>
+          <div class="show-box flex-fill">
+            <%= render Show::ReleasedToComponent.new(object_released_presenter: @object_released_presenter) %>
+          </div>
+        <% end %>
         <div class="show-box flex-fill">
           <%= render Show::BoxComponent.new(heading: 'Tags') do %>
             <ul>

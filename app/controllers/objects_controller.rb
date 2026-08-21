@@ -22,7 +22,7 @@ class ObjectsController < ApplicationController
   # keeps the frame actions themselves unaware of the lock: they just read whatever is in the cache,
   # trusting that this action (which always runs moments before them, as the parent page load) has
   # already made it fresh.
-  def show
+  def show # rubocop:disable Metrics/AbcSize
     druid = params[:druid]
     lock = Sdr::Repository.lock(druid:)
 
@@ -35,7 +35,10 @@ class ObjectsController < ApplicationController
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
     content = Content.find_by(druid:, lock:, immutable: false)
-    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:, content:)
+    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:,
+                                                         content:)
+    release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []
+    @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
   end
 
   def show_header
