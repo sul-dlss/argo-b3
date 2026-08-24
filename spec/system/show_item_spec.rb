@@ -73,7 +73,7 @@ RSpec.describe 'Show item' do
     ]
   end
 
-  def build_solr_doc(title:)
+  def build_solr_doc(title:, last_deposited: '2026-07-26')
     {
       Search::Fields::ID => druid,
       Search::Fields::OBJECT_TYPES => ['item'],
@@ -88,17 +88,33 @@ RSpec.describe 'Show item' do
       Search::Fields::BARCODES => ['bb123cd4567'],
       Search::Fields::DOI => 'https://doi.org/10.5072/bb123cd4567',
       Search::Fields::CONTENT_TYPES => ['book'],
+      Search::Fields::STATUS => 'v2 deposited',
+      Search::Fields::HUMAN_PRESERVED_SIZE => '30 MB',
+      Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE => '2025-01-08',
+      Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => last_deposited,
       Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
 
-  def build_cocina_object(title:, access: {})
+  def build_cocina_object(title:, access: {}, part_label: 'Part 1', sort_key: '001')
     file_access = { view: access.fetch(:view, 'dark'), download: access.fetch(:download, 'none') }
     file_shelve = file_access[:view] != 'dark'
 
     build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
       .new(
+        identification: {
+          sourceId: 'googlebooks:stanford_36105114203446',
+          catalogLinks: [
+            {
+              catalog: 'folio',
+              catalogRecordId: 'a6525053',
+              refresh: true,
+              partLabel: part_label,
+              sortKey: sort_key
+            }.compact
+          ]
+        },
         structural: {
           isMemberOf: [collection_druid],
           contains: [
@@ -215,15 +231,22 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('.nav-link', text: 'Description Preview')
 
     # Overview table
-    expect(page).to have_table_caption('overview-table-left', 'Overview')
-    expect(page).to have_table_value('overview-table-left', 'Object type', 'Item')
-    expect(page).to have_table_value('overview-table-left', 'Content type', 'Book')
-    within(find_table_value_cell('overview-table-right', 'Admin policy')) do
+    expect(page).to have_table_caption('overview-table', 'Overview')
+    expect(page).to have_table_value('overview-table', 'Druid', 'bb123cd4567')
+    expect(page).to have_table_value('overview-table', 'Content type', 'Book')
+    expect(page).to have_table_value('overview-table', 'Status', 'v2 deposited')
+    expect(page).to have_table_value('overview-table', 'Preservation size', '30 MB')
+    expect(page).to have_table_value('overview-table', 'Registered', '2025-01-08')
+    expect(page).to have_table_value('overview-table', 'Last deposited', '2026-07-26')
+
+    # APO, Collection, Rights table
+    expect(page).to have_table_caption('apo-collection-rights-table', 'APO, Collection, Rights')
+    within(find_table_value_cell('apo-collection-rights-table', 'Admin policy')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
     end
-    within(find_table_value_cell('overview-table-right', 'Collection')) do
+    within(find_table_value_cell('apo-collection-rights-table', 'Collection')) do
       expect(page).to have_link('My Collection', href: "/objects/#{collection_druid}")
       expect(page).to have_link('All objects with this collection',
                                 href: '/search?collection_titles%5B%5D=My+Collection&page=1')
@@ -243,11 +266,16 @@ RSpec.describe 'Show item' do
     expect(page).to have_table_value('identification-table', 'Barcode', 'bb123cd4567')
     expect(page).to have_table_value('identification-table', 'DOI', 'https://doi.org/10.5072/bb123cd4567')
 
-    # Access table
-    expect(page).to have_table_caption('access-table', 'Access')
-    expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
-    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
-    expect(page).to have_table_value('access-table', 'Embargo', '2040-06-15 - View: World, Download: World')
+    # Access rows
+    expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: Dark, Download: None')
+    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
+    expect(page).to have_table_value('apo-collection-rights-table', 'Embargo',
+                                     '2040-06-15 - View: World, Download: World')
+
+    # Folio table
+    expect(page).to have_table_caption('serials-table', 'Serials')
+    expect(page).to have_table_value('serials-table', 'Part label', 'Part 1')
+    expect(page).to have_table_value('serials-table', 'Sort key', '001')
 
     # Use and reproduction / Copyright cards
     within('.card', text: 'Use and reproduction') do
@@ -356,23 +384,30 @@ RSpec.describe 'Show item' do
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
     # Update the object and look for changes.
-    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
+    allow(Sdr::Repository).to receive(:find_solr)
+      .and_return(build_solr_doc(title: updated_title, last_deposited: nil))
     allow(Sdr::Repository).to receive(:find)
-      .and_return(build_cocina_object(title: updated_title, access: {
+      .and_return(build_cocina_object(title: updated_title,
+                                      access: {
                                         view: 'world',
                                         download: 'world',
                                         copyright: 'My updated copyright statement',
                                         license: 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
                                         useAndReproductionStatement: 'My updated use statement'
-                                      }))
+                                      },
+                                      part_label: 'Part 2',
+                                      sort_key: nil))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
     expect(page).to have_css('h1', text: updated_title, wait: 15)
 
     click_button 'Overview'
-    expect(page).to have_table_value('access-table', 'Access rights', 'View: World, Download: World')
-    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
+    expect(find_table('overview-table')).to have_no_css('th', text: 'Last deposited')
+    expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: World, Download: World')
+    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
+    expect(page).to have_table_value('serials-table', 'Part label', 'Part 2')
+    expect(find_table('serials-table')).to have_no_css('th', text: 'Sort key')
     within('.card', text: 'Use and reproduction') do
       expect(page).to have_css('.card-text', text: 'My updated use statement')
     end
