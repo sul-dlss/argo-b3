@@ -24,7 +24,10 @@
         <% end %>
       </div>
 
-      <%= render Show::EmbargoBannerComponent.new(release_date: @solr_doc.formatted_embargo_release_date) %>
+      <%= render Show::EmbargoBannerComponent.new(
+            release_date: @solr_doc.formatted_embargo_release_date,
+            edit_path: (edit_object_embargo_path(@solr_doc.druid) if allowed_to?(:edit?, @solr_doc, with: ObjectPolicy))
+          ) %>
     <% end %>
 
     <% layout.with_left_content do %>

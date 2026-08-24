@@ -24,7 +24,7 @@ module CocinaObjectMutators
         access_hash.delete(:embargo)
       else
         access_hash[:embargo] = {
-          releaseDate: cocina_model.embargo_release_date,
+          releaseDate: cocina_model.embargo_release_date.to_datetime,
           view: cocina_model.embargo_view,
           download: cocina_model.embargo_download,
           location: cocina_model.embargo_location

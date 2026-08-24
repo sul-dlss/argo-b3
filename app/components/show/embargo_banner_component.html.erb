@@ -1,4 +1,11 @@
 <div class="embargo-banner bg-black text-white text-center py-2">
   <h2>Embargoed until <%= formatted_release_date %>
-  <i class="bi bi-pencil ms-1" aria-hidden="true"></i></h2>
+  <% if edit_path %>
+    <%= link_to edit_path, class: 'text-white ms-1', aria: { label: 'Edit embargo release date' } do %>
+      <i class="bi bi-pencil" aria-hidden="true"></i>
+    <% end %>
+  <% else %>
+    <i class="bi bi-pencil ms-1" aria-hidden="true"></i>
+  <% end %>
+  </h2>
 </div>
