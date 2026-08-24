@@ -1,5 +1,9 @@
 // Object show page
 .object-show {
+  .embargo-banner {
+    margin-inline: calc(50% - 50vw);
+  }
+
   .show-box {
     max-width: 300px;
 
