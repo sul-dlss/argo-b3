@@ -191,6 +191,8 @@ Rails.application.routes.draw do
   get '/view/:druid', to: redirect('/objects/%{druid}')
 
   resources :objects, only: %i[show], param: :druid do
+    resource :embargo, only: %i[edit update], controller: 'embargoes'
+
     member do
       get 'track', to: 'objects#track'
       get 'overview', to: 'objects#show_overview'
