@@ -30,7 +30,7 @@ module AuthenticationHelpers
     config.include AuthenticationHelpers, type: :request
 
     config.before do
-      create(:permission, :admin, workgroup: ADMIN_GROUP)
+      Permission.find_or_create_by!(workgroup: ADMIN_GROUP, permission_type: :admin)
     end
   end
 end
