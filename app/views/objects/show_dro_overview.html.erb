@@ -47,7 +47,7 @@
   <%# NOTE: A Cocina object can have a partLabel without a sortKey. %>
   <%# A sortKey should always have a partLabel. %>
   <% if @cocina_model.catalog_link_part_label.present? %>
-    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'folio-table', classes: 'mb-5') do |component| %>
+    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'serials-table', classes: 'mb-5') do |component| %>
       <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Serials') %><% end %>
       <% component.with_row(label: 'Part label', value: @cocina_model.catalog_link_part_label) %>
       <% if @cocina_model.catalog_link_sort_key.present? %>
