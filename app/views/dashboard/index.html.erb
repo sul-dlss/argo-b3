@@ -71,11 +71,9 @@
         <% component.with_row(values: ['1947 Partition', 'bb234ab123', 'APO', nil]) %>
       <% end %>
 
-      <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Pinned searches', classes: 'mb-5', responsive: true) do |component| %>
-        <% component.with_header(label: 'Search') %>
-        <% component.with_header(label: 'Unpin') %>
-        <% component.with_row(values: ['heart mountain; Exclude Google Books > Yes; Collection > James Omura papers: 1912-1995', nil]) %>
-      <% end %>
+      <div class="mb-5">
+        <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
+      </div>
 
       <div class="mb-5">
         <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>

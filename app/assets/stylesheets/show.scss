@@ -81,3 +81,7 @@
 .object-type-virtual-object {
   @include object-type-colors($virtual-object-color, $virtual-object-color-rgb);
 }
+
+.object-type-search {
+  @include object-type-colors($search-color, $search-color-rgb);
+}

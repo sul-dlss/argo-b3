@@ -21,6 +21,7 @@ class DashboardController < ApplicationController
   def index
     @go_to_druid_form = GoToDruidForm.new
     set_pinned_object_docs
+    set_pinned_searches
   end
 
   def go_to_druid
@@ -30,11 +31,16 @@ class DashboardController < ApplicationController
       redirect_to object_path(@go_to_druid_form.druid)
     else
       set_pinned_object_docs
+      set_pinned_searches
       render :index, status: :unprocessable_content
     end
   end
 
   private
+
+  def set_pinned_searches
+    @pinned_searches = PinnedSearch.where(user: current_user)
+  end
 
   def set_pinned_object_docs
     pinned_object_druids = PinnedObject.where(user: current_user).pluck(:druid)
