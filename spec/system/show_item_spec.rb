@@ -73,7 +73,7 @@ RSpec.describe 'Show item' do
     ]
   end
 
-  def build_solr_doc(title:)
+  def build_solr_doc(title:, last_deposited: '2026-07-26')
     {
       Search::Fields::ID => druid,
       Search::Fields::OBJECT_TYPES => ['item'],
@@ -91,7 +91,7 @@ RSpec.describe 'Show item' do
       Search::Fields::STATUS => 'v2 deposited',
       Search::Fields::HUMAN_PRESERVED_SIZE => '30 MB',
       Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE => '2025-01-08',
-      Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => '2026-07-26',
+      Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => last_deposited,
       Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -273,7 +273,7 @@ RSpec.describe 'Show item' do
                                      '2040-06-15 - View: World, Download: World')
 
     # Folio table
-    expect(page).to have_table_caption('folio-table', 'Folio')
+    expect(page).to have_table_caption('folio-table', 'Serials')
     expect(page).to have_table_value('folio-table', 'Part label', 'Part 1')
     expect(page).to have_table_value('folio-table', 'Sort key', '001')
 
@@ -384,7 +384,8 @@ RSpec.describe 'Show item' do
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
     # Update the object and look for changes.
-    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
+    allow(Sdr::Repository).to receive(:find_solr)
+      .and_return(build_solr_doc(title: updated_title, last_deposited: nil))
     allow(Sdr::Repository).to receive(:find)
       .and_return(build_cocina_object(title: updated_title,
                                       access: {
@@ -394,7 +395,7 @@ RSpec.describe 'Show item' do
                                         license: 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
                                         useAndReproductionStatement: 'My updated use statement'
                                       },
-                                      part_label: nil,
+                                      part_label: 'Part 2',
                                       sort_key: nil))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
@@ -402,9 +403,11 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('h1', text: updated_title, wait: 15)
 
     click_button 'Overview'
+    expect(find_table('overview-table')).to have_no_css('th', text: 'Last deposited')
     expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: World, Download: World')
     expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
-    expect(page).to have_no_table('folio-table')
+    expect(page).to have_table_value('folio-table', 'Part label', 'Part 2')
+    expect(find_table('folio-table')).to have_no_css('th', text: 'Sort key')
     within('.card', text: 'Use and reproduction') do
       expect(page).to have_css('.card-text', text: 'My updated use statement')
     end

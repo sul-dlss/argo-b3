@@ -6,7 +6,9 @@
     <% component.with_row(label: 'Status', value: @solr_doc.status) %>
     <% component.with_row(label: 'Preservation size', value: @solr_doc.human_preserved_size) %>
     <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>
-    <% component.with_row(label: 'Last deposited', value: format_datetime(@solr_doc.formatted_deposited_latest_date, format: :date_time)) %>
+    <% if @solr_doc.formatted_deposited_latest_date.present? %>
+      <% component.with_row(label: 'Last deposited', value: format_datetime(@solr_doc.formatted_deposited_latest_date, format: :date_time)) %>
+    <% end %>
   <% end %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'apo-collection-rights-table', classes: 'mb-5') do |component| %>
@@ -42,11 +44,15 @@
     <% component.with_row(label: 'DOI', value: @solr_doc.doi) %>
   <% end %>
 
-  <% if @cocina_model.catalog_link_part_label.present? || @cocina_model.catalog_link_sort_key.present? %>
+  <%# NOTE: A Cocina object can have a partLabel without a sortKey. %>
+  <%# A sortKey should always have a partLabel. %>
+  <% if @cocina_model.catalog_link_part_label.present? %>
     <%= render SdrViewComponents::Tables::TableComponent.new(id: 'folio-table', classes: 'mb-5') do |component| %>
-      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Folio') %><% end %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Serials') %><% end %>
       <% component.with_row(label: 'Part label', value: @cocina_model.catalog_link_part_label) %>
-      <% component.with_row(label: 'Sort key', value: @cocina_model.catalog_link_sort_key) %>
+      <% if @cocina_model.catalog_link_sort_key.present? %>
+        <% component.with_row(label: 'Sort key', value: @cocina_model.catalog_link_sort_key) %>
+      <% end %>
     <% end %>
   <% end %>
 
