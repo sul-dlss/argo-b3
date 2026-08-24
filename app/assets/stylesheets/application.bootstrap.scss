@@ -9,6 +9,8 @@ $agreement-color-rgb: var(--stanford-palo-verde-light-rgb);
 $agreement-color: rgb(#{$agreement-color-rgb});
 $virtual-object-color-rgb: var(--stanford-olive-light-rgb);
 $virtual-object-color: rgb(#{$virtual-object-color-rgb});
+$search-color-rgb: var(--stanford-plum-light-rgb);
+$search-color: rgb(#{$search-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
