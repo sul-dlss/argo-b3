@@ -5,8 +5,9 @@ module Show
   class EmbargoBannerComponent < ApplicationComponent
     include ApplicationHelper
 
-    def initialize(release_date:)
+    def initialize(release_date:, edit_path: nil)
       @release_date = release_date
+      @edit_path = edit_path
       super()
     end
 
@@ -20,6 +21,6 @@ module Show
 
     private
 
-    attr_reader :release_date
+    attr_reader :edit_path, :release_date
   end
 end
