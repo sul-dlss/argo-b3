@@ -1,0 +1,25 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Edit embargo release date', classes: 'mb-3') %>
+
+  <p><%= @embargo_form.druid %></p>
+
+  <%= form_with model: @embargo_form, url: object_embargo_path(@embargo_form.druid), method: :patch do |form| %>
+    <div class="mb-3">
+      <%= form.label :embargo_release_date, 'Embargo release date', class: 'form-label fw-bold' %>
+      <%= form.date_field :embargo_release_date,
+                          class: class_names('form-control', 'is-invalid': @embargo_form.errors[:embargo_release_date].present?),
+                          required: true,
+                          aria: { describedby: ('embargo_form_embargo_release_date_error' if @embargo_form.errors[:embargo_release_date].present?) } %>
+      <% if @embargo_form.errors[:embargo_release_date].present? %>
+        <div id="embargo_form_embargo_release_date_error" class="invalid-feedback">
+          <%= @embargo_form.errors[:embargo_release_date].join(', ') %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save') %>
+      <%= link_to 'Cancel', object_path(@embargo_form.druid) %>
+    </div>
+  <% end %>
+</div>
