@@ -266,12 +266,11 @@ RSpec.describe 'Show item' do
     expect(page).to have_table_value('identification-table', 'Barcode', 'bb123cd4567')
     expect(page).to have_table_value('identification-table', 'DOI', 'https://doi.org/10.5072/bb123cd4567')
 
-    # Access table
-    expect(page).to have_table_caption('access-table', 'Access')
-    expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark, Download: None')
-    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
-    expect(page).to have_table_value('access-table', 'Embargo',
-                                     'June 15, 2040 12:00 PM - View: World, Download: World')
+    # Access rows
+    expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: Dark, Download: None')
+    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
+    expect(page).to have_table_value('apo-collection-rights-table', 'Embargo',
+                                     '2040-06-15 - View: World, Download: World')
 
     # Folio table
     expect(page).to have_table_caption('folio-table', 'Folio')
