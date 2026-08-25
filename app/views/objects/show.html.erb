@@ -79,12 +79,13 @@
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro_or_collection? %>
         <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') if @solr_doc.dro? %>
-        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
-        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
+        <% component.with_tab(id: 'history-tab', pane_id: 'history-pane', label: 'History') %>
+        <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
         <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
-        <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
+        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
+        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
 
         <%= component.with_pane(id: 'overview-pane', tab_id: 'overview-tab', active: true) do %>
           <%= turbo_frame_tag(@solr_doc.druid, 'overview', src: overview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
@@ -108,14 +109,12 @@
           <% end %>
         <% end %>
 
-        <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-            <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-          <% end %>
+        <%= component.with_pane(id: 'history-pane', tab_id: 'history-tab') do %>
+          <p>Not implemented yet</p>
         <% end %>
 
-        <%= component.with_pane(id: 'versions-pane', tab_id: 'versions-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
@@ -128,14 +127,20 @@
           <p>Not implemented yet</p>
         <% end %>
 
-        <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= component.with_pane(id: 'solr-doc-pane', tab_id: 'solr-doc-tab') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'solr_doc', src: solr_doc_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
 
-        <%= component.with_pane(id: 'solr-doc-pane', tab_id: 'solr-doc-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'solr_doc', src: solr_doc_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+        <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+          <% end %>
+        <% end %>
+
+        <%= component.with_pane(id: 'versions-pane', tab_id: 'versions-tab') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
