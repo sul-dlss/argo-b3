@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Controller for managing pinned objects
-class PinnedObjectsController < ApplicationController
+# Controller for managing pinned searches
+class PinnedSearchesController < ApplicationController
   # Any caller of create or destroy will want to include:
   # <% content_for :head do %>
   #   <meta name="turbo-refresh-method" content="morph">
@@ -12,7 +12,10 @@ class PinnedObjectsController < ApplicationController
   skip_verify_authorized
 
   def create
-    PinnedObject.find_or_create_by!(user: current_user, druid: params[:druid])
+    search_form = SearchForm.new(**params.permit(SearchForm.permitted_params))
+    unless PinnedSearch.exists_by_search_form?(search_form:, user: current_user)
+      PinnedSearch.create_from_search_form(search_form:, user: current_user)
+    end
 
     flash[:toast] = t('pinned.pin_added')
 
@@ -20,8 +23,8 @@ class PinnedObjectsController < ApplicationController
   end
 
   def destroy
-    pinned_object = PinnedObject.find_by!(druid: params.expect(:id), user: current_user)
-    pinned_object.destroy!
+    pinned_search = PinnedSearch.find_by!(user: current_user, search_form_md5: params.expect(:id))
+    pinned_search.destroy!
 
     flash[:toast] = t('pinned.pin_removed')
 

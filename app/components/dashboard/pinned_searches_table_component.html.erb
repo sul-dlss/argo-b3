@@ -16,7 +16,7 @@
         <%= search_link(search) %>
       <% end %>
       <% row_component.with_cell do %>
-        <%= helpers.pin_icon(classes: 'pinned') %>
+        <%= render Pin::PinnedSearchComponent.new(search_form: search.to_search_form, pinned: true) %>
       <% end %>
     <% end %>
   <% end %>

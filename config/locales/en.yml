@@ -42,6 +42,9 @@ en:
       # To hide banners, set to ''. Banners can include links or other HTML
       dashboard_html: >-
         Welcome to the new Argo application! View a demo of enhancements that have been developed.
+  pinned:
+    pin_added: 'Pin added'
+    pin_removed: 'Pin removed'
   search:
     # If not provided, will use humanized field name
     facets:

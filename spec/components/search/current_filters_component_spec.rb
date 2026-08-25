@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::CurrentFiltersComponent, type: :component do
-  let(:component) { described_class.new(search_form:) }
+  let(:component) { described_class.new(search_form:, pinned: false) }
 
   context 'when there are current filters' do
     let(:search_form) do
@@ -14,7 +14,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
       )
     end
 
-    it 'renders the current filters' do
+    it 'renders the current filters and the pin button' do
       render_inline(component)
 
       expect(page).to have_css('section[aria-label="Current Filters"]')
@@ -22,6 +22,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
       expect(page).to have_css('li', text: /Object types\s+❯\s+item/)
       expect(page).to have_css('li', text: /Object types\s+❯\s+collection/)
       expect(page).to have_css('li', text: /Projects\s+❯\s+Project 1/)
+      expect(page).to have_button('Pin')
       expect(page).to have_link('Clear all', href: '/search')
     end
   end

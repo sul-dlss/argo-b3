@@ -24,7 +24,7 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
       row = table.find('tbody tr')
       cells = row.all('td')
       expect(cells[0]).to have_link(search_form.to_s, href: search_path(search_form.attributes))
-      expect(cells[1]).to have_css('.bi-pin-fill')
+      expect(cells[1]).to have_button('Unpin')
     end
   end
 
