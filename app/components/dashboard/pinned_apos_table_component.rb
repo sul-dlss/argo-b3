@@ -17,13 +17,13 @@ module Dashboard
     end
 
     def title_link(apo_doc)
-      helpers.link_to(apo_doc.title, object_path(druid: apo_doc.druid))
+      helpers.link_to_object(apo_doc.title, apo_doc.druid)
     end
 
     def agreement_link(apo_doc)
       return if apo_doc.agreement_druid.blank?
 
-      helpers.link_to(apo_doc.agreement_title, object_path(druid: apo_doc.agreement_druid))
+      helpers.link_to_object(apo_doc.agreement_title, apo_doc.agreement_druid)
     end
 
     def classes

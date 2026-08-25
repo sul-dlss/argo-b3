@@ -2,6 +2,10 @@
 
 # Helper for creating links
 module LinkHelper
+  def link_to_object(label, druid, *, data: {}, **)
+    link_to(label, object_path(druid:), data: data.merge(turbo_prefetch: false), **)
+  end
+
   def link_to_new_tab(*, data: {}, **, &)
     link_to(*, target: '_blank', rel: 'noopener', data:, **, &)
   end

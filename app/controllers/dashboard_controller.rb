@@ -18,8 +18,16 @@ class DashboardController < ApplicationController
     Search::Fields::CONSTITUENTS_COUNT
   ].freeze
 
+  RECENT_OBJECT_FIELDS = [
+    Search::Fields::ID,
+    Search::Fields::TITLE,
+    Search::Fields::OBJECT_TYPES,
+    Search::Fields::OTHER_TAGS
+  ].freeze
+
   def index
     @go_to_druid_form = GoToDruidForm.new
+    set_recent_object_docs
     set_pinned_object_docs
     set_pinned_searches
   end
@@ -30,6 +38,7 @@ class DashboardController < ApplicationController
     if @go_to_druid_form.valid?
       redirect_to object_path(@go_to_druid_form.druid)
     else
+      set_recent_object_docs
       set_pinned_object_docs
       set_pinned_searches
       render :index, status: :unprocessable_content
@@ -37,6 +46,20 @@ class DashboardController < ApplicationController
   end
 
   private
+
+  def set_recent_object_docs
+    recent_object_druids = Array(session[:recent_object_druids])
+    @recent_object_docs = if recent_object_druids.present?
+                            recent_object_docs = Searchers::ItemByDruid.call(
+                              druids: recent_object_druids,
+                              fields: RECENT_OBJECT_FIELDS
+                            )
+                            docs_by_druid = recent_object_docs.index_by(&:druid)
+                            recent_object_druids.filter_map { |druid| docs_by_druid[druid] }
+                          else
+                            []
+                          end
+  end
 
   def set_pinned_searches
     @pinned_searches = PinnedSearch.where(user: current_user)

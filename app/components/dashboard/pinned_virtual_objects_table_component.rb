@@ -17,16 +17,16 @@ module Dashboard
     end
 
     def title_link(virtual_object_doc)
-      helpers.link_to(virtual_object_doc.title, object_path(druid: virtual_object_doc.druid))
+      helpers.link_to_object(virtual_object_doc.title, virtual_object_doc.druid)
     end
 
     def apo_link(virtual_object_doc)
-      helpers.link_to(virtual_object_doc.apo_title, object_path(druid: virtual_object_doc.apo_druid))
+      helpers.link_to_object(virtual_object_doc.apo_title, virtual_object_doc.apo_druid)
     end
 
     def collection_link_values(virtual_object_doc)
       Array(virtual_object_doc.collection_druids).map.with_index do |collection_druid, index|
-        helpers.link_to(virtual_object_doc.collection_titles[index], object_path(druid: collection_druid))
+        helpers.link_to_object(virtual_object_doc.collection_titles[index], collection_druid)
       end
     end
 

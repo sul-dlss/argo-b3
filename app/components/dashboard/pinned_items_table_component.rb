@@ -17,16 +17,16 @@ module Dashboard
     end
 
     def title_link(item_doc)
-      helpers.link_to(item_doc.title, object_path(druid: item_doc.druid))
+      helpers.link_to_object(item_doc.title, item_doc.druid)
     end
 
     def apo_link(item_doc)
-      helpers.link_to(item_doc.apo_title, object_path(druid: item_doc.apo_druid))
+      helpers.link_to_object(item_doc.apo_title, item_doc.apo_druid)
     end
 
     def collection_link_values(item_doc)
       Array(item_doc.collection_druids).map.with_index do |collection_druid, index|
-        helpers.link_to(item_doc.collection_titles[index], object_path(druid: collection_druid))
+        helpers.link_to_object(item_doc.collection_titles[index], collection_druid)
       end
     end
 

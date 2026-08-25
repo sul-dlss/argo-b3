@@ -5,8 +5,8 @@
         <% component.with_caption do %>
           <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
             <%= component.with_link do %>
-              <%# Pre-fetch here breaks tests because can be triggered unintentionally. %>
-              <%= helpers.link_to(title, object_path(druid:), data: { turbo_frame: '_top', turbo_prefetch: !Rails.env.test? }) %>
+              <%# Prefetching would record hovered objects as recently viewed. %>
+              <%= helpers.link_to_object(title, druid, data: { turbo_frame: '_top' }) %>
             <% end %>
           <% end %>
         <% end %>
