@@ -1,16 +1,16 @@
 <% if pinned %>
-  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_object_path(druid),
+  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_search_path(search_form_md5),
                                                                       icon: :pin,
                                                                       label: 'Unpin',
                                                                       method: :delete,
                                                                       classes: 'pin pinned',
                                                                       icon_classes: 'fs-4') %>
 <% else %>
-  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_objects_path,
+  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_searches_path,
                                                                       icon: :unpin,
                                                                       label: 'Pin',
                                                                       method: :post,
-                                                                      params: { druid: },
+                                                                      params: search_form.attributes,
                                                                       classes: 'pin not-pinned',
                                                                       icon_classes: 'fs-4') %>
 <% end %>

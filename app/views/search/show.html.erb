@@ -1,6 +1,11 @@
 <%= content_for :title, 'Search page' %>
 
-<%= render Search::CurrentFiltersComponent.new(search_form: @search_form) %>
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: @pinned) %>
 
 <%= render Search::LayoutComponent.new do |layout| %>
   <%= layout.with_main_content do %>
