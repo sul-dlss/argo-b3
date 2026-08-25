@@ -10,8 +10,8 @@ RSpec.describe Show::EmbargoBannerComponent, type: :component do
   it 'renders a full-width black banner with the release date and pencil icon' do
     render_inline(component)
 
-    expect(page).to have_css('.embargo-banner.bg-black.text-white', text: 'Embargoed until 2029-01-01')
-    expect(page).to have_css('.embargo-banner > i.bi-pencil')
+    expect(page).to have_css('.embargo-banner.bg-black.text-white h2', text: 'Embargoed until 2029-01-01')
+    expect(page).to have_css('.embargo-banner h2 > i.bi-pencil')
     expect(page).to have_no_link
   end
 

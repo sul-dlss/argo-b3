@@ -209,8 +209,8 @@ RSpec.describe 'Show item' do
 
     expect(page).to have_css('h1', text: original_title)
     expect(page).to have_css('.object-show.object-type-item .object-type-badge', text: 'ITEM')
-    expect(page).to have_css('.embargo-banner.bg-black.text-white', text: 'Embargoed until 2040-06-15')
-    expect(page).to have_css('.embargo-banner > i.bi-pencil')
+    expect(page).to have_css('.embargo-banner.bg-black.text-white h2', text: 'Embargoed until 2040-06-15')
+    expect(page).to have_css('.embargo-banner h2 > i.bi-pencil')
 
     # Status box
     expect(page).to have_css('h2', text: 'Deposited')
