@@ -77,7 +77,7 @@
 
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
-        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description Preview') if @solr_doc.dro_or_collection? %>
+        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.dro_or_collection? %>
         <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') if @solr_doc.dro? %>
         <% component.with_tab(id: 'history-tab', pane_id: 'history-pane', label: 'History') %>
         <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
