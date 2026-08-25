@@ -1,5 +1,19 @@
 // Object show page
 .object-show {
+  .embargo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+
+    h2 {
+      margin-bottom: 0;
+    }
+  }
+
   .show-box {
     max-width: 300px;
 

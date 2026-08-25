@@ -92,6 +92,7 @@ RSpec.describe 'Show item' do
       Search::Fields::HUMAN_PRESERVED_SIZE => '30 MB',
       Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE => '2025-01-08',
       Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => last_deposited,
+      Search::Fields::FORMATTED_EMBARGO_RELEASE_DATE => '2040-06-15 12:00:00 PM',
       Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -208,6 +209,8 @@ RSpec.describe 'Show item' do
 
     expect(page).to have_css('h1', text: original_title)
     expect(page).to have_css('.object-show.object-type-item .object-type-badge', text: 'ITEM')
+    expect(page).to have_css('.embargo-banner.bg-black.text-white h2', text: 'Embargoed until 2040-06-15')
+    expect(page).to have_css('.embargo-banner h2 > i.bi-pencil')
 
     # Status box
     expect(page).to have_css('h2', text: 'Deposited')

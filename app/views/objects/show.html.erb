@@ -22,6 +22,8 @@
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-xl-4 mb-3') %>
         <% end %>
       </div>
+
+      <%= render Show::EmbargoBannerComponent.new(release_date: @solr_doc.formatted_embargo_release_date) %>
     <% end %>
 
     <% layout.with_left_content do %>
