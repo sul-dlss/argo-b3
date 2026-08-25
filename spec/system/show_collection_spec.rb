@@ -85,7 +85,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
-    expect(page).to have_css('.nav-link', text: 'Description Preview')
+    expect(page).to have_css('.nav-link', text: 'Description preview')
 
     # PURL link in side nav
     expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
@@ -126,7 +126,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('andypf-json-viewer', text: original_title)
 
     # PURL preview tab
-    click_button 'Description Preview'
+    click_button 'Description preview'
     expect(page).to have_css('p', text: 'preview')
     expect(page).to have_link('View PURL page',
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)

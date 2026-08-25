@@ -222,13 +222,14 @@ RSpec.describe 'Show item' do
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
+    expect(page).to have_css('.nav-link', text: 'History')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Files')
     expect(page).to have_css('.nav-link', text: 'Technical metadata')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
-    expect(page).to have_css('.nav-link', text: 'Description Preview')
+    expect(page).to have_css('.nav-link', text: 'Description preview')
 
     # Overview table
     expect(page).to have_table_caption('overview-table', 'Overview')
@@ -378,7 +379,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('li', text: 'rr624wq8610_00_0001.jp2')
 
     # PURL preview tab
-    click_button 'Description Preview'
+    click_button 'Description preview'
     expect(page).to have_css('p', text: 'preview')
     expect(page).to have_link('View PURL page',
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)

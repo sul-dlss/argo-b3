@@ -73,12 +73,13 @@ RSpec.describe 'Show admin policy' do
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
+    expect(page).to have_css('.nav-link', text: 'History')
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
-    expect(page).to have_no_css('.nav-link', text: 'Description Preview')
+    expect(page).to have_no_css('.nav-link', text: 'Description preview')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
