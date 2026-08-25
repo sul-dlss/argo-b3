@@ -13,11 +13,13 @@
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Argo dashboard') %>
         </div>
 
-        <div class="col-xl-10 col-lg-12">
-          <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, dismissible: true) do %>
-            Welcome to the new Argo application! View a demo of enhancements that have been developed.
-          <% end %>
-        </div>
+        <% if I18n.t('banner.dashboard_html').present? %>
+          <div class="col-xl-10 col-lg-12">
+            <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, dismissible: true) do %>
+              <%= t('banner.dashboard_html') %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     <% end %>
     <% layout.with_left_content do %>
