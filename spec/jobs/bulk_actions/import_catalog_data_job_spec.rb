@@ -42,6 +42,7 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
 
   before do
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Sdr::Repository).to receive(:update)
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)

@@ -12,6 +12,7 @@ RSpec.describe BulkActions::ReindexJob do
   let(:object_client) { instance_double(Dor::Services::Client::Object, reindex: true) }
 
   before do
+    allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Dor::Services::Client).to receive(:object).and_return(object_client)
   end

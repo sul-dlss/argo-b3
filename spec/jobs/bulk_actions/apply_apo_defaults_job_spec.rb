@@ -23,7 +23,9 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
 
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
-    allow(File).to receive(:open).and_return(log)
+
+    allow(File).to receive(:open).and_call_original
+    allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
 
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
   end

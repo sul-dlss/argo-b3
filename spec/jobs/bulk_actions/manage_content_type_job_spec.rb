@@ -46,6 +46,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
 
   before do
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(Sdr::Repository).to receive(:update)
