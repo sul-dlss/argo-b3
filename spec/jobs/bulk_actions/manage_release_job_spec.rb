@@ -25,6 +25,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(Sdr::WorkflowService).to receive(:published?).and_return(true)
     allow(Sdr::Repository).to receive(:create_release_tag)
+    allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
 

@@ -23,8 +23,8 @@ RSpec.describe BulkActions::BaseCsvJob do
 
     allow(TestBulkActionCsvJob::JobItem).to receive(:new).and_call_original
 
+    allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
-    # allow_any_instance_of(BulkAction).to receive(:open_log_file).and_return(log)
   end
 
   after do
