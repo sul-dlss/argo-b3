@@ -3,9 +3,8 @@
 module Dashboard
   # Render the object show pages most recently visited by the user.
   class RecentObjectsTableComponent < ApplicationComponent
-    def initialize(recent_object_docs:, classes: [])
+    def initialize(recent_object_docs:)
       @recent_object_docs = recent_object_docs
-      @classes = classes
       super()
     end
 
@@ -21,10 +20,6 @@ module Dashboard
 
     def object_type_label(object_doc)
       SolrDocPresenter::OBJECT_TYPES.fetch(object_doc.object_type).fetch(:label)
-    end
-
-    def classes
-      merge_classes(@classes)
     end
   end
 end
