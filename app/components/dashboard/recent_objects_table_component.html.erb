@@ -1,11 +1,11 @@
 <%= render SdrViewComponents::Tables::TableComponent.new(
-      empty_message: 'No objects have been viewed',
+      empty_message: 'No objects have been viewed.',
       classes:,
       label:,
       responsive: true
     ) do |component| %>
   <% component.with_caption do %>
-    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: label) %>
+    <%= label %>
   <% end %>
   <% component.with_header(label: 'Title') %>
   <% component.with_header(label: 'Druid') %>

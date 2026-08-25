@@ -59,7 +59,9 @@
 
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'My recent activity', classes: 'mt-3') %>
 
-      <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs, classes: 'mb-5') %>
+      <div class="mb-5">
+        <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
+      </div>
 
       <div class="mb-5">
         <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>

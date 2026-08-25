@@ -45,7 +45,7 @@ RSpec.describe Dashboard::RecentObjectsTableComponent, type: :component do
     it 'renders the empty message' do
       render_inline(component)
 
-      expect(page).to have_text('No objects have been viewed')
+      expect(page).to have_text('No objects have been viewed.')
     end
   end
 end
