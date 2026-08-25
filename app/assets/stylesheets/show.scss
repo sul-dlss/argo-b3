@@ -1,7 +1,10 @@
 // Object show page
 .object-show {
   .embargo-banner {
-    margin-inline: calc(50% - 50vw);
+    position: relative;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
   }
 
   .show-box {
