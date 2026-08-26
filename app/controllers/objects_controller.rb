@@ -43,6 +43,7 @@ class ObjectsController < ApplicationController
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
 
     track_recent_object(druid) unless turbo_prefetch?
+    @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
   end
 
   def show_header

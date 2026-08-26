@@ -30,6 +30,7 @@ class DashboardController < ApplicationController
     set_recent_object_docs
     set_pinned_object_docs
     set_pinned_searches
+    set_pinned_tags
   end
 
   def go_to_druid
@@ -41,6 +42,7 @@ class DashboardController < ApplicationController
       set_recent_object_docs
       set_pinned_object_docs
       set_pinned_searches
+      set_pinned_tags
       render :index, status: :unprocessable_content
     end
   end
@@ -63,6 +65,10 @@ class DashboardController < ApplicationController
 
   def set_pinned_searches
     @pinned_searches = PinnedSearch.where(user: current_user)
+  end
+
+  def set_pinned_tags
+    @pinned_tags = PinnedTag.where(user: current_user)
   end
 
   def set_pinned_object_docs

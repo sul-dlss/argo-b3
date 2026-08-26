@@ -1,0 +1,23 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(
+      empty_message: 'No tags have been pinned.',
+      classes:,
+      label:,
+      responsive: true
+    ) do |component| %>
+  <% component.with_caption do %>
+    <%= label %>
+    <%= helpers.pin_icon(classes: 'pinned') %>
+  <% end %>
+  <% component.with_header(label: 'Tag') %>
+  <% component.with_header(label: 'Unpin') %>
+  <% pinned_tags.each do |pinned_tag| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= tag_link(pinned_tag) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render Pin::PinnedTagComponent.new(tag: pinned_tag.tag, pinned: true) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

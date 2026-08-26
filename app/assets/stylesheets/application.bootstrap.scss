@@ -81,7 +81,11 @@ $search-color: rgb(#{$search-color-rgb});
   }
 
   // Avoids the pin flashing a background when clicked.
+  // (Transparent background otherwise comes from sdr_view_components' .icon-button.btn rule.)
   &.btn {
     --bs-btn-disabled-bg: transparent !important;
+
+    // Removes vertical button padding so pin rows don't take up more height than plain text rows.
+    --bs-btn-padding-y: 0;
   }
 }

@@ -439,20 +439,44 @@ RSpec.describe 'Show item' do
       expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
     end
 
-    # Pinning and unpinning
-    expect(page).to have_css('.bi-pin')
-    expect(page).to have_no_css('.bi-pin-fill')
+    # Pinning and unpinning the object
+    within('h1') do
+      expect(page).to have_css('.bi-pin')
+      expect(page).to have_no_css('.bi-pin-fill')
 
-    find('.bi-pin').click
+      find('.bi-pin').click
+    end
 
     expect(page).to have_toast('Pin added')
-    expect(page).to have_css('.bi-pin-fill')
-    expect(page).to have_no_css('.bi-pin')
+    within('h1') do
+      expect(page).to have_css('.bi-pin-fill')
+      expect(page).to have_no_css('.bi-pin')
 
-    find('.bi-pin-fill').click
+      find('.bi-pin-fill').click
+    end
 
     expect(page).to have_toast('Pin removed')
-    expect(page).to have_css('.bi-pin')
-    expect(page).to have_no_css('.bi-pin-fill')
+    within('h1') do
+      expect(page).to have_css('.bi-pin')
+      expect(page).to have_no_css('.bi-pin-fill')
+    end
+
+    # Pinning and unpinning a tag
+    within('.card', text: 'Tags') do
+      within('li', text: 'TESTREQ-1') do
+        expect(page).to have_css('.bi-pin')
+        expect(page).to have_no_css('.bi-pin-fill')
+
+        find('.bi-pin').click
+      end
+    end
+
+    expect(page).to have_toast('Pin added')
+    within('.card', text: 'Tags') do
+      within('li', text: 'TESTREQ-1') do
+        expect(page).to have_css('.bi-pin-fill')
+        expect(page).to have_no_css('.bi-pin')
+      end
+    end
   end
 end
