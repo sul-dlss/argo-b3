@@ -2,6 +2,8 @@
 
 # Controller for objects (DRO, collection, admin policy)
 class ObjectsController < ApplicationController
+  RECENT_OBJECTS_LIMIT = 5
+
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_header show_versions
                                   show_purl_preview show_solr_doc show_files]
 
@@ -39,6 +41,8 @@ class ObjectsController < ApplicationController
                                                          content:)
     release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
+
+    track_recent_object(druid) unless turbo_prefetch?
   end
 
   def show_header
@@ -103,6 +107,15 @@ class ObjectsController < ApplicationController
   end
 
   private
+
+  def track_recent_object(druid)
+    other_recent_druids = Array(session[:recent_object_druids]).excluding(druid)
+    session[:recent_object_druids] = [druid, *other_recent_druids].first(RECENT_OBJECTS_LIMIT)
+  end
+
+  def turbo_prefetch?
+    request.headers['X-Sec-Purpose'] == 'prefetch'
+  end
 
   def verified_druid
     @verified_druid ||= verify_token(params[:druid])

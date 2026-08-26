@@ -15,7 +15,7 @@
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'APO, Collection, Rights') %><% end %>
     <% component.with_row(label: 'Admin policy') do |row_component| %>
       <% row_component.with_cell do %>
-        <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+        <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
         <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
         (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
       <% end %>
@@ -24,7 +24,7 @@
       <% row_component.with_cell do %>
         <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
           <% collection_title = Array(@solr_doc.collection_titles)[index] %>
-          <%= link_to collection_title, object_path(druid: collection_druid) %>
+          <%= link_to_object collection_title, collection_druid %>
           <% search_form = SearchForm.new(collection_titles: [collection_title]) %>
           (<%= link_to('All objects with this collection', search_path(search_form.attributes)) %>)
         <% end %>

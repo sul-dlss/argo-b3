@@ -61,17 +61,9 @@
 
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'My recent activity', classes: 'mt-3') %>
 
-      <%= render SdrViewComponents::Tables::TableComponent.new(classes: 'mb-5', responsive: true) do |component| %>
-        <% component.with_caption do %>
-          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Recent objects') %>
-        <% end %>
-        <% component.with_header(label: 'Title') %>
-        <% component.with_header(label: 'Druid') %>
-        <% component.with_header(label: 'Object type') %>
-        <% component.with_header(label: 'Tags') %>
-        <% component.with_row(values: ['Wiedoeft, Rudy Liver and bacon: fox trot: Emerson Records, New York...', 'bb234ab1234', 'Item', 'Project : Riegler-Deutsch Index']) %>
-        <% component.with_row(values: ['1947 Partition', 'bb234ab123', 'APO', nil]) %>
-      <% end %>
+      <div class="mb-5">
+        <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
+      </div>
 
       <div class="mb-5">
         <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>

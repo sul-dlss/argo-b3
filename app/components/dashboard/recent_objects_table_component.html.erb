@@ -1,0 +1,29 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(
+      empty_message: 'No objects have been viewed.',
+      label:,
+      responsive: true
+    ) do |component| %>
+  <% component.with_caption do %>
+    <%= label %>
+  <% end %>
+  <% component.with_header(label: 'Title') %>
+  <% component.with_header(label: 'Druid') %>
+  <% component.with_header(label: 'Object type') %>
+  <% component.with_header(label: 'Tags') %>
+  <% recent_object_docs.each do |object_doc| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= title_link(object_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= object_doc.bare_druid %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= object_type_label(object_doc) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: Array(object_doc.other_tags)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

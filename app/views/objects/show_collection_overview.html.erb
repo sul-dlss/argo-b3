@@ -4,7 +4,7 @@
     <% component.with_row(label: 'Object type', value: 'Collection') %>
     <% component.with_row(label: 'Admin policy') do |row_component| %>
       <% row_component.with_cell do %>
-        <%= link_to @solr_doc.apo_title, object_path(druid: @solr_doc.apo_druid) %>
+        <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
         <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
         (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
       <% end %>

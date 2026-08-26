@@ -3,6 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe LinkHelper do
+  describe '#link_to_object' do
+    it 'disables Turbo prefetching' do
+      link = helper.link_to_object('An object', 'druid:bc123df4567', data: { turbo_frame: '_top' })
+
+      expect(link).to include('href="/objects/druid:bc123df4567"')
+      expect(link).to include('data-turbo-frame="_top"')
+      expect(link).to include('data-turbo-prefetch="false"')
+    end
+  end
+
   describe '#searchworks_url' do
     let(:druid) { 'druid:bc123df4567' }
 

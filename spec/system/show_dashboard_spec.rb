@@ -22,7 +22,7 @@ RSpec.describe 'Show dashboard', :rack_test do
       expect(page).to have_no_button('Manage permissions')
       expect(page).to have_no_button('Impersonate')
 
-      expect(page).to have_css('table caption', text: 'Recent objects')
+      expect(page).to have_css('table[aria-label="Recent objects"]')
       expect(page).to have_css('table[aria-label="Pinned searches"]')
       expect(page).to have_css('table[aria-label="Pinned items"]')
       expect(page).to have_css('table[aria-label="Pinned collections"]')
