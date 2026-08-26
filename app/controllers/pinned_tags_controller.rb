@@ -8,7 +8,7 @@ class PinnedTagsController < ApplicationController
   #   <meta name="turbo-refresh-scroll" content="preserve">
   # <% end %>
 
-  # No reason to authorize since the user can only be the user.
+  # No reason to authorize since tags lookup is scoped to the current user
   skip_verify_authorized
 
   def create

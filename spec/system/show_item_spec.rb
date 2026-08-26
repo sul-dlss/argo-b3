@@ -93,7 +93,7 @@ RSpec.describe 'Show item' do
       Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE => '2025-01-08',
       Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => last_deposited,
       Search::Fields::FORMATTED_EMBARGO_RELEASE_DATE => '2040-06-15 12:00:00 PM',
-      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech'],
+      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
@@ -291,7 +291,7 @@ RSpec.describe 'Show item' do
 
     # Tags card
     within('.card', text: 'Tags') do
-      expect(page).to have_css('li', text: 'TESTREQ-1')
+      expect(page).to have_css('li', text: 'Ticket : TESTREQ-1')
       expect(page).to have_css('li', text: 'Registered By : jdoe')
       expect(page).to have_css('li', text: 'Remediated By : labtech')
     end
@@ -463,7 +463,7 @@ RSpec.describe 'Show item' do
 
     # Pinning and unpinning a tag
     within('.card', text: 'Tags') do
-      within('li', text: 'TESTREQ-1') do
+      within('li', text: 'Ticket : TESTREQ-1') do
         expect(page).to have_css('.bi-pin')
         expect(page).to have_no_css('.bi-pin-fill')
 
@@ -473,7 +473,7 @@ RSpec.describe 'Show item' do
 
     expect(page).to have_toast('Pin added')
     within('.card', text: 'Tags') do
-      within('li', text: 'TESTREQ-1') do
+      within('li', text: 'Ticket : TESTREQ-1') do
         expect(page).to have_css('.bi-pin-fill')
         expect(page).to have_no_css('.bi-pin')
       end

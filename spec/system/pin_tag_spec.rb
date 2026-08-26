@@ -48,7 +48,7 @@ RSpec.describe 'Pin and unpin a tag' do
     visit "/objects/#{druid}"
 
     within('.card', text: 'Tags') do
-      expect(page).to have_link('Project : Foo', href: search_path(tags: ['Project : Foo']))
+      expect(page).to have_link('Project : Foo', href: search_path(projects: ['Foo']))
       expect(page).to have_button('Pin')
 
       click_button 'Pin'
@@ -62,7 +62,7 @@ RSpec.describe 'Pin and unpin a tag' do
 
     visit root_path
 
-    expect(page).to have_link('Project : Foo', href: search_path(tags: ['Project : Foo']))
+    expect(page).to have_link('Project : Foo', href: search_path(projects: ['Foo']))
     expect(page).to have_button('Unpin')
 
     click_button 'Unpin'

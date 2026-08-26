@@ -1,0 +1,12 @@
+<%= render Show::BoxComponent.new(heading: 'Tags') do %>
+  <ul class="object-type-tag mb-0 dotted-underline-links">
+    <% tags.each do |tag| %>
+      <li>
+        <span class="d-inline-flex align-items-end gap-1">
+          <%= link_to tag, search_path_for(tag) %>
+          <%= render Pin::PinnedTagComponent.new(tag:, pinned: pinned?(tag), compact: true) %>
+        </span>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

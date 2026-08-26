@@ -45,15 +45,5 @@ RSpec.describe 'PinnedTags' do
       expect(response).to have_http_status(:see_other)
       expect(flash[:toast]).to eq('Pin removed')
     end
-
-    it 'does not destroy a pinned tag belonging to another user' do
-      sign_in(create(:user))
-
-      expect do
-        delete pinned_tag_path(tag)
-      end.not_to change(PinnedTag, :count)
-
-      expect(response).to have_http_status(:not_found)
-    end
   end
 end

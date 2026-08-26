@@ -66,18 +66,7 @@
           </div>
         <% end %>
         <div class="show-box flex-fill">
-          <%= render Show::BoxComponent.new(heading: 'Tags') do %>
-            <ul class="object-type-tag mb-0 dotted-underline-links">
-              <% (Array(@solr_doc.tickets) + Array(@solr_doc.other_tags)).each do |tag| %>
-                <li>
-                  <span class="d-inline-flex align-items-end gap-1">
-                    <%= link_to tag, search_path(tags: [tag]) %>
-                    <%= render Pin::PinnedTagComponent.new(tag:, pinned: @pinned_tags.include?(tag), compact: true) %>
-                  </span>
-                </li>
-              <% end %>
-            </ul>
-          <% end %>
+          <%= render Show::TagComponent.new(tags: Array(@solr_doc.other_tags), pinned_tags: @pinned_tags) %>
         </div>
       </div>
 
