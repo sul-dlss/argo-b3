@@ -50,10 +50,10 @@ RSpec.describe BulkActions::DruidsJob do
                                                                      job: instance_of(TestBulkActionJob))
 
       expect(log).to have_received(:puts)
-        .with("2026-07-29 14:56:58 PT Starting TestBulkActionJob for BulkAction #{bulk_action.id}")
+        .with("2026-07-29 14:56:58 PT\tStarting TestBulkActionJob for BulkAction #{bulk_action.id}")
       expect(log).to have_received(:puts).with(/Finished TestBulkActionJob for BulkAction #{bulk_action.id}/)
-      expect(log).to have_received(:puts).with(/Success: Testing successful for #{druids.first}/o)
-      expect(log).to have_received(:puts).with(/Error: Testing failed for #{druids.second}/o)
+      expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: Testing successful/o)
+      expect(log).to have_received(:puts).with(/#{druids.second}\tError: Testing failed/o)
       expect(log).to have_received(:close)
       expect(export_file).to have_received(:close)
 
@@ -88,8 +88,8 @@ RSpec.describe BulkActions::DruidsJob do
     it 'performs the job' do
       TestBulkActionJob.perform_now(bulk_action:, druids:)
 
-      expect(log).to have_received(:puts).with(/Success: Testing successful for #{druids.first}/o)
-      expect(log).to have_received(:puts).with(/Error: StandardError Something bad happened for #{druids.second}/o)
+      expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: Testing successful/o)
+      expect(log).to have_received(:puts).with(/#{druids.second}\tError: StandardError Something bad happened/o)
 
       expect(bulk_action.reload.druid_count_total).to eq(2)
       expect(bulk_action.druid_count_success).to eq(1)
