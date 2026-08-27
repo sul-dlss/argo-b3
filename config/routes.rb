@@ -181,6 +181,8 @@ Rails.application.routes.draw do
 
   resources :pinned_searches, only: %i[create destroy]
 
+  resources :pinned_tags, only: %i[create destroy]
+
   namespace :admin do
     get 'groups'
   end

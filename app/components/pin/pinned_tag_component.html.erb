@@ -1,0 +1,16 @@
+<% if pinned %>
+  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_tag_path(tag),
+                                                                      icon: :pin,
+                                                                      label: 'Unpin',
+                                                                      method: :delete,
+                                                                      classes: "pin pinned #{classes}",
+                                                                      icon_classes:) %>
+<% else %>
+  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: pinned_tags_path,
+                                                                      icon: :unpin,
+                                                                      label: 'Pin',
+                                                                      method: :post,
+                                                                      params: { tag: },
+                                                                      classes: "pin not-pinned #{classes}",
+                                                                      icon_classes:) %>
+<% end %>

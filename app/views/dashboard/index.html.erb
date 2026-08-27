@@ -81,6 +81,10 @@
         <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
       </div>
 
+      <div class="mb-5">
+        <%= render Dashboard::PinnedTagsTableComponent.new(pinned_tags: @pinned_tags) %>
+      </div>
+
       <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
     <% end %>
   <% end %>

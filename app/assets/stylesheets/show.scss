@@ -20,6 +20,11 @@
     > .border {
       height: 180px;
       overflow-y: auto;
+      scrollbar-color: var(--stanford-70-black) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--stanford-70-black);
+      }
     }
   }
 
@@ -55,6 +60,16 @@
 
   .file-set-card {
     background-color: var(--stanford-fog-light);
+  }
+
+  .dotted-underline-links a {
+    color: var(--stanford-70-black);
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+
+    &:hover {
+      text-decoration-style: solid;
+    }
   }
 }
 
@@ -98,4 +113,10 @@
 
 .object-type-search {
   @include object-type-colors($search-color, $search-color-rgb);
+}
+
+.object-type-tag {
+  .pinned {
+    color: black;
+  }
 }

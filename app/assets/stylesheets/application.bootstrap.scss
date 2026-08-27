@@ -80,8 +80,8 @@ $search-color: rgb(#{$search-color-rgb});
     color: black;
   }
 
-  // Avoids the pin flashing a background when clicked.
   &.btn {
-    --bs-btn-disabled-bg: transparent !important;
+    // Removes vertical button padding so pin rows don't take up more height than text.
+    --bs-btn-padding-y: 0;
   }
 }
