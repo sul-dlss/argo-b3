@@ -28,6 +28,8 @@ RSpec.describe BulkActions::ExportModsJob do
   end
 
   before do
+    create(:permission, :read_unrestricted, workgroup: bulk_action.user.groups.first)
+
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
