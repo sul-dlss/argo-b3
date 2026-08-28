@@ -117,5 +117,19 @@ module Constants # rubocop:disable Metrics/ModuleLength
 
   CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| uri.split('/').last }.freeze
 
+  # content types selectable by the user on a registration form
+  REGISTRATION_CONTENT_TYPES = {
+    'book' => Cocina::Models::ObjectType.book,
+    'file' => Cocina::Models::ObjectType.object,
+    'image' => Cocina::Models::ObjectType.image,
+    'map' => Cocina::Models::ObjectType.map,
+    'media' => Cocina::Models::ObjectType.media,
+    '3d' => Cocina::Models::ObjectType.three_dimensional,
+    'document' => Cocina::Models::ObjectType.document,
+    'geo' => Cocina::Models::ObjectType.geo,
+    'webarchive-binary' => Cocina::Models::ObjectType.webarchive_binary,
+    'webarchive-seed' => Cocina::Models::ObjectType.webarchive_seed
+  }.freeze
+
   RESOURCE_TYPES = Cocina::Models::FileSet::TYPES.index_by { |uri| uri.split('/').last }.freeze
 end
