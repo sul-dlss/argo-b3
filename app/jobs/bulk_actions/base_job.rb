@@ -52,7 +52,7 @@ module BulkActions
 
     # Builds a tab-delimited log message
     def delimited_log_message(message:, index: nil, druid: nil)
-      [("line #{index}" if index), druid, message].compact.join("\t")
+      [index && "line #{index}", druid, message].join("\t")
     end
 
     # Subclasses must implement.
