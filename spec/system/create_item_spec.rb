@@ -48,18 +48,28 @@ RSpec.describe 'Create an item' do
     it 'registers a valid cocina object' do
       visit new_item_path
 
+      expect(page).to have_link('Cancel', href: root_path)
+      expect(page).to have_button('Next')
+      expect(page).to have_no_button('Previous')
+
       fill_in 'Source ID', with: 'new:source-id'
       fill_in 'Title', with: 'The Title'
       select 'image', from: 'Content type'
 
-      find_by_id('rights-tab').click
+      click_button 'Next'
+      expect(page).to have_css('#rights-tab.active')
       select apo_title, from: 'APO'
 
-      find_by_id('release-tab').click
+      click_button 'Next'
+      expect(page).to have_css('#release-tab.active')
       choose 'Release to:'
       check 'SearchWorks'
 
-      find_by_id('deposit-tab').click
+      click_button 'Next'
+      expect(page).to have_css('#deposit-tab.active')
+      expect(page).to have_button('Previous')
+      expect(page).to have_no_button('Next')
+
       click_button('Register only')
 
       expect(page).to have_current_path("/objects/#{druid}")
@@ -129,6 +139,22 @@ RSpec.describe 'Create an item' do
         expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.book)
       end
       expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'cancels item creation' do
+      visit new_item_path
+
+      click_link 'Cancel'
+      expect(page).to have_current_path(root_path)
+    end
+
+    it 'cancels item creation returning to referring page' do
+      visit root_path
+      click_link_or_button 'Item'
+
+      expect(page).to have_link('Cancel')
+      click_link 'Cancel'
+      expect(page).to have_current_path(root_path)
     end
   end
 

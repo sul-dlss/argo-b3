@@ -2,6 +2,7 @@
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.items.new.title'), classes: 'mb-3') %>
 
   <% form_id = 'tabbed_form' %>
+  <% cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path %>
 
   <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @item_form, id: form_id, url: items_path) %>
 
@@ -14,7 +15,7 @@
     <% form_with(model: @item_form, url: items_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
                                                                           label: t('edit.items.tabs.details.label'),
-                                                                          mark_required: true)) do %>
+                                                                          mark_required: true)) do |pane| %>
         <%= render Edit::SourceIdChoiceComponent.new(form:) %>
 
         <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :title,
@@ -27,46 +28,86 @@
                                                                       options: Constants::REGISTRATION_CONTENT_TYPES,
                                                                       label_text: t('edit.items.fields.content_type.label'),
                                                                       label_mark_required: true,
-                                                                      label_classes: 'fw-bold') %>
+                                                                      label_classes: 'fw-bold',
+                                                                      container_classes: 'mb-3') %>
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
+              Next <%= right_arrow_icon %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
                                                                           label: t('edit.items.tabs.rights.label'),
-                                                                          mark_required: true)) do %>
+                                                                          mark_required: true)) do |pane| %>
         <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :admin_policy_druid,
                                                                       options: @apo_options,
                                                                       label_text: t('edit.items.fields.admin_policy_druid.label'),
                                                                       label_mark_required: true,
                                                                       label_classes: 'fw-bold') %>
+
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
+              Next <%= right_arrow_icon %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :release,
                                                                           label: t('edit.items.tabs.release.pane'),
-                                                                          help_text: t('edit.items.tabs.release.help_text'))) do %>
+                                                                          help_text: t('edit.items.tabs.release.help_text'))) do |pane| %>
         <%= render SdrViewComponents::Forms::HasOneComponent.new(form:,
                                                                  field_name: :release_tags,
                                                                  form_component: Edit::ReleaseTagsComponent,
                                                                  fieldset_label: t('edit.items.tabs.release.pane')) %>
+
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
+              Next <%= right_arrow_icon %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
                                                                           label: t('edit.items.tabs.deposit.label'),
                                                                           help_text: t('edit.items.tabs.deposit.help_text'),
-                                                                          mark_required: true)) do %>
-        <div class="d-flex justify-content-end">
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(
-                label: t('edit.items.new.buttons.register_add_files'),
-                form_id: form.id,
-                value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
-                classes: 'me-2'
-              ) %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(
-                label: t('edit.items.new.buttons.register'),
-                form_id: form.id,
-                value: ItemsController::DRAFT_VALUE,
-                variant: 'outline-primary'
-              ) %>
-        </div>
+                                                                          mark_required: true)) do |pane| %>
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
+                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.items.new.buttons.register_add_files'),
+                  form_id: form.id,
+                  value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
+                  classes: 'ms-2'
+                ) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.items.new.buttons.register'),
+                  form_id: form.id,
+                  value: ItemsController::DRAFT_VALUE,
+                  variant: 'outline-primary',
+                  classes: 'ms-2'
+                ) %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
