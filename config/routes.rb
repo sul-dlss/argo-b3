@@ -162,7 +162,6 @@ Rails.application.routes.draw do
 
   resources :objects, only: %i[show], param: :druid do
     member do
-      get 'header', to: 'objects#show_header'
       get 'overview', to: 'objects#show_overview'
       get 'json', to: 'objects#show_json'
       get 'workflows', to: 'objects#show_workflows'

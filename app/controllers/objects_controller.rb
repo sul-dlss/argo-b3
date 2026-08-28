@@ -4,7 +4,7 @@
 class ObjectsController < ApplicationController
   RECENT_OBJECTS_LIMIT = 5
 
-  skip_verify_authorized only: %i[show_json show_workflows show_overview show_header show_versions
+  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
                                   show_purl_preview show_solr_doc show_files]
 
   include TokenConcern
@@ -44,13 +44,7 @@ class ObjectsController < ApplicationController
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
-  end
-
-  def show_header
-    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
-    @pinned = PinnedObject.exists?(druid: verified_druid, user: current_user)
-
-    render layout: false
+    @pinned = PinnedObject.exists?(druid:, user: current_user)
   end
 
   def show_overview
