@@ -22,6 +22,12 @@
                                                                    label_mark_required: true,
                                                                    label_classes: 'fw-bold',
                                                                    container_classes: 'mb-3') %>
+
+        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :content_type,
+                                                                      options: Constants::CONTENT_TYPES,
+                                                                      label_text: t('edit.items.fields.content_type.label'),
+                                                                      label_mark_required: true,
+                                                                      label_classes: 'fw-bold') %>
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
