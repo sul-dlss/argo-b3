@@ -130,6 +130,8 @@ en:
       fields:
         admin_policy_druid:
           label: "APO"
+        content_type:
+          label: "Content type"
         source_id:
           label: "Source ID"
         source_id_prefix:

@@ -45,8 +45,8 @@ class ItemsController < ApplicationController
 
   def item_form_params
     params.permit(item: ItemForm.permitted_params)[:item]
-          # Hardcoding for now since required
-          .merge(access_view: 'world', access_download: 'world', content_type: Cocina::Models::ObjectType.object)
+          # Hardcoding access for now since required
+          .merge(access_view: 'world', access_download: 'world')
   end
 
   def set_apo_options

@@ -50,6 +50,7 @@ RSpec.describe 'Create an item' do
 
       fill_in 'Source ID', with: 'new:source-id'
       fill_in 'Title', with: 'The Title'
+      select 'image', from: 'Content type'
 
       find_by_id('rights-tab').click
       select apo_title, from: 'APO'
@@ -67,7 +68,7 @@ RSpec.describe 'Create an item' do
       expect(Sdr::Repository).to have_received(:register) do |args|
         request_cocina_object = args[:request_cocina_object]
         expect(request_cocina_object).to be_a(Cocina::Models::RequestDRO)
-        expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.object)
+        expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.image)
         expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
         expect(request_cocina_object.administrative.hasAdminPolicy).to eq(apo_druid)
         expect(request_cocina_object.description.title.first.value).to eq('The Title')
@@ -112,6 +113,7 @@ RSpec.describe 'Create an item' do
 
       fill_in 'Source ID', with: 'new:source-id'
       fill_in 'Title', with: 'The Title'
+      select 'book', from: 'Content type'
 
       find_by_id('rights-tab').click
       select apo_title, from: 'APO'
@@ -122,7 +124,10 @@ RSpec.describe 'Create an item' do
       expect(page).to have_current_path(edit_content_path(druid))
       expect(page).to have_toast('Item registered.')
 
-      expect(Sdr::Repository).to have_received(:register)
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        request_cocina_object = args[:request_cocina_object]
+        expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.book)
+      end
       expect(Sdr::Repository).not_to have_received(:accession)
     end
   end
