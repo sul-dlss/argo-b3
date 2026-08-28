@@ -95,7 +95,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)
-      expect(log).to have_received(:puts).with(/Registration successful for druid:df123df4567/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
       expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\n") # rubocop:disable Layout/LineLength
     end
@@ -132,7 +132,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: ['csv : test', 'Project : two'],
               workflow_name: 'accessionWF',
               user_name:).twice
-      expect(log).to have_received(:puts).with(/Registration successful for druid:df123df4567/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
     end
   end
@@ -159,7 +159,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)
-      expect(log).to have_received(:puts).with(/Registration successful for druid:df123df4567/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
     end
   end

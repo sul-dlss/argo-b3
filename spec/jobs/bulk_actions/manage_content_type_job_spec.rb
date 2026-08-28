@@ -75,7 +75,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
       end
       expect(job_item).to have_received(:close_version_if_needed!)
 
-      expect(log.string).to include('Successfully updated content type for')
+      expect(log.string).to include("#{druid}\tSuccess: Successfully updated content type")
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_success).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(0)
@@ -206,7 +206,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
 
       expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
-      expect(log.string).to include('No changes made for')
+      expect(log.string).to include("#{druid}\tSuccess: No changes made")
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_success).to eq(1)

@@ -70,7 +70,7 @@ RSpec.describe BulkActions::RefreshMetadataJob do
 
       expect(object_client).not_to have_received(:refresh_descriptive_metadata_from_ils)
 
-      expect(log).to have_received(:puts).with(/Does not have a Folio Instance HRID for #{druid}/)
+      expect(log).to have_received(:puts).with(/#{druid}\tError: Does not have a Folio Instance HRID/)
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
@@ -93,7 +93,7 @@ RSpec.describe BulkActions::RefreshMetadataJob do
 
       expect(object_client).not_to have_received(:refresh_descriptive_metadata_from_ils)
 
-      expect(log).to have_received(:puts).with(/Refresh is set to false for #{druid}/)
+      expect(log).to have_received(:puts).with(/#{druid}\tError: Refresh is set to false/)
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)

@@ -70,7 +70,7 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_total).to eq(3)
 
-      expect(log).to have_received(:puts).with(/Failed NoMethodError .+ for #{druid3}/).once
+      expect(log).to have_received(:puts).with(/#{druid3}\tFailed NoMethodError/).once
     end
   end
 
@@ -86,7 +86,7 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_total).to eq(3)
 
-      expect(log).to have_received(:puts).with(/Could not find object for #{druid3}/).once
+      expect(log).to have_received(:puts).with(/#{druid3}\tCould not find object/).once
     end
   end
 
@@ -103,7 +103,7 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_total).to eq(3)
 
-      expect(log).to have_received(:puts).with(/Could not request object for #{druid3}/).once
+      expect(log).to have_received(:puts).with(/#{druid3}\tCould not request object/).once
     end
   end
 end

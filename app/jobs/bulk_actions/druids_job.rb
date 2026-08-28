@@ -35,12 +35,12 @@ module BulkActions
 
     def success!(druid:, message: nil)
       bulk_action.increment(:druid_count_success)
-      log("#{message} for #{druid}") if message
+      log(delimited_log_message(message:, druid:)) if message
     end
 
     def failure!(druid:, message:)
       bulk_action.increment(:druid_count_fail)
-      log("#{message} for #{druid}")
+      log(delimited_log_message(message:, druid:))
     end
   end
 end

@@ -38,7 +38,7 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
     expect(object_client).to have_received(:apply_admin_policy_defaults)
     expect(job_item).to have_received(:close_version_if_needed!)
 
-    expect(log).to have_received(:puts).with(/Successfully applied defaults for druid:bb111cc2222/)
+    expect(log).to have_received(:puts).with(/druid:bb111cc2222\tSuccess: Successfully applied defaults/)
   end
 
   context 'when not authorized to update' do

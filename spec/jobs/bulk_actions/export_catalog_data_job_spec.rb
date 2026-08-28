@@ -41,7 +41,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
     expect(bulk_action.druid_count_success).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)
 
-    expect(log.string).to include "Exported catalog data for #{druid}"
+    expect(log.string).to include "#{druid}\tSuccess: Exported catalog data"
 
     expect(File).to exist(bulk_action.export_filepath)
     csv = CSV.read(bulk_action.export_filepath, headers: true)
@@ -115,7 +115,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
-      expect(log.string).to include "Sdr::Repository::NotFoundResponse Object not found: #{druid} for #{druid}"
+      expect(log.string).to include "#{druid}\tError: Sdr::Repository::NotFoundResponse Object not found: #{druid}"
     end
   end
 end

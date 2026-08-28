@@ -193,7 +193,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
     expect(bulk_action.druid_count_success).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)
 
-    expect(log.string).to include "Exported structural metadata for #{druid}"
+    expect(log.string).to include "#{druid}\tSuccess: Exported structural metadata"
 
     expect(File).to exist(bulk_action.export_filepath)
     output = CSV.read(bulk_action.export_filepath, headers: true)
@@ -208,7 +208,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
       job.perform_now
 
       expect(bulk_action.reload.druid_count_fail).to eq(1)
-      expect(log.string).to include "No structural metadata to export for #{druid}"
+      expect(log.string).to include "#{druid}\tError: No structural metadata to export"
 
       expect(File).to exist(bulk_action.export_filepath)
       File.open(bulk_action.export_filepath, 'r') do |file|

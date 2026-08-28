@@ -47,7 +47,12 @@ module BulkActions
     end
 
     def log(message)
-      log_file.puts("#{format_datetime(Time.zone.now)} #{message}")
+      log_file.puts("#{format_datetime(Time.zone.now)}\t#{message}")
+    end
+
+    # Builds a tab-delimited log message
+    def delimited_log_message(message:, index: nil, druid: nil)
+      [index && "line #{index}", druid, message].join("\t")
     end
 
     # Subclasses must implement.

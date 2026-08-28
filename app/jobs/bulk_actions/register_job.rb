@@ -21,18 +21,12 @@ module BulkActions
 
     def success!(message:, index:, druid: nil)
       bulk_action.increment(:druid_count_success).save
-      log(log_msg(message:, index:, druid:))
+      log(delimited_log_message(message:, index:, druid:))
     end
 
     def failure!(message:, index:, druid: nil)
       bulk_action.increment(:druid_count_fail).save
-      log(log_msg(message:, index:, druid:))
-    end
-
-    def log_msg(message:, index:, druid: nil)
-      msg = " - line #{index} - #{message}"
-      msg += " for #{druid}" if druid
-      msg
+      log(delimited_log_message(message:, index:, druid:))
     end
 
     def druid_count
