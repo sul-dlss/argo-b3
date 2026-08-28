@@ -1,7 +1,0 @@
-<%= turbo_frame_tag(@solr_doc.druid, 'header') do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, classes: 'mb-xl-4 mb-3 d-flex') do %>
-    <%= @solr_doc.title %>
-    <%= render Pin::PinnedObjectComponent.new(druid: @solr_doc.druid, pinned: @pinned) unless @solr_doc.agreement? %>
-  <% end %>
-
-<% end %>
