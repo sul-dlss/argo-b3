@@ -2,7 +2,6 @@
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.items.new.title'), classes: 'mb-3') %>
 
   <% form_id = 'tabbed_form' %>
-  <% cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path %>
 
   <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @item_form, id: form_id, url: items_path) %>
 
@@ -32,11 +31,7 @@
                                                                       container_classes: 'mb-3') %>
         <% pane.with_footer do %>
           <div class="d-flex">
-            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
-              Next <%= right_arrow_icon %>
-            <% end %>
+            <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>
           </div>
         <% end %>
       <% end %>
@@ -52,13 +47,7 @@
 
         <% pane.with_footer do %>
           <div class="d-flex">
-            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
-              Next <%= right_arrow_icon %>
-            <% end %>
+            <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
           </div>
         <% end %>
       <% end %>
@@ -73,13 +62,7 @@
 
         <% pane.with_footer do %>
           <div class="d-flex">
-            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showNext' }) do %>
-              Next <%= right_arrow_icon %>
-            <% end %>
+            <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
           </div>
         <% end %>
       <% end %>
@@ -90,9 +73,7 @@
                                                                           mark_required: true)) do |pane| %>
         <% pane.with_footer do %>
           <div class="d-flex">
-            <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) %>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
-                                                                        data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
+            <%= render Item::TabNavigationComponent.new(pane:, show_next: false, cancel_path: @cancel_path) %>
             <%= render SdrViewComponents::Forms::SubmitComponent.new(
                   label: t('edit.items.new.buttons.register_add_files'),
                   form_id: form.id,
