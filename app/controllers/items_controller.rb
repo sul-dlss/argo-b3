@@ -11,6 +11,8 @@ class ItemsController < ApplicationController
     authorize! with: ItemPolicy
 
     @item_form = ItemForm.new
+    @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path
+
     set_apo_options
   end
 
