@@ -331,7 +331,7 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 
 ### Adding a bulk action
 
-1. Add a job that is a subclass of `BulkActionJob` and a test.
+1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test.
 2. Add a new resource to `routes.rb` under the `bulk_actions` namespace.
 3. Add configuration to `services/bulk_actions.rb`.
 4. Add the bulk action to the list of bulk actions in `views/bulk_actions/new.html.erb`.

@@ -155,6 +155,7 @@ Rails.application.routes.draw do
     resource :refresh_metadata, only: %i[new create], controller: 'refresh_metadata'
     resource :register, only: %i[new create], controller: 'register'
     resource :republish, only: %i[new create], controller: 'republish'
+    resource :update_governing_apo, only: %i[new create], controller: 'update_governing_apo'
   end
 
   # Redirect legacy route for object show page

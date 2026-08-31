@@ -31,7 +31,7 @@ module CocinaObjectMutators
       cocina_object.is_a?(Cocina::Models::RequestDRO) || cocina_object.is_a?(Cocina::Models::RequestCollection)
     end
 
-    def build_new_cocina_props # rubocop:disable Metrics/AbcSize
+    def build_new_cocina_props # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       source_props.tap do |new_cocina_props|
         new_cocina_props[:description] = cocina_model.description_hash
         unless request_object?
@@ -40,6 +40,8 @@ module CocinaObjectMutators
         end
         new_cocina_props[:identification] ||= {}
         new_cocina_props[:identification][:sourceId] = cocina_model.source_id
+        new_cocina_props[:administrative] ||= {}
+        new_cocina_props[:administrative][:hasAdminPolicy] = cocina_model.admin_policy_druid
         new_cocina_props[:access] ||= {}
         new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement
         new_cocina_props[:access][:license] = cocina_model.license
