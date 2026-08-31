@@ -1,15 +1,15 @@
 // Colors for object types
-$item-color-rgb: var(--stanford-illuminating-light-rgb);
+$item-color-rgb: var(--item-color-rgb);
 $item-color: rgb(#{$item-color-rgb});
-$collection-color-rgb: var(--stanford-poppy-light-rgb);
+$collection-color-rgb: var(--collection-color-rgb);
 $collection-color: rgb(#{$collection-color-rgb});
-$admin-policy-color-rgb: var(--stanford-sky-light-rgb);
+$admin-policy-color-rgb: var(--stanford-sky-rgb); // Accent/Sky/Base (#4298B5)
 $admin-policy-color: rgb(#{$admin-policy-color-rgb});
 $agreement-color-rgb: var(--stanford-palo-verde-light-rgb);
 $agreement-color: rgb(#{$agreement-color-rgb});
-$virtual-object-color-rgb: var(--stanford-olive-light-rgb);
+$virtual-object-color-rgb: var(--stanford-olive-dark-rgb); // Accent/Olive/Dark (#7A863B)
 $virtual-object-color: rgb(#{$virtual-object-color-rgb});
-$search-color-rgb: var(--stanford-plum-light-rgb);
+$search-color-rgb: var(--stanford-plum-light-rgb); // Accent/Plum/Light (#734675)
 $search-color: rgb(#{$search-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
@@ -18,6 +18,12 @@ $search-color: rgb(#{$search-color-rgb});
 @import 'bl_facets';
 @import 'search';
 @import 'show';
+
+// Local custom properties for object-type colors without a matching Stanford palette entry.
+:root {
+  --item-color-rgb: 185, 138, 0; // #B98A00
+  --collection-color-rgb: 218, 122, 0; // #DA7A00
+}
 
 /* Header color */
 .stone-dark {
