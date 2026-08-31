@@ -9,7 +9,7 @@ RSpec.describe Dashboard::PinnedVirtualObjectsTableComponent, type: :component d
 
   let(:druid) { 'druid:bc123df4567' }
   let(:collection_druid) { 'druid:cd456fg7890' }
-  let(:apo_druid) { 'druid:ef123gh4567' }
+  let(:apo_druid) { 'druid:fg123gh4567' }
 
   let(:virtual_object_doc) do
     SearchResults::Item.new(solr_doc: {

@@ -64,9 +64,9 @@ RSpec.describe 'Show dashboard', :rack_test do
 
     let(:pinned_druid) { 'druid:bc123df4567' }
     let(:other_pinned_druid) { 'druid:cd456fg7890' }
-    let(:collection_druid) { 'druid:de567gh8901' }
-    let(:other_collection_druid) { 'druid:ef678hi9012' }
-    let(:apo_druid) { 'druid:fg789ij0123' }
+    let(:collection_druid) { 'druid:df567gh8901' }
+    let(:other_collection_druid) { 'druid:fh678hj9012' }
+    let(:apo_druid) { 'druid:fg789jm0123' }
     let(:other_apo_druid) { 'druid:gh890jk1234' }
 
     let(:solr_docs) do
@@ -139,7 +139,7 @@ RSpec.describe 'Show dashboard', :rack_test do
 
     let(:pinned_druid) { 'druid:bc123df4567' }
     let(:other_pinned_druid) { 'druid:cd456fg7890' }
-    let(:apo_druid) { 'druid:fg789ij0123' }
+    let(:apo_druid) { 'druid:fg789jm0123' }
     let(:other_apo_druid) { 'druid:gh890jk1234' }
 
     let(:solr_docs) do
@@ -207,7 +207,7 @@ RSpec.describe 'Show dashboard', :rack_test do
 
     let(:pinned_druid) { 'druid:bc123df4567' }
     let(:other_pinned_druid) { 'druid:cd456fg7890' }
-    let(:agreement_druid) { 'druid:fg789ij0123' }
+    let(:agreement_druid) { 'druid:fg789jm0123' }
     let(:other_agreement_druid) { 'druid:gh890jk1234' }
 
     let(:solr_docs) do
@@ -275,9 +275,9 @@ RSpec.describe 'Show dashboard', :rack_test do
 
     let(:pinned_druid) { 'druid:bc123df4567' }
     let(:other_pinned_druid) { 'druid:cd456fg7890' }
-    let(:collection_druid) { 'druid:de567gh8901' }
-    let(:other_collection_druid) { 'druid:ef678hi9012' }
-    let(:apo_druid) { 'druid:fg789ij0123' }
+    let(:collection_druid) { 'druid:df567gh8901' }
+    let(:other_collection_druid) { 'druid:fh678hj9012' }
+    let(:apo_druid) { 'druid:fg789jm0123' }
     let(:other_apo_druid) { 'druid:gh890jk1234' }
 
     let(:solr_docs) do

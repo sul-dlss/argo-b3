@@ -7,24 +7,24 @@ RSpec.describe Search::ItemResultComponent, type: :component do
   let(:result) { SearchResults::Item.new(solr_doc:, index: 2) }
   let(:solr_doc) { build(:solr_item, druid:, title:, apo_druid:) }
   let(:title) { 'Test Title' }
-  let(:druid) { 'druid:ab123cd4567' }
+  let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:xy987zt6543' }
 
   context 'with a basic item' do
     it 'renders the result' do
       render_inline(component)
 
-      caption = page.find('table#item-result-ab123cd4567 caption')
+      caption = page.find('table#item-result-bb123cd4567 caption')
       expect(caption).to have_css('span', text: '2.')
       expect(caption).to have_link('Test Title', href: "/objects/#{druid}")
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'DRUID', druid)
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Object Type', 'item')
-      expect(find_table_value_cell('item-result-ab123cd4567', 'Admin Policy'))
+      expect(page).to have_table_value('item-result-bb123cd4567', 'DRUID', druid)
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Object Type', 'item')
+      expect(find_table_value_cell('item-result-bb123cd4567', 'Admin Policy'))
         .to have_link('University Archives', href: "/objects/#{apo_druid}")
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Content Type', 'book')
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Access Rights', 'dark, stanford')
-      expect(find_table_value_cell('item-result-ab123cd4567', 'Old Argo'))
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Content Type', 'book')
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Access Rights', 'dark, stanford')
+      expect(find_table_value_cell('item-result-bb123cd4567', 'Old Argo'))
         .to have_link('Test Title', href: "https://argo.stanford.edu/view/#{druid}")
     end
   end
@@ -37,7 +37,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the collection links' do
       render_inline(component)
 
-      cell = find_table_value_cell('item-result-ab123cd4567', 'Collections')
+      cell = find_table_value_cell('item-result-bb123cd4567', 'Collections')
       expect(cell).to have_link(collection_titles.first, href: "/objects/#{collection_druids.first}")
       expect(cell).to have_link(collection_titles.last, href: "/objects/#{collection_druids.last}")
     end
@@ -49,7 +49,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the project links' do
       render_inline(component)
 
-      cell = find_table_value_cell('item-result-ab123cd4567', 'Projects')
+      cell = find_table_value_cell('item-result-bb123cd4567', 'Projects')
       expect(cell).to have_link('Project 1', href: '/search?projects%5B%5D=Project+1')
       expect(cell).to have_link('Project 2 : Project 2a', href: '/search?projects%5B%5D=Project+2+%3A+Project+2a')
     end
@@ -62,7 +62,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the source ID' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Source ID', source_id)
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Source ID', source_id)
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the identifiers' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'IDs', 'test:source-123, folio:a13335677')
+      expect(page).to have_table_value('item-result-bb123cd4567', 'IDs', 'test:source-123, folio:a13335677')
     end
   end
 
@@ -84,7 +84,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the released to values' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Released to', 'Earthworks and Searchworks')
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Released to', 'Earthworks and Searchworks')
     end
   end
 
@@ -95,7 +95,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the ticket links' do
       render_inline(component)
 
-      cell = find_table_value_cell('item-result-ab123cd4567', 'Tickets')
+      cell = find_table_value_cell('item-result-bb123cd4567', 'Tickets')
       expect(cell).to have_link('ticket-001', href: '/search?tickets%5B%5D=ticket-001')
       expect(cell).to have_link('ticket-002', href: '/search?tickets%5B%5D=ticket-002')
     end
@@ -108,7 +108,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the status' do
       render_inline(component)
 
-      expect(page).to have_table_value('item-result-ab123cd4567', 'Status', 'v1 accessioned')
+      expect(page).to have_table_value('item-result-bb123cd4567', 'Status', 'v1 accessioned')
     end
   end
 
@@ -119,7 +119,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the workflow errors' do
       render_inline(component)
 
-      cell = find_table_value_cell('item-result-ab123cd4567', 'Errors')
+      cell = find_table_value_cell('item-result-bb123cd4567', 'Errors')
       expect(cell).to have_css('span.text-danger', text: 'Error 1; Error 2')
     end
   end
