@@ -25,7 +25,7 @@ class ObjectsController < ApplicationController
   # trusting that this action (which always runs moments before them, as the parent page load) has
   # already made it fresh.
   def show # rubocop:disable Metrics/AbcSize
-    druid = params[:druid]
+    druid = druid_param
     lock = Sdr::Repository.lock(druid:)
 
     @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
@@ -185,5 +185,11 @@ class ObjectsController < ApplicationController
     cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid))
     Content.find_by(druid:, lock: cocina_object.lock, immutable: true) ||
       Contents::Builder.call(cocina_object:)
+  end
+
+  def druid_param
+    DruidSupport.prefixed_druid_from(params.expect(:druid)).tap do |druid|
+      raise ActionController::RoutingError, 'Not Found' unless DruidValidator::PATTERN.match?(druid)
+    end
   end
 end

@@ -8,7 +8,7 @@ RSpec.describe Dashboard::PinnedCollectionsTableComponent, type: :component do
   let(:component) { described_class.new(pinned_collection_docs:) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:apo_druid) { 'druid:ef123gh4567' }
+  let(:apo_druid) { 'druid:fg123gh4567' }
 
   let(:collection_doc) do
     SearchResults::Item.new(solr_doc: {

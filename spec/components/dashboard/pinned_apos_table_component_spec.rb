@@ -8,7 +8,7 @@ RSpec.describe Dashboard::PinnedAposTableComponent, type: :component do
   let(:component) { described_class.new(pinned_apo_docs:) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:agreement_druid) { 'druid:ef123gh4567' }
+  let(:agreement_druid) { 'druid:fg123gh4567' }
 
   let(:apo_doc) do
     SearchResults::Item.new(solr_doc: {

@@ -9,7 +9,7 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:collection_druid) { 'druid:cd456fg7890' }
-  let(:apo_druid) { 'druid:ef123gh4567' }
+  let(:apo_druid) { 'druid:fg123gh4567' }
 
   let(:item_doc) do
     SearchResults::Item.new(solr_doc: {
