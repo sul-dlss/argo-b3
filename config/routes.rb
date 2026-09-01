@@ -185,6 +185,9 @@ Rails.application.routes.draw do
 
   namespace :admin do
     get 'groups'
+    get 'impersonate'
+    patch 'impersonate', to: 'update_impersonation'
+    delete 'impersonate', to: 'stop_impersonating', as: :stop_impersonate
   end
 
   mount MissionControl::Jobs::Engine, at: '/jobs'

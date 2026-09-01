@@ -7,7 +7,7 @@ class ItemPolicy < ApplicationPolicy
   def new?
     # User belongs to a workgroup that has edit permissions on anything.
     Permission.permission_type_edit.exists?(
-      workgroup: user.groups
+      workgroup: current_groups
     )
   end
 

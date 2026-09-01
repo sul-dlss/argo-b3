@@ -4,5 +4,9 @@
 # This obviates the need to pass these variables around as arguments, e.g., to view components.
 # They can be accessed with Current.user, etc.
 class Current < ActiveSupport::CurrentAttributes
-  attribute :user
+  attribute :user, :effective_groups, :impersonated_groups
+
+  def impersonating?
+    impersonated_groups.present?
+  end
 end

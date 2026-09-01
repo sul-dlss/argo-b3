@@ -8,7 +8,7 @@ RSpec.describe HeaderComponent, type: :component do
   let(:user) { build_stubbed(:user, name: 'Test User') }
 
   before do
-    allow(Current).to receive(:user).and_return(user)
+    allow(Current).to receive_messages(user:, impersonating?: false)
   end
 
   it 'renders the header' do
@@ -110,15 +110,28 @@ RSpec.describe HeaderComponent, type: :component do
     context 'when the user is an admin' do
       let(:user) { build_stubbed(:user, :admin, name: 'Admin User') }
 
-      it 'renders the disabled admin links' do
+      it 'renders admin links including impersonate' do
         render_inline(component)
 
         expect(page).to have_css('a.dropdown-item.disabled', text: 'Manage permissions')
-        expect(page).to have_css('a.dropdown-item.disabled', text: 'Impersonate')
+        expect(page).to have_link('Impersonate', href: '/admin/impersonate')
       end
     end
 
-    context 'when the user is not an admin' do
+    context 'when the user is impersonating' do
+      before do
+        allow(Current).to receive(:impersonating?).and_return(true)
+      end
+
+      it 'renders impersonate and stop impersonating links' do
+        render_inline(component)
+
+        expect(page).to have_link('Impersonate', href: '/admin/impersonate')
+        expect(page).to have_link('Stop impersonating', href: '/admin/impersonate')
+      end
+    end
+
+    context 'when the user is not an admin and not impersonating' do
       it 'does not render the admin links' do
         render_inline(component)
 

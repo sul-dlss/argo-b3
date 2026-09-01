@@ -12,11 +12,10 @@ RSpec.describe 'Show dashboard', :rack_test do
       expect(page).to have_css('h1', text: 'Argo dashboard')
 
       expect(page).to have_css('h2', text: 'Register & deposit single object')
-      expect(page).to have_button('Item')
-      expect(page).to have_css('a.disabled', text: 'Item')
+      expect(page).to have_button('Item', class: 'disabled')
 
       expect(page).to have_css('h2', text: 'Register or deposit multiple items')
-      expect(page).to have_button('Register multiple items')
+      expect(page).to have_button('Register multiple items', class: 'disabled')
 
       expect(page).to have_no_css('h2', text: 'Admin')
       expect(page).to have_no_button('Manage permissions')
@@ -54,8 +53,8 @@ RSpec.describe 'Show dashboard', :rack_test do
       visit root_path
 
       expect(page).to have_css('h2', text: 'Admin')
-      expect(page).to have_button('Manage permissions')
-      expect(page).to have_button('Impersonate')
+      expect(page).to have_button('Manage permissions', class: 'disabled')
+      expect(page).to have_link('Impersonate', href: admin_impersonate_path)
     end
   end
 

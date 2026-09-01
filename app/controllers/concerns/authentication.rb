@@ -69,8 +69,18 @@ module Authentication
     resume_session || request_authentication
   end
 
-  def resume_session
+  def resume_session # rubocop:disable Metrics/AbcSize
     Current.user ||= User.find_by(email_address: remote_user)
+
+    if Current.user.present?
+      Current.impersonated_groups = Impersonation::Workgroups.from_cookie(cookies:)
+      Current.effective_groups = Current.impersonated_groups.presence || Current.user.groups
+    else
+      Current.impersonated_groups = []
+      Current.effective_groups = []
+    end
+
+    Current.user
   end
 
   def request_authentication

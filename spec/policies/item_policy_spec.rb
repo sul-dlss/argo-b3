@@ -11,6 +11,10 @@ RSpec.describe ItemPolicy do
     let(:user) { create(:user, groups: [workgroup]) }
     let(:workgroup) { 'sdr:test-workgroup' }
 
+    before do
+      Current.effective_groups = user.groups
+    end
+
     context 'when the user belongs to a workgroup with edit permission' do
       before do
         create(:permission, :edit, workgroup:)
@@ -21,6 +25,15 @@ RSpec.describe ItemPolicy do
 
     context 'when the user does not belong to a workgroup with edit permission' do
       it { is_expected.to be false }
+    end
+
+    context 'when the effective groups differ from user groups' do
+      before do
+        Current.effective_groups = ['sdr:effective-group']
+        create(:permission, :edit, workgroup: 'sdr:effective-group')
+      end
+
+      it { is_expected.to be true }
     end
   end
 end

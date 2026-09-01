@@ -20,7 +20,7 @@ class ObjectPolicy < ApplicationPolicy
   # APO.
   def edit?
     Permission.permission_type_edit.exists?(
-      workgroup: user.groups,
+      workgroup: current_groups,
       target_druid: permission_target_druids
     )
   end
