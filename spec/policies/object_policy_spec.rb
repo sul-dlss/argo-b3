@@ -166,6 +166,32 @@ RSpec.describe ObjectPolicy, type: :policy do
         expect(policy.apply(:edit?)).to be true
       end
     end
+
+    context 'with a Cocina-like record that has no structural attribute (e.g., a Collection or AdminPolicy)' do
+      let(:record) do
+        double(
+          externalIdentifier: object_druid,
+          administrative:
+        )
+      end
+      let(:administrative) { double(hasAdminPolicy: apo_druid) }
+
+      context 'when there is an edit permission on the APO' do
+        before do
+          Permission.create!(workgroup: 'sdr:object-editors', permission_type: :edit, target_druid: apo_druid)
+        end
+
+        it 'authorizes edit without raising' do
+          expect(policy.apply(:edit?)).to be true
+        end
+      end
+
+      context 'when there is no matching edit permission' do
+        it 'denies edit without raising' do
+          expect(policy.apply(:edit?)).to be false
+        end
+      end
+    end
   end
 
   describe '#show?' do

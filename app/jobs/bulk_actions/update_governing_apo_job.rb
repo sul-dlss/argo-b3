@@ -32,10 +32,17 @@ module BulkActions
 
       private
 
-      # The user must have edit permission on both the APO currently governing the item and the new APO.
+      # The user must have edit permission on both the APO currently governing the item and the new APO,
+      # unless they are an admin (who can manage anything).
       def can_update_governing_apo?
+        return true if admin?
+
         allowed_to?(:update?, cocina_object, with: ObjectPolicy, context: { user: }) &&
           Permission.permission_type_edit.exists?(workgroup: user.groups, target_druid: new_apo_id)
+      end
+
+      def admin?
+        Permission.permission_type_admin.exists?(workgroup: user.groups)
       end
     end
   end

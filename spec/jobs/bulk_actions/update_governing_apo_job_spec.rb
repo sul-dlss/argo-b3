@@ -102,4 +102,55 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
       expect(bulk_action.druid_count_fail).to eq(0)
     end
   end
+
+  describe '#can_update_governing_apo?' do
+    subject(:job_item) { described_class::JobItem.new(druid:, index: 0, job:) }
+
+    let(:workgroup) { 'sdr:test-workgroup' }
+    let(:job_user) { create(:user, groups: [workgroup]) }
+    let(:job) { instance_double(described_class, user: job_user, new_apo_id:) }
+
+    before do
+      allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    end
+
+    context 'when the user is an admin' do
+      let(:job_user) { create(:user, :admin) }
+
+      it 'allows the update without any edit permissions' do
+        expect(job_item.send(:can_update_governing_apo?)).to be true
+      end
+    end
+
+    context 'when the user has edit permission on both the current and new APO' do
+      before do
+        create(:permission, :edit, workgroup:, target_druid: cocina_object.administrative.hasAdminPolicy)
+        create(:permission, :edit, workgroup:, target_druid: new_apo_id)
+      end
+
+      it 'allows the update' do
+        expect(job_item.send(:can_update_governing_apo?)).to be true
+      end
+    end
+
+    context 'when the user lacks edit permission on the new APO' do
+      before do
+        create(:permission, :edit, workgroup:, target_druid: cocina_object.administrative.hasAdminPolicy)
+      end
+
+      it 'does not allow the update' do
+        expect(job_item.send(:can_update_governing_apo?)).to be false
+      end
+    end
+
+    context 'when the user lacks edit permission on the current APO' do
+      before do
+        create(:permission, :edit, workgroup:, target_druid: new_apo_id)
+      end
+
+      it 'does not allow the update' do
+        expect(job_item.send(:can_update_governing_apo?)).to be false
+      end
+    end
+  end
 end
