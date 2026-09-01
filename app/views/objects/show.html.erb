@@ -38,12 +38,12 @@
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
         <% component.with_button(link: '/', label: 'Use as template', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Download description', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '/', label: 'Download structural CSV', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: '/', label: 'Download structural metadata', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
-      <%= render Elements::ButtonListComponent.new(title: 'Edit', help_text: '(requires new version)', classes: 'mt-4') do |component| %>
+      <%= render Elements::ButtonListComponent.new(title: 'Update', help_text: '(requires new version)', classes: 'mt-4') do |component| %>
         <% component.with_button(link: '/', label: 'Apply APO defaults', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Extract text', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Add embargo', variant: 'outline-primary', disabled: true) %>
