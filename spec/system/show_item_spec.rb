@@ -491,17 +491,41 @@ RSpec.describe 'Show item' do
                                                  find: build_cocina_object(title: original_title))
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(Search::SolrService).to receive(:post)
-        .with(request: hash_including(start: 1)).and_return('response' => { 'docs' => [{ 'id' => previous_druid }] })
-      allow(Search::SolrService).to receive(:post)
-        .with(request: hash_including(start: 3)).and_return('response' => { 'docs' => [{ 'id' => next_druid }] })
+        .with(request: hash_including(start: 1, rows: 3))
+        .and_return('response' => { 'numFound' => 10,
+                                    'docs' => [{ 'id' => previous_druid }, { 'id' => druid }, { 'id' => next_druid }] })
     end
 
     it 'renders previous and next links to the neighboring search results' do
       visit "/objects/#{druid}?search_position=3"
 
       expect(page).to have_css('.item-search-navigation', text: '3 of 10')
-      expect(page).to have_link('‹‹ Previous', href: "/objects/#{previous_druid}?search_position=2")
-      expect(page).to have_link('Next ››', href: "/objects/#{next_druid}?search_position=4")
+      expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}?search_position=2")
+      expect(page).to have_link('Next »', href: "/objects/#{next_druid}?search_position=4")
+      expect(Search::SolrService).to have_received(:post).once
+    end
+
+    it 'does not render item navigation for an invalid position' do
+      visit "/objects/#{druid}?search_position=-1"
+
+      expect(page).to have_css('h1', text: original_title)
+      expect(page).to have_no_css('.item-search-navigation')
+      expect(Search::SolrService).not_to have_received(:post)
+    end
+
+    context 'without a saved search' do
+      before do
+        page.driver.browser.manage.delete_cookie(:last_search)
+      end
+
+      it 'does not render search navigation' do
+        visit "/objects/#{druid}?search_position=3"
+
+        expect(page).to have_css('h1', text: original_title)
+        expect(page).to have_no_link('← Search results')
+        expect(page).to have_no_css('.item-search-navigation')
+        expect(Search::SolrService).not_to have_received(:post)
+      end
     end
   end
 end
