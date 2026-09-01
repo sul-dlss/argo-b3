@@ -1,0 +1,13 @@
+<nav class="item-search-navigation d-flex align-items-center ms-3" aria-label="Search results navigation" data-turbo-prefetch="false">
+  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '‹‹ Previous', link: previous_link, variant: :link,
+                                                                  classes: 'px-0', disabled: previous_druid.blank?,
+                                                                  data: { turbo_frame: '_top' }, rel: 'prev',
+                                                                  'aria-label': 'Go to previous item in search results') %>
+
+  <span class="mx-2"><%= current_position %> of <%= number_with_delimiter(total_results) %></span>
+
+  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Next ››', link: next_link, variant: :link,
+                                                                  classes: 'px-0', disabled: next_druid.blank?,
+                                                                  data: { turbo_frame: '_top' }, rel: 'next',
+                                                                  'aria-label': 'Go to next item in search results') %>
+</nav>

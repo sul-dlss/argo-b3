@@ -6,7 +6,7 @@
           <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
             <%= component.with_link do %>
               <%# Prefetching would record hovered objects as recently viewed. %>
-              <%= helpers.link_to_object(title, druid, data: { turbo_frame: '_top' }) %>
+              <%= helpers.link_to_object(title, druid, params: { search_position: index }, data: { turbo_frame: '_top' }) %>
             <% end %>
           <% end %>
         <% end %>

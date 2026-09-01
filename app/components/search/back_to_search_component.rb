@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for a "Back to search" button that links to the last search performed.
+  # Component for a "Search results" button that links to the last search performed.
   class BackToSearchComponent < ApplicationComponent
     def initialize(last_search_form:)
       @last_search_form = last_search_form
@@ -9,8 +9,8 @@ module Search
     end
 
     def call
-      render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Back to search', classes: 'ps-0',
-                                                                  variant: nil,
+      render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Search results', classes: 'ps-0',
+                                                                  variant: :link,
                                                                   link: search_path(last_search_form.attributes))
     end
 
