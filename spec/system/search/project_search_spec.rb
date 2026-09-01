@@ -16,7 +16,7 @@ RSpec.describe 'Project search', :solr do
 
     within(find_project_results_section) do
       expect(page).to have_result_count(1)
-      find_project_result('Project 2 : Project 2a').first('a').click
+      find_project_result('Project 2 : Project 2a').find('a').click
     end
 
     within(find_item_results_section) do

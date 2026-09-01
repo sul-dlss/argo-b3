@@ -16,7 +16,7 @@ RSpec.describe 'Tag search', :solr do
 
     within(find_tag_results_section) do
       expect(page).to have_result_count(1)
-      find_tag_result('Tag 2 : Tag 2a').first('a').click
+      find_tag_result('Tag 2 : Tag 2a').find('a').click
     end
 
     within(find_item_results_section) do

@@ -20,7 +20,8 @@ RSpec.describe 'Item search', :solr do
       find_search_field.fill_in(with: item_doc[Search::Fields::TITLE])
       click_button('Search')
 
-      expect(find_project_results_section).to be_nil
+      expect(page).to have_css('turbo-frame#projects-search[complete]')
+      expect(page).to have_no_css('section[aria-label="Project results"]')
       within(find_item_results_section) do
         expect(page).to have_result_count(1)
         expect(page).to have_item_result(item_doc)
@@ -82,7 +83,8 @@ RSpec.describe 'Item search', :solr do
         find_search_field.fill_in(with: '')
         click_button('Search')
 
-        expect(find_item_results_section).to be_nil
+        expect(page).to have_css('turbo-frame#items-search[complete]')
+        expect(page).to have_no_css('section[aria-label="Item, collection, and admin policy results"]')
       end
     end
 
