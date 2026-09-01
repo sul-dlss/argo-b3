@@ -34,7 +34,7 @@ class ObjectsController < ApplicationController
     refresh_cocina_hash(druid, lock) # Warm the cache for the other frames (e.g., overview, json, purl_preview).
 
     set_from_last_search_cookie # This provides @last_search_form and @total_results
-    set_search_navigation(druid:)
+    set_search_navigation
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
     content = Content.find_by(druid:, lock:, immutable: false)
@@ -107,13 +107,13 @@ class ObjectsController < ApplicationController
   # Determines the previous/next druids within the current search results, based on the
   # "search_position" (1-based position within the search result set) that was passed along
   # from the search results list.
-  def set_search_navigation(druid:)
+  def set_search_navigation
     position = Integer(params[:search_position], exception: false)
     total_results = Integer(@total_results, exception: false)
     return if @last_search_form.blank? || position.nil? || total_results.nil?
     return unless position.positive?
 
-    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:, current_druid: druid)
+    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:)
     return if navigation.blank?
 
     @search_position = position

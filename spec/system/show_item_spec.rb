@@ -499,7 +499,7 @@ RSpec.describe 'Show item' do
     it 'renders previous and next links to the neighboring search results' do
       visit "/objects/#{druid}?search_position=3"
 
-      expect(page).to have_css('.item-search-navigation', text: '3 of 10')
+      expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
       expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}?search_position=2")
       expect(page).to have_link('Next »', href: "/objects/#{next_druid}?search_position=4")
       expect(Search::SolrService).to have_received(:post).once

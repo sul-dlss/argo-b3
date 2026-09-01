@@ -14,7 +14,7 @@
         <span class="btn btn-link disabled px-0" aria-disabled="true">« Previous</span>
       <% end %>
 
-      <span class="mx-2 fw-bold"><%= current_position %> of <%= number_with_delimiter(total_results) %></span>
+      <span class="mx-2 fw-bold"><%= current_position %></span> of <span class="mx-2 fw-bold"><%= number_with_delimiter(total_results) %></span>
 
       <% if next_druid.present? %>
         <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Next »', link: next_path,

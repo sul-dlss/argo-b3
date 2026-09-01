@@ -3,13 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::ItemNavigation do
-  let(:navigation) { described_class.call(search_form:, position:, current_druid:) }
+  let(:navigation) { described_class.call(search_form:, position:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:position) { 3 }
   let(:previous_druid) { 'druid:bc123df4567' }
   let(:current_druid) { 'druid:cd234eg5678' }
-  let(:result_druid) { current_druid }
   let(:next_druid) { 'druid:df345fh6789' }
   let(:solr_response) do
     {
@@ -17,7 +16,7 @@ RSpec.describe Searchers::ItemNavigation do
         'numFound' => 10,
         'docs' => [
           { 'id' => previous_druid },
-          { 'id' => result_druid },
+          { 'id' => current_druid },
           { 'id' => next_druid }
         ]
       }
@@ -48,7 +47,7 @@ RSpec.describe Searchers::ItemNavigation do
       {
         'response' => {
           'numFound' => 10,
-          'docs' => [{ 'id' => result_druid }, { 'id' => next_druid }]
+          'docs' => [{ 'id' => current_druid }, { 'id' => next_druid }]
         }
       }
     end
@@ -65,7 +64,7 @@ RSpec.describe Searchers::ItemNavigation do
       {
         'response' => {
           'numFound' => 10,
-          'docs' => [{ 'id' => previous_druid }, { 'id' => result_druid }]
+          'docs' => [{ 'id' => previous_druid }, { 'id' => current_druid }]
         }
       }
     end
@@ -73,14 +72,6 @@ RSpec.describe Searchers::ItemNavigation do
     it 'returns only the previous druid' do
       expect(navigation.previous_druid).to eq(previous_druid)
       expect(navigation.next_druid).to be_nil
-    end
-  end
-
-  context 'when the current druid does not match the result at the requested position' do
-    let(:result_druid) { 'druid:fg456hj7890' }
-
-    it 'returns nil' do
-      expect(navigation).to be_nil
     end
   end
 
