@@ -35,7 +35,7 @@ RSpec.describe 'Item search', :solr do
         find_search_field.fill_in(with: 'Item')
         click_button('Search')
 
-        within(find_item_results_section) do
+        within('turbo-frame#items-search') do
           expect(page).to have_result_count(11)
           expect(page).to have_current_results_page(1)
           expect(page).to have_total_results_pages(3)
@@ -44,25 +44,19 @@ RSpec.describe 'Item search', :solr do
           expect(page).not_to have_previous_page(wait: 0)
           expect(page).not_to have_previous_page(brief: true, wait: 0)
           find_next_page.click
-        end
 
-        within(find_item_results_section) do
           expect(page).to have_current_results_page(2)
           expect(page).to have_next_page(brief: true)
           expect(page).to have_previous_page(brief: true)
           find_next_page(brief: true).click
-        end
 
-        within(find_item_results_section) do
           expect(page).to have_current_results_page(3)
           expect(page).not_to have_next_page(wait: 0)
           expect(page).not_to have_next_page(brief: true, wait: 0)
           expect(page).to have_previous_page
           expect(page).to have_previous_page(brief: true)
           find_previous_page.click
-        end
 
-        within(find_item_results_section) do
           expect(page).to have_current_results_page(2)
         end
       end
