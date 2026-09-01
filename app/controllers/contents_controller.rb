@@ -54,16 +54,18 @@ class ContentsController < ApplicationController
     files.each do |index, file|
       # Dropzone controller is modified to provide the full path as content[:paths][index]
       filepath = params[:content][:paths][index]
-      # IgnoreFileService will be added in future PR.
-      # next if IgnoreFileService.call(filepath:)
+      next if IgnoreFileService.call(filepath:)
 
-      # Current naive implementation is one FileSet per file.
-      content_file_set = @content.content_file_sets.create(file_set_type: 'object',
-                                                           label: '')
-      content_file_binary = find_or_build_content_file_binary(filepath:)
-      attach_file(content_file_binary:, file:)
-      content_file_set.content_files.create!(content_file_binary:, **file_params)
+      create_content_file(filepath:, file:)
     end
+  end
+
+  # Current naive implementation is one FileSet per file.
+  def create_content_file(filepath:, file:)
+    content_file_set = @content.content_file_sets.create(file_set_type: 'object', label: '')
+    content_file_binary = find_or_build_content_file_binary(filepath:)
+    attach_file(content_file_binary:, file:)
+    content_file_set.content_files.create!(content_file_binary:, **file_params)
   end
 
   def fetch_cocina_hash(druid:, lock:)
