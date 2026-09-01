@@ -20,7 +20,7 @@ RSpec.describe 'Project search', :solr do
 
     within(find_ticket_results_section) do
       expect(page).to have_result_count(1)
-      find_ticket_result('TESTREQ-0').first('a').click
+      find_ticket_result('TESTREQ-0').find('a').click
     end
 
     within(find_item_results_section) do

@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 def find_item_results_section
-  all('section[aria-label="Item, collection, and admin policy results"]')&.first
+  find('section[aria-label="Item, collection, and admin policy results"]')
 end
 
 def find_project_results_section
-  all('section[aria-label="Project results"]')&.first
+  find('section[aria-label="Project results"]')
 end
 
 def find_tag_results_section
-  all('section[aria-label="Tag results"]')&.first
+  find('section[aria-label="Tag results"]')
 end
 
 def find_ticket_results_section
-  all('section[aria-label="Ticket results"]')&.first
+  find('section[aria-label="Ticket results"]')
 end
 
 def find_pagination(brief: false)
