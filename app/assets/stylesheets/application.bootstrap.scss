@@ -69,7 +69,7 @@ $search-color: rgb(#{$search-color-rgb});
   border-bottom: 3px solid rgb(var(--stanford-archway-dark-rgb)) !important;
   color: rgb(var(--stanford-archway-dark-rgb)) !important;
 }
- 
+
 .required {
   font-weight: $font-weight-bold;
   color: var(--stanford-poppy-dark);
@@ -83,11 +83,20 @@ $search-color: rgb(#{$search-color-rgb});
 // Note that pin colors for objects are defined in object-type-colors mixin in show.scss.
 .pin {
   &.not-pinned {
+    --bs-btn-active-color: black;
+    --bs-btn-disabled-color: black;
+
     color: black;
   }
 
   &.btn {
     // Removes vertical button padding so pin rows don't take up more height than text.
     --bs-btn-padding-y: 0;
+
+    // Prevents Turbo's temporary disabled state from fading the pin.
+    --bs-btn-disabled-opacity: 1;
+
+    // Prevents Turbo's page morph from animating the pin.
+    transition: none;
   }
 }
