@@ -99,11 +99,12 @@ Note:
 
 
 ### Deploy
+
+To build and deploy the local, committed code:
+
 ```
 bin/kamal-otk qa deploy
 ```
-
-This will build and deploy the local, committed code.
 
 #### Rollback
 ```
@@ -123,6 +124,20 @@ bin/kamal-otk qa app start
 ```
 bin/kamal-otk qa app maintenance --message "Wait for it..."
 bin/kamal-otk qa app live
+```
+
+#### Console
+
+To run a rails console on a deployed environment:
+
+```
+bin/kamal-otk prod console
+```
+
+To run a shell inside the deployed app container:
+
+```
+bin/kamal-otk prod shell
 ```
 
 ### Monitoring
