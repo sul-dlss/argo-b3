@@ -82,7 +82,7 @@ class DashboardController < ApplicationController
                                  end
     @pinned_item_docs = grouped_pinned_object_docs.fetch('item', [])
     @pinned_collection_docs = grouped_pinned_object_docs.fetch('collection', [])
-    @pinned_apo_docs = grouped_pinned_object_docs.fetch('adminPolicy', [])
+    @pinned_apo_docs = grouped_pinned_object_docs.fetch('APO', [])
     @pinned_virtual_object_docs = grouped_pinned_object_docs.fetch('virtual object', [])
   end
 end

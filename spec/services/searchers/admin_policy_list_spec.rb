@@ -25,7 +25,7 @@ RSpec.describe Searchers::AdminPolicyList do
 
     expect(Search::SolrService).to have_received(:post) do |args|
       solr_query = args[:request].with_indifferent_access
-      expect(solr_query['fq']).to eq("#{Search::Fields::OBJECT_TYPES}:adminPolicy")
+      expect(solr_query['fq']).to eq("#{Search::Fields::OBJECT_TYPES}:APO")
       expect(solr_query['fl']).to eq([Search::Fields::ID, Search::Fields::TITLE])
     end
   end

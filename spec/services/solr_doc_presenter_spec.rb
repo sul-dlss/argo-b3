@@ -32,7 +32,7 @@ RSpec.describe SolrDocPresenter do
 
   describe '#admin_policy?' do
     context 'when the object type is admin policy' do
-      let(:object_type) { 'adminPolicy' }
+      let(:object_type) { 'APO' }
 
       it 'returns true' do
         expect(presenter.admin_policy?).to be true
@@ -101,8 +101,8 @@ RSpec.describe SolrDocPresenter do
       end
     end
 
-    context 'when the object type is admin policy' do
-      let(:object_type) { 'adminPolicy' }
+    context 'when the object type is an APO' do
+      let(:object_type) { 'APO' }
 
       it 'returns false' do
         expect(presenter.dro?).to be false
@@ -143,8 +143,8 @@ RSpec.describe SolrDocPresenter do
       end
     end
 
-    context 'when the object type is admin policy' do
-      let(:object_type) { 'adminPolicy' }
+    context 'when the object type is an APO' do
+      let(:object_type) { 'APO' }
 
       it 'returns false' do
         expect(presenter.dro_or_collection?).to be false

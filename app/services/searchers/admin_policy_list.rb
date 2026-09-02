@@ -24,7 +24,7 @@ module Searchers
     def solr_request
       {
         q: '*:*',
-        fq: "#{OBJECT_TYPES}:adminPolicy",
+        fq: "#{OBJECT_TYPES}:APO",
         fl: [ID, TITLE],
         rows: 10_000
       }

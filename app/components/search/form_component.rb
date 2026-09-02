@@ -14,7 +14,7 @@ module Search
     def object_type_options
       [
         %w[Agreement agreement],
-        %w[APO adminPolicy],
+        %w[APO APO],
         %w[Collection collection],
         %w[Item item],
         ['Virtual object', 'virtual object']

@@ -20,7 +20,7 @@ RSpec.describe SearchResults::FacetCounts do
             { 'val' => 'collection', 'count' => 2 },
             { 'val' => 'agreement', 'count' => 3 },
             { 'val' => 'virtual object', 'count' => 3 },
-            { 'val' => 'adminPolicy', 'count' => 4 }
+            { 'val' => 'APO', 'count' => 4 }
           ],
           'numBuckets' => 100
         }
@@ -68,7 +68,7 @@ RSpec.describe SearchResults::FacetCounts do
                                        { value: 'collection', count: 2 },
                                        { value: 'agreement', count: 3 },
                                        { value: 'virtual object', count: 3 },
-                                       { value: 'adminPolicy', count: 4 }
+                                       { value: 'APO', count: 4 }
                                      ])
       end
     end
