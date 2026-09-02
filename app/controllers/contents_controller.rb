@@ -29,10 +29,11 @@ class ContentsController < ApplicationController
 
   def update
     verified_content_id = verify_token(params[:id])
-    @content = Content.find(verified_content_id)
-    @cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid: @content.druid, lock: @content.lock))
+    content = Content.find(verified_content_id)
+    cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid: content.druid, lock: content.lock))
 
-    update_files
+    Contents::FileUpdater.call(content:, cocina_object:, files: params[:content][:files],
+                               paths: params[:content][:paths])
 
     head :ok
   end
@@ -49,25 +50,6 @@ class ContentsController < ApplicationController
     SolrDocPresenter.new(solr_doc:)
   end
 
-  def update_files
-    files = params[:content][:files]
-    files.each do |index, file|
-      # Dropzone controller is modified to provide the full path as content[:paths][index]
-      filepath = params[:content][:paths][index]
-      next if IgnoreFileService.call(filepath:)
-
-      create_content_file(filepath:, file:)
-    end
-  end
-
-  # Current naive implementation is one FileSet per file.
-  def create_content_file(filepath:, file:)
-    content_file_set = @content.content_file_sets.create(file_set_type: 'object', label: '')
-    content_file_binary = find_or_build_content_file_binary(filepath:)
-    attach_file(content_file_binary:, file:)
-    content_file_set.content_files.create!(content_file_binary:, **file_params)
-  end
-
   def fetch_cocina_hash(druid:, lock:)
     cache_key = "contents/cocina-hash/#{druid}/#{lock}"
     Rails.cache.fetch(cache_key, expires_in: COCINA_HASH_EXPIRATION) do
@@ -80,32 +62,5 @@ class ContentsController < ApplicationController
     cache_key = "contents/cocina-hash/#{cocina_object.externalIdentifier}/#{cocina_object.lock}"
     Rails.cache.write(cache_key, CacheSupport.cacheable_cocina_object(cocina_object:),
                       expires_in: COCINA_HASH_EXPIRATION)
-  end
-
-  def find_or_build_content_file_binary(filepath:)
-    @content.content_file_binaries.find_by(filepath:) ||
-      @content.content_file_binaries.build(filepath:)
-  end
-
-  def attach_file(content_file_binary:, file:)
-    content_file_binary.file_location = :attached
-    content_file_binary.size = file.size
-    content_file_binary.sha1_digest = nil
-    content_file_binary.md5_digest = nil
-    content_file_binary.save!
-    content_file_binary.file.attach(file)
-  end
-
-  def file_params
-    access = @cocina_object.access.embargo.presence || @cocina_object.access
-    {
-      label: '',
-      preserve: true,
-      publish: true,
-      shelve: true,
-      view: access.view == 'citation-only' ? 'dark' : access.view,
-      download: access.download,
-      location: access.location
-    }
   end
 end
