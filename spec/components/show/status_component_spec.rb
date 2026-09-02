@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:, druid:) }
+  subject(:component) { described_class.new(object_status_presenter:) }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }

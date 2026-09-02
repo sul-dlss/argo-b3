@@ -61,8 +61,7 @@
     <% layout.with_main_content do %>
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
-          <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter,
-                                               druid: @solr_doc.druid) %>
+          <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter) %>
         </div>
         <% if @solr_doc.dro_or_collection? %>
           <div class="show-box flex-fill">
