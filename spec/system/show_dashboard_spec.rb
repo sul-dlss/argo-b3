@@ -215,14 +215,14 @@ RSpec.describe 'Show dashboard', :rack_test do
         pinned_druid => {
           Search::Fields::ID => pinned_druid,
           Search::Fields::TITLE => 'The pinned APO title',
-          Search::Fields::OBJECT_TYPES => ['adminPolicy'],
+          Search::Fields::OBJECT_TYPES => ['APO'],
           Search::Fields::AGREEMENT_DRUID => agreement_druid,
           Search::Fields::AGREEMENT_TITLE => 'The pinned APO agreement'
         },
         other_pinned_druid => {
           Search::Fields::ID => other_pinned_druid,
           Search::Fields::TITLE => 'The other pinned APO title',
-          Search::Fields::OBJECT_TYPES => ['adminPolicy'],
+          Search::Fields::OBJECT_TYPES => ['APO'],
           Search::Fields::AGREEMENT_DRUID => other_agreement_druid,
           Search::Fields::AGREEMENT_TITLE => 'The other pinned APO agreement'
         }
