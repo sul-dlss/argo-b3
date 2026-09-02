@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:) }
+  subject(:component) { described_class.new(object_status_presenter:, druid:) }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
@@ -22,10 +22,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Draft, not deposited')
-      expect(page).to have_link('Edit item details', href: '#')
-      expect(page).to have_link('Manage files', href: '#')
-      expect(page).to have_link('Manage description', href: '#')
-      expect(page).to have_css('a[aria-disabled="true"]', text: 'Edit item details')
+      expect(page).to have_button('Edit item', class: 'btn btn-outline-primary btn-sm disabled')
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit",
+                                                class: 'btn btn-outline-primary btn-sm')
+      expect(page).to have_button('Deposit', class: 'btn btn-primary btn-sm disabled')
     end
   end
 
@@ -37,7 +37,10 @@ RSpec.describe Show::StatusComponent, type: :component do
 
       expect(page).to have_css('h2', text: 'Deposited')
       expect(page).to have_css('h2 i.bi-check-circle-fill')
-      expect(page).to have_link('Edit item details', href: '#')
+      expect(page).to have_button('Edit item', class: 'btn btn-outline-primary btn-sm disabled')
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit",
+                                                class: 'btn btn-outline-primary btn-sm')
+      expect(page).to have_no_button('Deposit')
     end
   end
 

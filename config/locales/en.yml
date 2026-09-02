@@ -79,9 +79,9 @@ en:
       staging:
         heading: "Staging files"
       actions:
-        edit_item_details: "Edit item details"
+        edit_item: "Edit item"
         manage_files: "Manage files"
-        manage_description: "Manage description"
+        deposit: "Deposit"
     released_to:
       released:
         heading: "Released to"

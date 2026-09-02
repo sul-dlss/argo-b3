@@ -8,12 +8,13 @@ module Show
       error: 'bi-exclamation-triangle-fill text-danger'
     }.freeze
 
-    def initialize(object_status_presenter:)
+    def initialize(object_status_presenter:, druid:)
       @object_status_presenter = object_status_presenter
+      @druid = druid
       super()
     end
 
-    attr_reader :object_status_presenter
+    attr_reader :object_status_presenter, :druid
 
     delegate :status, :workflow_error_messages, to: :object_status_presenter
 
