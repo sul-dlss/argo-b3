@@ -187,11 +187,6 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     form: BulkActions::ManageEmbargoForm
   )
 
-  MANAGE_GOVERNING_APO = Config.new(
-    label: 'Update governing APO',
-    help_text: 'Moves the object to a new governing APO.'
-  )
-
   MANAGE_LICENSE_AND_RIGHTS_STATEMENTS = Config.new(
     label: 'Update licenses and rights statements',
     help_text: 'Edit license, copyright statement, and/or use & reproduction statements',
@@ -273,6 +268,14 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     job: BulkActions::RepublishJob,
     path_helper: to_path_helper(:new_bulk_actions_republish_path),
     form: BulkActions::BasicForm
+  )
+
+  UPDATE_GOVERNING_APO = Config.new(
+    label: 'Update governing APO',
+    help_text: 'Moves the object to a new governing APO.',
+    job: BulkActions::UpdateGoverningApoJob,
+    path_helper: to_path_helper(:new_bulk_actions_update_governing_apo_path),
+    form: BulkActions::UpdateGoverningApoForm
   )
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(

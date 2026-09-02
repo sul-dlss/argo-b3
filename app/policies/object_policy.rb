@@ -34,7 +34,7 @@ class ObjectPolicy < ApplicationPolicy
                record.structural&.isMemberOf
              elsif record.respond_to?(:collection_druids)
                record.collection_druids
-             else
+             elsif record.respond_to?(:fetch)
                record.fetch(Search::Fields::COLLECTION_DRUIDS, nil)
              end
 
