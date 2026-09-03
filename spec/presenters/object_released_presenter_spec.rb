@@ -51,7 +51,7 @@ RSpec.describe ObjectReleasedPresenter do
     it 'returns a label and url for each release target' do
       expect(presenter.release_tag_links).to eq(
         [
-          { label: 'Searchworks', url: "https://searchworks.stanford.edu/view/#{druid}" },
+          { label: 'Searchworks', url: 'https://searchworks.stanford.edu/view/bc123df4567' },
           { label: 'Earthworks', url: 'https://earthworks.stanford.edu/catalog/stanford-bc123df4567' },
           { label: 'PURL sitemap', url: 'https://purl.stanford.edu/bc123df4567' }
         ]

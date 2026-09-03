@@ -19,7 +19,7 @@ module LinkHelper
   end
 
   def searchworks_url(druid, catalog_record_id = nil)
-    "#{Settings.searchworks.url}/view/#{catalog_record_id.presence || druid}"
+    "#{Settings.searchworks.url}/view/#{catalog_record_id.presence || DruidSupport.bare_druid_from(druid)}"
   end
 
   def earthworks_url(druid)
