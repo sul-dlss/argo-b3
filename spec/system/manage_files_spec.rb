@@ -23,6 +23,8 @@ RSpec.describe 'Manage files' do
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
   before do
+    create(:permission, :read_unrestricted, workgroup: user.groups.first)
+
     sign_in(user)
 
     allow(Sdr::Repository).to receive_messages(find: cocina_object,

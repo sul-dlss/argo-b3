@@ -18,7 +18,7 @@ RSpec.describe 'Create an item' do
   end
 
   context 'when valid' do
-    let(:registered_cocina_object) { build(:dro_with_metadata) }
+    let(:registered_cocina_object) { build(:dro_with_metadata, admin_policy_id: apo_druid) }
     let(:druid) { registered_cocina_object.externalIdentifier }
 
     let(:object_client) do
@@ -37,7 +37,7 @@ RSpec.describe 'Create an item' do
     before do
       allow(Sdr::Repository).to receive_messages(accession: nil, create_release_tag: nil,
                                                  register: registered_cocina_object, find: registered_cocina_object,
-                                                 find_solr: build(:solr_item, druid:, title: 'The Title'),
+                                                 find_solr: build(:solr_item, druid:, title: 'The Title', apo_druid:),
                                                  lock: registered_cocina_object.lock,
                                                  source_id_exists?: false)
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])

@@ -6,7 +6,6 @@ RSpec.describe ObjectPolicy, type: :policy do
   subject(:policy) { described_class.new(record, user:) }
 
   let(:user) { create(:user, groups: ['sdr:object-editors']) }
-  let(:other_group_user) { create(:user, groups: ['sdr:other-group']) }
 
   let(:object_druid) { generate(:unique_druid) }
   let(:collection_druid) { generate(:unique_druid) }
@@ -195,16 +194,158 @@ RSpec.describe ObjectPolicy, type: :policy do
   end
 
   describe '#show?' do
-    let(:record) { {} }
-
-    it 'allows show for the primary user' do
-      expect(policy.apply(:show?)).to be true
+    let(:record) do
+      {
+        Search::Fields::ID => object_druid,
+        Search::Fields::COLLECTION_DRUIDS => [collection_druid],
+        Search::Fields::APO_DRUID => [apo_druid]
+      }
     end
 
-    it 'allows show for another user' do
-      other_user_policy = described_class.new(record, user: other_group_user)
+    context 'when the user has edit permission on the object collection and the APO is read restricted' do
+      before do
+        create(:permission, :edit, workgroup: 'sdr:object-editors', target_druid: collection_druid)
+        create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: apo_druid)
+      end
 
-      expect(other_user_policy.apply(:show?)).to be true
+      it 'authorizes show because an updater is also a reader' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read restricted permission on the object' do
+      before do
+        create(:permission, :read_restricted, workgroup: 'sdr:object-editors', target_druid: object_druid)
+      end
+
+      it 'authorizes show' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read restricted permission on the object collection' do
+      before do
+        create(:permission, :read_restricted, workgroup: 'sdr:object-editors', target_druid: collection_druid)
+      end
+
+      it 'authorizes show' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read restricted permission on the object APO' do
+      before do
+        create(:permission, :read_restricted, workgroup: 'sdr:object-editors', target_druid: apo_druid)
+      end
+
+      it 'authorizes show' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read unrestricted permission and the object is not read restricted' do
+      before do
+        create(:permission, :read_unrestricted, workgroup: 'sdr:object-editors')
+      end
+
+      it 'authorizes show' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read unrestricted permission and the object is read restricted for another group' do
+      before do
+        create(:permission, :read_unrestricted, workgroup: 'sdr:object-editors')
+        create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: collection_druid)
+      end
+
+      it 'denies show' do
+        expect(policy.apply(:show?)).to be false
+      end
+    end
+
+    context 'when the object belongs to both one restricted and one unrestricted collection' do
+      let(:restricted_collection_druid) { 'druid:df234gh5678' }
+      let(:unrestricted_collection_druid) { 'druid:hj345km6789' }
+      let(:record) do
+        {
+          Search::Fields::ID => object_druid,
+          Search::Fields::COLLECTION_DRUIDS => [restricted_collection_druid, unrestricted_collection_druid],
+          Search::Fields::APO_DRUID => [apo_druid]
+        }
+      end
+
+      context 'when an unrestricted reader does not have access to the restricted collection' do
+        before do
+          create(:permission, :read_unrestricted, workgroup: 'sdr:object-editors')
+          create(:permission, :read_restricted,
+                 workgroup: 'sdr:other-group', target_druid: restricted_collection_druid)
+        end
+
+        it 'denies show' do
+          expect(policy.apply(:show?)).to be false
+        end
+      end
+
+      context 'when an unrestricted reader has access to the restricted collection' do
+        before do
+          create(:permission, :read_unrestricted, workgroup: 'sdr:object-editors')
+          create(:permission, :read_restricted,
+                 workgroup: 'sdr:object-editors', target_druid: restricted_collection_druid)
+        end
+
+        it 'authorizes show' do
+          expect(policy.apply(:show?)).to be true
+        end
+      end
+    end
+
+    context 'when the object belongs to collections restricted to different groups' do
+      let(:second_collection_druid) { 'druid:np456qr7890' }
+      let(:record) do
+        {
+          Search::Fields::ID => object_druid,
+          Search::Fields::COLLECTION_DRUIDS => [collection_druid, second_collection_druid],
+          Search::Fields::APO_DRUID => [apo_druid]
+        }
+      end
+
+      before do
+        create(:permission, :read_restricted, workgroup: 'sdr:object-editors', target_druid: collection_druid)
+        create(:permission, :read_restricted,
+               workgroup: 'sdr:other-group', target_druid: second_collection_druid)
+      end
+
+      it 'authorizes show when the user has access to one restricted collection' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when the user has read unrestricted permission and an unrelated object is read restricted' do
+      before do
+        create(:permission, :read_unrestricted, workgroup: 'sdr:object-editors')
+        create(:permission, :read_restricted, workgroup: 'sdr:other-group')
+      end
+
+      it 'authorizes show' do
+        expect(policy.apply(:show?)).to be true
+      end
+    end
+
+    context 'when a matching read restricted permission exists for a different group' do
+      before do
+        create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: apo_druid)
+      end
+
+      it 'denies show' do
+        expect(policy.apply(:show?)).to be false
+      end
+    end
+
+    context 'when no matching permissions exist' do
+      it 'denies show' do
+        expect(policy.apply(:show?)).to be false
+      end
     end
   end
 end

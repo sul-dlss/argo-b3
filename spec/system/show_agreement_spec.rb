@@ -37,6 +37,8 @@ RSpec.describe 'Show agreement' do
   end
 
   before do
+    create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
     allow(Sdr::Repository).to receive_messages(find_solr: solr_doc, find: cocina_object)

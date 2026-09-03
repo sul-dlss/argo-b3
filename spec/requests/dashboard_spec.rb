@@ -39,6 +39,8 @@ RSpec.describe 'Dashboard' do
     end
 
     before do
+      create(:permission, :read_unrestricted, workgroup: user.groups.first)
+
       allow(Sdr::Repository).to receive(:lock) { |druid:| "lock-#{druid}" }
       allow(Sdr::Repository).to receive(:find_solr) { |druid:| solr_doc_for.call(druid) }
       allow(Sdr::Repository).to receive(:find) { |druid:| build(:dro_with_metadata, id: druid) }

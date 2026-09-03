@@ -5,8 +5,14 @@ class ObjectPolicy < ApplicationPolicy
   alias_rule :show_json?, to: :show?
   alias_rule :update?, to: :edit?
 
+  # 1. If you can edit the object, you can read it
+  # 2. If the object is restricted, only users with a matching restricted permission can read.
+  # 3. If the object is not restricted, users with unrestricted permission can read.
   def show?
-    true
+    return true if edit?
+    return read_restricted? if record_read_restricted?
+
+    read_unrestricted?
   end
 
   # Edit permission is granted when a user is in a workgroup with edit
@@ -15,14 +21,32 @@ class ObjectPolicy < ApplicationPolicy
   def edit?
     Permission.permission_type_edit.exists?(
       workgroup: user.groups,
-      target_druid: edit_target_druids
+      target_druid: permission_target_druids
     )
   end
 
   private
 
-  def edit_target_druids
+  def permission_target_druids
     [record_druid, *record_collection_druids, record_admin_policy_druid].compact.uniq
+  end
+
+  def read_restricted?
+    read_restricted_permissions.exists?(workgroup: user.groups)
+  end
+
+  def read_unrestricted?
+    Permission.permission_type_read_unrestricted.exists?(workgroup: user.groups)
+  end
+
+  def record_read_restricted?
+    read_restricted_permissions.exists?
+  end
+
+  def read_restricted_permissions
+    Permission.permission_type_read_restricted.where(
+      target_druid: permission_target_druids
+    )
   end
 
   def record_druid

@@ -180,6 +180,8 @@ RSpec.describe 'Show item' do
   end
 
   before do
+    create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
 
