@@ -93,7 +93,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
     end
   end
 
-  context 'when the object is an admin policy' do
+  context 'when the object is an APO' do
     let(:cocina_object) { build(:admin_policy_with_metadata, id: druid) }
 
     it 'records a failure and does not write to CSV' do

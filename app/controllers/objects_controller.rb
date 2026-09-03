@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Controller for objects (DRO, collection, admin policy)
+# Controller for objects (DRO, collection, adminPolicy)
 class ObjectsController < ApplicationController
   RECENT_OBJECTS_LIMIT = 5
 

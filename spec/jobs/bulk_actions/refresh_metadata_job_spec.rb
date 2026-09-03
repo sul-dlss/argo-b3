@@ -46,7 +46,7 @@ RSpec.describe BulkActions::RefreshMetadataJob do
     expect(bulk_action.druid_count_success).to eq(1)
   end
 
-  context 'when the object is an admin policy' do
+  context 'when the object is an APO' do
     let(:cocina_object) { build(:admin_policy_with_metadata, id: druid) }
 
     it 'does not refresh the metadata' do

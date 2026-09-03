@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Admin policy facets', :solr do
+RSpec.describe 'APO facets', :solr do
   before do
     create(:solr_item)
     sign_in(create(:user))

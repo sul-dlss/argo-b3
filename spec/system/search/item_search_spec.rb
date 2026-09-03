@@ -84,7 +84,7 @@ RSpec.describe 'Item search', :solr do
         click_button('Search')
 
         expect(page).to have_css('turbo-frame#items-search[complete]')
-        expect(page).to have_no_css('section[aria-label="Item, collection, and admin policy results"]')
+        expect(page).to have_no_css('section[aria-label="Item, collection, and APO results"]')
       end
     end
 

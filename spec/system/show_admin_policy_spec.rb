@@ -2,12 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Show admin policy' do
+RSpec.describe 'Show APO' do
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
 
-  let(:original_title) { 'My admin policy title' }
-  let(:updated_title) { 'My updated admin policy title' }
+  let(:original_title) { 'My APO title' }
+  let(:updated_title) { 'My updated APO title' }
 
   # Versions are tested in show_dro_spec so returning [].
   let(:object_client) do
@@ -50,7 +50,7 @@ RSpec.describe 'Show admin policy' do
     sign_in(create(:user))
   end
 
-  it 'displays the admin policy' do
+  it 'displays the APO' do
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: original_title))
@@ -83,8 +83,8 @@ RSpec.describe 'Show admin policy' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
-    expect(page).to have_table_value('overview-table', 'Object type', 'Admin policy')
-    within(find_table_value_cell('overview-table', 'Admin policy')) do
+    expect(page).to have_table_value('overview-table', 'Object type', 'APO')
+    within(find_table_value_cell('overview-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')

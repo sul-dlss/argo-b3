@@ -10,7 +10,7 @@ RSpec.describe Search::LoadingItemResultsComponent, type: :component do
   it 'renders placeholders' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Loading item, collection, and admin policy results"]')
+    expect(page).to have_css('section[aria-label="Loading item, collection, and APO results"]')
     expect(page).to have_css('ul.placeholder-glow li table caption span.placeholder', count: 3)
     table = page.first('table')
     expect(table).to have_css('tr th span.placeholder', count: 10)

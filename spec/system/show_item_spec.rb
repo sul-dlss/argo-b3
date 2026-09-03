@@ -245,7 +245,7 @@ RSpec.describe 'Show item' do
 
     # APO, Collection, Rights table
     expect(page).to have_table_caption('apo-collection-rights-table', 'APO, Collection, Rights')
-    within(find_table_value_cell('apo-collection-rights-table', 'Admin policy')) do
+    within(find_table_value_cell('apo-collection-rights-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')

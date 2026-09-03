@@ -8,7 +8,7 @@ module BulkActions
       def perform
         return unless check_update_ability?
 
-        open_new_version_if_needed!(description: 'Applied admin policy defaults')
+        open_new_version_if_needed!(description: 'Applied APO defaults')
 
         Dor::Services::Client.object(druid).apply_admin_policy_defaults
 
