@@ -2,7 +2,7 @@
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
     <% component.with_row(label: 'Object type', value: 'Collection') %>
-    <% component.with_row(label: 'Admin policy') do |row_component| %>
+    <% component.with_row(label: 'APO') do |row_component| %>
       <% row_component.with_cell do %>
         <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
         <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>

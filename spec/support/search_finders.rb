@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 def find_item_results_section
-  find('section[aria-label="Item, collection, and admin policy results"]')
+  find('section[aria-label="Item, collection, and APO results"]')
 end
 
 def find_project_results_section

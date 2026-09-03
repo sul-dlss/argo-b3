@@ -17,8 +17,8 @@
         <%# Only items have content types. %>
         <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
 
-        <%# In tests, items may not have an admin policy. %>
-        <% component.with_row(label: 'Admin Policy', values: admin_policy_values) if result.apo_druid.present? %>
+        <%# In tests, items may not have an APO. %>
+        <% component.with_row(label: 'APO', values: admin_policy_values) if result.apo_druid.present? %>
         <% component.with_row(label: 'Collections', values: collections_values) if result.collection_druids.present? %>
         <% component.with_row(label: 'Projects', values: projects_values) if result.projects.present? %>
         <% component.with_row(label: 'Source ID', values: [result.source_id]) if result.source_id.present? %>

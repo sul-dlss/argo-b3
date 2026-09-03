@@ -1,8 +1,8 @@
 <%= turbo_frame_tag 'items-search' do %>
   <% if @results.any? %>
-    <section aria-label="Item, collection, and admin policy results">
+    <section aria-label="Item, collection, and APO results">
       <h3>
-        Item, collection, and admin policy results
+        Item, collection, and APO results
         (<%= number_with_delimiter(@results.total_results) %> found)
       </h3>
 

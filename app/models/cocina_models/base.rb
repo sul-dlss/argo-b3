@@ -19,7 +19,7 @@ module CocinaModels
 
     attribute :description_hash, default: -> { { title: [{ value: ':auto' }] } }
 
-    # All objects have an admin policy
+    # All objects have an admin policy (APO)
     attribute :admin_policy_druid, :string
     validates :admin_policy_druid, presence: true
 

@@ -30,13 +30,13 @@ module Reports
 
     APO_DRUID = Config.new(
       field: Search::Fields::BARE_APO_DRUID,
-      label: 'Admin policy ID',
+      label: 'APO ID',
       help_text: 'For example: bf569gy6501'
     )
 
     APO_TITLE = Config.new(
       field: Search::Fields::APO_TITLE,
-      label: 'Admin policy',
+      label: 'APO',
       help_text: 'For example: Google Books'
     )
 

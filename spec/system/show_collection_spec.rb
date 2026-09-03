@@ -93,7 +93,7 @@ RSpec.describe 'Show collection' do
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
     expect(page).to have_table_value('overview-table', 'Object type', 'Collection')
-    within(find_table_value_cell('overview-table', 'Admin policy')) do
+    within(find_table_value_cell('overview-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')

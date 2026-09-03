@@ -20,7 +20,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'DRUID', druid)
       expect(page).to have_table_value('item-result-bb123cd4567', 'Object Type', 'item')
-      expect(find_table_value_cell('item-result-bb123cd4567', 'Admin Policy'))
+      expect(find_table_value_cell('item-result-bb123cd4567', 'APO'))
         .to have_link('University Archives', href: "/objects/#{apo_druid}")
       expect(page).to have_table_value('item-result-bb123cd4567', 'Content Type', 'book')
       expect(page).to have_table_value('item-result-bb123cd4567', 'Access Rights', 'dark, stanford')
