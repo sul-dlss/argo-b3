@@ -24,7 +24,7 @@ RSpec.describe LinkHelper do
 
     context 'when no catalog record id is present' do
       it 'builds a url using the druid' do
-        expect(helper.searchworks_url(druid)).to eq("https://searchworks.stanford.edu/view/#{druid}")
+        expect(helper.searchworks_url(druid)).to eq('https://searchworks.stanford.edu/view/bc123df4567')
       end
     end
   end
