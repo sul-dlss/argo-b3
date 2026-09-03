@@ -11,7 +11,9 @@
     } do %>
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
-      <%= render Search::BackToSearchComponent.new(last_search_form: @last_search_form) %>
+      <%= render Search::ItemNavigationComponent.new(last_search_form: @last_search_form,
+                                                     current_position: @search_position, total_results: @total_results,
+                                                     previous_druid: @previous_druid, next_druid: @next_druid) %>
 
       <div class="d-flex flex-column d-xl-block">
         <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">

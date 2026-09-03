@@ -11,6 +11,12 @@ RSpec.describe LinkHelper do
       expect(link).to include('data-turbo-frame="_top"')
       expect(link).to include('data-turbo-prefetch="false"')
     end
+
+    it 'includes additional params in the url' do
+      link = helper.link_to_object('An object', 'druid:bc123df4567', params: { search_position: 3 })
+
+      expect(link).to include('href="/objects/druid:bc123df4567?search_position=3"')
+    end
   end
 
   describe '#searchworks_url' do

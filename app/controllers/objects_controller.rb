@@ -24,7 +24,7 @@ class ObjectsController < ApplicationController
   # keeps the frame actions themselves unaware of the lock: they just read whatever is in the cache,
   # trusting that this action (which always runs moments before them, as the parent page load) has
   # already made it fresh.
-  def show # rubocop:disable Metrics/AbcSize
+  def show # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     druid = druid_param
     lock = Sdr::Repository.lock(druid:)
 
@@ -33,7 +33,8 @@ class ObjectsController < ApplicationController
 
     refresh_cocina_hash(druid, lock) # Warm the cache for the other frames (e.g., overview, json, purl_preview).
 
-    set_from_last_search_cookie # This provides @last_search_form
+    set_from_last_search_cookie # This provides @last_search_form and @total_results
+    set_search_navigation
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
     content = Content.find_by(druid:, lock:, immutable: false)
@@ -102,6 +103,24 @@ class ObjectsController < ApplicationController
   end
 
   private
+
+  # Determines the previous/next druids within the current search results, based on the
+  # "search_position" (1-based position within the search result set) that was passed along
+  # from the search results list.
+  def set_search_navigation
+    position = Integer(params[:search_position], exception: false)
+    total_results = Integer(@total_results, exception: false)
+    return if @last_search_form.blank? || position.nil? || total_results.nil?
+    return unless position.positive?
+
+    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:)
+    return if navigation.blank?
+
+    @search_position = position
+    @total_results = navigation.total_results
+    @previous_druid = navigation.previous_druid
+    @next_druid = navigation.next_druid
+  end
 
   def track_recent_object(druid)
     other_recent_druids = Array(session[:recent_object_druids]).excluding(druid)
