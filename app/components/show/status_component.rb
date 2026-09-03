@@ -15,7 +15,7 @@ module Show
 
     attr_reader :object_status_presenter
 
-    delegate :status, :workflow_error_messages, to: :object_status_presenter
+    delegate :status, :workflow_error_messages, :druid, to: :object_status_presenter
 
     def heading
       label = I18n.t("show.status.#{status}.heading")

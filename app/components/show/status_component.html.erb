@@ -1,11 +1,18 @@
 <%= render Show::BoxComponent.new(heading:) do %>
   <% case status %>
   <% when :deposited, :draft %>
-    <ul>
-      <li><%= link_to I18n.t('show.status.actions.edit_item_details'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
-      <li><%= link_to I18n.t('show.status.actions.manage_files'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
-      <li><%= link_to I18n.t('show.status.actions.manage_description'), '#', class: 'pe-none text-muted', 'aria-disabled': 'true', tabindex: '-1' %></li>
-    </ul>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.edit_item'),
+                                                                  variant: :'outline-primary', size: :sm,
+                                                                  disabled: true) %>
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: I18n.t('show.status.actions.manage_files'),
+                                                                      link: edit_content_path(druid),
+                                                                      variant: :'outline-primary', size: :sm) %>
+      <% if status == :draft %>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
+                                                                    variant: :primary, size: :sm, disabled: true) %>
+      <% end %>
+    </div>
   <% when :depositing %>
     <p><%= I18n.t('show.status.depositing.body') %></p>
   <% when :error %>

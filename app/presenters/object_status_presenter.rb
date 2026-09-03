@@ -8,7 +8,7 @@ class ObjectStatusPresenter
     @content = content
   end
 
-  delegate :workflow_errors, to: :document
+  delegate :workflow_errors, :druid, to: :document
 
   def status
     # For the purposes of the status, treating these states as mutually exclusive.
