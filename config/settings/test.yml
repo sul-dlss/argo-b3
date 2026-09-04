@@ -4,6 +4,10 @@ solr:
 bulk_actions:
   directory: "tmp/bulk_jobs_test"
 
+feature_flags:
+  ocr_workflow: true
+  speech_to_text_workflow: true
+
 reload_intervals:
   cocina_model: 1000
   bulk_actions_history: 500
