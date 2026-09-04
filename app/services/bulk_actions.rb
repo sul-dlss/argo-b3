@@ -135,9 +135,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     form: BulkActions::BasicForm
   )
 
-  EXTRACT_TEXT = Config.new(
+  TEXT_EXTRACTION = Config.new(
     label: 'Text extraction',
-    help_text: 'Start text extraction workflow for the selected items.'
+    help_text: 'Start text extraction workflow for the selected items.',
+    job: BulkActions::TextExtractionJob,
+    path_helper: to_path_helper(:new_bulk_actions_text_extraction_path),
+    form: BulkActions::TextExtractionForm
   )
 
   IMPORT_CATALOG_DATA = Config.new(

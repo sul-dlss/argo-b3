@@ -23,6 +23,8 @@ bulk_actions:
 
 feature_flags:
   bulk_actions: false
+  ocr_workflow: false
+  speech_to_text_workflow: false
 
 stacks:
   url: "http://stacks.stanford.edu/image"
