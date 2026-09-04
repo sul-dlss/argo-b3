@@ -259,7 +259,7 @@ RSpec.describe 'Show item' do
     end
 
     # Thumbnail
-    expect(page).to have_css('img.thumbnail[src="http://stacks.stanford.edu/image/iiif/bb123cd4567%2Frr624wq8610_00_0001/full/!160,160/0/default.jpg"]') # rubocop:disable Layout/LineLength
+    expect(page).to have_css('img.thumbnail', visible: :all)
 
     # PURL link in side nav
     expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")

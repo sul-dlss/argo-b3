@@ -2,6 +2,7 @@
 
 # Base class for application policies
 class ApplicationPolicy < ActionPolicy::Base
+  class_attribute :admin_workgroups
   pre_check :allow_admins
 
   def allow_admins
@@ -9,7 +10,11 @@ class ApplicationPolicy < ActionPolicy::Base
   end
 
   def admin?
-    user.groups.intersect?(admin_workgroups)
+    current_groups.intersect?(admin_workgroups)
+  end
+
+  def current_groups
+    Current.effective_groups || user.groups
   end
 
   private
@@ -18,6 +23,6 @@ class ApplicationPolicy < ActionPolicy::Base
     # This is the simplest possible form of caching on the assumption
     # that admin groups will rarely (if ever) be changing.
     # Changing would require a restart of the app.
-    @@admin_workgroups ||= Permission.permission_type_admin.pluck(:workgroup) # rubocop:disable Style/ClassVars
+    self.class.admin_workgroups ||= Permission.permission_type_admin.pluck(:workgroup)
   end
 end

@@ -49,7 +49,9 @@
 
       <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
         <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary', disabled: true) if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
-        <% component.with_button(link: '#', label: 'Impersonate', variant: 'outline-primary', disabled: true) if allowed_to?(:impersonate?, nil, with: AdminPolicy) %>
+        <% if allowed_to?(:impersonate?, nil, with: AdminPolicy) || Current.impersonating? %>
+          <% component.with_button(link: admin_impersonate_path, label: 'Impersonate', variant: 'outline-primary') %>
+        <% end %>
       <% end %>
     <% end %>
     <% layout.with_main_content do %>

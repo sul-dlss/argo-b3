@@ -1,0 +1,24 @@
+<div class="container">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Impersonate') %>
+
+  <p>Select one or more workgroups to impersonate. If no workgroups are selected, impersonation will be removed.</p>
+
+  <%= form_with url: admin_impersonate_path, method: :patch do %>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+      <% @workgroup_columns.each do |workgroup_column| %>
+        <div class="col">
+          <% workgroup_column.each do |workgroup| %>
+            <div class="form-check">
+              <%= check_box_tag 'impersonation[workgroups][]', workgroup, @selected_workgroups.include?(workgroup), id: "impersonation_workgroup_#{workgroup.parameterize}", class: 'form-check-input' %>
+              <%= label_tag "impersonation_workgroup_#{workgroup.parameterize}", workgroup, class: 'form-check-label' %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-3">
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Impersonate') %>
+    </div>
+  <% end %>
+</div>

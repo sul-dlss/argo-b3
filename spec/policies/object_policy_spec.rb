@@ -24,6 +24,10 @@ RSpec.describe ObjectPolicy, type: :policy do
   end
 
   describe '#edit?' do
+    before do
+      Current.effective_groups = user.groups
+    end
+
     context 'with a Cocina-like record' do
       let(:record) do
         double(
@@ -78,6 +82,17 @@ RSpec.describe ObjectPolicy, type: :policy do
       context 'when no matching edit permissions exist' do
         it 'denies edit' do
           expect(policy.apply(:edit?)).to be false
+        end
+      end
+
+      context 'when effective groups differ from user groups' do
+        before do
+          Current.effective_groups = ['sdr:other-group']
+          Permission.create!(workgroup: 'sdr:other-group', permission_type: :edit, target_druid: object_druid)
+        end
+
+        it 'authorizes based on effective groups' do
+          expect(policy.apply(:edit?)).to be true
         end
       end
 
