@@ -33,6 +33,7 @@ bulk_actions:
 
 feature_flags:
   bulk_actions: false
+  ocr_workflow: true
 
 stacks:
   url: "http://stacks.stanford.edu/image"

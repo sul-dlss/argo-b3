@@ -1,0 +1,16 @@
+<%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:,
+                                                              field_name: :text_extraction_languages,
+                                                              options: available_ocr_languages,
+                                                              label_text: 'Search for a language',
+                                                              container_classes: 'my-fieldset',
+                                                              container_data: { controller: 'multi-select',
+                                                                                'multi-select-max-recommended-value': MAX_RECOMMENDED_LANGUAGES },
+                                                              input_multiple: true,
+                                                              input_data: { 'multi-select-target': 'select' }) do |component| %>
+  <% component.with_additional_container_content do %>
+    <div class="d-none text-danger" data-multi-select-target="warning">
+      <b>Warning</b>: Selecting more than eight text-extraction languages may have an adverse effect on the
+      speed and quality of recognition. Please reduce the number of languages.
+    </div>
+  <% end %>
+<% end %>

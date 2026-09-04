@@ -8,6 +8,9 @@ bulk_actions:
 rabbitmq:
   enabled: false
 
+feature_flags:
+  ocr_workflow: true
+
 reload_intervals:
   cocina_model: 1000
   bulk_action_show: 500

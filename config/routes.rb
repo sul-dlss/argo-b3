@@ -181,6 +181,7 @@ Rails.application.routes.draw do
     resource :refresh_metadata, only: %i[new create], controller: 'refresh_metadata'
     resource :register_csv, only: %i[new create], controller: 'register_csv'
     resource :republish, only: %i[new create], controller: 'republish'
+    resource :text_extraction, only: %i[new create], controller: 'text_extraction'
     resource :update_governing_apo, only: %i[new create], controller: 'update_governing_apo'
   end
 

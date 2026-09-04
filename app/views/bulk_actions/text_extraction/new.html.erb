@@ -1,0 +1,16 @@
+<% if Settings.feature_flags.ocr_workflow %>
+  <%= form_with model: @bulk_action_form, url: bulk_actions_text_extraction_path do |form| %>
+    <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+      <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+
+      <%= render LanguageSelectorComponent.new(form:) %>
+
+      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, classes: 'mt-2') do %>
+        <p>Do not run this process for images that contain no printed or typed text. This process will not overwrite OCR files
+          that were generated outside SDR or that have been corrected to comply with accessibility standards.</p>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <p>Text extraction job currently not available.</p>
+<% end %>
