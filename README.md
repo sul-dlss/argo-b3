@@ -105,7 +105,9 @@ In development, available at http://localhost:3000/lookbook
 
 Note:
 * Honeybadger deploy notifications are performed in `.kamal/hooks/post-deploy`.
-* Secrets are retrieved directly using the Vault CLI. See `.kamal/secrets-common` and environment specific secrets files.
+* Kamal deploy secrets are resolved from environment variables via `.kamal/secrets-common`.
+  * In CI, Jenkins injects those variables from Vault and runs `bin/kamal` directly.
+  * For local deploys, `bin/kamal-otk` loads any missing required deploy secrets from Vault before invoking Kamal.
 * The Dockerfile configures the lyberadmin (50:503) user to match the host server.
 * `/workspace/bulk` and `/var/log/argo` are shared with the containers.
 * The docker image is built on the stage server (AMD64) for all environments to avoid emulation on the developer Mac. Sharing one builder keeps its layer cache warm across environments.
@@ -118,6 +120,8 @@ To build and deploy the local, committed code:
 ```
 bin/kamal-otk qa deploy
 ```
+
+For local deploys, `bin/kamal-otk` loads required deploy secrets from Vault only when they are missing from the current environment, then runs Kamal.
 
 #### Deploying faster when deploying to all environments
 

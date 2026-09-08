@@ -17,16 +17,90 @@
 
 require 'bundler/setup'
 require 'kamal'
+require 'open3'
 require 'pathname'
 require 'securerandom'
 require 'tmpdir'
 require 'uri'
+
+REQUIRED_DEPLOY_SECRETS = [
+  'HONEYBADGER_API_KEY',
+  'SECRET_KEY_BASE',
+  'SETTINGS__DOR_SERVICES__TOKEN',
+  'SETTINGS__PRESERVATION_CATALOG__TOKEN',
+  'DATABASE_PASSWORD',
+  'SETTINGS__FOLIO__OKAPI__PASSWORD',
+  'SETTINGS__RABBITMQ__USERNAME',
+  'SETTINGS__RABBITMQ__PASSWORD'
+].freeze
+
+def vault_secret_path(key, destination)
+  case key
+  when 'HONEYBADGER_API_KEY' then 'puppet/application/argo-b3/honeybadger-api-key'
+  when 'SECRET_KEY_BASE' then "puppet/application/argo-b3/#{destination}/secret-key-base"
+  when 'SETTINGS__DOR_SERVICES__TOKEN' then "puppet/application/argo-b3/#{destination}/dor-services-token"
+  when 'SETTINGS__PRESERVATION_CATALOG__TOKEN' then "puppet/application/argo-b3/#{destination}/preservation-catalog-token"
+  when 'DATABASE_PASSWORD' then "puppet/application/argo-b3/#{destination}/lyberadmin-db-pwd"
+  when 'SETTINGS__FOLIO__OKAPI__PASSWORD' then 'puppet/application/folio/app_sdr_password'
+  when 'SETTINGS__RABBITMQ__USERNAME' then "puppet/application/argo-b3/#{destination}/rabbitmq-username"
+  when 'SETTINGS__RABBITMQ__PASSWORD' then "puppet/application/argo-b3/#{destination}/rabbitmq-password"
+  else
+    raise "Unknown secret key: #{key}"
+  end
+end
+
+def missing_required_deploy_secrets
+  REQUIRED_DEPLOY_SECRETS.select { |key| ENV[key].to_s.empty? }
+end
+
+def vault_available?
+  system('vault', '-version', out: File::NULL, err: File::NULL)
+end
+
+def ensure_vault_login!
+  return if system('vault', 'token', 'lookup', out: File::NULL, err: File::NULL)
+
+  warn 'Vault token missing or expired; launching `vault login -method oidc`...'
+  system('vault', 'login', '-method', 'oidc', exception: true)
+end
+
+def fetch_secret_from_vault(path)
+  stdout, stderr, status = Open3.capture3('vault', 'kv', 'get', '-field=content', path)
+  return stdout.strip if status.success?
+
+  raise "Unable to read Vault secret at #{path}: #{stderr.strip}"
+end
+
+def populate_missing_deploy_secrets_from_vault!(destination)
+  missing_secrets = missing_required_deploy_secrets
+  return if missing_secrets.empty?
+
+  raise "Missing required deploy secrets in environment (#{missing_secrets.join(', ')}) and `vault` CLI is unavailable" unless vault_available?
+
+  ensure_vault_login!
+
+  missing_secrets.each do |key|
+    ENV[key] = fetch_secret_from_vault(vault_secret_path(key, destination))
+  end
+
+  remaining_missing_secrets = missing_required_deploy_secrets
+  return if remaining_missing_secrets.empty?
+
+  raise "Required deploy secrets are still missing after Vault fetch: #{remaining_missing_secrets.join(', ')}"
+end
 
 destination = ARGV.shift
 if destination.nil?
   warn 'Usage: bin/kamal-otk [destination, e.g., qa] [kamal args...]'
   exit 1
 end
+
+unless %w[qa stage prod].include?(destination)
+  warn "Usage error: destination must be one of qa, stage, prod (got #{destination.inspect})"
+  exit 1
+end
+
+populate_missing_deploy_secrets_from_vault!(destination)
 
 config = Kamal::Configuration.create_from(config_file: Pathname.new('config/deploy.yml'), destination: destination)
 # The remote builder (config/deploy.yml's `builder.remote`, shared by all destinations) needs the
