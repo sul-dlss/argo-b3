@@ -107,15 +107,34 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
   context 'when DSA raises an error' do
     before do
-      allow(object_client).to receive(:find).and_raise(Dor::Services::Client::NotFoundResponse, 'object not found')
+      allow(object_client).to receive(:find).and_raise(Dor::Services::Client::ConnectionFailed, 'Connection refused')
+      allow(Honeybadger).to receive(:notify)
     end
 
-    it 'records a failure' do
+    it 'records a failure and notifies Honeybadger' do
       job.perform_now
 
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
-      expect(log.string).to include "#{druid}\tError: Sdr::Repository::NotFoundResponse Object not found: #{druid}"
+      expect(log.string).to include "#{druid}\tError: Dor::Services::Client::ConnectionFailed Connection refused"
+      expect(Honeybadger).to have_received(:notify)
+        .with(instance_of(Dor::Services::Client::ConnectionFailed))
+    end
+  end
+
+  context 'when an object cannot be found error' do
+    before do
+      allow(object_client).to receive(:find).and_raise(Dor::Services::Client::NotFoundResponse, 'object not found')
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'records a failure but does not notify Honeybadger' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Object not found"
+      expect(Honeybadger).not_to have_received(:notify)
     end
   end
 end

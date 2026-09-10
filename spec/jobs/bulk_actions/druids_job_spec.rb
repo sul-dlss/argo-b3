@@ -72,8 +72,42 @@ RSpec.describe BulkActions::DruidsJob do
     end
   end
 
+  context 'when an object is missing' do
+    let(:druids) { %w[druid:bc123df4567 druid:gh123jk4589] }
+    let(:cocina_object) { instance_double(Cocina::Models::DRO) }
+
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
+        def perform
+          cocina_object
+          success!(message: 'Testing successful')
+        end
+      end
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
+
+      allow(Sdr::Repository).to receive(:find).with(druid: druids.first)
+                                              .and_raise(Sdr::Repository::NotFoundResponse)
+      allow(Sdr::Repository).to receive(:find).with(druid: druids.second).and_return(cocina_object)
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'records the failure and completes the remaining items without notifying Honeybadger' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(log).to have_received(:puts).with(/#{druids.first}\tError: Object not found$/o)
+      expect(log).to have_received(:puts).with(/#{druids.second}\tSuccess: Testing successful/o)
+      expect(bulk_action.reload.druid_count_total).to eq(2)
+      expect(bulk_action.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(1)
+      expect(bulk_action.completed?).to be true
+      expect(Honeybadger).not_to have_received(:notify)
+    end
+  end
+
   context 'when errors' do
     before do
+      allow(Honeybadger).to receive(:notify)
+
       bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
         def perform
           success!(message: 'Testing successful') if druid == 'druid:bb111cc2222'
@@ -90,6 +124,7 @@ RSpec.describe BulkActions::DruidsJob do
 
       expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: Testing successful/o)
       expect(log).to have_received(:puts).with(/#{druids.second}\tError: StandardError Something bad happened/o)
+      expect(Honeybadger).to have_received(:notify).with(instance_of(StandardError))
 
       expect(bulk_action.reload.druid_count_total).to eq(2)
       expect(bulk_action.druid_count_success).to eq(1)

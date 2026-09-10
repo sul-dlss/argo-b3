@@ -22,6 +22,8 @@ module BulkActions
     def perform_bulk_action
       druids.each_with_index do |druid, index|
         perform_item_class.new(druid:, index:, job: self).perform
+      rescue Sdr::Repository::NotFoundResponse
+        failure!(druid:, message: 'Error: Object not found')
       rescue StandardError => e
         failure!(druid:, message: "Error: #{e.class} #{e.message}")
         Rails.logger.error(e.full_message)
