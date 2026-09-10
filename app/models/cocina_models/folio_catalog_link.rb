@@ -3,7 +3,9 @@
 module CocinaModels
   # Model for a Folio catalog link (catalog: 'folio').
   class FolioCatalogLink < Blanks::Base
-    attribute :catalog_record_id, :string
-    validates :catalog_record_id, format: { with: /\A(a\d+|L\d+|in\d+)\z/ }, allow_blank: false
+    include NormalizationConcern
+    include CatalogRecordIdConcern
+
+    validates :catalog_record_id, presence: true
   end
 end

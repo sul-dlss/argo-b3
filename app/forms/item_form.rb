@@ -4,12 +4,12 @@
 # Note that this is a subclass of CocinaModels::Dro, not ApplicationForm.
 class ItemForm < CocinaModels::Dro
   include PermittedParamsConcern
+  include EmbargoFormConcern
+  include TitleFormConcern
 
   SOURCE_ID_PROVIDED_CHOICE = 'provide'
   SOURCE_ID_GENERATE_CHOICE = 'generate'
 
-  attribute :title, :string
-  normalizes :title, with: ->(title) { title.strip }
   validates :title, presence: true
 
   attribute :source_id_choice, :string, default: SOURCE_ID_PROVIDED_CHOICE
@@ -23,21 +23,15 @@ class ItemForm < CocinaModels::Dro
 
   has_one :release_tags
 
-  attribute :with_embargo, :boolean
-  validates :embargo_release_date, presence: true, if: -> { with_embargo }
-
   before_validation :populate_description_hash, if: -> { title.present? }
   before_validation :generate_source_id, if: lambda {
     source_id_choice == SOURCE_ID_GENERATE_CHOICE && source_id_prefix.present?
   }
-  before_validation :nullify_embargo_access_rights, if: -> { with_embargo == false }
 
   def initialize(attributes = {})
     super
     build_release_tags unless release_tags
-    # When with_embargo is not provided, e.g., when not initialized from form params,
-    # it is derived from the embargo release date.
-    self.with_embargo = embargo_release_date.present? if with_embargo.nil?
+    derive_with_embargo
   end
 
   def create!(user_name:)
@@ -55,13 +49,6 @@ class ItemForm < CocinaModels::Dro
   def generate_source_id
     self.source_id = "#{source_id_prefix}:#{SecureRandom.uuid}"
     self.source_id_choice = SOURCE_ID_PROVIDED_CHOICE
-  end
-
-  def nullify_embargo_access_rights
-    self.embargo_release_date = nil
-    self.embargo_view = nil
-    self.embargo_download = nil
-    self.embargo_location = nil
   end
 
   def source_id_must_be_unique

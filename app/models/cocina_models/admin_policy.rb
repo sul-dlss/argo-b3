@@ -28,7 +28,7 @@ module CocinaModels
         {
           type: Cocina::Models::ObjectType.admin_policy,
           administrative: {
-            hasAdminPolicy: admin_policy_druid,
+            hasAdminPolicy: apo_druid,
             hasAgreement: agreement_druid,
             accessTemplate: {
               view: access_view,

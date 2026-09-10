@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Register bulk action' do
+RSpec.describe 'Register CSV bulk action' do
   let(:user) { create(:user) }
 
   before do
@@ -16,7 +16,7 @@ RSpec.describe 'Register bulk action' do
       end
 
       it 'renders successfully without error' do
-        get new_bulk_actions_register_path
+        get new_bulk_actions_register_csv_path
 
         expect(response).to have_http_status(:ok)
       end

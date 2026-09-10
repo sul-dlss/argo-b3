@@ -1,4 +1,4 @@
-<%= form_with model: @bulk_action_form, url: bulk_actions_register_path do |form| %>
+<%= form_with model: @bulk_action_form, url: bulk_actions_register_csv_path do |form| %>
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
     <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                            field_name: :csv_file,

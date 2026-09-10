@@ -7,7 +7,7 @@ namespace :development do
 
     admin_policy = CocinaModels::AdminPolicy.new(
       # This contains arbitrary hardcoded values; in the future, may want to make more flexible.
-      admin_policy_druid: 'druid:hv992ry2431',
+      apo_druid: 'druid:hv992ry2431',
       agreement_druid: 'druid:hp308wm0436',
       access_view: 'world',
       access_download: 'world',
