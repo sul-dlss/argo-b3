@@ -1,0 +1,37 @@
+<%= tag.div class: 'container py-2', data: do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-3') %>
+
+  <%= unless completed?
+        render SdrViewComponents::Elements::SpinnerComponent.new(
+          message: 'Processing...',
+          image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
+          height: 192,
+          width: 192,
+          speed: 2.0,
+          message_position: :bottom,
+          classes: 'align-items-center'
+        )
+      end %>
+
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'bulk-action-details-table') do |component| %>
+    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Details') %><% end %>
+    <% component.with_row(label: 'Submitted', value: helpers.format_datetime(bulk_action.created_at)) %>
+    <% component.with_row(label: 'Description', value: bulk_action.description) %>
+    <% component.with_row(label: 'Status', value: bulk_action.status.titleize) %>
+    <% component.with_row(label: 'Total / Success / Failed', value: "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}") %>
+    <% component.with_row(label: 'Log file', value: log_file_link) if bulk_action.log_file? %>
+    <% component.with_row(label: bulk_action.export_label, value: export_link) if bulk_action.export_file? %>
+  <% end %>
+
+  <% if show_export? %>
+    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'bulk-action-export-table', variant: :data, responsive: true, empty_message: 'No records.') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: bulk_action.export_label) %><% end %>
+      <% export_csv.headers.each do |header| %>
+        <% component.with_header(label: header) %>
+      <% end %>
+      <% export_csv.each do |row| %>
+        <% component.with_row(values: row.fields) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

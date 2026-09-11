@@ -19,6 +19,7 @@ module BulkActions
 
     def values_for(bulk_action)
       [
+        show_link_for(bulk_action),
         bulk_action.bulk_action_config.label,
         bulk_action.description,
         bulk_action.status.titleize,
@@ -38,6 +39,10 @@ module BulkActions
     end
 
     private
+
+    def show_link_for(bulk_action)
+      link_to(helpers.format_datetime(bulk_action.created_at), bulk_action_path(bulk_action))
+    end
 
     def log_file_link_for(bulk_action)
       return '' unless bulk_action.log_file?

@@ -18,6 +18,8 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :path_helper,
                       # Filename for the export created by this bulk action, if any.
                       :export_filename,
+                      # When true and export file is a CSV, displays the CSV as a table on bulk action show page.
+                      :show_export,
                       :export_label) do
                         # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
                         def action_type
@@ -248,6 +250,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Register druids.',
     export_filename: 'registration_report.csv',
     export_label: 'Registration report',
+    show_export: true,
     job: BulkActions::RegisterCsvJob,
     path_helper: to_path_helper(:new_bulk_actions_register_csv_path),
     form: BulkActions::RegisterForm
@@ -258,6 +261,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     help_text: 'Register druids.',
     export_filename: 'registration_report.csv',
     export_label: 'Registration report',
+    show_export: true,
     job: BulkActions::RegisterFormJob
   )
 

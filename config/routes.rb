@@ -122,7 +122,7 @@ Rails.application.routes.draw do
     post 'reset'
   end
 
-  resources :bulk_actions, only: %i[new index destroy] do
+  resources :bulk_actions, only: %i[new index destroy show] do
     member do
       get 'file'
     end
