@@ -2,11 +2,15 @@
 
 # Controller for bulk actions.
 class BulkActionsController < ApplicationController
-  before_action :set_bulk_action, only: %i[destroy file]
+  before_action :set_bulk_action, only: %i[destroy file show]
   skip_verify_authorized only: %i[index new]
 
   def index
     @bulk_actions = Current.user.bulk_actions.order(created_at: :desc)
+  end
+
+  def show
+    authorize! @bulk_action
   end
 
   def new; end

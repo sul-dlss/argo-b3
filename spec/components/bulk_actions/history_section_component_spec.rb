@@ -31,7 +31,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(table).to have_css('tbody tr', count: 2)
 
     bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
-    expect(bulk_action_row).to have_css('td:nth-of-type(1)', text: '2026-04-16 03:00:00 PT')
+    expect(bulk_action_row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']",
+                                        text: '2026-04-16 03:00:00 PT')
     expect(bulk_action_row).to have_css('td:nth-of-type(2)', text: BulkActions::REINDEX.label)
     expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: 'Test description')
     expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Created')
@@ -41,6 +42,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(bulk_action_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
 
     bulk_action_with_files_row = table.find("tr##{dom_id(bulk_action_with_files, 'row')}")
+    expect(bulk_action_with_files_row)
+      .to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action_with_files.id}']")
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(2)', text: BulkActions::EXPORT_COCINA_JSON.label)
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(3)', text: '')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4)', text: 'Completed')
