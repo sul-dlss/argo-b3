@@ -201,6 +201,37 @@ RSpec.describe ItemForm do
     end
   end
 
+  describe 'with_embargo' do
+    context 'when not provided and the embargo release date is present' do
+      subject(:item_form) do
+        described_class.new(
+          source_id:,
+          source_id_choice:,
+          source_id_prefix:,
+          title:,
+          apo_druid: 'druid:bc123df4567',
+          content_type: Cocina::Models::ObjectType.object,
+          access_view: 'world',
+          access_download: 'world',
+          embargo_release_date: Time.zone.parse('2030-01-01'),
+          embargo_view: 'location-based',
+          embargo_download: 'location-based',
+          embargo_location: 'spec'
+        )
+      end
+
+      it 'defaults to true' do
+        expect(item_form.with_embargo).to be(true)
+      end
+    end
+
+    context 'when not provided and the embargo release date is blank' do
+      it 'defaults to false' do
+        expect(item_form.with_embargo).to be(false)
+      end
+    end
+  end
+
   describe 'embargo_release_date' do
     context 'when with_embargo is true and the embargo release date is blank' do
       before do
