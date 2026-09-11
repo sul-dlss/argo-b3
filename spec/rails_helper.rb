@@ -79,8 +79,13 @@ RSpec.configure do |config|
   config.before do
     # Ensure each example starts with a clean request context.
     # Some specs set Current.effective_groups / Current.impersonated_groups directly.
-    # Current also memoizes admin workgroups used by policies.
     Current.reset
+
+    # ApplicationPolicy memoizes admin workgroups with a class variable.
+    # Clear between examples to avoid order-dependent leakage across the suite.
+    if ApplicationPolicy.class_variable_defined?(:@@admin_workgroups)
+      ApplicationPolicy.remove_class_variable(:@@admin_workgroups)
+    end
   end
 
   config.after do
