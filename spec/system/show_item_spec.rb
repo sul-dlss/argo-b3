@@ -445,16 +445,18 @@ RSpec.describe 'Show item' do
     within('h1') do
       expect(page).to have_css('.bi-pin')
       expect(page).to have_no_css('.bi-pin-fill')
+      expect(page).to have_button('Pin')
 
-      find('.bi-pin').click
+      click_button 'Pin'
     end
 
     expect(page).to have_toast('Pin added')
     within('h1') do
       expect(page).to have_css('.bi-pin-fill')
       expect(page).to have_no_css('.bi-pin')
+      expect(page).to have_button('Unpin')
 
-      find('.bi-pin-fill').click
+      click_button 'Unpin'
     end
 
     expect(page).to have_toast('Pin removed')
