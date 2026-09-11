@@ -9,7 +9,11 @@ class ApplicationPolicy < ActionPolicy::Base
   end
 
   def admin?
-    user.groups.intersect?(admin_workgroups)
+    current_groups.intersect?(admin_workgroups)
+  end
+
+  def current_groups
+    Current.effective_groups || user.groups
   end
 
   private

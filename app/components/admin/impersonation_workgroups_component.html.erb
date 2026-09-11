@@ -1,0 +1,14 @@
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Workgroups', help_text: 'Select one or more workgroups to impersonate.') do %>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+    <% workgroup_columns.each do |workgroup_column| %>
+      <div class="col">
+        <%= form.collection_check_boxes :workgroups, workgroup_column, :to_s, :to_s, checked: selected_workgroups do |workgroup_builder| %>
+          <div class="form-check">
+            <%= workgroup_builder.check_box(class: 'form-check-input', include_hidden: false) %>
+            <%= workgroup_builder.label(class: 'form-check-label') %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

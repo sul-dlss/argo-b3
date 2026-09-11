@@ -71,6 +71,11 @@ module Authentication
 
   def resume_session
     Current.user ||= User.find_by(email_address: remote_user)
+
+    Current.impersonated_groups = Impersonation::Workgroups.from_cookie(cookies:)
+    Current.effective_groups = Current.impersonated_groups.presence || Current.user.groups
+
+    Current.user
   end
 
   def request_authentication

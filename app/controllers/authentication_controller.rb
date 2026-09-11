@@ -3,6 +3,7 @@
 # Controller for login and logout.
 class AuthenticationController < ApplicationController
   allow_unauthenticated_access only: %i[login test_login]
+  skip_before_action :authentication, only: %i[login test_login]
   skip_verify_authorized only: %i[login logout test_login]
 
   # See Authentication concern for the methods used below.

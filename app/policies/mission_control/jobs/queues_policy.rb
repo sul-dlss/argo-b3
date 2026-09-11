@@ -14,7 +14,7 @@ module MissionControl
       end
 
       def developer?
-        user.groups.include?('sdr:developer')
+        current_groups.include?('sdr:developer')
       end
     end
   end

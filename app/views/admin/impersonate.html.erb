@@ -1,0 +1,13 @@
+<div class="container">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Impersonate') %>
+
+  <p>Select one or more workgroups to impersonate. If no workgroups are selected, impersonation will be removed.</p>
+
+  <%= form_with url: admin_impersonate_path, method: :patch, scope: :impersonation do |form| %>
+    <%= render Admin::ImpersonationWorkgroupsComponent.new(form:, workgroup_columns: @workgroup_columns, selected_workgroups: @selected_workgroups) %>
+
+    <div class="mt-3">
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Impersonate') %>
+    </div>
+  <% end %>
+</div>

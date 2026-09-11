@@ -56,15 +56,24 @@
       <% end %>
     <% end %>
 
-    <% if admin? %>
+    <% if admin? || impersonating? %>
       <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Admin') do |dropdown| %>
-        <% dropdown.with_item do %>
-          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: '#', disabled: true) %>
+        <% if admin? %>
+          <% dropdown.with_item do %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: '#', disabled: true) %>
+          <% end %>
         <% end %>
-        <% dropdown.with_item do %>
-          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Impersonate', link: '#', disabled: true) %>
+
+        <% if show_impersonation_link? %>
+          <% dropdown.with_item do %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Impersonate', link: admin_impersonate_path) %>
+          <% end %>
         <% end %>
       <% end %>
+    <% end %>
+
+    <% if impersonating? %>
+      <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Stop impersonating', path: admin_stop_impersonate_path, data: { turbo_method: :delete, turbo_confirm: 'Stop impersonating?' }) %>
     <% end %>
 
   <% end %>

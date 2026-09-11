@@ -76,6 +76,20 @@ RSpec.configure do |config|
   # To enable this behaviour uncomment the line below.
   config.infer_spec_type_from_file_location!
 
+  config.before do
+    # Ensure each example starts with a clean request context.
+    # Some specs set Current.effective_groups / Current.impersonated_groups directly.
+    # Current also memoizes admin workgroups used by policies.
+    Current.reset
+  end
+
+  config.after do
+    # Clear Current at teardown as defense-in-depth in case an example mutates
+    # Current late in execution (or in an after hook) and a following example
+    # is run in the same thread/process.
+    Current.reset
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
