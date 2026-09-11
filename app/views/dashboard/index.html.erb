@@ -36,7 +36,7 @@
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Register or deposit multiple items', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '#', label: 'Register multiple items', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: new_multiple_item_path, label: 'Register multiple items', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
         <% component.with_button(link: '#', label: 'Deposit multiple items', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary', disabled: true) %>
       <% end %>
