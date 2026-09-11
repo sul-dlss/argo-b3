@@ -41,7 +41,7 @@ module CocinaObjectMutators
         new_cocina_props[:identification] ||= {}
         new_cocina_props[:identification][:sourceId] = cocina_model.source_id
         new_cocina_props[:administrative] ||= {}
-        new_cocina_props[:administrative][:hasAdminPolicy] = cocina_model.admin_policy_druid
+        new_cocina_props[:administrative][:hasAdminPolicy] = cocina_model.apo_druid
         new_cocina_props[:access] ||= {}
         new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement
         new_cocina_props[:access][:license] = cocina_model.license

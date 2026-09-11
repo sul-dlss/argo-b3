@@ -85,7 +85,7 @@ module CocinaModels
         {
           type: content_type,
           identification: { sourceId: source_id },
-          administrative: { hasAdminPolicy: admin_policy_druid },
+          administrative: { hasAdminPolicy: apo_druid },
           description: description_hash
         },
         validate: false

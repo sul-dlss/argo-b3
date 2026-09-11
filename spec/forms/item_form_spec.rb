@@ -9,7 +9,7 @@ RSpec.describe ItemForm do
       source_id_choice:,
       source_id_prefix:,
       title:,
-      admin_policy_druid: 'druid:bc123df4567',
+      apo_druid: 'druid:bc123df4567',
       content_type: Cocina::Models::ObjectType.object,
       access_view: 'world',
       access_download: 'world'
@@ -231,7 +231,7 @@ RSpec.describe ItemForm do
         source_id_choice:,
         source_id_prefix:,
         title:,
-        admin_policy_druid: 'druid:bc123df4567',
+        apo_druid: 'druid:bc123df4567',
         content_type: Cocina::Models::ObjectType.object,
         access_view: 'world',
         access_download: 'world',

@@ -128,7 +128,7 @@ en:
         rights:
           label: "APO, collection, rights"
       fields:
-        admin_policy_druid:
+        apo_druid:
           label: "APO"
         content_type:
           label: "Content type"

@@ -199,7 +199,7 @@ RSpec.describe CocinaModels::Dro do
       let(:new_dro) do
         described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
                             access_view: 'world', access_download: 'world',
-                            admin_policy_druid: 'druid:hv992ry2431')
+                            apo_druid: 'druid:hv992ry2431')
       end
       let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
       let(:registered_cocina_object) { build(:dro_with_metadata) }
@@ -224,7 +224,7 @@ RSpec.describe CocinaModels::Dro do
       let(:new_dro) do
         described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
                             access_view: 'world', access_download: 'world',
-                            admin_policy_druid: 'druid:hv992ry2431')
+                            apo_druid: 'druid:hv992ry2431')
       end
       let(:registered_cocina_object) { build(:dro_with_metadata) }
 
@@ -565,21 +565,21 @@ RSpec.describe CocinaModels::Dro do
     end
   end
 
-  describe 'admin_policy_druid' do
+  describe 'apo_druid' do
     context 'when initialized from a cocina object' do
       let(:cocina_object) { build(:dro_with_metadata, admin_policy_id: 'druid:bc123df4567') }
 
-      it 'maps admin_policy_druid from the cocina object administrative.hasAdminPolicy' do
-        expect(dro.admin_policy_druid).to eq('druid:bc123df4567')
+      it 'maps apo_druid from the cocina object administrative.hasAdminPolicy' do
+        expect(dro.apo_druid).to eq('druid:bc123df4567')
       end
     end
 
-    context 'when admin_policy_druid is blank' do
-      before { dro.admin_policy_druid = nil }
+    context 'when apo_druid is blank' do
+      before { dro.apo_druid = nil }
 
       it 'is not valid' do
         expect(dro).not_to be_valid
-        expect(dro.errors[:admin_policy_druid]).to include("can't be blank")
+        expect(dro.errors[:apo_druid]).to include("can't be blank")
       end
     end
   end
