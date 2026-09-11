@@ -6,13 +6,13 @@
 <div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multiple_items %>">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multiple_items.new.title'), classes: 'mb-3') %>
 
-   <%= render SdrViewComponents::Elements::SpinnerComponent.new(
-         message: 'Validating...',
-         image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
-         height: 192,
-         width: 192,
-         speed: 2.0,
-         message_position: :bottom,
-         classes: 'align-items-center'
-       ) %>
+  <%= render SdrViewComponents::Elements::SpinnerComponent.new(
+        message: 'Validating...',
+        image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
+        height: 192,
+        width: 192,
+        speed: 2.0,
+        message_position: :bottom,
+        classes: 'align-items-center'
+      ) %>
 </div>

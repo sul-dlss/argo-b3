@@ -2,7 +2,7 @@
 
 # Policy for bulk actions
 class BulkActionPolicy < ApplicationPolicy
-  alias_rule :destroy?, :file?, to: :manage?
+  alias_rule :destroy?, :file?, :show?, to: :manage?
 
   def manage?
     record.user_id == user.id

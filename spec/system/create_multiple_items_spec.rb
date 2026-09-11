@@ -88,10 +88,10 @@ RSpec.describe 'Create multiple items' do
 
       ValidateFormJob.perform_now(form_validation_action:)
 
-      expect(page).to have_current_path(bulk_actions_path)
       expect(page).to have_toast("#{bulk_action_label} submitted")
 
       bulk_action = BulkAction.last
+      expect(page).to have_current_path(bulk_action_path(bulk_action))
       expect(bulk_action.action_type).to eq(BulkActions::REGISTER_FORM.action_type.to_s)
       expect(bulk_action.user).to eq(user)
       expect(bulk_action.queued?).to be true
@@ -116,6 +116,30 @@ RSpec.describe 'Create multiple items' do
           expect(item_registrations.last.barcode).to eq('36105212345678')
         end
       )
+    end
+
+    # Turbo renders a redirect's HTML before updating the URL to the redirect target, so the
+    # scheduled-refresh controller on the bulk action page connects while the URL is still the
+    # multiple items URL. Refreshes must keep working after that.
+    it 'continues to refresh the bulk action page it redirects to' do
+      submit_two_items
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      bulk_action = BulkAction.last
+      expect(page).to have_current_path(bulk_action_path(bulk_action))
+      expect(page).to have_text('Processing...')
+
+      bulk_action.update!(status: :completed, druid_count_success: 2, druid_count_total: 2)
+
+      # The page refreshes on an interval, so the completed bulk action is shown without reloading.
+      expect(page).to have_css('table#bulk-action-details-table td', text: 'Completed')
+      expect(page).to have_css('table#bulk-action-details-table td', text: '2 / 2 / 0')
+      expect(page).to have_no_text('Processing...')
     end
   end
 
