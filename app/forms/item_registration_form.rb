@@ -3,6 +3,7 @@
 # Form object for registering a single item as part of multiple item registration (DROs)
 class ItemRegistrationForm < ApplicationForm
   include PermittedParamsConcern
+  include PrevalidationConcern
   include CocinaModels::SourceIdConcern
   include CocinaModels::BarcodeConcern
   include CocinaModels::CatalogRecordIdConcern

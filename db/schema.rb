@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_11_123744) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -120,6 +120,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_180000) do
     t.index ["druid", "lock", "immutable"], name: "index_contents_on_druid_and_lock_and_immutable", unique: true
   end
 
+  create_table "form_validation_actions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "error_data"
+    t.jsonb "form_payload", null: false
+    t.string "status", default: "created", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_form_validation_actions_on_user_id"
+  end
+
   create_table "permissions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "permission_type", null: false
@@ -174,6 +184,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_180000) do
   add_foreign_key "content_file_sets", "contents"
   add_foreign_key "content_files", "content_file_binaries"
   add_foreign_key "content_files", "content_file_sets"
+  add_foreign_key "form_validation_actions", "users"
   add_foreign_key "pinned_objects", "users"
   add_foreign_key "pinned_searches", "users"
   add_foreign_key "pinned_tags", "users"

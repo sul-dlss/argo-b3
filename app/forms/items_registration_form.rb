@@ -3,6 +3,7 @@
 # Form object for registering multiple Items (DROs)
 class ItemsRegistrationForm < ApplicationForm
   include PermittedParamsConcern
+  include PrevalidationConcern
   include CocinaModels::AccessConcern
   include CocinaModels::ContentTypeConcern
   include CocinaModels::ApoConcern
