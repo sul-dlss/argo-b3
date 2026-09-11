@@ -148,6 +148,8 @@ en:
         title:
           label: "Title"
     multiple_items:
+      errors:
+        failed: "An error occurred while validating your registrations. Please try again."
       new:
         title: "Register items"
       validations:

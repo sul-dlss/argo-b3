@@ -175,7 +175,7 @@ Rails.application.routes.draw do
 
   resources :items, only: %i[new create update]
 
-  resources :multiple_items, only: %i[new create]
+  resources :multiple_items, only: %i[new create show]
 
   resources :contents, only: %i[edit update show]
 

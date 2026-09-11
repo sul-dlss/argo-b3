@@ -29,4 +29,35 @@ RSpec.describe 'Multiple items' do
       expect(response).to redirect_to(root_path)
     end
   end
+
+  describe 'showing a form validation action' do
+    let(:form_validation_action) do
+      FormValidationAction.create!(user: form_validation_action_user, form: ItemsRegistrationForm.new,
+                                   status: 'queued')
+    end
+
+    before do
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+    end
+
+    context 'when the form validation action belongs to the user' do
+      let(:form_validation_action_user) { user }
+
+      it 'renders the show page' do
+        get multiple_item_path(form_validation_action)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when the form validation action belongs to another user' do
+      let(:form_validation_action_user) { create(:user) }
+
+      it 'denies access' do
+        get multiple_item_path(form_validation_action)
+
+        expect(response).to be_unauthorized
+      end
+    end
+  end
 end

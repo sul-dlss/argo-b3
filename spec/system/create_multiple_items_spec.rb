@@ -19,32 +19,74 @@ RSpec.describe 'Create multiple items' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
   end
 
+  # Fills in the registration form with two items and submits it.
+  def submit_two_items
+    visit new_multiple_item_path
+
+    expect(page).to have_css('h1', text: 'Register items')
+
+    fill_in_registration_settings
+    fill_in_two_items
+
+    click_button 'Register items'
+  end
+
+  def fill_in_registration_settings
+    select 'image', from: 'Content type'
+    select apo_title, from: 'APO'
+    select 'Stanford', from: 'View access'
+    select 'Stanford', from: 'Download access'
+  end
+
+  def fill_in_two_items
+    within(first('.form-instance')) do
+      fill_in 'Source ID', with: 'sul:first-item'
+      fill_in 'Title', with: 'First title'
+    end
+
+    click_button 'Add another item'
+    expect(page).to have_css('.form-instance', count: 2)
+
+    within(all('.form-instance').last) do
+      fill_in 'Source ID', with: 'sul:second-item'
+      fill_in 'Folio instance HRID', with: 'in11403803'
+      fill_in 'Barcode', with: '36105212345678'
+    end
+  end
+
+  # Waits for the validating page, which is shown while the form validation action is pending.
+  # @return [FormValidationAction] the form validation action for the submitted form
+  def wait_for_validating_page
+    expect(page).to have_text('Validating...')
+
+    FormValidationAction.last.tap do |form_validation_action|
+      expect(page).to have_current_path(multiple_item_path(form_validation_action))
+    end
+  end
+
+  context 'when the form validation is pending' do
+    it 'shows the validating page and enqueues a validate form job' do
+      submit_two_items
+
+      form_validation_action = wait_for_validating_page
+
+      expect(form_validation_action.user).to eq(user)
+      expect(form_validation_action.status_queued?).to be true
+
+      expect(ValidateFormJob).to have_been_enqueued.with(form_validation_action:)
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+      expect(BulkAction.count).to eq(0)
+    end
+  end
+
   context 'when valid' do
     it 'enqueues a register form bulk action' do
-      visit new_multiple_item_path
+      submit_two_items
 
-      expect(page).to have_css('h1', text: 'Register items')
+      form_validation_action = wait_for_validating_page
 
-      select 'image', from: 'Content type'
-      select apo_title, from: 'APO'
-      select 'Stanford', from: 'View access'
-      select 'Stanford', from: 'Download access'
-
-      within(first('.form-instance')) do
-        fill_in 'Source ID', with: 'sul:first-item'
-        fill_in 'Title', with: 'First title'
-      end
-
-      click_button 'Add another item'
-      expect(page).to have_css('.form-instance', count: 2)
-
-      within(all('.form-instance').last) do
-        fill_in 'Source ID', with: 'sul:second-item'
-        fill_in 'Folio instance HRID', with: 'in11403803'
-        fill_in 'Barcode', with: '36105212345678'
-      end
-
-      click_button 'Register items'
+      ValidateFormJob.perform_now(form_validation_action:)
 
       expect(page).to have_current_path(bulk_actions_path)
       expect(page).to have_toast("#{bulk_action_label} submitted")
@@ -86,7 +128,29 @@ RSpec.describe 'Create multiple items' do
 
       click_button 'Register items'
 
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
       expect(page).to have_css('.invalid-feedback', text: 'at least one item is required')
+      expect(page).to have_current_path(multiple_item_path(form_validation_action))
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+      expect(BulkAction.count).to eq(0)
+    end
+  end
+
+  context 'when failed' do
+    it 'shows an error message and does not enqueue a bulk action' do
+      submit_two_items
+
+      form_validation_action = wait_for_validating_page
+
+      form_validation_action.status_failed!
+
+      expect(page).to have_css('.alert', text: 'An error occurred while validating your registrations. ' \
+                                               'Please try again.')
+      expect(page).to have_button('Register items')
 
       expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
       expect(BulkAction.count).to eq(0)
