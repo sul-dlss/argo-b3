@@ -2,12 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe BulkActions::RegisterJob do
+RSpec.describe BulkActions::RegisterCsvJob do
   subject(:job) { described_class.new(bulk_action:, **params) }
 
   let(:params) { { csv_file: csv_string } }
 
-  let(:bulk_action) { create(:bulk_action, action_type: 'register') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'register_csv') }
   let(:log) { instance_double(File, puts: nil, close: true) }
   let(:user_name) { bulk_action.user.sunetid }
 

@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to register objects from a CSV file
-  class RegisterJob < BaseJob
+  class RegisterCsvJob < BaseJob
     HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Title'].freeze
 
     def perform(bulk_action:, csv_file:, **register_params)
