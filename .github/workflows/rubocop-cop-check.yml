@@ -1,0 +1,77 @@
+# .github/workflows/rubocop-cop-check.yml
+# NOTE: workflow_dispatch inputs are used for manual runs while testing
+# and will be removed after confirmation.
+name: Detect new Rubocop cops
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Gemfile.lock"
+  workflow_dispatch:
+    inputs:
+      previous_version:
+        description: "Previous rubocop version"
+        required: true
+      current_version:
+        description: "Current rubocop version"
+        required: true
+permissions:
+  issues: write
+  contents: read
+jobs:
+  check-rubocop-cops:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for rubocop version change
+        id: version_check
+        run: |
+          PREV=$(git show HEAD~1:Gemfile.lock | grep "    rubocop " | awk '{print $2}')
+          CURR=$(grep "    rubocop " Gemfile.lock | awk '{print $2}')
+          echo "previous=$PREV" >> $GITHUB_OUTPUT
+          echo "current=$CURR" >> $GITHUB_OUTPUT
+          if [ "$PREV" != "$CURR" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fetch new cops from changelog
+        id: new_cops
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          # Pull rubocop changelog and extract cops added between versions
+          gem install rubocop --version ${{ steps.version_check.outputs.current }} --no-document
+          NEW_COPS=$(ruby -e "
+            require 'rubocop'
+            # Compare available cops against what's in .rubocop.yml
+            configured = File.read('.rubocop.yml')
+            all_cops = RuboCop::Cop::Registry.global.cops.map(&:cop_name)
+            new_cops = all_cops.reject { |c| configured.include?(c) }
+            puts new_cops.join('\n')
+          ")
+          echo "cops<<EOF" >> $GITHUB_OUTPUT
+          echo "$NEW_COPS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create issue and assign to Copilot
+        if: steps.version_check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "Rubocop updated ${{ steps.version_check.outputs.previous }} → ${{ steps.version_check.outputs.current }}: add new cops to .rubocop.yml" \
+            --body "## New cops to configure
+          Rubocop was updated and the following cops are not yet in .rubocop.yml:
+
+          ${{ steps.new_cops.outputs.cops }}
+
+          ## Instructions
+          Add each cop to .rubocop.yml with \`Enabled: false\` under the correct department.
+          Preserve all existing configuration. Run rubocop to verify the config is valid." \
+            --assignee "@copilot" \
+            --label "rubocop,maintenance"
