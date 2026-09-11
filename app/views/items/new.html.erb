@@ -23,12 +23,7 @@
                                                                    label_classes: 'fw-bold',
                                                                    container_classes: 'mb-3') %>
 
-        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :content_type,
-                                                                      options: Constants::REGISTRATION_CONTENT_TYPES,
-                                                                      label_text: t('edit.items.fields.content_type.label'),
-                                                                      label_mark_required: true,
-                                                                      label_classes: 'fw-bold',
-                                                                      container_classes: 'mb-3') %>
+        <%= render Edit::ContentTypeComponent.new(form:, container_classes: 'mb-3') %>
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>
         <% end %>
@@ -37,11 +32,7 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
                                                                           label: t('edit.items.tabs.rights.label'),
                                                                           mark_required: true)) do |pane| %>
-        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :apo_druid,
-                                                                      options: @apo_options,
-                                                                      label_text: t('edit.items.fields.apo_druid.label'),
-                                                                      label_mark_required: true,
-                                                                      label_classes: 'fw-bold') %>
+        <%= render Edit::ApoComponent.new(form:, options: @apo_options) %>
 
         <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
