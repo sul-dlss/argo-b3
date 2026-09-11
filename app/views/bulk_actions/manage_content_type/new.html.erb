@@ -1,7 +1,7 @@
 <%= form_with model: @bulk_action_form, url: bulk_actions_manage_content_type_path do |form| %>
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
 
-    <fieldset class="mb-3">
+    <fieldset>
       <legend>Content type</legend>
       <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_content_type,
                                                                  label_text: 'Change content type',
@@ -14,7 +14,7 @@
       <% end %>
     </fieldset>
 
-    <fieldset class="mb-3">
+    <fieldset class="my-fieldset">
       <legend>Viewing direction</legend>
       <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_viewing_direction,
                                                                  label_text: 'Change viewing direction (books and images only)',
@@ -28,7 +28,7 @@
       <% end %>
     </fieldset>
 
-    <fieldset class="mb-3">
+    <fieldset class="my-fieldset">
       <legend>Resource types</legend>
       <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :change_resource_type,
                                                                  label_text: 'Change resource types', container_classes: 'mt-4',

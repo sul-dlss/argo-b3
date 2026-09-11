@@ -1,20 +1,24 @@
-<div class="container my-3">
-  <h1 class="h4"><%= label %></h1>
-  <p><%= help_text %></p>
+<div class="container b3-form my-3">
+  <h1 class="mb-5"><%= label %></h1>
   <%= content %>
 
-  <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :description, container_classes: 'mt-3', label_text: 'Describe this bulk action', input_rows: 3) %>
+  <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
+                                                             field_name: :description,
+                                                             container_classes: 'my-fieldset',
+                                                             label_text: 'Describe this bulk action',
+                                                             label_classes: 'fw-bold',
+                                                             input_rows: 3) %>
 
   <% if with_close_version? %>
     <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:,
                                                                field_name: :close_version,
-                                                               container_classes: 'mt-3',
+                                                               container_classes: 'my-fieldset',
                                                                label_classes: 'fw-bold',
-                                                               label_text: 'Close version once action is complete',
-                                                               help_text: 'Uncheck this option if you want to make additional edits to these items before closing the version.') %>
+                                                               label_text: 'Deposit objects once action is complete',
+                                                               help_text: 'Uncheck this option if you want to make additional edits to these objects before depositing the version.') %>
   <% end %>
 
-  <div class="d-flex align-items-center mt-3">
+  <div class="d-flex align-items-center mt-5">
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
     <%= link_to 'Cancel', new_bulk_action_path %>
   </div>

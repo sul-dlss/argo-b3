@@ -62,7 +62,7 @@ RSpec.describe CocinaModels::AdminPolicy do
       let(:new_admin_policy) do
         described_class.new(agreement_druid: 'druid:bb008zm4587',
                             access_view: 'world', access_download: 'world',
-                            admin_policy_druid: 'druid:hv992ry2431')
+                            apo_druid: 'druid:hv992ry2431')
       end
       let(:request_cocina_object) { instance_double(Cocina::Models::RequestAdminPolicy) }
       let(:registered_cocina_object) { build(:admin_policy_with_metadata) }
@@ -87,7 +87,7 @@ RSpec.describe CocinaModels::AdminPolicy do
       let(:new_admin_policy) do
         described_class.new(agreement_druid: 'druid:bb008zm4587',
                             access_view: 'world', access_download: 'world',
-                            admin_policy_druid: 'druid:hv992ry2431')
+                            apo_druid: 'druid:hv992ry2431')
       end
       let(:registered_cocina_object) { build(:admin_policy_with_metadata) }
 

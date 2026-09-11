@@ -1,0 +1,42 @@
+<div data-controller="toggle">
+  <%= render SdrViewComponents::Forms::ToggleComponent.new(form:,
+                                                           field_name: :with_embargo,
+                                                           label_text: 'Access settings',
+                                                           label_classes: 'fw-bold') do |component| %>
+    <% component.with_left_toggle_option(form:, field_name: :with_embargo, label: 'Without embargo', value: false,
+                                         data: { toggle_target: 'radio', toggle_section: 'without-embargo',
+                                                 action: 'toggle#toggle' }) %>
+    <% component.with_right_toggle_option(form:, field_name: :with_embargo, label: 'With embargo', value: true,
+                                          data: { toggle_target: 'radio', toggle_section: 'with-embargo',
+                                                  action: 'toggle#toggle' }) %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings without embargo', hidden_label: true,
+                                                             data: { toggle_target: 'section',
+                                                                     toggle_section: 'without-embargo' }) do %>
+    <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+  <% end %>
+
+  <div data-toggle-target="section" data-toggle-section="with-embargo">
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Embargo release date', hidden_label: true,
+                                                               classes: 'my-fieldset') do %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
+                                                                  field_name: :embargo_release_date,
+                                                                  label_text: 'When will this embargo end?',
+                                                                  label_classes: 'fw-bold',
+                                                                  label_mark_required: true,
+                                                                  container_classes: 'my-field',
+                                                                  input_type: 'date') %>
+    <% end %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings during embargo',
+                                                               classes: 'my-fieldset') do %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field') %>
+    <% end %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings once embargo ends',
+                                                               classes: 'my-fieldset') do %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+    <% end %>
+  </div>
+</div>

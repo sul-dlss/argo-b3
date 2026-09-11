@@ -10,7 +10,7 @@
                                                                   input_value: 'false') %>
 
     <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :to, text: 'to') %>
-    <%= form.select :to, Constants::RELEASE_TARGETS, {}, class: 'form-select mb-3' %>
+    <%= form.select :to, Constants::RELEASE_TARGETS, {}, class: 'form-select' %>
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
   <% end %>
 <% end %>

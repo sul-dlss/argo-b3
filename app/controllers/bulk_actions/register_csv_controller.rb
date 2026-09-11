@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module BulkActions
-  # Controller for register bulk action.
-  class RegisterController < BulkActionApplicationController
+  # Controller for register CSV bulk action.
+  class RegisterCsvController < BulkActionApplicationController
     private
 
     def bulk_action_config
-      BulkActions::REGISTER
+      BulkActions::REGISTER_CSV
     end
 
     def job_params

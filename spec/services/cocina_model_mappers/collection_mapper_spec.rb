@@ -31,7 +31,7 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
         catalog_link_refresh: true,
         catalog_link_part_label: 'Part 1',
         catalog_link_sort_key: '001',
-        admin_policy_druid: cocina_object.administrative.hasAdminPolicy
+        apo_druid: cocina_object.administrative.hasAdminPolicy
       )
     end
   end

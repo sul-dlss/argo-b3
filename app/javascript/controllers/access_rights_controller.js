@@ -1,64 +1,39 @@
 import { Controller } from '@hotwired/stimulus'
 
-// This controller is used to toggle access rights inputs on the manage rights bulk action form.
+// Download options permitted for each view option.
+const DOWNLOAD_OPTIONS_BY_VIEW = {
+  world: ['world', 'stanford', 'location-based', 'none'],
+  dark: ['none'],
+  'citation-only': ['none'],
+  stanford: ['stanford', 'location-based', 'none'],
+  'location-based': ['location-based', 'none']
+}
+
+// This controller is used to toggle access rights options on the manage rights bulk action form.
 export default class extends Controller {
-  static targets = [
-    'worldView', 'darkView', 'citationOnlyView', 'stanfordView', 'locationBasedView',
-    'worldDownload', 'noneDownload', 'stanfordDownload', 'locationBasedDownload',
-    'location'
-  ]
+  static targets = ['view', 'download', 'location']
 
   connect () {
     this.toggle()
   }
 
   toggle () {
-    if (this.selectedViewTarget === this.worldViewTarget) {
-      this.disableExcept(this.downloadTargets, this.downloadTargets)
-    } else if (this.selectedViewTarget === this.darkViewTarget || this.selectedViewTarget === this.citationOnlyViewTarget) {
-      this.disableExcept(this.downloadTargets, [this.noneDownloadTarget])
-    } else if (this.selectedViewTarget === this.locationBasedViewTarget) {
-      this.disableExcept(this.downloadTargets, [this.locationBasedDownloadTarget, this.noneDownloadTarget])
-    } else if (this.selectedViewTarget === this.stanfordViewTarget) {
-      this.disableExcept(this.downloadTargets, [this.stanfordDownloadTarget, this.locationBasedDownloadTarget, this.noneDownloadTarget])
-    }
-
-    this.toggleLocations(this.selectedViewTarget !== this.locationBasedViewTarget && this.selectedDownloadTarget !== this.locationBasedDownloadTarget)
+    this.enableOptions(this.downloadTarget, DOWNLOAD_OPTIONS_BY_VIEW[this.viewTarget.value] ?? [])
+    // Read the download value after enableOptions, which may have changed it.
+    this.locationTarget.disabled = this.viewTarget.value !== 'location-based' &&
+      this.downloadTarget.value !== 'location-based'
   }
 
-  disableExcept (targets, exceptTargets) {
-    targets.forEach((target) => {
-      target.disabled = !exceptTargets.includes(target)
+  enableOptions (select, enabledValues) {
+    Array.from(select.options).forEach((option) => {
+      option.disabled = !enabledValues.includes(option.value)
     })
-    this.checkFirstIfNeeded(exceptTargets)
+    this.selectFirstEnabledIfNeeded(select)
   }
 
-  toggleLocations (disabled) {
-    this.locationTargets.forEach((target) => {
-      target.disabled = disabled
-    })
-    this.checkFirstIfNeeded(this.locationTargets)
-  }
-
-  checkFirstIfNeeded (targets) {
-    if (targets.some((target) => target.checked)) return
-    const firstEnabledTarget = targets.find((target) => !target.disabled)
-    if (firstEnabledTarget) firstEnabledTarget.checked = true
-  }
-
-  get viewTargets () {
-    return [this.worldViewTarget, this.darkViewTarget, this.citationOnlyViewTarget, this.stanfordViewTarget, this.locationBasedViewTarget]
-  }
-
-  get selectedViewTarget () {
-    return this.viewTargets.find((target) => target.checked)
-  }
-
-  get downloadTargets () {
-    return [this.worldDownloadTarget, this.stanfordDownloadTarget, this.locationBasedDownloadTarget, this.noneDownloadTarget]
-  }
-
-  get selectedDownloadTarget () {
-    return this.downloadTargets.find((target) => target.checked)
+  selectFirstEnabledIfNeeded (select) {
+    if (!select.selectedOptions[0]?.disabled) return
+    const firstEnabledOption = Array.from(select.options).find((option) => !option.disabled)
+    if (firstEnabledOption) select.value = firstEnabledOption.value
   }
 }

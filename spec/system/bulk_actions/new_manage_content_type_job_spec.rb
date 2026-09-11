@@ -30,7 +30,7 @@ RSpec.describe 'Create a new manage content type bulk action' do
       fill_in 'Enter druid list', with: druids.join("\n")
       fill_in 'Describe this bulk action', with: 'Update content type for test items'
 
-      expect(page).to have_checked_field('Close version once action is complete')
+      expect(page).to have_checked_field('Deposit objects once action is complete')
       click_button 'Submit'
 
       expect(page).to have_current_path(bulk_actions_path)
@@ -69,7 +69,7 @@ RSpec.describe 'Create a new manage content type bulk action' do
       fill_in 'Enter druid list', with: druids.join("\n")
       fill_in 'Describe this bulk action', with: 'Update to book with page resource type'
 
-      uncheck 'Close version once action is complete'
+      uncheck 'Deposit objects once action is complete'
       click_button 'Submit'
 
       expect(page).to have_current_path(bulk_actions_path)

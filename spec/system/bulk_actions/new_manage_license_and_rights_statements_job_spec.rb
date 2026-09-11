@@ -36,7 +36,7 @@ RSpec.describe 'Create a new manage license and rights statements bulk action' d
       select 'CC Attribution 4.0 International', from: 'License'
 
       fill_in 'Describe this bulk action', with: 'Update license and rights statements for test items'
-      expect(page).to have_checked_field('Close version once action is complete')
+      expect(page).to have_checked_field('Deposit objects once action is complete')
       click_button 'Submit'
 
       expect(page).to have_current_path(bulk_actions_path)
@@ -74,7 +74,7 @@ RSpec.describe 'Create a new manage license and rights statements bulk action' d
       fill_in 'Enter druid list', with: druids.join("\n")
       fill_in 'Describe this bulk action', with: 'No rights updates for test items'
 
-      expect(page).to have_checked_field('Close version once action is complete')
+      expect(page).to have_checked_field('Deposit objects once action is complete')
       click_button 'Submit'
 
       expect(page).to have_current_path(bulk_actions_path)
@@ -110,7 +110,7 @@ RSpec.describe 'Create a new manage license and rights statements bulk action' d
       choose 'Remove existing use and reproduction statement'
       choose 'Remove existing copyright statement'
       choose 'Remove existing license'
-      uncheck 'Close version once action is complete'
+      uncheck 'Deposit objects once action is complete'
 
       fill_in 'Describe this bulk action', with: 'Remove rights statements for test items'
       click_button 'Submit'

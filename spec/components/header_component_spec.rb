@@ -73,6 +73,13 @@ RSpec.describe HeaderComponent, type: :component do
         expect(page).to have_link('Item', href: '/items/new')
         expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Item')
       end
+
+      it 'renders an enabled link for multiple item registration' do
+        render_inline(component)
+
+        expect(page).to have_link('Register multiple items', href: '/multiple_items/new')
+        expect(page).to have_no_css('a.dropdown-item.disabled', exact_text: 'Register multiple items')
+      end
     end
 
     context 'when the user does not belong to a workgroup with edit permission' do
@@ -81,12 +88,17 @@ RSpec.describe HeaderComponent, type: :component do
 
         expect(page).to have_css('a.dropdown-item.disabled', text: 'Item')
       end
+
+      it 'renders a disabled link for multiple item registration' do
+        render_inline(component)
+
+        expect(page).to have_css('a.dropdown-item.disabled', exact_text: 'Register multiple items')
+      end
     end
 
-    it 'renders disabled links for multiple item registration' do
+    it 'renders disabled links for the other multiple item options' do
       render_inline(component)
 
-      expect(page).to have_css('a.dropdown-item.disabled', text: 'Register multiple items')
       expect(page).to have_css('a.dropdown-item.disabled', text: 'Register multiple items for Goobi')
       expect(page).to have_css('a.dropdown-item.disabled', text: 'Deposit multiple items')
     end

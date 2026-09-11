@@ -22,7 +22,7 @@ class DashboardController < ApplicationController
     Search::Fields::ID,
     Search::Fields::TITLE,
     Search::Fields::OBJECT_TYPES,
-    Search::Fields::OTHER_TAGS
+    Search::Fields::ALL_TAGS
   ].freeze
 
   def index

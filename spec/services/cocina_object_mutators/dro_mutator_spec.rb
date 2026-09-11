@@ -93,6 +93,32 @@ RSpec.describe CocinaObjectMutators::DroMutator do
       end
     end
 
+    context 'when embargo attributes are set on a request object' do
+      let(:cocina_object) { Cocina::Models.build_request(request_props, validate: false) }
+      let(:request_props) do
+        {
+          type: Cocina::Models::ObjectType.object,
+          identification: { sourceId: 'new:source-id' },
+          administrative: { hasAdminPolicy: 'druid:bc123df4567' },
+          description: { title: [{ value: 'The Title' }] }
+        }
+      end
+      let(:cocina_model) do
+        CocinaModels::Dro.new(source_id: 'new:source-id', apo_druid: 'druid:bc123df4567',
+                              content_type: Cocina::Models::ObjectType.object,
+                              access_view: 'world', access_download: 'world',
+                              embargo_release_date: DateTime.parse('2040-06-01'),
+                              embargo_view: 'dark', embargo_download: 'none')
+      end
+
+      it 'writes the embargo to the RequestDRO' do
+        expect(result).to be_a(Cocina::Models::RequestDRO)
+        expect(result.access.embargo.releaseDate).to eq DateTime.parse('2040-06-01')
+        expect(result.access.embargo.view).to eq 'dark'
+        expect(result.access.embargo.download).to eq 'none'
+      end
+    end
+
     context 'when embargo_release_date is nil' do
       it 'does not write an embargo to the DROWithMetadata' do
         expect(result.access.embargo).to be_nil

@@ -28,7 +28,7 @@ RSpec.describe 'Pin and unpin a tag' do
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::COLLECTION_DRUIDS => [],
       Search::Fields::COLLECTION_TITLES => [],
-      Search::Fields::OTHER_TAGS => ['Project : Foo']
+      Search::Fields::ALL_TAGS => ['Project : Foo']
     }
   end
 

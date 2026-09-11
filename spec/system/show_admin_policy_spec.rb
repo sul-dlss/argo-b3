@@ -28,7 +28,7 @@ RSpec.describe 'Show APO' do
       Search::Fields::TITLE => title,
       Search::Fields::APO_DRUID => [apo_druid],
       Search::Fields::APO_TITLE => ['My APO'],
-      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
+      Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end

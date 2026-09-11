@@ -18,6 +18,8 @@ module BulkActions
       csv.each.with_index(2) do |row, index|
         druid = row[DRUID_COLUMN]
         perform_item_class.new(druid:, index:, job: self, row:).perform
+      rescue Sdr::Repository::NotFoundResponse
+        failure!(druid:, message: 'Error: Object not found', index:)
       rescue StandardError => e
         failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
       end

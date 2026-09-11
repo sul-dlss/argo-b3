@@ -1,0 +1,18 @@
+.b3-form, .tab-form {
+  fieldset legend {
+    font-size: unset;
+    font-weight: bold;
+  }
+
+  // Margin between fieldsets
+  .my-fieldset {
+    margin-top: $spacer * 1.5;
+    margin-bottom: $spacer * 1.5;
+  }
+
+  // Margin between form fields
+  .my-field {
+    margin-top: $spacer; 
+    margin-bottom: $spacer;
+  }
+}

@@ -12,13 +12,13 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
     let(:view) { 'stanford' }
     let(:download) { 'location-based' }
     let(:location) { Constants::ACCESS_LOCATIONS.first }
-    let(:admin_policy_druid) { 'druid:hv992ry2431' }
+    let(:apo_druid) { 'druid:hv992ry2431' }
     let(:agreement_druid) { 'druid:bb008zm4587' }
 
     let(:cocina_object) do
       build(:admin_policy_with_metadata).new(
         administrative: {
-          hasAdminPolicy: admin_policy_druid,
+          hasAdminPolicy: apo_druid,
           hasAgreement: agreement_druid,
           accessTemplate: {
             view:,
@@ -40,7 +40,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
         use_and_reproduction_statement:,
         license:,
         copyright:,
-        admin_policy_druid:,
+        apo_druid:,
         agreement_druid:
       )
     end
@@ -51,7 +51,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
       let(:cocina_object) do
         build(:admin_policy_with_metadata).new(
           administrative: {
-            hasAdminPolicy: admin_policy_druid,
+            hasAdminPolicy: apo_druid,
             hasAgreement: agreement_druid,
             accessTemplate: {
               view:,
@@ -65,7 +65,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
         expect(result).to eq(
           access_view: view,
           access_download: download,
-          admin_policy_druid:,
+          apo_druid:,
           agreement_druid:
         )
       end

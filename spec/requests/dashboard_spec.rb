@@ -33,7 +33,7 @@ RSpec.describe 'Dashboard' do
           Search::Fields::TITLE => "Title #{DruidSupport.bare_druid_from(object_druid)}",
           Search::Fields::OBJECT_TYPES => ['item'],
           Search::Fields::CONTENT_TYPES => ['book'],
-          Search::Fields::OTHER_TAGS => []
+          Search::Fields::ALL_TAGS => []
         }
       end
     end

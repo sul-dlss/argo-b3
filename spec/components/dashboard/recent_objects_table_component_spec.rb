@@ -12,7 +12,7 @@ RSpec.describe Dashboard::RecentObjectsTableComponent, type: :component do
                               Search::Fields::ID => druid,
                               Search::Fields::TITLE => 'Liver and bacon: fox trot',
                               Search::Fields::OBJECT_TYPES => ['item'],
-                              Search::Fields::OTHER_TAGS => ['Project : Riegler-Deutsch Index', 'Remediated']
+                              Search::Fields::ALL_TAGS => ['Project : Riegler-Deutsch Index', 'Remediated']
                             })
   end
 

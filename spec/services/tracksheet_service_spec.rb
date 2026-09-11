@@ -68,7 +68,7 @@ RSpec.describe TracksheetService do
       let(:solr_doc) do
         { Search::Fields::ID => druid,
           Search::Fields::TITLE => title,
-          Search::Fields::OTHER_TAGS => ['Some : First : Tag', 'Some : Second : Tag', 'Project : Ignored'] }
+          Search::Fields::ALL_TAGS => ['Some : First : Tag', 'Some : Second : Tag', 'Project : Ignored'] }
       end
 
       it 'adds the tags, ignoring project tags' do

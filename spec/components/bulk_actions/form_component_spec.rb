@@ -11,7 +11,6 @@ RSpec.describe BulkActions::FormComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('h1', text: BulkActions::REINDEX.label)
-    expect(page).to have_css('p', text: BulkActions::REINDEX.help_text)
     expect(page).to have_field('Describe this bulk action', type: 'textarea')
 
     expect(page).to have_button('Submit', type: 'submit')

@@ -9,7 +9,7 @@ RSpec.describe ItemForm do
       source_id_choice:,
       source_id_prefix:,
       title:,
-      admin_policy_druid: 'druid:bc123df4567',
+      apo_druid: 'druid:bc123df4567',
       content_type: Cocina::Models::ObjectType.object,
       access_view: 'world',
       access_download: 'world'
@@ -198,6 +198,103 @@ RSpec.describe ItemForm do
       expect(described_class.permitted_params).to include(
         release_tags_attributes: ReleaseTagsForm.permitted_params
       )
+    end
+  end
+
+  describe 'with_embargo' do
+    context 'when not provided and the embargo release date is present' do
+      subject(:item_form) do
+        described_class.new(
+          source_id:,
+          source_id_choice:,
+          source_id_prefix:,
+          title:,
+          apo_druid: 'druid:bc123df4567',
+          content_type: Cocina::Models::ObjectType.object,
+          access_view: 'world',
+          access_download: 'world',
+          embargo_release_date: Time.zone.parse('2030-01-01'),
+          embargo_view: 'location-based',
+          embargo_download: 'location-based',
+          embargo_location: 'spec'
+        )
+      end
+
+      it 'defaults to true' do
+        expect(item_form.with_embargo).to be(true)
+      end
+    end
+
+    context 'when not provided and the embargo release date is blank' do
+      it 'defaults to false' do
+        expect(item_form.with_embargo).to be(false)
+      end
+    end
+  end
+
+  describe 'embargo_release_date' do
+    context 'when with_embargo is true and the embargo release date is blank' do
+      before do
+        item_form.with_embargo = true
+      end
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:embargo_release_date]).to include("can't be blank")
+      end
+    end
+
+    context 'when with_embargo is false and the embargo release date is blank' do
+      before do
+        item_form.with_embargo = false
+      end
+
+      it 'is valid' do
+        expect(item_form).to be_valid
+      end
+    end
+  end
+
+  describe 'nullify_embargo_access_rights' do
+    subject(:item_form) do
+      described_class.new(
+        source_id:,
+        source_id_choice:,
+        source_id_prefix:,
+        title:,
+        apo_druid: 'druid:bc123df4567',
+        content_type: Cocina::Models::ObjectType.object,
+        access_view: 'world',
+        access_download: 'world',
+        embargo_release_date: Time.zone.parse('2030-01-01'),
+        embargo_view: 'location-based',
+        embargo_download: 'location-based',
+        embargo_location: 'spec'
+      )
+    end
+
+    context 'when with_embargo is false' do
+      before do
+        item_form.with_embargo = false
+      end
+
+      it 'nullifies the embargo fields on validation' do
+        expect(item_form).to be_valid
+        expect(item_form.embargo_release_date).to be_nil
+        expect(item_form.embargo_view).to be_nil
+        expect(item_form.embargo_download).to be_nil
+        expect(item_form.embargo_location).to be_nil
+      end
+    end
+
+    context 'when with_embargo is true' do
+      it 'does not nullify the embargo fields on validation' do
+        expect(item_form).to be_valid
+        expect(item_form.embargo_release_date).to eq(Time.zone.parse('2030-01-01'))
+        expect(item_form.embargo_view).to eq('location-based')
+        expect(item_form.embargo_download).to eq('location-based')
+        expect(item_form.embargo_location).to eq('spec')
+      end
     end
   end
 

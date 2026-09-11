@@ -4,12 +4,12 @@
 # Note that this is a subclass of CocinaModels::Dro, not ApplicationForm.
 class ItemForm < CocinaModels::Dro
   include PermittedParamsConcern
+  include EmbargoFormConcern
+  include TitleFormConcern
 
   SOURCE_ID_PROVIDED_CHOICE = 'provide'
   SOURCE_ID_GENERATE_CHOICE = 'generate'
 
-  attribute :title, :string
-  normalizes :title, with: ->(title) { title.strip }
   validates :title, presence: true
 
   attribute :source_id_choice, :string, default: SOURCE_ID_PROVIDED_CHOICE
@@ -31,6 +31,7 @@ class ItemForm < CocinaModels::Dro
   def initialize(attributes = {})
     super
     build_release_tags unless release_tags
+    derive_with_embargo
   end
 
   def create!(user_name:)

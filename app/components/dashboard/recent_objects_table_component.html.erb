@@ -22,7 +22,7 @@
         <%= object_type_label(object_doc) %>
       <% end %>
       <% row_component.with_cell do %>
-        <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: Array(object_doc.other_tags)) %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: Array(object_doc.all_tags)) %>
       <% end %>
     <% end %>
   <% end %>

@@ -119,7 +119,7 @@ class TracksheetService
     project = solr_doc_presenter.projects&.first
     table_data.push(['Project Name:', normalize(project)]) if project
 
-    tags = Array(solr_doc_presenter.other_tags).filter_map do |tag|
+    tags = Array(solr_doc_presenter.all_tags).filter_map do |tag|
       /^Project\s*:/.match?(tag) ? nil : normalize(tag).gsub(/\s+/, Prawn::Text::NBSP)
     end
     table_data.push(['Tags:', tags.join("\n")]) unless tags.empty?

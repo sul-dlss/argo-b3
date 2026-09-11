@@ -60,6 +60,21 @@ RSpec.describe 'Create an item' do
       expect(page).to have_css('#rights-tab.active')
       select apo_title, from: 'APO'
 
+      # Only the section for the selected access settings toggle option is shown. The other
+      # section is disabled so that its fields are not submitted.
+      expect(page).to have_no_css('legend', text: 'Access settings during embargo')
+      expect(page).to have_select('item[access_view]', disabled: false)
+      expect(page).to have_select('item[embargo_view]', disabled: true, visible: :all)
+
+      choose 'With embargo', allow_label_click: true
+      expect(page).to have_css('legend', text: 'Access settings during embargo')
+      expect(page).to have_select('item[embargo_view]', disabled: false)
+      expect(page).to have_select('item[access_view]', disabled: false)
+
+      choose 'Without embargo', allow_label_click: true
+      expect(page).to have_no_css('legend', text: 'Access settings during embargo')
+      expect(page).to have_select('item[embargo_view]', disabled: true, visible: :all)
+
       click_button 'Next'
       expect(page).to have_css('#release-tab.active')
       choose 'Release to:'
@@ -115,6 +130,87 @@ RSpec.describe 'Create an item' do
       expect(Sdr::Repository).to have_received(:register) do |args|
         request_cocina_object = args[:request_cocina_object]
         expect(request_cocina_object.identification.sourceId).to eq('new:11111111-1111-1111-1111-111111111111')
+      end
+    end
+
+    it 'registers a valid cocina object with Stanford access' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+      select 'Stanford', from: 'View access'
+      select 'Stanford', from: 'Download access'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        access = args[:request_cocina_object].access
+        expect(access.view).to eq('stanford')
+        expect(access.download).to eq('stanford')
+        expect(access.location).to be_nil
+      end
+    end
+
+    it 'registers a valid cocina object with location-based access' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+      select 'Location Based', from: 'View access'
+      select 'Special collections', from: 'Location'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        access = args[:request_cocina_object].access
+        expect(access.view).to eq('location-based')
+        expect(access.download).to eq('location-based')
+        expect(access.location).to eq('spec')
+      end
+    end
+
+    it 'registers a valid cocina object with an embargo' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+      choose 'With embargo', allow_label_click: true
+
+      fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
+      within_fieldset('Access settings during embargo') do
+        select 'Dark', from: 'View access'
+      end
+      within_fieldset('Access settings once embargo ends') do
+        select 'Stanford', from: 'View access'
+      end
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        access = args[:request_cocina_object].access
+        expect(access.view).to eq('stanford')
+        expect(access.download).to eq('stanford')
+        expect(access.embargo.releaseDate).to eq(DateTime.parse('2040-06-01'))
+        expect(access.embargo.view).to eq('dark')
+        expect(access.embargo.download).to eq('none')
       end
     end
 
@@ -181,6 +277,25 @@ RSpec.describe 'Create an item' do
 
       find_by_id('release-tab').click
       expect(page).to have_css('.invalid-feedback', text: 'At least one target must be selected')
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'requires an embargo release date when an embargo is selected' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      choose 'With embargo', allow_label_click: true
+      # Leaving the embargo release date blank.
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_invalid_feedback('When will this embargo end?', "can't be blank")
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(Sdr::Repository).not_to have_received(:accession)

@@ -2,12 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe BulkActions::RegisterJob do
+RSpec.describe BulkActions::RegisterCsvJob do
   subject(:job) { described_class.new(bulk_action:, **params) }
 
   let(:params) { { csv_file: csv_string } }
 
-  let(:bulk_action) { create(:bulk_action, action_type: 'register') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'register_csv') }
   let(:log) { instance_double(File, puts: nil, close: true) }
   let(:user_name) { bulk_action.user.sunetid }
 
@@ -73,7 +73,7 @@ RSpec.describe BulkActions::RegisterJob do
     it 'logs the error' do
       job.perform_now
 
-      expect(log).to have_received(:puts).with(/connection problem/)
+      expect(log).to have_received(:puts).with(/line 2\t\tError: StandardError connection problem/)
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
     end
@@ -95,7 +95,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)
-      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tSuccess: Registration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
       expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\n") # rubocop:disable Layout/LineLength
     end
@@ -132,7 +132,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: ['csv : test', 'Project : two'],
               workflow_name: 'accessionWF',
               user_name:).twice
-      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tSuccess: Registration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
     end
   end
@@ -159,7 +159,7 @@ RSpec.describe BulkActions::RegisterJob do
               tags: [],
               workflow_name: 'accessionWF',
               user_name:)
-      expect(log).to have_received(:puts).with(/druid:df123df4567\tRegistration successful/).twice
+      expect(log).to have_received(:puts).with(/druid:df123df4567\tSuccess: Registration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
     end
   end

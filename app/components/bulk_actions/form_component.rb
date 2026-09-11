@@ -12,7 +12,7 @@ module BulkActions
 
     attr_reader :form, :bulk_action_config
 
-    delegate :label, :help_text, to: :bulk_action_config
+    delegate :label, to: :bulk_action_config
 
     def with_close_version?
       @with_close_version

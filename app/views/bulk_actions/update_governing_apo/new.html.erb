@@ -3,6 +3,7 @@
     <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :new_apo_id,
                                                                   options: @apo_options,
                                                                   label_text: 'New governing APO',
+                                                                  label_classes: 'fw-bold',
                                                                   label_mark_required: true) %>
 
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form,

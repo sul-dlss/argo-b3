@@ -128,8 +128,12 @@ en:
         rights:
           label: "APO, collection, rights"
       fields:
-        admin_policy_druid:
+        apo_druid:
           label: "APO"
+        barcode:
+          label: "Barcode"
+        catalog_record_id:
+          label: "Folio instance HRID"
         content_type:
           label: "Content type"
         source_id:
@@ -143,6 +147,12 @@ en:
             label: "Enter prefix to autogenerate source ID"
         title:
           label: "Title"
+    multiple_items:
+      new:
+        title: "Register items"
+      validations:
+        no_items: "at least one item is required"
+        title_required: "title is required if a FOLIO Instance HRID is not provided"
   access:
     locations:
       spec: "Special collections"

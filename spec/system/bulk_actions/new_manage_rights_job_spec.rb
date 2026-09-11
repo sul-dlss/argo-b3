@@ -28,12 +28,12 @@ RSpec.describe 'Create a new manage rights bulk action' do
     # When dark view is selected, only none download is enabled and selected
     choose_view_right 'Dark'
     expect_download_rights_enabled ['None']
-    within_fieldset('Download rights') { expect(page).to have_checked_field('None') }
+    expect(page).to have_select('Download access', selected: 'None')
 
     # When citation-only view is selected, only none download is enabled and selected
     choose_view_right 'Citation Only'
     expect_download_rights_enabled ['None']
-    within_fieldset('Download rights') { expect(page).to have_checked_field('None') }
+    expect(page).to have_select('Download access', selected: 'None')
 
     # When stanford view is selected, stanford and location-based download are enabled
     choose_view_right 'Stanford'
@@ -47,11 +47,11 @@ RSpec.describe 'Create a new manage rights bulk action' do
     expect_locations_enabled
 
     # Select a location and switch back to world view with none download
-    within_fieldset('Location') { choose 'Spec' }
+    select 'Special collections', from: 'Location'
     choose_view_right 'World'
     choose_download_right 'None'
 
-    # Locations are disabled (but previously selected location can remain checked)
+    # Locations are disabled (but previously selected location remains selected)
     expect_locations_disabled
 
     # When location-based download is selected, locations are enabled again
@@ -61,7 +61,7 @@ RSpec.describe 'Create a new manage rights bulk action' do
     # Submit the bulk action
     fill_in 'Enter druid list', with: druids.join("\n")
     fill_in 'Describe this bulk action', with: 'Manage rights for test items'
-    expect(page).to have_checked_field('Close version once action is complete')
+    expect(page).to have_checked_field('Deposit objects once action is complete')
     click_button 'Submit'
 
     expect(page).to have_current_path(bulk_actions_path)
@@ -84,11 +84,11 @@ RSpec.describe 'Create a new manage rights bulk action' do
   end
 
   def choose_view_right(label)
-    within_fieldset('View rights') { choose label }
+    select label, from: 'View access'
   end
 
   def choose_download_right(label)
-    within_fieldset('Download rights') { choose label }
+    select label, from: 'Download access'
   end
 
   def expect_download_rights_enabled(enabled_labels)
@@ -99,23 +99,22 @@ RSpec.describe 'Create a new manage rights bulk action' do
       'None' => 'none'
     }
 
-    within_fieldset('Download rights') do
-      all_download_options.each do |label, value|
-        selector = "input[name='bulk_actions_manage_rights[download]'][value='#{value}']"
-        if enabled_labels.include?(label)
-          expect(page).to have_css("#{selector}:not([disabled])")
-        else
-          expect(page).to have_css("#{selector}[disabled]")
-        end
+    download_select = find_field('Download access')
+    all_download_options.each do |label, value|
+      selector = "option[value='#{value}']"
+      if enabled_labels.include?(label)
+        expect(download_select).to have_css("#{selector}:not([disabled])")
+      else
+        expect(download_select).to have_css("#{selector}[disabled]")
       end
     end
   end
 
   def expect_locations_enabled
-    expect(page).to have_no_css('input[name="bulk_actions_manage_rights[location]"][disabled]')
+    expect(page).to have_field('Location', disabled: false)
   end
 
   def expect_locations_disabled
-    expect(page).to have_css('input[name="bulk_actions_manage_rights[location]"][disabled]', count: Constants::ACCESS_LOCATIONS.length)
+    expect(page).to have_field('Location', disabled: true)
   end
 end

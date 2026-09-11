@@ -32,7 +32,7 @@ RSpec.describe 'Show collection' do
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
       Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
-      Search::Fields::OTHER_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
+      Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
   end
