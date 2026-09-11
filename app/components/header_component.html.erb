@@ -37,7 +37,7 @@
         <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Multiple items', classes: 'h4') %>
       <% end %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items', link: '#', disabled: true) %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items', link: new_multiple_item_path, disabled: !register_item?) %>
       <% end %>
       <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items for Goobi', link: '#', disabled: true) %>

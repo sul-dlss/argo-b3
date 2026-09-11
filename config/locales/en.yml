@@ -130,6 +130,10 @@ en:
       fields:
         apo_druid:
           label: "APO"
+        barcode:
+          label: "Barcode"
+        catalog_record_id:
+          label: "Folio instance HRID"
         content_type:
           label: "Content type"
         source_id:
@@ -144,6 +148,8 @@ en:
         title:
           label: "Title"
     multiple_items:
+      new:
+        title: "Register items"
       validations:
         no_items: "at least one item is required"
         title_required: "title is required if a FOLIO Instance HRID is not provided"

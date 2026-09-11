@@ -175,6 +175,8 @@ Rails.application.routes.draw do
 
   resources :items, only: %i[new create update]
 
+  resources :multiple_items, only: %i[new create]
+
   resources :contents, only: %i[edit update show]
 
   resources :pinned_objects, only: %i[create destroy]
