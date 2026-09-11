@@ -37,9 +37,9 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
                                                                           label: t('edit.items.tabs.rights.label'),
                                                                           mark_required: true)) do |pane| %>
-        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :admin_policy_druid,
+        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :apo_druid,
                                                                       options: @apo_options,
-                                                                      label_text: t('edit.items.fields.admin_policy_druid.label'),
+                                                                      label_text: t('edit.items.fields.apo_druid.label'),
                                                                       label_mark_required: true,
                                                                       label_classes: 'fw-bold') %>
 

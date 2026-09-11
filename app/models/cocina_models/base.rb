@@ -5,6 +5,7 @@ module CocinaModels
   class Base < Blanks::Base
     include ActiveModel::AttributeAssignment
     include NormalizationConcern
+    include ApoConcern
 
     alias update assign_attributes
 
@@ -18,10 +19,6 @@ module CocinaModels
     alias druid external_identifier
 
     attribute :description_hash, default: -> { { title: [{ value: ':auto' }] } }
-
-    # All objects have an admin policy (APO)
-    attribute :admin_policy_druid, :string
-    validates :admin_policy_druid, presence: true
 
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
