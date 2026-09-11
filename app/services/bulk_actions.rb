@@ -253,6 +253,14 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     form: BulkActions::RegisterForm
   )
 
+  REGISTER_FORM = Config.new(
+    label: 'Register new druids (via a form)',
+    help_text: 'Register druids.',
+    export_filename: 'registration_report.csv',
+    export_label: 'Registration report',
+    job: BulkActions::RegisterFormJob
+  )
+
   REINDEX = Config.new(
     label: 'Reindex',
     help_text: 'Reindexes the DOR object in Solr.',

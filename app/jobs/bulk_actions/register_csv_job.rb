@@ -2,83 +2,37 @@
 
 module BulkActions
   # Job to register objects from a CSV file
-  class RegisterCsvJob < BaseJob
-    HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Title'].freeze
-
+  class RegisterCsvJob < BaseRegisterJob
     def perform(bulk_action:, csv_file:, **register_params)
       @csv_file = csv_file
       @register_params = register_params
       super
     end
 
-    def perform_bulk_action
-      convert_results.each.with_index do |convert_result, index|
-        JobItem.new(index:, job: self, convert_result:).perform
-      rescue StandardError => e
-        failure!(message: "Failed #{e.class} #{e.message}", index:)
-      end
+    def registrations
+      @registrations ||= RegistrationCsvConverter.convert(csv_string: @csv_file, params: register_params)
     end
 
-    def success!(message:, index:, druid: nil)
-      bulk_action.increment(:druid_count_success).save
-      log(delimited_log_message(message:, index:, druid:))
-    end
-
-    def failure!(message:, index:, druid: nil)
-      bulk_action.increment(:druid_count_fail).save
-      log(delimited_log_message(message:, index:, druid:))
-    end
-
-    def druid_count
-      convert_results.length
-    end
-
-    def convert_results
-      @convert_results ||= RegistrationCsvConverter.convert(csv_string: @csv_file, params: register_params)
-    end
-
-    def export_file
-      @export_file ||= CSV.open(bulk_action.export_filepath, 'wb', write_headers: true, headers: HEADERS)
+    # The header is line 1, so the first registration is line 2.
+    def index_offset
+      2
     end
 
     attr_reader :register_params
 
     # Register a single object from the CSV
-    class JobItem < BaseJobItem
-      def initialize(convert_result:, **args)
-        @convert_result = convert_result
-        super(druid: nil, **args)
+    class JobItem < BaseRegisterJobItem
+      alias convert_result registration
+
+      def valid?
+        return true unless convert_result.failure?
+
+        failure!(message: convert_result.failure.message)
+        false
       end
 
-      attr_reader :convert_result
-
-      def perform
-        return failure!(message: convert_result.failure.message) if convert_result.failure?
-
-        # After registration, set druid and cocina_object so that logging, etc. works as expected.
-        @cocina_object = Sdr::Repository.register(user_name: user_id, **convert_result.value!)
-        @druid = cocina_object.externalIdentifier
-
-        success!(message: 'Registration successful')
-        export_file << row
-      end
-
-      def row # rubocop:disable Metrics/AbcSize
-        [
-          DruidSupport.bare_druid_from(cocina_object.externalIdentifier),
-          cocina_object.identification.barcode,
-          cocina_object.identification.catalogLinks.first&.catalogRecordId,
-          cocina_object.identification.sourceId,
-          Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title)
-        ]
-      end
-
-      def success!(message:)
-        job.success!(druid:, message:, index:)
-      end
-
-      def failure!(message:)
-        job.failure!(druid:, message:, index:)
+      def register
+        Sdr::Repository.register(user_name: user_id, **convert_result.value!)
       end
     end
   end
