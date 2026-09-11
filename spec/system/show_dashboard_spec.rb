@@ -17,6 +17,7 @@ RSpec.describe 'Show dashboard', :rack_test do
 
       expect(page).to have_css('h2', text: 'Register or deposit multiple items')
       expect(page).to have_button('Register multiple items')
+      expect(page).to have_css('a.disabled', exact_text: 'Register multiple items')
 
       expect(page).to have_no_css('h2', text: 'Admin')
       expect(page).to have_no_button('Manage permissions')
@@ -44,6 +45,13 @@ RSpec.describe 'Show dashboard', :rack_test do
 
       expect(page).to have_link('Item', href: new_item_path)
       expect(page).to have_no_css('a.disabled', text: 'Item')
+    end
+
+    it 'enables the Register multiple items button' do
+      visit root_path
+
+      expect(page).to have_link('Register multiple items', href: new_multiple_item_path)
+      expect(page).to have_no_css('a.disabled', exact_text: 'Register multiple items')
     end
   end
 

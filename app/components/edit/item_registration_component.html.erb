@@ -1,0 +1,16 @@
+<%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :source_id,
+                                                            label_text: t('edit.items.fields.source_id.label'),
+                                                            label_mark_required: true,
+                                                            container_classes: 'my-field') %>
+
+<%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                            label_text: t('edit.items.fields.title.label'),
+                                                            container_classes: 'my-field') %>
+
+<%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_record_id,
+                                                            label_text: t('edit.items.fields.catalog_record_id.label'),
+                                                            container_classes: 'my-field') %>
+
+<%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
+                                                            label_text: t('edit.items.fields.barcode.label'),
+                                                            container_classes: 'my-field') %>

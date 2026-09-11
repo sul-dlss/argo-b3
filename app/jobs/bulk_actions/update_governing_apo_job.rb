@@ -18,7 +18,7 @@ module BulkActions
         return failure!(message: "Not authorized to move item to #{new_apo_id}") unless can_update_governing_apo?
         return unless check_object_type?(allow_admin_policy: false)
 
-        cocina_model.admin_policy_druid = new_apo_id
+        cocina_model.apo_druid = new_apo_id
 
         return failure!(message: cocina_model.errors.full_messages.join(', ')) unless cocina_model.valid?
         return success!(message: 'No changes to governing APO') unless cocina_model.changed?

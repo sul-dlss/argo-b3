@@ -1,0 +1,28 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multiple_items.new.title'), classes: 'mb-3') %>
+  <%= form_with(model: @items_registration_form, url: multiple_items_path, class: 'b3-form') do |form| %>
+    <%= render Edit::ContentTypeComponent.new(form:) %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <%= render Edit::ApoComponent.new(form:, options: @apo_options) %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <%= render Edit::AccessAndEmbargoComponent.new(form:) %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :item_registrations) %>
+
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :item_registrations,
+                                                     form_component: Edit::ItemRegistrationComponent,
+                                                     container_classes: 'my-fieldset',
+                                                     add_button_label: 'Add another item') %>
+
+    <div class="d-flex align-items-center mt-5">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: root_path, variant: :link, classes: 'me-3') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Register items') %>
+    </div>
+  <% end %>
+</div>

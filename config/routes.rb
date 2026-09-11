@@ -153,7 +153,7 @@ Rails.application.routes.draw do
     resource :purge, only: %i[new create], controller: 'purge'
     resource :reindex, only: %i[new create], controller: 'reindex'
     resource :refresh_metadata, only: %i[new create], controller: 'refresh_metadata'
-    resource :register, only: %i[new create], controller: 'register'
+    resource :register_csv, only: %i[new create], controller: 'register_csv'
     resource :republish, only: %i[new create], controller: 'republish'
     resource :update_governing_apo, only: %i[new create], controller: 'update_governing_apo'
   end
@@ -174,6 +174,8 @@ Rails.application.routes.draw do
   end
 
   resources :items, only: %i[new create update]
+
+  resources :multiple_items, only: %i[new create]
 
   resources :contents, only: %i[edit update show]
 

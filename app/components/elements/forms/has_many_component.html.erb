@@ -1,0 +1,26 @@
+<%= tag.div class: container_classes, data: { controller: 'has-many' } do %>
+  <div data-has-many-target="container">
+    <template data-has-many-target="template">
+      <%= form.fields_for field_name, template_record, child_index: 'NEW_RECORD' do |nested_form| %>
+        <%# The row markup here and in the block below must be kept in sync. %>
+        <%= tag.div class: 'form-instance d-flex align-items-start gap-2 mb-3',
+                    data: { has_many_target: 'row', index: 'NEW_RECORD' } do %>
+          <div class="flex-grow-1"><%= render form_component.new(form: nested_form) %></div>
+          <%= render Elements::DeleteButtonComponent.new(data: { action: 'has-many#remove' }) %>
+        <% end %>
+      <% end %>
+    </template>
+
+    <%= form.fields_for field_name do |nested_form| %>
+      <%= tag.div class: 'form-instance d-flex align-items-start gap-2 mb-3',
+                  data: { has_many_target: 'row', index: nested_form.index } do %>
+        <div class="flex-grow-1"><%= render form_component.new(form: nested_form) %></div>
+        <%= render Elements::DeleteButtonComponent.new(data: { action: 'has-many#remove' }) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: add_button_label,
+                                                              variant: :'outline-primary',
+                                                              data: { action: 'has-many#add' }) %>
+<% end %>

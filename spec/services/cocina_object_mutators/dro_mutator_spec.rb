@@ -104,7 +104,7 @@ RSpec.describe CocinaObjectMutators::DroMutator do
         }
       end
       let(:cocina_model) do
-        CocinaModels::Dro.new(source_id: 'new:source-id', admin_policy_druid: 'druid:bc123df4567',
+        CocinaModels::Dro.new(source_id: 'new:source-id', apo_druid: 'druid:bc123df4567',
                               content_type: Cocina::Models::ObjectType.object,
                               access_view: 'world', access_download: 'world',
                               embargo_release_date: DateTime.parse('2040-06-01'),

@@ -21,7 +21,7 @@ module CocinaModelMappers
         use_and_reproduction_statement: cocina_object.administrative.accessTemplate.useAndReproductionStatement,
         license: cocina_object.administrative.accessTemplate.license,
         copyright: cocina_object.administrative.accessTemplate.copyright,
-        admin_policy_druid: cocina_object.administrative.hasAdminPolicy,
+        apo_druid: cocina_object.administrative.hasAdminPolicy,
         agreement_druid: cocina_object.administrative.hasAgreement
       }.compact
     end

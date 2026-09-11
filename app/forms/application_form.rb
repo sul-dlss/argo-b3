@@ -2,4 +2,5 @@
 
 class ApplicationForm < Blanks::Base
   include PermittedParamsConcern
+  include NormalizationConcern
 end
