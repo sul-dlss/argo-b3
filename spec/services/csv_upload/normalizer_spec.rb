@@ -10,8 +10,8 @@ RSpec.describe CsvUpload::Normalizer do
     context 'with xls file' do
       let(:filepath) { file_fixture('catalog_record_id_and_barcode.xls') }
 
-      it 'reads the CSV' do
-        expect { csv }.to raise_error(CSV::MalformedCSVError)
+      it 'raises an exception since the legacy xls format is not supported' do
+        expect { csv }.to raise_error(RuntimeError, /Unsupported upload file type/)
       end
     end
 
@@ -58,8 +58,8 @@ RSpec.describe CsvUpload::Normalizer do
     context 'with CSV with invalid bytes' do
       let(:filepath) { file_fixture('invalid_bulk_upload_nonutf8.csv') }
 
-      it 'raises an exception' do
-        expect { csv }.to raise_error(CSV::MalformedCSVError)
+      it 'raises an exception describing the encoding error' do
+        expect { csv }.to raise_error(RuntimeError, /CSV could not be opened due to an encoding error: /)
       end
     end
 
