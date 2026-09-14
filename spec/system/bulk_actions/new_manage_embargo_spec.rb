@@ -56,4 +56,20 @@ RSpec.describe 'Create a new manage embargo bulk action' do
                                             text: 'missing headers: release_date.')
     end
   end
+
+  context 'with a file that has location-based access but no location column' do
+    it 'shows an error message' do
+      visit new_bulk_actions_manage_embargo_path
+
+      expect(page).to have_css('h1', text: bulk_action_label)
+      attach_file 'Upload a CSV or Excel file', 'spec/fixtures/files/manage_embargo_missing_location.csv'
+
+      fill_in 'Describe this bulk action', with: 'Update embargoes for test items'
+
+      click_button 'Submit'
+
+      expect(page).to have_invalid_feedback('Upload a CSV or Excel file',
+                                            text: 'missing headers: location.')
+    end
+  end
 end
