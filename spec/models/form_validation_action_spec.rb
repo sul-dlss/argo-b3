@@ -48,6 +48,21 @@ RSpec.describe FormValidationAction do
       end
     end
 
+    context 'when the form has an uploaded csv file' do
+      let(:form) do
+        ItemsRegistrationForm.new(items_choice: ItemsRegistrationForm::UPLOAD_CSV_CHOICE,
+                                  csv_file: fixture_file_upload('register_multiple_items.csv', 'text/csv'))
+      end
+
+      it 'round-trips the uploaded file as a normalized csv string' do
+        form_validation_action.save!
+
+        reloaded_form = form_validation_action.reload.form
+        expect(reloaded_form.csv_file).to be_nil
+        expect(reloaded_form.csv).to start_with('barcode,folio_instance_hrid,source_id,title')
+      end
+    end
+
     context 'when there is error data' do
       subject(:form_validation_action) do
         described_class.new(user:, form:, error_data: {

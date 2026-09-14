@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Disable/enable associated inputs based on radio button selection
+// Disable/enable associated inputs and buttons based on radio button selection
 // Borrowed from H3.
 // Mark the radio buttons with: <input data-radio-target="radio" data-action="radio#toggle" type="radio" ></input>
 export default class extends Controller {
@@ -33,6 +33,12 @@ export default class extends Controller {
       // If not disabled, an element is marked required because it must go with
       // the selected radio button.
       input.setAttribute('aria-required', !disable)
+    })
+    // Buttons are disabled so that, for example, rows cannot be added or removed
+    // for a radio button that is not selected.
+    const buttons = containerElem.querySelectorAll('button')
+    buttons.forEach((button) => {
+      button.disabled = disable
     })
     // Elements that have radio-hide class will be hidden when the radio is not selected.
     const hideEls = containerElem.querySelectorAll('.radio-hide')
