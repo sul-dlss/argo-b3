@@ -1,0 +1,5 @@
+<%= tag.div class: 'form-instance d-flex align-items-start gap-2 mb-3',
+            data: { has_many_target: 'row', index: form.index } do %>
+  <div class="flex-grow-1"><%= render form_component.new(form:) %></div>
+  <%= render Elements::DeleteButtonComponent.new(data: { action: 'has-many#remove' }) %>
+<% end %>

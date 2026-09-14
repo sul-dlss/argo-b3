@@ -54,6 +54,33 @@ RSpec.describe 'Create multiple items' do
     end
   end
 
+  # Fills in the registration form with a valid item and an item missing a title, then submits it.
+  def submit_valid_and_invalid_item
+    visit new_multiple_item_path
+
+    expect(page).to have_css('h1', text: 'Register items')
+
+    fill_in_registration_settings
+    fill_in_valid_and_invalid_item
+
+    click_button 'Register items'
+  end
+
+  def fill_in_valid_and_invalid_item
+    within(first('.form-instance')) do
+      fill_in 'Source ID', with: 'sul:first-item'
+      fill_in 'Title', with: 'First title'
+    end
+
+    click_button 'Add another item'
+    expect(page).to have_css('.form-instance', count: 2)
+
+    within(all('.form-instance').last) do
+      # Leaving Title and Folio instance HRID blank.
+      fill_in 'Source ID', with: 'sul:second-item'
+    end
+  end
+
   # Waits for the validating page, which is shown while the form validation action is pending.
   # @return [FormValidationAction] the form validation action for the submitted form
   def wait_for_validating_page
@@ -154,6 +181,48 @@ RSpec.describe 'Create multiple items' do
 
       expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
       expect(BulkAction.count).to eq(0)
+    end
+  end
+
+  context 'when there are item errors' do
+    it 'shows only the items with errors and allows clearing all items' do
+      submit_valid_and_invalid_item
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_css('.alert-danger',
+                               text: 'Fix the errors or delete items below and click "Register items" again, ' \
+                                     'or click "Clear all items and enter again."')
+
+      # Only the item with errors is displayed.
+      expect(page).to have_css('.form-instance', count: 1)
+      expect(page).to have_field('Source ID', with: 'sul:second-item')
+      expect(page).to have_css('.invalid-feedback', text: 'title is required if a FOLIO Instance HRID is not provided')
+
+      # The item without errors is retained as hidden fields.
+      expect(page).to have_field(with: 'sul:first-item', type: 'hidden', visible: :hidden)
+      expect(page).to have_field(with: 'First title', type: 'hidden', visible: :hidden)
+
+      expect(page).to have_no_text('Enter each item individually')
+
+      click_button 'Clear all items and enter again'
+
+      expect(page).to have_text('Enter each item individually')
+      expect(page).to have_no_button('Clear all items and enter again')
+      expect(page).to have_css('.form-instance', count: 1)
+      expect(page).to have_field('Source ID', with: '')
+      expect(page).to have_no_field(with: 'sul:first-item', type: 'hidden', visible: :hidden)
+    end
+  end
+
+  context 'when there are no item errors' do
+    it 'does not show the clear all items button' do
+      visit new_multiple_item_path
+
+      expect(page).to have_button('Register items')
+      expect(page).to have_no_button('Clear all items and enter again')
     end
   end
 end
