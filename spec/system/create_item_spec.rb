@@ -75,6 +75,13 @@ RSpec.describe 'Create an item' do
       expect(page).to have_no_css('legend', text: 'Access settings during embargo')
       expect(page).to have_select('item[embargo_view]', disabled: true, visible: :all)
 
+      # No license is selected by default.
+      expect(page).to have_select('License', selected: '')
+
+      fill_in 'Use and reproduction', with: 'Property rights reside with the repository.'
+      fill_in 'Copyright', with: 'Copyright © Stanford University.'
+      select 'CC Zero 1.0', from: 'License'
+
       click_button 'Next'
       expect(page).to have_css('#release-tab.active')
       choose 'Release to:'
@@ -99,6 +106,11 @@ RSpec.describe 'Create an item' do
         expect(request_cocina_object.description.title.first.value).to eq('The Title')
         expect(request_cocina_object.access.view).to eq('world')
         expect(request_cocina_object.access.download).to eq('world')
+        expect(request_cocina_object.access.useAndReproductionStatement)
+          .to eq('Property rights reside with the repository.')
+        expect(request_cocina_object.access.copyright).to eq('Copyright © Stanford University.')
+        expect(request_cocina_object.access.license)
+          .to eq('https://creativecommons.org/publicdomain/zero/1.0/legalcode')
 
         expect(args[:user_name]).to eq(user.sunetid)
       end
@@ -107,6 +119,29 @@ RSpec.describe 'Create an item' do
 
       expect(Sdr::Repository).to have_received(:create_release_tag)
         .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
+    end
+
+    it 'registers a valid cocina object without a license or rights statements' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+      # Leaving Use and reproduction, Copyright, and License blank.
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        access = args[:request_cocina_object].access
+        expect(access.useAndReproductionStatement).to be_nil
+        expect(access.copyright).to be_nil
+        expect(access.license).to be_nil
+      end
     end
 
     it 'registers a valid cocina object with a generated source id' do

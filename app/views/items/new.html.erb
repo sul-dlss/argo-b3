@@ -38,6 +38,16 @@
 
         <%= render Edit::AccessAndEmbargoComponent.new(form:) %>
 
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
         <% end %>

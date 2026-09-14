@@ -43,9 +43,9 @@ module CocinaObjectMutators
         new_cocina_props[:administrative] ||= {}
         new_cocina_props[:administrative][:hasAdminPolicy] = cocina_model.apo_druid
         new_cocina_props[:access] ||= {}
-        new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement
-        new_cocina_props[:access][:license] = cocina_model.license
-        new_cocina_props[:access][:copyright] = cocina_model.copyright
+        new_cocina_props[:access][:useAndReproductionStatement] = cocina_model.use_and_reproduction_statement.presence
+        new_cocina_props[:access][:license] = cocina_model.license.presence
+        new_cocina_props[:access][:copyright] = cocina_model.copyright.presence
         new_cocina_props[:identification][:catalogLinks] = build_catalog_links
       end
     end

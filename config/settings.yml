@@ -49,3 +49,6 @@ file_upload:
   directory: "tmp/argo-files"
 
 staging_location: 'tmp/sdr-deposit-staging'
+
+links:
+  license: 'https://sdr.library.stanford.edu/documentation/license-options'
