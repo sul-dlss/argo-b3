@@ -3,7 +3,8 @@
 module CsvUpload
   # Reads and normalizes a CSV that is uploaded as part of Bulk Actions.
   class Normalizer
-    SUPPORTED_FILE_EXTENSIONS = %w[.csv .ods .xls .xlsx].freeze
+    # Note that .xls is not supported because roo-xls has not been updated for roo 3.x (see Gemfile).
+    SUPPORTED_FILE_EXTENSIONS = %w[.csv .ods .xlsx].freeze
 
     def self.read(...)
       new(...).read
@@ -17,8 +18,8 @@ module CsvUpload
     # Reads uploaded file (could be csv or Excel) and normalizes to CSV.
     # This includes handling BOM and druids without prefixes.
     # @return [String] csv
-    # @raise [StandardError] if unsupported file type
-    # @raise [CSV::MalformedCSVError] if malformed CSV, e.g., invalid byte sequence
+    # @raise [RuntimeError] if unsupported file type or the file cannot be read, e.g., invalid byte sequence
+    # @raise [CSV::MalformedCSVError] if malformed CSV
     def read # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize
       raise 'Unsupported upload file type' unless normalized_file_extension.in?(SUPPORTED_FILE_EXTENSIONS)
 
@@ -46,7 +47,7 @@ module CsvUpload
 
       table.to_csv
     rescue ArgumentError => e
-      raise CSV::MalformedCSVError.new(e, 'CSV could not be opened due to an encoding error')
+      raise "CSV could not be opened due to an encoding error: #{e.message}"
     end
 
     private
