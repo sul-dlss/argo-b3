@@ -15,4 +15,8 @@
     margin-top: $spacer; 
     margin-bottom: $spacer;
   }
+
+  .form-label ~ span {
+    margin-left: $spacer;
+  }
 }

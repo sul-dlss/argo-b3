@@ -136,6 +136,12 @@ en:
           label: "Folio instance HRID"
         content_type:
           label: "Content type"
+        copyright:
+          label: "Copyright"
+        license:
+          label: "License"
+          label_caption: "Get help selecting a license"
+          help_text: "Assigning a license may improve discovery of your work in web searches."
         source_id:
           label: "Source ID"
         source_id_prefix:
@@ -147,6 +153,8 @@ en:
             label: "Enter prefix to autogenerate source ID"
         title:
           label: "Title"
+        use_and_reproduction_statement:
+          label: "Use and reproduction"
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."
