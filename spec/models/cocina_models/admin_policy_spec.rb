@@ -76,7 +76,7 @@ RSpec.describe CocinaModels::AdminPolicy do
         new_admin_policy.create!(user_name:)
 
         expect(Sdr::Repository).to have_received(:register)
-          .with(request_cocina_object:, user_name:)
+          .with(request_cocina_object:, user_name:, tags: [])
         expect(new_admin_policy.persisted?).to be true
         expect(new_admin_policy.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_admin_policy.changed?).to be false

@@ -4,16 +4,25 @@ require 'rails_helper'
 
 RSpec.describe FormErrorsSerializer do
   describe '.serialize' do
-    context 'when the errors were added with a message' do
-      let(:form) { ItemRegistrationForm.new(source_id: 'sul:1234') }
+    # These examples use stubbed forms rather than application forms so that they do not have to be
+    # updated as attributes and associations are added to the application forms.
+    let(:widget_form_class) do
+      Class.new(ApplicationForm) do
+        attribute :name, :string
+      end
+    end
+    let(:form) { WidgetForm.new }
 
-      before { form.valid? }
+    before { stub_const('WidgetForm', widget_form_class) }
+
+    context 'when the errors were added with a message' do
+      before { form.errors.add(:name, 'name is required') }
 
       it 'serializes the message as a string type' do
         expect(described_class.serialize(form)).to eq(
           'errors' => [
-            { 'attribute' => 'title',
-              'type' => 'title is required if a FOLIO Instance HRID is not provided',
+            { 'attribute' => 'name',
+              'type' => 'name is required',
               'type_class' => 'String',
               'options' => {} }
           ]
@@ -22,14 +31,12 @@ RSpec.describe FormErrorsSerializer do
     end
 
     context 'when the errors were added with a symbol type and options' do
-      let(:form) { SearchForm.new }
-
-      before { form.errors.add(:query, :too_short, count: 5) }
+      before { form.errors.add(:name, :too_short, count: 5) }
 
       it 'serializes the type as a symbol type along with the options' do
         expect(described_class.serialize(form)).to eq(
           'errors' => [
-            { 'attribute' => 'query',
+            { 'attribute' => 'name',
               'type' => 'too_short',
               'type_class' => 'Symbol',
               'options' => { 'count' => 5 } }
@@ -38,31 +45,34 @@ RSpec.describe FormErrorsSerializer do
       end
     end
 
-    context 'when the form has nested forms' do
-      let(:form) do
-        ItemsRegistrationForm.new(
-          apo_druid: 'druid:bc123df4567',
-          content_type: Cocina::Models::ObjectType.book,
-          access_view: 'world',
-          access_download: 'world',
-          item_registrations_attributes: [{ source_id: 'sul:1234' }, { source_id: 'sul:5678', title: 'A title' }]
-        )
-      end
+    context 'when the form has has_many nested forms' do
+      let(:widgets_form_class) do
+        Class.new(ApplicationForm) do
+          attribute :label, :string
 
-      before { form.valid? }
+          has_many :widgets
+        end
+      end
+      let(:form) { WidgetsForm.new(widgets_attributes: [{ name: nil }, { name: 'A name' }]) }
+
+      before do
+        stub_const('WidgetsForm', widgets_form_class)
+        form.errors.add(:'widgets[0].name', 'name is required')
+        form.widgets.first.errors.add(:name, 'name is required')
+      end
 
       it 'serializes the errors of the nested forms alongside the errors of the form' do
         expect(described_class.serialize(form)).to eq(
           'errors' => [
-            { 'attribute' => 'item_registrations[0].title',
-              'type' => 'title is required if a FOLIO Instance HRID is not provided',
+            { 'attribute' => 'widgets[0].name',
+              'type' => 'name is required',
               'type_class' => 'String',
               'options' => {} }
           ],
-          'item_registrations_attributes' => [
+          'widgets_attributes' => [
             { 'errors' => [
-              { 'attribute' => 'title',
-                'type' => 'title is required if a FOLIO Instance HRID is not provided',
+              { 'attribute' => 'name',
+                'type' => 'name is required',
                 'type_class' => 'String',
                 'options' => {} }
             ] },
@@ -72,38 +82,34 @@ RSpec.describe FormErrorsSerializer do
       end
     end
 
-    context 'when an error option will not round trip through jsonb' do
-      let(:form) { SearchForm.new }
-
-      before { form.errors.add(:registered_date_from, :invalid, value: Date.new(2026, 9, 11)) }
-
-      it 'raises an UnserializableOptionError' do
-        expect { described_class.serialize(form) }
-          .to raise_error(described_class::UnserializableOptionError, /Date option value on registered_date_from/)
-      end
-    end
-
     context 'when the form has a has_one nested form' do
-      let(:form) { ItemForm.new }
+      let(:widgets_form_class) do
+        Class.new(ApplicationForm) do
+          attribute :label, :string
+
+          has_one :widget
+        end
+      end
+      let(:form) { WidgetsForm.new.tap(&:build_widget) }
 
       before do
-        form.errors.add(:title, :blank)
-        form.release_tags.errors.add(:release_targets, 'At least one target must be selected')
+        stub_const('WidgetsForm', widgets_form_class)
+        form.errors.add(:label, :blank)
+        form.widget.errors.add(:name, 'name is required')
       end
 
       it 'serializes the errors of the nested form alongside the errors of the form' do
         expect(described_class.serialize(form)).to eq(
           'errors' => [
-            { 'attribute' => 'title',
+            { 'attribute' => 'label',
               'type' => 'blank',
               'type_class' => 'Symbol',
               'options' => {} }
           ],
-          'folio_catalog_links_attributes' => [],
-          'release_tags_attributes' => {
+          'widget_attributes' => {
             'errors' => [
-              { 'attribute' => 'release_targets',
-                'type' => 'At least one target must be selected',
+              { 'attribute' => 'name',
+                'type' => 'name is required',
                 'type_class' => 'String',
                 'options' => {} }
             ]
@@ -113,14 +119,12 @@ RSpec.describe FormErrorsSerializer do
     end
 
     context 'when the error options contain arrays and hashes of JSON primitives' do
-      let(:form) { SearchForm.new }
-
-      before { form.errors.add(:query, :inclusion, in: %w[first second], counts: { first: 1 }) }
+      before { form.errors.add(:name, :inclusion, in: %w[first second], counts: { first: 1 }) }
 
       it 'serializes the options' do
         expect(described_class.serialize(form)).to eq(
           'errors' => [
-            { 'attribute' => 'query',
+            { 'attribute' => 'name',
               'type' => 'inclusion',
               'type_class' => 'Symbol',
               'options' => { 'in' => %w[first second], 'counts' => { first: 1 } } }
@@ -129,25 +133,30 @@ RSpec.describe FormErrorsSerializer do
       end
     end
 
-    context 'when an error option is an array containing a value that will not round trip through jsonb' do
-      let(:form) { SearchForm.new }
-
-      before { form.errors.add(:registered_date_from, :invalid, values: [Date.new(2026, 9, 11)]) }
+    context 'when an error option will not round trip through jsonb' do
+      before { form.errors.add(:name, :invalid, value: Date.new(2026, 9, 11)) }
 
       it 'raises an UnserializableOptionError' do
         expect { described_class.serialize(form) }
-          .to raise_error(described_class::UnserializableOptionError, /Array option values on registered_date_from/)
+          .to raise_error(described_class::UnserializableOptionError, /Date option value on name/)
+      end
+    end
+
+    context 'when an error option is an array containing a value that will not round trip through jsonb' do
+      before { form.errors.add(:name, :invalid, values: [Date.new(2026, 9, 11)]) }
+
+      it 'raises an UnserializableOptionError' do
+        expect { described_class.serialize(form) }
+          .to raise_error(described_class::UnserializableOptionError, /Array option values on name/)
       end
     end
 
     context 'when an error option is a hash containing a value that will not round trip through jsonb' do
-      let(:form) { SearchForm.new }
-
-      before { form.errors.add(:registered_date_from, :invalid, values: { from: Date.new(2026, 9, 11) }) }
+      before { form.errors.add(:name, :invalid, values: { from: Date.new(2026, 9, 11) }) }
 
       it 'raises an UnserializableOptionError' do
         expect { described_class.serialize(form) }
-          .to raise_error(described_class::UnserializableOptionError, /Hash option values on registered_date_from/)
+          .to raise_error(described_class::UnserializableOptionError, /Hash option values on name/)
       end
     end
   end

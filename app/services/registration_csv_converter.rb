@@ -93,7 +93,7 @@ class RegistrationCsvConverter
 
   def ticket_tags(row)
     tickets = params[:tickets].presence || values_from_repeating_column(row, 'tickets')
-    tickets.map { |tag| "Ticket : #{tag}" }
+    tickets.map { |tag| "#{TicketTagForm::TICKET_TAG_PREFIX}#{tag}" }
   end
 
   def values_from_repeating_column(row, column_name)

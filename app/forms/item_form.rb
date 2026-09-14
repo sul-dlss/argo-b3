@@ -6,6 +6,7 @@ class ItemForm < CocinaModels::Dro
   include PermittedParamsConcern
   include EmbargoFormConcern
   include TitleFormConcern
+  include TagsFormConcern
 
   SOURCE_ID_PROVIDED_CHOICE = 'provide'
   SOURCE_ID_GENERATE_CHOICE = 'generate'

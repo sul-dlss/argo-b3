@@ -83,6 +83,18 @@ RSpec.describe 'Create an item' do
       select 'CC Zero 1.0', from: 'License'
 
       click_button 'Next'
+      expect(page).to have_css('#tags-tab.active')
+      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+      click_button 'Add another tag'
+      fill_in 'item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
+      fill_in 'item[project_tags_attributes][0][tag]', with: 'Argo'
+      click_button 'Add another project'
+      fill_in 'item[project_tags_attributes][1][tag]', with: 'Google Books'
+      fill_in 'item[ticket_tags_attributes][0][tag]', with: 'ABC-123'
+      click_button 'Add another ticket'
+      fill_in 'item[ticket_tags_attributes][1][tag]', with: 'ABC-456'
+
+      click_button 'Next'
       expect(page).to have_css('#release-tab.active')
       choose 'Release to:'
       check 'SearchWorks'
@@ -113,6 +125,9 @@ RSpec.describe 'Create an item' do
           .to eq('https://creativecommons.org/publicdomain/zero/1.0/legalcode')
 
         expect(args[:user_name]).to eq(user.sunetid)
+        expect(args[:tags]).to eq(['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
+                                   'Project : Argo', 'Project : Google Books',
+                                   'Ticket : ABC-123', 'Ticket : ABC-456'])
       end
 
       expect(Sdr::Repository).not_to have_received(:accession)
@@ -249,6 +264,82 @@ RSpec.describe 'Create an item' do
       end
     end
 
+    it 'registers a valid cocina object without tags' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      # Leaving the blank tag row empty.
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq([])
+      end
+    end
+
+    it 'registers a valid cocina object after removing a tag' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+      click_button 'Add another tag'
+      fill_in 'item[other_tags_attributes][1][tag]', with: 'Project : Argo'
+
+      within 'fieldset', text: 'Tags' do
+        within first('.form-instance') do
+          click_button 'Remove'
+        end
+        expect(page).to have_css('.form-instance', count: 1)
+      end
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq(['Project : Argo'])
+      end
+    end
+
+    it 'registers a valid cocina object when project and ticket tags include prefixes' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      fill_in 'item[project_tags_attributes][0][tag]', with: 'Project : Argo'
+      fill_in 'item[ticket_tags_attributes][0][tag]', with: 'Ticket : ABC-123'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq(['Project : Argo', 'Ticket : ABC-123'])
+      end
+    end
+
     it 'registers and redirects to add files' do
       visit new_item_path
 
@@ -312,6 +403,27 @@ RSpec.describe 'Create an item' do
 
       find_by_id('release-tab').click
       expect(page).to have_css('.invalid-feedback', text: 'At least one target must be selected')
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'shows validation errors for a malformed tag' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('tags-tab').click
+      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      find_by_id('tags-tab').click
+      expect(page).to have_css('.invalid-feedback',
+                               text: 'must be a series of 2 or more strings delimited with space-padded colons')
+      expect(page).to have_field('item[other_tags_attributes][0][tag]', with: 'Registered By')
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(Sdr::Repository).not_to have_received(:accession)

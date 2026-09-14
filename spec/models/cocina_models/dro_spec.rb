@@ -199,10 +199,11 @@ RSpec.describe CocinaModels::Dro do
       let(:new_dro) do
         described_class.new(source_id: 'new:source-id', content_type: Cocina::Models::ObjectType.book,
                             access_view: 'world', access_download: 'world',
-                            apo_druid: 'druid:hv992ry2431')
+                            apo_druid: 'druid:hv992ry2431', tags:)
       end
       let(:request_cocina_object) { instance_double(Cocina::Models::RequestDRO) }
       let(:registered_cocina_object) { build(:dro_with_metadata) }
+      let(:tags) { ['My : tag'] }
 
       before do
         allow(new_dro).to receive(:request_cocina_object).and_return(request_cocina_object)
@@ -213,7 +214,7 @@ RSpec.describe CocinaModels::Dro do
         new_dro.create!(user_name:)
 
         expect(Sdr::Repository).to have_received(:register)
-          .with(request_cocina_object:, user_name:)
+          .with(request_cocina_object:, user_name:, tags:)
         expect(new_dro.persisted?).to be true
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false
