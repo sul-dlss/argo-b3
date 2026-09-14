@@ -13,6 +13,16 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
+    <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset') %>
+
+    <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset') %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
     <% if @items_registration_form.invalid_item_registrations.blank? %>
       <%= render SdrViewComponents::Forms::FieldsetComponent.new(data: { controller: 'radio' },
                                                                  classes: 'my-fieldset',
