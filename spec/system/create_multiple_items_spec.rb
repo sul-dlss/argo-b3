@@ -36,6 +36,13 @@ RSpec.describe 'Create multiple items' do
     select apo_title, from: 'APO'
     select 'Stanford', from: 'View access'
     select 'Stanford', from: 'Download access'
+
+    # No license is selected by default.
+    expect(page).to have_select('License', selected: '')
+
+    fill_in 'Use and reproduction', with: 'Property rights reside with the repository.'
+    fill_in 'Copyright', with: 'Copyright © Stanford University.'
+    select 'CC Zero 1.0', from: 'License'
   end
 
   def fill_in_two_items
@@ -133,7 +140,10 @@ RSpec.describe 'Create multiple items' do
           content_type: Cocina::Models::ObjectType.image,
           apo_druid:,
           access_view: 'stanford',
-          access_download: 'stanford'
+          access_download: 'stanford',
+          use_and_reproduction_statement: 'Property rights reside with the repository.',
+          copyright: 'Copyright © Stanford University.',
+          license: 'https://creativecommons.org/publicdomain/zero/1.0/legalcode'
         )
       )
 
@@ -171,6 +181,37 @@ RSpec.describe 'Create multiple items' do
       expect(page).to have_css('table#bulk-action-details-table td', text: 'Completed')
       expect(page).to have_css('table#bulk-action-details-table td', text: '2 / 2 / 0')
       expect(page).to have_no_text('Processing...')
+    end
+  end
+
+  context 'when no license or rights statements are provided' do
+    it 'enqueues a register form bulk action without a license or rights statements' do
+      visit new_multiple_item_path
+
+      select 'image', from: 'Content type'
+      select apo_title, from: 'APO'
+      select 'Stanford', from: 'View access'
+      select 'Stanford', from: 'Download access'
+      # Leaving Use and reproduction, Copyright, and License blank.
+
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(
+          use_and_reproduction_statement: be_blank,
+          copyright: be_blank,
+          license: be_blank
+        )
+      )
     end
   end
 
