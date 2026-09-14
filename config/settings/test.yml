@@ -6,6 +6,7 @@ bulk_actions:
 
 reload_intervals:
   cocina_model: 1000
+  bulk_action_show: 500
   bulk_actions_history: 500
   workflow_grid: 500
   multiple_items: 500

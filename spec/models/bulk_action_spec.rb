@@ -118,6 +118,53 @@ RSpec.describe BulkAction do
     end
   end
 
+  describe '.show_csv_export?' do
+    context 'when the export is configured to be shown and the CSV export file exists' do
+      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
+
+      before do
+        File.write(bulk_action.export_filepath, 'druid,status')
+      end
+
+      it 'returns true' do
+        expect(bulk_action.show_csv_export?).to be true
+      end
+    end
+
+    context 'when the export is not configured to be shown' do
+      subject(:bulk_action) { described_class.create!(action_type: :export_catalog_data, user:) }
+
+      before do
+        File.write(bulk_action.export_filepath, 'druid,barcode')
+      end
+
+      it 'returns false' do
+        expect(bulk_action.show_csv_export?).to be false
+      end
+    end
+
+    context 'when the export file does not exist' do
+      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
+
+      it 'returns false' do
+        expect(bulk_action.show_csv_export?).to be false
+      end
+    end
+
+    context 'when the export file is not a CSV' do
+      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
+
+      before do
+        allow(bulk_action.bulk_action_config).to receive(:export_filename).and_return('report.pdf')
+        File.write(bulk_action.export_filepath, 'Report content')
+      end
+
+      it 'returns false' do
+        expect(bulk_action.show_csv_export?).to be false
+      end
+    end
+  end
+
   describe '.export_filepath' do
     subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 

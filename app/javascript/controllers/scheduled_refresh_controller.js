@@ -8,7 +8,6 @@ export default class extends Controller {
   }
 
   connect () {
-    this.href = window.location.href
     if (this.reloadTimeout) return
 
     this.scheduleReload()
@@ -22,10 +21,11 @@ export default class extends Controller {
   }
 
   // Refreshes the whole page (via Turbo's morph-based page refresh) on each interval.
+  // Refreshes are skipped while the user is on a different tab.
   scheduleReload = () => {
     this.reloadTimeout = setTimeout(() => {
-      if (this.href === window.location.href && document.visibilityState === 'visible') {
-        Turbo.session.refresh(this.href)
+      if (document.visibilityState === 'visible') {
+        Turbo.session.refresh(window.location.href)
       }
 
       this.scheduleReload()

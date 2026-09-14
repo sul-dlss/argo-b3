@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Show bulk actions history' do
   include ActionView::RecordIdentifier
+  include ApplicationHelper
 
   # This bulk action is owned by a different user, so should not appear in the list.
   let!(:bulk_action_other_user) { create(:bulk_action) }
@@ -28,6 +29,8 @@ RSpec.describe 'Show bulk actions history' do
                                                                 action_type: 'export_cocina_json')
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
+    expect(row).to have_css("td:nth-of-type(1) a[href='#{bulk_action_path(bulk_action)}']",
+                            text: format_datetime(bulk_action.created_at))
     expect(row).to have_css('td:nth-of-type(3)', text: 'First bulk action')
     expect(row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
     expect(page).to have_css("tr##{dom_id(bulk_action, 'row')}", text: 'First bulk action')
@@ -58,5 +61,18 @@ RSpec.describe 'Show bulk actions history' do
     expect(page).to have_toast("#{bulk_action.label} deleted")
 
     expect(BulkAction.exists?(bulk_action.id)).to be false
+  end
+
+  it 'links to the show page for a bulk action' do
+    bulk_action = create(:bulk_action, user:, description: 'First bulk action',
+                                       action_type: 'export_cocina_json')
+
+    visit bulk_actions_path
+
+    row = page.find("tr##{dom_id(bulk_action, 'row')}")
+    row.click_link(format_datetime(bulk_action.created_at))
+
+    expect(page).to have_current_path(bulk_action_path(bulk_action))
+    expect(page).to have_css('h1', text: BulkActions::EXPORT_COCINA_JSON.label)
   end
 end

@@ -62,6 +62,12 @@ class BulkAction < ApplicationRecord
     File.join(output_directory, filename)
   end
 
+  def show_csv_export?
+    bulk_action_config.show_export.present? &&
+      export_file? &&
+      export_filename.ends_with?('.csv')
+  end
+
   private
 
   def create_output_directory!

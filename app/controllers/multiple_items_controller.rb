@@ -17,9 +17,9 @@ class MultipleItemsController < ApplicationController
 
     case form_validation_action.status
     when 'valid'
-      enqueue_bulk_action
+      bulk_action = enqueue_bulk_action
       flash[:toast] = "#{bulk_action_config.label} submitted"
-      redirect_to bulk_actions_path
+      redirect_to bulk_action_path(bulk_action)
     when 'invalid', 'failed'
       set_apo_options
       flash.now[:warning] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
@@ -69,5 +69,6 @@ class MultipleItemsController < ApplicationController
       user: current_user
     )
     bulk_action.enqueue_job(items_registration_form: @items_registration_form)
+    bulk_action
   end
 end
