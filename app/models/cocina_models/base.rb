@@ -20,6 +20,8 @@ module CocinaModels
 
     attribute :description_hash, default: -> { { title: [{ value: ':auto' }] } }
 
+    attribute :tags, default: -> { [] }
+
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
     # @raise [Sdr::Repository::Error] if there is an error updating the object
@@ -41,7 +43,7 @@ module CocinaModels
       raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
 
       validate!
-      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:)
+      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:, tags:)
       assign_from_cocina_object(registered_cocina_object)
     end
 

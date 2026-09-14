@@ -8,6 +8,7 @@
   <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.items.tabs.details.label'), tab_name: :details, mark_required: true) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.rights.label'), tab_name: :rights, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.tags.label'), tab_name: :tags) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.release.label'), tab_name: :release) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
@@ -47,6 +48,15 @@
         <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
         <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :tags,
+                                                                          label: t('edit.items.tabs.tags.label'))) do |pane| %>
+        <%= render Edit::TagsComponent.new(form:) %>
 
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>

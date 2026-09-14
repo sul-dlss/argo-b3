@@ -127,6 +127,8 @@ en:
             but before release, you should choose 'Do not release.'
         rights:
           label: "APO, collection, rights"
+        tags:
+          label: "Tags"
       fields:
         apo_druid:
           label: "APO"
@@ -142,6 +144,10 @@ en:
           label: "License"
           label_caption: "Get help selecting a license"
           help_text: "Assigning a license may improve discovery of your work in web searches."
+        other_tag:
+          label: 'Tag'
+        project_tag:
+          label: 'Project name'
         source_id:
           label: "Source ID"
         source_id_prefix:
@@ -151,10 +157,14 @@ en:
             label: "Enter source ID"
           generate:
             label: "Enter prefix to autogenerate source ID"
+        ticket_tag:
+          label: 'Ticket'
         title:
           label: "Title"
         use_and_reproduction_statement:
           label: "Use and reproduction"
+      validations:
+        other_tag_format: "must be a series of 2 or more strings delimited with space-padded colons"
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."
