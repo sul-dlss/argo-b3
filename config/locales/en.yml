@@ -152,6 +152,11 @@ en:
         failed: "An error occurred while validating your registrations. Please try again."
       new:
         title: "Register items"
+        buttons:
+          clear: "Clear all items and enter again"
+          register: "Register items"
+        invalid_items_alert: >-
+          Fix the errors or delete items below and click "%{register_label}" again, or click "%{clear_label}."
       validations:
         no_items: "at least one item is required"
         title_required: "title is required if a FOLIO Instance HRID is not provided"

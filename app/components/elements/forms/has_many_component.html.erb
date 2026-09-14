@@ -2,21 +2,12 @@
   <div data-has-many-target="container">
     <template data-has-many-target="template">
       <%= form.fields_for field_name, template_record, child_index: 'NEW_RECORD' do |nested_form| %>
-        <%# The row markup here and in the block below must be kept in sync. %>
-        <%= tag.div class: 'form-instance d-flex align-items-start gap-2 mb-3',
-                    data: { has_many_target: 'row', index: 'NEW_RECORD' } do %>
-          <div class="flex-grow-1"><%= render form_component.new(form: nested_form) %></div>
-          <%= render Elements::DeleteButtonComponent.new(data: { action: 'has-many#remove' }) %>
-        <% end %>
+        <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:) %>
       <% end %>
     </template>
 
     <%= form.fields_for field_name do |nested_form| %>
-      <%= tag.div class: 'form-instance d-flex align-items-start gap-2 mb-3',
-                  data: { has_many_target: 'row', index: nested_form.index } do %>
-        <div class="flex-grow-1"><%= render form_component.new(form: nested_form) %></div>
-        <%= render Elements::DeleteButtonComponent.new(data: { action: 'has-many#remove' }) %>
-      <% end %>
+      <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:) %>
     <% end %>
   </div>
 

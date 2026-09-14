@@ -9,6 +9,8 @@
 # 4. When the form validation is complete, the user is redirected if valid,
 #    or shown the form with errors if invalid.
 class MultipleItemsController < ApplicationController
+  CLEAR_VALUE = 'clear'
+
   def show # rubocop:disable Metrics/AbcSize
     form_validation_action = FormValidationAction.find(params.expect(:id))
     authorize! form_validation_action, with: MultipleItemsPolicy
@@ -41,12 +43,18 @@ class MultipleItemsController < ApplicationController
 
     @items_registration_form = ItemsRegistrationForm.new(items_registration_form_params)
 
-    form_validation_action = FormValidationAction.create!(user: current_user, form: @items_registration_form,
-                                                          status: 'queued')
+    if params[:commit] == CLEAR_VALUE
+      @items_registration_form.item_registrations.clear
+      set_apo_options
+      render :new, status: :unprocessable_content
+    else
+      form_validation_action = FormValidationAction.create!(user: current_user, form: @items_registration_form,
+                                                            status: 'queued')
 
-    ValidateFormJob.perform_later(form_validation_action:)
+      ValidateFormJob.perform_later(form_validation_action:)
 
-    redirect_to multiple_item_path(form_validation_action.id)
+      redirect_to multiple_item_path(form_validation_action.id)
+    end
   end
 
   private

@@ -42,4 +42,25 @@ RSpec.describe ItemsRegistrationForm do
       end
     end
   end
+
+  describe '#invalid_item_registrations' do
+    let(:form) do
+      described_class.new(
+        apo_druid: 'druid:bc123df4567',
+        content_type: Cocina::Models::ObjectType.book,
+        access_view: 'world',
+        access_download: 'world',
+        item_registrations_attributes: [
+          { source_id: 'sul:1234', title: 'A title' },
+          { source_id: 'sul:5678' }
+        ]
+      )
+    end
+
+    it 'returns only the item registrations with errors' do
+      form.valid?
+
+      expect(form.invalid_item_registrations.map(&:source_id)).to eq(['sul:5678'])
+    end
+  end
 end

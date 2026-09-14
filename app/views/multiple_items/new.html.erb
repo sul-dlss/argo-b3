@@ -13,16 +13,41 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-    <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :item_registrations) %>
+    <% if @items_registration_form.invalid_item_registrations.blank? %>
+      <p>Enter each item individually. Either FOLIO Instance HRID or Title is required.</p>
+      <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :item_registrations) %>
 
-    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :item_registrations,
-                                                     form_component: Edit::ItemRegistrationComponent,
-                                                     container_classes: 'my-fieldset',
-                                                     add_button_label: 'Add another item') %>
+      <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :item_registrations,
+                                                       form_component: Edit::ItemRegistrationComponent,
+                                                       container_classes: 'my-fieldset',
+                                                       add_button_label: 'Add another item') %>
+    <% else %>
+      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger) do %>
+        <%= t('edit.multiple_items.new.invalid_items_alert',
+              register_label: t('edit.multiple_items.new.buttons.register'),
+              clear_label: t('edit.multiple_items.new.buttons.clear')) %>
+      <% end %>
+      <%= tag.div class: 'my-fieldset', data: { controller: 'has-many' } do %>
+        <div data-has-many-target="container">
+          <%= form.fields_for :item_registrations do |nested_form| %>
+            <% if nested_form.object.errors.any? %>
+              <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form,
+                                                                  form_component: Edit::ItemRegistrationComponent) %>
+            <% else %>
+              <%= nested_form.hidden_field :title %>
+              <%= nested_form.hidden_field :source_id %>
+              <%= nested_form.hidden_field :barcode %>
+              <%= nested_form.hidden_field :catalog_record_id %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
 
     <div class="d-flex align-items-center mt-5">
       <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: root_path, variant: :link, classes: 'me-3') %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Register items') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.clear'), variant: 'outline-primary', value: MultipleItemsController::CLEAR_VALUE, classes: 'me-3') if @items_registration_form.invalid_item_registrations.any? %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.register')) %>
     </div>
   <% end %>
 </div>

@@ -21,8 +21,8 @@ export default class extends Controller {
   remove (event) {
     event.preventDefault()
     event.target.closest('.form-instance').remove()
-    // Never leave the user with no fields at all.
-    if (this.rowTargets.length === 0) this.appendRow()
+    // Never leave the user with no fields at all (if a template is provided).
+    if (this.rowTargets.length === 0 && this.hasTemplateTarget) this.appendRow()
   }
 
   appendRow () {

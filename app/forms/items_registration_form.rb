@@ -20,6 +20,11 @@ class ItemsRegistrationForm < ApplicationForm
     derive_with_embargo
   end
 
+  # @return [Array<ItemRegistrationForm>] the item registrations that have validation errors
+  def invalid_item_registrations
+    @invalid_item_registrations ||= item_registrations.to_a.select { |item_registration| item_registration.errors.any? }
+  end
+
   private
 
   # Discards item registrations left blank by the user, unless every one of them is blank
