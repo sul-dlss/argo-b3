@@ -21,4 +21,14 @@ RSpec.describe FormSerializer do
       expect(described_class.serialize?(form)).to be(false)
     end
   end
+
+  describe '.for' do
+    it 'returns the form-specific serializer when there is one' do
+      expect(described_class.for(ItemsRegistrationForm.new)).to eq(ItemsRegistrationFormSerializer)
+    end
+
+    it 'returns FormSerializer otherwise' do
+      expect(described_class.for(form)).to eq(described_class)
+    end
+  end
 end

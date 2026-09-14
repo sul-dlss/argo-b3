@@ -14,13 +14,52 @@
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
     <% if @items_registration_form.invalid_item_registrations.blank? %>
-      <p>Enter each item individually. Either FOLIO Instance HRID or Title is required.</p>
-      <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :item_registrations) %>
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(data: { controller: 'radio' },
+                                                                 classes: 'my-fieldset',
+                                                                 label: 'How do you want to enter items?') do %>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :items_choice,
+                                                                    container_classes: 'my-fieldset',
+                                                                    label_text: 'Upload CSV from computer',
+                                                                    input_value: ItemsRegistrationForm::UPLOAD_CSV_CHOICE,
+                                                                    input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                 field_name: :csv_file,
+                                                                 container_classes: 'my-fieldset',
+                                                                 label_text: 'Upload a CSV file',
+                                                                 label_hidden: true) %>
+        <% end %>
+      <% end %>
 
-      <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :item_registrations,
-                                                       form_component: Edit::ItemRegistrationComponent,
-                                                       container_classes: 'my-fieldset',
-                                                       add_button_label: 'Add another item') %>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :items_choice,
+                                                                    container_classes: 'my-fieldset',
+                                                                    label_text: 'Enter a tab-delimited list of Barcode, FOLIO Instance HRID, Source ID, and Title',
+                                                                    input_value: ItemsRegistrationForm::ENTER_TAB_DELIMITED_CHOICE,
+                                                                    input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
+                                                                     container_classes: 'my-fieldset',
+                                                                     field_name: :tab_delimited_items,
+                                                                     label_text: 'Enter tab-delimited list',
+                                                                     label_hidden: true,
+                                                                     input_rows: 5) %>
+        <% end %>
+      <% end %>
+
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :items_choice,
+                                                                    label_text: 'Enter each item individually. Either FOLIO Instance HRID or Title is required.',
+                                                                    input_value: ItemsRegistrationForm::ENTER_EACH_CHOICE,
+                                                                    input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :item_registrations) %>
+
+          <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :item_registrations,
+                                                           form_component: Edit::ItemRegistrationComponent,
+                                                           container_classes: 'my-fieldset',
+                                                           add_button_label: 'Add another item') %>
+        <% end %>
+      <% end %>
+      <% end %>
     <% else %>
       <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger) do %>
         <%= t('edit.multiple_items.new.invalid_items_alert',

@@ -15,7 +15,9 @@ class FormValidationAction < ApplicationRecord
   # be validated again (see PrevalidationConcern::AlreadyValidatedError).
   # @return [ApplicationForm] the form, deserialized from the form payload
   def form
-    form = FormSerializer.deserialize(form_payload)
+    # Note that deserializing does not require a serializer lookup since the payload records which
+    # serializer serialized it.
+    form = ActiveJob::Serializers.deserialize(form_payload)
     return form if error_data.blank?
 
     FormErrorsSerializer.deserialize(form:, error_data:)
@@ -26,7 +28,7 @@ class FormValidationAction < ApplicationRecord
   def form=(form)
     raise ArgumentError, "#{form.class} cannot be serialized by FormSerializer" unless FormSerializer.serialize?(form)
 
-    self.form_payload = FormSerializer.serialize(form)
+    self.form_payload = FormSerializer.for(form).serialize(form)
   end
 
   # Records that the form was validated and is valid.
@@ -34,7 +36,7 @@ class FormValidationAction < ApplicationRecord
   # so the payload reflects the form as validated rather than as submitted.
   # @param form [ApplicationForm] the validated form
   def mark_valid!(form)
-    update!(status: 'valid', form_payload: FormSerializer.serialize(form), error_data: nil)
+    update!(status: 'valid', form_payload: FormSerializer.for(form).serialize(form), error_data: nil)
   end
 
   # Records that the form was validated and is invalid, along with its errors.
@@ -43,7 +45,7 @@ class FormValidationAction < ApplicationRecord
   # @param form [ApplicationForm] the validated form
   def mark_invalid!(form)
     update!(status: 'invalid',
-            form_payload: FormSerializer.serialize(form),
+            form_payload: FormSerializer.for(form).serialize(form),
             error_data: FormErrorsSerializer.serialize(form))
   end
 end

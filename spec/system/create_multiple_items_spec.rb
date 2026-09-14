@@ -39,6 +39,8 @@ RSpec.describe 'Create multiple items' do
   end
 
   def fill_in_two_items
+    choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
+
     within(first('.form-instance')) do
       fill_in 'Source ID', with: 'sul:first-item'
       fill_in 'Title', with: 'First title'
@@ -67,6 +69,8 @@ RSpec.describe 'Create multiple items' do
   end
 
   def fill_in_valid_and_invalid_item
+    choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
+
     within(first('.form-instance')) do
       fill_in 'Source ID', with: 'sul:first-item'
       fill_in 'Title', with: 'First title'
@@ -175,6 +179,7 @@ RSpec.describe 'Create multiple items' do
       visit new_multiple_item_path
 
       select apo_title, from: 'APO'
+      choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
       # Leaving all of the item fields blank.
 
       click_button 'Register items'
@@ -247,6 +252,143 @@ RSpec.describe 'Create multiple items' do
 
       expect(page).to have_button('Register items')
       expect(page).to have_no_button('Clear all items and enter again')
+    end
+  end
+
+  context 'when entering a tab-delimited list of items' do
+    it 'enqueues a register form bulk action with an item per row' do
+      visit new_multiple_item_path
+
+      expect(page).to have_css('h1', text: 'Register items')
+
+      fill_in_registration_settings
+
+      choose 'Enter a tab-delimited list of Barcode, FOLIO Instance HRID, Source ID, and Title'
+      fill_in 'Enter tab-delimited list',
+              with: "36105212345678\tin11403803\tsul:first-item\tFirst title\n" \
+                    "36105287654321\tin11403804\tsul:second-item\tSecond title"
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+      expect(page).to have_current_path(bulk_action_path(BulkAction.last))
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: satisfy do |items_registration_form|
+          item_registrations = items_registration_form.item_registrations.to_a
+          expect(item_registrations.map(&:barcode)).to eq(%w[36105212345678 36105287654321])
+          expect(item_registrations.map(&:catalog_record_id)).to eq(%w[in11403803 in11403804])
+          expect(item_registrations.map(&:source_id)).to eq(['sul:first-item', 'sul:second-item'])
+          expect(item_registrations.map(&:title)).to eq(['First title', 'Second title'])
+        end
+      )
+    end
+  end
+
+  context 'when the tab-delimited list is blank' do
+    it 'shows the presence error for the text area and does not enqueue a bulk action' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+
+      choose 'Enter a tab-delimited list of Barcode, FOLIO Instance HRID, Source ID, and Title'
+      # Leaving the tab-delimited list blank.
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_css('.invalid-feedback', text: 'at least one item is required')
+      expect(page).to have_current_path(multiple_item_path(form_validation_action))
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+      expect(BulkAction.count).to eq(0)
+    end
+  end
+
+  context 'when uploading a CSV of items' do
+    it 'enqueues a register form bulk action with an item per row' do
+      visit new_multiple_item_path
+
+      expect(page).to have_css('h1', text: 'Register items')
+
+      fill_in_registration_settings
+
+      choose 'Upload CSV from computer'
+      attach_file 'Upload a CSV file', file_fixture('register_multiple_items.csv')
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+      expect(page).to have_current_path(bulk_action_path(BulkAction.last))
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: satisfy do |items_registration_form|
+          item_registrations = items_registration_form.item_registrations.to_a
+          expect(item_registrations.map(&:barcode)).to eq(%w[36105212345678 36105287654321])
+          expect(item_registrations.map(&:catalog_record_id)).to eq(%w[in11403803 in11403804])
+          expect(item_registrations.map(&:source_id)).to eq(['sul:first-item', 'sul:second-item'])
+          expect(item_registrations.map(&:title)).to eq(['First title', 'Second title'])
+        end
+      )
+    end
+
+    context 'when the CSV has no rows' do
+      it 'shows the presence error for the file field and does not enqueue a bulk action' do
+        visit new_multiple_item_path
+
+        fill_in_registration_settings
+
+        choose 'Upload CSV from computer'
+        attach_file 'Upload a CSV file', file_fixture('register_multiple_items_no_items.csv')
+
+        click_button 'Register items'
+
+        form_validation_action = wait_for_validating_page
+
+        ValidateFormJob.perform_now(form_validation_action:)
+
+        expect(page).to have_css('.invalid-feedback', text: 'at least one item is required')
+        expect(page).to have_current_path(multiple_item_path(form_validation_action))
+
+        expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+        expect(BulkAction.count).to eq(0)
+      end
+    end
+
+    context 'when the CSV is missing the source_id column' do
+      it 'shows a validation error for the file field and does not enqueue a bulk action' do
+        visit new_multiple_item_path
+
+        fill_in_registration_settings
+
+        choose 'Upload CSV from computer'
+        attach_file 'Upload a CSV file', file_fixture('register_multiple_items_bad.csv')
+
+        click_button 'Register items'
+
+        form_validation_action = wait_for_validating_page
+
+        ValidateFormJob.perform_now(form_validation_action:)
+
+        expect(page).to have_css('.invalid-feedback', text: 'missing headers: source_id.')
+        expect(page).to have_current_path(multiple_item_path(form_validation_action))
+
+        expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+        expect(BulkAction.count).to eq(0)
+      end
     end
   end
 end
