@@ -43,6 +43,32 @@ RSpec.describe BulkActions::ManageEmbargoForm do
       end
     end
 
+    context 'when the csv_file is missing the view and download headers' do
+      let(:params) do
+        {
+          csv_file: fixture_file_upload('manage_embargo_missing_view_download.csv', 'text/csv')
+        }
+      end
+
+      it 'is invalid' do
+        expect(form.valid?).to be false
+        expect(form.errors[:csv_file]).to include('missing headers: view, download.')
+      end
+    end
+
+    context 'when the csv_file has location-based access but no location column' do
+      let(:params) do
+        {
+          csv_file: fixture_file_upload('manage_embargo_missing_location.csv', 'text/csv')
+        }
+      end
+
+      it 'is invalid' do
+        expect(form.valid?).to be false
+        expect(form.errors[:csv_file]).to include('missing headers: location.')
+      end
+    end
+
     context 'when no csv_file is provided' do
       let(:params) { {} }
 
