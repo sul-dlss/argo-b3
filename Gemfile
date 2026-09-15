@@ -49,6 +49,7 @@ gem 'csv'
 gem 'dor-services-client'
 gem 'druid-tools'
 gem 'dry-monads'
+gem 'folio_client'
 gem 'honeybadger'
 gem 'marcel' # For MIME type detection
 gem 'mission_control-jobs'
