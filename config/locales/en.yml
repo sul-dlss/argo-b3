@@ -163,8 +163,6 @@ en:
           label: "Title"
         use_and_reproduction_statement:
           label: "Use and reproduction"
-      validations:
-        other_tag_format: "must be a series of 2 or more strings delimited with space-padded colons"
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."

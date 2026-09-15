@@ -2,6 +2,8 @@
 
 # Form object for a project tag on an item
 class ProjectTagForm < ApplicationForm
+  include PrevalidationConcern
+
   PROJECT_TAG_PREFIX = 'Project : '
 
   attribute :tag, :string

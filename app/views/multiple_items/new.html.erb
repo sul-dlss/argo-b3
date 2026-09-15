@@ -23,6 +23,11 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
+    <%= render Edit::TagsComponent.new(form:) %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <div id="item-registrations">
     <% if @items_registration_form.invalid_item_registrations.blank? %>
       <%= render SdrViewComponents::Forms::FieldsetComponent.new(data: { controller: 'radio' },
                                                                  classes: 'my-fieldset',
@@ -92,6 +97,7 @@
         </div>
       <% end %>
     <% end %>
+    </div>
 
     <div class="d-flex align-items-center mt-5">
       <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: root_path, variant: :link, classes: 'me-3') %>

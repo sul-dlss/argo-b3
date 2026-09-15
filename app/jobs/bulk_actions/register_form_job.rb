@@ -27,7 +27,8 @@ module BulkActions
       def build_dro # rubocop:disable Metrics/AbcSize
         CocinaModels::Dro.new(
           source_id: item_registration_form.source_id,
-          barcode: item_registration_form.barcode
+          barcode: item_registration_form.barcode,
+          tags: items_registration_form.tags
         ).tap do |dro|
           if item_registration_form.title.present?
             dro.description_hash = { title: [{ value: item_registration_form.title }] }

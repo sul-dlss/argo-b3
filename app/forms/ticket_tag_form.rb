@@ -2,6 +2,8 @@
 
 # Form object for a ticket tag on an item
 class TicketTagForm < ApplicationForm
+  include PrevalidationConcern
+
   TICKET_TAG_PREFIX = 'Ticket : '
 
   attribute :tag, :string

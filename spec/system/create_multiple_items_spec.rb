@@ -19,6 +19,12 @@ RSpec.describe 'Create multiple items' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
   end
 
+  # The container for the item registrations. Item rows are scoped to it since the tag rows on the
+  # page are also rendered as .form-instance rows.
+  def item_registrations
+    find_by_id('item-registrations')
+  end
+
   # Fills in the registration form with two items and submits it.
   def submit_two_items
     visit new_multiple_item_path
@@ -48,19 +54,34 @@ RSpec.describe 'Create multiple items' do
   def fill_in_two_items
     choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
 
-    within(first('.form-instance')) do
-      fill_in 'Source ID', with: 'sul:first-item'
-      fill_in 'Title', with: 'First title'
-    end
+    within(item_registrations) do
+      within(first('.form-instance')) do
+        fill_in 'Source ID', with: 'sul:first-item'
+        fill_in 'Title', with: 'First title'
+      end
 
+      add_item_row
+
+      within(all('.form-instance').last) do
+        fill_in 'Source ID', with: 'sul:second-item'
+        fill_in 'Folio instance HRID', with: 'in11403803'
+        fill_in 'Barcode', with: '36105212345678'
+      end
+    end
+  end
+
+  # Adds a second item row. Must be called within the item registrations container.
+  def add_item_row
     click_button 'Add another item'
     expect(page).to have_css('.form-instance', count: 2)
+  end
 
-    within(all('.form-instance').last) do
-      fill_in 'Source ID', with: 'sul:second-item'
-      fill_in 'Folio instance HRID', with: 'in11403803'
-      fill_in 'Barcode', with: '36105212345678'
-    end
+  def fill_in_tags
+    fill_in 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+    click_button 'Add another tag'
+    fill_in 'items_registration[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
+    fill_in 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
+    fill_in 'items_registration[ticket_tags_attributes][0][tag]', with: 'ABC-123'
   end
 
   # Fills in the registration form with a valid item and an item missing a title, then submits it.
@@ -78,17 +99,18 @@ RSpec.describe 'Create multiple items' do
   def fill_in_valid_and_invalid_item
     choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
 
-    within(first('.form-instance')) do
-      fill_in 'Source ID', with: 'sul:first-item'
-      fill_in 'Title', with: 'First title'
-    end
+    within(item_registrations) do
+      within(first('.form-instance')) do
+        fill_in 'Source ID', with: 'sul:first-item'
+        fill_in 'Title', with: 'First title'
+      end
 
-    click_button 'Add another item'
-    expect(page).to have_css('.form-instance', count: 2)
+      add_item_row
 
-    within(all('.form-instance').last) do
-      # Leaving Title and Folio instance HRID blank.
-      fill_in 'Source ID', with: 'sul:second-item'
+      within(all('.form-instance').last) do
+        # Leaving Title and Folio instance HRID blank.
+        fill_in 'Source ID', with: 'sul:second-item'
+      end
     end
   end
 
@@ -237,6 +259,58 @@ RSpec.describe 'Create multiple items' do
     end
   end
 
+  context 'when tags are provided' do
+    it 'enqueues a register form bulk action with the tags' do
+      visit new_multiple_item_path
+
+      expect(page).to have_css('h1', text: 'Register items')
+
+      fill_in_registration_settings
+      fill_in_tags
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(
+          tags: ['Registered By : mjgiarlo', 'Remediated By : 5.0.0', 'Project : Argo', 'Ticket : ABC-123']
+        )
+      )
+    end
+  end
+
+  context 'when an other tag is malformed' do
+    it 'shows a validation error, retains the tag, and does not enqueue a bulk action' do
+      visit new_multiple_item_path
+
+      expect(page).to have_css('h1', text: 'Register items')
+
+      fill_in_registration_settings
+      fill_in 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By'
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_css('.invalid-feedback',
+                               text: 'must be a series of 2 or more strings delimited with space-padded colons')
+      expect(page).to have_field('items_registration[other_tags_attributes][0][tag]', with: 'Registered By')
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+      expect(BulkAction.count).to eq(0)
+    end
+  end
+
   context 'when failed' do
     it 'shows an error message and does not enqueue a bulk action' do
       submit_two_items
@@ -267,7 +341,7 @@ RSpec.describe 'Create multiple items' do
                                      'or click "Clear all items and enter again."')
 
       # Only the item with errors is displayed.
-      expect(page).to have_css('.form-instance', count: 1)
+      expect(item_registrations).to have_css('.form-instance', count: 1)
       expect(page).to have_field('Source ID', with: 'sul:second-item')
       expect(page).to have_css('.invalid-feedback', text: 'title is required if a FOLIO Instance HRID is not provided')
 
@@ -281,7 +355,7 @@ RSpec.describe 'Create multiple items' do
 
       expect(page).to have_text('Enter each item individually')
       expect(page).to have_no_button('Clear all items and enter again')
-      expect(page).to have_css('.form-instance', count: 1)
+      expect(item_registrations).to have_css('.form-instance', count: 1)
       expect(page).to have_field('Source ID', with: '')
       expect(page).to have_no_field(with: 'sul:first-item', type: 'hidden', visible: :hidden)
     end

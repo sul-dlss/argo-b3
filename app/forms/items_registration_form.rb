@@ -9,6 +9,7 @@ class ItemsRegistrationForm < ApplicationForm
   include CocinaModels::ApoConcern
   include CocinaModels::EmbargoConcern
   include EmbargoFormConcern
+  include TagsFormConcern
 
   UPLOAD_CSV_CHOICE = 'upload_csv'
   ENTER_TAB_DELIMITED_CHOICE = 'enter_tab_delimited'
@@ -43,9 +44,12 @@ class ItemsRegistrationForm < ApplicationForm
   before_validation :remove_blank_item_registrations
   validate :item_registrations_presence
 
+  attribute :tags, default: -> { [] }
+
   # csv is derived from csv_file rather than submitted by the user.
+  # tags are derived from various tag fields.
   def self.immutable_attributes
-    [:csv]
+    %i[csv tags]
   end
 
   def initialize(attributes = {})
