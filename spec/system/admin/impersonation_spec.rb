@@ -33,20 +33,8 @@ RSpec.describe 'Admin impersonation', :rack_test do
 
     click_link 'Stop impersonating'
 
-    expect(page).to have_current_path(admin_impersonate_path)
-    expect(page).to have_no_link('Stop impersonating')
-  end
-
-  it 'removes impersonation when no groups are selected' do
-    visit admin_impersonate_path
-
-    check 'sdr:workgroup-a'
-    click_button 'Impersonate'
-    expect(page).to have_link('Stop impersonating', href: admin_stop_impersonate_path)
-
-    uncheck 'sdr:workgroup-a'
-    click_button 'Impersonate'
-
+    expect(page).to have_current_path(root_path)
+    expect(page).to have_text('You have stopped impersonating.')
     expect(page).to have_no_link('Stop impersonating')
   end
 end

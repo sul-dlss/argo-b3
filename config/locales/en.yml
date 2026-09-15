@@ -186,3 +186,8 @@ en:
       art: "Art"
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
+  admin:
+    impersonation:
+      start: "You are now impersonating the selected workgroups."
+      stop: "You have stopped impersonating."
+      invalid: "You must select workgroups to enable impersonation."

@@ -4,11 +4,17 @@
 class AdminPolicy < ApplicationPolicy
   alias_rule :manage_permissions?, :groups?, to: :admin?
 
+  # can only start/update impersonating if an admin and not currently impersonating
   def impersonate?
-    admin? || Current.impersonating?
+    admin? && !Current.impersonating?
   end
 
-  alias_rule :update_impersonation?, :stop_impersonating?, to: :impersonate?
+  # can only stop impersonating if currently impersonating
+  def stop_impersonating?
+    Current.impersonating?
+  end
+
+  alias_rule :update_impersonation?, to: :impersonate?
 
   # NOTE: Allowing admins is handled by precheck in ApplicationPolicy so returning false still allows admins.
 end

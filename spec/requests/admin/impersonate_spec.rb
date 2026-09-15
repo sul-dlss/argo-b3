@@ -73,7 +73,8 @@ RSpec.describe 'Admin impersonate' do
         }
       }
 
-      expect(response).to redirect_to(admin_impersonate_path)
+      expect(response).to redirect_to(root_path)
+      expect(flash[:success]).to eq('You are now impersonating the selected workgroups.')
       expect(encrypted_impersonated_workgroups).to eq(['sdr:group-a', 'sdr:group-b'])
     end
 
@@ -87,19 +88,11 @@ RSpec.describe 'Admin impersonate' do
       expect(encrypted_impersonated_workgroups).to eq(['sdr:group-a'])
     end
 
-    it 'clears cookie when no workgroups are selected' do
-      patch admin_impersonate_path, params: {
-        impersonation: {
-          workgroups: ['sdr:group-a']
-        }
-      }
-
-      expect(encrypted_impersonated_workgroups).to eq(['sdr:group-a'])
-
+    it 'does not enable impersonation when no workgroups are selected' do
       patch admin_impersonate_path, params: { impersonation: { workgroups: [] } }
 
-      get admin_impersonate_path
-
+      expect(response).to redirect_to(admin_impersonate_path)
+      expect(flash[:warning]).to eq('You must select workgroups to enable impersonation.')
       expect(encrypted_impersonated_workgroups).to be_nil
     end
 
@@ -129,7 +122,8 @@ RSpec.describe 'Admin impersonate' do
     it 'deletes the impersonation cookie' do
       delete admin_stop_impersonate_path
 
-      expect(response).to redirect_to(admin_impersonate_path)
+      expect(response).to redirect_to(root_path)
+      expect(flash[:success]).to eq('You have stopped impersonating.')
 
       get admin_impersonate_path
 
@@ -147,10 +141,10 @@ RSpec.describe 'Admin impersonate' do
       sign_in(user)
     end
 
-    it 'allows access' do
+    it 'denies access' do
       get admin_impersonate_path
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to be_unauthorized
     end
   end
 
@@ -167,7 +161,8 @@ RSpec.describe 'Admin impersonate' do
     it 'allows clearing impersonation' do
       delete admin_stop_impersonate_path
 
-      expect(response).to redirect_to(admin_impersonate_path)
+      expect(response).to redirect_to(root_path)
+      expect(flash[:success]).to eq('You have stopped impersonating.')
 
       get admin_impersonate_path
 
