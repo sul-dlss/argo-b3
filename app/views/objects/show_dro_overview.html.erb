@@ -58,24 +58,24 @@
 
   <div class="use-access-copyright-section d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
     <div class="flex-fill">
-      <div class="card">
-        <div class="card-body">
-          <h2 class="card-title">Use and reproduction</h2>
+      <%= render SdrViewComponents::Elements::CardComponent.new do |card| %>
+        <% card.with_body do %>
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: 'Use and reproduction') %>
           <p class="card-text">
             <%= @cocina_model.use_and_reproduction_statement %>
           </p>
-        </div>
-      </div>
+        <% end %>
+      <% end %>
     </div>
     <div class="show-details-box flex-fill">
-      <div class="card">
-        <div class="card-body">
-          <h2 class="card-title">Copyright</h2>
+      <%= render SdrViewComponents::Elements::CardComponent.new do |card| %>
+        <% card.with_body do %>
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: 'Copyright') %>
           <p class="card-text">
             <%= @cocina_model.copyright %>
           </p>
-        </div>
-      </div>
+        <% end %>
+      <% end %>
     </div>
   </div>
 <% end %>

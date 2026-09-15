@@ -10,7 +10,8 @@ export default class extends Controller {
   updateSubmit () {
     const noneChecked = this.element.querySelectorAll('input[type="checkbox"]:checked').length === 0
     const noDruids = this.druidListInputTarget.value.trim() === '' && this.sourceRadioTarget.checked
-    this.element.querySelectorAll('input[type="submit"]').forEach((submit) => {
+    // Matches both <input type="submit"> and the <button type="submit"> rendered by SubmitComponent.
+    this.element.querySelectorAll('[type="submit"]').forEach((submit) => {
       submit.disabled = noneChecked || noDruids
     })
   }

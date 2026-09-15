@@ -36,7 +36,7 @@ RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
       expect(page).to have_css("turbo-stream[action='replace'][target='#{facet_config.form_field}-facet']")
       # The content inside the template is not available to Capybara for some reason.
       expect(results.to_html).to include('<section aria-label="MIME types"')
-      expect(results.to_html).to include('<input type="submit" name="commit" value="Filter"')
+      expect(results.to_html).to include('name="commit" value="Filter"')
     end
   end
 

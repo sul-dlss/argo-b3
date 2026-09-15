@@ -46,7 +46,10 @@
                                                                     label_text: 'Update license',
                                                                     input_value: 'update') %>
       <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :license, text: 'License', hidden: true) %>
-      <%= form.select :license, Constants::LICENSE_OPTIONS.map { |option| [option[:label], option[:uri]] }, {}, class: 'form-select' %>
+      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(
+            form:, field_name: :license,
+            options: Constants::LICENSE_OPTIONS.map { |option| [option[:label], option[:uri]] }
+          ) %>
     </fieldset>
 
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>

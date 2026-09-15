@@ -29,7 +29,7 @@
             <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
             <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
             <div class="dz-message">
-              <div class="fs-1"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+              <div class="fs-1"><%= cloud_upload_icon %></div>
               <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
               <div class="fs-5">or</div>
               <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
