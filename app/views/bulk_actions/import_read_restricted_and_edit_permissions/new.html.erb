@@ -1,0 +1,24 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_import_read_restricted_and_edit_permissions_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file',
+                                                           label_classes: 'fw-bold') %>
+
+    <p class="mt-2">
+      The CSV should have the following headers:
+    </p>
+    <ul>
+      <li>
+        <em>permission_type</em>
+        (value should be <em>read_restricted</em> or <em>edit</em> to grant the permission, or left blank
+        to revoke all read restricted and edit permissions for the druid and workgroup)
+      </li>
+      <li><em>druid</em> (must be a collection or APO)</li>
+      <li><em>workgroup</em></li>
+    </ul>
+    <p>
+      Only the druid and workgroup pairs in the CSV are affected. Other permissions are left alone.
+    </p>
+  <% end %>
+<% end %>

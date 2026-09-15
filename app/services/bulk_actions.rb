@@ -158,6 +158,23 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     form: BulkActions::ImportDescriptiveMetadataForm
   )
 
+  IMPORT_READ_RESTRICTED_AND_EDIT_PERMISSIONS = Config.new(
+    label: 'Import read restricted and edit permissions',
+    help_text: 'Grants or revokes read restricted or edit permissions on collections and APOs for ' \
+               'workgroups with a CSV.',
+    job: BulkActions::ImportReadRestrictedAndEditPermissionsJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_read_restricted_and_edit_permissions_path),
+    form: BulkActions::ImportReadRestrictedAndEditPermissionsForm
+  )
+
+  IMPORT_READ_UNRESTRICTED_WORKGROUPS = Config.new(
+    label: 'Import read unrestricted workgroups',
+    help_text: 'Grants or revokes read unrestricted permission for workgroups with a CSV.',
+    job: BulkActions::ImportReadUnrestrictedWorkgroupsJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_read_unrestricted_workgroups_path),
+    form: BulkActions::ImportReadUnrestrictedWorkgroupsForm
+  )
+
   IMPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Import structural metadata',
     help_text: 'Upload structural metadata as CSV (comma-separated values).'
