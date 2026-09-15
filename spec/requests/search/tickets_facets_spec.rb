@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Tickets facets', :solr do
   before do
     create(:solr_item, tickets: ['TESTREQ-1'])
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   describe 'index' do

@@ -10,6 +10,12 @@ FactoryBot.define do
       groups { ['sdr:argo-access', AuthenticationHelpers::ADMIN_GROUP] }
     end
 
+    trait :reader do
+      after(:create) do |user|
+        Permission.find_or_create_by!(workgroup: user.groups.first, permission_type: :read_unrestricted)
+      end
+    end
+
     trait :developer do
       groups { ['sdr:developer'] }
     end

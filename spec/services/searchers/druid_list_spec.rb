@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::DruidList do
+  let(:user) { create(:user, :admin) }
   let(:druids) { described_class.call(search_form:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
@@ -19,6 +20,7 @@ RSpec.describe Searchers::DruidList do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 

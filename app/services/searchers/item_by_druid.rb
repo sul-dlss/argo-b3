@@ -29,7 +29,7 @@ module Searchers
 
     def solr_request
       {
-        fq: solr_fq,
+        fq: [solr_fq, Search::PermissionFilter.call].compact,
         fl: fields,
         rows: druids.size
       }

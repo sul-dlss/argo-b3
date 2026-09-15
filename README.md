@@ -216,6 +216,9 @@ Note: By convention, `CocinaModels::*` instances are referred to as "cocina mode
 Note: Where possible, `CocinaDisplay` should be used for extracting description from cocina objects.
 
 ## Discovery
+
+Search results, facets, tag/project/ticket suggestions, search-result navigation, dashboard object lists, reports, and workflow grid counts and reset selections are restricted to objects readable by the current user's effective workgroups.`Permissions::UserScope` resolves permissions from PostgreSQL, and `Search::PermissionFilter` constructs a Solr filter over the object ID, collection IDs, and APO ID using the same rules as `ObjectPolicy#show?`. Searchers use the effective workgroups established in `Current` for each authenticated request Workgroup membership refreshes at login; impersonation uses the effective workgroups for the current request. Workflow reset jobs carry the effective workgroups so impersonation is preserved.
+
 In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:
 * Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)
 * Is optimized for slow searching / faceting (1) by asynchronously loading some search results and facets (2) by splitting up searching for item results and a small number of primary facets from the rest of the facets (secondary facets)/

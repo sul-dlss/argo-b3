@@ -3,8 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::ReportByDruid do
+  let(:user) { create(:user, :admin) }
   let(:druids) { ['druid:rt276nw8963', 'druid:kk754nn3333'] }
   let(:fields) { [Reports::Fields::DRUID.field, Reports::Fields::PURL.field] }
+
+  before { Current.effective_groups = user.groups }
 
   context 'when streaming results' do
     subject(:results) { described_class.call(druids:, fields:, stream:, rows: 10) }
@@ -19,7 +22,7 @@ RSpec.describe Searchers::ReportByDruid do
       results
       expect(Search::SolrService).to have_received(:stream) do |args|
         solr_query = args[:request].with_indifferent_access
-        expect(solr_query['fq']).to eq('id:("druid:rt276nw8963" OR "druid:kk754nn3333")')
+        expect(solr_query['fq']).to eq(['id:("druid:rt276nw8963" OR "druid:kk754nn3333")'])
         expect(solr_query['fl']).to eq(fields)
         expect(solr_query['rows']).to eq(10)
         expect(solr_query['wt']).to eq(:csv)
@@ -54,7 +57,7 @@ RSpec.describe Searchers::ReportByDruid do
 
       expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
-        expect(solr_query['fq']).to eq('id:("druid:rt276nw8963" OR "druid:kk754nn3333")')
+        expect(solr_query['fq']).to eq(['id:("druid:rt276nw8963" OR "druid:kk754nn3333")'])
         expect(solr_query['fl']).to eq(fields)
         expect(solr_query['rows']).to eq(10)
         expect(solr_query['wt']).to eq(:csv)

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Pin and unpin a search', :solr do
   before do
     create_list(:solr_item, 2)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'pins from the search page and unpins from the dashboard' do

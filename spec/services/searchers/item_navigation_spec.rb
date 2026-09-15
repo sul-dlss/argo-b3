@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::ItemNavigation do
+  let(:user) { create(:user, :admin) }
   let(:navigation) { described_class.call(search_form:, position:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
@@ -24,6 +25,7 @@ RSpec.describe Searchers::ItemNavigation do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
