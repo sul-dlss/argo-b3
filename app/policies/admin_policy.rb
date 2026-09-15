@@ -6,12 +6,12 @@ class AdminPolicy < ApplicationPolicy
 
   # can only start/update impersonating if an admin and not currently impersonating
   def impersonate?
-    admin? || !Current.impersonating?
+    admin? && !Current.impersonating?
   end
 
-  # can only stop impersonating if an admin and currently impersonating
+  # can only stop impersonating if currently impersonating
   def stop_impersonating?
-    admin? || Current.impersonating?
+    Current.impersonating?
   end
 
   alias_rule :update_impersonation?, to: :impersonate?
