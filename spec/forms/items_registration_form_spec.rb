@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ItemsRegistrationForm do
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe 'validation of item_registrations' do
     context 'when some item registrations are blank and some are not' do
       let(:form) do

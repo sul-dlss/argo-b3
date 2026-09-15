@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ItemRegistrationForm do
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe '#empty?' do
     it 'is true when all attributes are blank' do
       expect(described_class.new.empty?).to be(true)

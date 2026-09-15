@@ -7,6 +7,10 @@ RSpec.describe CocinaModels::Collection do
 
   let(:cocina_object) { build(:collection_with_metadata) }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::CollectionWithMetadata' do
       it 'initializes with a Cocina::Models::CollectionWithMetadata' do

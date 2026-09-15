@@ -150,6 +150,8 @@ en:
           label: 'Project name'
         source_id:
           label: "Source ID"
+          validations:
+            already_exists: "already exists"
         source_id_prefix:
           label: "Source ID prefix"
         source_id_choice:

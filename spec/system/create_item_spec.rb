@@ -408,6 +408,27 @@ RSpec.describe 'Create an item' do
       expect(Sdr::Repository).not_to have_received(:accession)
     end
 
+    context 'when the source ID already exists' do
+      before do
+        allow(Sdr::Repository).to receive(:source_id_exists?).and_return(true)
+      end
+
+      it 'shows a validation error and does not register or accession' do
+        visit new_item_path
+
+        fill_in 'Source ID', with: 'new:source-id'
+        fill_in 'Title', with: 'The Title'
+
+        find_by_id('deposit-tab').click
+        click_button('Register only')
+
+        expect(page).to have_invalid_feedback('Source ID', 'already exists')
+
+        expect(Sdr::Repository).not_to have_received(:register)
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
     it 'shows validation errors for a malformed tag' do
       visit new_item_path
 

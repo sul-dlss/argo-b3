@@ -17,6 +17,7 @@ RSpec.describe 'Create multiple items' do
     create(:permission, :edit, workgroup:, target_druid: apo_druid)
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
   end
 
   # The container for the item registrations. Item rows are scoped to it since the tag rows on the
