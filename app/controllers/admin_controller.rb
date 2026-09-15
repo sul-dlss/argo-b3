@@ -10,7 +10,6 @@ class AdminController < ApplicationController
 
   def impersonate
     authorize! :impersonate?, with: AdminPolicy
-    deny_access if Current.impersonating?
 
     available_workgroups = Impersonation::Workgroups.available_for_user(user: current_user)
 
@@ -19,14 +18,14 @@ class AdminController < ApplicationController
   end
 
   def update_impersonation
-    authorize! :impersonate?, with: AdminPolicy
+    authorize! :update_impersonation?, with: AdminPolicy
 
     if impersonated_workgroups.empty?
-      flash[:warning] = 'You must select workgroups to enable impersonation.'
+      flash[:warning] = I18n.t('admin.impersonation.invalid')
       redirect_to admin_impersonate_path
     else
       Impersonation::Workgroups.update_cookie(cookies:, groups: impersonated_workgroups)
-      flash[:success] = 'You are now impersonating the selected workgroups.'
+      flash[:success] = I18n.t('admin.impersonation.start')
       redirect_to root_path
     end
   end
@@ -35,7 +34,7 @@ class AdminController < ApplicationController
     authorize! :stop_impersonating?, with: AdminPolicy
     Impersonation::Workgroups.clear_cookie(cookies:)
 
-    flash[:success] = 'You have stopped impersonating.'
+    flash[:success] = I18n.t('admin.impersonation.stop')
     redirect_to root_path
   end
 
