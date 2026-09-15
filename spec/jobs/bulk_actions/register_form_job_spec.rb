@@ -95,6 +95,40 @@ RSpec.describe BulkActions::RegisterFormJob do
     end
   end
 
+  context 'when the form has tags' do
+    let(:items_registration_form) do
+      ItemsRegistrationForm.new(
+        apo_druid: 'druid:bc123df4567',
+        content_type: Cocina::Models::ObjectType.book,
+        access_view: 'world',
+        access_download: 'world',
+        item_registrations_attributes: [
+          { source_id: 'sul:1234', title: 'A title' },
+          { source_id: 'sul:5678', title: 'Another title' }
+        ],
+        other_tags_attributes: [{ tag: 'Registered By : mjgiarlo' }],
+        project_tags_attributes: [{ tag: 'Argo' }],
+        ticket_tags_attributes: [{ tag: 'ABC-123' }]
+      )
+    end
+
+    let(:tags) { ['Registered By : mjgiarlo', 'Project : Argo', 'Ticket : ABC-123'] }
+
+    before do
+      # The form reaching this job has already been validated by ValidateFormJob, which is what
+      # populates tags from the other, project, and ticket tags.
+      items_registration_form.valid?
+    end
+
+    it 'registers every object with the tags' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:register)
+        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags:).twice
+      expect(bulk_action.druid_count_success).to eq 2
+    end
+  end
+
   context 'when registration fails' do
     before do
       allow(Sdr::Repository).to receive(:register).and_raise(StandardError, 'connection problem')

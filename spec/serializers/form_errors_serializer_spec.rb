@@ -301,5 +301,23 @@ RSpec.describe FormErrorsSerializer do
       expect(deserialized_form.item_registrations.first.errors.messages)
         .to eq(form.item_registrations.first.errors.messages)
     end
+
+    context 'when an other tag is malformed' do
+      let(:form) do
+        ItemsRegistrationForm.new(
+          apo_druid: 'druid:bc123df4567',
+          content_type: Cocina::Models::ObjectType.book,
+          access_view: 'world',
+          access_download: 'world',
+          item_registrations_attributes: [{ source_id: 'sul:1234', title: 'A title' }],
+          other_tags_attributes: [{ tag: 'Registered By' }]
+        )
+      end
+
+      it 'preserves the error message of the tag' do
+        expect(deserialized_form.other_tags.first.errors[:tag])
+          .to eq(['must be a series of 2 or more strings delimited with space-padded colons'])
+      end
+    end
   end
 end

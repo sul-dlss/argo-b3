@@ -279,4 +279,62 @@ RSpec.describe ItemsRegistrationForm do
       end
     end
   end
+
+  describe 'tags' do
+    let(:form) do
+      described_class.new(
+        apo_druid: 'druid:bc123df4567',
+        content_type: Cocina::Models::ObjectType.book,
+        access_view: 'world',
+        access_download: 'world',
+        item_registrations_attributes: [{ source_id: 'sul:1234', title: 'A title' }],
+        other_tags_attributes:,
+        project_tags_attributes:,
+        ticket_tags_attributes:
+      )
+    end
+    let(:other_tags_attributes) { [{ tag: 'Registered By : mjgiarlo' }] }
+    let(:project_tags_attributes) { [{ tag: 'Argo' }] }
+    let(:ticket_tags_attributes) { [{ tag: 'ABC-123' }] }
+
+    it 'populates tags from the other, project, and ticket tags' do
+      expect(form).to be_valid
+      expect(form.tags).to eq(['Registered By : mjgiarlo', 'Project : Argo', 'Ticket : ABC-123'])
+    end
+
+    context 'when there are no tags' do
+      let(:other_tags_attributes) { [] }
+      let(:project_tags_attributes) { [] }
+      let(:ticket_tags_attributes) { [] }
+
+      it 'populates tags with an empty array' do
+        expect(form).to be_valid
+        expect(form.tags).to eq([])
+      end
+    end
+
+    context 'when an other tag is malformed' do
+      let(:other_tags_attributes) { [{ tag: 'Registered By' }] }
+
+      it 'is not valid' do
+        expect(form).not_to be_valid
+        expect(form.other_tags.first.errors[:tag])
+          .to include('must be a series of 2 or more strings delimited with space-padded colons')
+      end
+    end
+  end
+
+  describe '.permitted_params' do
+    it 'permits the nested tag attributes' do
+      expect(described_class.permitted_params).to include(
+        { other_tags_attributes: OtherTagForm.permitted_params },
+        { project_tags_attributes: ProjectTagForm.permitted_params },
+        { ticket_tags_attributes: TicketTagForm.permitted_params }
+      )
+    end
+
+    it 'does not permit the derived tags' do
+      expect(described_class.permitted_params).not_to include(:tags)
+    end
+  end
 end

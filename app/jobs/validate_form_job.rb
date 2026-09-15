@@ -15,6 +15,7 @@ class ValidateFormJob < ApplicationJob
     Honeybadger.notify(e,
                        context: { form_validation_action_id: form_validation_action.id,
                                   user: form_validation_action.user.sunetid })
+    Rails.logger.error("ValidateFormJob failed for form_validation_action #{form_validation_action.id}: #{e.full_message}") # rubocop:disable Layout/LineLength
     form_validation_action.status_failed!
   end
 end
