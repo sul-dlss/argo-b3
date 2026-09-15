@@ -32,6 +32,7 @@ class AdminController < ApplicationController
 
   def stop_impersonating
     authorize! :stop_impersonating?, with: AdminPolicy
+
     Impersonation::Workgroups.clear_cookie(cookies:)
 
     flash[:success] = I18n.t('admin.impersonation.stop')
