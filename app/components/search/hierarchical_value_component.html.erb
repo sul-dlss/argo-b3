@@ -3,8 +3,8 @@
     <div class="d-flex">
       <% if facet_count.branch? %>
         <%= tag.a data: { bs_toggle: 'collapse', action: 'mouseover->hierarchical-facet-value#load' }, href: "##{children_collapse_id}", role: 'button', 'aria-expanded': expanded?, 'aria-controls': children_collapse_id, title: toggle_label do %>
-          <i class="bi bi-plus me-2 expand-icon"></i>
-          <i class="bi bi-dash me-2 collapse-icon"></i>
+          <%= helpers.expand_icon(classes: 'me-2') %>
+          <%= helpers.collapse_icon(classes: 'me-2') %>
 
           <span class="visually-hidden">[<%= toggle_label %>]</span>
         <% end %>

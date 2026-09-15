@@ -11,7 +11,7 @@
         <div class="input-group">
           <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:,
                                                                              field_name: :object_types,
-                                                                             classes: 'custom-select form-select search-field d-none d-md-block',
+                                                                             classes: 'custom-select search-field d-none d-md-block',
                                                                              options: object_type_options,
                                                                              prompt: 'All object types',
                                                                              # Hack to use a single select (instead of multiselect) submitting to an array field.
@@ -24,9 +24,12 @@
           <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(form:,
                                                                            field_name: :query,
                                                                            placeholder: 'Search by keyword',
-                                                                           classes: 'search-q q form-control',
+                                                                           classes: 'search-q q',
                                                                            type: 'search') %>
-          <button class="btn btn-primary search-btn" type="submit" id="search"><span class="submit-search-text">Search</span></button>
+          <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'search-btn',
+                                                                      type: 'submit', id: 'search') do %>
+            <span class="submit-search-text">Search</span>
+          <% end %>
         </div>
       <% end %>
     </search>

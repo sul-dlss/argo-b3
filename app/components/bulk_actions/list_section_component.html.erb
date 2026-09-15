@@ -1,5 +1,5 @@
 <%= tag.section class: classes, id: do %>
-  <h2 class="h5"><%= label %></h2>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h5, text: label) %>
   <ul class="list-unstyled">
     <% bulk_action_configs.each do |bulk_action_config| %>
       <li>

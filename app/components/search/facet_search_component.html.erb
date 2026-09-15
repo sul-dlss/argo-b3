@@ -1,7 +1,7 @@
 <%= tag.div data:, role: 'combobox', class: classes do %>
   <div class="input-group">
     <%= tag.label for: id, class: 'input-group-text bg-body border-end-0 pe-0' do %>
-      <i class="bi bi-search" aria-hidden="true"></i>
+      <%= helpers.search_icon(aria: { hidden: true }) %>
       <span class="visually-hidden"><%= label %></span>
     <% end %>
 

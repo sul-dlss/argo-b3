@@ -3,21 +3,24 @@
     <fieldset>
       <legend>Select scope for workflow grid:</legend>
 
-      <div class="form-check">
-        <%= form.radio_button :scope, 'all', class: 'form-check-input', checked: @scope == 'all' %>
-        <%= form.label :scope_all, 'All items', class: 'form-check-label' %>
-      </div>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :scope,
+                                                                    label_text: 'All items',
+                                                                    input_value: 'all',
+                                                                    input_checked: @scope == 'all') %>
 
-      <div class="form-check">
-        <%= form.radio_button :scope, 'last_search', class: 'form-check-input', disabled: !defined?(@last_search_form), checked: @scope == 'last_search' %>
-        <%= form.label :scope_last_search, 'From last search', class: 'form-check-label' %>
-
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :scope,
+                                                                    label_text: 'From last search',
+                                                                    input_value: 'last_search',
+                                                                    input_disabled: !defined?(@last_search_form),
+                                                                    input_checked: @scope == 'last_search') do |component| %>
         <% if defined?(@last_search_form) %>
-          <p><%= @total_results %> items for: <%= @last_search_form.to_s %></p>
+          <%= component.with_additional_container_content do %>
+            <p><%= @total_results %> items for: <%= @last_search_form.to_s %></p>
+          <% end %>
         <% end %>
-      </div>
+      <% end %>
 
-      <%= form.submit 'Go', class: 'btn btn-primary' %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Go', variant: :primary) %>
     </fieldset>
   <% end %>
 

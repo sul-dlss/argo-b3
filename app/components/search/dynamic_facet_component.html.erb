@@ -26,7 +26,8 @@
         <%= form.date_field date_to_form_field, class: 'form-control' %>
       <% end %>
 
-      <%= form.submit 'Filter', class: 'btn btn-primary btn-sm mt-3' %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter', variant: :primary,
+                                                               classes: 'btn-sm mt-3') %>
     <% end %>
   <% end %>
 <% end %>

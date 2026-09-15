@@ -1,13 +1,12 @@
 <%= turbo_frame_tag 'report-preview' do %>
-  <div class="table-responsive">
-    <%= render SdrViewComponents::Tables::TableComponent.new(variant: :data, label: 'Preview', id: 'preview-table', show_label: false) do |table| %>
-      <% @csv.headers.each do |header| %>
-        <%= table.with_header(label: header) %>
-      <% end %>
-
-      <% @csv.each do |row| %>
-        <%= table.with_row(first_value: row.field(0), values: row.fields(1..)) %>
-      <% end %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(variant: :data, label: 'Preview', id: 'preview-table',
+                                                           show_label: false, responsive: true) do |table| %>
+    <% @csv.headers.each do |header| %>
+      <%= table.with_header(label: header) %>
     <% end %>
-  </div>
+
+    <% @csv.each do |row| %>
+      <%= table.with_row(first_value: row.field(0), values: row.fields(1..)) %>
+    <% end %>
+  <% end %>
 <% end %>

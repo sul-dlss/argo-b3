@@ -1,5 +1,5 @@
 <section aria-label="Facets" class="facets">
-  <h2 class="facets-heading h4">Filters</h2>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h4, classes: 'facets-heading', text: 'Filters') %>
 
   <% unless blank_search? %>
     <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::PROJECTS) %>

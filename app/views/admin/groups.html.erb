@@ -1,6 +1,6 @@
 <div class="container">
 
-  <h1 class="h4">Groups</h1>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, variant: :h4, text: 'Groups') %>
 
   <ul class="list-unstyled">
     <% current_user.groups.each do |group| %>
