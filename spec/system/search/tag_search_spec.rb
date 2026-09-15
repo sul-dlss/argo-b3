@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Tag search', :solr do
   before do
     create_list(:solr_item, 5, :with_tags)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'returns tag search results' do

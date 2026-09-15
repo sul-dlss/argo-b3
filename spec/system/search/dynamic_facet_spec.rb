@@ -9,7 +9,7 @@ RSpec.describe 'Dynamic facets', :solr do
   before do
     create_list(:solr_item, 4)
     create_list(:solr_item, 3, released_to_earthworks: false)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'returns facets' do

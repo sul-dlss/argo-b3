@@ -15,7 +15,7 @@ module Searchers
     def solr_request_query
       values = druids.map { |value| "\"#{value}\"" }.join(' OR ')
       {
-        fq: "#{Search::Fields::ID}:(#{values})"
+        fq: ["#{Search::Fields::ID}:(#{values})", Search::PermissionFilter.call].compact
       }
     end
   end

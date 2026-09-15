@@ -7,7 +7,7 @@ RSpec.describe 'Facets', :solr do
 
   before do
     create(:solr_collection, :with_projects, projects: ['Project 1'])
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'returns facets' do

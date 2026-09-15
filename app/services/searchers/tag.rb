@@ -33,6 +33,7 @@ module Searchers
       # This is a very imperfect way of querying for tags.
       {
         q: '*:*',
+        fq: [Search::PermissionFilter.call].compact,
         rows: 0,
         facet: true,
         'facet.field': field,

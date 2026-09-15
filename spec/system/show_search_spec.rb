@@ -6,7 +6,7 @@ RSpec.describe 'Show search page', :solr do
   before do
     create_list(:solr_item, 4)
     create_list(:solr_collection, 3)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'displays the search page' do

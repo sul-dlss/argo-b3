@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe Searchers::Workflow do
   subject(:searcher) { described_class.new(search_form:) }
 
+  let(:user) { create(:user, :reader) }
+
   let(:search_form) { SearchForm.new(query: 'test') }
 
   let(:solr_response) do
@@ -24,6 +26,7 @@ RSpec.describe Searchers::Workflow do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 

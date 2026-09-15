@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Item search', :solr do
+  let(:user) { create(:user, :reader) }
   let!(:item_doc) { create(:solr_item) }
   let!(:collection_doc) { create(:solr_collection) }
 
@@ -10,7 +11,7 @@ RSpec.describe 'Item search', :solr do
     stub_const('Searchers::Item::PER_PAGE', 5)
     create_list(:solr_item, 10)
     create_list(:solr_collection, 4)
-    sign_in(create(:user))
+    sign_in(user)
   end
 
   context 'when a single page of results' do
@@ -117,6 +118,21 @@ RSpec.describe 'Item search', :solr do
         expect(page).to have_result_count(1)
         expect(page).to have_current_filter('Object types', 'collection')
       end
+    end
+  end
+
+  context 'when the user does not have read permission' do
+    let(:user) { create(:user) }
+
+    it 'does not return search results' do
+      visit search_path
+
+      find_search_field.fill_in(with: item_doc[Search::Fields::TITLE])
+      click_button('Search')
+
+      expect(page).to have_css('turbo-frame#items-search[complete]')
+      expect(page).to have_no_css('section[aria-label="Item, collection, and APO results"]')
+      expect(page).not_to have_item_result(item_doc)
     end
   end
 end

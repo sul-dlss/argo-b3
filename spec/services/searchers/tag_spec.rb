@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Tag do
+  let(:user) { create(:user, :admin) }
   let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'project 1' }
@@ -19,6 +20,7 @@ RSpec.describe Searchers::Tag do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -28,6 +30,7 @@ RSpec.describe Searchers::Tag do
 
     expect(Search::SolrService).to have_received(:post)
       .with(request: { q: '*:*',
+                       fq: [],
                        rows: 0,
                        facet: true,
                        'facet.field': Search::Fields::PROJECTS_EXPLODED,

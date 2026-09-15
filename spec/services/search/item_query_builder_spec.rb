@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe Search::ItemQueryBuilder do
   subject(:item_query) { described_class.call(search_form:) }
 
+  let(:user) { create(:user, :admin) }
+
+  before { Current.effective_groups = user.groups }
+
   context 'with a blank search form' do
     let(:search_form) { SearchForm.new(query: '') }
 

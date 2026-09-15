@@ -2,8 +2,11 @@
 
 # Job to reset workflow errors for a set of druids based on a search form.
 class ResetWorkflowErrorsJob < ApplicationJob
-  def perform(search_form:, workflow_name:, process_name:)
-    druids = druids_for(search_form:, workflow_name:, process_name:)
+  def perform(search_form:, workflow_name:, process_name:, effective_groups:)
+    # Preserve the requesting user's impersonation context when the job runs asynchronously.
+    druids = Current.set(effective_groups:) do
+      druids_for(search_form:, workflow_name:, process_name:)
+    end
     Rails.logger.info "Resetting workflow errors for #{workflow_name} - #{process_name} " \
                       "limited by #{search_form}: #{druids.join(', ')}"
 

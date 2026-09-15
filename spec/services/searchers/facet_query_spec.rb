@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::FacetQuery do
+  let(:user) { create(:user, :admin) }
   let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project') }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
@@ -19,6 +20,7 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
