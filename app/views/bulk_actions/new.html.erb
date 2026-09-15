@@ -58,6 +58,16 @@
             BulkActions::CREATE_VIRTUAL_OBJECT
           ]
         ) %>
+    <% if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+      <%= render BulkActions::ListSectionComponent.new(
+            label: 'Manage permissions',
+            classes: 'col-lg-4 col-md-6',
+            bulk_action_configs: [
+              BulkActions::IMPORT_READ_UNRESTRICTED_WORKGROUPS,
+              BulkActions::IMPORT_READ_RESTRICTED_AND_EDIT_PERMISSIONS
+            ]
+          ) %>
+    <% end %>
     <%= render BulkActions::ListSectionComponent.new(
           label: 'Tags and reporting',
           classes: 'col-lg-4 col-md-6',
