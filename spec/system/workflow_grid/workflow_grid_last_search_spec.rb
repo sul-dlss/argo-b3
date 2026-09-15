@@ -3,11 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Workflow grid with all scope', :solr do
+  let(:user) { create(:user, :reader) }
+
   before do
     create(:solr_item, :with_workflows, title: 'Mark Twain : portrait for orchestra')
     create(:solr_item, title: 'The Adventures of Mark Twain', workflows: ['accessionWF:update-doi:error'])
     create_list(:solr_item, 3, :with_workflows)
-    sign_in(create(:user))
+    sign_in(user)
 
     allow(Dor::Services::Client.workflows).to receive(:templates).and_return(['accessionWF'])
     allow(Dor::Services::Client.workflows).to receive(:template).with('accessionWF').and_return(ACCESSIONWF_TEMPLATE)
@@ -50,6 +52,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
     expect(ResetWorkflowErrorsJob).to have_received(:perform_later) do |args|
       expect(args[:workflow_name]).to eq('accessionWF')
       expect(args[:process_name]).to eq('update-doi')
+      expect(args[:effective_groups]).to eq(user.groups)
       expect(args[:search_form]).to be_a(SearchForm)
       expect(args[:search_form].attributes).to match({ 'query' => 'twain', 'page' => 1 })
     end

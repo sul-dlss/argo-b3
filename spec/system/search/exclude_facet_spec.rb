@@ -8,7 +8,7 @@ RSpec.describe 'Exclude facets', :solr do
 
   before do
     create_list(:solr_item, 3)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'returns facets' do

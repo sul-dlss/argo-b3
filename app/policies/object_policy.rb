@@ -19,24 +19,25 @@ class ObjectPolicy < ApplicationPolicy
   # permissions that target the object itself, one of its collections, or its
   # APO.
   def edit?
-    Permission.permission_type_edit.exists?(
-      workgroup: current_groups,
-      target_druid: permission_target_druids
-    )
+    permission_scope.edit_targets.intersect?(permission_target_druids)
   end
 
   private
+
+  def permission_scope
+    @permission_scope ||= Permissions::UserScope.new(groups: current_groups)
+  end
 
   def permission_target_druids
     [record_druid, *record_collection_druids, record_admin_policy_druid].compact.uniq
   end
 
   def read_restricted?
-    read_restricted_permissions.exists?(workgroup: user.groups)
+    permission_scope.restricted_targets.intersect?(permission_target_druids)
   end
 
   def read_unrestricted?
-    Permission.permission_type_read_unrestricted.exists?(workgroup: user.groups)
+    permission_scope.read_unrestricted?
   end
 
   def record_read_restricted?

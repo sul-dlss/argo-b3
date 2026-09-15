@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Languages facets', :solr do
   before do
     create(:solr_item)
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it_behaves_like 'a simple facet controller',

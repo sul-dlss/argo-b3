@@ -54,7 +54,7 @@ module Search
       # Note that this will override values specified in solrconfig.xml
       {
         q: search_form.query,
-        fq: filter_queries,
+        fq: (filter_queries + [permission_filter]).compact,
         debugQuery: search_form.debug,
         qf: query_fields,
         defType: 'dismax',
@@ -65,6 +65,10 @@ module Search
     private
 
     attr_reader :search_form
+
+    def permission_filter
+      PermissionFilter.call
+    end
 
     def filter_queries
       [].tap do |queries|
