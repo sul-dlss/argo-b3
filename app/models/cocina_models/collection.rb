@@ -4,6 +4,7 @@ module CocinaModels
   # Model for a Cocina Collection object.
   class Collection < Base
     include CatalogLinksConcern
+    include SourceIdConcern
 
     # @param cocina_object [Cocina::Models::CollectionWithMetadata] the Cocina object to build this model from
     def self.build_from_cocina_object(cocina_object)
@@ -13,10 +14,6 @@ module CocinaModels
 
       super
     end
-
-    attribute :source_id, :string
-    validates :source_id, presence: true
-    validates :source_id, format: { with: /\A.+:.+\z/ }
 
     # Access fields
     attribute :use_and_reproduction_statement, :string

@@ -6,6 +6,10 @@ RSpec.describe FormValidationAction do
   let(:user) { create(:user) }
   let(:form) { SearchForm.new(query: 'test', object_types: %w[collection item]) }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe 'validations' do
     subject(:form_validation_action) { described_class.new(user:) }
 

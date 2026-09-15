@@ -6,6 +6,10 @@ RSpec.describe PrevalidationConcern do
   # ItemRegistrationForm is used as a representative form that includes the concern.
   subject(:form) { ItemRegistrationForm.new(source_id: 'sul:1234', title: 'A title') }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe '#valid?' do
     context 'when the form is prevalidated' do
       before { form.prevalidated! }

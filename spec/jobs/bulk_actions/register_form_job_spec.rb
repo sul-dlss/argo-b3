@@ -40,6 +40,7 @@ RSpec.describe BulkActions::RegisterFormJob do
 
   before do
     allow(Sdr::Repository).to receive(:register).and_return(first_cocina_object, second_cocina_object)
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end

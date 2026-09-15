@@ -8,6 +8,10 @@ RSpec.describe ValidateFormJob do
   let(:user) { create(:user) }
   let(:form_validation_action) { FormValidationAction.create!(user:, form:, status: 'queued') }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe '#perform' do
     context 'when the form is valid' do
       let(:form) { SearchForm.new(query: 'test') }

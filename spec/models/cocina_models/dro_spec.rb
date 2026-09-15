@@ -10,6 +10,10 @@ RSpec.describe CocinaModels::Dro do
 
   let(:cocina_object) { build(:dro_with_metadata) }
 
+  before do
+    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
   describe '.build_from_cocina_object' do
     context 'with a valid Cocina::Models::DROWithMetadata' do
       it 'initializes with a Cocina::Models::DROWithMetadata' do

@@ -294,7 +294,10 @@ RSpec.describe FormErrorsSerializer do
                                   error_data: described_class.serialize(form).as_json)
     end
 
-    before { form.valid? }
+    before do
+      allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+      form.valid?
+    end
 
     it 'preserves the errors of the form and its nested forms' do
       expect(deserialized_form.errors.messages).to eq(form.errors.messages)
