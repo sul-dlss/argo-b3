@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/SubjectStub
+# rubocop:disable-next RSpec/SubjectStub
 RSpec.describe BulkActions::BaseCsvJobItem do
   subject(:job) { instance_double(BulkActions::BaseCsvJob, user:) }
 
@@ -39,4 +39,3 @@ RSpec.describe BulkActions::BaseCsvJobItem do
     end
   end
 end
-# rubocop:enable RSpec/SubjectStub
