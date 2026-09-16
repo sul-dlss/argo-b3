@@ -3,9 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Report do
+  let(:user) { create(:user, :admin) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:fields) { [Reports::Fields::DRUID.field, Reports::Fields::PURL.field] }
+
+  before { Current.effective_groups = user.groups }
 
   context 'when streaming results' do
     subject(:results) { described_class.call(search_form:, fields:, stream:, rows: 10) }
@@ -61,6 +64,25 @@ RSpec.describe Searchers::Report do
         expect(solr_query['wt']).to eq(:csv)
         expect(solr_query['csv.mv.separator']).to eq(';')
       end
+    end
+  end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let!(:visible_document) { create(:solr_item) }
+    let(:search_form) { SearchForm.new(query: 'Test') }
+
+    before do
+      Current.effective_groups = user.groups
+      create(:solr_item, apo_druid: restricted_apo_druid)
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'filters reports generated from a search to only readable items' do
+      report = described_class.call(search_form:, fields: [Search::Fields::ID], rows: 10)
+
+      expect(report.map(&:fields).flatten).to eq([visible_document.fetch(Search::Fields::ID)])
     end
   end
 end

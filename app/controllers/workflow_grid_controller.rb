@@ -4,7 +4,8 @@
 class WorkflowGridController < ApplicationController
   include SearchFormConcern
 
-  # Workflow grid doesn't require authorization.
+  # While any logged in user can see the workflow grid, the search scope for workflow counts and reset selections
+  # are restricted to readable objects by the currently logged in/impersonated user.
   skip_verify_authorized
 
   def show
@@ -29,7 +30,8 @@ class WorkflowGridController < ApplicationController
     @workflow_name = params[:workflow_name]
     @process_name = params[:process_name]
     ResetWorkflowErrorsJob.perform_later(search_form: @search_form, workflow_name: @workflow_name,
-                                         process_name: @process_name)
+                                         process_name: @process_name,
+                                         effective_groups: Current.effective_groups)
   end
 
   private

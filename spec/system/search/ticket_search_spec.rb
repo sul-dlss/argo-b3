@@ -9,7 +9,7 @@ RSpec.describe 'Project search', :solr do
     Search::Facets::TICKETS.limit = 5
     create_list(:solr_item, 6)
     create(:solr_item, tickets: ['TESTREQ-Z9'])
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
   end
 
   it 'returns ticket search results' do

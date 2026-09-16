@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::DruidList do
+  let(:user) { create(:user, :admin) }
   let(:druids) { described_class.call(search_form:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
@@ -19,6 +20,7 @@ RSpec.describe Searchers::DruidList do
   end
 
   before do
+    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -31,6 +33,26 @@ RSpec.describe Searchers::DruidList do
       expect(solr_query['q']).to eq(query)
       expect(solr_query['fl']).to eq([Search::Fields::ID])
       expect(solr_query['rows']).to eq(10_000_000)
+    end
+  end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let!(:visible_document) { create(:solr_item) }
+    let(:search_form) { SearchForm.new(query: 'Test') }
+
+    before do
+      Current.effective_groups = user.groups
+      allow(Search::SolrService).to receive(:post).and_call_original
+      create(:solr_item, apo_druid: restricted_apo_druid)
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'filters bulk-action and workflow selections to readable items' do
+      druids = described_class.call(search_form:)
+
+      expect(druids).to eq([visible_document.fetch(Search::Fields::ID)])
     end
   end
 end
