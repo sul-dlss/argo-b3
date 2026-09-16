@@ -38,7 +38,7 @@ RSpec.describe Searchers::Item do
       expect(facet_json).to include(
         Search::Fields::OBJECT_TYPES
       )
-      expect(solr_query['rows']).to eq(20)
+      expect(solr_query['rows']).to eq(50)
       expect(solr_query['start']).to eq(0)
     end
   end
@@ -62,7 +62,7 @@ RSpec.describe Searchers::Item do
       results
       expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
-        expect(solr_query['start']).to eq(40)
+        expect(solr_query['start']).to eq(100)
       end
     end
   end
