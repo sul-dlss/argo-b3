@@ -30,6 +30,19 @@ RSpec.describe DescriptiveCsv::Import do
     end
   end
 
+  context 'without a druid' do
+    let(:druid) { nil }
+    let(:csv) { CSV.parse("title1.value\nA title\n", headers: true) }
+
+    it 'returns a request description, which does not have a purl' do
+      result = described_class.import(csv_row: csv.first, druid:)
+
+      expect(result.value!).to be_a(Cocina::Models::RequestDescription)
+      expect(result.value!.to_h).not_to have_key(:purl)
+      expect(result.value!.title.first.value).to eq('A title')
+    end
+  end
+
   context 'with a valid csv' do
     let(:csv) do
       # From https://argo-stage.stanford.edu/view/druid:bb041bm1345

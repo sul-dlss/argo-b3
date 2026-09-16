@@ -53,8 +53,13 @@ RSpec.describe 'Create an item' do
       expect(page).to have_no_button('Previous')
 
       fill_in 'Source ID', with: 'new:source-id'
-      fill_in 'Title', with: 'The Title'
       select 'image', from: 'Content type'
+
+      click_button 'Next'
+      expect(page).to have_css('#description-tab.active')
+
+      # 'Enter title myself' is selected by default.
+      fill_in 'Title', with: 'The Title'
 
       click_button 'Next'
       expect(page).to have_css('#rights-tab.active')
@@ -140,6 +145,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -166,6 +173,8 @@ RSpec.describe 'Create an item' do
 
       choose 'Enter prefix to autogenerate source ID'
       fill_in 'Source ID prefix', with: 'new'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -183,10 +192,63 @@ RSpec.describe 'Create an item' do
       end
     end
 
+    it 'registers a valid cocina object with a Folio Instance HRID instead of a title' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      choose 'Use FOLIO Instance HRID to retrieve title'
+      fill_in 'Folio Instance HRID', with: 'in11403803'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Item registered.')
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        catalog_link = args[:request_cocina_object].identification.catalogLinks.first
+        expect(catalog_link.catalog).to eq('folio')
+        expect(catalog_link.catalogRecordId).to eq('in11403803')
+        expect(catalog_link.refresh).to be(true)
+      end
+    end
+
+    it 'registers a valid cocina object with a description from a spreadsheet' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      choose 'Upload description spreadsheet'
+      attach_file 'Upload a CSV file', file_fixture('item_description.csv')
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Item registered.')
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        description = args[:request_cocina_object].description
+        expect(description.title.first.value).to eq('A spreadsheet title')
+        expect(description.note.first.value).to eq('A note')
+      end
+    end
+
     it 'registers a valid cocina object with Stanford access' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -211,6 +273,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -235,6 +299,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -268,6 +334,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -290,6 +358,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -321,6 +391,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
@@ -344,8 +416,10 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
-      fill_in 'Title', with: 'The Title'
       select 'book', from: 'Content type'
+
+      find_by_id('description-tab').click
+      fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
       select apo_title, from: 'APO'
@@ -399,10 +473,68 @@ RSpec.describe 'Create an item' do
       find_by_id('deposit-tab').click
       click_button('Register only')
 
+      find_by_id('description-tab').click
       expect(page).to have_invalid_feedback('Title', "can't be blank")
 
       find_by_id('release-tab').click
       expect(page).to have_css('.invalid-feedback', text: 'At least one target must be selected')
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'requires a Folio Instance HRID instead of a title when retrieving the title from the catalog' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      choose 'Use FOLIO Instance HRID to retrieve title'
+      # Leaving Title and Folio Instance HRID blank.
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      find_by_id('description-tab').click
+      expect(page).to have_invalid_feedback('Folio Instance HRID', "can't be blank")
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'requires a description spreadsheet when uploading a description spreadsheet' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      choose 'Upload description spreadsheet'
+      # Leaving the spreadsheet unattached.
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      find_by_id('description-tab').click
+      expect(page).to have_invalid_feedback('Upload a CSV file', "can't be blank")
+
+      expect(Sdr::Repository).not_to have_received(:register)
+      expect(Sdr::Repository).not_to have_received(:accession)
+    end
+
+    it 'shows validation errors for a description spreadsheet without a title column' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      choose 'Upload description spreadsheet'
+      attach_file 'Upload a CSV file', file_fixture('item_description_invalid.csv')
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      find_by_id('description-tab').click
+      expect(page).to have_invalid_feedback('Upload a CSV file', 'Title column not found.')
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(Sdr::Repository).not_to have_received(:accession)
@@ -417,6 +549,8 @@ RSpec.describe 'Create an item' do
         visit new_item_path
 
         fill_in 'Source ID', with: 'new:source-id'
+
+        find_by_id('description-tab').click
         fill_in 'Title', with: 'The Title'
 
         find_by_id('deposit-tab').click
@@ -433,6 +567,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('tags-tab').click
@@ -454,6 +590,8 @@ RSpec.describe 'Create an item' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click

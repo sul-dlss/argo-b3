@@ -1,0 +1,71 @@
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      label: t('edit.items.fields.description_choice.label'),
+      mark_required: true,
+      data: { controller: 'radio' }
+    ) do %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :description_choice,
+        label_text: t('edit.items.fields.description_choice.title.label'),
+        input_value: ItemForm::DESCRIPTION_TITLE_CHOICE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'my-fieldset'
+      ) do |component| %>
+    <% component.with_additional_container_content do %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                                  label_text: t('edit.items.fields.title.label'),
+                                                                  label_mark_required: true,
+                                                                  container_classes: 'my-field') %>
+    <% end %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :description_choice,
+        label_text: t('edit.items.fields.description_choice.catalog_id.label'),
+        input_value: ItemForm::DESCRIPTION_CATALOG_ID_CHOICE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'my-fieldset'
+      ) do |component| %>
+    <% component.with_additional_container_content do %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_record_id,
+                                                                  label_text: t('edit.items.fields.catalog_record_id.label'),
+                                                                  label_mark_required: true,
+                                                                  container_classes: 'my-field') %>
+
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
+                                                                  label_text: t('edit.items.fields.barcode.label'),
+                                                                  container_classes: 'my-field') %>
+
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(classes: 'my-fieldset', legend_classes: 'fw-normal') do |component| %>
+        <% component.with_legend do %><%= t('edit.items.fields.serials.label') %><% end %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_link_part_label,
+                                                                    label_text: t('edit.items.fields.part_label.label'),
+                                                                    container_classes: 'my-field') %>
+
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_link_sort_key,
+                                                                    label_text: t('edit.items.fields.sort_key.label'),
+                                                                    container_classes: 'my-field') %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :description_choice,
+        label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
+        input_value: ItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
+        input_data: { radio_target: 'radio', action: 'radio#toggle' },
+        container_classes: 'my-fieldset'
+      ) do |component| %>
+    <% component.with_additional_container_content do %>
+      <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                             field_name: :description_csv_file,
+                                                             container_classes: 'my-field',
+                                                             label_text: t('edit.items.fields.description_csv_file.label'),
+                                                             label_hidden: true) %>
+    <% end %>
+  <% end %>
+
+<% end %>

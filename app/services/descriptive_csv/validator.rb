@@ -3,9 +3,12 @@
 module DescriptiveCsv
   # Validate the descriptive metadata spreadsheet
   class Validator # rubocop:disable Metrics/ClassLength
+    # @param csv [CSV::Table] the parsed descriptive metadata spreadsheet
+    # @param bulk_job [Boolean] whether the spreadsheet is for a bulk job, which additionally
+    #   requires a druid column identifying the object each row describes
     def initialize(csv, bulk_job: false)
       @headers = csv.headers
-      @bulk_job = bulk_job # indicates if validating from a bulk job
+      @bulk_job = bulk_job
       @errors = []
       # CSV::Row#[] (and CSV::Row#to_h, which calls it internally) does a linear scan
       # over the row's headers, so repeatedly looking up cells by header name is
@@ -16,6 +19,9 @@ module DescriptiveCsv
       @rows = csv.map { |row| row.to_a.to_h }
     end
 
+    # Runs all of the validations, accumulating their messages in #errors. Must be called before
+    # #errors, which is empty until then.
+    # @return [Boolean] true if the spreadsheet has no validation errors
     def valid?
       validate_duplicate_headers
       validate_title_headers
@@ -33,6 +39,8 @@ module DescriptiveCsv
       errors.empty?
     end
 
+    # @return [Array<String>] the validation error messages accumulated by #valid?, deduplicated
+    #   because a single problem can be reported by more than one validation
     def errors
       @errors.uniq
     end

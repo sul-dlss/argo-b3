@@ -9,6 +9,9 @@ RSpec.describe ItemForm do
       source_id_choice:,
       source_id_prefix:,
       title:,
+      description_choice:,
+      catalog_record_id:,
+      description_csv_file:,
       apo_druid: 'druid:bc123df4567',
       content_type: Cocina::Models::ObjectType.object,
       access_view: 'world',
@@ -17,6 +20,9 @@ RSpec.describe ItemForm do
   end
 
   let(:title) { 'The Title' }
+  let(:description_choice) { ItemForm::DESCRIPTION_TITLE_CHOICE }
+  let(:catalog_record_id) { nil }
+  let(:description_csv_file) { nil }
   let(:source_id) { 'new:source-id' }
   let(:source_id_choice) { ItemForm::SOURCE_ID_PROVIDED_CHOICE }
   let(:source_id_prefix) { nil }
@@ -50,11 +56,137 @@ RSpec.describe ItemForm do
       end
     end
 
+    context 'when blank and description choice is not title' do
+      let(:title) { nil }
+      let(:description_choice) { ItemForm::DESCRIPTION_CATALOG_ID_CHOICE }
+      let(:catalog_record_id) { 'in11403803' }
+
+      it 'is valid' do
+        expect(item_form).to be_valid
+      end
+    end
+
     context 'when surrounded by whitespace' do
       let(:title) { '  The Title  ' }
 
       it 'is normalized by stripping whitespace' do
         expect(item_form.title).to eq('The Title')
+      end
+    end
+  end
+
+  describe 'description_csv_file' do
+    let(:description_choice) { ItemForm::DESCRIPTION_SPREADSHEET_CHOICE }
+    let(:title) { nil }
+    let(:description_csv_file) { fixture_file_upload('item_description.csv', 'text/csv') }
+
+    context 'when a valid spreadsheet is provided' do
+      it 'is valid and populates the description from the spreadsheet' do
+        expect(item_form).to be_valid
+        expect(item_form.description_hash[:title].first).to include(value: 'A spreadsheet title')
+        expect(item_form.description_hash[:note].first).to include(value: 'A note', type: 'summary')
+      end
+
+      it 'does not include a purl, which a registration request does not allow' do
+        item_form.valid?
+        expect(item_form.description_hash).not_to have_key(:purl)
+      end
+    end
+
+    context 'when blank' do
+      let(:description_csv_file) { nil }
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(["can't be blank"])
+      end
+    end
+
+    context 'when blank and description choice is not spreadsheet' do
+      let(:description_choice) { ItemForm::DESCRIPTION_TITLE_CHOICE }
+      let(:title) { 'The Title' }
+      let(:description_csv_file) { nil }
+
+      it 'is valid' do
+        expect(item_form).to be_valid
+      end
+    end
+
+    context 'when the spreadsheet is not valid' do
+      let(:description_csv_file) { fixture_file_upload('item_description_invalid.csv', 'text/csv') }
+
+      it 'is not valid and does not populate the description' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(['Title column not found.'])
+        expect(item_form.description_hash).to eq(title: [{ value: ':auto' }])
+      end
+    end
+
+    context 'when the spreadsheet has more than one row' do
+      let(:description_csv_file) { fixture_file_upload('item_description_multiple_rows.csv', 'text/csv') }
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(['Only one row of description is allowed.'])
+      end
+    end
+
+    context 'when the spreadsheet has no rows' do
+      let(:description_csv_file) { fixture_file_upload('item_description_no_rows.csv', 'text/csv') }
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(['Description row not found.'])
+      end
+    end
+
+    context 'when the spreadsheet has a title column but no title value' do
+      let(:description_csv_file) { fixture_file_upload('item_description_no_title_value.csv', 'text/csv') }
+
+      it 'is not valid and does not populate the description' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(['Title value not found.'])
+        expect(item_form.description_hash).to eq(title: [{ value: ':auto' }])
+      end
+    end
+
+    context 'when the description cannot be imported' do
+      before do
+        allow(DescriptiveCsv::Import).to receive(:import).and_return(Dry::Monads::Failure(['Nope.']))
+      end
+
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:description_csv_file]).to eq(['Nope.'])
+      end
+    end
+  end
+
+  describe 'catalog_record_id' do
+    let(:description_choice) { ItemForm::DESCRIPTION_CATALOG_ID_CHOICE }
+    let(:title) { nil }
+
+    context 'when present' do
+      let(:catalog_record_id) { 'in11403803' }
+
+      it 'is valid' do
+        expect(item_form).to be_valid
+      end
+    end
+
+    context 'when blank' do
+      it 'is not valid' do
+        expect(item_form).not_to be_valid
+        expect(item_form.errors[:catalog_record_id]).to include("can't be blank")
+      end
+    end
+
+    context 'when blank and description choice is not catalog id' do
+      let(:description_choice) { ItemForm::DESCRIPTION_TITLE_CHOICE }
+      let(:title) { 'The Title' }
+
+      it 'is valid' do
+        expect(item_form).to be_valid
       end
     end
   end
@@ -298,7 +430,32 @@ RSpec.describe ItemForm do
     end
   end
 
-  describe 'populate_description_hash' do
+  describe 'populate_folio_catalog_link' do
+    let(:title) { nil }
+    let(:catalog_record_id) { 'in11403803' }
+
+    context 'when description choice is catalog id' do
+      let(:description_choice) { ItemForm::DESCRIPTION_CATALOG_ID_CHOICE }
+
+      it 'builds a folio catalog link and requests a catalog refresh on validation' do
+        item_form.valid?
+        expect(item_form.folio_catalog_links.map(&:catalog_record_id)).to eq(['in11403803'])
+        expect(item_form.catalog_link_refresh).to be(true)
+      end
+    end
+
+    context 'when description choice is not catalog id' do
+      let(:description_choice) { ItemForm::DESCRIPTION_SPREADSHEET_CHOICE }
+
+      it 'does not build a folio catalog link' do
+        item_form.valid?
+        expect(item_form.folio_catalog_links).to be_empty
+        expect(item_form.catalog_link_refresh).to be(false)
+      end
+    end
+  end
+
+  describe 'populate_description_hash_from_title' do
     context 'when title is present' do
       it 'sets description_hash from title on validation' do
         item_form.valid?
@@ -308,6 +465,14 @@ RSpec.describe ItemForm do
 
     context 'when title is blank' do
       let(:title) { nil }
+
+      it 'does not overwrite description_hash' do
+        expect { item_form.valid? }.not_to(change(item_form, :description_hash))
+      end
+    end
+
+    context 'when description choice is not title' do
+      let(:description_choice) { ItemForm::DESCRIPTION_CATALOG_ID_CHOICE }
 
       it 'does not overwrite description_hash' do
         expect { item_form.valid? }.not_to(change(item_form, :description_hash))

@@ -117,6 +117,8 @@ en:
           help_text: >-
             Complete registration of your item. Choose 'Register and add files' to proceed with your deposit. If you're not
             ready to deposit your item, choose 'Register only' to return to it later.
+        description:
+          label: "Description"
         details:
           label: "Item details"
         release:
@@ -135,21 +137,41 @@ en:
         barcode:
           label: "Barcode"
         catalog_record_id:
-          label: "Folio instance HRID"
+          label: "Folio Instance HRID"
           validations:
             not_found: "was not found in FOLIO"
         content_type:
           label: "Content type"
         copyright:
           label: "Copyright"
+        description_choice:
+          label: "How would you like to enter description?"
+          catalog_id:
+            label: 'Use FOLIO Instance HRID to retrieve title'
+          spreadsheet:
+            label: 'Upload description spreadsheet'
+          title:
+            label: 'Enter title myself'
+        description_csv_file:
+          label: "Upload a CSV file"
+          validations:
+            extra_rows: "Only one row of description is allowed."
+            missing_title: "Title value not found."
+            no_rows: "Description row not found."
         license:
           label: "License"
           label_caption: "Get help selecting a license"
           help_text: "Assigning a license may improve discovery of your work in web searches."
         other_tag:
           label: 'Tag'
+        part_label:
+          label: 'Part label'
         project_tag:
           label: 'Project name'
+        serials:
+          label: 'Serials metadata'
+        sort_key:
+          label: 'Sort key'
         source_id:
           label: "Source ID"
           validations:
