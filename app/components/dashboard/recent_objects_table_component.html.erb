@@ -19,7 +19,7 @@
         <%= object_doc.bare_druid %>
       <% end %>
       <% row_component.with_cell do %>
-        <%= object_type_label(object_doc) %>
+        <%= object_doc.object_type_label %>
       <% end %>
       <% row_component.with_cell do %>
         <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: Array(object_doc.all_tags)) %>

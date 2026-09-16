@@ -12,7 +12,6 @@
         <% end %>
 
         <% component.with_row(label: 'DRUID', values: [druid]) %>
-        <% component.with_row(label: 'Object Type', value: result.object_types) %>
 
         <%# Only items have content types. %>
         <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
@@ -31,7 +30,10 @@
         <% component.with_row(label: 'Old Argo', values: [helpers.link_to_old_argo(title, druid)]) %>
       <% end %>
     </div>
-    <div class="col-md-2 mx-auto align-self-center">
+    <div class="col-md-2 mx-auto align-self-start pt-5 <%= result.object_type_class %>">
+      <div class="object-type-bg fw-bold text-center text-uppercase rounded-pill small px-3 py-1 mb-3">
+        <%= result.object_type_label %>
+      </div>
       <%= render ThumbnailComponent.new(result:) %>
     </div>
   </div>

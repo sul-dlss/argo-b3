@@ -19,7 +19,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       expect(caption).to have_link('Test Title', href: "/objects/#{druid}?search_position=2")
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'DRUID', druid)
-      expect(page).to have_table_value('item-result-bb123cd4567', 'Object Type', 'item')
+      expect(page).to have_css('.object-type-item .rounded-pill', text: 'Item')
       expect(find_table_value_cell('item-result-bb123cd4567', 'APO'))
         .to have_link('University Archives', href: "/objects/#{apo_druid}")
       expect(page).to have_table_value('item-result-bb123cd4567', 'Content Type', 'book')

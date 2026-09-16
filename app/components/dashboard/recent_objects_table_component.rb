@@ -17,9 +17,5 @@ module Dashboard
     def title_link(object_doc)
       helpers.link_to_object(object_doc.title, object_doc.druid)
     end
-
-    def object_type_label(object_doc)
-      SolrDocPresenter::OBJECT_TYPES.fetch(object_doc.object_type).fetch(:label)
-    end
   end
 end
