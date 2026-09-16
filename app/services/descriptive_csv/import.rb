@@ -12,11 +12,22 @@ module DescriptiveCsv
       new(csv_row:, druid:).import
     end
 
+    # @param csv_row [CSV::Row] a row of descriptive metadata, with headers as flattened Cocina addresses
+    #   (e.g. "title1:value")
+    # @param druid [String, nil] the druid of the object the description is for, used to derive its purl.
+    #   See #import for the effect of a nil druid.
     def initialize(csv_row:, druid:)
       @csv_row = csv_row
       @druid = druid
     end
 
+    # Expands the flattened headers of the CSV row into the nested structure of a Cocina Description.
+    # Headers are processed in address order so that parent nodes are created before their children.
+    # When there is no druid (an object that has not been registered yet), there is no purl, so a
+    # RequestDescription is returned instead of a Description.
+    # @return [Dry::Monads::Result] Success with a Cocina::Models::Description (or a
+    #   Cocina::Models::RequestDescription when there is no druid), or Failure with an Array of error
+    #   messages if the description is not valid Cocina
     def import # rubocop: disable Metrics/AbcSize
       params = {}
 
@@ -29,14 +40,19 @@ module DescriptiveCsv
         visit(params, split_address(address), @csv_row[address]) if @csv_row[address]
       end
 
-      params[:purl] = Cocina::Models::Mapping::Purl.for(druid: @druid)
+      params[:purl] = Cocina::Models::Mapping::Purl.for(druid: @druid) if @druid
 
-      Success(ImportFilter.filter(compact_params(params)))
+      Success(ImportFilter.filter(compact_params(params), model: description_model))
     rescue Cocina::Models::ValidationError => e
       Failure([e.message])
     end
 
     private
+
+    # A RequestDescription is a Description without a purl.
+    def description_model
+      @druid.nil? ? Cocina::Models::RequestDescription : Cocina::Models::Description
+    end
 
     def split_address(address)
       address.scan(/[[:alpha:]]+|[[:digit:]]+/)

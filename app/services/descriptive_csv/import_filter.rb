@@ -5,11 +5,12 @@ module DescriptiveCsv
   # Typically this is for things like a date has a type (e.g. "created"), but no value.
   class ImportFilter
     # @param compacted_params [Hash]
-    # @return [Cocina::Model::Description]
+    # @param model [Class] the Cocina description model to build
+    # @return [Cocina::Models::Description, Cocina::Models::RequestDescription]
     # @raises Cocina::Models::ValidationError
-    def self.filter(compacted_params)
-      new.filter(compacted_params)
-      Cocina::Models::Description.new(compacted_params)
+    def self.filter(compacted_params, model: Cocina::Models::Description)
+      new.filter(compacted_params, model:)
+      model.new(compacted_params)
     end
 
     ATTRIBUTES_TO_FILTER = {

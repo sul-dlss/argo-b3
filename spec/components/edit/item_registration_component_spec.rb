@@ -15,6 +15,6 @@ RSpec.describe Edit::ItemRegistrationComponent, type: :component do
     expect(page).to have_field('Title', type: 'text', with: 'A title')
     expect(page).to have_field('Source ID', type: 'text', with: 'sul:1234')
     expect(page).to have_field('Barcode', type: 'text', with: '36105212345678')
-    expect(page).to have_field('Folio instance HRID', type: 'text')
+    expect(page).to have_field('Folio Instance HRID', type: 'text')
   end
 end

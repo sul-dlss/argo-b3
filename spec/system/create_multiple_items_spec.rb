@@ -66,7 +66,7 @@ RSpec.describe 'Create multiple items' do
 
       within(all('.form-instance').last) do
         fill_in 'Source ID', with: 'sul:second-item'
-        fill_in 'Folio instance HRID', with: 'in11403803'
+        fill_in 'Folio Instance HRID', with: 'in11403803'
         fill_in 'Barcode', with: '36105212345678'
       end
     end
@@ -110,7 +110,7 @@ RSpec.describe 'Create multiple items' do
       add_item_row
 
       within(all('.form-instance').last) do
-        # Leaving Title and Folio instance HRID blank.
+        # Leaving Title and Folio Instance HRID blank.
         fill_in 'Source ID', with: 'sul:second-item'
       end
     end
