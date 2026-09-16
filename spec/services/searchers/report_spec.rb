@@ -66,4 +66,23 @@ RSpec.describe Searchers::Report do
       end
     end
   end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let!(:visible_document) { create(:solr_item) }
+    let(:search_form) { SearchForm.new(query: 'Test') }
+
+    before do
+      Current.effective_groups = user.groups
+      create(:solr_item, apo_druid: restricted_apo_druid)
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'filters reports generated from a search to only readable items' do
+      report = described_class.call(search_form:, fields: [Search::Fields::ID], rows: 10)
+
+      expect(report.map(&:fields).flatten).to eq([visible_document.fetch(Search::Fields::ID)])
+    end
+  end
 end

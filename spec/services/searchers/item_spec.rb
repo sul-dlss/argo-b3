@@ -66,4 +66,35 @@ RSpec.describe Searchers::Item do
       end
     end
   end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let!(:visible_document) { create(:solr_item) }
+    let(:search_form) { SearchForm.new(query: 'Test') }
+
+    before do
+      Current.effective_groups = user.groups
+      allow(Search::SolrService).to receive(:post).and_call_original
+      create(:solr_item, apo_druid: restricted_apo_druid, content_type: 'image')
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'filters results, counts, and facets to only readable items' do
+      results = described_class.call(search_form:)
+
+      expect(results.map(&:druid)).to eq([visible_document.fetch(Search::Fields::ID)])
+      expect(results.total_results).to eq(1)
+      expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))
+        .to eq([{ 'val' => 'book', 'count' => 1 }])
+    end
+
+    it 'retains authorization when a facet excludes its own selected filter' do
+      results = described_class.call(search_form: SearchForm.new(query: 'Test', content_types: ['image']))
+
+      expect(results.total_results).to eq(0)
+      expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))
+        .to eq([{ 'val' => 'book', 'count' => 1 }])
+    end
+  end
 end

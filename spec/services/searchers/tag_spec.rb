@@ -48,4 +48,24 @@ RSpec.describe Searchers::Tag do
         .with(request: hash_including(debugQuery: true))
     end
   end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+
+    before do
+      Current.effective_groups = user.groups
+      allow(Search::SolrService).to receive(:post).and_call_original
+      create(:solr_item, projects: ['Visible project'])
+      create(:solr_item, apo_druid: restricted_apo_druid, projects: ['Hidden project'])
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'only returns project tags for readable items' do
+      tags = described_class.call(search_form: SearchForm.new(query: 'project'),
+                                  field: Search::Fields::PROJECTS_EXPLODED)
+
+      expect(tags.to_a).to eq(['Visible project'])
+    end
+  end
 end

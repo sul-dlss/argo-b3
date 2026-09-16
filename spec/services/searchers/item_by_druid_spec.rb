@@ -35,4 +35,24 @@ RSpec.describe Searchers::ItemByDruid do
       expect(solr_query['rows']).to eq(2)
     end
   end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let!(:visible_document) { create(:solr_item) }
+    let!(:hidden_document) { create(:solr_item, apo_druid: restricted_apo_druid) }
+
+    before do
+      Current.effective_groups = user.groups
+      allow(Search::SolrService).to receive(:post).and_call_original
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'only returns readable items from the supplied druids' do
+      druids = [visible_document, hidden_document].pluck(Search::Fields::ID)
+      results = described_class.call(druids:)
+
+      expect(results.map(&:druid)).to eq([visible_document.fetch(Search::Fields::ID)])
+    end
+  end
 end
