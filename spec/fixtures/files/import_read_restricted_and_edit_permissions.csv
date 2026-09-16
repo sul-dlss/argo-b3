@@ -1,0 +1,4 @@
+permission_type,druid,workgroup
+read_restricted,druid:bc123df4567,sdr:baker-staff
+edit,druid:bc123df4567,sdr:hoover-staff
+,druid:dd456gh7890,sdr:baker-staff
