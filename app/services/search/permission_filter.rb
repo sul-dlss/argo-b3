@@ -23,8 +23,10 @@ module Search
 
       if @scope.read_unrestricted?
         restricted_query = target_query(@scope.all_restricted_targets)
+        return if restricted_query.nil? # no filtering required if aren't any restricted objects for read_unrestricted
+
         # read_unrestricted will match all objects except those governed by object/collection/APOs marked as restricted
-        queries << (restricted_query ? "(*:* AND NOT #{restricted_query})" : '*:*')
+        queries << "(*:* AND NOT #{restricted_query})"
       end
       queries.compact!
 
@@ -37,6 +39,9 @@ module Search
 
     private
 
+    # Builds a query matching target druids from permission records (`Permission`) against
+    # an object's druid, collection druids, or governing APO druid.
+    # Returns nil if no targets, so the caller can distinguish no specific targeted access from a match-all query.
     def target_query(targets)
       return if targets.empty?
 

@@ -15,7 +15,7 @@ RSpec.describe 'Search and report permissions', :solr do
     sign_in(user)
   end
 
-  it 'only renders readable items through the search endpoint' do
+  it 'only returns readable items through the search endpoint' do
     get search_items_path, params: { query: 'item' }
 
     expect(response).to have_http_status(:ok)
@@ -23,7 +23,7 @@ RSpec.describe 'Search and report permissions', :solr do
     expect(response.body).not_to include('Hidden item')
   end
 
-  it 'only suggests projects found on readable items' do
+  it 'only returns project search results from readable objects' do
     get search_projects_path, params: { query: 'project' }
 
     expect(response).to have_http_status(:ok)
