@@ -3,6 +3,14 @@
 module SearchResults
   # Search results for an item (DROs, collections, or APOs)
   class Item
+    OBJECT_TYPES = {
+      'item' => { label: 'Item', css_class: 'object-type-item' },
+      'collection' => { label: 'Collection', css_class: 'object-type-collection' },
+      'APO' => { label: 'APO', css_class: 'object-type-apo' },
+      'agreement' => { label: 'Agreement', css_class: 'object-type-agreement' },
+      'virtual object' => { label: 'Virtual object', css_class: 'object-type-virtual-object' }
+    }.freeze
+
     def initialize(solr_doc:, index: nil)
       @solr_doc = solr_doc
       @index = index
@@ -14,6 +22,14 @@ module SearchResults
 
     def druid
       solr_doc[Search::Fields::ID]
+    end
+
+    def object_type_label
+      OBJECT_TYPES.fetch(object_type).fetch(:label)
+    end
+
+    def object_type_class
+      OBJECT_TYPES.fetch(object_type).fetch(:css_class)
     end
 
     # Derive a getter method from the constant for a field in Search::Fields.
