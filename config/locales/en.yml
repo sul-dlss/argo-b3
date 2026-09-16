@@ -136,6 +136,8 @@ en:
           label: "Barcode"
         catalog_record_id:
           label: "Folio instance HRID"
+          validations:
+            not_found: "was not found in FOLIO"
         content_type:
           label: "Content type"
         copyright:
@@ -163,6 +165,8 @@ en:
           label: 'Ticket'
         title:
           label: "Title"
+          validations:
+            required: "title is required if a FOLIO Instance HRID is not provided"
         use_and_reproduction_statement:
           label: "Use and reproduction"
     multiple_items:
@@ -177,7 +181,6 @@ en:
           Fix the errors or delete items below and click "%{register_label}" again, or click "%{clear_label}."
       validations:
         no_items: "at least one item is required"
-        title_required: "title is required if a FOLIO Instance HRID is not provided"
   access:
     locations:
       spec: "Special collections"

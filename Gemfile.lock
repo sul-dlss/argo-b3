@@ -168,6 +168,7 @@ GEM
     deprecation (1.1.0)
       activesupport
     diff-lcs (1.6.2)
+    domain_name (0.6.20260907)
     dor-services-client (15.67.0)
       activesupport (>= 7.0.0)
       cocina-models (~> 0.133.0)
@@ -231,6 +232,9 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
+    faraday-cookie_jar (0.0.8)
+      faraday (>= 0.8.0)
+      http-cookie (>= 1.0.0)
     faraday-net_http (3.4.4)
       net-http (~> 0.5)
     faraday-retry (2.4.0)
@@ -243,6 +247,15 @@ GEM
     ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
     ffi (1.17.4-x86_64-linux-musl)
+    folio_client (1.2.0)
+      activesupport (>= 4.2)
+      deprecation
+      dry-monads
+      faraday
+      faraday-cookie_jar
+      marc
+      ostruct
+      zeitwerk
     fugit (1.14.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
@@ -265,6 +278,8 @@ GEM
       ostruct
     htmlbeautifier (1.4.3)
     htmlentities (4.4.2)
+    http-cookie (1.1.6)
+      domain_name (~> 0.5)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -338,6 +353,9 @@ GEM
       net-imap
       net-pop
       net-smtp
+    marc (1.4.0)
+      nokogiri (~> 1.0)
+      rexml
     marcel (1.2.1)
     matrix (0.4.3)
     mini_mime (1.1.5)
@@ -712,6 +730,7 @@ DEPENDENCIES
   dry-monads
   erb_lint
   factory_bot_rails
+  folio_client
   herb
   honeybadger
   importmap-rails

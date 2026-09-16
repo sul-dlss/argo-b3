@@ -19,6 +19,7 @@ env:
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-prod.stanford.edu
     SETTINGS__STACKS__URL: https://stacks.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
+    SETTINGS__FOLIO__OKAPI__URL: https://folio-prod-api.stanford.edu
 
     DATABASE_HOSTNAME: argo-b3-db-prod-a
 
