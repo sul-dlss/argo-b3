@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/SubjectStub
+# rubocop:disable-next RSpec/SubjectStub
 RSpec.describe Sdr::VersionService do
   subject(:service) { described_class.new(druid:) }
 
@@ -67,4 +67,3 @@ RSpec.describe Sdr::VersionService do
     end
   end
 end
-# rubocop:enable RSpec/SubjectStub

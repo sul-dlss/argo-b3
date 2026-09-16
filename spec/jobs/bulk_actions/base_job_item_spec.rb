@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/SubjectStub
+# rubocop:disable-next RSpec/SubjectStub
 RSpec.describe BulkActions::BaseJobItem do
   subject(:bulk_action_item) { described_class.new(druid:, index: 2, job:) }
 
@@ -274,4 +274,3 @@ RSpec.describe BulkActions::BaseJobItem do
     end
   end
 end
-# rubocop:enable RSpec/SubjectStub

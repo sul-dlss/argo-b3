@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/IndexedLet
+# rubocop:disable-next RSpec/IndexedLet
 RSpec.describe DescriptiveCsv::DescriptionsGrouper do
   subject(:run) { described_class.group(descriptions:) }
 
@@ -1295,4 +1295,3 @@ RSpec.describe DescriptiveCsv::DescriptionsGrouper do
     end
   end
 end
-# rubocop:enable RSpec/IndexedLet

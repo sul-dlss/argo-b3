@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/IndexedLet
+# rubocop:disable-next RSpec/IndexedLet
 RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
   subject(:job) { described_class.new(bulk_action:, druids:) }
 
@@ -107,4 +107,3 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
     end
   end
 end
-# rubocop:enable RSpec/IndexedLet
