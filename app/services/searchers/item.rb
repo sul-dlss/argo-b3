@@ -63,7 +63,7 @@ module Searchers
       Search::ItemQueryBuilder.call(search_form:).merge(
         {
           fl: FIELD_LIST,
-          rows:,
+          rows: PER_PAGE,
           start:,
           sort:,
           'json.facet': facet_json
@@ -75,17 +75,13 @@ module Searchers
       Search::FacetsBuilder.call(facet_configs: FACETS).to_json
     end
 
-    def rows
-      search_form.blank? ? 0 : PER_PAGE
-    end
-
     # @return [String, nil] Solr sort value or nil if none
     def sort
       Search::SortOptions.find_config_by_sort_field(search_form.sort)&.sort_value
     end
 
     def start
-      (search_form.page - 1) * rows
+      (search_form.page - 1) * PER_PAGE
     end
   end
 end
