@@ -5,9 +5,9 @@
       <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.edit_item'),
                                                                   variant: :'outline-primary', size: :sm,
                                                                   disabled: true) %>
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: I18n.t('show.status.actions.manage_files'),
-                                                                      link: edit_content_path(druid),
-                                                                      variant: :'outline-primary', size: :sm) %>
+      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.manage_files'),
+                                                                  variant: :'outline-primary', size: :sm,
+                                                                  disabled: true) %>
       <% if status == :draft %>
         <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
                                                                     variant: :primary, size: :sm, disabled: true) %>
