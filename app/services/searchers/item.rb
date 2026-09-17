@@ -3,7 +3,7 @@
 module Searchers
   # Searcher for items (DROs, collections, or APOs)
   class Item
-    PER_PAGE = 20
+    PER_PAGE = 50
 
     # fl fields to request from Solr
     FIELD_LIST = [
