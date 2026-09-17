@@ -2,7 +2,7 @@
 
 module CocinaModels
   # Base class for catalog link models (symphony and folio variants).
-  class CatalogLinkBase < Blanks::Base
+  class CatalogLinkBase < Voids::Base
     attribute :catalog_record_id, :string
     attribute :refresh, :boolean, default: false
 

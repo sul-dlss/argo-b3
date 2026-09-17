@@ -4,7 +4,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 ## Architecture
 
 - Domain behavior usually lives in Cocina-backed Active Model form objects and presenters rather than conventional Active Record models.
-- See the blanks gem (https://github.com/joshmn/blanks) for the implementation of the form objects, which are similar to Active Record models.
+- See the Voids gem (https://github.com/sul-dlss/voids) for the implementation of the form objects, which are similar to Active Record models.
 
 ## Conventions
 
