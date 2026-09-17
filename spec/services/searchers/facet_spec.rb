@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Facet do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(search_form:, facet_config:) }
+  let(:workgroups) { user.groups }
+  let(:results) { described_class.call(search_form:, facet_config:, workgroups:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:facet_config) { Search::Facets::Config.new(field: Search::Fields::PROJECTS_EXPLODED) }
@@ -22,7 +23,6 @@ RSpec.describe Searchers::Facet do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -61,7 +61,7 @@ RSpec.describe Searchers::Facet do
   end
 
   context 'when limit is provided' do
-    let(:results) { described_class.call(search_form:, facet_config:, limit: 5) }
+    let(:results) { described_class.call(search_form:, facet_config:, workgroups:, limit: 5) }
 
     it 'includes limit in the Solr request' do
       results

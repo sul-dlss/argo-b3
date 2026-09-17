@@ -4,7 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Searchers::FacetQuery do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project') }
+  let(:workgroups) { user.groups }
+  let(:results) do
+    described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', workgroups:)
+  end
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
@@ -20,7 +23,6 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -44,7 +46,10 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   context 'when alpha_sort is true' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', alpha_sort: true) }
+    let(:results) do
+      described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project',
+                           workgroups:, alpha_sort: true)
+    end
 
     it 'includes sort in the Solr request' do
       results
@@ -56,7 +61,10 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   context 'when limit is provided' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', limit: 5) }
+    let(:results) do
+      described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project',
+                           workgroups:, limit: 5)
+    end
 
     it 'includes limit in the Solr request' do
       results

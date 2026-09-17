@@ -54,7 +54,8 @@ class DashboardController < ApplicationController
     @recent_object_docs = if recent_object_druids.present?
                             recent_object_docs = Searchers::ItemByDruid.call(
                               druids: recent_object_druids,
-                              fields: RECENT_OBJECT_FIELDS
+                              fields: RECENT_OBJECT_FIELDS,
+                              workgroups:
                             )
                             docs_by_druid = recent_object_docs.index_by(&:druid)
                             recent_object_druids.filter_map { |druid| docs_by_druid[druid] }
@@ -74,8 +75,11 @@ class DashboardController < ApplicationController
   def set_pinned_object_docs
     pinned_object_druids = PinnedObject.where(user: current_user).pluck(:druid)
     grouped_pinned_object_docs = if pinned_object_druids.present?
-                                   pinned_object_docs = Searchers::ItemByDruid.call(druids: pinned_object_druids,
-                                                                                    fields: PINNED_OBJECT_FIELDS)
+                                   pinned_object_docs = Searchers::ItemByDruid.call(
+                                     druids: pinned_object_druids,
+                                     fields: PINNED_OBJECT_FIELDS,
+                                     workgroups:
+                                   )
                                    pinned_object_docs.group_by(&:object_type)
                                  else
                                    {}

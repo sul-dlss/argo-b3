@@ -6,7 +6,8 @@ module Search
     layout false
 
     def index
-      @tickets = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::TICKETS)
+      @tickets = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::TICKETS,
+                                     workgroups:)
     end
   end
 end

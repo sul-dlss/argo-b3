@@ -43,6 +43,11 @@ module Authentication
 
   private
 
+  # the currently logged in (or impersonated) user's workgroups for use in permission filtering of results
+  def workgroups
+    Current.effective_groups
+  end
+
   def remote_user
     return ENV.fetch('EMAIL') if Rails.env.development?
 

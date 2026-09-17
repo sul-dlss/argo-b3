@@ -11,11 +11,13 @@ module Searchers
 
     # @param search_form [SearchForm]
     # @param facet_config [Search::Facets::FacetConfig] configuration for the facet
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
     # @param limit [Integer, nil] maximum number of facet values to return
     # @param page [Integer, nil] optional page number for paged facets
-    def initialize(search_form:, facet_config:, limit: nil, page: nil)
+    def initialize(search_form:, facet_config:, workgroups:, limit: nil, page: nil)
       @search_form = search_form
       @facet_config = facet_config
+      @workgroups = workgroups
       @limit = limit || facet_config.limit
       @page = page
     end
@@ -27,7 +29,7 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :facet_config, :limit, :page
+    attr_reader :search_form, :facet_config, :workgroups, :limit, :page
 
     delegate :field, :alpha_sort, to: :facet_config
 
@@ -36,7 +38,7 @@ module Searchers
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, workgroups:).merge(
         {
           'json.facet': facet_json.to_json,
           rows: 0

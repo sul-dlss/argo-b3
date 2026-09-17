@@ -52,7 +52,7 @@ RSpec.describe 'Workflow grid with all scope', :solr do
     expect(ResetWorkflowErrorsJob).to have_received(:perform_later) do |args|
       expect(args[:workflow_name]).to eq('accessionWF')
       expect(args[:process_name]).to eq('update-doi')
-      expect(args[:effective_groups]).to eq(user.groups)
+      expect(args[:workgroups]).to eq(user.groups)
       expect(args[:search_form]).to be_a(SearchForm)
       expect(args[:search_form].attributes).to match({ 'query' => 'twain', 'page' => 1 })
     end

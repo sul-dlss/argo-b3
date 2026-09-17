@@ -3,9 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::Workflow do
-  subject(:searcher) { described_class.new(search_form:) }
+  subject(:searcher) { described_class.new(search_form:, workgroups:) }
 
   let(:user) { create(:user, :reader) }
+  let(:workgroups) { user.groups }
 
   let(:search_form) { SearchForm.new(query: 'test') }
 
@@ -26,7 +27,6 @@ RSpec.describe Searchers::Workflow do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -60,7 +60,6 @@ RSpec.describe Searchers::Workflow do
     let(:workflow) { 'accessionWF:publish:completed' }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:solr_item, workflows: [workflow])
       create(:solr_item, apo_druid: restricted_apo_druid, workflows: [workflow])
@@ -68,7 +67,7 @@ RSpec.describe Searchers::Workflow do
     end
 
     it 'only counts workflows on readable items' do
-      counts = described_class.call(search_form: SearchForm.new(query: 'Test'))
+      counts = described_class.call(search_form: SearchForm.new(query: 'Test'), workgroups:)
 
       expect(counts.count_for(workflow_name: 'accessionWF', process_name: 'publish', status: 'completed')).to eq(1)
     end

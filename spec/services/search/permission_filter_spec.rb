@@ -3,7 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Search::PermissionFilter, :solr do
+  subject(:permission_filter) { described_class.call(workgroups:) }
+
   let(:user) { create(:user) }
+  let(:workgroups) { user.groups }
   let(:apo_druid) { 'druid:bc123df4567' }
   let(:collection_druid) { 'druid:df234gh5678' }
   let(:other_collection_druid) { 'druid:hj345km6789' }
@@ -28,7 +31,7 @@ RSpec.describe Search::PermissionFilter, :solr do
     it 'matches exactly the documents authorized by ObjectPolicy' do
       expected_ids = documents.select { |document| ObjectPolicy.new(document, user:).apply(:show?) }
                               .pluck(Search::Fields::ID)
-      response = Search::SolrService.post(request: { q: '*:*', fq: [described_class.call].compact })
+      response = Search::SolrService.post(request: { q: '*:*', fq: [permission_filter].compact })
 
       expect(response.fetch('response').fetch('docs').pluck(Search::Fields::ID)).to match_array(expected_ids)
       expect(response.fetch('response').fetch('numFound')).to eq(expected_ids.size)
@@ -39,15 +42,12 @@ RSpec.describe Search::PermissionFilter, :solr do
     it_behaves_like 'the object policy scope'
   end
 
-  context 'without effective groups' do
+  context 'without workgroups' do
     let(:user) { create(:user, :admin) }
-
-    before do
-      Current.effective_groups = nil
-    end
+    let(:workgroups) { nil }
 
     it 'fails closed' do
-      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call })
+      response = Search::SolrService.post(request: { q: '*:*', fq: permission_filter })
 
       expect(response.fetch('response').fetch('numFound')).to eq(0)
     end
@@ -92,18 +92,16 @@ RSpec.describe Search::PermissionFilter, :solr do
     end
   end
 
-  context 'when impersonating a restricted reader' do
+  context 'when the supplied workgroups differ from Current.effective_groups' do
     let(:user) { create(:user, :admin) }
+    let(:workgroups) { ['sdr:impersonated'] }
 
     before do
       create(:permission, :read_restricted, workgroup: 'sdr:impersonated', target_druid: collection_druid)
-      Current.effective_groups = ['sdr:impersonated']
     end
 
-    it_behaves_like 'the object policy scope'
-
-    it 'does not inherit administrator access' do
-      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call })
+    it 'uses the supplied workgroups' do
+      response = Search::SolrService.post(request: { q: '*:*', fq: permission_filter })
 
       expect(response.fetch('response').fetch('docs').pluck(Search::Fields::ID))
         .to contain_exactly(object_druid, collection_druid)

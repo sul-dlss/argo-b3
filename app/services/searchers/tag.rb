@@ -11,9 +11,11 @@ module Searchers
 
     # @param search_form [SearchForm]
     # @param field [String]
-    def initialize(search_form:, field:)
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(search_form:, field:, workgroups:)
       @search_form = search_form
       @field = field
+      @workgroups = workgroups
     end
 
     # @return [SearchResults::FacetValues] search results
@@ -23,7 +25,7 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :field
+    attr_reader :search_form, :field, :workgroups
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -33,7 +35,7 @@ module Searchers
       # This is a very imperfect way of querying for tags.
       {
         q: '*:*',
-        fq: [Search::PermissionFilter.call].compact,
+        fq: [Search::PermissionFilter.call(workgroups:)].compact,
         rows: 0,
         facet: true,
         'facet.field': field,
