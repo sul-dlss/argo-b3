@@ -10,7 +10,7 @@ RSpec.describe Search::ItemQueryBuilder do
   before { Current.effective_groups = user.groups }
 
   context 'with a blank search form' do
-    let(:search_form) { SearchForm.new(query: '') }
+    let(:search_form) { ResultsSearchForm.new(query: '') }
 
     it 'builds the correct query parts' do
       result = described_class.call(search_form:)
@@ -21,7 +21,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with a query' do
-    let(:search_form) { SearchForm.new(query: 'test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
     it 'builds the correct query parts' do
       result = described_class.call(search_form:)
@@ -30,7 +30,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'when debug is true' do
-    let(:search_form) { SearchForm.new(debug: true) }
+    let(:search_form) { ResultsSearchForm.new(debug: true) }
 
     it 'includes debugQuery in the result' do
       result = described_class.call(search_form:)
@@ -39,7 +39,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with object types (facet filter query)' do
-    let(:search_form) { SearchForm.new(object_types: %w[dro collection]) }
+    let(:search_form) { ResultsSearchForm.new(object_types: %w[dro collection]) }
 
     it 'builds the correct filter query for object types' do
       result = described_class.call(search_form:)
@@ -48,7 +48,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with access rights (facet filter query)' do
-    let(:search_form) { SearchForm.new(access_rights: ['dark']) }
+    let(:search_form) { ResultsSearchForm.new(access_rights: ['dark']) }
 
     it 'builds the correct filter query for access rights' do
       result = described_class.call(search_form:)
@@ -57,7 +57,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with access rights exclude (facet filter query)' do
-    let(:search_form) { SearchForm.new(access_rights_exclude: ['dark']) }
+    let(:search_form) { ResultsSearchForm.new(access_rights_exclude: ['dark']) }
 
     it 'builds the correct filter query for access rights exclude' do
       result = described_class.call(search_form:)
@@ -66,7 +66,7 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with released to earthworks (dynamic facet)' do
-    let(:search_form) { SearchForm.new(released_to_earthworks: %w[last_year never]) }
+    let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[last_year never]) }
 
     it 'builds the correct filter query for released to earthworks' do
       result = described_class.call(search_form:)
@@ -79,7 +79,7 @@ RSpec.describe Search::ItemQueryBuilder do
   context 'with earliest accessioned date (dynamic facet)' do
     context 'with from and to dates' do
       let(:search_form) do
-        SearchForm.new(earliest_accessioned_date_from: '2023-01-01', earliest_accessioned_date_to: '2023-12-31')
+        ResultsSearchForm.new(earliest_accessioned_date_from: '2023-01-01', earliest_accessioned_date_to: '2023-12-31')
       end
 
       it 'builds the correct filter query for earliest accessioned date' do
@@ -90,7 +90,7 @@ RSpec.describe Search::ItemQueryBuilder do
     end
 
     context 'with from date' do
-      let(:search_form) { SearchForm.new(earliest_accessioned_date_from: '2023-01-01') }
+      let(:search_form) { ResultsSearchForm.new(earliest_accessioned_date_from: '2023-01-01') }
 
       it 'builds the correct filter query for earliest accessioned date' do
         result = described_class.call(search_form:)
@@ -100,7 +100,7 @@ RSpec.describe Search::ItemQueryBuilder do
     end
 
     context 'with to date' do
-      let(:search_form) { SearchForm.new(earliest_accessioned_date_to: '2023-12-31') }
+      let(:search_form) { ResultsSearchForm.new(earliest_accessioned_date_to: '2023-12-31') }
 
       it 'builds the correct filter query for earliest accessioned date' do
         result = described_class.call(search_form:)

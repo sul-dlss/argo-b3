@@ -39,9 +39,20 @@ module Search
     end
 
     delegate :form_field, :alpha_sort, :limit,
-             :facet_path_helper, :facet_children_path_helper, :facet_search_path_helper,
              :field, :hierarchical_field,
              to: :facet_config
+
+    def facet_path_helper
+      Search::FacetPathResolver.index_path_helper(facet_config:, search_form:)
+    end
+
+    def facet_children_path_helper
+      Search::FacetPathResolver.children_path_helper(facet_config:, search_form:)
+    end
+
+    def facet_search_path_helper
+      Search::FacetPathResolver.search_path_helper(facet_config:, search_form:)
+    end
 
     attr_reader :search_form
 

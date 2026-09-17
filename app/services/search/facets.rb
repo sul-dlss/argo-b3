@@ -3,10 +3,6 @@
 module Search
   # Constants for facet configuration
   module Facets # rubocop:disable Metrics/ModuleLength
-    def self.to_path_helper(path_name)
-      ->(*args) { Rails.application.routes.url_helpers.public_send(path_name, *args) }
-    end
-
     def self.find_config_by_form_field(form_field)
       Search::Facets.constants.each do |const_name|
         config = Search::Facets.const_get(const_name)
@@ -29,15 +25,18 @@ module Search
                         # Form field for the from/to dates in a date range facet.
                         :date_from_form_field,
                         :date_to_form_field,
-                        # Path helper for the index endpoint for the facet.
+                        # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
+                        # Path helpers are resolved from this plus the search form's route scope.
+                        # See Search::FacetPathResolver.
+                        :facet_resource,
+                        # True if the facet has an index endpoint.
                         # This is used for a lazy facet and/or a pageable facet.
-                        # If is included and the number of facet values exceeds the limit, paging will be enabled.
-                        :facet_path_helper,
-                        # Path helper for the children endpoint for a hierarchical facet.
-                        :facet_children_path_helper,
-                        # Path helper for the search endpoint for a facet that supports searching.
-                        # If provided, search will be enabled for the facet.
-                        :facet_search_path_helper,
+                        # If true and the number of facet values exceeds the limit, paging will be enabled.
+                        :facet_index,
+                        # True if the facet has a children endpoint. Only for hierarchical facets.
+                        :facet_children,
+                        # True if the facet has a search endpoint. If true, search will be enabled.
+                        :facet_search,
                         # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
                         # See FacetBuilder.
                         # This is used, for example, for a checkbox facet like object types.
@@ -48,7 +47,8 @@ module Search
                         :dynamic_facet)
 
     def Config.with_defaults(**)
-      defaults = { alpha_sort: false, limit: 100, exclude: false }
+      defaults = { alpha_sort: false, limit: 100, exclude: false,
+                   facet_index: false, facet_children: false, facet_search: false }
       new(**defaults, **)
     end
 
@@ -64,24 +64,27 @@ module Search
       form_field: :admin_policy_titles,
       field: Search::Fields::APO_TITLE,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_admin_policy_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_admin_policy_facets_path)
+      facet_resource: :admin_policy_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     COLLECTIONS = Config.with_defaults(
       form_field: :collection_titles,
       field: Search::Fields::COLLECTION_TITLES,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_collection_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_collection_facets_path)
+      facet_resource: :collection_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     DATES = Config.with_defaults(
       form_field: :dates,
       field: Search::Fields::PUBLICATION_DATE,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_date_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_date_facets_path)
+      facet_resource: :date_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     EARLIEST_ACCESSIONED_DATE = Config.with_defaults(
@@ -166,8 +169,9 @@ module Search
       form_field: :mimetypes,
       field: Search::Fields::MIMETYPES,
       limit: 10,
-      facet_path_helper: to_path_helper(:search_mimetype_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_mimetype_facets_path)
+      facet_resource: :mimetype_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     CONTENT_TYPES = Config.with_defaults(
@@ -194,16 +198,18 @@ module Search
       form_field: :genres,
       field: Search::Fields::GENRES,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_genre_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_genre_facets_path)
+      facet_resource: :genre_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     LANGUAGES = Config.with_defaults(
       form_field: :languages,
       field: Search::Fields::LANGUAGES,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_language_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_language_facets_path)
+      facet_resource: :language_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     METADATA_SOURCES = Config.with_defaults(
@@ -237,17 +243,19 @@ module Search
       hierarchical_field: Search::Fields::PROJECTS_HIERARCHICAL,
       alpha_sort: true,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_project_facets_path),
-      facet_children_path_helper: to_path_helper(:children_search_project_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_project_facets_path)
+      facet_resource: :project_facets,
+      facet_index: true,
+      facet_children: true,
+      facet_search: true
     )
 
     REGIONS = Config.with_defaults(
       form_field: :regions,
       field: Search::Fields::REGIONS,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_region_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_region_facets_path)
+      facet_resource: :region_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     REGISTERED_DATE = Config.with_defaults(
@@ -301,9 +309,10 @@ module Search
       hierarchical_field: Search::Fields::OTHER_HIERARCHICAL_TAGS,
       alpha_sort: true,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_tag_facets_path),
-      facet_children_path_helper: to_path_helper(:children_search_tag_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_tag_facets_path)
+      facet_resource: :tag_facets,
+      facet_index: true,
+      facet_children: true,
+      facet_search: true
     )
 
     TICKETS = Config.with_defaults(
@@ -311,16 +320,18 @@ module Search
       field: Search::Fields::TICKETS,
       alpha_sort: true,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_ticket_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_ticket_facets_path)
+      facet_resource: :ticket_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     TOPICS = Config.with_defaults(
       form_field: :topics,
       field: Search::Fields::TOPICS,
       limit: 25,
-      facet_path_helper: to_path_helper(:search_topic_facets_path),
-      facet_search_path_helper: to_path_helper(:search_search_topic_facets_path)
+      facet_resource: :topic_facets,
+      facet_index: true,
+      facet_search: true
     )
 
     VERSIONS = Config.with_defaults(
@@ -335,8 +346,9 @@ module Search
       hierarchical_field: Search::Fields::WPS_HIERARCHICAL_WORKFLOWS,
       alpha_sort: false,
       limit: 100,
-      facet_path_helper: to_path_helper(:search_workflow_facets_path),
-      facet_children_path_helper: to_path_helper(:children_search_workflow_facets_path)
+      facet_resource: :workflow_facets,
+      facet_index: true,
+      facet_children: true
     )
   end
 end

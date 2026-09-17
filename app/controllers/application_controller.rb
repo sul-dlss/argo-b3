@@ -27,10 +27,13 @@ class ApplicationController < ActionController::Base
     render plain: 'Forbidden', status: :forbidden
   end
 
+  # Sets @last_search_form and @total_results from the last search cookie.
+  # Note that this deliberately does not assign @search_form: the last search is not the current
+  # search, and conflating them would let a stale cookie silently override the current search.
   def set_from_last_search_cookie
     return if cookies.signed[:last_search].blank?
 
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
-    @last_search_form = @search_form = SearchForm.new(form_params)
+    @last_search_form = ResultsSearchForm.new(form_params)
   end
 end

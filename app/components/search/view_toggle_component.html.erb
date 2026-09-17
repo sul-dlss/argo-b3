@@ -1,0 +1,7 @@
+<div class="btn-group btn-group-toggle view-toggle mb-3" role="group" aria-label="Select view">
+  <% views.each do |view| %>
+    <%= link_to view[:label], view[:path],
+                class: class_names('btn', view[:position_class], 'active' => view[:selected]),
+                'aria-current': view[:selected] ? 'page' : nil %>
+  <% end %>
+</div>

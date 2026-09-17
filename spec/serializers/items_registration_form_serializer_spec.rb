@@ -57,7 +57,7 @@ RSpec.describe ItemsRegistrationFormSerializer do
 
   context 'when not an ItemsRegistrationForm' do
     it 'does not serialize the object' do
-      expect(described_class.serialize?(SearchForm.new)).to be(false)
+      expect(described_class.serialize?(ResultsSearchForm.new)).to be(false)
     end
   end
 end

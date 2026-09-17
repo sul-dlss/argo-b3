@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Searchers::Tag do
   let(:user) { create(:user, :admin) }
   let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
-  let(:search_form) { SearchForm.new(query:) }
+  let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'project 1' }
   let(:solr_response) do
     {
@@ -40,7 +40,7 @@ RSpec.describe Searchers::Tag do
   end
 
   context 'when the search form has debug enabled' do
-    let(:search_form) { SearchForm.new(query:, debug: true) }
+    let(:search_form) { ResultsSearchForm.new(query:, debug: true) }
 
     it 'includes debugQuery in the Solr request' do
       results
@@ -62,7 +62,7 @@ RSpec.describe Searchers::Tag do
     end
 
     it 'only returns project tags for readable items' do
-      tags = described_class.call(search_form: SearchForm.new(query: 'project'),
+      tags = described_class.call(search_form: ResultsSearchForm.new(query: 'project'),
                                   field: Search::Fields::PROJECTS_EXPLODED)
 
       expect(tags.to_a).to eq(['Visible project'])

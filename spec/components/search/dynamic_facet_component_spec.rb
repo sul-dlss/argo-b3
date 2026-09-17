@@ -6,7 +6,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
   let(:component) do
     described_class.new(facet_counts:, search_form:, form_field: :released_to_earthworks)
   end
-  let(:search_form) { SearchForm.new(released_to_earthworks: ['last_week'], page: 2) }
+  let(:search_form) { ResultsSearchForm.new(released_to_earthworks: ['last_week'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::DynamicFacetCounts) }
 
   before do
@@ -47,7 +47,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
                           date_from_form_field: :earliest_accessioned_date_from,
                           date_to_form_field: :earliest_accessioned_date_to)
     end
-    let(:search_form) { SearchForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
+    let(:search_form) { ResultsSearchForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
 
     it 'renders the date range inputs' do
       render_inline(component)

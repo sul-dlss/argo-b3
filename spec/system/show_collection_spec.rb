@@ -98,7 +98,7 @@ RSpec.describe 'Show collection' do
     within(find_table_value_cell('overview-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
-                                href: '/search?admin_policy_titles%5B%5D=My+APO&page=1')
+                                href: '/search?admin_policy_titles%5B%5D=My+APO')
     end
 
     # Identification table

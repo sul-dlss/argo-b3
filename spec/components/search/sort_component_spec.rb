@@ -6,7 +6,7 @@ RSpec.describe Search::SortComponent, type: :component do
   let(:component) { described_class.new(search_form:) }
 
   context 'when sort is not set' do
-    let(:search_form) { SearchForm.new }
+    let(:search_form) { ResultsSearchForm.new }
 
     it 'renders the default component' do
       render_inline(component)
@@ -18,7 +18,7 @@ RSpec.describe Search::SortComponent, type: :component do
   end
 
   context 'when sort is set' do
-    let(:search_form) { SearchForm.new(sort: 'druid') }
+    let(:search_form) { ResultsSearchForm.new(sort: 'druid') }
 
     it 'renders the component with the specified sort' do
       render_inline(component)

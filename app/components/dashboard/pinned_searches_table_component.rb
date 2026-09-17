@@ -18,7 +18,7 @@ module Dashboard
 
     def search_link(search)
       search_form = search.to_search_form
-      helpers.link_to(search_form.to_s, search_path(search_form.attributes))
+      helpers.link_to(search_form.to_s, url_for(search_form))
     end
 
     def classes

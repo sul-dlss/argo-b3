@@ -1,7 +1,7 @@
 <%= render SdrViewComponents::Tables::TableComponent.new(id:, variant: :data, body_classes: 'placeholder-glow') do |table| %>
   <%= table.with_caption do %>
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3) do %>
-      <%= link_to workflow_name, workflow_path %>
+      <%= link_to workflow_name, workflow_path, data: { turbo_frame: '_top' } %>
     <% end %>
   <% end %>
 
@@ -16,7 +16,7 @@
     <%= table.with_row(values: [process[:label]]) do |row| %>
       <% row.with_label_content do %>
         <%= index + 1 %>.&nbsp;
-        <%= link_to process[:name], process_path_for(process[:name]) %>
+        <%= link_to process[:name], process_path_for(process[:name]), data: { turbo_frame: '_top' } %>
       <% end %>
 
       <% if placeholder? %>

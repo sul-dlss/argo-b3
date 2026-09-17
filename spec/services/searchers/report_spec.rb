@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Report do
   let(:user) { create(:user, :admin) }
-  let(:search_form) { SearchForm.new(query:) }
+  let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:fields) { [Reports::Fields::DRUID.field, Reports::Fields::PURL.field] }
 
@@ -71,7 +71,7 @@ RSpec.describe Searchers::Report do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
     let!(:visible_document) { create(:solr_item) }
-    let(:search_form) { SearchForm.new(query: 'Test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'Test') }
 
     before do
       Current.effective_groups = user.groups

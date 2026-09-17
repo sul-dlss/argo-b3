@@ -9,7 +9,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     let(:form_field) { :object_types }
     let(:value) { 'item' }
     let(:search_form) do
-      SearchForm.new(
+      ResultsSearchForm.new(
         object_types: %w[item collection],
         projects: ['Project 1']
       )
@@ -29,7 +29,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     let(:form_field) { :released_to_earthworks }
     let(:value) { 'last_year' }
     let(:search_form) do
-      SearchForm.new(
+      ResultsSearchForm.new(
         released_to_earthworks: ['last_year']
       )
     end

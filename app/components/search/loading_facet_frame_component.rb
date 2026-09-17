@@ -11,7 +11,7 @@ module Search
 
     attr_reader :search_form, :facet_config
 
-    delegate :form_field, :facet_path_helper, to: :facet_config
+    delegate :form_field, to: :facet_config
 
     def id
       helpers.facet_id(form_field)
@@ -19,6 +19,10 @@ module Search
 
     def path
       facet_path_helper.call(search_form.with_attributes(page: nil))
+    end
+
+    def facet_path_helper
+      Search::FacetPathResolver.index_path_helper(facet_config:, search_form:)
     end
 
     def label

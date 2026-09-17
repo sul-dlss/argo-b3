@@ -1,13 +1,55 @@
 # frozen_string_literal: true
 
-# Search form
+# Base search form.
+#
+# This class is abstract: instantiate ResultsSearchForm or WorkflowGridSearchForm instead. A form's
+# class determines which view it represents; there is deliberately no `view` attribute.
+#
+# Attributes declared here determine *which objects match*. Attributes that only affect how matching
+# objects are presented (e.g., page, sort) belong on a subclass.
 class SearchForm < ApplicationForm
   include NormalizationConcern
 
+  # Attributes that do not contribute to the query. Subclasses that add presentation attributes
+  # should append to this.
+  def self.non_query_attributes
+    %w[debug]
+  end
+
+  # The route scope that this form's view is mounted under. Used to resolve facet path helpers.
+  # @return [String]
+  def self.route_scope
+    raise NotImplementedError, "#{name} must implement .route_scope"
+  end
+
+  def self.permitted_params
+    raise NotImplementedError, 'SearchForm is abstract; use a subclass' if self == SearchForm
+
+    super
+  end
+
+  delegate :route_scope, to: :class
+
+  # @return [Boolean] whether this search can be pinned
+  def pinnable?
+    false
+  end
+
+  # @return [Boolean] whether this view supports sorting search results
+  def sortable?
+    false
+  end
+
+  # Whether this view renders the list of item results. The primary facets (object types and
+  # content types) are returned by that same query, so views that do not render item results get
+  # those facets from the secondary facets request instead.
+  # @return [Boolean]
+  def item_results?
+    false
+  end
+
   attribute :query, :string
-  attribute :page, :integer, default: 1
   attribute :debug, :boolean, default: false
-  attribute :sort, :string
 
   # Facet fields
   attribute :access_rights, array: true, default: -> { [] }
@@ -59,7 +101,7 @@ class SearchForm < ApplicationForm
   attribute :wps_workflows, array: true, default: -> { [] }
 
   def blank?
-    attributes.except('page', 'debug', 'sort').values.all?(&:blank?)
+    attributes.except(*self.class.non_query_attributes).values.all?(&:blank?)
   end
 
   # @return [hash] this form's attributes merged with new_attrs
@@ -93,9 +135,24 @@ class SearchForm < ApplicationForm
     end.compact
   end
 
-  # @return [SearchForm] a new SearchForm with the provided attrs removed
+  # @return [SearchForm] a new form of the same class with the provided attrs merged in
+  def with(new_attrs)
+    build(self.class, with_attributes(new_attrs))
+  end
+
+  # @return [SearchForm] a new form of the same class with the provided attrs removed
   def without(without_attrs)
-    SearchForm.new(without_attributes(without_attrs))
+    build(self.class, without_attributes(without_attrs))
+  end
+
+  # Converts this form to another view's form, keeping only attributes that the target class
+  # declares. This is how the view toggle crosses form classes; nothing else should need it.
+  # @param klass [Class] the target form class
+  # @return [SearchForm]
+  def as(klass)
+    return self if instance_of?(klass)
+
+    build(klass, attributes)
   end
 
   # @param key [String, Symbol] the attribute name
@@ -117,7 +174,7 @@ class SearchForm < ApplicationForm
   end
 
   def facet_attributes
-    attributes.except('page', 'debug', 'query', 'sort')
+    attributes.except(*self.class.non_query_attributes, 'query')
   end
 
   # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
@@ -139,5 +196,14 @@ class SearchForm < ApplicationForm
 
   def to_s
     Search::Serializer.call(search_form: self)
+  end
+
+  private
+
+  # Builds a form of the given class, dropping attributes that the class does not declare.
+  # Callers pass attributes that not every view has -- most commonly page, which facet links reset
+  # when the filters change -- and a view that has no such attribute should simply ignore it.
+  def build(klass, attrs)
+    klass.new(attrs.slice(*klass.attribute_names))
   end
 end

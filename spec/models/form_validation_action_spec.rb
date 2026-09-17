@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe FormValidationAction do
   let(:user) { create(:user) }
-  let(:form) { SearchForm.new(query: 'test', object_types: %w[collection item]) }
+  let(:form) { ResultsSearchForm.new(query: 'test', object_types: %w[collection item]) }
 
   before do
     allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
@@ -23,7 +23,7 @@ RSpec.describe FormValidationAction do
     subject(:form_validation_action) { described_class.new(user:, form:) }
 
     it 'round-trips the form for an unsaved record' do
-      expect(form_validation_action.form).to be_a(SearchForm)
+      expect(form_validation_action.form).to be_a(ResultsSearchForm)
       expect(form_validation_action.form.attributes).to eq(form.attributes)
     end
 
@@ -31,7 +31,7 @@ RSpec.describe FormValidationAction do
       form_validation_action.save!
 
       reloaded_form = form_validation_action.reload.form
-      expect(reloaded_form).to be_a(SearchForm)
+      expect(reloaded_form).to be_a(ResultsSearchForm)
       expect(reloaded_form.attributes).to eq(form.attributes)
     end
 
@@ -89,7 +89,7 @@ RSpec.describe FormValidationAction do
 
   describe '#mark_valid!' do
     subject(:form_validation_action) do
-      described_class.create!(user:, form: SearchForm.new, status: 'started', error_data: { 'errors' => [] })
+      described_class.create!(user:, form: ResultsSearchForm.new, status: 'started', error_data: { 'errors' => [] })
     end
 
     it 'records the status, the validated form, and no error data' do
@@ -103,7 +103,7 @@ RSpec.describe FormValidationAction do
 
   describe '#mark_invalid!' do
     subject(:form_validation_action) do
-      described_class.create!(user:, form: SearchForm.new, status: 'started')
+      described_class.create!(user:, form: ResultsSearchForm.new, status: 'started')
     end
 
     let(:invalid_form) { ItemRegistrationForm.new(source_id: 'sul:1234') }

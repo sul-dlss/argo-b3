@@ -7,7 +7,7 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
 
   let(:component) { described_class.new(pinned_searches:) }
 
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
   context 'when there are pinned searches' do
     let(:pinned_searches) { [build(:pinned_search, search_form_attributes: search_form.attributes)] }

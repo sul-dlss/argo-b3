@@ -1,18 +1,15 @@
 # frozen_string_literal: true
 
-# Controller for displaying the workflow grid
-class WorkflowGridController < ApplicationController
-  include SearchFormConcern
-
-  # While any logged in user can see the workflow grid, the search scope for workflow counts and reset selections
-  # are restricted to readable objects by the currently logged in/impersonated user.
-  skip_verify_authorized
-
+# Controller for displaying the workflow grid.
+#
+# The workflow grid is a view of the current search (see WorkflowGridSearchForm), so the search form
+# is built from the request params exactly as it is for the search results view.
+#
+# While any logged in user can see the workflow grid, the search scope for workflow counts and reset
+# selections are restricted to readable objects by the currently logged in/impersonated user.
+# Authorization itself is skipped in SearchApplicationController.
+class WorkflowGridController < SearchApplicationController
   def show
-    set_from_last_search_cookie
-    set_scope
-    set_search_form_for_scope
-
     @templates = workflow_names.index_with do |name|
       template_for(name)
     end
@@ -26,7 +23,6 @@ class WorkflowGridController < ApplicationController
 
   # Resets workflow errors to waiting
   def reset
-    set_search_form # This is from the posted search form.
     @workflow_name = params[:workflow_name]
     @process_name = params[:process_name]
     ResetWorkflowErrorsJob.perform_later(search_form: @search_form, workflow_name: @workflow_name,
@@ -51,20 +47,6 @@ class WorkflowGridController < ApplicationController
 
   def expires_in
     24.hours
-  end
-
-  def set_search_form_for_scope
-    # It is already set to last search form if scope is last_search
-    @search_form = SearchForm.new if @scope == 'all'
-  end
-
-  def set_scope
-    # Scope is provided by the scope param or a default is selected based on whether there is a last search cookie.
-    @scope = if (params[:scope] == 'last_search' || params[:scope].blank?) && @last_search_form.present?
-               'last_search'
-             else
-               'all'
-             end
   end
 
   def placeholder?

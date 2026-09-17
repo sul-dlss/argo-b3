@@ -1,7 +1,7 @@
 <div class="d-flex align-items-center flex-wrap">
   <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Search results', classes: 'ps-0',
                                                                   variant: :link,
-                                                                  link: search_path(last_search_form.attributes)) %>
+                                                                  link: url_for(last_search_form)) %>
 
   <% if item_navigation? %>
     <nav class="item-search-navigation d-flex align-items-center ms-3" aria-label="Search results navigation" data-turbo-prefetch="false">

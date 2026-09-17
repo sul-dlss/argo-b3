@@ -16,10 +16,10 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
     ]
   end
 
-  let(:search_form) { SearchForm.new }
+  let(:search_form) { ResultsSearchForm.new }
   let(:form_field) { :tags }
-  let(:facet_path_helper) { Search::Facets::TAGS.facet_path_helper }
-  let(:facet_children_path_helper) { Search::Facets::TAGS.facet_children_path_helper }
+  let(:facet_path_helper) { Search::FacetPathResolver.index_path_helper(facet_config: Search::Facets::TAGS, search_form:) }
+  let(:facet_children_path_helper) { Search::FacetPathResolver.children_path_helper(facet_config: Search::Facets::TAGS, search_form:) }
   let(:facet_search_path_helper) { nil }
 
   before do
@@ -38,7 +38,7 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
   end
 
   context 'when facet search is enabled' do
-    let(:facet_search_path_helper) { Search::Facets::TAGS.facet_search_path_helper }
+    let(:facet_search_path_helper) { Search::FacetPathResolver.search_path_helper(facet_config: Search::Facets::TAGS, search_form:) }
 
     it 'renders the facet search input' do
       render_inline(component)
@@ -48,7 +48,7 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
   end
 
   context 'when paging is enabled' do
-    let(:facet_page_path_helper) { Search::Facets::TAGS.facet_path_helper }
+    let(:facet_page_path_helper) { Search::FacetPathResolver.index_path_helper(facet_config: Search::Facets::TAGS, search_form:) }
 
     before do
       allow(facet_counts).to receive(:total_pages).and_return(3)

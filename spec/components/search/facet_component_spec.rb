@@ -7,7 +7,7 @@ RSpec.describe Search::FacetComponent, type: :component do
     described_class.new(facet_counts:, search_form:, form_field: :object_types,
                         facet_page_path_helper:, facet_search_path_helper:)
   end
-  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2) }
+  let(:search_form) { ResultsSearchForm.new(object_types: ['collection'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: 1) }
   let(:facet_page_path_helper) { nil }
   let(:facet_search_path_helper) { nil }
@@ -38,7 +38,7 @@ RSpec.describe Search::FacetComponent, type: :component do
 
   context 'when paging is enabled' do
     # Object types doesn't have facet_path_helper, so borrowing from projects facet for test.
-    let(:facet_page_path_helper) { Search::Facets::PROJECTS.facet_path_helper }
+    let(:facet_page_path_helper) { Search::FacetPathResolver.index_path_helper(facet_config: Search::Facets::PROJECTS, search_form:) }
 
     before do
       allow(facet_counts).to receive(:total_pages).and_return(3)
@@ -54,7 +54,7 @@ RSpec.describe Search::FacetComponent, type: :component do
   end
 
   context 'when facet search is enabled' do
-    let(:facet_search_path_helper) { Search::Facets::PROJECTS.facet_search_path_helper }
+    let(:facet_search_path_helper) { Search::FacetPathResolver.search_path_helper(facet_config: Search::Facets::PROJECTS, search_form:) }
 
     it 'renders the facet search input' do
       render_inline(component)
@@ -79,7 +79,7 @@ RSpec.describe Search::FacetComponent, type: :component do
                           exclude_form_field: :access_rights_exclude,
                           facet_page_path_helper:, facet_search_path_helper:)
     end
-    let(:search_form) { SearchForm.new(access_rights_exclude: ['dark'], page: 2) }
+    let(:search_form) { ResultsSearchForm.new(access_rights_exclude: ['dark'], page: 2) }
 
     before do
       allow(facet_counts).to receive(:each)

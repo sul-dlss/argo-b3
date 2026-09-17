@@ -65,7 +65,7 @@ class ReportsController < ApplicationController
   def show
     @report_form = ReportForm.new(fields: FREQUENTLY_USED_FIELDS.map(&:field))
     set_from_last_search_cookie
-    @report_form.source = 'results' if @search_form.present?
+    @report_form.source = 'results' if @last_search_form.present?
   end
 
   def download
@@ -105,7 +105,7 @@ class ReportsController < ApplicationController
 
   def generate_report_from_last_search(stream: nil)
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
-    search_form = SearchForm.new(form_params).without(:page)
+    search_form = ResultsSearchForm.new(form_params).without(:page)
 
     Searchers::Report.call(search_form:, fields: @report_form.fields, rows:, stream:)
   end

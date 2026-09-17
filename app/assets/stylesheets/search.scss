@@ -37,3 +37,28 @@ a[aria-expanded="false"] {
 .input-group-text {
 	border-color: var(--stanford-60-black);
 }
+
+// View toggle (search results / workflow status).
+// Search::ViewToggleComponent renders links rather than the radio inputs that
+// SdrViewComponents::Forms::ToggleComponent uses, so these mirror the gem's
+// .btn-group-toggle :checked rules for an .active link instead.
+.btn-group-toggle.view-toggle {
+  a.btn {
+    color: var(--stanford-digital-blue);
+    border-color: var(--stanford-digital-blue);
+  }
+
+  a.btn.active {
+    background-color: var(--stanford-digital-blue);
+    border-color: var(--stanford-digital-blue);
+    color: #fff;
+
+    &::before {
+      display: inline-block;
+      margin-right: 3px;
+      font-family: bootstrap-icons, sans-serif;
+      vertical-align: -15%;
+      content: "\F633";
+    }
+  }
+}

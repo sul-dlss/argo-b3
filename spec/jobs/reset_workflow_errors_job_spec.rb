@@ -8,7 +8,7 @@ RSpec.describe ResetWorkflowErrorsJob do
   let(:workflow_name) { 'accessionWF' }
   let(:user) { create(:user, :reader) }
   let(:process_name) { 'update-doi' }
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { WorkflowGridSearchForm.new(query: 'test') }
 
   let(:object_client) { instance_double(Dor::Services::Client::Object) }
   let(:workflow_client) { instance_double(Dor::Services::Client::ObjectWorkflow) }
@@ -25,7 +25,10 @@ RSpec.describe ResetWorkflowErrorsJob do
   it 'resets the workflow errors for the matching items' do
     job.perform(workflow_name:, process_name:, search_form:, effective_groups: user.groups)
 
-    expect(Searchers::DruidList).to have_received(:call).with(search_form:)
+    expect(Searchers::DruidList).to have_received(:call)
+      .with(search_form: having_attributes(query: 'test', wps_workflows: ['accessionWF:update-doi:error']))
+    # The caller's form must not be modified in place.
+    expect(search_form.wps_workflows).to be_empty
     expect(Dor::Services::Client).to have_received(:object).with('druid:fm262cb0015')
     expect(Dor::Services::Client).to have_received(:object).with('druid:rt276nw8963')
     expect(object_client).to have_received(:workflow).twice.with(workflow_name)

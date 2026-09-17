@@ -7,7 +7,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
   let(:component) { described_class.new(facet_count:, search_form:, path_helper:, form_field:) }
 
-  let(:search_form) { SearchForm.new }
+  let(:search_form) { ResultsSearchForm.new }
   let(:path_helper) do
     lambda { |parent_value:, **params|
       children_search_workflow_facets_path(parent_value:, **params)
@@ -35,7 +35,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when selected' do
       let(:search_form) do
-        SearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
+        ResultsSearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
       end
 
       it 'renders without children and as selected' do
@@ -59,7 +59,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when selected' do
       let(:search_form) do
-        SearchForm.new(wps_workflows: ['ocrWF:end-ocr'])
+        ResultsSearchForm.new(wps_workflows: ['ocrWF:end-ocr'])
       end
 
       it 'renders with children showing and as selected' do
@@ -89,7 +89,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
 
     context 'when a child is selected' do
       let(:search_form) do
-        SearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
+        ResultsSearchForm.new(wps_workflows: ['ocrWF:end-ocr:waiting'])
       end
 
       it 'renders with children showing and as not selected' do

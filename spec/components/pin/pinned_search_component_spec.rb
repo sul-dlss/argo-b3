@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Pin::PinnedSearchComponent, type: :component do
   include Rails.application.routes.url_helpers
 
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
   context 'when not pinned' do
     let(:component) { described_class.new(search_form:, pinned: false) }

@@ -12,7 +12,7 @@ class PinnedSearchesController < ApplicationController
   skip_verify_authorized
 
   def create
-    search_form = SearchForm.new(**params.permit(SearchForm.permitted_params))
+    search_form = ResultsSearchForm.new(**params.permit(ResultsSearchForm.permitted_params))
     unless PinnedSearch.exists_by_search_form?(search_form:, user: current_user)
       PinnedSearch.create_from_search_form(search_form:, user: current_user)
     end

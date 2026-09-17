@@ -5,8 +5,8 @@
       <% component.with_row(label: 'APO') do |row_component| %>
         <% row_component.with_cell do %>
           <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
-          <% search_form = SearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-          (<%= link_to('All objects with this APO', search_path(search_form.attributes)) %>)
+          <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+          (<%= link_to('All objects with this APO', url_for(search_form)) %>)
         <% end %>
       <% end %>
     <% end %>

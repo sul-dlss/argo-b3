@@ -44,7 +44,7 @@ RSpec.describe 'Create a new reindex bulk action' do
   end
 
   context 'when using last search' do
-    let(:search_form) { SearchForm.new(query: 'test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
     before do
       set_last_search_cookie(search_form:)

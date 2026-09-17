@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Search::FacetSearchComponent, type: :component do
   let(:component) { described_class.new(search_form:, form_field: :tags, facet_search_path_helper:) }
-  let(:search_form) { SearchForm.new(query: 'test', tags: ['test : tag']) }
-  let(:facet_search_path_helper) { Search::Facets::TAGS.facet_search_path_helper }
+  let(:search_form) { ResultsSearchForm.new(query: 'test', tags: ['test : tag']) }
+  let(:facet_search_path_helper) { Search::FacetPathResolver.search_path_helper(facet_config: Search::Facets::TAGS, search_form:) }
 
   it 'renders the facet search input' do
     render_inline(component)

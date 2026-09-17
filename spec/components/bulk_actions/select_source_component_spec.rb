@@ -23,7 +23,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
   end
 
   context 'when last search form is provided' do
-    let(:search_form) { SearchForm.new(query: 'test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
     let(:total_results) { 42 }
     let(:bulk_action_form) { BulkActions::BasicForm.new(source: 'results') }
 

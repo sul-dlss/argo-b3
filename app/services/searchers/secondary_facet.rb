@@ -32,6 +32,12 @@ module Searchers
       Search::Facets::VERSIONS
     ].freeze
 
+    # Facets that the item search normally returns alongside the item results.
+    PRIMARY_FACETS = [
+      Search::Facets::OBJECT_TYPES,
+      Search::Facets::CONTENT_TYPES
+    ].freeze
+
     def self.call(...)
       new(...).call
     end
@@ -64,7 +70,13 @@ module Searchers
     end
 
     def facet_json
-      Search::FacetsBuilder.call(facet_configs: FACETS).to_json
+      Search::FacetsBuilder.call(facet_configs:).to_json
+    end
+
+    def facet_configs
+      return FACETS if search_form.item_results?
+
+      FACETS + PRIMARY_FACETS
     end
   end
 end

@@ -11,7 +11,12 @@ module Search
 
     attr_reader :search_form, :pinned
 
-    delegate :current_filters, to: :search_form
+    delegate :current_filters, :pinnable?, to: :search_form
+
+    # Clearing the filters keeps the user in the view they are currently in.
+    def clear_all_path
+      url_for(search_form.class.new)
+    end
 
     def render?
       current_filters.any?
