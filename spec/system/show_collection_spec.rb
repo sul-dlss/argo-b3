@@ -54,6 +54,7 @@ RSpec.describe 'Show collection' do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
+    allow(Searchers::ObjectCount).to receive(:call).and_return(12)
 
     sign_in(create(:user))
   end
@@ -82,8 +83,6 @@ RSpec.describe 'Show collection' do
 
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
-    expect(page).to have_css('.nav-link', text: 'Workflows')
-    expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
@@ -94,21 +93,16 @@ RSpec.describe 'Show collection' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
-    expect(page).to have_table_value('overview-table', 'Object type', 'Collection')
-    within(find_table_value_cell('overview-table', 'APO')) do
+    expect(page).to have_table_value('overview-table', '# of items', '12')
+    expect(page).to have_link('12', href: search_path(collection_titles: [original_title]))
+    within(find_table_value_cell('access-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
                                 href: '/search?admin_policy_titles%5B%5D=My+APO')
     end
 
-    # Identification table
-    expect(page).to have_table_caption('identification-table', 'Identification')
-    expect(page).to have_table_value('identification-table', 'Druid', druid)
-    expect(page).to have_table_value('identification-table', 'Source ID', 'googlebooks:stanford_36105114203446')
-    expect(page).to have_table_value('identification-table', 'Folio Instance HRID', 'a6525053')
-
     # Access table
-    expect(page).to have_table_caption('access-table', 'Access')
+    expect(page).to have_table_caption('access-table', 'APO and rights')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark')
     expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')

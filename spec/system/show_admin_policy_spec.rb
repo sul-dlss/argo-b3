@@ -76,8 +76,6 @@ RSpec.describe 'Show APO' do
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'History')
-    expect(page).to have_css('.nav-link', text: 'Workflows')
-    expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
