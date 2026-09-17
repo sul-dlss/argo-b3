@@ -23,9 +23,9 @@ RSpec.describe ResetWorkflowErrorsJob do
   end
 
   it 'resets the workflow errors for the matching items' do
-    job.perform(workflow_name:, process_name:, search_form:, effective_groups: user.groups)
+    job.perform(workflow_name:, process_name:, search_form:, workgroups: user.groups)
 
-    expect(Searchers::DruidList).to have_received(:call).with(search_form:)
+    expect(Searchers::DruidList).to have_received(:call).with(search_form:, workgroups: user.groups)
     expect(Dor::Services::Client).to have_received(:object).with('druid:fm262cb0015')
     expect(Dor::Services::Client).to have_received(:object).with('druid:rt276nw8963')
     expect(object_client).to have_received(:workflow).twice.with(workflow_name)
@@ -35,7 +35,7 @@ RSpec.describe ResetWorkflowErrorsJob do
 
   context 'with an impersonated workgroup', :solr do
     let(:user) { create(:user, :admin) }
-    let(:effective_groups) { ['sdr:workflow-reader'] }
+    let(:workgroups) { ['sdr:workflow-reader'] }
     let(:allowed_apo_druid) { 'druid:bc123df4567' }
     let!(:visible_document) do
       create(:solr_item, apo_druid: allowed_apo_druid, workflows: ['accessionWF:update-doi:error'])
@@ -45,12 +45,12 @@ RSpec.describe ResetWorkflowErrorsJob do
     end
 
     before do
-      create(:permission, :read_restricted, workgroup: effective_groups.first, target_druid: allowed_apo_druid)
+      create(:permission, :read_restricted, workgroup: workgroups.first, target_druid: allowed_apo_druid)
       allow(Searchers::DruidList).to receive(:call).and_call_original
     end
 
     it 'only resets readable objects using the workgroups supplied by the request' do
-      job.perform(workflow_name:, process_name:, search_form:, effective_groups:)
+      job.perform(workflow_name:, process_name:, search_form:, workgroups:)
 
       expect(Dor::Services::Client).to have_received(:object).with(visible_document.fetch(Search::Fields::ID)).once
       expect(Dor::Services::Client).not_to have_received(:object).with(hidden_document.fetch(Search::Fields::ID))

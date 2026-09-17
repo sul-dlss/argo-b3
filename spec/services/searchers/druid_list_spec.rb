@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::DruidList do
   let(:user) { create(:user, :admin) }
-  let(:druids) { described_class.call(search_form:) }
+  let(:workgroups) { user.groups }
+  let(:druids) { described_class.call(search_form:, workgroups:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
@@ -20,7 +21,6 @@ RSpec.describe Searchers::DruidList do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -43,14 +43,13 @@ RSpec.describe Searchers::DruidList do
     let(:search_form) { SearchForm.new(query: 'Test') }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:solr_item, apo_druid: restricted_apo_druid)
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'filters bulk-action and workflow selections to readable items' do
-      druids = described_class.call(search_form:)
+      druids = described_class.call(search_form:, workgroups:)
 
       expect(druids).to eq([visible_document.fetch(Search::Fields::ID)])
     end

@@ -7,12 +7,13 @@ module Search
     TARGET_FIELDS = [Fields::ID, Fields::COLLECTION_DRUIDS, Fields::APO_DRUID].freeze
     MATCH_NONE_FILTER = '(*:* AND NOT *:*)'
 
-    def self.call
-      new.call
+    def self.call(...)
+      new(...).call
     end
 
-    def initialize
-      @scope = Permissions::UserScope.new(groups: Array(Current.effective_groups))
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(workgroups:)
+      @scope = Permissions::UserScope.new(groups: Array(workgroups))
     end
 
     def call

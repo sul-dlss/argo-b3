@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::ItemNavigation do
   let(:user) { create(:user, :admin) }
-  let(:navigation) { described_class.call(search_form:, position:) }
+  let(:workgroups) { user.groups }
+  let(:navigation) { described_class.call(search_form:, position:, workgroups:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:position) { 3 }
@@ -25,7 +26,6 @@ RSpec.describe Searchers::ItemNavigation do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -94,7 +94,6 @@ RSpec.describe Searchers::ItemNavigation do
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:solr_item)
       create(:solr_item, apo_druid: restricted_apo_druid)
@@ -102,7 +101,7 @@ RSpec.describe Searchers::ItemNavigation do
     end
 
     it 'uses only the allowed readable result set for previous and next navigation' do
-      navigation = described_class.call(search_form: SearchForm.new(query: 'Test'), position: 1)
+      navigation = described_class.call(search_form: SearchForm.new(query: 'Test'), position: 1, workgroups:)
 
       expect(navigation.total_results).to eq(1)
       expect(navigation.previous_druid).to be_nil

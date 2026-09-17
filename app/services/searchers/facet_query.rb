@@ -13,12 +13,15 @@ module Searchers
 
     # @param search_form [SearchForm]
     # @param field [String] the Solr field to facet on
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
     # @param facet_query [String] query to filter facet values
     # @param alpha_sort [Boolean] whether to sort facet values alphabetically
     # @param limit [Integer, nil] maximum number of facet values to return
-    def initialize(search_form:, field:, facet_query:, alpha_sort: false, limit: nil)
+    def initialize(search_form:, field:, facet_query:, workgroups:, # rubocop:disable Metrics/ParameterLists
+                   alpha_sort: false, limit: nil)
       @search_form = search_form
       @field = field
+      @workgroups = workgroups
       @alpha_sort = alpha_sort
       @limit = limit
       @facet_query = facet_query
@@ -31,14 +34,14 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :field, :alpha_sort, :limit, :facet_query
+    attr_reader :search_form, :field, :workgroups, :alpha_sort, :limit, :facet_query
 
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, workgroups:).merge(
         {
           facet: true,
           'facet.field': [field],

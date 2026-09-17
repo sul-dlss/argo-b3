@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Item do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(search_form:) }
+  let(:workgroups) { user.groups }
+  let(:results) { described_class.call(search_form:, workgroups:) }
   let(:search_form) { SearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
@@ -19,7 +20,6 @@ RSpec.describe Searchers::Item do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -74,14 +74,13 @@ RSpec.describe Searchers::Item do
     let(:search_form) { SearchForm.new(query: 'Test') }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:solr_item, apo_druid: restricted_apo_druid, content_type: 'image')
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'filters results, counts, and facets to only readable items' do
-      results = described_class.call(search_form:)
+      results = described_class.call(search_form:, workgroups:)
 
       expect(results.map(&:druid)).to eq([visible_document.fetch(Search::Fields::ID)])
       expect(results.total_results).to eq(1)
@@ -90,7 +89,8 @@ RSpec.describe Searchers::Item do
     end
 
     it 'retains authorization when a facet excludes its own selected filter' do
-      results = described_class.call(search_form: SearchForm.new(query: 'Test', content_types: ['image']))
+      results = described_class.call(search_form: SearchForm.new(query: 'Test', content_types: ['image']),
+                                     workgroups:)
 
       expect(results.total_results).to eq(0)
       expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))

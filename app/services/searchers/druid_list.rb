@@ -8,8 +8,10 @@ module Searchers
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:, limit: 10_000_000)
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(search_form:, workgroups:, limit: 10_000_000)
       @search_form = search_form
+      @workgroups = workgroups
       @limit = limit
     end
 
@@ -20,14 +22,14 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :limit
+    attr_reader :search_form, :workgroups, :limit
 
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, workgroups:).merge(
         {
           fl: [Search::Fields::ID],
           rows: limit

@@ -31,6 +31,7 @@ module Search
     def facet_counts
       Searchers::Facet.call(search_form:,
                             facet_config:,
+                            workgroups:,
                             page: page_param)
     end
   end

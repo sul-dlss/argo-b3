@@ -107,12 +107,14 @@ class ReportsController < ApplicationController
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
     search_form = SearchForm.new(form_params).without(:page)
 
-    Searchers::Report.call(search_form:, fields: @report_form.fields, rows:, stream:)
+    Searchers::Report.call(search_form:, fields: @report_form.fields, rows:, stream:,
+                           workgroups:)
   end
 
   def generate_report_from_druids(stream: nil)
     druids = DruidSupport.parse_list(@report_form.druid_list)
-    Searchers::ReportByDruid.call(druids:, fields: @report_form.fields, rows:, stream:)
+    Searchers::ReportByDruid.call(druids:, fields: @report_form.fields, rows:, stream:,
+                                  workgroups:)
   end
 
   def set_report_form

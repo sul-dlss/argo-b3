@@ -31,6 +31,7 @@ module Search
     def facet_counts(for_children: false)
       Searchers::HierarchicalFacet.call(search_form:,
                                         facet_config:,
+                                        workgroups:,
                                         value: for_children ? parent_value_param : nil,
                                         limit: for_children ? -1 : limit)
     end

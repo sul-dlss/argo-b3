@@ -45,8 +45,10 @@ module Search
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:)
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(search_form:, workgroups:)
       @search_form = search_form
+      @workgroups = workgroups
     end
 
     # @return [Hash] parts of Solr request
@@ -64,10 +66,10 @@ module Search
 
     private
 
-    attr_reader :search_form
+    attr_reader :search_form, :workgroups
 
     def permission_filter
-      PermissionFilter.call
+      PermissionFilter.call(workgroups:)
     end
 
     def filter_queries

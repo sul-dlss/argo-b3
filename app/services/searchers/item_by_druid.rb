@@ -9,8 +9,10 @@ module Searchers
 
     # @param druids [Array<String>]
     # @param fields [Array<String>] fields to include in the results
-    def initialize(druids:, fields: Item::FIELD_LIST)
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(druids:, workgroups:, fields: Item::FIELD_LIST)
       @druids = druids
+      @workgroups = workgroups
       @fields = fields
     end
 
@@ -21,7 +23,7 @@ module Searchers
 
     private
 
-    attr_reader :druids, :fields
+    attr_reader :druids, :workgroups, :fields
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -29,7 +31,7 @@ module Searchers
 
     def solr_request
       {
-        fq: [solr_fq, Search::PermissionFilter.call].compact,
+        fq: [solr_fq, Search::PermissionFilter.call(workgroups:)].compact,
         fl: fields,
         rows: druids.size
       }

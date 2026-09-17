@@ -37,8 +37,10 @@ module Searchers
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:)
+    # @param workgroups [Array<String>, nil] workgroups used to determine permissions
+    def initialize(search_form:, workgroups:)
       @search_form = search_form
+      @workgroups = workgroups
     end
 
     # @return [SearchResults::Items] search results
@@ -48,14 +50,14 @@ module Searchers
 
     private
 
-    attr_reader :search_form
+    attr_reader :search_form, :workgroups
 
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, workgroups:).merge(
         {
           rows: 0,
           'json.facet': facet_json

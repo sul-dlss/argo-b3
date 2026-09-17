@@ -6,7 +6,8 @@ module Search
     layout false
 
     def index
-      @project_tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::PROJECTS_EXPLODED)
+      @project_tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::PROJECTS_EXPLODED,
+                                          workgroups:)
     end
   end
 end
