@@ -78,14 +78,17 @@ RSpec.describe 'Item search', :solr do
     end
 
     context 'when query is blank' do
-      it 'does not return any results' do
+      let(:user) { create(:user, :admin) }
+
+      it 'returns all results' do
         visit search_path
 
         find_search_field.fill_in(with: '')
         click_button('Search')
 
-        expect(page).to have_css('turbo-frame#items-search[complete]')
-        expect(page).to have_no_css('section[aria-label="Item, collection, and APO results"]')
+        within(find_item_results_section) do
+          expect(page).to have_result_count(16)
+        end
       end
     end
 

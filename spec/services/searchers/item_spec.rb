@@ -46,11 +46,11 @@ RSpec.describe Searchers::Item do
   context 'when the search form is blank' do
     let(:search_form) { ResultsSearchForm.new }
 
-    it 'sets rows to 0' do
+    it 'requests a page of results' do
       results
       expect(Search::SolrService).to have_received(:post) do |args|
         solr_query = args[:request].with_indifferent_access
-        expect(solr_query['rows']).to eq(0)
+        expect(solr_query['rows']).to eq(50)
       end
     end
   end
