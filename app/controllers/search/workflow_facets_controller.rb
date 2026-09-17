@@ -32,7 +32,8 @@ module Search
       Searchers::HierarchicalFacet.call(search_form:,
                                         facet_config:,
                                         value: for_children ? parent_value_param : nil,
-                                        limit: for_children ? -1 : limit)
+                                        limit: for_children ? -1 : limit,
+                                        user_scope: current_user_scope)
     end
   end
 end

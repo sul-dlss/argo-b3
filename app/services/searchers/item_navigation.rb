@@ -12,9 +12,11 @@ module Searchers
 
     # @param search_form [SearchForm]
     # @param position [Integer] 1-based absolute position within the result set
-    def initialize(search_form:, position:)
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(search_form:, position:, user_scope:)
       @search_form = search_form
       @position = position
+      @user_scope = user_scope
     end
 
     # @return [Result] navigation details
@@ -24,7 +26,7 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :position
+    attr_reader :search_form, :user_scope, :position
 
     def previous_druid
       druids[current_index - 1] if current_index.positive?
@@ -51,7 +53,7 @@ module Searchers
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, user_scope:).merge(
         {
           fl: [Search::Fields::ID],
           rows: 3,

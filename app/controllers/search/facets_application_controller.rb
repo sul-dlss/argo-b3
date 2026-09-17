@@ -12,7 +12,8 @@ module Search
     end
 
     def index
-      facet_counts = Searchers::Facet.call(search_form:, facet_config:, page: required_page_param)
+      facet_counts = Searchers::Facet.call(search_form:, facet_config:, page: required_page_param,
+                                           user_scope: current_user_scope)
       component = Search::FacetComponent.new(
         facet_counts:,
         search_form:,
@@ -27,7 +28,8 @@ module Search
         search_form:,
         field:,
         limit: SEARCH_LIMIT,
-        facet_query: facet_query_param
+        facet_query: facet_query_param,
+        user_scope: current_user_scope
       )
       render(Search::FacetSearchResultComponent.with_collection(facet_counts), content_type: 'text/html')
     end

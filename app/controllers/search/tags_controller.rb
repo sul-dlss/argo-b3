@@ -6,7 +6,8 @@ module Search
     layout false
 
     def index
-      @tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::OTHER_TAGS_EXPLODED)
+      @tags = Searchers::Tag.call(search_form: @search_form, field: Search::Fields::OTHER_TAGS_EXPLODED,
+                                  user_scope: current_user_scope)
     end
   end
 end

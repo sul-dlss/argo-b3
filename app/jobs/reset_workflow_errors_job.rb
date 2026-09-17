@@ -2,11 +2,12 @@
 
 # Job to reset workflow errors for a set of druids based on a search form.
 class ResetWorkflowErrorsJob < ApplicationJob
+  # @param effective_groups [Array<String>] the requesting user's authorization workgroups. This is
+  #   a snapshot taken at enqueue time, so it preserves the requesting user's impersonation context
+  #   even if their workgroups change before the job runs.
   def perform(search_form:, workflow_name:, process_name:, effective_groups:)
-    # Preserve the requesting user's impersonation context when the job runs asynchronously.
-    druids = Current.set(effective_groups:) do
-      druids_for(search_form:, workflow_name:, process_name:)
-    end
+    user_scope = Permissions::UserScope.new(groups: effective_groups)
+    druids = druids_for(search_form:, workflow_name:, process_name:, user_scope:)
     Rails.logger.info "Resetting workflow errors for #{workflow_name} - #{process_name} " \
                       "limited by #{search_form}: #{druids.join(', ')}"
 
@@ -18,9 +19,10 @@ class ResetWorkflowErrorsJob < ApplicationJob
 
   private
 
-  def druids_for(search_form:, workflow_name:, process_name:)
+  def druids_for(search_form:, workflow_name:, process_name:, user_scope:)
     Searchers::DruidList.call(
-      search_form: search_form.with(wps_workflows: [[workflow_name, process_name, 'error'].join(':')])
+      search_form: search_form.with(wps_workflows: [[workflow_name, process_name, 'error'].join(':')]),
+      user_scope:
     )
   end
 end

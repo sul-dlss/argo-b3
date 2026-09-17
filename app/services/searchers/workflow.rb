@@ -8,8 +8,10 @@ module Searchers
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:)
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(search_form:, user_scope:)
       @search_form = search_form
+      @user_scope = user_scope
     end
 
     # @return [SearchResults::FacetCounts] search results
@@ -19,14 +21,14 @@ module Searchers
 
     private
 
-    attr_reader :search_form
+    attr_reader :search_form, :user_scope
 
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, user_scope:).merge(
         {
           'json.facet': facet_json.to_json,
           rows: 0

@@ -6,13 +6,13 @@ module Search
     layout false
 
     def index
-      @results = Searchers::Item.call(search_form: @search_form)
+      @results = Searchers::Item.call(search_form: @search_form, user_scope: current_user_scope)
       set_last_search_cookie
     end
 
     # Retrieve some facets in a separate request to allow the main search to load faster.
     def secondary_facets
-      @results = Searchers::SecondaryFacet.call(search_form: @search_form)
+      @results = Searchers::SecondaryFacet.call(search_form: @search_form, user_scope: current_user_scope)
     end
 
     private

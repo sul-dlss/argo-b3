@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::SecondaryFacet do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(search_form:) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
+  let(:results) { described_class.call(search_form:, user_scope:) }
   let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
@@ -19,7 +20,6 @@ RSpec.describe Searchers::SecondaryFacet do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 

@@ -113,7 +113,8 @@ class ObjectsController < ApplicationController
     return if @last_search_form.blank? || position.nil? || total_results.nil?
     return unless position.positive?
 
-    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:)
+    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:,
+                                                user_scope: current_user_scope)
     return if navigation.blank?
 
     @search_position = position

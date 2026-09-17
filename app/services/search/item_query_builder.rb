@@ -45,8 +45,10 @@ module Search
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:)
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(search_form:, user_scope:)
       @search_form = search_form
+      @user_scope = user_scope
     end
 
     # @return [Hash] parts of Solr request
@@ -64,10 +66,10 @@ module Search
 
     private
 
-    attr_reader :search_form
+    attr_reader :search_form, :user_scope
 
     def permission_filter
-      PermissionFilter.call
+      PermissionFilter.call(user_scope:)
     end
 
     def filter_queries

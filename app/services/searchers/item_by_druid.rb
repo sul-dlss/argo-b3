@@ -8,9 +8,11 @@ module Searchers
     end
 
     # @param druids [Array<String>]
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @param fields [Array<String>] fields to include in the results
-    def initialize(druids:, fields: Item::FIELD_LIST)
+    def initialize(druids:, user_scope:, fields: Item::FIELD_LIST)
       @druids = druids
+      @user_scope = user_scope
       @fields = fields
     end
 
@@ -21,7 +23,7 @@ module Searchers
 
     private
 
-    attr_reader :druids, :fields
+    attr_reader :druids, :user_scope, :fields
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -29,7 +31,7 @@ module Searchers
 
     def solr_request
       {
-        fq: [solr_fq, Search::PermissionFilter.call].compact,
+        fq: [solr_fq, Search::PermissionFilter.call(user_scope:)].compact,
         fl: fields,
         rows: druids.size
       }

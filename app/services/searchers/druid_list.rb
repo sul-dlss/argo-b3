@@ -8,8 +8,10 @@ module Searchers
     end
 
     # @param search_form [SearchForm]
-    def initialize(search_form:, limit: 10_000_000)
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(search_form:, user_scope:, limit: 10_000_000)
       @search_form = search_form
+      @user_scope = user_scope
       @limit = limit
     end
 
@@ -20,14 +22,14 @@ module Searchers
 
     private
 
-    attr_reader :search_form, :limit
+    attr_reader :search_form, :user_scope, :limit
 
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
 
     def solr_request
-      Search::ItemQueryBuilder.call(search_form:).merge(
+      Search::ItemQueryBuilder.call(search_form:, user_scope:).merge(
         {
           fl: [Search::Fields::ID],
           rows: limit
