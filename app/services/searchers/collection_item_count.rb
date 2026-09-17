@@ -8,17 +8,19 @@ module Searchers
     end
 
     # @param collection_druid [String]
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @return [Integer] number of items in the collection
-    def initialize(collection_druid:)
+    def initialize(collection_druid:, user_scope:)
       @collection_druid = collection_druid
+      @user_scope = user_scope
     end
 
     def call
-      QueryCount.call(query: "#{Search::Fields::COLLECTION_DRUIDS}:\"#{collection_druid}\"")
+      QueryCount.call(query: "#{Search::Fields::COLLECTION_DRUIDS}:\"#{collection_druid}\"", user_scope:)
     end
 
     private
 
-    attr_reader :collection_druid
+    attr_reader :collection_druid, :user_scope
   end
 end

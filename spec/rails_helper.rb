@@ -78,7 +78,8 @@ RSpec.configure do |config|
 
   config.before do
     # Ensure each example starts with a clean request context.
-    # Some specs set Current.effective_groups / Current.impersonated_groups directly.
+    # The policy specs (and permission_filter_spec, which asserts agreement with ObjectPolicy) set
+    # Current.effective_groups / Current.impersonated_groups directly.
     Current.reset
 
     # ApplicationPolicy memoizes admin workgroups with a class variable.

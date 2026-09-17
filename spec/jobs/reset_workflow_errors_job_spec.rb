@@ -26,7 +26,8 @@ RSpec.describe ResetWorkflowErrorsJob do
     job.perform(workflow_name:, process_name:, search_form:, effective_groups: user.groups)
 
     expect(Searchers::DruidList).to have_received(:call)
-      .with(search_form: having_attributes(query: 'test', wps_workflows: ['accessionWF:update-doi:error']))
+      .with(search_form: having_attributes(query: 'test', wps_workflows: ['accessionWF:update-doi:error']),
+            user_scope: an_instance_of(Permissions::UserScope))
     # The caller's form must not be modified in place.
     expect(search_form.wps_workflows).to be_empty
     expect(Dor::Services::Client).to have_received(:object).with('druid:fm262cb0015')

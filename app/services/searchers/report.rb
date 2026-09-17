@@ -4,9 +4,10 @@ module Searchers
   # Searcher for streaming a report
   class Report < BaseReport
     # @param search_form [SearchForm]
-    def initialize(search_form:, fields:, rows:, stream: nil)
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(search_form:, fields:, rows:, user_scope:, stream: nil)
       @search_form = search_form
-      super(fields:, rows:, stream:)
+      super(fields:, rows:, user_scope:, stream:)
     end
 
     private
@@ -14,7 +15,7 @@ module Searchers
     attr_reader :search_form
 
     def solr_request_query
-      Search::ItemQueryBuilder.call(search_form:)
+      Search::ItemQueryBuilder.call(search_form:, user_scope:)
     end
   end
 end

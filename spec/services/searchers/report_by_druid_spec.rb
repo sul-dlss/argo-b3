@@ -4,13 +4,12 @@ require 'rails_helper'
 
 RSpec.describe Searchers::ReportByDruid do
   let(:user) { create(:user, :admin) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
   let(:druids) { ['druid:rt276nw8963', 'druid:kk754nn3333'] }
   let(:fields) { [Reports::Fields::DRUID.field, Reports::Fields::PURL.field] }
 
-  before { Current.effective_groups = user.groups }
-
   context 'when streaming results' do
-    subject(:results) { described_class.call(druids:, fields:, stream:, rows: 10) }
+    subject(:results) { described_class.call(druids:, fields:, stream:, rows: 10, user_scope:) }
 
     let(:stream) { StringIO.new }
 
@@ -34,7 +33,7 @@ RSpec.describe Searchers::ReportByDruid do
   end
 
   context 'when not streaming results' do
-    subject(:results) { described_class.call(druids:, fields:, rows: 10) }
+    subject(:results) { described_class.call(druids:, fields:, rows: 10, user_scope:) }
 
     let(:csv_string) do
       <<~CSV
@@ -73,16 +72,15 @@ RSpec.describe Searchers::ReportByDruid do
     let!(:hidden_document) { create(:solr_item, apo_druid: restricted_apo_druid) }
 
     before do
-      Current.effective_groups = user.groups
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'filters previews and streamed downloads to only readable items' do
       druids = [visible_document, hidden_document].pluck(Search::Fields::ID)
       fields = [Search::Fields::ID]
-      preview = described_class.call(druids:, fields:, rows: 10)
+      preview = described_class.call(druids:, fields:, rows: 10, user_scope:)
       stream = StringIO.new
-      described_class.call(druids:, fields:, rows: 10, stream:)
+      described_class.call(druids:, fields:, rows: 10, stream:, user_scope:)
 
       expect(preview.map(&:fields).flatten).to eq([visible_document.fetch(Search::Fields::ID)])
       expect(stream.string).to include(visible_document.fetch(Search::Fields::ID))

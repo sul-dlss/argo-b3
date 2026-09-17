@@ -8,9 +8,11 @@ module Searchers
     end
 
     # @param query [String] Solr query to count
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @return [Integer] number of matching results
-    def initialize(query:)
+    def initialize(query:, user_scope:)
       @query = query
+      @user_scope = user_scope
     end
 
     def call
@@ -19,7 +21,7 @@ module Searchers
 
     private
 
-    attr_reader :query
+    attr_reader :query, :user_scope
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -28,7 +30,7 @@ module Searchers
     def solr_request
       {
         q: query,
-        fq: [Search::PermissionFilter.call].compact,
+        fq: [Search::PermissionFilter.call(user_scope:)].compact,
         rows: 0
       }
     end

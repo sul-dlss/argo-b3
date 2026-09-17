@@ -9,11 +9,13 @@ module Searchers
 
     # @param fields [Array<String>] fields to include in the report
     # @param rows [Integer] number of rows to return
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @param stream [IO, nil] stream to write results to; if nil, returns CSV::Table.
     # @return [CSV::Table, nil] search results if stream is nil, otherwise CSV::Table.
-    def initialize(fields:, rows:, stream: nil)
+    def initialize(fields:, rows:, user_scope:, stream: nil)
       @fields = fields
       @rows = rows
+      @user_scope = user_scope
       @stream = stream
     end
 
@@ -28,7 +30,7 @@ module Searchers
 
     private
 
-    attr_reader :rows, :fields, :stream
+    attr_reader :rows, :fields, :user_scope, :stream
 
     # @return [Hash] solr request query specific to the report
     def solr_request_query

@@ -18,7 +18,10 @@ class WorkflowGridController < SearchApplicationController
     # /workflow_grid?placeholder=false renders with real data.
     # The initial load of the workflow grid uses placeholders for faster rendering,
     # then the turbo-frame loads itself with the placeholder parameter to get real data.
-    @workflow_process_counts = Searchers::Workflow.call(search_form: @search_form) unless placeholder?
+    return if placeholder?
+
+    @workflow_process_counts = Searchers::Workflow.call(search_form: @search_form,
+                                                        user_scope: current_user_scope)
   end
 
   # Resets workflow errors to waiting
@@ -27,7 +30,7 @@ class WorkflowGridController < SearchApplicationController
     @process_name = params[:process_name]
     ResetWorkflowErrorsJob.perform_later(search_form: @search_form, workflow_name: @workflow_name,
                                          process_name: @process_name,
-                                         effective_groups: Current.effective_groups)
+                                         effective_groups: current_effective_groups)
   end
 
   private

@@ -8,6 +8,10 @@ RSpec.describe Search::PermissionFilter, :solr do
   let(:collection_druid) { 'druid:df234gh5678' }
   let(:other_collection_druid) { 'druid:hj345km6789' }
   let(:object_druid) { 'druid:np456qr7890' }
+  # Drives both sides of the comparison: `user_scope` for the filter under test, and
+  # `Current.effective_groups` for the ObjectPolicy the filter is asserted to agree with.
+  let(:effective_groups) { user.groups }
+  let(:user_scope) { Permissions::UserScope.new(groups: Array(effective_groups)) }
   let(:documents) do
     [
       build(:solr_item, druid: object_druid, apo_druid:,
@@ -19,7 +23,7 @@ RSpec.describe Search::PermissionFilter, :solr do
   end
 
   before do
-    Current.effective_groups = user.groups
+    Current.effective_groups = effective_groups
     Search::SolrFactory.call.add(documents)
     Search::SolrFactory.call.commit
   end
@@ -28,7 +32,7 @@ RSpec.describe Search::PermissionFilter, :solr do
     it 'matches exactly the documents authorized by ObjectPolicy' do
       expected_ids = documents.select { |document| ObjectPolicy.new(document, user:).apply(:show?) }
                               .pluck(Search::Fields::ID)
-      response = Search::SolrService.post(request: { q: '*:*', fq: [described_class.call].compact })
+      response = Search::SolrService.post(request: { q: '*:*', fq: [described_class.call(user_scope:)].compact })
 
       expect(response.fetch('response').fetch('docs').pluck(Search::Fields::ID)).to match_array(expected_ids)
       expect(response.fetch('response').fetch('numFound')).to eq(expected_ids.size)
@@ -41,13 +45,10 @@ RSpec.describe Search::PermissionFilter, :solr do
 
   context 'without effective groups' do
     let(:user) { create(:user, :admin) }
-
-    before do
-      Current.effective_groups = nil
-    end
+    let(:effective_groups) { nil }
 
     it 'fails closed' do
-      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call })
+      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call(user_scope:) })
 
       expect(response.fetch('response').fetch('numFound')).to eq(0)
     end
@@ -94,16 +95,16 @@ RSpec.describe Search::PermissionFilter, :solr do
 
   context 'when impersonating a restricted reader' do
     let(:user) { create(:user, :admin) }
+    let(:effective_groups) { ['sdr:impersonated'] }
 
     before do
       create(:permission, :read_restricted, workgroup: 'sdr:impersonated', target_druid: collection_druid)
-      Current.effective_groups = ['sdr:impersonated']
     end
 
     it_behaves_like 'the object policy scope'
 
     it 'does not inherit administrator access' do
-      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call })
+      response = Search::SolrService.post(request: { q: '*:*', fq: described_class.call(user_scope:) })
 
       expect(response.fetch('response').fetch('docs').pluck(Search::Fields::ID))
         .to contain_exactly(object_druid, collection_druid)

@@ -41,6 +41,19 @@ module Authentication
     Current.user
   end
 
+  # The authorization workgroups in effect for this request.
+  # @return [Array<String>]
+  def current_effective_groups
+    Array(Current.effective_groups)
+  end
+
+  # The permission scope of the requesting user, for passing to search and Solr services as
+  # `user_scope:`.
+  # @return [Permissions::UserScope]
+  def current_user_scope
+    @current_user_scope ||= Permissions::UserScope.new(groups: current_effective_groups)
+  end
+
   private
 
   def remote_user

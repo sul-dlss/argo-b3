@@ -7,22 +7,23 @@ module Search
     TARGET_FIELDS = [Fields::ID, Fields::COLLECTION_DRUIDS, Fields::APO_DRUID].freeze
     MATCH_NONE_FILTER = '(*:* AND NOT *:*)'
 
-    def self.call
-      new.call
+    def self.call(...)
+      new(...).call
     end
 
-    def initialize
-      @scope = Permissions::UserScope.new(groups: Array(Current.effective_groups))
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(user_scope:)
+      @user_scope = user_scope
     end
 
     def call
-      return if @scope.admin? # admins can see everything, no filtering required
+      return if user_scope.admin? # admins can see everything, no filtering required
 
       # not an admin?  first include any objects the user can explicitly edit or has read_restricted access to
-      queries = [target_query(@scope.allowed_targets)]
+      queries = [target_query(user_scope.allowed_targets)]
 
-      if @scope.read_unrestricted?
-        restricted_query = target_query(@scope.all_restricted_targets)
+      if user_scope.read_unrestricted?
+        restricted_query = target_query(user_scope.all_restricted_targets)
         return if restricted_query.nil? # no filtering required if aren't any restricted objects for read_unrestricted
 
         # read_unrestricted will match all objects except those governed by object/collection/APOs marked as restricted
@@ -38,6 +39,8 @@ module Search
     end
 
     private
+
+    attr_reader :user_scope
 
     # Builds a query matching target druids from permission records (`Permission`) against
     # an object's druid, collection druids, or governing APO druid.

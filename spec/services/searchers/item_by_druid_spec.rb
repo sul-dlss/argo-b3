@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::ItemByDruid do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(druids:) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
+  let(:results) { described_class.call(druids:, user_scope:) }
   let(:druids) { ['druid:rt276nw8963', 'druid:kk754nn3333'] }
   let(:solr_response) do
     {
@@ -20,7 +21,6 @@ RSpec.describe Searchers::ItemByDruid do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -43,14 +43,13 @@ RSpec.describe Searchers::ItemByDruid do
     let!(:hidden_document) { create(:solr_item, apo_druid: restricted_apo_druid) }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'only returns readable items from the supplied druids' do
       druids = [visible_document, hidden_document].pluck(Search::Fields::ID)
-      results = described_class.call(druids:)
+      results = described_class.call(druids:, user_scope:)
 
       expect(results.map(&:druid)).to eq([visible_document.fetch(Search::Fields::ID)])
     end
