@@ -22,10 +22,9 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Draft, not deposited')
-      expect(page).to have_button('Edit item', class: 'btn btn-outline-primary btn-sm disabled')
-      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit",
-                                                class: 'btn btn-outline-primary btn-sm')
-      expect(page).to have_button('Deposit', class: 'btn btn-primary btn-sm disabled')
+      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_button('Deposit', class: 'disabled')
     end
   end
 
@@ -37,9 +36,8 @@ RSpec.describe Show::StatusComponent, type: :component do
 
       expect(page).to have_css('h2', text: 'Deposited')
       expect(page).to have_css('h2 i.bi-check-circle-fill')
-      expect(page).to have_button('Edit item', class: 'btn btn-outline-primary btn-sm disabled')
-      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit",
-                                                class: 'btn btn-outline-primary btn-sm')
+      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_button('Manage files', class: 'disabled')
       expect(page).to have_no_button('Deposit')
     end
   end
