@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe BulkActions::CloseVersionJob do
+RSpec.describe BulkActions::RedepositJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bc123df4567' }
@@ -39,7 +39,7 @@ RSpec.describe BulkActions::CloseVersionJob do
       allow(job_item).to receive(:check_update_ability?).and_return(false)
     end
 
-    it 'does not close the version' do
+    it 'does not redeposit the object' do
       job.perform_now
 
       expect(job_item).not_to have_received(:close_version_if_needed!)

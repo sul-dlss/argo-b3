@@ -10,11 +10,13 @@
         <% else %>
           <span style="font-weight: var(--sul-link-font-weight);"><%= bulk_action_config.label %></span>
         <% end %>
-        <p class="mb-2">
-          <small>
-            <%= bulk_action_config.help_text %>
-          </small>
-        </p>
+        <% if bulk_action_config.help_text.present? %>
+          <p class="mb-2">
+            <small>
+              <%= bulk_action_config.help_text %>
+            </small>
+          </p>
+        <% end %>
       </li>
     <% end %>
   </ul>

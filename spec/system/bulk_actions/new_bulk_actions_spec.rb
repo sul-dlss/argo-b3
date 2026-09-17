@@ -14,35 +14,42 @@ RSpec.describe 'New bulk actions', :rack_test do
 
     within('section#perform-actions-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Perform actions')
+      expect(page).to have_link('Manage release')
+      expect(page).to have_link('Republish')
       expect(page).to have_link('Reindex')
-      expect(page).to have_css('p', text: 'Reindexes the DOR object in Solr.')
+      expect(page).to have_css('p', text: 'Reindex objects in Solr.')
       expect(page).to have_css('li', count: 3)
     end
 
     within('section#modify-objects-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Modify objects')
-      expect(page).to have_link('Open new version')
+      expect(page).to have_link('Redeposit')
+      expect(page).to have_css('li', count: 5)
     end
 
     within('section#manage-descriptive-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage descriptive metadata')
-      expect(page).to have_link('Refresh metadata from FOLIO record')
+      expect(page).to have_link('Refresh metadata from FOLIO')
+      expect(page).to have_css('li', count: 7)
     end
 
     within('section#manage-rights-and-administrative-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage rights and administrative metadata')
       expect(page).to have_link('Update rights')
-      expect(page).to have_link('Update source id')
+      expect(page).to have_link('Update source ID')
+      expect(page).to have_css('li', count: 6)
     end
 
     within('section#manage-structural-metadata-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Manage structural metadata')
       expect(page).to have_link('Update content type')
+      expect(page).to have_css('li', count: 5)
     end
 
     within('section#tags-and-reporting-bulk-actions-section') do
       expect(page).to have_css('h2', text: 'Tags and reporting')
       expect(page).to have_link('Export tags')
+      expect(page).to have_css('li', count: 5)
     end
   end
 end

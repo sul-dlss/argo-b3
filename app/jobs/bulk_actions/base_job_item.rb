@@ -54,7 +54,7 @@ module BulkActions
     end
 
     def close_version_if_needed!(force: false)
-      # Note that force is set for the close version job which doesn't use the close_version param.
+      # Note that force is set for the redeposit job, which doesn't use the close_version param.
       # Do not close version unless requested to by user (via a job parameter)
       return unless close_version? || force
 
