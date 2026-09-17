@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'PinnedSearches' do
   let(:user) { create(:user) }
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
   before do
     sign_in(user)

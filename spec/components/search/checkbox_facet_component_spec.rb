@@ -6,7 +6,7 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
   let(:component) do
     described_class.new(facet_counts:, search_form:, form_field: :object_types)
   end
-  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2, query: 'test') }
+  let(:search_form) { ResultsSearchForm.new(object_types: ['collection'], page: 2, query: 'test') }
   let(:facet_counts) do
     [
       SearchResults::FacetCount.new(value: 'collection', count: 10),

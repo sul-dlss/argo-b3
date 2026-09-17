@@ -22,7 +22,7 @@ module Search
     end
 
     def path
-      search_path(form_field => [value])
+      url_for(ResultsSearchForm.new(form_field => [value]))
     end
   end
 end

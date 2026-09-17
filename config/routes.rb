@@ -21,7 +21,10 @@ Rails.application.routes.draw do
 
   # resource :home, only: [:show], controller: 'home'
 
-  resource :search, only: [:show], controller: 'search' do
+  # Facet and field-value endpoints are shared by every search view. They are mounted under each
+  # view's route so that the route (not a user-supplied param) determines which search form class
+  # the controller builds -- see SearchFormConcern.
+  concern :search_endpoints do
     scope module: :search do
       resources :items, only: [:index] do
         collection do
@@ -111,15 +114,35 @@ Rails.application.routes.draw do
     end
   end
 
+  # Every route that builds a search form declares which view it belongs to via the view_form
+  # default. Route defaults take precedence over query params, so the view cannot be spoofed.
+  scope defaults: { view_form: 'results' } do
+    resource :search, only: [:show], controller: 'search' do
+      concerns :search_endpoints
+    end
+  end
+
+  scope defaults: { view_form: 'workflow_grid' } do
+    resource :workflow_grid, only: %i[show], controller: 'workflow_grid' do
+      concerns :search_endpoints
+      post 'reset'
+    end
+  end
+
+  # Routes a search form to its view. Each form class maps to its own route, so components can call
+  # url_for(form) without knowing which view they are rendering in.
+  # Note that the mapping is keyed by model_name, which Blanks derives by stripping the "Form"
+  # suffix, so these are named via model_name rather than spelled out.
+  resolve(ResultsSearchForm.model_name.name) { |form, options| [:search, form.attributes.merge(options)] }
+  resolve(WorkflowGridSearchForm.model_name.name) do |form, options|
+    [:workflow_grid, form.attributes.merge(options)]
+  end
+
   resource :report, only: [:show], controller: 'reports' do
     collection do
       post 'download'
       post 'preview'
     end
-  end
-
-  resource :workflow_grid, only: %i[show], controller: 'workflow_grid' do
-    post 'reset'
   end
 
   resources :bulk_actions, only: %i[new index destroy show] do

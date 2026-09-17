@@ -7,7 +7,7 @@ RSpec.describe Searchers::Workflow do
 
   let(:user) { create(:user, :reader) }
 
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { WorkflowGridSearchForm.new(query: 'test') }
 
   let(:solr_response) do
     {
@@ -68,7 +68,7 @@ RSpec.describe Searchers::Workflow do
     end
 
     it 'only counts workflows on readable items' do
-      counts = described_class.call(search_form: SearchForm.new(query: 'Test'))
+      counts = described_class.call(search_form: WorkflowGridSearchForm.new(query: 'Test'))
 
       expect(counts.count_for(workflow_name: 'accessionWF', process_name: 'publish', status: 'completed')).to eq(1)
     end

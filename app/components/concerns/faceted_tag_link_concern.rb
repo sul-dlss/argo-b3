@@ -14,8 +14,8 @@ module FacetedTagLinkConcern
   def search_path_for(tag)
     prefix, value = tag.split(' : ', 2)
     form_field = FACETED_TAG_PREFIXES[prefix]
-    return search_path(tags: [tag]) unless form_field && value
+    return url_for(ResultsSearchForm.new(tags: [tag])) unless form_field && value
 
-    search_path(form_field => [value])
+    url_for(ResultsSearchForm.new(form_field => [value]))
   end
 end

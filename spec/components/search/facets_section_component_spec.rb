@@ -6,7 +6,7 @@ RSpec.describe Search::FacetsSectionComponent, type: :component do
   let(:component) { described_class.new(search_form:) }
 
   context 'with a blank search form' do
-    let(:search_form) { SearchForm.new }
+    let(:search_form) { ResultsSearchForm.new }
 
     it 'renders containers for facets' do
       render_inline(component)
@@ -20,7 +20,7 @@ RSpec.describe Search::FacetsSectionComponent, type: :component do
   end
 
   context 'with a populated search form' do
-    let(:search_form) { SearchForm.new(query: 'test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
     it 'renders containers for all facets' do
       render_inline(component)

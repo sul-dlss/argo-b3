@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe FormSerializer do
-  let(:form) { SearchForm.new(query: 'test', object_types: %w[collection item]) }
+  let(:form) { ResultsSearchForm.new(query: 'test', object_types: %w[collection item]) }
 
   it 'serializes and deserializes an ApplicationForm' do
     serialized = described_class.serialize(form)
     # Change to JSON and back to simulate ActiveJob serialization.
     serialized = JSON.parse(serialized.to_json)
     deserialized = described_class.deserialize(serialized)
-    expect(deserialized).to be_a(SearchForm)
+    expect(deserialized).to be_a(ResultsSearchForm)
     expect(deserialized.attributes).to eq(form.attributes)
   end
 

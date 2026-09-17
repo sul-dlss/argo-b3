@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe WorkflowGrid::WorkflowTablesComponent, type: :component do
-  let(:component) { described_class.new(templates:, search_form:, scope: 'all', workflow_process_counts:) }
+  let(:component) { described_class.new(templates:, search_form:, workflow_process_counts:) }
 
   let(:workflow_process_counts) { nil }
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { WorkflowGridSearchForm.new(query: 'test') }
   let(:templates) do
     {
       'accessionWF' => ACCESSIONWF_TEMPLATE
@@ -17,7 +17,7 @@ RSpec.describe WorkflowGrid::WorkflowTablesComponent, type: :component do
     it 'renders the placeholder workflow tables' do
       render_inline(component)
 
-      expect(page).to have_css('turbo-frame#workflow-grid[src="/workflow_grid?placeholder=false&scope=all"]')
+      expect(page).to have_css('turbo-frame#workflow-grid[src="/workflow_grid?placeholder=false&query=test"]')
       expect(page).to have_css('turbo-frame table#workflow-table-accessionWF tbody td span.placeholder')
     end
   end

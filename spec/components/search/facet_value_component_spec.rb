@@ -7,7 +7,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
     described_class.new(count: 10, search_form:, form_field: :object_types,
                         value: 'collection', label:, data:)
   end
-  let(:search_form) { SearchForm.new(object_types: ['collection'], page: 2) }
+  let(:search_form) { ResultsSearchForm.new(object_types: ['collection'], page: 2) }
   let(:label) { nil }
   let(:data) { {} }
 
@@ -21,7 +21,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
   end
 
   context 'when not selected' do
-    let(:search_form) { SearchForm.new(object_types: ['item'], page: 2) }
+    let(:search_form) { ResultsSearchForm.new(object_types: ['item'], page: 2) }
 
     it 'renders the unselected facet value' do
       render_inline(component)
@@ -79,7 +79,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
                           value: 'dark')
     end
 
-    let(:search_form) { SearchForm.new(access_rights_exclude: ['dark'], object_types: ['collection'], page: 2) }
+    let(:search_form) { ResultsSearchForm.new(access_rights_exclude: ['dark'], object_types: ['collection'], page: 2) }
 
     it 'renders the exclude link' do
       render_inline(component)

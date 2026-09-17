@@ -8,7 +8,7 @@ RSpec.describe WorkflowGrid::ResetButtonComponent, type: :component do
   end
 
   let(:status) { 'error' }
-  let(:search_form) { SearchForm.new(query: 'test') }
+  let(:search_form) { WorkflowGridSearchForm.new(query: 'test') }
 
   it 'renders the reset button when status is error' do
     render_inline(component)

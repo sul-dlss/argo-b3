@@ -69,17 +69,15 @@ module Search
 
     def project_links
       result.projects.map do |project|
-        search_form = SearchForm.new(projects: [project])
-        helpers.link_to(project,
-                        search_path(search_form.with_attributes(page: nil)), data: { turbo_frame: '_top' })
+        search_form = ResultsSearchForm.new(projects: [project])
+        helpers.link_to(project, helpers.url_for(search_form), data: { turbo_frame: '_top' })
       end
     end
 
     def ticket_links
       result.tickets.map do |ticket|
-        search_form = SearchForm.new(tickets: [ticket])
-        helpers.link_to(ticket,
-                        search_path(search_form.with_attributes(page: nil)), data: { turbo_frame: '_top' })
+        search_form = ResultsSearchForm.new(tickets: [ticket])
+        helpers.link_to(ticket, helpers.url_for(search_form), data: { turbo_frame: '_top' })
       end
     end
   end

@@ -14,7 +14,7 @@ RSpec.describe ValidateFormJob do
 
   describe '#perform' do
     context 'when the form is valid' do
-      let(:form) { SearchForm.new(query: 'test') }
+      let(:form) { ResultsSearchForm.new(query: 'test') }
 
       it 'marks the form validation action valid' do
         job.perform(form_validation_action:)
@@ -57,7 +57,7 @@ RSpec.describe ValidateFormJob do
     end
 
     context 'when validating is underway' do
-      let(:form) { SearchForm.new(query: 'test') }
+      let(:form) { ResultsSearchForm.new(query: 'test') }
 
       it 'has marked the form validation action started' do
         status_while_validating = nil
@@ -72,7 +72,7 @@ RSpec.describe ValidateFormJob do
     end
 
     context 'when validating the form raises' do
-      let(:form) { SearchForm.new(query: 'test') }
+      let(:form) { ResultsSearchForm.new(query: 'test') }
       let(:error) { StandardError.new('oops') }
 
       before do

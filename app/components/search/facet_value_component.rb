@@ -44,7 +44,7 @@ module Search
 
     def remove_path
       remove_form_field = exclude_selected? ? exclude_form_field : form_field
-      search_path(search_form.without_attributes({ remove_form_field => value, page: nil }))
+      url_for(search_form.without({ remove_form_field => value, page: nil }))
     end
   end
 end

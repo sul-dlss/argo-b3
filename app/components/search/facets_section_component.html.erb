@@ -1,5 +1,5 @@
 <section aria-label="Facets" class="facets">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h4, classes: 'facets-heading', text: 'Filters') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3, text: 'Limit your search') %>
 
   <% unless blank_search? %>
     <%= render Search::LoadingFacetFrameComponent.new(search_form:, facet_config: Search::Facets::PROJECTS) %>

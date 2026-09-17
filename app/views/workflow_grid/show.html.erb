@@ -1,28 +1,27 @@
-<div class="container" data-controller="workflow-grid">
-  <%= form_with url: workflow_grid_path, method: :get do |form| %>
-    <fieldset>
-      <legend>Select scope for workflow grid:</legend>
+<%= content_for :title, t('workflow_grid.label') %>
 
-      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :scope,
-                                                                    label_text: 'All items',
-                                                                    input_value: 'all',
-                                                                    input_checked: @scope == 'all') %>
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
 
-      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :scope,
-                                                                    label_text: 'From last search',
-                                                                    input_value: 'last_search',
-                                                                    input_disabled: !defined?(@last_search_form),
-                                                                    input_checked: @scope == 'last_search') do |component| %>
-        <% if defined?(@last_search_form) %>
-          <%= component.with_additional_container_content do %>
-            <p><%= @total_results %> items for: <%= @last_search_form.to_s %></p>
-          <% end %>
-        <% end %>
-      <% end %>
+<div class="container my-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('workflow_grid.label'), classes: 'mb-4') %>
 
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Go', variant: :primary) %>
-    </fieldset>
+  <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: false) %>
+
+  <%= render Search::LayoutComponent.new do |layout| %>
+    <%= layout.with_main_content do %>
+      <%= render Search::ViewToggleComponent.new(search_form: @search_form) %>
+
+      <%= render WorkflowGrid::WorkflowTablesComponent.new(templates: @templates, search_form: @search_form, workflow_process_counts: @workflow_process_counts) %>
+
+      <%# Populates the facets in the sidebar. See Searchers::SecondaryFacet. %>
+      <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_workflow_grid_items_path(@search_form.attributes) %>
+    <% end %>
+
+    <%= layout.with_sidebar do %>
+      <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
+    <% end %>
   <% end %>
-
-  <%= render WorkflowGrid::WorkflowTablesComponent.new(templates: @templates, search_form: @search_form, scope: @scope, workflow_process_counts: @workflow_process_counts) %>
 </div>

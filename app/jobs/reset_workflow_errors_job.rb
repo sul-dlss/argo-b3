@@ -19,7 +19,8 @@ class ResetWorkflowErrorsJob < ApplicationJob
   private
 
   def druids_for(search_form:, workflow_name:, process_name:)
-    search_form.wps_workflows << [workflow_name, process_name, 'error'].join(':')
-    Searchers::DruidList.call(search_form:)
+    Searchers::DruidList.call(
+      search_form: search_form.with(wps_workflows: [[workflow_name, process_name, 'error'].join(':')])
+    )
   end
 end

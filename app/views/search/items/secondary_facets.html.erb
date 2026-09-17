@@ -104,4 +104,15 @@
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::LANGUAGES,
                                                           facet_counts: @results.languages_facet,
                                                           search_form: @search_form) %>
+
+  <%# Views without item results get the primary facets here instead. See Searchers::SecondaryFacet. %>
+  <% unless @search_form.item_results? %>
+    <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::OBJECT_TYPES,
+                                                            facet_counts: @results.object_types_facet,
+                                                            search_form: @search_form, facet_component: :checkbox) %>
+
+    <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::CONTENT_TYPES,
+                                                            facet_counts: @results.content_types_facet,
+                                                            search_form: @search_form, facet_component: :checkbox) %>
+  <% end %>
 <% end %>

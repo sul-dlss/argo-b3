@@ -25,15 +25,19 @@ module Search
 
     attr_reader :facet_config, :facet_counts, :search_form, :facet_component
 
-    delegate :form_field, :facet_search_path_helper, :exclude_form_field, :date_from_form_field, :date_to_form_field,
+    delegate :form_field, :exclude_form_field, :date_from_form_field, :date_to_form_field,
              to: :facet_config
+
+    def facet_search_path_helper
+      Search::FacetPathResolver.search_path_helper(facet_config:, search_form:)
+    end
 
     def facet_id
       helpers.facet_id(form_field)
     end
 
     def facet_page_path_helper
-      facet_config.facet_path_helper
+      Search::FacetPathResolver.index_path_helper(facet_config:, search_form:)
     end
 
     def facet_search_path

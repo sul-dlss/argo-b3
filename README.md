@@ -223,8 +223,20 @@ In addition to supporting discovery of items (DROs, collections, and admin polic
 * Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)
 * Is optimized for slow searching / faceting (1) by asynchronously loading some search results and facets (2) by splitting up searching for item results and a small number of primary facets from the rest of the facets (secondary facets)/
 
+### Search forms and views
+A search is represented by a search form. `SearchForm` is an abstract base class holding the attributes that determine *which objects match* (the query and all of the facet fields). Each **view** of a search is a subclass:
+
+* `ResultsSearchForm` - the search results view (`/search`). Adds the attributes that only affect how matching objects are presented as a list: `page` and `sort`.
+* `WorkflowGridSearchForm` - the workflow grid / workflow status view (`/workflow_grid`). See [Workflow grid](#workflow-grid).
+
+A form's **class** is what identifies its view; there is deliberately no `view` attribute, so there is only one source of truth. Views differ in behavior via capability predicates on the form (`pinnable?`, `sortable?`, `item_results?`) rather than via type checks in components.
+
+Because both views share the same query attributes and the same facet UI, components build links by handing a form to `url_for` rather than naming a route: `resolve` in `config/routes.rb` maps each form class to its view's route, so `url_for(search_form.with(...))` keeps the user in whichever view they are already in. `SearchForm#with`, `#without` and `#as` return new forms (they never mutate), dropping any attribute the target class does not declare - so a facet link that resets `page` works unchanged on a view that has no paging.
+
+Which form class a request builds is determined by the **route**, not by a param: every route that builds a search form is declared under a `scope defaults: { view_form: ... }`, and `SearchFormConcern` maps that to a form class.
+
 The following will help illustrate the discovery system components involved for a search from the home page:
-1. The search form is rendered from `SearchForm`.
+1. The search form is rendered from `ResultsSearchForm`.
 2. The user enters a query in the search form and starts the search.
 3. The page is rendered with:
   * An async turbo frame for items and primary facets.
@@ -237,7 +249,7 @@ The following will help illustrate the discovery system components involved for 
   * Turbo stream replace elements (`<turbo-stream action="replace">`) for the primary facets containing the facet content. When rendering the page, Turbo replaces the empty divs with the facet content.
 5. Concurrently, the secondary facets async turbo frame calls `Search::ItemsController.secondary_facets`. This invokes the secondary facets searcher (`Searchers::SecondaryFacet`) which queries Solr and returns `SearchResults::Items`. The rendered response includes turbo stream replace elements for the secondary facets containing the facet content.
 5. Concurrently, each of the async field value turbo frames calls the appropriate search controller (e.g., `Search::ProjectsController.index`). This invokes the appropriate searcher (e.g., `Searchers::Project`) which queries Solr and returns `SearchResults::FacetValues` (a wrapper around the Solr response). The rendered response includes the field value search results (e.g., a list of projects).
-6. Concurrently, each of the lazy facet async turbo frames calls the appropriate endpoint on the `Search::FacetsController` (e.g., `project_tags` for the projects facet). This invokes the facets searcher (`Searchers::Facet`) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
+6. Concurrently, each of the lazy facet async turbo frames calls the appropriate `Search::*FacetsController` (e.g., `Search::ProjectFacetsController` for the projects facet). This invokes the facets searcher (`Searchers::Facet`, or `Searchers::HierarchicalFacet` for hierarchical facets) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
 
 Notes:
 * On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
@@ -255,9 +267,9 @@ The lazy async pattern should be used for slow facets. Each of these facets invo
 1. Add an attribute for the facet to `SearchForm`.
 2. Add any new solr fields to `Search::Fields`.
 3. Add a `Search::LoadingFacetFrameComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `turbo-frame` that will be replaced with the facet content.
-4. Add a new `*_facets` resource to `routes.rb` providing the `index` route. See for example, `:tag_facets`.
+4. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`, providing the `index` route. See for example, `:tag_facets`.
 5. Add a new `Search::*FacetsController` and add a request spec. For simple (non-hierarchical) paged facets, call `serves_facet <Config>` — the `index` and `search` actions are inherited from `FacetsApplicationController`. For hierarchical facets, implement a custom `index` and `children` method. See for example, `Search::TagFacetsController`.
-6. Add a configuration constant to `Search::Facets`. This must include the `form_field`, `field`, and `facet_path_helper` attributes.
+6. Add a configuration constant to `Search::Facets`. This must include the `form_field` and `field` attributes, plus `facet_resource` (the routing resource added in step 4) and `facet_index: true`.
 7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
 8. Optionally, add a label for the facet to `en.yml`.
 
@@ -277,17 +289,17 @@ The non-lazy sync pattern should be used for fast facets. The facet values are r
 8. Optionally, add a label for the facet to `en.yml`.
 
 ### Adding paging to a facet
-1. Add a new `*_facets` resource to `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
+1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
 2. Add a new `Search::*FacetsController` that calls `serves_facet <Config>` and add a request spec using the `'a simple facet controller'` shared examples. See for example, `Search::MimetypeFacetsController`. The `index` action is inherited from `FacetsApplicationController`.
-3. Add `facet_path_helper` to the configuration constant in `Search::Facets`.
+3. Add `facet_resource` and `facet_index: true` to the configuration constant in `Search::Facets`.
 
 Note:
 * Some of these steps may already have been performed, e.g., for a lazy, async facet.
 
 ### Adding facet search to a facet
-1. Add a new `*_facets` resource to `routes.rb`. See for example, `:project_facets`. This should provide a `search` route.
+1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:project_facets`. This should provide a `search` route.
 2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. The `search` action is inherited from `FacetsApplicationController`; no custom implementation is needed unless the controller also has a custom `index`.
-3. Add `facet_search_path_helper` to the configuration constant in `Search::Facets`.
+3. Add `facet_resource` and `facet_search: true` to the configuration constant in `Search::Facets`.
 
 Note:
 * Some of these steps may already have been performed, e.g., for a lazy, async facet.
@@ -300,7 +312,7 @@ Note:
 * This is a good candidate for a `Search::CheckboxFacetComponent`, e.g., for object types.
 
 ### Making a facet hierarchical
-1. Add a new `*_facets` resource to `routes.rb`. See for example, `:tag_facets`. This should provide the `children` route.
+1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:tag_facets`. This should provide the `children` route.
 2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `children` method.
 3. Add `facet_children_path_helper` and `hierarchical_field` to the configuration constant in `Search::Facets`.
 4. Change the facet to be rendered with the hierarchical facet component. For a lazy async facet, render a `Search::HierarchicalFacetFrameComponent` in `Search::*FacetsController.index`. For a non-lazy sync facet, set the turbo stream replace element in `views/search/items/index.html.erb` to render a `Search::HierarchicalFacetComponent`.
@@ -339,6 +351,13 @@ Currently, excluding is only available for basic facets (i.e., not hierarchical,
 2. Add the field to `fl` in `Searchers::Item.solr_request`.
 3. Possibly add a method to `SearchResults::Item`. See description of how missing methods are handled.
 4. Display the field in `Search::ItemResultComponent`.
+
+### Workflow grid
+The workflow grid (labeled "Workflow status") is a view of the current search. It displays workflow process counts for the objects matching the search, and renders the same layout, current filters, and facet sidebar as the search results view - so the search can be refined from the grid exactly as it can from the results.
+
+* The grid's search is `WorkflowGridSearchForm`.
+* The grid loads in two phases: `/workflow_grid` renders placeholders, then a turbo frame requests `/workflow_grid?...&placeholder=false` for the real data.
+* The facets in the sidebar come from `Search::ItemsController#secondary_facets`. The two primary facets (object types and content types) normally ride along with the item results query, which the grid does not render, so `Searchers::SecondaryFacet` adds them for any form where `item_results?` is false.
 
 ### Adding sort options to search results
 1. Add any new solr fields to `Search::Fields`.

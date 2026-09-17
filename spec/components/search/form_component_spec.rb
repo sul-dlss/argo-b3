@@ -6,7 +6,7 @@ RSpec.describe Search::FormComponent, type: :component do
   let(:component) { described_class.new(search_form:, url: '/search') }
 
   context 'when no facets are selected' do
-    let(:search_form) { SearchForm.new(query: 'test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
 
     it 'renders the search form' do
       render_inline(component)
@@ -19,7 +19,7 @@ RSpec.describe Search::FormComponent, type: :component do
   end
 
   context 'when facets are selected' do
-    let(:search_form) { SearchForm.new(query: 'test', projects: ['Google Books']) }
+    let(:search_form) { ResultsSearchForm.new(query: 'test', projects: ['Google Books']) }
 
     it 'renders the search form' do
       render_inline(component)

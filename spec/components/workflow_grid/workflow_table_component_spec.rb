@@ -9,7 +9,7 @@ RSpec.describe WorkflowGrid::WorkflowTableComponent, type: :component do
 
   let(:workflow_name) { 'accessionWF' }
   let(:workflow_process_counts) { nil }
-  let(:search_form) { SearchForm.new }
+  let(:search_form) { WorkflowGridSearchForm.new }
 
   let(:solr_response) do
     {
@@ -53,6 +53,10 @@ RSpec.describe WorkflowGrid::WorkflowTableComponent, type: :component do
       first_row = table.find('tbody tr:first-child')
       expect(first_row).to have_css('th', text: /1\..+start-accession/m)
       expect(page).to have_link('start-accession', href: '/search?wps_workflows%5B%5D=accessionWF%3Astart-accession')
+      # The grid renders inside a turbo frame, but these links leave it for the results view, so
+      # they must target _top or Turbo reports the frame content as missing.
+      expect(page).to have_css("a[href*='wps_workflows'][data-turbo-frame='_top']")
+      expect(page).to have_no_css("a[href*='wps_workflows']:not([data-turbo-frame='_top'])")
       cells = first_row.all('td')
       expect(cells[0]).to have_text('Start Accessioning')
       expect(cells[1..4]).to all(have_css('span.placeholder'))

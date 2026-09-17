@@ -60,8 +60,9 @@ module WorkflowGrid
 
     private
 
+    # Clicking a count shows the matching items, so this deliberately crosses to the results view.
     def path_for(*parts)
-      search_path(search_form.with_attributes(wps_workflows: [parts.join(':')], page: nil))
+      url_for(search_form.as(ResultsSearchForm).with(wps_workflows: [parts.join(':')]))
     end
   end
 end

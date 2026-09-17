@@ -3,200 +3,83 @@
 require 'rails_helper'
 
 RSpec.describe SearchForm do
-  subject(:form) do
-    described_class.new(
-      object_types: %w[item collection],
-      projects: ['Project 1'],
-      query: 'test'
-    )
-  end
+  describe 'abstractness' do
+    it 'does not provide permitted params' do
+      expect { described_class.permitted_params }.to raise_error(NotImplementedError)
+    end
 
-  describe '#facet_attributes' do
-    it 'returns the attributes that correspond to facets' do
-      expect(form.facet_attributes).to eq({
-                                            'object_types' => %w[item collection],
-                                            'projects' => ['Project 1']
-                                          })
+    it 'does not provide a route scope' do
+      expect { described_class.route_scope }.to raise_error(NotImplementedError)
     end
   end
 
-  describe '#blank?' do
-    context 'when attributes are blank' do
-      subject(:form) do
-        described_class.new(
-          query: '',
-          page: 2
-        )
-      end
+  describe '#with' do
+    let(:form) { ResultsSearchForm.new(query: 'twain', tags: ['Registered By : jdoe'], page: 4) }
 
-      it 'returns true' do
-        expect(form.blank?).to be true
-      end
+    it 'returns a form of the same class' do
+      expect(form.with(object_types: ['item'])).to be_an_instance_of(ResultsSearchForm)
     end
 
-    context 'when query is present' do
-      subject(:form) { described_class.new(query: 'test') }
-
-      it 'returns false' do
-        expect(form.blank?).to be false
-      end
-    end
-
-    context 'when a facet attribute is present' do
-      subject(:form) do
-        described_class.new(
-          object_types: ['DRO']
-        )
-      end
-
-      it 'returns false' do
-        expect(form.blank?).to be false
-      end
+    it 'drops attributes that the class does not declare' do
+      # Facet links reset page when the filters change, but not every view has a page.
+      expect(WorkflowGridSearchForm.new(query: 'twain').with(object_types: ['item'], page: nil).attributes)
+        .to eq({ 'query' => 'twain', 'object_types' => ['item'] })
     end
   end
 
-  describe '#with_attributes' do
-    subject(:form) { described_class.new(query: 'test', object_types: ['DRO'], page: 1, projects: ['Google Books']) }
+  describe '#without' do
+    it 'returns a form of the same class' do
+      form = WorkflowGridSearchForm.new(query: 'twain', tags: ['a'])
 
-    let(:new_attrs) { { object_types: ['Collection'], page: 2, projects: nil } }
-
-    it 'merges array attributes and overrides scalar attributes' do
-      expect(form.with_attributes(new_attrs))
-        .to eq({
-                 'query' => 'test',
-                 'object_types' => %w[DRO Collection],
-                 'page' => 2,
-                 'projects' => ['Google Books']
-               })
+      expect(form.without(:tags)).to be_an_instance_of(WorkflowGridSearchForm)
     end
   end
 
-  describe '#without_attributes' do
-    subject(:form) do
-      described_class.new(query: 'test', object_types: %w[item collection], page: 2, projects: ['Google Books'])
+  describe '#as' do
+    let(:query_attributes) do
+      {
+        query: 'twain',
+        object_types: %w[item collection],
+        tags: ['Registered By : jdoe'],
+        registered_date_from: Date.new(2024, 1, 1)
+      }
     end
 
-    let(:without_attrs) { { object_types: 'item', page: 2, projects: nil } }
+    it 'converts to the other view, dropping attributes it does not declare' do
+      results_form = ResultsSearchForm.new(**query_attributes, page: 4, sort: 'title')
 
-    it 'removes specified attributes' do
-      expect(form.without_attributes(without_attrs))
-        .to eq({
-                 'query' => 'test',
-                 'object_types' => ['collection']
-               })
-    end
-  end
+      grid_form = results_form.as(WorkflowGridSearchForm)
 
-  describe '#selected?' do
-    subject(:form) do
-      described_class.new(query: 'test', object_types: %w[DRO Collection], page: 2, projects: ['Google Books'])
+      expect(grid_form).to be_an_instance_of(WorkflowGridSearchForm)
+      expect(grid_form.attributes).to eq(ResultsSearchForm.new(**query_attributes).attributes.except('page', 'sort'))
     end
 
-    context 'when the key/value is selected' do
-      it 'returns true for array attributes' do
-        expect(form.selected?(key: 'object_types', value: 'DRO')).to be true
-      end
+    it 'round-trips the query attributes and resets the presentation attributes' do
+      round_tripped = ResultsSearchForm.new(**query_attributes, page: 4, sort: 'title')
+                                       .as(WorkflowGridSearchForm)
+                                       .as(ResultsSearchForm)
 
-      it 'returns true for array attributes when providing a symbol' do
-        expect(form.selected?(key: 'object_types', value: :DRO)).to be true
-      end
-
-      it 'returns true for scalar attributes' do
-        expect(form.selected?(key: 'page', value: 2)).to be true
-      end
+      expect(round_tripped.attributes).to eq(ResultsSearchForm.new(**query_attributes).attributes)
+      expect(round_tripped.page).to eq(1)
+      expect(round_tripped.sort).to be_nil
     end
 
-    context 'when the key is selected' do
-      it 'returns true for array attributes' do
-        expect(form.selected?(key: 'object_types')).to be true
-      end
+    it 'returns itself when already the requested class' do
+      form = ResultsSearchForm.new(query: 'twain')
 
-      it 'returns true for scalar attributes' do
-        expect(form.selected?(key: 'page')).to be true
-      end
-    end
-
-    context 'when the key/value is not selected' do
-      it 'returns false for array attributes' do
-        expect(form.selected?(key: 'object_types', value: 'APO')).to be false
-      end
-
-      it 'returns false for scalar attributes' do
-        expect(form.selected?(key: 'page', value: 1)).to be false
-      end
-
-      it 'returns false for non-existent attributes' do
-        expect(form.selected?(key: 'non_existent', value: 'value')).to be false
-      end
-    end
-
-    context 'when the key is not selected' do
-      it 'returns false for array attributes' do
-        expect(form.selected?(key: 'access_rights')).to be false
-      end
-
-      it 'returns false for scalar attributes' do
-        expect(form.selected?(key: 'debug')).to be false
-      end
-
-      it 'returns false for non-existent attributes' do
-        expect(form.selected?(key: 'non_existent')).to be false
-      end
+      expect(form.as(ResultsSearchForm)).to be(form)
     end
   end
 
-  describe '#current_filters' do
-    context 'when attributes are set' do
-      subject(:form) { described_class.new(query: 'test') }
-
-      it 'returns current filters as attribute name/value pairs' do
-        expect(form.current_filters).to eq([%w[query test]])
-      end
+  describe 'view capabilities' do
+    it 'describes the search results view' do
+      expect(ResultsSearchForm.new).to have_attributes(route_scope: 'search', pinnable?: true, sortable?: true,
+                                                       item_results?: true)
     end
 
-    context 'when facet attributes are set' do
-      it 'returns the current filters as attribute name/value pairs' do
-        expect(form.current_filters).to contain_exactly(
-          %w[query test],
-          %w[object_types item],
-          %w[object_types collection],
-          ['projects', 'Project 1']
-        )
-      end
-    end
-
-    context 'when no attributes are set' do
-      subject(:form) { described_class.new }
-
-      it 'returns empty array' do
-        expect(form.current_filters).to eq([])
-      end
-    end
-  end
-
-  describe '#facets_selected?' do
-    context 'when no facets are selected' do
-      subject(:form) { described_class.new(query: 'test') }
-
-      it 'returns false' do
-        expect(form.facets_selected?).to be false
-      end
-    end
-
-    context 'when a facet is selected' do
-      subject(:form) { described_class.new(object_types: ['DRO']) }
-
-      it 'returns true' do
-        expect(form.facets_selected?).to be true
-      end
-    end
-  end
-
-  describe '#to_s' do
-    subject(:form) { described_class.new(query: 'test') }
-
-    it 'returns the serialized search form' do
-      expect(form.to_s).to eq('"test"')
+    it 'describes the workflow grid view' do
+      expect(WorkflowGridSearchForm.new).to have_attributes(route_scope: 'workflow_grid', pinnable?: false,
+                                                            sortable?: false, item_results?: false)
     end
   end
 end

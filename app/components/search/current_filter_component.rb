@@ -19,7 +19,7 @@ module Search
     end
 
     def remove_path
-      search_path(search_form.without_attributes({ form_field => value, page: nil }))
+      url_for(search_form.without({ form_field => value, page: nil }))
     end
 
     def query?

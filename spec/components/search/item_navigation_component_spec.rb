@@ -6,7 +6,7 @@ RSpec.describe Search::ItemNavigationComponent, type: :component do
   let(:component) do
     described_class.new(last_search_form:, current_position:, navigation:)
   end
-  let(:last_search_form) { instance_double(SearchForm, attributes: { query: 'cats', page: 2 }) }
+  let(:last_search_form) { ResultsSearchForm.new(query: 'cats', page: 2) }
   let(:current_position) { 3 }
   let(:navigation) { Searchers::ItemNavigation::Result.new(previous_druid:, next_druid:, total_results: 10) }
   let(:previous_druid) { 'druid:bc123df4567' }

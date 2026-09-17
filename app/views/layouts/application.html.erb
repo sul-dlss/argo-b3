@@ -42,7 +42,8 @@
   <body>
     <%= turbo_stream_from 'notifications', current_user, data: { turbo_permanent: true } %>
     <%= render HeaderComponent.new %>
-    <%= render Search::FormComponent.new(search_form: @search_form || SearchForm.new, url: search_path) %>
+    <% search_bar_form = @search_form || @last_search_form || ResultsSearchForm.new %>
+    <%= render Search::FormComponent.new(search_form: search_bar_form, url: url_for(search_bar_form)) %>
 
     <div class="container mt-3">
       <%# This prevents the flash from being cached by turbo. %>

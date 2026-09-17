@@ -1,34 +1,40 @@
-<%= content_for :title, 'Search page' %>
+<%= content_for :title, t('search.label') %>
 
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: @pinned) %>
+<div class="container my-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('search.label'), classes: 'mb-4') %>
 
-<%= render Search::LayoutComponent.new do |layout| %>
-  <%= layout.with_main_content do %>
-    <% if !@search_form.facets_selected? && @search_form.query.present? %>
-      <%= turbo_frame_tag 'projects-search', src: search_projects_path(@search_form.attributes) do %>
-        <%= render Search::LoadingFacetResultsComponent.new(label: 'Project results') %>
+  <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: @pinned) %>
+
+  <%= render Search::LayoutComponent.new do |layout| %>
+    <%= layout.with_main_content do %>
+      <%= render Search::ViewToggleComponent.new(search_form: @search_form) %>
+
+      <% if !@search_form.facets_selected? && @search_form.query.present? %>
+        <%= turbo_frame_tag 'projects-search', src: search_projects_path(@search_form.attributes) do %>
+          <%= render Search::LoadingFacetResultsComponent.new(label: 'Project results') %>
+        <% end %>
+        <%= turbo_frame_tag 'tags-search', src: search_tags_path(@search_form.attributes) do %>
+          <%= render Search::LoadingFacetResultsComponent.new(label: 'Tag results') %>
+        <% end %>
+        <%= turbo_frame_tag 'tickets-search', src: search_tickets_path(@search_form.attributes) do %>
+          <%= render Search::LoadingFacetResultsComponent.new(label: 'Ticket results') %>
+        <% end %>
       <% end %>
-      <%= turbo_frame_tag 'tags-search', src: search_tags_path(@search_form.attributes) do %>
-        <%= render Search::LoadingFacetResultsComponent.new(label: 'Tag results') %>
+
+      <%= turbo_frame_tag 'items-search', src: search_items_path(@search_form.attributes) do %>
+        <%= render Search::LoadingItemResultsComponent.new if @search_form.present? %>
       <% end %>
-      <%= turbo_frame_tag 'tickets-search', src: search_tickets_path(@search_form.attributes) do %>
-        <%= render Search::LoadingFacetResultsComponent.new(label: 'Ticket results') %>
-      <% end %>
+
+      <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_search_items_path(@search_form.attributes) %>
     <% end %>
 
-    <%= turbo_frame_tag 'items-search', src: search_items_path(@search_form.attributes) do %>
-      <%= render Search::LoadingItemResultsComponent.new if @search_form.present? %>
+    <%= layout.with_sidebar do %>
+      <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
     <% end %>
-
-    <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_search_items_path(@search_form.attributes) %>
   <% end %>
-
-  <%= layout.with_sidebar do %>
-    <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
-  <% end %>
-<% end %>
+</div>

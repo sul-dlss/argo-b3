@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Searchers::Item do
   let(:user) { create(:user, :admin) }
   let(:results) { described_class.call(search_form:) }
-  let(:search_form) { SearchForm.new(query:) }
+  let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
     {
@@ -44,7 +44,7 @@ RSpec.describe Searchers::Item do
   end
 
   context 'when the search form is blank' do
-    let(:search_form) { SearchForm.new }
+    let(:search_form) { ResultsSearchForm.new }
 
     it 'sets rows to 0' do
       results
@@ -56,7 +56,7 @@ RSpec.describe Searchers::Item do
   end
 
   context 'when on page 3' do
-    let(:search_form) { SearchForm.new(query:, page: 3) }
+    let(:search_form) { ResultsSearchForm.new(query:, page: 3) }
 
     it 'calculates the correct start value' do
       results
@@ -71,7 +71,7 @@ RSpec.describe Searchers::Item do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
     let!(:visible_document) { create(:solr_item) }
-    let(:search_form) { SearchForm.new(query: 'Test') }
+    let(:search_form) { ResultsSearchForm.new(query: 'Test') }
 
     before do
       Current.effective_groups = user.groups
@@ -90,7 +90,7 @@ RSpec.describe Searchers::Item do
     end
 
     it 'retains authorization when a facet excludes its own selected filter' do
-      results = described_class.call(search_form: SearchForm.new(query: 'Test', content_types: ['image']))
+      results = described_class.call(search_form: ResultsSearchForm.new(query: 'Test', content_types: ['image']))
 
       expect(results.total_results).to eq(0)
       expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))

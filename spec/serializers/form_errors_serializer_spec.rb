@@ -193,8 +193,8 @@ RSpec.describe FormErrorsSerializer do
 
     context 'when the form does not include PrevalidationConcern' do
       it 'raises an ArgumentError' do
-        expect { described_class.deserialize(form: SearchForm.new, error_data: { 'errors' => [] }) }
-          .to raise_error(ArgumentError, /SearchForm must include PrevalidationConcern/)
+        expect { described_class.deserialize(form: ResultsSearchForm.new, error_data: { 'errors' => [] }) }
+          .to raise_error(ArgumentError, /ResultsSearchForm must include PrevalidationConcern/)
       end
     end
 
