@@ -2,12 +2,10 @@
 
 module CocinaModels
   # Base model for a Cocina object.
-  class Base < Blanks::Base
+  class Base < Voids::Base
     include ActiveModel::AttributeAssignment
     include NormalizationConcern
     include ApoConcern
-
-    alias update assign_attributes
 
     # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata]
     # @return [Base] a new instance built from the given Cocina object
@@ -45,6 +43,10 @@ module CocinaModels
       validate!
       registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:, tags:)
       assign_from_cocina_object(registered_cocina_object)
+    end
+
+    def update(*, **)
+      assign_attributes(*, **, changes_applied: false)
     end
 
     # Rebase the model on a newer version of the same Cocina object (e.g., after opening a new version),
@@ -87,17 +89,6 @@ module CocinaModels
     # Subclasses can override this.
     def tracked_associations_changed?
       false
-    end
-
-    # Overrides Blanks::Base#valid? to always validate nested forms (e.g., release_tags),
-    # even when this form's own attributes are invalid.
-    # See https://github.com/joshmn/blanks/pull/1
-    def valid?(context = nil)
-      run_callbacks :validation do
-        own_valid = ActiveModel::Validations.instance_method(:valid?).bind_call(self, context)
-        nested_valid = nested_forms_valid?
-        own_valid & nested_valid
-      end
     end
 
     private

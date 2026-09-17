@@ -10,13 +10,13 @@ RSpec.describe Elements::Forms::HasManyComponent, type: :component do
   end
 
   let(:widget_form_class) do
-    Class.new(Blanks::Base) do
+    Class.new(Voids::Base) do
       attribute :name, :string
     end
   end
 
   let(:widgets_form_class) do
-    Class.new(Blanks::Base) do
+    Class.new(Voids::Base) do
       has_many :widgets, class_name: 'WidgetForm'
     end
   end
