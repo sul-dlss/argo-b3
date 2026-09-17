@@ -15,7 +15,7 @@
       </div>
 
       <ul class="list-unstyled">
-        <%= render Search::ItemResultComponent.with_collection(@results) %>
+        <%= render Search::ItemResultComponent.with_collection(@results, pinned_object_druids: @pinned_object_druids) %>
       </ul>
 
       <%= render Elements::Pagination::FullComponent.new(total_pages: @results.total_pages, current_page: @results.page, path_func:) %>

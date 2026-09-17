@@ -6,12 +6,13 @@ module Search
     with_collection_parameter :result
 
     # @param result [SearchResults::Item]
-    def initialize(result:)
+    def initialize(result:, pinned_object_druids:)
       @result = result
+      @pinned_object_druids = pinned_object_druids
       super()
     end
 
-    attr_reader :result
+    attr_reader :result, :pinned_object_druids
 
     delegate :title, :druid, :bare_druid, :index, to: :result
 
@@ -57,6 +58,14 @@ module Search
 
     def access_rights_values
       [result.access_rights.join(', ')]
+    end
+
+    def pinnable?
+      result.object_type != 'agreement'
+    end
+
+    def pinned?
+      pinned_object_druids.include?(druid)
     end
 
     private

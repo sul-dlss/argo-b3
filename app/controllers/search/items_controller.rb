@@ -7,6 +7,7 @@ module Search
 
     def index
       @results = Searchers::Item.call(search_form: @search_form)
+      @pinned_object_druids = PinnedObject.where(user: current_user, druid: @results.map(&:druid)).pluck(:druid).to_set
       set_last_search_cookie
     end
 
