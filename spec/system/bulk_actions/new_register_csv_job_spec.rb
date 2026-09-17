@@ -18,6 +18,13 @@ RSpec.describe 'Create a new register bulk action' do
       click_link bulk_action_label
 
       expect(page).to have_css('h1', text: bulk_action_label)
+      upload_field_xpath = "//label[normalize-space()='Upload a CSV or Excel file']" \
+                           "/following-sibling::input[@type='file']"
+      instructions_xpath = "//input[@type='file']/ancestor::div[1]/following-sibling::p" \
+                           "[contains(normalize-space(.), 'The spreadsheet must include the following columns.')]"
+      expect(page).to have_xpath(upload_field_xpath)
+      expect(page).to have_xpath(instructions_xpath)
+      expect(page).to have_css('li', text: 'title (required unless a folio_instance_hrid has been entered)')
       attach_file 'Upload a CSV or Excel file', 'spec/fixtures/files/bulk_register.csv'
 
       fill_in 'Describe this bulk action', with: 'Register test items'

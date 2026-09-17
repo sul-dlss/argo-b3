@@ -29,7 +29,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   ADD_WORKFLOW = Config.new(
     label: 'Add workflow',
-    help_text: 'Starts a workflow for individual objects',
+    help_text: 'Start a specialized workflow.',
     job: BulkActions::AddWorkflowJob,
     path_helper: to_path_helper(:new_bulk_actions_add_workflow_path),
     form: BulkActions::AddWorkflowForm
@@ -37,29 +37,28 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   APPLY_APO_DEFAULTS = Config.new(
     label: 'Apply APO defaults',
-    help_text: 'Overwrite object metadata with the defaults from the APO',
+    help_text: "Overwrite access settings and rights statements with the defaults from the objects' APO(s).",
     job: BulkActions::ApplyApoDefaultsJob,
     path_helper: to_path_helper(:new_bulk_actions_apply_apo_defaults_path),
     form: BulkActions::BasicForm
   )
 
-  CLOSE_VERSION = Config.new(
-    label: 'Close version',
-    help_text: 'Close a version of the items so the changes can be accessioned. The items will retain ' \
-               'the version description as entered when the item was opened for versioning.',
-    job: BulkActions::CloseVersionJob,
-    path_helper: to_path_helper(:new_bulk_actions_close_version_path),
+  REDEPOSIT = Config.new(
+    label: 'Redeposit',
+    help_text: 'Deposit objects without making additional changes.',
+    job: BulkActions::RedepositJob,
+    path_helper: to_path_helper(:new_bulk_actions_redeposit_path),
     form: BulkActions::BasicForm
   )
 
   CREATE_VIRTUAL_OBJECT = Config.new(
     label: 'Create virtual object',
-    help_text: 'Create one or more virtual objects.'
+    help_text: 'Group druids into one or more virtual objects.'
   )
 
   EXPORT_CATALOG_DATA = Config.new(
-    label: 'Export FOLIO Instance HRIDs, barcodes, and serials metadata',
-    help_text: 'Download FOLIO Instance HRIDs and barcodes as CSV (comma-separated values) for selected druids.',
+    label: 'Export FOLIO instance HRIDs, barcodes and serials metadata',
+    help_text: 'Download a spreadsheet containing FOLIO instance HRIDs, barcodes, part labels and sort keys.',
     export_filename: 'catalog_data.csv',
     export_label: 'Catalog data',
     job: BulkActions::ExportCatalogDataJob,
@@ -69,7 +68,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_CHECKSUM_REPORT = Config.new(
     label: 'Download checksum report',
-    help_text: 'Download checksums of files in objects (as csv).',
+    help_text: 'Download a spreadsheet listing checksums and file size for each file.',
     export_filename: 'checksum_report.csv',
     export_label: 'Checksum report',
     job: BulkActions::ExportChecksumReportJob,
@@ -79,7 +78,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_COCINA_JSON = Config.new(
     label: 'Download full Cocina JSON',
-    help_text: 'Download full Cocina JSON for objects.',
+    help_text: nil,
     export_filename: 'cocina.jsonl.gz',
     export_label: 'Cocina JSON',
     job: BulkActions::ExportCocinaJsonJob,
@@ -89,7 +88,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Download descriptive metadata spreadsheet',
-    help_text: 'Download descriptive metadata for objects.',
+    help_text: 'Download a spreadsheet listing Cocina descriptive metadata.',
     export_filename: 'descriptive.csv',
     export_label: 'Descriptive metadata spreadsheet',
     job: BulkActions::ExportDescriptiveMetadataJob,
@@ -99,7 +98,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_MODS = Config.new(
     label: 'Download descriptive metadata as MODS XML',
-    help_text: 'Download descriptive metadata for objects.',
+    help_text: nil,
     export_filename: 'mods_export.zip',
     export_label: 'MODS XML',
     job: BulkActions::ExportModsJob,
@@ -109,7 +108,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Export structural metadata',
-    help_text: 'Export structural metadata as CSV (comma-separated values) for selected druids.',
+    help_text: "Download a spreadsheet of objects' structural metadata.",
     export_filename: 'structural_metadata.csv',
     export_label: 'Structural metadata spreadsheet',
     job: BulkActions::ExportStructuralMetadataJob,
@@ -119,7 +118,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TRACKING_SHEETS = Config.new(
     label: 'Download tracking sheets',
-    help_text: 'Download PDF tracking sheets of objects.',
+    help_text: 'Download PDF tracking sheets to use in digitization workflows.',
     export_filename: 'tracking_sheets.pdf',
     export_label: 'Tracking sheets',
     job: BulkActions::ExportTrackingSheetsJob,
@@ -129,7 +128,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TAGS = Config.new(
     label: 'Export tags',
-    help_text: 'Download tags as CSV (comma-separated values) for selected druids.',
+    help_text: "Download a spreadsheet listing objects' tags, including project and ticket tags.",
     export_filename: 'tags.csv',
     export_label: 'Tags',
     job: BulkActions::ExportTagsJob,
@@ -138,13 +137,13 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   )
 
   EXTRACT_TEXT = Config.new(
-    label: 'Text extraction',
-    help_text: 'Start text extraction workflow for the selected items.'
+    label: 'Extract text',
+    help_text: 'Perform OCR on book or image items.'
   )
 
   IMPORT_CATALOG_DATA = Config.new(
-    label: 'Import FOLIO Instance HRIDs, barcodes, and serials metadata',
-    help_text: 'Adds or updates Folio Instance HRIDs and/or barcodes associated with objects.',
+    label: 'Import FOLIO instance HRIDs, barcodes and serials metadata',
+    help_text: 'Update FOLIO instance HRIDs, barcodes, part labels and sort keys by uploading a spreadsheet.',
     job: BulkActions::ImportCatalogDataJob,
     path_helper: to_path_helper(:new_bulk_actions_import_catalog_data_path),
     form: BulkActions::ImportCatalogDataForm
@@ -152,7 +151,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Upload descriptive metadata spreadsheet',
-    help_text: 'Upload descriptive metadata for objects.',
+    help_text: "Update objects' Cocina descriptive metadata by uploading a spreadsheet.",
     job: BulkActions::ImportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_import_descriptive_metadata_path),
     form: BulkActions::ImportDescriptiveMetadataForm
@@ -177,22 +176,22 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Import structural metadata',
-    help_text: 'Upload structural metadata as CSV (comma-separated values).'
+    help_text: 'Update structural metadata by uploading a spreadsheet.'
   )
 
   IMPORT_TAGS = Config.new(
     label: 'Import tags',
-    help_text: 'Upload tags as CSV (comma-separated values).'
+    help_text: 'Update tags, including project and ticket tags, by uploading a spreadsheet.'
   )
 
   MANAGE_COLLECTIONS = Config.new(
     label: 'Update collections',
-    help_text: 'Set collection(s).'
+    help_text: 'Add items to a collection or remove items from a collection.'
   )
 
   MANAGE_CONTENT_TYPE = Config.new(
     label: 'Update content type',
-    help_text: 'Set content type, reading direction and/or resource types.',
+    help_text: "Change items' content type.",
     job: BulkActions::ManageContentTypeJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_content_type_path),
     form: BulkActions::ManageContentTypeForm
@@ -200,15 +199,15 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_EMBARGO = Config.new(
     label: 'Manage embargo',
-    help_text: 'Manage embargoes with a CSV.',
+    help_text: 'Update embargo settings by uploading a spreadsheet.',
     job: BulkActions::ManageEmbargoJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_embargo_path),
     form: BulkActions::ManageEmbargoForm
   )
 
   MANAGE_LICENSE_AND_RIGHTS_STATEMENTS = Config.new(
-    label: 'Update licenses and rights statements',
-    help_text: 'Edit license, copyright statement, and/or use & reproduction statements',
+    label: 'Update license and rights statements',
+    help_text: "Update items' license, copyright statement, and/or use and reproduction statement.",
     job: BulkActions::ManageLicenseAndRightsStatementsJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_license_and_rights_statements_path),
     form: BulkActions::ManageLicenseAndRightsStatementsForm
@@ -216,7 +215,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_RELEASE = Config.new(
     label: 'Manage release',
-    help_text: 'Adds release tags to individual objects.',
+    help_text: 'Choose whether objects are released to SearchWorks, EarthWorks, and/or search engines.',
     job: BulkActions::ManageReleaseJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_release_path),
     form: BulkActions::ManageReleaseForm
@@ -224,47 +223,39 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_RIGHTS = Config.new(
     label: 'Update rights',
-    help_text: 'Edit rights.',
+    help_text: "Update objects' view and download rights settings.",
     job: BulkActions::ManageRightsJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_rights_path),
     form: BulkActions::ManageRightsForm
   )
 
   MANAGE_SOURCE_ID = Config.new(
-    label: 'Update source id',
-    help_text: 'Adds or updates source IDs associated with objects.',
+    label: 'Update source ID',
+    help_text: "Update objects' source IDs by uploading a spreadsheet.",
     job: BulkActions::ManageSourceIdJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_source_id_path),
     form: BulkActions::ManageSourceIdForm
   )
 
-  OPEN_VERSION = Config.new(
-    label: 'Open new version',
-    help_text: 'Open items not yet open for versioning.',
-    job: BulkActions::OpenVersionJob,
-    path_helper: to_path_helper(:new_bulk_actions_open_version_path),
-    form: BulkActions::OpenVersionForm
-  )
-
   PURGE = Config.new(
     label: 'Purge',
-    help_text: 'Deletes unpublished objects.',
+    help_text: 'Delete registered, undeposited objects.',
     job: BulkActions::PurgeJob,
     path_helper: to_path_helper(:new_bulk_actions_purge_path),
     form: BulkActions::BasicForm
   )
 
   REFRESH_METADATA = Config.new(
-    label: 'Refresh metadata from FOLIO record',
-    help_text: 'Refresh metadata from the catalog.',
+    label: 'Refresh metadata from FOLIO',
+    help_text: "Overwrite SDR descriptive metadata with the latest metadata from objects' FOLIO records.",
     job: BulkActions::RefreshMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_refresh_metadata_path),
     form: BulkActions::BasicForm
   )
 
   REGISTER_CSV = Config.new(
-    label: 'Register new druids (via CSV)',
-    help_text: 'Register druids.',
+    label: 'Register items',
+    help_text: 'Register items with item-specific settings by uploading a spreadsheet.',
     export_filename: 'registration_report.csv',
     export_label: 'Registration report',
     show_export: true,
@@ -284,7 +275,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REINDEX = Config.new(
     label: 'Reindex',
-    help_text: 'Reindexes the DOR object in Solr.',
+    help_text: 'Reindex objects in Solr.',
     job: BulkActions::ReindexJob,
     path_helper: to_path_helper(:new_bulk_actions_reindex_path),
     form: BulkActions::BasicForm
@@ -292,8 +283,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REPUBLISH = Config.new(
     label: 'Republish',
-    help_text: 'Republish objects. You still need to use the normal versioning process to make sure ' \
-               'your changes are preserved.',
+    help_text: 'Sync changes to PURL, SearchWorks, etc.',
     job: BulkActions::RepublishJob,
     path_helper: to_path_helper(:new_bulk_actions_republish_path),
     form: BulkActions::BasicForm
@@ -301,7 +291,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   UPDATE_GOVERNING_APO = Config.new(
     label: 'Update governing APO',
-    help_text: 'Moves the object to a new governing APO.',
+    help_text: 'Move objects to a different governing APO.',
     job: BulkActions::UpdateGoverningApoJob,
     path_helper: to_path_helper(:new_bulk_actions_update_governing_apo_path),
     form: BulkActions::UpdateGoverningApoForm
@@ -309,6 +299,6 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(
     label: 'Validate descriptive metadata spreadsheet',
-    help_text: 'Validate descriptive metadata for objects.'
+    help_text: 'Validate a Cocina descriptive metadata spreadsheet without applying changes.'
   )
 end

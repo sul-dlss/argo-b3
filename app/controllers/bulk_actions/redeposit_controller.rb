@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module BulkActions
-  # Controller for close version bulk action.
-  class CloseVersionController < BulkActionApplicationController
+  # Controller for the redeposit bulk action.
+  class RedepositController < BulkActionApplicationController
     private
 
     def bulk_action_config
-      BulkActions::CLOSE_VERSION
+      BulkActions::REDEPOSIT
     end
 
     def job_params

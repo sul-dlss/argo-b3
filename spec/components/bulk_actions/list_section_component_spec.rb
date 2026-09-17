@@ -22,7 +22,7 @@ RSpec.describe BulkActions::ListSectionComponent, type: :component do
     expect(page).to have_css('section.my-class#my-bulk-actions-bulk-actions-section h2', text: 'My bulk actions')
     reindex_li = page.find('section ul li:nth-of-type(1)')
     expect(reindex_li).to have_link('Reindex', href: '/bulk_actions/reindex/new')
-    expect(reindex_li).to have_css('p', text: 'Reindexes the DOR object in Solr.')
+    expect(reindex_li).to have_css('p', text: 'Reindex objects in Solr.')
 
     test_li = page.find('section ul li:nth-of-type(2)')
     expect(test_li).to have_css('span', text: 'Test')

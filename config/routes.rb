@@ -154,7 +154,7 @@ Rails.application.routes.draw do
   namespace :bulk_actions do
     resource :add_workflow, only: %i[new create], controller: 'add_workflow'
     resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
-    resource :close_version, only: %i[new create], controller: 'close_version'
+    resource :redeposit, only: %i[new create], controller: 'redeposit'
     resource :export_catalog_data, only: %i[new create], controller: 'export_catalog_data'
     resource :export_checksum_report, only: %i[new create], controller: 'export_checksum_report'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
@@ -176,7 +176,6 @@ Rails.application.routes.draw do
     resource :manage_release, only: %i[new create], controller: 'manage_release'
     resource :manage_rights, only: %i[new create], controller: 'manage_rights'
     resource :manage_source_id, only: %i[new create], controller: 'manage_source_id'
-    resource :open_version, only: %i[new create], controller: 'open_version'
     resource :purge, only: %i[new create], controller: 'purge'
     resource :reindex, only: %i[new create], controller: 'reindex'
     resource :refresh_metadata, only: %i[new create], controller: 'refresh_metadata'
