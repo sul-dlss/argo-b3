@@ -37,7 +37,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   APPLY_APO_DEFAULTS = Config.new(
     label: 'Apply APO defaults',
-    help_text: 'Overwrite access settings and rights statements with the defaults from the objects’ APO(s).',
+    help_text: "Overwrite access settings and rights statements with the defaults from the objects' APO(s).",
     job: BulkActions::ApplyApoDefaultsJob,
     path_helper: to_path_helper(:new_bulk_actions_apply_apo_defaults_path),
     form: BulkActions::BasicForm
@@ -108,7 +108,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Export structural metadata',
-    help_text: 'Download a spreadsheet of objects’ structural metadata.',
+    help_text: "Download a spreadsheet of objects' structural metadata.",
     export_filename: 'structural_metadata.csv',
     export_label: 'Structural metadata spreadsheet',
     job: BulkActions::ExportStructuralMetadataJob,
@@ -128,7 +128,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   EXPORT_TAGS = Config.new(
     label: 'Export tags',
-    help_text: 'Download a spreadsheet listing objects’ tags, including project and ticket tags.',
+    help_text: "Download a spreadsheet listing objects' tags, including project and ticket tags.",
     export_filename: 'tags.csv',
     export_label: 'Tags',
     job: BulkActions::ExportTagsJob,
@@ -151,7 +151,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Upload descriptive metadata spreadsheet',
-    help_text: 'Update objects\' Cocina descriptive metadata by uploading a spreadsheet.',
+    help_text: "Update objects' Cocina descriptive metadata by uploading a spreadsheet.",
     job: BulkActions::ImportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_import_descriptive_metadata_path),
     form: BulkActions::ImportDescriptiveMetadataForm
@@ -191,7 +191,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_CONTENT_TYPE = Config.new(
     label: 'Update content type',
-    help_text: 'Change items’ content type.',
+    help_text: "Change items' content type.",
     job: BulkActions::ManageContentTypeJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_content_type_path),
     form: BulkActions::ManageContentTypeForm
@@ -207,7 +207,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_LICENSE_AND_RIGHTS_STATEMENTS = Config.new(
     label: 'Update license and rights statements',
-    help_text: 'Update items’ license, copyright statement, and/or use and reproduction statement.',
+    help_text: "Update items' license, copyright statement, and/or use and reproduction statement.",
     job: BulkActions::ManageLicenseAndRightsStatementsJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_license_and_rights_statements_path),
     form: BulkActions::ManageLicenseAndRightsStatementsForm
@@ -223,7 +223,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_RIGHTS = Config.new(
     label: 'Update rights',
-    help_text: 'Update objects’ view and download rights settings.',
+    help_text: "Update objects' view and download rights settings.",
     job: BulkActions::ManageRightsJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_rights_path),
     form: BulkActions::ManageRightsForm
@@ -231,7 +231,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_SOURCE_ID = Config.new(
     label: 'Update source ID',
-    help_text: 'Update objects’ source IDs by uploading a spreadsheet.',
+    help_text: "Update objects' source IDs by uploading a spreadsheet.",
     job: BulkActions::ManageSourceIdJob,
     path_helper: to_path_helper(:new_bulk_actions_manage_source_id_path),
     form: BulkActions::ManageSourceIdForm
@@ -247,7 +247,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REFRESH_METADATA = Config.new(
     label: 'Refresh metadata from FOLIO',
-    help_text: 'Overwrite SDR descriptive metadata with the latest metadata from objects’ FOLIO records.',
+    help_text: "Overwrite SDR descriptive metadata with the latest metadata from objects' FOLIO records.",
     job: BulkActions::RefreshMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_refresh_metadata_path),
     form: BulkActions::BasicForm
