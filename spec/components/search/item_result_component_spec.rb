@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Search::ItemResultComponent, type: :component do
-  let(:component) { described_class.new(result:) }
+  let(:component) { described_class.new(result:, pinned_object_druids:) }
   let(:result) { SearchResults::Item.new(solr_doc:, index: 2) }
+  let(:pinned_object_druids) { Set.new }
   let(:solr_doc) { build(:solr_item, druid:, title:, apo_druid:) }
   let(:title) { 'Test Title' }
   let(:druid) { 'druid:bb123cd4567' }
@@ -17,6 +18,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       caption = page.find('table#item-result-bb123cd4567 caption')
       expect(caption).to have_css('span', text: '2.')
       expect(caption).to have_link('Test Title', href: "/objects/#{druid}?search_position=2")
+      expect(caption).to have_button('Pin')
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'DRUID', druid)
       expect(page).to have_css('.object-type-item .rounded-pill', text: 'Item')
@@ -26,6 +28,30 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       expect(page).to have_table_value('item-result-bb123cd4567', 'Access Rights', 'dark, stanford')
       expect(find_table_value_cell('item-result-bb123cd4567', 'Old Argo'))
         .to have_link('Test Title', href: "https://argo.stanford.edu/view/#{druid}")
+    end
+  end
+
+  context 'when the item is pinned' do
+    let(:pinned_object_druids) { Set[druid] }
+
+    it 'renders an unpin button beside the result title' do
+      render_inline(component)
+
+      caption = page.find('table#item-result-bb123cd4567 caption')
+      expect(caption).to have_button('Unpin')
+      expect(caption).to have_css('.bi-pin-fill')
+    end
+  end
+
+  context 'when the result is an agreement' do
+    let(:solr_doc) { build(:solr_item, :agreement, druid:, title:) }
+
+    it 'does not render a pin button' do
+      render_inline(component)
+
+      caption = page.find('table#item-result-bb123cd4567 caption')
+      expect(caption).to have_no_button('Pin')
+      expect(caption).to have_no_button('Unpin')
     end
   end
 

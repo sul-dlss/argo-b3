@@ -30,6 +30,26 @@ RSpec.describe 'Item search', :solr do
       end
     end
 
+    it 'pins and unpins a search result' do
+      visit search_path(query: item_doc[Search::Fields::TITLE])
+
+      within("#item-result-#{item_doc[Search::Fields::BARE_DRUID]} caption") do
+        expect(page).to have_button('Pin')
+        click_button('Pin')
+      end
+
+      expect(page).to have_toast('Pin added')
+      within("#item-result-#{item_doc[Search::Fields::BARE_DRUID]} caption") do
+        expect(page).to have_button('Unpin')
+        click_button('Unpin')
+      end
+
+      expect(page).to have_toast('Pin removed')
+      within("#item-result-#{item_doc[Search::Fields::BARE_DRUID]} caption") do
+        expect(page).to have_button('Pin')
+      end
+    end
+
     context 'when multiple pages of results' do
       it 'paginates results' do
         visit search_path
