@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Contents::FileUpdater do
+RSpec.describe Contents::Populator do
   subject(:call) { described_class.call(content:, cocina_object:, files:, paths:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
