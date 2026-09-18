@@ -30,4 +30,8 @@ class SolrDocPresenter < SearchResults::Item
   def dro_or_collection?
     dro? || collection?
   end
+
+  def workflow_list
+    Array(workflows).join(', ')
+  end
 end

@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Show APO' do
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
+  let(:agreement_druid) { 'druid:dd123fg4567' }
+  let(:agreement_title) { 'My agreement' }
 
   let(:original_title) { 'My APO title' }
   let(:updated_title) { 'My updated APO title' }
@@ -28,6 +30,9 @@ RSpec.describe 'Show APO' do
       Search::Fields::TITLE => title,
       Search::Fields::APO_DRUID => [apo_druid],
       Search::Fields::APO_TITLE => ['My APO'],
+      Search::Fields::AGREEMENT_DRUID => agreement_druid,
+      Search::Fields::AGREEMENT_TITLE => agreement_title,
+      Search::Fields::WORKFLOWS => %w[accessionWF goobiWF],
       Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -48,6 +53,7 @@ RSpec.describe 'Show APO' do
 
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
+    allow(Searchers::QueryCount).to receive(:call).and_return(12)
 
     sign_in(create(:user))
   end
@@ -66,6 +72,12 @@ RSpec.describe 'Show APO' do
     expect(page).to have_css('h2', text: 'Depositing...')
     expect(page).to have_text('Actions unavailable until deposit is complete.')
 
+    # Agreement box
+    within('.show-box', text: 'Agreement') do
+      expect(page).to have_css('h2', text: 'Agreement')
+      expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
+    end
+
     # No PURL link for admin policies
     expect(page).to have_no_link('View PURL page')
 
@@ -83,12 +95,15 @@ RSpec.describe 'Show APO' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
-    expect(page).to have_table_value('overview-table', 'Object type', 'APO')
-    within(find_table_value_cell('overview-table', 'APO')) do
-      expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
-      expect(page).to have_link('All objects with this APO',
-                                href: '/search?admin_policy_titles%5B%5D=My+APO')
+    expect(page).to have_table_value('overview-table', 'Druid', druid)
+    within(find_table_value_cell('overview-table', 'Agreement')) do
+      expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
     end
+    expect(page).to have_table_value('overview-table', 'Access rights', 'View: World')
+    expect(page).to have_table_value('overview-table', 'Workflows', 'accessionWF, goobiWF')
+    expect(page).to have_table_value('overview-table', 'Read restricted', 'no')
+    expect(page).to have_table_value('overview-table', '# of collections', '12')
+    expect(page).to have_table_value('overview-table', '# of items', '12')
 
     # Tags card
     within('.card', text: 'Tags') do

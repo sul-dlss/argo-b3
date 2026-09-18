@@ -2,21 +2,25 @@
     <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
       <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
       <% component.with_row(label: 'Druid', value: @solr_doc.id) %>
-      <% component.with_row(label: 'Agreement', value: '') %>
-      <% component.with_row(label: 'Access rights', value: '') %>
-      <% component.with_row(label: 'Workflows', value: '') %>
-      <% component.with_row(label: 'Read restricted', value: '') %>
+      <% component.with_row(label: 'Agreement') do |row_component| %>
+        <% row_component.with_cell do %>
+          <%= link_to_object @solr_doc.agreement_title, @solr_doc.agreement_druid %>
+        <% end %>
+      <% end %>
+      <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
+      <% component.with_row(label: 'Workflows', value: @solr_doc.workflow_list) %>
+      <% component.with_row(label: 'Read restricted', value: @cocina_model.read_restricted) %>
       <% component.with_row(label: 'Status', value: @solr_doc.status) %>
       <% component.with_row(label: '# of collections') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(collection_titles: [@solr_doc.title]) %>
-          <%= link_to @collection_count, url_for(search_form) %>
+          <%= link_to @cocina_model.collection_count, url_for(search_form) %>
+        <% end %>
       <% end %>
       <% component.with_row(label: '# of items') do |row_component| %>
         <% row_component.with_cell do %>
-          <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
           <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-          <%= link_to @item_count, url_for(search_form) %>
+          <%= link_to @cocina_model.item_count, url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>
@@ -27,8 +31,11 @@
 
     <%= render SdrViewComponents::Tables::TableComponent.new(id: 'access-table', classes: 'mb-5') do |component| %>
       <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Default object rights') %><% end %>
-      <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
+      <% component.with_row(label: 'View access', value: @cocina_model.access_view) %>
+      <% component.with_row(label: 'Download access', value: @cocina_model.access_download) %>
+      <% component.with_row(label: 'Location', value: @cocina_model.access_location) if @cocina_model.location_based_access? || @cocina_model.location_based_download_access? %>
       <% component.with_row(label: 'Copyright', value: @cocina_model.copyright) %>
       <% component.with_row(label: 'License', value: @cocina_model.license) %>
+      <% component.with_row(label: 'Use and reproduction', value: @cocina_model.use_and_reproduction_statement) %>
     <% end %>
 <% end %>
