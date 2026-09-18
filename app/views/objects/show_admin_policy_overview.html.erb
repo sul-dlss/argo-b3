@@ -8,19 +8,17 @@
         <% end %>
       <% end %>
       <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
-      <% component.with_row(label: 'Workflows', value: @solr_doc.workflow_list) %>
-      <% component.with_row(label: 'Read restricted', value: @cocina_model.read_restricted) %>
       <% component.with_row(label: 'Status', value: @solr_doc.status) %>
       <% component.with_row(label: '# of collections') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(collection_titles: [@solr_doc.title]) %>
-          <%= link_to @cocina_model.collection_count, url_for(search_form) %>
+          <%= link_to @object_counts.collection_count, url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: '# of items') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
-          <%= link_to @cocina_model.item_count, url_for(search_form) %>
+          <%= link_to @object_counts.item_count, url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>

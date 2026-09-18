@@ -74,7 +74,6 @@ module Search
     TOPICS = 'subject_topic_other_ssimdv'
     VERSION = 'current_version_ipsidv'
     WORKFLOW_ERRORS = 'wf_error_ssim'
-    WORKFLOWS = 'wf_ssim'
     WPS_HIERARCHICAL_WORKFLOWS = 'wf_hierarchical_wps_ssimdv'
     WPS_WORKFLOWS = 'wf_wps_ssimdv'
   end

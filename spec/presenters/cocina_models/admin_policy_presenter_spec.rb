@@ -5,30 +5,23 @@ require 'rails_helper'
 RSpec.describe CocinaModels::AdminPolicyPresenter do
   subject(:presenter) { described_class.new(cocina_model) }
 
-  let(:druid) { 'druid:bc123df4567' }
-  let(:cocina_model) { instance_double(CocinaModels::AdminPolicy, druid:) }
+  let(:cocina_model) { instance_double(CocinaModels::AdminPolicy, access_view:) }
 
-  before do
-    allow(Searchers::QueryCount).to receive(:call).and_return(12)
-  end
+  describe '#display_access_rights' do
+    context 'when access_view is world' do
+      let(:access_view) { 'world' }
 
-  describe '#item_count' do
-    it 'returns the number of items governed by the admin policy' do
-      expect(presenter.item_count).to eq(12)
-
-      expect(Searchers::QueryCount).to have_received(:call).with(
-        query: "#{Search::Fields::APO_DRUID}:\"#{druid}\" AND #{Search::Fields::OBJECT_TYPES}:\"item\""
-      )
+      it 'returns a humanized world access label' do
+        expect(presenter.display_access_rights).to eq('View: World')
+      end
     end
-  end
 
-  describe '#collection_count' do
-    it 'returns the number of collections governed by the admin policy' do
-      expect(presenter.collection_count).to eq(12)
+    context 'when access_view is dark' do
+      let(:access_view) { 'dark' }
 
-      expect(Searchers::QueryCount).to have_received(:call).with(
-        query: "#{Search::Fields::APO_DRUID}:\"#{druid}\" AND #{Search::Fields::OBJECT_TYPES}:\"collection\""
-      )
+      it 'returns a humanized dark access label' do
+        expect(presenter.display_access_rights).to eq('View: Dark')
+      end
     end
   end
 end

@@ -7,7 +7,7 @@
     <% component.with_row(label: '# of items') do |row_component| %>
       <% row_component.with_cell do %>
         <% search_form = ResultsSearchForm.new(collection_titles: [@solr_doc.title]) %>
-        <%= link_to @cocina_model.item_count, url_for(search_form) %>
+        <%= link_to @item_count, url_for(search_form) %>
       <% end %>
     <% end %>
     <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>

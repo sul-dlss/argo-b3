@@ -22,6 +22,9 @@ RSpec.describe 'Show APO' do
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
+  let(:object_counts) do
+    Searchers::AdminPolicyObjectCounts::Result.new(item_count: 12, collection_count: 12)
+  end
 
   def build_solr_doc(title:)
     {
@@ -32,7 +35,6 @@ RSpec.describe 'Show APO' do
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::AGREEMENT_DRUID => agreement_druid,
       Search::Fields::AGREEMENT_TITLE => agreement_title,
-      Search::Fields::WORKFLOWS => %w[accessionWF goobiWF],
       Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -53,7 +55,7 @@ RSpec.describe 'Show APO' do
 
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
-    allow(Searchers::QueryCount).to receive(:call).and_return(12)
+    allow(Searchers::AdminPolicyObjectCounts).to receive(:call).and_return(object_counts)
 
     sign_in(create(:user))
   end
@@ -100,8 +102,6 @@ RSpec.describe 'Show APO' do
       expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
     end
     expect(page).to have_table_value('overview-table', 'Access rights', 'View: World')
-    expect(page).to have_table_value('overview-table', 'Workflows', 'accessionWF, goobiWF')
-    expect(page).to have_table_value('overview-table', 'Read restricted', 'no')
     expect(page).to have_table_value('overview-table', '# of collections', '12')
     expect(page).to have_table_value('overview-table', '# of items', '12')
 

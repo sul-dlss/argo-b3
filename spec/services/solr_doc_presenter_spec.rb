@@ -159,16 +159,4 @@ RSpec.describe SolrDocPresenter do
       end
     end
   end
-
-  describe '#workflow_list' do
-    let(:object_type) { 'APO' }
-
-    before do
-      solr_doc[Search::Fields::WORKFLOWS] = %w[accessionWF goobiWF]
-    end
-
-    it 'returns a comma-delimited workflow list' do
-      expect(presenter.workflow_list).to eq('accessionWF, goobiWF')
-    end
-  end
 end

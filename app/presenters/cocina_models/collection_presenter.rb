@@ -9,9 +9,5 @@ module CocinaModels
     def display_access_rights
       "View: #{humanize_access_value(access_view)}"
     end
-
-    def item_count
-      Searchers::QueryCount.call(query: "#{Search::Fields::COLLECTION_DRUIDS}:\"#{druid}\"")
-    end
   end
 end
