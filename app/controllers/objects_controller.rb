@@ -54,6 +54,8 @@ class ObjectsController < ApplicationController
 
     case @solr_doc.object_type
     when 'collection'
+      query = "#{Search::Fields::COLLECTION_DRUIDS}:\"#{@solr_doc.druid}\""
+      @item_count = Searchers::QueryCount.call(query:)
       render :show_collection_overview, layout: false
     when 'APO'
       render :show_admin_policy_overview, layout: false

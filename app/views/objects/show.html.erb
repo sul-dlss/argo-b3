@@ -83,8 +83,8 @@
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
         <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
-        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
-        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
+        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') if @solr_doc.dro? %>
+        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') if @solr_doc.dro? %>
 
         <%= component.with_pane(id: 'overview-pane', tab_id: 'overview-tab', active: true) do %>
           <%= turbo_frame_tag(@solr_doc.druid, 'overview', src: overview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
