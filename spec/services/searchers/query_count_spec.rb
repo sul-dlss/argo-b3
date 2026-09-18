@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Searchers::ObjectCount do
+RSpec.describe Searchers::QueryCount do
   let(:user) { create(:user, :admin) }
   let(:count) { described_class.call(query:) }
   let(:query) { 'member_of_collection_ssim:"druid:bb123cd4567"' }

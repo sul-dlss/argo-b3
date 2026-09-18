@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module Searchers
-  # Searcher for counting objects matching a Solr query.
-  class ObjectCount
+  # Searcher for counting solr docs matching a Solr query.
+  class QueryCount
     def self.call(...)
       new(...).call
     end
 
     # @param query [String] Solr query to count
-    # @return [Integer] number of matching objects
+    # @return [Integer] number of matching results
     def initialize(query:)
       @query = query
     end
