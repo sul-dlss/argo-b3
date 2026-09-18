@@ -32,8 +32,8 @@ class ContentsController < ApplicationController
     content = Content.find(verified_content_id)
     cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid: content.druid, lock: content.lock))
 
-    Contents::FileUpdater.call(content:, cocina_object:, files: params[:content][:files],
-                               paths: params[:content][:paths])
+    Contents::Populator.call(content:, cocina_object:, files: params[:content][:files],
+                             paths: params[:content][:paths])
 
     head :ok
   end

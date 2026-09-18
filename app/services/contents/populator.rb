@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module Contents
-  # Creates ContentFile records and attaches uploaded binaries to a Content.
-  class FileUpdater
+  # Populates an existing Content with ContentFileSets, ContentFiles, and ContentFileBinaries
+  # from uploaded files, attaching each uploaded binary.
+  class Populator
     def self.call(...)
       new(...).call
     end
