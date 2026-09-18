@@ -54,7 +54,7 @@ RSpec.describe 'Show collection' do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
-    allow(Searchers::QueryCount).to receive(:call).and_return(12)
+    allow(Searchers::CollectionItemCount).to receive(:call).and_return(12)
 
     sign_in(create(:user))
   end
