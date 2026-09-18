@@ -250,12 +250,12 @@ RSpec.describe 'Show item' do
     within(find_table_value_cell('apo-collection-rights-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
-                                href: '/search?admin_policy_titles%5B%5D=My+APO')
+                                href: search_path(admin_policy_druids: [apo_druid]))
     end
     within(find_table_value_cell('apo-collection-rights-table', 'Collection')) do
       expect(page).to have_link('My Collection', href: "/objects/#{collection_druid}")
       expect(page).to have_link('All objects with this collection',
-                                href: '/search?collection_titles%5B%5D=My+Collection')
+                                href: search_path(collection_druids: [collection_druid]))
     end
 
     # Thumbnail

@@ -10,6 +10,7 @@
 # Authorization itself is skipped in SearchApplicationController.
 class WorkflowGridController < SearchApplicationController
   def show
+    @facet_labels = selected_facet_labels
     @templates = workflow_names.index_with do |name|
       template_for(name)
     end

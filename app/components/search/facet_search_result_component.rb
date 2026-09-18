@@ -12,6 +12,6 @@ module Search
 
     attr_reader :facet_count
 
-    delegate :value, :count, to: :facet_count
+    delegate :value, :count, :label, to: :facet_count
   end
 end

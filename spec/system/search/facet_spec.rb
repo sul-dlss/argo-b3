@@ -7,6 +7,13 @@ RSpec.describe 'Facets', :solr do
 
   before do
     create(:solr_collection, :with_projects, projects: ['Project 1'])
+    create(:solr_collection,
+           druid: item_doc.fetch(Search::Fields::COLLECTION_DRUIDS).first,
+           title: item_doc.fetch(Search::Fields::COLLECTION_TITLES).first)
+    create(:solr_collection,
+           druid: item_doc.fetch(Search::Fields::APO_DRUID).first,
+           title: item_doc.fetch(Search::Fields::APO_TITLE).first,
+           object_type: 'APO')
     sign_in(create(:user, :reader))
   end
 
@@ -70,5 +77,25 @@ RSpec.describe 'Facets', :solr do
     expect(page).to have_result_count(2)
     expect(page).to have_facet('Projects', expanded: false)
     expect(page).not_to have_current_filter('Projects', 'Project 2', wait: 0)
+  end
+
+  it 'displays collection titles while filtering by collection druid' do
+    collection_druid = item_doc.fetch(Search::Fields::COLLECTION_DRUIDS).first
+    collection_title = item_doc.fetch(Search::Fields::COLLECTION_TITLES).first
+
+    visit search_path(query: 'test')
+
+    find_facet_section('Collections').click
+    expect(page).to have_facet_value(collection_title, count: 1, facet: 'Collections')
+
+    within(find_facet_section('Collections')) do
+      click_link(collection_title)
+    end
+
+    expect(page).to have_current_filter('Collections', collection_title)
+    expect(page).to have_result_count(1)
+    expect(page).to have_item_result(item_doc)
+    query_params = Rack::Utils.parse_nested_query(URI.parse(page.current_url).query)
+    expect(query_params.fetch('collection_druids')).to eq([collection_druid])
   end
 end

@@ -6,7 +6,7 @@
     <% component.with_row(label: 'Status', value: @solr_doc.status) %>
     <% component.with_row(label: '# of items') do |row_component| %>
       <% row_component.with_cell do %>
-        <% search_form = ResultsSearchForm.new(collection_titles: [@solr_doc.title]) %>
+        <% search_form = ResultsSearchForm.new(collection_druids: [@solr_doc.druid]) %>
         <%= link_to @item_count, url_for(search_form) %>
       <% end %>
     <% end %>
@@ -21,7 +21,7 @@
     <% component.with_row(label: 'APO') do |row_component| %>
       <% row_component.with_cell do %>
         <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
-        <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+        <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.apo_druid]) %>
         (<%= link_to('All objects with this APO', url_for(search_form)) %>)
       <% end %>
     <% end %>

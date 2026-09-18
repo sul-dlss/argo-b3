@@ -10,8 +10,9 @@
 #     facet_frame_fragment: 'turbo-frame id="genres-facet-page1"',
 #     facet_value: 'Maps',
 #     search_query: 'maps'
-RSpec.shared_examples 'a simple facet controller' do |index_path:, search_path:,
-                                                       facet_frame_fragment:, facet_value:, search_query:|
+RSpec.shared_examples 'a simple facet controller' do |index_path:, search_path:, # rubocop:disable Metrics/ParameterLists
+                                                       facet_frame_fragment:, facet_value:, search_query:,
+                                                       facet_search_value: facet_value|
   describe 'index' do
     it 'returns facet values' do
       get send(index_path), params: { query: 'test', facet_page: 1 }
@@ -27,7 +28,7 @@ RSpec.shared_examples 'a simple facet controller' do |index_path:, search_path:,
       get send(search_path), params: { query: 'test', q: search_query }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("data-autocomplete-value=\"#{facet_value}\"")
+      expect(response.body).to include("data-autocomplete-value=\"#{facet_search_value}\"")
     end
   end
 end

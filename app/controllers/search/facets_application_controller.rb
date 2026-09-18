@@ -23,12 +23,17 @@ module Search
     end
 
     def search
-      facet_counts = Searchers::FacetQuery.call(
-        search_form:,
-        field:,
-        limit: SEARCH_LIMIT,
-        facet_query: facet_query_param
-      )
+      facet_counts = if facet_config.label_object_type
+                       Searchers::DruidFacetQuery.call(search_form:, facet_config:, limit: SEARCH_LIMIT,
+                                                       facet_query: facet_query_param)
+                     else
+                       Searchers::FacetQuery.call(
+                         search_form:,
+                         field:,
+                         limit: SEARCH_LIMIT,
+                         facet_query: facet_query_param
+                       )
+                     end
       render(Search::FacetSearchResultComponent.with_collection(facet_counts), content_type: 'text/html')
     end
 
