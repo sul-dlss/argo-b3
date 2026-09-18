@@ -2,7 +2,7 @@
 
 module CocinaModels
   # Model for a Folio catalog link (catalog: 'folio').
-  class FolioCatalogLink < Blanks::Base
+  class FolioCatalogLink < Voids::Base
     include NormalizationConcern
     include CatalogRecordIdConcern
 

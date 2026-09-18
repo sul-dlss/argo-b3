@@ -41,7 +41,6 @@ gem 'bootsnap', require: false
 # Additional gems
 gem 'action_policy'
 gem 'barby' # generates barcodes; used in TracksheetService
-gem 'blanks' # ActiveRecord-like forms.
 gem 'cocina_display'
 gem 'cocina-models'
 gem 'config'
@@ -66,6 +65,7 @@ gem 'rubyzip'
 gem 'sdr_view_components'
 gem 'state_machines-activerecord'
 gem 'view_component'
+gem 'voids' # ActiveRecord-like form objects built on ActiveModel
 
 group :development, :test do
   # Security audit for known security defects in code (use config/brakeman.ignore to ignore issues)
