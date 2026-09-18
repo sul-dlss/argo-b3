@@ -25,6 +25,7 @@ env:
     SETTINGS__EARTHWORKS__URL: https://earthworks-stage.stanford.edu
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
     SETTINGS__FOLIO__OKAPI__URL: https://folio-test-api.stanford.edu
+    SETTINGS__RABBITMQ_HOSTNAME: sul-rabbit-qa.stanford.edu
 
     DATABASE_HOSTNAME: argo-b3-db-qa-a
 

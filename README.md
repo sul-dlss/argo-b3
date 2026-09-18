@@ -45,6 +45,14 @@ to connect to the Argo QA Solr index. (Alternatively, you can connect to the sta
 SETTINGS__DOR_SERVICES__URL='https://dor-services-qa-lb.stanford.edu' SETTINGS__DOR_SERVICES__TOKEN=hbGcifaketokenOiJIUzI1NiJ9.jbvl5uai9y2MF7_nFqYrcewO4uKJ8tLY2A69b bin/setup
 ```
 
+#### RabbitMQ
+Argo publishes events (e.g., permission changes) to RabbitMQ, where they are consumed by DSA. Publishing is
+disabled by default (`Settings.rabbitmq.enabled`) so that a local RabbitMQ is not required. To publish events
+to a RabbitMQ instance:
+```
+SETTINGS__RABBITMQ__ENABLED=true SETTINGS__RABBITMQ__HOSTNAME='sul-rabbitmq-qa-a.stanford.edu' bin/setup
+```
+
 #### PresCat
 [Obtain a token for the PresCat instance](https://github.com/sul-dlss/preservation_catalog#authn) and then:
 

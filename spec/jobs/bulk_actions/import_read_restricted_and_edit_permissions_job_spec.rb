@@ -10,17 +10,20 @@ RSpec.describe BulkActions::ImportReadRestrictedAndEditPermissionsJob do
   let(:workgroup) { 'sdr:baker-staff' }
   let(:cocina_object) { build(:collection_with_metadata, id: druid) }
   let(:log) { StringIO.new }
+  let(:host) { 'argo-test.stanford.edu' }
 
   before do
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Event).to receive(:create)
+    allow(Socket).to receive(:gethostname).and_return(host)
   end
 
   context 'when granting a read restricted permission for a collection' do
     let(:csv_file) { "permission_type,druid,workgroup\nread_restricted,#{druid},#{workgroup}\n" }
 
-    it 'creates the permission' do
+    it 'creates the permission and an event' do
       job.perform_now
 
       expect(Permission.permission_type_read_restricted.find_by(workgroup:, target_druid: druid)).to be_present
@@ -28,6 +31,9 @@ RSpec.describe BulkActions::ImportReadRestrictedAndEditPermissionsJob do
       expect(bulk_action.druid_count_success).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(0)
       expect(log.string).to include("Success: Created read restricted permission for #{workgroup}")
+      expect(Sdr::Event).to have_received(:create)
+        .with(druid:, type: 'argo_permission_created',
+              data: { who: bulk_action.user.sunetid, host:, permission_type: 'read_restricted' })
     end
   end
 
@@ -110,6 +116,12 @@ RSpec.describe BulkActions::ImportReadRestrictedAndEditPermissionsJob do
       expect(Permission.where(workgroup:, target_druid: other_druid).count).to eq(1)
       expect(bulk_action.reload.druid_count_success).to eq(1)
       expect(log.string).to include("Success: Deleted 2 permissions for #{workgroup}")
+      expect(Sdr::Event).to have_received(:create)
+        .with(druid:, type: 'argo_permission_deleted',
+              data: { who: bulk_action.user.sunetid, host:, permission_type: 'read_restricted' })
+      expect(Sdr::Event).to have_received(:create)
+        .with(druid:, type: 'argo_permission_deleted',
+              data: { who: bulk_action.user.sunetid, host:, permission_type: 'edit' })
     end
   end
 
