@@ -4,6 +4,10 @@ solr:
 bulk_actions:
   directory: "tmp/bulk_jobs_test"
 
+# Tests should never publish events to a RabbitMQ instance.
+rabbitmq:
+  enabled: false
+
 reload_intervals:
   cocina_model: 1000
   bulk_action_show: 500

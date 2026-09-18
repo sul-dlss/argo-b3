@@ -77,7 +77,8 @@ env:
   clear:
     DATABASE_USERNAME: lyberadmin
     DATABASE_HOSTNAME: host.docker.internal
-
+    SETTINGS__RABBITMQ__VHOST: workflow
+    SETTINGS__RABBITMQ__ENABLED: true
     RAILS_LOG_TO_FILE: /var/log/argo/production.log
 
     # Governs how long SolidQueue's supervisor waits for in-flight jobs to
@@ -90,6 +91,9 @@ env:
     - SECRET_KEY_BASE
     - SETTINGS__DOR_SERVICES__TOKEN
     - SETTINGS__PRESERVATION_CATALOG__TOKEN
+    - SETTINGS__FOLIO__OKAPI__PASSWORD
+    - SETTINGS__RABBITMQ__USERNAME
+    - SETTINGS__RABBITMQ__PASSWORD
     - DATABASE_PASSWORD
 
 # Destination-specific configuration (hosts, builder.remote, and the env vars
