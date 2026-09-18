@@ -7,6 +7,12 @@ module Searchers
       new(...).call
     end
 
+    # @param docs [Array<Hash>] Solr documents with id and title fields
+    # @return [Hash<String, String>] labels keyed by druid
+    def self.labels_from_docs(docs)
+      docs.to_h { |doc| [doc.fetch(Search::Fields::ID), doc.fetch(Search::Fields::TITLE)] }
+    end
+
     # @param druids [Array<String>]
     # @return [Hash<String, String>] labels keyed by druid
     def initialize(druids:)
@@ -16,9 +22,7 @@ module Searchers
     def call
       return {} if druids.empty?
 
-      solr_response.fetch('response').fetch('docs').to_h do |doc|
-        [doc.fetch(Search::Fields::ID), doc.fetch(Search::Fields::TITLE)]
-      end
+      self.class.labels_from_docs(solr_response.fetch('response').fetch('docs'))
     end
 
     private
@@ -35,8 +39,7 @@ module Searchers
     end
 
     def druid_filter
-      values = druids.map { |druid| %("#{RSolr.solr_escape(druid)}") }.join(' OR ')
-      "#{Search::Fields::ID}:(#{values})"
+      "#{Search::Fields::ID}:(#{Search::SolrFilter.quoted_values(druids)})"
     end
   end
 end

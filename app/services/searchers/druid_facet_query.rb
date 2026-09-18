@@ -37,9 +37,7 @@ module Searchers
 
     def matching_labels
       response = Search::SolrService.post(request: label_search_request)
-      response.fetch('response').fetch('docs').to_h do |doc|
-        [doc.fetch(Search::Fields::ID), doc.fetch(Search::Fields::TITLE)]
-      end
+      Searchers::FacetLabels.labels_from_docs(response.fetch('response').fetch('docs'))
     end
 
     def label_search_request
@@ -63,8 +61,7 @@ module Searchers
     end
 
     def druid_filter(druids:)
-      values = druids.map { |druid| %("#{RSolr.solr_escape(druid)}") }.join(' OR ')
-      "#{field}:(#{values})"
+      "#{field}:(#{Search::SolrFilter.quoted_values(druids)})"
     end
 
     def facet_json
@@ -74,13 +71,7 @@ module Searchers
     end
 
     def empty_facet_counts
-      SearchResults::FacetCounts.new(
-        solr_response: {
-          'responseHeader' => { 'params' => { 'json.facet' => facet_json } },
-          'facets' => {}
-        },
-        facet_config:
-      )
+      SearchResults::FacetCounts.new(solr_response: { 'facets' => {} }, facet_config:)
     end
   end
 end
