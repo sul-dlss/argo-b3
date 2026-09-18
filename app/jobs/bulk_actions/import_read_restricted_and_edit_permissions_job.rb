@@ -74,5 +74,11 @@ module BulkActions
         success!(message: "Deleted #{destroyed.size} #{'permission'.pluralize(destroyed.size)} for #{workgroup}")
       end
     end
+
+    # Current.user is not otherwise set in a job, but is needed so that permission changes
+    # are recorded as events in SDR.
+    def perform_bulk_action
+      Current.set(user:) { super }
+    end
   end
 end

@@ -20,6 +20,7 @@ env:
     SETTINGS__STACKS__URL: https://stacks.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
     SETTINGS__FOLIO__OKAPI__URL: https://folio-prod-api.stanford.edu
+    SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-prod.stanford.edu
 
     DATABASE_HOSTNAME: argo-b3-db-prod-a
 
