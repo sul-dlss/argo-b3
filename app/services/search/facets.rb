@@ -42,6 +42,8 @@ module Search
                         # This is used, for example, for a checkbox facet like object types.
                         # Exclude is also true if exclude_form_field is provided, but does not need to be set here.
                         :exclude,
+                        # Object type used to resolve druid facet values to display titles.
+                        :label_object_type,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
                         :dynamic_facet)
@@ -61,8 +63,9 @@ module Search
     )
 
     ADMIN_POLICIES = Config.with_defaults(
-      form_field: :admin_policy_titles,
-      field: Search::Fields::APO_TITLE,
+      form_field: :admin_policy_druids,
+      field: Search::Fields::APO_DRUID,
+      label_object_type: 'APO',
       limit: 25,
       facet_resource: :admin_policy_facets,
       facet_index: true,
@@ -70,8 +73,9 @@ module Search
     )
 
     COLLECTIONS = Config.with_defaults(
-      form_field: :collection_titles,
-      field: Search::Fields::COLLECTION_TITLES,
+      form_field: :collection_druids,
+      field: Search::Fields::COLLECTION_DRUIDS,
+      label_object_type: 'collection',
       limit: 25,
       facet_resource: :collection_facets,
       facet_index: true,

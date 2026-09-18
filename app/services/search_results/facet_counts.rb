@@ -5,9 +5,10 @@ module SearchResults
   class FacetCounts
     include Enumerable
 
-    def initialize(solr_response:, facet_config:)
+    def initialize(solr_response:, facet_config:, labels: {})
       @solr_response = solr_response
       @facet_config = facet_config
+      @labels = labels
     end
 
     # @yield [SearchResults::FacetCount] each facet count
@@ -17,7 +18,8 @@ module SearchResults
       return if facet_result.nil?
 
       facet_result['buckets'].each do |bucket|
-        yield FacetCount.new(value: bucket['val'], count: bucket['count'])
+        value = bucket['val']
+        yield FacetCount.new(value:, count: bucket['count'], label: labels.fetch(value, value))
       end
     end
 
@@ -39,10 +41,10 @@ module SearchResults
       (total_facets.to_f / per_page).ceil
     end
 
-    attr_reader :solr_response, :facet_config
+    attr_reader :solr_response, :facet_config, :labels
 
     def facet_result
-      @solr_response['facets'][field]
+      @solr_response['facets']&.[](field)
     end
 
     def json_facet

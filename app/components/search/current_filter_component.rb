@@ -3,14 +3,15 @@
 module Search
   # Component to display a single current filter applied to a search
   class CurrentFilterComponent < ViewComponent::Base
-    def initialize(form_field:, value:, search_form:)
+    def initialize(form_field:, value:, search_form:, display_label: nil)
       @form_field = form_field
       @value = value
       @search_form = search_form
+      @display_label = display_label
       super()
     end
 
-    attr_reader :form_field, :value, :search_form
+    attr_reader :form_field, :value, :search_form, :display_label
 
     def label
       return value_label if query?
@@ -38,7 +39,7 @@ module Search
       if facet_config&.dynamic_facet
         helpers.facet_value_label(value)
       else
-        value
+        display_label || value
       end
     end
   end

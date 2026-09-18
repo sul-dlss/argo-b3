@@ -22,7 +22,12 @@ module Searchers
 
     # @return [SearchResults::FacetCounts] search results
     def call
-      SearchResults::FacetCounts.new(solr_response:, facet_config:)
+      response = solr_response
+      facet_counts = SearchResults::FacetCounts.new(solr_response: response, facet_config:)
+      return facet_counts unless facet_config.label_object_type
+
+      labels = Searchers::FacetLabels.call(druids: facet_counts.map(&:value))
+      SearchResults::FacetCounts.new(solr_response: response, facet_config:, labels:)
     end
 
     private

@@ -5,9 +5,10 @@ module SearchResults
   class Items
     include Enumerable
 
-    def initialize(solr_response:, per_page:)
+    def initialize(solr_response:, per_page:, facet_labels: {})
       @solr_response = solr_response
       @per_page = per_page
+      @facet_labels = facet_labels
     end
 
     # @yield [SearchResult::Item] each item
@@ -48,7 +49,7 @@ module SearchResults
       facet_config = Search::Facets.const_get(method_name_to_const_name(method_name))
       # Different facet count classes are needed depending on the facet type.
       clazz = facet_config.dynamic_facet.present? ? DynamicFacetCounts : FacetCounts
-      clazz.new(solr_response:, facet_config:)
+      clazz.new(solr_response:, facet_config:, **facet_count_args(clazz:, facet_config:))
     end
 
     def respond_to_missing?(method_name, include_private = false)
@@ -58,6 +59,14 @@ module SearchResults
     end
 
     private
+
+    attr_reader :facet_labels
+
+    def facet_count_args(clazz:, facet_config:)
+      return {} unless clazz == FacetCounts && facet_config.label_object_type
+
+      { labels: facet_labels }
+    end
 
     def method_name_to_const_name(method_name)
       method_name.to_s.delete_suffix('_facet').upcase

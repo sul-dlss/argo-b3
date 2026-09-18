@@ -65,6 +65,22 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with an admin policy druid (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(admin_policy_druids: ['druid:bc123df4567']) }
+
+    it 'builds the correct filter query for the admin policy druid' do
+      expect(Array(item_query[:fq])).to include(%(#{Search::Fields::APO_DRUID}:("druid:bc123df4567")))
+    end
+  end
+
+  context 'with a collection druid (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(collection_druids: ['druid:bc123df4567']) }
+
+    it 'builds the correct filter query for the collection druid' do
+      expect(Array(item_query[:fq])).to include(%(#{Search::Fields::COLLECTION_DRUIDS}:("druid:bc123df4567")))
+    end
+  end
+
   context 'with released to earthworks (dynamic facet)' do
     let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[last_year never]) }
 

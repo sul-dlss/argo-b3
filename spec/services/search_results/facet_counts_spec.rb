@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe SearchResults::FacetCounts do
-  let(:facet_counts) { described_class.new(solr_response:, facet_config:) }
+  let(:facet_counts) { described_class.new(solr_response:, facet_config:, labels:) }
   let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, facet_config:) }
 
   let(:solr_response) do
@@ -52,6 +52,7 @@ RSpec.describe SearchResults::FacetCounts do
     }
   end
   let(:offset) { 0 }
+  let(:labels) { {} }
 
   describe '#each' do
     context 'when there are results' do
@@ -70,6 +71,14 @@ RSpec.describe SearchResults::FacetCounts do
                                        { value: 'virtual object', count: 3 },
                                        { value: 'APO', count: 4 }
                                      ])
+      end
+    end
+
+    context 'when labels are provided' do
+      let(:labels) { { 'item' => 'Item label' } }
+
+      it 'uses the label for display while retaining the facet value' do
+        expect(facet_counts.first).to have_attributes(value: 'item', label: 'Item label')
       end
     end
 

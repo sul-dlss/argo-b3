@@ -45,7 +45,7 @@ module Search
     def target_query(targets)
       return if targets.empty?
 
-      values = targets.map { |target| "\"#{RSolr.solr_escape(target)}\"" }.join(' OR ')
+      values = Search::SolrFilter.quoted_values(targets)
       "(#{TARGET_FIELDS.map { |field| "#{field}:(#{values})" }.join(' OR ')})"
     end
   end

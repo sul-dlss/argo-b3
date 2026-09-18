@@ -8,7 +8,8 @@
 <div class="container my-2">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('workflow_grid.label'), classes: 'mb-4') %>
 
-  <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: false) %>
+  <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: false,
+                                                 facet_labels: @facet_labels) %>
 
   <%= render Search::LayoutComponent.new do |layout| %>
     <%= layout.with_main_content do %>

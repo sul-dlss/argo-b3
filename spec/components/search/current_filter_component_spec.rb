@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Search::CurrentFilterComponent, type: :component do
-  let(:component) { described_class.new(form_field:, value:, search_form:) }
+  let(:component) { described_class.new(form_field:, value:, search_form:, display_label:) }
+  let(:display_label) { nil }
 
   context 'when there are current filters' do
     let(:form_field) { :object_types }
@@ -22,6 +23,19 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       expect(page).to have_link('',
                                 href: '/search?object_types%5B%5D=collection&projects%5B%5D=Project+1',
                                 title: 'Remove Object types > item')
+    end
+  end
+
+  context 'when the facet value has a display label' do
+    let(:form_field) { :collection_druids }
+    let(:value) { 'druid:bc123df4567' }
+    let(:display_label) { 'My Collection' }
+    let(:search_form) { ResultsSearchForm.new(collection_druids: [value]) }
+
+    it 'renders the display label' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: /Collections\s+❯\s+My Collection/)
     end
   end
 

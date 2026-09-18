@@ -49,7 +49,8 @@ module Searchers
 
     # @return [SearchResults::Items] search results
     def call
-      SearchResults::Items.new(solr_response:, per_page: 0)
+      response = solr_response
+      SearchResults::Items.new(solr_response: response, per_page: 0, facet_labels: facet_labels(response:))
     end
 
     private
@@ -77,6 +78,15 @@ module Searchers
       return FACETS if search_form.item_results?
 
       FACETS + PRIMARY_FACETS
+    end
+
+    def facet_labels(response:)
+      druids = facet_configs.filter_map do |facet_config|
+        next unless facet_config.label_object_type
+
+        SearchResults::FacetCounts.new(solr_response: response, facet_config:).map(&:value)
+      end.flatten
+      Searchers::FacetLabels.call(druids:)
     end
   end
 end
