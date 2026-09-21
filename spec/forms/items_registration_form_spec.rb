@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe ItemsRegistrationForm do
   before do
     allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+    allow(CatalogRepository).to receive(:exists?).and_return(true)
   end
 
   describe 'validation of item_registrations' do
@@ -273,11 +274,13 @@ RSpec.describe ItemsRegistrationForm do
       let(:csv) { "folio_instance_hrid,title\nin11403803,First title\n" }
       let(:form) { described_class.new(items_choice:, csv:) }
 
-      it 'reports the error for csv_file' do
+      it 'reports the error for csv_file and does not build any item registrations' do
         expect(form.valid?).to be false
         expect(form.errors[:csv_file]).to eq(['missing headers: source_id.'])
         expect(form.errors[:csv]).to be_empty
         expect(form.errors[:item_registrations]).to be_empty
+        expect(form.item_registrations.to_a).to be_empty
+        expect(form.invalid_item_registrations).to be_empty
       end
     end
 
