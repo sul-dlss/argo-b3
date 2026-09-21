@@ -3,6 +3,8 @@
 module Contents
   # Populates an existing Content with ContentFileSets, ContentFiles, and ContentFileBinaries
   # from uploaded files, attaching each uploaded binary.
+  # Populator filters out files that should be ignored and determines a specific populator to call
+  # based on content type and other considerations.
   class Populator
     def self.call(...)
       new(...).call
@@ -20,51 +22,26 @@ module Contents
     end
 
     def call
-      files.each do |index, file|
-        filepath = paths[index]
-        next if IgnoreFileService.call(filepath:)
-
-        create_content_file(filepath:, file:)
-      end
+      # Currently the only populator
+      Contents::Populators::FileSetPerFile.call(content:, cocina_object:, files: retained_files,
+                                                paths: retained_paths)
     end
 
     private
 
     attr_reader :content, :cocina_object, :files, :paths
 
-    # Current naive implementation is one FileSet per file.
-    def create_content_file(filepath:, file:)
-      content_file_set = content.content_file_sets.create!(file_set_type: 'object', label: '')
-      content_file_binary = find_or_build_content_file_binary(filepath:)
-      attach_file(content_file_binary:, file:)
-      content_file_set.content_files.create!(content_file_binary:, **file_attributes)
+    # @return [Array<String>] the upload indexes of the files that should not be ignored
+    def retained_indexes
+      @retained_indexes ||= files.keys.reject { |index| IgnoreFileService.call(filepath: paths[index]) }
     end
 
-    def find_or_build_content_file_binary(filepath:)
-      content.content_file_binaries.find_by(filepath:) ||
-        content.content_file_binaries.build(filepath:)
+    def retained_files
+      files.slice(*retained_indexes)
     end
 
-    def attach_file(content_file_binary:, file:)
-      content_file_binary.file_location = :attached
-      content_file_binary.size = file.size
-      content_file_binary.sha1_digest = nil
-      content_file_binary.md5_digest = nil
-      content_file_binary.save!
-      content_file_binary.file.attach(file)
-    end
-
-    def file_attributes
-      access = cocina_object.access.embargo.presence || cocina_object.access
-      {
-        label: '',
-        preserve: true,
-        publish: true,
-        shelve: true,
-        view: access.view == 'citation-only' ? 'dark' : access.view,
-        download: access.download,
-        location: access.location
-      }
+    def retained_paths
+      paths.slice(*retained_indexes)
     end
   end
 end
