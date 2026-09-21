@@ -69,6 +69,12 @@ module Search
       facet_search: true
     )
 
+    # Used for direct links that must remain stable when an admin policy title changes.
+    ADMIN_POLICY_DRUIDS = Config.with_defaults(
+      form_field: :admin_policy_druids,
+      field: Search::Fields::APO_DRUID
+    )
+
     COLLECTIONS = Config.with_defaults(
       form_field: :collection_titles,
       field: Search::Fields::COLLECTION_TITLES,

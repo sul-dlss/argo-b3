@@ -48,6 +48,7 @@ en:
   search:
     # If not provided, will use humanized field name
     facets:
+      admin_policy_druids: "Admin policies"
       admin_policy_titles: "Admin policies"
       collection_titles: "Collections"
       earliest_accessioned_date: "Earliest accessioned"

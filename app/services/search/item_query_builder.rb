@@ -7,6 +7,7 @@ module Search
 
     FACETS = [
       Search::Facets::ACCESS_RIGHTS,
+      Search::Facets::ADMIN_POLICY_DRUIDS,
       Search::Facets::ADMIN_POLICIES,
       Search::Facets::COLLECTIONS,
       Search::Facets::CONTENT_TYPES,

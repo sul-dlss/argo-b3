@@ -54,6 +54,7 @@ class SearchForm < ApplicationForm
   # Facet fields
   attribute :access_rights, array: true, default: -> { [] }
   attribute :access_rights_exclude, array: true, default: -> { [] }
+  attribute :admin_policy_druids, array: true, default: -> { [] }
   attribute :admin_policy_titles, array: true, default: -> { [] }
   attribute :collection_titles, array: true, default: -> { [] }
   attribute :content_types, array: true, default: -> { [] }

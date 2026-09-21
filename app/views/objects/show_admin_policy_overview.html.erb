@@ -11,13 +11,13 @@
       <% component.with_row(label: 'Status', value: @solr_doc.status) %>
       <% component.with_row(label: '# of collections') do |row_component| %>
         <% row_component.with_cell do %>
-          <% search_form = ResultsSearchForm.new(collection_titles: [@solr_doc.title]) %>
+          <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['collection']) %>
           <%= link_to @object_counts.collection_count, url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: '# of items') do |row_component| %>
         <% row_component.with_cell do %>
-          <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+          <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['item']) %>
           <%= link_to @object_counts.item_count, url_for(search_form) %>
         <% end %>
       <% end %>
