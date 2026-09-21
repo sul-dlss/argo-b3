@@ -87,9 +87,12 @@ class ItemsRegistrationForm < ApplicationForm
   # Replaces the item registrations with ones parsed from the uploaded CSV.
   # Columns that are missing from the CSV leave their fields blank (and so will generally fail
   # ItemRegistrationForm's own validations); extra columns are ignored.
+  # Nothing is built from an invalid CSV, since csv_must_be_valid reports the error instead and the
+  # item registrations derived from it are not worth fixing one by one.
   def build_item_registrations_from_csv
     return unless items_choice == UPLOAD_CSV_CHOICE
     return if csv.blank?
+    return unless csv_valid?
 
     item_registrations.clear
     CSV.parse(csv, headers: true).each do |row|
@@ -113,12 +116,22 @@ class ItemsRegistrationForm < ApplicationForm
     return unless items_choice == UPLOAD_CSV_CHOICE
     return errors.add(:csv_file, :blank) if csv.blank?
 
-    validator = CsvUpload::Validator.new(csv:, required_headers: CSV_REQUIRED_HEADERS)
-    return if validator.valid?
+    return if csv_valid?
 
-    validator.errors.each do |message|
+    csv_validator.errors.each do |message|
       errors.add(:csv_file, :invalid, message:)
     end
+  end
+
+  def csv_validator
+    @csv_validator ||= CsvUpload::Validator.new(csv:, required_headers: CSV_REQUIRED_HEADERS)
+  end
+
+  # CsvUpload::Validator#valid? appends to its errors on each call, so the result is memoized.
+  def csv_valid?
+    return @csv_valid if defined?(@csv_valid)
+
+    @csv_valid = csv_validator.valid?
   end
 
   def item_registrations_presence
