@@ -218,7 +218,7 @@ RSpec.describe CocinaModels::Dro do
         new_dro.create!(user_name:)
 
         expect(Sdr::Repository).to have_received(:register)
-          .with(request_cocina_object:, user_name:, tags:)
+          .with(request_cocina_object:, user_name:, tags:, workflow_name: nil)
         expect(new_dro.persisted?).to be true
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false

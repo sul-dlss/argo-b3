@@ -54,7 +54,7 @@ RSpec.describe BulkActions::RegisterFormJob do
       job.perform_now
 
       expect(Sdr::Repository).to have_received(:register)
-        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags: []).twice
+        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags: [], workflow_name: nil).twice
       expect(log).to have_received(:puts).with(/druid:bc123df4567\tSuccess: Registration successful/)
       expect(log).to have_received(:puts).with(/druid:dj123qx4568\tSuccess: Registration successful/)
       expect(bulk_action.druid_count_total).to eq 2
@@ -125,7 +125,7 @@ RSpec.describe BulkActions::RegisterFormJob do
       job.perform_now
 
       expect(Sdr::Repository).to have_received(:register)
-        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags:).twice
+        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags:, workflow_name: nil).twice
       expect(bulk_action.druid_count_success).to eq 2
     end
   end

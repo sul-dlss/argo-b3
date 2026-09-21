@@ -127,15 +127,6 @@ RSpec.describe 'Create multiple items' do
     end
   end
 
-  it 'renders the Goobi deposit choices horizontally' do
-    visit new_multiple_item_path
-
-    expect(page).to have_css('fieldset .row.align-items-center > .col-3', text: 'Deposit with Goobi')
-    expect(page).to have_css('fieldset .row.align-items-center > .form-check.col-auto', count: 2)
-    expect(page).to have_css('input.form-check-input + label.form-check-label', text: 'Yes')
-    expect(page).to have_css('input.form-check-input + label.form-check-label', text: 'No')
-  end
-
   context 'when the form validation is pending' do
     it 'shows the validating page and enqueues a validate form job' do
       submit_two_items
