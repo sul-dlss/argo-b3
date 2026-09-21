@@ -54,10 +54,12 @@ class ObjectsController < ApplicationController
 
     case @solr_doc.object_type
     when 'collection'
-      @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid)
+      @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid,
+                                                        user_scope: current_user_scope)
       render :show_collection_overview, layout: false
     when 'APO'
-      @object_counts = Searchers::AdminPolicyObjectCounts.call(admin_policy_druid: @solr_doc.druid)
+      @object_counts = Searchers::AdminPolicyObjectCounts.call(admin_policy_druid: @solr_doc.druid,
+                                                               user_scope: current_user_scope)
       render :show_admin_policy_overview, layout: false
     else
       # This also includes agreements and virtual objects.
@@ -115,7 +117,8 @@ class ObjectsController < ApplicationController
     return if @last_search_form.blank? || position.nil? || total_results.nil?
     return unless position.positive?
 
-    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:)
+    navigation = Searchers::ItemNavigation.call(search_form: @last_search_form, position:,
+                                                user_scope: current_user_scope)
     return if navigation.blank?
 
     @search_position = position

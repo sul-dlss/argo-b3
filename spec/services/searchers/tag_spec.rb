@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Tag do
   let(:user) { create(:user, :admin) }
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
+  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, user_scope:) }
   let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'project 1' }
   let(:solr_response) do
@@ -20,7 +21,6 @@ RSpec.describe Searchers::Tag do
   end
 
   before do
-    Current.effective_groups = user.groups
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
@@ -54,7 +54,6 @@ RSpec.describe Searchers::Tag do
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
 
     before do
-      Current.effective_groups = user.groups
       allow(Search::SolrService).to receive(:post).and_call_original
       create(:solr_item, projects: ['Visible project'])
       create(:solr_item, apo_druid: restricted_apo_druid, projects: ['Hidden project'])
@@ -63,7 +62,8 @@ RSpec.describe Searchers::Tag do
 
     it 'only returns project tags for readable items' do
       tags = described_class.call(search_form: ResultsSearchForm.new(query: 'project'),
-                                  field: Search::Fields::PROJECTS_EXPLODED)
+                                  field: Search::Fields::PROJECTS_EXPLODED,
+                                  user_scope:)
 
       expect(tags.to_a).to eq(['Visible project'])
     end

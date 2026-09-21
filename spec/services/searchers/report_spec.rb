@@ -4,14 +4,13 @@ require 'rails_helper'
 
 RSpec.describe Searchers::Report do
   let(:user) { create(:user, :admin) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
   let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:fields) { [Reports::Fields::DRUID.field, Reports::Fields::PURL.field] }
 
-  before { Current.effective_groups = user.groups }
-
   context 'when streaming results' do
-    subject(:results) { described_class.call(search_form:, fields:, stream:, rows: 10) }
+    subject(:results) { described_class.call(search_form:, fields:, stream:, rows: 10, user_scope:) }
 
     let(:stream) { StringIO.new }
 
@@ -35,7 +34,7 @@ RSpec.describe Searchers::Report do
   end
 
   context 'when not streaming results' do
-    subject(:results) { described_class.call(search_form:, fields:, rows: 10) }
+    subject(:results) { described_class.call(search_form:, fields:, rows: 10, user_scope:) }
 
     let(:csv_string) do
       <<~CSV
@@ -74,13 +73,12 @@ RSpec.describe Searchers::Report do
     let(:search_form) { ResultsSearchForm.new(query: 'Test') }
 
     before do
-      Current.effective_groups = user.groups
       create(:solr_item, apo_druid: restricted_apo_druid)
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'filters reports generated from a search to only readable items' do
-      report = described_class.call(search_form:, fields: [Search::Fields::ID], rows: 10)
+      report = described_class.call(search_form:, fields: [Search::Fields::ID], rows: 10, user_scope:)
 
       expect(report.map(&:fields).flatten).to eq([visible_document.fetch(Search::Fields::ID)])
     end

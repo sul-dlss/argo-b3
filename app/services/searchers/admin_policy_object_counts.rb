@@ -10,9 +10,11 @@ module Searchers
     end
 
     # @param admin_policy_druid [String]
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @return [Result] counts for items and collections governed by the admin policy
-    def initialize(admin_policy_druid:)
+    def initialize(admin_policy_druid:, user_scope:)
       @admin_policy_druid = admin_policy_druid
+      @user_scope = user_scope
     end
 
     def call
@@ -24,11 +26,11 @@ module Searchers
 
     private
 
-    attr_reader :admin_policy_druid
+    attr_reader :admin_policy_druid, :user_scope
 
     def count(object_type:)
       QueryCount.call(query: "#{Search::Fields::APO_DRUID}:\"#{admin_policy_druid}\" AND " \
-                             "#{Search::Fields::OBJECT_TYPES}:\"#{object_type}\"")
+                             "#{Search::Fields::OBJECT_TYPES}:\"#{object_type}\"", user_scope:)
     end
   end
 end

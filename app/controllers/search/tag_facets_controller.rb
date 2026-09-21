@@ -35,7 +35,8 @@ module Search
                                         facet_config:,
                                         value: for_children ? parent_value_param : nil,
                                         limit: for_children ? -1 : limit,
-                                        page: page_param)
+                                        page: page_param,
+                                        user_scope: current_user_scope)
     end
   end
 end
