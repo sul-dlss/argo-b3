@@ -21,7 +21,8 @@ module BulkActions
       log("Starting #{self.class} for BulkAction #{bulk_action.id}")
       update_druid_count!
 
-      perform_bulk_action
+      # Current.user is needed for some jobs, e.g., so that permission changes are recorded as events in SDR.
+      Current.set(user:) { perform_bulk_action }
 
       log("Finished #{self.class} for BulkAction #{bulk_action.id}")
       bulk_action.completed!
