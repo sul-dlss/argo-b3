@@ -69,6 +69,12 @@ module Search
       facet_search: true
     )
 
+    # Used for direct links from APO show page for items/collections governed by the APO (use druid for faceting)
+    ADMIN_POLICY_DRUIDS = Config.with_defaults(
+      form_field: :admin_policy_druids,
+      field: Search::Fields::APO_DRUID
+    )
+
     COLLECTIONS = Config.with_defaults(
       form_field: :collection_titles,
       field: Search::Fields::COLLECTION_TITLES,
@@ -76,6 +82,12 @@ module Search
       facet_resource: :collection_facets,
       facet_index: true,
       facet_search: true
+    )
+
+    # Used for direct links from Collection show page for items in the collection (use druid for faceting)
+    COLLECTION_DRUIDS = Config.with_defaults(
+      form_field: :collection_druids,
+      field: Search::Fields::COLLECTION_DRUIDS
     )
 
     DATES = Config.with_defaults(

@@ -69,6 +69,13 @@
             <%= render Show::ReleasedToComponent.new(object_released_presenter: @object_released_presenter) %>
           </div>
         <% end %>
+        <% if @solr_doc.admin_policy? %>
+          <div class="show-box flex-fill">
+            <%= render Show::BoxComponent.new(heading: 'Agreement') do %>
+              <%= link_to_object @solr_doc.agreement_title, @solr_doc.agreement_druid %>
+            <% end %>
+          </div>
+        <% end %>
         <div class="show-box flex-fill">
           <%= render Show::TagComponent.new(tags: Array(@solr_doc.all_tags), pinned_tags: @pinned_tags) %>
         </div>

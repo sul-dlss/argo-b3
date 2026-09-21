@@ -54,7 +54,7 @@ RSpec.describe 'Show collection' do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
-    allow(Searchers::QueryCount).to receive(:call).and_return(12)
+    allow(Searchers::CollectionItemCount).to receive(:call).and_return(12)
 
     sign_in(create(:user))
   end
@@ -93,8 +93,9 @@ RSpec.describe 'Show collection' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
-    expect(page).to have_table_value('overview-table', '# of items', '12')
-    expect(page).to have_link('12', href: search_path(collection_titles: [original_title]))
+    within(find_table_value_cell('overview-table', '# of items')) do
+      expect(page).to have_link('12', href: search_path(collection_druids: [druid], object_types: ['item']))
+    end
     within(find_table_value_cell('access-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',

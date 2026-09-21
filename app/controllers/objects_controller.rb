@@ -54,10 +54,10 @@ class ObjectsController < ApplicationController
 
     case @solr_doc.object_type
     when 'collection'
-      query = "#{Search::Fields::COLLECTION_DRUIDS}:\"#{@solr_doc.druid}\""
-      @item_count = Searchers::QueryCount.call(query:)
+      @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid)
       render :show_collection_overview, layout: false
     when 'APO'
+      @object_counts = Searchers::AdminPolicyObjectCounts.call(admin_policy_druid: @solr_doc.druid)
       render :show_admin_policy_overview, layout: false
     else
       # This also includes agreements and virtual objects.
