@@ -47,6 +47,8 @@ module ArgoB3
     # Don't generate system test files.
     config.generators.system_tests = nil
 
+    config.active_storage.variant_processor = :disabled
+
     # Bootstrap form error handling
     ActionView::Base.field_error_proc = proc do |html_tag, _instance|
       html_tag.gsub(/(form-control|form-check-input|form-select)/, '\1 is-invalid').html_safe # rubocop:disable Rails/OutputSafety
