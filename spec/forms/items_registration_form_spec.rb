@@ -66,6 +66,41 @@ RSpec.describe ItemsRegistrationForm do
 
       expect(form.invalid_item_registrations.map(&:source_id)).to eq(['sul:5678'])
     end
+
+    context 'when the csv is at fault' do
+      let(:form) do
+        described_class.new(items_choice: described_class::UPLOAD_CSV_CHOICE,
+                            csv: "folio_instance_hrid,title\nin11403803,First title\n")
+      end
+
+      it 'returns no item registrations, since csv_must_be_valid reports the error instead' do
+        form.valid?
+
+        expect(form.invalid_item_registrations).to be_empty
+      end
+    end
+
+    context 'when the tab-delimited list is at fault' do
+      let(:form) do
+        described_class.new(items_choice: described_class::ENTER_TAB_DELIMITED_CHOICE, tab_delimited_items: '')
+      end
+
+      it 'returns no item registrations, since item_registrations_presence reports the error instead' do
+        form.valid?
+
+        expect(form.invalid_item_registrations).to be_empty
+      end
+    end
+
+    context 'when every item registration is blank' do
+      let(:form) { described_class.new(item_registrations_attributes: [{}, {}]) }
+
+      it 'returns no item registrations, since item_registrations_presence reports the error instead' do
+        form.valid?
+
+        expect(form.invalid_item_registrations).to be_empty
+      end
+    end
   end
 
   describe 'tab-delimited items' do

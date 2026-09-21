@@ -5,8 +5,8 @@ module NormalizationConcern
   extend ActiveSupport::Concern
 
   class_methods do
-    # Blanks stores normalizations in a class_attribute whose default is a single shared hash that
-    # Blanks::Normalization#normalizes mutates in place, so declaring a normalization for an
+    # Voids stores normalizations in a class_attribute whose default is a single shared hash that
+    # Voids::Normalization#normalizes mutates in place, so declaring a normalization for an
     # attribute name (e.g., :tag) in one class would clobber it for every other class. Giving the
     # declaring class its own copy first keeps normalizations per-class.
     def normalizes(*, **)

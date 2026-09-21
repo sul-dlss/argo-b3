@@ -94,9 +94,6 @@ GEM
       smart_properties
     bigdecimal (3.3.1)
     bindex (0.8.1)
-    blanks (1.0.0)
-      activemodel (>= 6.0)
-      activesupport (>= 6.0)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
     brakeman (8.0.6)
@@ -676,6 +673,10 @@ GEM
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
       concurrent-ruby (~> 1)
+    voids (3.0.0)
+      activemodel (>= 6.0)
+      activesupport (>= 6.0)
+      zeitwerk
     web-console (4.3.0)
       actionview (>= 8.0.0)
       bindex (>= 0.4.0)
@@ -712,7 +713,6 @@ PLATFORMS
 DEPENDENCIES
   action_policy
   barby
-  blanks
   bootsnap
   brakeman
   bundler-audit
@@ -775,6 +775,7 @@ DEPENDENCIES
   thruster
   turbo-rails
   view_component
+  voids
   web-console
   webmock
 

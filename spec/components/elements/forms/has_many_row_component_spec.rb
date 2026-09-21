@@ -9,7 +9,7 @@ RSpec.describe Elements::Forms::HasManyRowComponent, type: :component do
   end
 
   let(:widget_form_class) do
-    Class.new(Blanks::Base) do
+    Class.new(Voids::Base) do
       attribute :name, :string
     end
   end

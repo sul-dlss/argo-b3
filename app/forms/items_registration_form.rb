@@ -57,8 +57,13 @@ class ItemsRegistrationForm < ApplicationForm
     derive_with_embargo
   end
 
+  # The item registrations that the user is asked to fix. When the problem is with how the items were
+  # entered rather than with the items themselves, none of them are, since the item registrations
+  # derived from a faulty entry are not worth fixing one by one.
   # @return [Array<ItemRegistrationForm>] the item registrations that have validation errors
   def invalid_item_registrations
+    return [] if items_entry_error?
+
     @invalid_item_registrations ||= item_registrations.to_a.select { |item_registration| item_registration.errors.any? }
   end
 
@@ -122,6 +127,13 @@ class ItemsRegistrationForm < ApplicationForm
     return if item_registrations.to_a.any? { |item_registration| !item_registration.empty? }
 
     errors.add(items_choice_error_attribute, I18n.t('edit.multiple_items.validations.no_items'))
+  end
+
+  # Whether the error is with how the items were entered (e.g., a CSV with missing headers, or no items
+  # at all) rather than with the individual items. csv_must_be_valid or item_registrations_presence
+  # reports the error in that case, and the view shows the item entry fields rather than the items.
+  def items_entry_error?
+    errors[:csv_file].any? || errors[:tab_delimited_items].any? || item_registrations.to_a.all?(&:empty?)
   end
 
   def items_choice_error_attribute

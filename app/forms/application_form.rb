@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ApplicationForm < Blanks::Base
+class ApplicationForm < Voids::Base
   include PermittedParamsConcern
   include NormalizationConcern
 end
