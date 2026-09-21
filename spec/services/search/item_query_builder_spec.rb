@@ -65,6 +65,15 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with collection druids (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(collection_druids: ['druid:bc123df4567']) }
+
+    it 'builds the correct filter query for collection druids' do
+      result = described_class.call(search_form:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::COLLECTION_DRUIDS}:(\"druid:bc123df4567\")")
+    end
+  end
+
   context 'with access rights exclude (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(access_rights_exclude: ['dark']) }
 

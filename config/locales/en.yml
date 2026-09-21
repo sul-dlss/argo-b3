@@ -50,6 +50,7 @@ en:
     facets:
       admin_policy_druids: "Admin policies"
       admin_policy_titles: "Admin policies"
+      collection_druids: "Collections"
       collection_titles: "Collections"
       earliest_accessioned_date: "Earliest accessioned"
       earliest_accessioned_date_from: 'Earliest accessioned from'
