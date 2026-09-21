@@ -223,6 +223,13 @@ RSpec.describe CocinaModels::Dro do
         expect(new_dro.external_identifier).to eq(registered_cocina_object.externalIdentifier)
         expect(new_dro.changed?).to be false
       end
+
+      it 'registers the object with an initial workflow when provided' do
+        new_dro.create!(user_name:, workflow_name: 'goobiWF')
+
+        expect(Sdr::Repository).to have_received(:register)
+          .with(request_cocina_object:, user_name:, tags:, workflow_name: 'goobiWF')
+      end
     end
 
     context 'when building the real request cocina object' do

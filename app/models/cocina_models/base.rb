@@ -37,11 +37,13 @@ module CocinaModels
     # @raise [RuntimeError] if the object has already been persisted
     # @raise [Sdr::Repository::Error] if there is an error registering the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def create!(user_name:)
+    def create!(user_name:, workflow_name: nil)
       raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
 
       validate!
-      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:, tags:)
+      repository_params = { request_cocina_object:, user_name:, tags: }
+      repository_params[:workflow_name] = workflow_name if workflow_name
+      registered_cocina_object = Sdr::Repository.register(**repository_params)
       assign_from_cocina_object(registered_cocina_object)
     end
 

@@ -130,6 +130,20 @@ RSpec.describe BulkActions::RegisterFormJob do
     end
   end
 
+  context 'when depositing with Goobi' do
+    before do
+      items_registration_form.deposit_with_goobi = true
+    end
+
+    it 'registers every object with the Goobi workflow' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:register)
+        .with(request_cocina_object: Cocina::Models::RequestDRO, user_name:, tags: [],
+              workflow_name: 'goobiWF').twice
+    end
+  end
+
   context 'when registration fails' do
     before do
       allow(Sdr::Repository).to receive(:register).and_raise(StandardError, 'connection problem')

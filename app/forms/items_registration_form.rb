@@ -30,6 +30,8 @@ class ItemsRegistrationForm < ApplicationForm
 
   CSV_REQUIRED_HEADERS = %w[source_id].freeze
 
+  attribute :deposit_with_goobi, :boolean, default: false
+
   attribute :items_choice, :string, default: ENTER_EACH_CHOICE
 
   attribute :tab_delimited_items, :string

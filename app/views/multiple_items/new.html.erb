@@ -23,6 +23,24 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(classes: 'my-fieldset',
+                                                               hidden_label: true,
+                                                               label: 'Deposit with Goobi') do %>
+      <div class="row align-items-center">
+        <div class="col-3 form-label fw-bold" aria-hidden="true">Deposit with Goobi</div>
+        <div class="col-auto form-check">
+          <%= form.radio_button :deposit_with_goobi, 'true', class: 'form-check-input' %>
+          <%= form.label :deposit_with_goobi_true, 'Yes', class: 'form-check-label' %>
+        </div>
+        <div class="col-auto form-check">
+          <%= form.radio_button :deposit_with_goobi, 'false', class: 'form-check-input' %>
+          <%= form.label :deposit_with_goobi_false, 'No', class: 'form-check-label' %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
     <%= render Edit::TagsComponent.new(form:) %>
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
