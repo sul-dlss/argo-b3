@@ -446,4 +446,95 @@ RSpec.describe Contents::Builder do
       )
     end
   end
+
+  context 'with the same filename referenced more than once in a single file set' do
+    let(:cocina_hash) do
+      {
+        'type' => Cocina::Models::ObjectType.image,
+        'externalIdentifier' => druid,
+        'version' => 1,
+        'access' => {
+          'view' => 'world',
+          'download' => 'world'
+        },
+        'administrative' => {
+          'hasAdminPolicy' => 'druid:fh940mz2717'
+        },
+        'description' => {
+          'title' => [
+            {
+              'value' => 'dood'
+            }
+          ],
+          'purl' => 'https://purl.stanford.edu/qr773tm1060',
+          'access' => {
+            'digitalRepository' => [
+              {
+                'value' => 'Stanford Digital Repository'
+              }
+            ]
+          }
+        },
+        'identification' => {
+          'sourceId' => 'foo:129'
+        },
+        'structural' => {
+          'contains' => [
+            {
+              'type' => Cocina::Models::FileSetType.image,
+              'externalIdentifier' => 'https://cocina.sul.stanford.edu/fileSet/e43590ae-abf9-4a5c-88f2-a8627969dc23',
+              'label' => 'Image 1',
+              'version' => 1,
+              'structural' => {
+                'contains' => [
+                  {
+                    'type' => Cocina::Models::ObjectType.file,
+                    'externalIdentifier' => 'https://cocina.sul.stanford.edu/file/de24d694-2fe8-41a5-9113-ae6adf4506fd',
+                    'label' => 'Image 1 file',
+                    'filename' => 'qr773tm1060_0001.tiff',
+                    'version' => 1,
+                    'hasMessageDigests' => [],
+                    'access' => {
+                      'view' => 'world',
+                      'download' => 'world'
+                    },
+                    'administrative' => {
+                      'publish' => true,
+                      'sdrPreserve' => false,
+                      'shelve' => true
+                    }
+                  },
+                  {
+                    'type' => Cocina::Models::ObjectType.file,
+                    'externalIdentifier' => 'https://cocina.sul.stanford.edu/file/86de37bc-b930-49ac-936b-15e8db7af88e',
+                    'label' => 'Image 1 file (again)',
+                    'filename' => 'qr773tm1060_0001.tiff',
+                    'version' => 1,
+                    'hasMessageDigests' => [],
+                    'access' => {
+                      'view' => 'world',
+                      'download' => 'world'
+                    },
+                    'administrative' => {
+                      'publish' => false,
+                      'sdrPreserve' => true,
+                      'shelve' => false
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    end
+
+    it 'creates a ContentFile for each reference, sharing a single ContentFileBinary' do
+      content_file_binary = content.content_file_binaries.sole
+      files = content.content_file_sets.sole.content_files.sort_by(&:position)
+
+      expect(files.map(&:label)).to eq(['Image 1 file', 'Image 1 file (again)'])
+      expect(files.map(&:content_file_binary)).to all(eq(content_file_binary))
+    end
+  end
 end

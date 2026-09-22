@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -105,7 +105,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_120000) do
     t.string "view", null: false
     t.integer "width"
     t.index ["content_file_binary_id"], name: "index_content_files_on_content_file_binary_id"
-    t.index ["content_file_set_id", "content_file_binary_id"], name: "idx_on_content_file_set_id_content_file_binary_id_6042d030c0", unique: true
     t.index ["content_file_set_id", "position"], name: "index_content_files_on_content_file_set_id_and_position", unique: true
     t.index ["content_file_set_id"], name: "index_content_files_on_content_file_set_id"
   end
