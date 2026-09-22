@@ -15,7 +15,7 @@ class ContentStructureController < ContentsApplicationController
   end
 
   def update
-    populator = "Contents::Populators::#{params[:populator]}".constantize
+    populator = find_populator
     if params[:commit] == APPEND_VALUE
       populator.append(content: @content, cocina_object: @cocina_object)
       flash[:toast] = t('edit.contents.structure.toasts.append')
@@ -28,6 +28,12 @@ class ContentStructureController < ContentsApplicationController
   end
 
   private
+
+  def find_populator
+    Contents::PopulatorSelector::POPULATORS_BY_NAME.fetch(params[:populator]) do
+      raise ActionController::BadRequest, "Unknown populator: #{params[:populator]}"
+    end
+  end
 
   def set_content_and_cocina_object
     @content_token = params[:content_id]
