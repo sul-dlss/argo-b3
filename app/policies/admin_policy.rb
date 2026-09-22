@@ -2,6 +2,10 @@
 
 # Policy for admin-related actions
 class AdminPolicy < ApplicationPolicy
+  # Without skipping pre_check, these are always true when the user is an admin or impersonating an admin,
+  # therefore skipping the actual policy logic.
+  skip_pre_check :allow_admins, only: %i[impersonate? stop_impersonating?]
+
   alias_rule :manage_permissions?, :groups?, to: :admin?
 
   # can only start/update impersonating if an admin and not currently impersonating

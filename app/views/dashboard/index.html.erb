@@ -41,10 +41,10 @@
         <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
-      <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary', disabled: true) if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
-        <% if allowed_to?(:impersonate?, nil, with: AdminPolicy) || Current.impersonating? %>
-          <% component.with_button(link: admin_impersonate_path, label: 'Impersonate', variant: 'outline-primary') %>
+      <% if allowed_to?(:admin?, nil, with: AdminPolicy) %>
+        <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
+          <% component.with_button(link: '#', label: 'Manage permissions', variant: 'outline-primary', disabled: true) if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+          <% component.with_button(link: admin_impersonate_path, label: 'Impersonate', variant: 'outline-primary', disabled: Current.impersonating?) %>
         <% end %>
       <% end %>
     <% end %>

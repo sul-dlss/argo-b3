@@ -112,7 +112,7 @@ RSpec.describe 'Admin impersonate' do
   end
 
   describe 'DELETE /admin/impersonate' do
-    let(:admin_user) { create(:user, :admin) }
+    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
 
     before do
       sign_in(admin_user)
@@ -128,6 +128,35 @@ RSpec.describe 'Admin impersonate' do
       get admin_impersonate_path
 
       expect(encrypted_impersonated_workgroups).to be_nil
+    end
+  end
+
+  describe 'DELETE /admin/impersonate when not impersonating' do
+    let(:admin_user) { create(:user, :admin) }
+
+    before do
+      sign_in(admin_user)
+    end
+
+    it 'is unauthorized' do
+      delete admin_stop_impersonate_path
+
+      expect(response).to be_unauthorized
+    end
+  end
+
+  describe 'GET /admin/impersonate while an admin is impersonating an admin group' do
+    let(:admin_user) { create(:user, :admin) }
+
+    before do
+      sign_in(admin_user)
+      patch admin_impersonate_path, params: { impersonation: { workgroups: [AuthenticationHelpers::ADMIN_GROUP] } }
+    end
+
+    it 'is unauthorized' do
+      get admin_impersonate_path
+
+      expect(response).to be_unauthorized
     end
   end
 
