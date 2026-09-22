@@ -34,14 +34,15 @@ module CocinaModels
     end
 
     # @param [String] user_name the sunetid of the user performing the action
+    # @param [String, nil] optional workflow_name the name of the workflow to initialize when creating object
     # @raise [RuntimeError] if the object has already been persisted
     # @raise [Sdr::Repository::Error] if there is an error registering the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def create!(user_name:)
+    def create!(user_name:, workflow_name: nil)
       raise 'Cannot create an object that has already been persisted; call #save! instead' if persisted?
 
       validate!
-      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:, tags:)
+      registered_cocina_object = Sdr::Repository.register(request_cocina_object:, user_name:, tags:, workflow_name:)
       assign_from_cocina_object(registered_cocina_object)
     end
 

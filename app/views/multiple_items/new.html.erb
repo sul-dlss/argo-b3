@@ -23,6 +23,24 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(classes: 'my-fieldset',
+                                                               hidden_label: true,
+                                                               label: t('edit.items.fields.goobi.deposit')) do %>
+      <div class="row align-items-center">
+        <div class="col-3 form-label fw-bold" aria-hidden="true"><%= t('edit.items.fields.goobi.deposit') %></div>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :deposit_with_goobi,
+                                                                      container_classes: 'col-auto d-flex align-items-center gap-2',
+                                                                      input_classes: 'order-first ms-0',
+                                                                      label_text: 'Yes', input_value: 'true') %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :deposit_with_goobi,
+                                                                      container_classes: 'col-auto d-flex align-items-center gap-2',
+                                                                      input_classes: 'order-first ms-0',
+                                                                      label_text: 'No', input_value: 'false') %>
+      </div>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
     <%= render Edit::TagsComponent.new(form:) %>
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>

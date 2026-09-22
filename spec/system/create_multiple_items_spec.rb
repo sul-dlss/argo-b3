@@ -47,6 +47,7 @@ RSpec.describe 'Create multiple items' do
 
     # No license is selected by default.
     expect(page).to have_select('License', selected: '')
+    expect(page).to have_field('No', type: 'radio', checked: true)
 
     fill_in 'Use and reproduction', with: 'Property rights reside with the repository.'
     fill_in 'Copyright', with: 'Copyright © Stanford University.'
@@ -180,6 +181,26 @@ RSpec.describe 'Create multiple items' do
           expect(item_registrations.last.catalog_record_id).to eq('in11403803')
           expect(item_registrations.last.barcode).to eq('36105212345678')
         end
+      )
+    end
+
+    it 'retains the choice to deposit with Goobi' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+      choose 'Yes'
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(deposit_with_goobi: true)
       )
     end
 

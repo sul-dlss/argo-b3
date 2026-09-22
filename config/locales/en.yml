@@ -163,6 +163,8 @@ en:
             extra_rows: "Only one row of description is allowed."
             missing_title: "Title value not found."
             no_rows: "Description row not found."
+        goobi:
+          deposit: 'Deposit with Goobi'
         license:
           label: "License"
           label_caption: "Get help selecting a license"

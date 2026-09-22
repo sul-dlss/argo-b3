@@ -3,6 +3,8 @@
 module BulkActions
   # Job to register objects from a form submission. This job is used for multiple item registration.
   class RegisterFormJob < BaseRegisterJob
+    GOOBI_WORKFLOW_NAME = 'goobiWF'
+
     def perform(bulk_action:, items_registration_form:)
       @items_registration_form = items_registration_form
       super
@@ -21,7 +23,8 @@ module BulkActions
       delegate :items_registration_form, to: :job
 
       def register
-        build_dro.tap { |dro| dro.create!(user_name: user_id) }.previous_cocina_object
+        workflow_name = GOOBI_WORKFLOW_NAME if items_registration_form.deposit_with_goobi
+        build_dro.tap { |dro| dro.create!(user_name: user_id, workflow_name:) }.previous_cocina_object
       end
 
       def build_dro # rubocop:disable Metrics/AbcSize
