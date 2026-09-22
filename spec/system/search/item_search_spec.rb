@@ -91,8 +91,17 @@ RSpec.describe 'Item search', :solr do
 
         within(find_item_results_section) do
           click_link_or_button('Sort by Relevance')
-          expect(page).to have_css('.dropdown-item', text: 'Relevance')
-          expect(page).to have_css('.dropdown-item', text: 'Druid')
+          expect(page.all('.dropdown-item').map(&:text)).to eq(['Relevance',
+                                                                'Last deposited date (ascending)',
+                                                                'Last deposited date (descending)',
+                                                                'Registered date (ascending)',
+                                                                'Registered date (descending)',
+                                                                'Source ID',
+                                                                'Druid'])
+
+          click_link_or_button('Registered date (descending)')
+          expect(page).to have_button('Sort by Registered date (descending)')
+          expect(page).to have_result_count(11)
         end
       end
     end
