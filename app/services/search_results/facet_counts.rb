@@ -17,7 +17,8 @@ module SearchResults
       return if facet_result.nil?
 
       facet_result['buckets'].each do |bucket|
-        yield FacetCount.new(value: bucket['val'], count: bucket['count'])
+        value, label = bucket_value_and_label(bucket['val'])
+        yield FacetCount.new(value:, label:, count: bucket['count'])
       end
     end
 
@@ -60,7 +61,13 @@ module SearchResults
     private
 
     def field
-      facet_config.field
+      facet_config.facet_field
+    end
+
+    def bucket_value_and_label(val)
+      return [val, val] unless facet_config.composite_facet_field
+
+      Search::CompositeFacetValue.parse(val)
     end
   end
 end

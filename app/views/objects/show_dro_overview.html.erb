@@ -16,7 +16,7 @@
     <% component.with_row(label: 'APO') do |row_component| %>
       <% row_component.with_cell do %>
         <%= link_to_object @solr_doc.apo_title, @solr_doc.apo_druid %>
-        <% search_form = ResultsSearchForm.new(admin_policy_titles: [@solr_doc.apo_title]) %>
+        <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.apo_druid]) %>
         (<%= link_to('All objects with this APO', url_for(search_form)) %>)
       <% end %>
     <% end %>
@@ -25,7 +25,7 @@
         <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
           <% collection_title = Array(@solr_doc.collection_titles)[index] %>
           <%= link_to_object collection_title, collection_druid %>
-          <% search_form = ResultsSearchForm.new(collection_titles: [collection_title]) %>
+          <% search_form = ResultsSearchForm.new(collection_druids: [collection_druid]) %>
           (<%= link_to('All objects with this collection', url_for(search_form)) %>)
         <% end %>
       <% end %>

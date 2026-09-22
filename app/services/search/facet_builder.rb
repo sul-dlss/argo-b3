@@ -14,13 +14,16 @@ module Search
     # @param facet_prefix [String, nil] optional prefix to filter facet values
     # @param exclude [Boolean] whether to exclude a tagged filter
     # @param page [Integer, nil] optional page number for paged facets
-    def initialize(field:, alpha_sort: false, limit: nil, facet_prefix: nil, exclude: false, page: nil) # rubocop:disable Metrics/ParameterLists
+    # @param tag [String, nil] the filter tag to exclude; defaults to `field`. Needed when faceting on a
+    #   different field than the one filters are tagged with (see ItemQueryBuilder#facet_filter_query).
+    def initialize(field:, alpha_sort: false, limit: nil, facet_prefix: nil, exclude: false, page: nil, tag: nil) # rubocop:disable Metrics/ParameterLists
       @field = field
       @alpha_sort = alpha_sort
       @limit = limit
       @facet_prefix = facet_prefix
       @exclude = exclude
       @page = page
+      @tag = tag || field
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -36,13 +39,13 @@ module Search
         # Tagging is done in ItemQueryBuilder.
         # This is useful for checkbox facets (in all values for the facet should be returned).
         # See https://solr.apache.org/guide/8_11/json-faceting-domain-changes.html#filter-exclusions
-        facet[:domain] = { excludeTags: [field] } if exclude
+        facet[:domain] = { excludeTags: [tag] } if exclude
         facet[:offset] = (page - 1) * limit if page && limit
       end
     end
 
     private
 
-    attr_reader :field, :alpha_sort, :limit, :facet_prefix, :exclude, :page
+    attr_reader :field, :alpha_sort, :limit, :facet_prefix, :exclude, :page, :tag
   end
 end

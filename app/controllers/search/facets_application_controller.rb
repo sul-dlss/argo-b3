@@ -26,7 +26,7 @@ module Search
     def search
       facet_counts = Searchers::FacetQuery.call(
         search_form:,
-        field:,
+        facet_config:,
         limit: SEARCH_LIMIT,
         facet_query: facet_query_param,
         user_scope: current_user_scope
@@ -41,7 +41,7 @@ module Search
     end
 
     delegate :form_field, :alpha_sort, :limit,
-             :field, :hierarchical_field,
+             :hierarchical_field,
              to: :facet_config
 
     def facet_path_helper

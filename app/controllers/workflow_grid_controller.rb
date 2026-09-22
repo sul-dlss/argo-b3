@@ -13,6 +13,7 @@ class WorkflowGridController < SearchApplicationController
     @templates = workflow_names.index_with do |name|
       template_for(name)
     end
+    @facet_labels = Search::CompositeFacetLabels.call(search_form: @search_form)
 
     # /workflow_grid renders with placeholders.
     # /workflow_grid?placeholder=false renders with real data.

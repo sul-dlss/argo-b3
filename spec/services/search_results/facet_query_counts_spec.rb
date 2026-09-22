@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe SearchResults::FacetQueryCounts do
-  let(:facet_counts) { described_class.new(solr_response:, field:) }
-  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, field:) }
+  let(:facet_counts) { described_class.new(solr_response:, facet_config:) }
+  let(:empty_facet_counts) { described_class.new(solr_response: empty_solr_response, facet_config:) }
 
   let(:solr_response) do
     {
@@ -29,7 +29,7 @@ RSpec.describe SearchResults::FacetQueryCounts do
       }
     }
   end
-  let(:field) { Search::Fields::MIMETYPES }
+  let(:facet_config) { Search::Facets::MIMETYPES }
 
   describe '#each' do
     context 'when there are results' do
@@ -60,6 +60,29 @@ RSpec.describe SearchResults::FacetQueryCounts do
     it 'returns an array of facet counts' do
       expect(facet_counts.to_ary).to be_an(Array)
       expect(facet_counts.to_ary.size).to eq(3)
+    end
+  end
+
+  context 'when the facet config is composite' do
+    let(:facet_config) { Search::Facets::ADMIN_POLICIES }
+
+    let(:solr_response) do
+      {
+        'facet_counts' => {
+          'facet_fields' => {
+            Search::Fields::APO_TITLE_DRUID => [
+              'University Archives:druid:bc123df4567', 5
+            ]
+          }
+        }
+      }
+    end
+
+    it 'parses the druid and label out of the composite bucket value' do
+      facet_count = facet_counts.first
+      expect(facet_count.value).to eq 'druid:bc123df4567'
+      expect(facet_count.label).to eq 'University Archives'
+      expect(facet_count.count).to eq 5
     end
   end
 end

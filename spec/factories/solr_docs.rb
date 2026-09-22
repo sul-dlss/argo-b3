@@ -75,7 +75,11 @@ FactoryBot.define do
         Search::Fields::LAST_DEPOSITED_DATE => last_deposited_date&.utc&.iso8601,
         Search::Fields::COLLECTION_DRUIDS => collection_druids,
         Search::Fields::COLLECTION_TITLES => collection_titles,
+        Search::Fields::COLLECTION_TITLE_DRUIDS => collection_titles.zip(collection_druids).map do |title, druid|
+          "#{title}:#{druid}"
+        end,
         Search::Fields::APO_TITLE => admin_policy_titles,
+        Search::Fields::APO_TITLE_DRUID => admin_policy_titles.map { |title| "#{title}:#{apo_druid}" },
         Search::Fields::PUBLISHER => publisher,
         Search::Fields::PUBLICATION_DATE => dates,
         Search::Fields::PUBLICATION_PLACE => publication_place,

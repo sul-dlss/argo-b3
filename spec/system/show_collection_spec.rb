@@ -99,7 +99,7 @@ RSpec.describe 'Show collection' do
     within(find_table_value_cell('access-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
-                                href: '/search?admin_policy_titles%5B%5D=My+APO')
+                                href: search_path(admin_policy_druids: ['druid:cc123cd4578']))
     end
 
     # Access table

@@ -49,9 +49,7 @@ en:
     # If not provided, will use humanized field name
     facets:
       admin_policy_druids: "APOs"
-      admin_policy_titles: "APOs"
       collection_druids: "Collections"
-      collection_titles: "Collections"
       earliest_accessioned_date: "Earliest accessioned"
       earliest_accessioned_date_from: 'Earliest accessioned from'
       earliest_accessioned_date_to: 'Earliest accessioned to'

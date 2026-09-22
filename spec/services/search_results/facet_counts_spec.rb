@@ -130,4 +130,27 @@ RSpec.describe SearchResults::FacetCounts do
       expect(facet_counts.to_ary.size).to eq(5)
     end
   end
+
+  context 'when the facet config is composite' do
+    let(:facet_config) { Search::Facets::ADMIN_POLICIES }
+    let(:field) { Search::Fields::APO_TITLE_DRUID }
+    let(:solr_response) do
+      {
+        'responseHeader' => { 'params' => { 'json.facet' => facet_json.to_json } },
+        'facets' => {
+          field => {
+            'buckets' => [{ 'val' => 'University Archives:druid:bc123df4567', 'count' => 5 }],
+            'numBuckets' => 1
+          }
+        }
+      }
+    end
+
+    it 'parses the druid and label out of each composite bucket value' do
+      facet_count = facet_counts.first
+      expect(facet_count.value).to eq 'druid:bc123df4567'
+      expect(facet_count.label).to eq 'University Archives'
+      expect(facet_count.count).to eq 5
+    end
+  end
 end
