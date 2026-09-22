@@ -1,0 +1,9 @@
+<p>Strategy for structuring: <%= actual_populator_label %></p>
+<% if fallback? %>
+  <p>Reasons for not using <%= populator_for_content_type_label %></p>
+  <ul>
+    <% reason_labels.each do |reason_label| %>
+      <li><%= reason_label %></li>
+    <% end %>
+  </ul>
+<% end %>

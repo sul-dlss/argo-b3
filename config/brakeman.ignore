@@ -22,6 +22,29 @@
         22
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "3c830bd642ee830d531f670b15df9424ed188130ff39896e0f53ad03e5b2afcb",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called on parameter value",
+      "file": "app/controllers/content_structure_controller.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "\"Contents::Populators::#{params[:populator]}\".constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ContentStructureController",
+        "method": "populate"
+      },
+      "user_input": "params[:populator]",
+      "confidence": "High",
+      "cwe_id": [
+        470
+      ],
+      "note": "The constant is scoped to the Contents::Populators namespace, which a qualified const_get cannot escape, so no arbitrary class is reachable."
     }
   ],
   "brakeman_version": "8.0.5"

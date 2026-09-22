@@ -203,7 +203,9 @@ Rails.application.routes.draw do
 
   resources :multiple_items, only: %i[new create show]
 
-  resources :contents, only: %i[edit update show]
+  resources :contents, only: %i[edit update show] do
+    resource :structure, only: %i[edit update], controller: 'content_structure'
+  end
 
   resources :pinned_objects, only: %i[create destroy]
 

@@ -99,11 +99,20 @@ en:
         buttons:
           deposit: "Deposit"
           draft: "Save as draft"
+      structure:
+        unassociated_files:
+          one: "There is 1 file that has not been added to the structure."
+          other: "There are %{count} files that have not been added to the structure."
+        toasts:
+          structure: "Structure built from files"
+          append: "Files appended to structure"
+        populators:
+          file_set_per_file: "Default (resource per file)"
       tabs:
         add_files:
           label: "Add files"
-        manage_files:
-          label: "Manage files"
+        structural:
+          label: "Structure"
         deposit:
           label: "Deposit"
     items:

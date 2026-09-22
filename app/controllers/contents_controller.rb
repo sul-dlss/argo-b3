@@ -23,15 +23,16 @@ class ContentsController < ContentsApplicationController
   def update
     verified_content_id = verify_token(params[:id])
     content = Content.find(verified_content_id)
-    cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid: content.druid, lock: content.lock))
-
-    Contents::Populator.call(content:, cocina_object:, files: params[:content][:files],
-                             paths: params[:content][:paths])
+    build_content_file_binaries(content:)
 
     head :ok
   end
 
   private
+
+  def build_content_file_binaries(content:)
+    Contents::BinaryBuilder.call(content:, files: params[:content][:files], paths: params[:content][:paths])
+  end
 
   def find_or_create_content(cocina_object:)
     Content.find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false) ||
