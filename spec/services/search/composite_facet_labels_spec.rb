@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Search::CompositeFacetLabels do
-  let(:user) { create(:user, :admin) }
-  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
   let(:apo_druid) { 'druid:bc123df4567' }
   let(:collection_druid) { 'druid:gh456jk7890' }
   let(:search_form) { ResultsSearchForm.new(admin_policy_druids: [apo_druid], collection_druids: [collection_druid]) }
@@ -22,7 +20,7 @@ RSpec.describe Search::CompositeFacetLabels do
 
   describe '.call' do
     it 'returns a hash of druid to label for each selected composite facet value' do
-      expect(described_class.call(search_form:, user_scope:)).to eq(
+      expect(described_class.call(search_form:)).to eq(
         apo_druid => 'University Archives',
         collection_druid => 'David Rumsey Map Collection'
       )
@@ -33,7 +31,7 @@ RSpec.describe Search::CompositeFacetLabels do
     let(:search_form) { ResultsSearchForm.new }
 
     it 'returns an empty hash without querying Solr' do
-      expect(described_class.call(search_form:, user_scope:)).to eq({})
+      expect(described_class.call(search_form:)).to eq({})
       expect(Search::SolrService).not_to have_received(:post)
     end
   end

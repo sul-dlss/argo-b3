@@ -11,10 +11,8 @@ module Search
     end
 
     # @param search_form [SearchForm]
-    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
-    def initialize(search_form:, user_scope:)
+    def initialize(search_form:)
       @search_form = search_form
-      @user_scope = user_scope
     end
 
     # @return [Hash<String, String>] druid => label, for every currently selected composite facet value
@@ -26,7 +24,7 @@ module Search
 
     private
 
-    attr_reader :search_form, :user_scope
+    attr_reader :search_form
 
     def composite_facet_configs
       Search::Facets.constants.filter_map do |const_name|
@@ -54,7 +52,7 @@ module Search
       values = druids.map { |druid| "\"#{druid}\"" }.join(' OR ')
       {
         q: '*:*',
-        fq: ["#{facet_config.field}:(#{values})", Search::PermissionFilter.call(user_scope:)].compact,
+        fq: "#{facet_config.field}:(#{values})",
         'json.facet': {
           facet_config.composite_facet_field => Search::FacetBuilder.call(field: facet_config.composite_facet_field,
                                                                           limit: druids.size)
