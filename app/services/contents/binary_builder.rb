@@ -46,6 +46,7 @@ module Contents
       content_file_binary.size = file.size
       content_file_binary.sha1_digest = nil
       content_file_binary.md5_digest = nil
+      content_file_binary.mime_type = nil
       content_file_binary.save!
       content_file_binary.file.attach(file)
     end

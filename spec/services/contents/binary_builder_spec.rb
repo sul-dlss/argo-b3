@@ -56,14 +56,15 @@ RSpec.describe Contents::BinaryBuilder do
     context 'when a binary already exists for the filepath' do
       let!(:content_file_binary) do
         create(:content_file_binary, content:, filepath: 'folder/dropzone_upload.txt', file_location: 'deposited',
-                                     size: 123, md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+                                     size: 123, md5_digest: 'existing-md5', sha1_digest: 'existing-sha1',
+                                     mime_type: 'image/tiff')
       end
 
       it 'reuses the binary and replaces its attachment metadata' do
         expect { call }.not_to change(ContentFileBinary, :count)
 
         expect(content_file_binary.reload).to have_attributes(file_location: 'attached', size: uploaded_file.size,
-                                                              md5_digest: nil, sha1_digest: nil)
+                                                              md5_digest: nil, sha1_digest: nil, mime_type: nil)
         expect(content_file_binary.file).to be_attached
       end
     end
