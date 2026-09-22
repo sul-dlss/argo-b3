@@ -2,66 +2,41 @@
 
 module Contents
   module Populators
-    # Populates an existing Content with ContentFileSets, ContentFiles, and ContentFileBinaries
-    # from uploaded files, attaching each uploaded binary.
+    # Populates an existing Content with ContentFileSets and ContentFiles for the ContentFileBinaries
+    # that are not yet part of its structure.
     # It uses a one FileSet per file strategy.
-    class FileSetPerFile
-      def self.call(...)
-        new(...).call
+    class FileSetPerFile < Base
+      # For this strategy, structuring and appending are the same: Populator clears the structure before
+      # structuring, which leaves every binary unassociated.
+      def structure
+        create_content_file_sets
       end
 
-      # @param [Content] content
-      # @param [Cocina::Models::DROWithMetadata] cocina_object
-      # @param [Hash] files uploaded files keyed by their upload index
-      # @param [Hash] paths full filepaths keyed by their upload index
-      def initialize(content:, cocina_object:, files:, paths:)
-        @content = content
-        @cocina_object = cocina_object
-        @files = files
-        @paths = paths
-      end
-
-      def call
-        files.each do |index, file|
-          create_content_file(filepath: paths[index], file:)
-        end
+      def append
+        create_content_file_sets
       end
 
       private
 
-      attr_reader :content, :cocina_object, :files, :paths
+      # New file sets are positioned at the end of the existing file sets by the positioning gem.
+      def create_content_file_sets
+        unassociated_content_file_binaries.order(:id).each do |content_file_binary|
+          create_content_file(content_file_binary:)
+        end
+      end
 
-      def create_content_file(filepath:, file:)
+      def create_content_file(content_file_binary:)
         content_file_set = content.content_file_sets.create!(file_set_type: 'object', label: '')
-        content_file_binary = find_or_build_content_file_binary(filepath:)
-        attach_file(content_file_binary:, file:)
         content_file_set.content_files.create!(content_file_binary:, **file_attributes)
       end
 
-      def find_or_build_content_file_binary(filepath:)
-        content.content_file_binaries.find_by(filepath:) ||
-          content.content_file_binaries.build(filepath:)
-      end
-
-      def attach_file(content_file_binary:, file:)
-        content_file_binary.file_location = :attached
-        content_file_binary.size = file.size
-        content_file_binary.sha1_digest = nil
-        content_file_binary.md5_digest = nil
-        content_file_binary.save!
-        content_file_binary.file.attach(file)
-      end
-
       def file_attributes
-        access = cocina_object.access.embargo.presence || cocina_object.access
         {
           label: '',
           preserve: true,
           publish: true,
           shelve: true,
-          view: access.view == 'citation-only' ? 'dark' : access.view,
-          download: access.download,
-          location: access.location
+          **file_access_attributes
         }
       end
     end

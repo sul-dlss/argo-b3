@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Contents::Analyzer do
-  subject(:call) { described_class.call(content_file_binary:) }
+  subject(:call) { described_class.call(content_file_binary:, mime_type_only:) }
+
+  let(:mime_type_only) { false }
 
   describe '#call' do
     context 'when the digests and mime type are not yet set' do
@@ -72,7 +74,7 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
-    context 'when the file location is attached' do
+    context 'when the file location is attached and the blob has been analyzed' do
       let(:content_file_binary) do
         create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',
                                      sha1_digest: 'existing-sha1')
@@ -87,12 +89,36 @@ RSpec.describe Contents::Analyzer do
           content_type: 'application/octet-stream',
           identify: false
         )
+        content_file_binary.file.blob.update!(metadata: { analyzed: true })
       end
 
       it "uses the attached blob's content type" do
         call
 
         expect(content_file_binary.mime_type).to eq('application/octet-stream')
+      end
+    end
+
+    context 'when the file location is attached but the blob has not been analyzed' do
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',
+                                     sha1_digest: 'existing-sha1')
+      end
+
+      before do
+        content_file_binary.file.attach(
+          io: Rails.root.join('spec/fixtures/files/catalog_record_id_and_barcode.xlsx').open,
+          filename: 'catalog_record_id_and_barcode.xlsx',
+          content_type: 'application/octet-stream',
+          identify: false
+        )
+        content_file_binary.file.blob.update!(metadata: { analyzed: false })
+      end
+
+      it 'sniffs the mime type from the file contents on disk' do
+        call
+
+        expect(content_file_binary.mime_type).to eq('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       end
     end
 
@@ -109,9 +135,10 @@ RSpec.describe Contents::Analyzer do
           content_type: 'application/octet-stream',
           identify: false
         )
+        content_file_binary.file.blob.update!(metadata: { analyzed: true })
       end
 
-      it 'sniffs the mime type from the file contents on disk instead of using the (unset) blob content type' do
+      it 'sniffs the mime type from the file contents on disk instead of using the blob content type' do
         call
 
         expect(content_file_binary.mime_type).to eq('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -132,6 +159,26 @@ RSpec.describe Contents::Analyzer do
         call
 
         expect(content_file_binary.size).to eq(content_file_binary.file.blob.byte_size)
+      end
+    end
+
+    context 'when mime_type_only is true' do
+      let(:mime_type_only) { true }
+      let(:content_file_binary) { create(:content_file_binary, file_location: 'attached') }
+
+      before do
+        content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
+      end
+
+      it 'populates the mime type but not the digests or size' do
+        call
+
+        expect(content_file_binary.reload).to have_attributes(
+          mime_type: 'text/plain',
+          md5_digest: nil,
+          sha1_digest: nil,
+          size: nil
+        )
       end
     end
 
