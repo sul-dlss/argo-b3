@@ -312,6 +312,9 @@ Note:
 Note:
 * Some of these steps may already have been performed, e.g., for a lazy, async facet.
 
+### Composite (label + druid) facets
+Some facets need to filter on a unique identifier (a druid) but display a human-friendly, searchable label (a title) — e.g., the APO and Collections facets. A title isn't unique, so faceting directly on the display value of the facet (like most facets do) would be ambiguous. Instead, DSA indexes a composite Solr field whose values are `"<label>:<druid>"` (see`Indexing::CompositeFacetValue` in dor-services-app), and the APO and Collection facet (and links) are built using that composite field.
+
 ### Rendering all of the values for a facet
 1. Set `exclude: true` in the configuration constant in `Search::Facets`.
 

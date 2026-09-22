@@ -3,13 +3,14 @@
 module Search
   # Component to display the current filters applied to a search
   class CurrentFiltersComponent < ViewComponent::Base
-    def initialize(search_form:, pinned:)
+    def initialize(search_form:, pinned:, facet_labels: {})
       @search_form = search_form
       @pinned = pinned
+      @facet_labels = facet_labels
       super()
     end
 
-    attr_reader :search_form, :pinned
+    attr_reader :search_form, :pinned, :facet_labels
 
     delegate :current_filters, :pinnable?, to: :search_form
 

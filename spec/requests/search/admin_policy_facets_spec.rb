@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'APO facets', :solr do
   before do
-    create(:solr_item)
+    create(:solr_item, apo_druid: 'druid:bc123df4567')
     sign_in(create(:user, :reader))
   end
 
   it_behaves_like 'a simple facet controller',
                   index_path: :search_admin_policy_facets_path,
                   search_path: :search_search_admin_policy_facets_path,
-                  facet_frame_fragment: 'turbo-frame id="admin-policy-titles-facet-page1"',
-                  facet_value: 'University Archives',
+                  facet_frame_fragment: 'turbo-frame id="admin-policy-druids-facet-page1"',
+                  facet_value: 'druid:bc123df4567',
+                  facet_label: 'University Archives',
                   search_query: 'Archives'
 end

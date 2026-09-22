@@ -31,7 +31,7 @@ module Searchers
 
     attr_reader :search_form, :user_scope, :facet_config, :limit, :page
 
-    delegate :field, :alpha_sort, to: :facet_config
+    delegate :facet_field, :alpha_sort, to: :facet_config
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -48,7 +48,8 @@ module Searchers
 
     def facet_json
       {
-        field => Search::FacetBuilder.call(field:, alpha_sort:, limit:, page:)
+        facet_field => Search::FacetBuilder.call(field: facet_field, tag: facet_config.field, alpha_sort:, limit:,
+                                                 page:)
       }
     end
   end

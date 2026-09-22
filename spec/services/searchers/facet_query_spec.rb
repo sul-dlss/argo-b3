@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Searchers::FacetQuery do
   let(:user) { create(:user, :admin) }
   let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
-  let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', user_scope:) }
+  let(:results) { described_class.call(search_form:, facet_config: Search::Facets::MIMETYPES, facet_query: 'project', user_scope:) }
   let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:solr_response) do
@@ -13,7 +13,7 @@ RSpec.describe Searchers::FacetQuery do
       'response' => {
         'facet_counts' => {
           'facet_fields' => {
-            Search::Fields::PROJECTS_EXPLODED => ['Project 1', 2, 'Project 2', 1]
+            Search::Fields::MIMETYPES => ['Project 1', 2, 'Project 2', 1]
           }
         }
       }
@@ -34,7 +34,7 @@ RSpec.describe Searchers::FacetQuery do
       expect(solr_query['q']).to eq(query)
       expect(solr_query['facet']).to be true
       # Only testing one field here so that the test is not brittle.
-      expect(solr_query['facet.field']).to eq([Search::Fields::PROJECTS_EXPLODED])
+      expect(solr_query['facet.field']).to eq([Search::Fields::MIMETYPES])
       expect(solr_query['facet.contains']).to eq('project')
       expect(solr_query['facet.contains.ignoreCase']).to be(true)
       expect(solr_query['rows']).to eq(0)
@@ -44,7 +44,7 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   context 'when alpha_sort is true' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', alpha_sort: true, user_scope:) }
+    let(:results) { described_class.call(search_form:, facet_config: Search::Facets::PROJECTS, facet_query: 'project', user_scope:) }
 
     it 'includes sort in the Solr request' do
       results
@@ -56,7 +56,7 @@ RSpec.describe Searchers::FacetQuery do
   end
 
   context 'when limit is provided' do
-    let(:results) { described_class.call(search_form:, field: Search::Fields::PROJECTS_EXPLODED, facet_query: 'project', limit: 5, user_scope:) }
+    let(:results) { described_class.call(search_form:, facet_config: Search::Facets::MIMETYPES, facet_query: 'project', limit: 5, user_scope:) }
 
     it 'includes limit in the Solr request' do
       results

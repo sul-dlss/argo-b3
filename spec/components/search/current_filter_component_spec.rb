@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Search::CurrentFilterComponent, type: :component do
-  let(:component) { described_class.new(form_field:, value:, search_form:) }
+  let(:component) { described_class.new(form_field:, value:, search_form:, facet_labels:) }
+  let(:facet_labels) { {} }
 
   context 'when there are current filters' do
     let(:form_field) { :object_types }
@@ -38,6 +39,29 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('li', text: /Released to Earthworks\s+❯\s+Last year/)
+    end
+  end
+
+  context 'when a filter for a composite facet (e.g. Admin Policies)' do
+    let(:form_field) { :admin_policy_druids }
+    let(:value) { 'druid:bc123df4567' }
+    let(:search_form) { ResultsSearchForm.new(admin_policy_druids: [value]) }
+    let(:facet_labels) { { 'druid:bc123df4567' => 'University Archives' } }
+
+    it 'renders the resolved label instead of the raw druid' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: /APOs\s+❯\s+University Archives/)
+    end
+
+    context 'when the druid has no resolved label' do
+      let(:facet_labels) { {} }
+
+      it 'falls back to the raw druid' do
+        render_inline(component)
+
+        expect(page).to have_css('li', text: /APOs\s+❯\s+druid:bc123df4567/)
+      end
     end
   end
 end

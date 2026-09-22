@@ -44,7 +44,19 @@ module Search
                         :exclude,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
-                        :dynamic_facet)
+                        :dynamic_facet,
+                        # `composite_facet_field` is a solr field whose values encode "<label>:<druid>"
+                        # (see Search::CompositeFacetValue), e.g. "Stanford Theses:druid:bc123df4567".
+                        # Set this when a facet needs to filter on an identifier (eg druid) but display and
+                        # text-search a human-readable label (eg object title). Since a title alone isn't unique
+                        # faceting on the display label directly (like most facets do) is ambiguous for
+                        # objects with a shared title.
+                        :composite_facet_field) do
+      # @return [String] the Solr field to facet/search on
+      def facet_field
+        composite_facet_field || field
+      end
+    end
 
     def Config.with_defaults(**)
       defaults = { alpha_sort: false, limit: 100, exclude: false,
@@ -60,34 +72,30 @@ module Search
       alpha_sort: true
     )
 
+    # Facets and filters on the druid (a title is not a unique identifier), but displays the title
+    # via the composite field. Also used for direct links from the APO show page for items/collections
+    # governed by the APO.
     ADMIN_POLICIES = Config.with_defaults(
-      form_field: :admin_policy_titles,
-      field: Search::Fields::APO_TITLE,
+      form_field: :admin_policy_druids,
+      field: Search::Fields::APO_DRUID,
+      composite_facet_field: Search::Fields::APO_TITLE_DRUID,
       limit: 25,
       facet_resource: :admin_policy_facets,
       facet_index: true,
       facet_search: true
     )
 
-    # Used for direct links from APO show page for items/collections governed by the APO (use druid for faceting)
-    ADMIN_POLICY_DRUIDS = Config.with_defaults(
-      form_field: :admin_policy_druids,
-      field: Search::Fields::APO_DRUID
-    )
-
+    # Facets and filters on the druid (a title is not a unique identifier), but displays the title
+    # via the composite field. Also used for direct links from the Collection show page for items
+    # in the collection.
     COLLECTIONS = Config.with_defaults(
-      form_field: :collection_titles,
-      field: Search::Fields::COLLECTION_TITLES,
+      form_field: :collection_druids,
+      field: Search::Fields::COLLECTION_DRUIDS,
+      composite_facet_field: Search::Fields::COLLECTION_TITLE_DRUIDS,
       limit: 25,
       facet_resource: :collection_facets,
       facet_index: true,
       facet_search: true
-    )
-
-    # Used for direct links from Collection show page for items in the collection (use druid for faceting)
-    COLLECTION_DRUIDS = Config.with_defaults(
-      form_field: :collection_druids,
-      field: Search::Fields::COLLECTION_DRUIDS
     )
 
     DATES = Config.with_defaults(
