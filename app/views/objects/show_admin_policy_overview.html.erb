@@ -1,7 +1,7 @@
 <%= turbo_frame_tag(@solr_doc.druid, 'overview') do %>
     <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
       <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
-      <% component.with_row(label: 'Druid', value: @solr_doc.id) %>
+      <% component.with_row(label: 'Druid', value: @solr_doc.bare_druid) %>
       <% component.with_row(label: 'Agreement') do |row_component| %>
         <% row_component.with_cell do %>
           <%= link_to_object @solr_doc.agreement_title, @solr_doc.agreement_druid %>
