@@ -15,7 +15,8 @@ module Search
     end
 
     def sort_options
-      %w[relevance druid]
+      %w[relevance last_deposited_date_asc last_deposited_date_desc registered_date_asc registered_date_desc
+         source_id druid]
     end
 
     def label_for(sort_option)

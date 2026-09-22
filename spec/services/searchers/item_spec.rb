@@ -67,6 +67,67 @@ RSpec.describe Searchers::Item do
     end
   end
 
+  context 'when sorting', :solr do
+    let(:search_form) { ResultsSearchForm.new(query: 'Test', sort:) }
+    let!(:oldest) do
+      create(:solr_item, source_id: 'sul:001', earliest_registered_date: 3.years.ago,
+                         last_deposited_date: 3.years.ago)
+    end
+    let!(:middle) do
+      create(:solr_item, source_id: 'sul:002', earliest_registered_date: 2.years.ago,
+                         last_deposited_date: 2.years.ago)
+    end
+    let!(:newest) do
+      create(:solr_item, source_id: 'sul:003', earliest_registered_date: 1.year.ago,
+                         last_deposited_date: 1.year.ago)
+    end
+    let(:ascending_druids) { [oldest, middle, newest].map { |solr_doc| solr_doc.fetch(Search::Fields::ID) } }
+
+    before do
+      allow(Search::SolrService).to receive(:post).and_call_original
+    end
+
+    context 'when sorting by last deposited date ascending' do
+      let(:sort) { 'last_deposited_date_asc' }
+
+      it 'returns the least recently deposited first' do
+        expect(results.map(&:druid)).to eq(ascending_druids)
+      end
+    end
+
+    context 'when sorting by last deposited date descending' do
+      let(:sort) { 'last_deposited_date_desc' }
+
+      it 'returns the most recently deposited first' do
+        expect(results.map(&:druid)).to eq(ascending_druids.reverse)
+      end
+    end
+
+    context 'when sorting by registered date ascending' do
+      let(:sort) { 'registered_date_asc' }
+
+      it 'returns the least recently registered first' do
+        expect(results.map(&:druid)).to eq(ascending_druids)
+      end
+    end
+
+    context 'when sorting by registered date descending' do
+      let(:sort) { 'registered_date_desc' }
+
+      it 'returns the most recently registered first' do
+        expect(results.map(&:druid)).to eq(ascending_druids.reverse)
+      end
+    end
+
+    context 'when sorting by source id' do
+      let(:sort) { 'source_id' }
+
+      it 'returns the results in source id order' do
+        expect(results.map(&:druid)).to eq(ascending_druids)
+      end
+    end
+  end
+
   context 'with specific permission targets', :solr do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
