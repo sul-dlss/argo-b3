@@ -1,15 +1,8 @@
 # frozen_string_literal: true
 
 # Controller for managing content (structural)
-class ContentsController < ApplicationController
-  COCINA_HASH_EXPIRATION = 1.hour
-
+class ContentsController < ContentsApplicationController
   skip_verify_authorized only: %i[update show]
-
-  include TokenConcern
-
-  # The strategy is to authorize on edit, but not repeat authorization for update.
-  self.token_purpose = 'contents'
 
   def show
     verified_content_id = verify_token(params[:id])
@@ -48,19 +41,5 @@ class ContentsController < ApplicationController
   def fetch_solr_doc(druid:)
     solr_doc = Sdr::Repository.find_solr(druid:)
     SolrDocPresenter.new(solr_doc:)
-  end
-
-  def fetch_cocina_hash(druid:, lock:)
-    cache_key = "contents/cocina-hash/#{druid}/#{lock}"
-    Rails.cache.fetch(cache_key, expires_in: COCINA_HASH_EXPIRATION) do
-      cocina_object = Sdr::Repository.find(druid:)
-      CacheSupport.cacheable_cocina_object(cocina_object:)
-    end
-  end
-
-  def cache_cocina_hash(cocina_object:)
-    cache_key = "contents/cocina-hash/#{cocina_object.externalIdentifier}/#{cocina_object.lock}"
-    Rails.cache.write(cache_key, CacheSupport.cacheable_cocina_object(cocina_object:),
-                      expires_in: COCINA_HASH_EXPIRATION)
   end
 end

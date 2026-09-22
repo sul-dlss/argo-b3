@@ -22,19 +22,19 @@
                         dropzone_max_filesize_value: Settings.file_upload.max_filesize,
                         dropzone_dropzone_files_outlet: '.dropzone-files'
                       }, id: 'file-dropzone', class: 'dropzone mb-3' do |form| %>
-            <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
-              <span data-dropzone-target="folderAlertText"></span>
-              <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
-            <% end %>
-            <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
-            <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
-            <div class="dz-message">
-              <div class="fs-1"><%= cloud_upload_icon %></div>
-              <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
-              <div class="fs-5">or</div>
-              <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
-            </div>
-            <div id="dropzone-hidden-input-container"></div>
+          <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
+            <span data-dropzone-target="folderAlertText"></span>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
+          <% end %>
+          <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
+          <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
+          <div class="dz-message">
+            <div class="fs-1"><%= cloud_upload_icon %></div>
+            <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
+            <div class="fs-5">or</div>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
+          </div>
+          <div id="dropzone-hidden-input-container"></div>
         <% end %>
     <% end %>
                                                                           <% end %>

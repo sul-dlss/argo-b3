@@ -3,11 +3,63 @@
 require 'rails_helper'
 
 RSpec.describe ContentFileBinary do
+  describe 'association scopes' do
+    let(:content) { create(:content, druid: 'druid:dg234hj5678') }
+    let!(:unassociated_content_file_binary) { create(:content_file_binary, content:, filepath: 'image1.tif') }
+    let!(:associated_content_file_binary) { create(:content_file_binary, content:, filepath: 'image2.tif') }
+
+    before do
+      create(:content_file, content_file_set: create(:content_file_set, content:),
+                            content_file_binary: associated_content_file_binary)
+    end
+
+    describe '.unassociated' do
+      it 'returns only the binaries that are not referenced by a file' do
+        expect(described_class.unassociated).to eq([unassociated_content_file_binary])
+      end
+    end
+
+    describe '.associated' do
+      it 'returns only the binaries that are referenced by a file' do
+        expect(described_class.associated).to eq([associated_content_file_binary])
+      end
+
+      context 'when a binary is referenced by multiple files' do
+        before do
+          create(:content_file, content_file_set: create(:content_file_set, content:, position: 2),
+                                content_file_binary: associated_content_file_binary)
+        end
+
+        it 'returns the binary once' do
+          expect(described_class.associated).to eq([associated_content_file_binary])
+        end
+      end
+    end
+  end
+
   describe '#filename' do
     subject(:content_file_binary) { build(:content_file_binary, filepath: 'folder1/folder2/image1.tif') }
 
     it 'returns the filename portion of the filepath' do
       expect(content_file_binary.filename).to eq('image1.tif')
+    end
+  end
+
+  describe '#hierarchical?' do
+    context 'when the filepath includes directories' do
+      subject(:content_file_binary) { create(:content_file_binary, filepath: 'folder1/image1.tif') }
+
+      it 'returns true' do
+        expect(content_file_binary.hierarchical?).to be true
+      end
+    end
+
+    context 'when the filepath does not include directories' do
+      subject(:content_file_binary) { create(:content_file_binary, filepath: 'image1.tif') }
+
+      it 'returns false' do
+        expect(content_file_binary.hierarchical?).to be false
+      end
     end
   end
 

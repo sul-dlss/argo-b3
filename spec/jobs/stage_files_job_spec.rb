@@ -19,11 +19,14 @@ RSpec.describe StageFilesJob do
     create(:content_file_binary, content:, file_location: 'deposited', filepath: 'image2.tif')
   end
 
+  let(:content_file_set) { create(:content_file_set, content:) }
+
   let(:staging_filepath) { StagingSupport.staging_filepath(druid:, filepath: 'image1.tif') }
 
   before do
     attached_content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
-    deposited_content_file_binary
+    create(:content_file, content_file_set:, content_file_binary: attached_content_file_binary, position: 1)
+    create(:content_file, content_file_set:, content_file_binary: deposited_content_file_binary, position: 2)
 
     allow(Contents::ExternalIdentifierMinter).to receive(:call)
     allow(Contents::Analyzer).to receive(:call)
@@ -67,6 +70,36 @@ RSpec.describe StageFilesJob do
 
       expect(attached_content_file_binary.reload.file_location).to eq('stage')
       expect(deposited_content_file_binary.reload.file_location).to eq('deposited')
+    end
+
+    context 'when an attached content file binary is not associated with a content file' do
+      let!(:unassociated_content_file_binary) do
+        create(:content_file_binary, content:, file_location: 'attached', filepath: 'image3.tif')
+      end
+
+      it 'does not analyze or stage it' do
+        job.perform(content:, user:)
+
+        expect(Contents::Analyzer).not_to have_received(:call)
+          .with(content_file_binary: unassociated_content_file_binary)
+        expect(File.exist?(StagingSupport.staging_filepath(druid:, filepath: 'image3.tif'))).to be false
+        expect(unassociated_content_file_binary.reload.file_location).to eq('attached')
+      end
+    end
+
+    context 'when a content file binary is referenced by multiple content files' do
+      before do
+        other_content_file_set = create(:content_file_set, content:, position: 2)
+        create(:content_file, content_file_set: other_content_file_set,
+                              content_file_binary: attached_content_file_binary)
+      end
+
+      it 'analyzes and stages it once' do
+        job.perform(content:, user:)
+
+        expect(Contents::Analyzer).to have_received(:call)
+          .with(content_file_binary: attached_content_file_binary).once
+      end
     end
 
     it 'updates SDR with the mutated structural metadata' do
