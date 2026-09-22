@@ -13,6 +13,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - Solr fields are referred to by constants which are defined in `app/services/search/fields.rb`.
 - Prefer full variable names instead of abbreviations (e.g., `full_variable_name` instead of `fvn` or `full_var_name`).
 - `Current.effective_groups` is read only by the `Authentication` concern and Action Policy classes. Search and Solr services never read it; they receive a `Permissions::UserScope` as an explicit `user_scope:` argument, which controllers and jobs supply (`current_user_scope` in controllers).
+- Changes and additions to the README should be for high level architectural notes and design choices only and should not include code level implementation details (which can be added inline in the code if warranted).
 
 ## Testing notes
 
