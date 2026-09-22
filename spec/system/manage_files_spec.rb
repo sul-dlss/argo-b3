@@ -122,6 +122,48 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when the object is a book with images' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+        .new(access: { view: 'world', download: 'world' })
+    end
+
+    it 'structures the book with a file set per page' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('page_0001.png')
+
+      click_on 'Structure'
+
+      expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
+      expect(page).to have_no_text('Reasons for not using')
+
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+
+      content = Content.find_by!(druid:)
+      expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'page', label: 'Page 1')
+    end
+  end
+
+  context 'when the object is a book that cannot be structured as a book' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
+
+    it 'falls back to the default strategy and explains why' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+
+      expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
+      expect(page).to have_text('Reasons for not using Book (resource per page)')
+      expect(page).to have_css('li', text: 'the object is dark')
+      expect(page).to have_css('li', text: 'there are no image files')
+    end
+  end
+
   context 'when the structure has been built and another file is uploaded' do
     let(:content) { Content.find_by!(druid:) }
 
