@@ -1,0 +1,43 @@
+<%= turbo_frame_tag @content, 'edit-structure' do %>
+  <%= render Elements::FlashToastComponent.new %>
+
+  <% if @content.content_file_binaries.none? %>
+    <p>No files yet.</p>
+  <% else %>
+    <% unassociated_count = @content.content_file_binaries.unassociated.count %>
+    <% if unassociated_count.positive? %>
+      <p data-unassociated-files-target="unassociated"><%= t('edit.contents.structure.unassociated_files', count: unassociated_count) %></p>
+    <% end %>
+    <%= render Edit::StructurePopulatorDescriptionComponent.new(populator_selection: @populator_selection) %>
+    <% populator = @populator_selection.actual_populator.name.demodulize %>
+    <% if @content.content_file_sets.none? %>
+      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                      label: 'Structure files',
+                                                                      params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: },
+                                                                      top: false,
+                                                                      method: :patch,
+                                                                      variant: :'outline-primary') %>
+    <% else %>
+      <div class="d-flex">
+        <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                        label: 'Clear and structure files again',
+                                                                        params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: },
+                                                                        top: false,
+                                                                        method: :patch,
+                                                                        variant: :'outline-primary') %>
+
+        <% if unassociated_count.positive? %>
+          <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                          label: 'Append files to structure',
+                                                                          params: { commit: ContentStructureController::APPEND_VALUE, populator: },
+                                                                          classes: 'ms-3',
+                                                                          top: false,
+                                                                          method: :patch,
+                                                                          variant: :'outline-primary') %>
+        <% end %>
+      </div>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
+      <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, classes: 'mb-2') %>
+    <% end %>
+  <% end %>
+<% end %>

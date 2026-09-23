@@ -3,17 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe Contents::Populators::FileSetPerFile do
-  subject(:call) { described_class.call(content:, cocina_object:, files:, paths:) }
+  subject(:structure) { described_class.structure(content:, cocina_object:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
   let(:cocina_object) { build(:dro_with_metadata, id: content.druid) }
-  let(:uploaded_file) { fixture_file_upload('dropzone_upload.txt', 'text/plain') }
-  let(:files) { { '0' => uploaded_file } }
-  let(:paths) { { '0' => 'folder/dropzone_upload.txt' } }
+  let!(:content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image1.tif') }
 
-  describe '.call' do
-    it 'creates a file set, binary, and file for an uploaded file' do
-      call
+  describe '.structure' do
+    it 'creates a file set and file for an unassociated binary' do
+      structure
 
       content_file_set = content.content_file_sets.sole
       expect(content_file_set).to have_attributes(file_set_type: 'object', label: '')
@@ -23,27 +21,31 @@ RSpec.describe Contents::Populators::FileSetPerFile do
                                               view: cocina_object.access.view,
                                               download: cocina_object.access.download,
                                               location: cocina_object.access.location)
-
-      content_file_binary = content_file.content_file_binary
-      expect(content_file_binary).to have_attributes(filepath: 'folder/dropzone_upload.txt',
-                                                     file_location: 'attached', size: uploaded_file.size)
-      expect(content_file_binary.file).to be_attached
-      expect(content_file_binary.file.filename.to_s).to eq('dropzone_upload.txt')
+      expect(content_file.content_file_binary).to eq(content_file_binary)
     end
 
-    context 'when a binary already exists for the filepath' do
-      let!(:content_file_binary) do
-        create(:content_file_binary, content:, filepath: 'folder/dropzone_upload.txt', file_location: 'deposited',
-                                     size: 123, md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+    context 'when there are multiple unassociated binaries' do
+      let!(:other_content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image2.tif') }
+
+      it 'creates a file set per binary, in creation order' do
+        structure
+
+        expect(content.content_file_sets.map { |file_set| file_set.content_files.sole.content_file_binary })
+          .to eq([content_file_binary, other_content_file_binary])
+        expect(content.content_file_sets.pluck(:position)).to eq([1, 2])
+      end
+    end
+
+    context 'when a binary is already associated with a file' do
+      let(:content_file_set) { create(:content_file_set, content:) }
+
+      before do
+        create(:content_file, content_file_set:, content_file_binary:)
       end
 
-      it 'reuses the binary and replaces its attachment metadata' do
-        expect { call }.not_to change(ContentFileBinary, :count)
-
+      it 'does not create another file set for it' do
+        expect { structure }.not_to change(ContentFileSet, :count)
         expect(content.content_files.sole.content_file_binary).to eq(content_file_binary)
-        expect(content_file_binary.reload).to have_attributes(file_location: 'attached', size: uploaded_file.size,
-                                                              md5_digest: nil, sha1_digest: nil)
-        expect(content_file_binary.file).to be_attached
       end
     end
 
@@ -63,7 +65,7 @@ RSpec.describe Contents::Populators::FileSetPerFile do
       end
 
       it 'uses the embargo access settings' do
-        call
+        structure
 
         expect(content.content_files.sole).to have_attributes(view: 'stanford', download: 'stanford')
       end
@@ -75,10 +77,37 @@ RSpec.describe Contents::Populators::FileSetPerFile do
       end
 
       it 'maps citation-only view access to dark' do
-        call
+        structure
 
         expect(content.content_files.sole).to have_attributes(view: 'dark', download: 'none')
       end
+    end
+  end
+
+  describe '.append' do
+    subject(:append) { described_class.append(content:, cocina_object:) }
+
+    let(:existing_content_file_set) { create(:content_file_set, content:) }
+    let!(:existing_content_file) do
+      create(:content_file, content_file_set: existing_content_file_set, content_file_binary:)
+    end
+    let!(:unassociated_content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image2.tif') }
+
+    it 'adds a file set for the unassociated binary at the end of the existing file sets' do
+      append
+
+      expect(content.content_file_sets.pluck(:position)).to eq([1, 2])
+
+      appended_content_file_set = content.content_file_sets.last
+      expect(appended_content_file_set.content_files.sole.content_file_binary)
+        .to eq(unassociated_content_file_binary)
+    end
+
+    it 'retains the existing file set and file' do
+      append
+
+      expect(existing_content_file_set.reload).to have_attributes(position: 1)
+      expect(existing_content_file_set.content_files.sole).to eq(existing_content_file)
     end
   end
 end
