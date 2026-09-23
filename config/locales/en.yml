@@ -157,6 +157,10 @@ en:
           label: "Folio Instance HRID"
           validations:
             not_found: "was not found in FOLIO"
+        collection_druids:
+          label: "Collections"
+          placeholder: "Start typing the collection name or druid..."
+          limit_label: "Only view collections in selected APO"
         content_type:
           label: "Content type"
         copyright:

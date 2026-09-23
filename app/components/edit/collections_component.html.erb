@@ -1,0 +1,21 @@
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.items.fields.collection_druids.label'),
+                                                           classes: 'my-fieldset') do %>
+  <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+        form:,
+        field_name: :collection_druids,
+        options:,
+        label_text: t('edit.items.fields.collection_druids.label'),
+        label_hidden: true,
+        input_multiple: true,
+        input_data:,
+        container_classes: 'my-field'
+      ) %>
+
+  <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+        form:,
+        field_name: :limit_collection_by_apo,
+        label_text: t('edit.items.fields.collection_druids.limit_label'),
+        input_include_hidden: false,
+        container_classes: 'my-field'
+      ) %>
+<% end %>

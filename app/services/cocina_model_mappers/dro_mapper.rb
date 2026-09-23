@@ -14,7 +14,8 @@ module CocinaModelMappers
         embargo_location: cocina_object.access.embargo&.location,
         barcode: cocina_object.identification.barcode,
         content_type: cocina_object.type,
-        viewing_direction: cocina_object.structural.hasMemberOrders&.first&.viewingDirection
+        viewing_direction: cocina_object.structural.hasMemberOrders&.first&.viewingDirection,
+        collection_druids: cocina_object.structural.isMemberOf
       )
     end
   end

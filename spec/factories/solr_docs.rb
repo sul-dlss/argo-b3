@@ -117,6 +117,7 @@ FactoryBot.define do
       druid { generate(:unique_druid) }
       sequence(:title) { |n| "Test Collection #{n}" }
       object_type { 'collection' }
+      apo_druid { generate(:unique_druid) }
       projects { [] }
       tags { [] }
       tickets { [] }
@@ -130,6 +131,7 @@ FactoryBot.define do
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
         Search::Fields::OBJECT_TYPES => [object_type],
+        Search::Fields::APO_DRUID => [apo_druid],
         Search::Fields::PROJECTS => projects,
         Search::Fields::PROJECTS_EXPLODED => explode_hierarchy(values: projects),
         Search::Fields::PROJECTS_HIERARCHICAL => explode_hierarchy(values: projects, as_hierarchical: true),

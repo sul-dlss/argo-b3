@@ -207,6 +207,8 @@ Rails.application.routes.draw do
     resource :structure, only: %i[edit update], controller: 'content_structure'
   end
 
+  resources :collection_options, only: %i[index], defaults: { format: :json }
+
   resources :pinned_objects, only: %i[create destroy]
 
   resources :pinned_searches, only: %i[create destroy]

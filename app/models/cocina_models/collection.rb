@@ -31,5 +31,19 @@ module CocinaModels
     def mutated_cocina_object
       CocinaObjectMutators::CollectionMutator.call(cocina_object: previous_cocina_object, cocina_model: self)
     end
+
+    def request_cocina_object
+      # This is the minimal props to create a valid RequestCollection.
+      # The rest will be filled in by the mutator.
+      cocina_request_object = Cocina::Models.build_request(
+        {
+          type: Cocina::Models::ObjectType.collection,
+          administrative: { hasAdminPolicy: apo_druid },
+          description: description_hash
+        },
+        validate: false
+      )
+      CocinaObjectMutators::CollectionMutator.call(cocina_object: cocina_request_object, cocina_model: self)
+    end
   end
 end

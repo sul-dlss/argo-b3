@@ -39,6 +39,28 @@ RSpec.describe CocinaObjectMutators::DroMutator do
     end
   end
 
+  describe 'collections' do
+    let(:cocina_object) { build(:dro_with_metadata, collection_ids: ['druid:bc123df4567']) }
+
+    context 'when the cocina model has updated collection_druids' do
+      let(:collection_druids) { %w[druid:gh456jk7890 druid:mn789pq0123] }
+
+      before { cocina_model.collection_druids = collection_druids }
+
+      it 'sets isMemberOf to the collection druids' do
+        expect(result.structural.isMemberOf).to eq(collection_druids)
+      end
+    end
+
+    context 'when the cocina model has no collection_druids' do
+      before { cocina_model.collection_druids = [] }
+
+      it 'removes the collections from isMemberOf' do
+        expect(result.structural.isMemberOf).to be_empty
+      end
+    end
+  end
+
   context 'when the cocina model has an updated source_id' do
     let(:new_source_id) { 'new:source-id' }
     let(:license) { 'https://creativecommons.org/publicdomain/zero/1.0/legalcode' }
