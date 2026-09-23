@@ -10,6 +10,11 @@ class ContentFileBinary < ApplicationRecord
 
   has_one_attached :file
 
+  # A binary that is not referenced by a ContentFile is not part of the structure of the Content.
+  scope :unassociated, -> { where.missing(:content_files) }
+  # distinct is necessary since a binary may be referenced by multiple files.
+  scope :associated, -> { where.associated(:content_files).distinct }
+
   # Note that the flow of a file to different locations is: attached or globus or mount -> stage -> deposited
   enum :file_location,
        {
@@ -33,6 +38,12 @@ class ContentFileBinary < ApplicationRecord
   def filepath_on_disk
     # Globus and mount to be added.
     ActiveStorageSupport.filepath_for_blob(file.blob)
+  end
+
+  # @return [Boolean] true if the filepath includes directories (e.g., folder1/image1.tif)
+  # Note that this relies on path_parts, which is derived from the filepath when saved.
+  def hierarchical?
+    path_parts.any?
   end
 
   private

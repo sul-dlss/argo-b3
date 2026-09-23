@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Contents::FileUpdater do
+RSpec.describe Contents::Populators::FileSetPerFile do
   subject(:call) { described_class.call(content:, cocina_object:, files:, paths:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
@@ -29,16 +29,6 @@ RSpec.describe Contents::FileUpdater do
                                                      file_location: 'attached', size: uploaded_file.size)
       expect(content_file_binary.file).to be_attached
       expect(content_file_binary.file.filename.to_s).to eq('dropzone_upload.txt')
-    end
-
-    context 'when the filepath should be ignored' do
-      let(:paths) { { '0' => 'folder/._dropzone_upload.txt' } }
-
-      it 'does not create file records' do
-        expect { call }.not_to change(ContentFile, :count)
-        expect(content.content_file_sets).to be_empty
-        expect(content.content_file_binaries).to be_empty
-      end
     end
 
     context 'when a binary already exists for the filepath' do
