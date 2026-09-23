@@ -43,7 +43,7 @@ RSpec.describe Elements::Forms::HasManyComponent, type: :component do
   it 'wires up the has-many Stimulus controller' do
     render_inline(component)
 
-    expect(page).to have_css('[data-controller="has-many"]')
+    expect(page).to have_css('[data-controller="has-many"][data-has-many-field-name-value="widgets"]')
   end
 
   it 'renders an Add button and, for each row, a Remove button' do

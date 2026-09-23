@@ -307,6 +307,50 @@ RSpec.describe 'Create multiple items' do
         )
       )
     end
+
+    it 'enqueues a register form bulk action with tags entered all at once' do
+      visit new_multiple_item_path
+
+      expect(page).to have_css('h1', text: 'Register items')
+
+      fill_in_registration_settings
+
+      # A project name is already filled in, so the pasted project tag has to be appended below it
+      # rather than overwrite it.
+      fill_in 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
+      # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
+      # the tabs as real keystrokes, which blur the text area. It also sends the first four and
+      # last three characters as keystrokes, so keep the delimiters away from both ends.
+      fill_in 'Enter multiple tags',
+              with: "Registered By : mjgiarlo\tProject : Google Books\nTicket : ABC-123\tRemediated By : 5.0.0"
+      click_button 'Add tags'
+
+      expect(page).to have_field('items_registration[other_tags_attributes][0][tag]',
+                                 with: 'Registered By : mjgiarlo')
+      expect(page).to have_field('items_registration[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0')
+      expect(page).to have_field('items_registration[project_tags_attributes][0][tag]', with: 'Argo')
+      expect(page).to have_field('items_registration[project_tags_attributes][1][tag]', with: 'Google Books')
+      expect(page).to have_field('items_registration[ticket_tags_attributes][0][tag]', with: 'ABC-123')
+      expect(page).to have_field('Enter multiple tags', with: '')
+
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(
+          tags: ['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
+                 'Project : Argo', 'Project : Google Books', 'Ticket : ABC-123']
+        )
+      )
+    end
   end
 
   context 'when an other tag is malformed' do

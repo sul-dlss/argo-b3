@@ -1,4 +1,4 @@
-<%= tag.div class: container_classes, data: { controller: 'has-many' } do %>
+<%= tag.div class: container_classes, data: { controller: 'has-many', has_many_field_name_value: field_name } do %>
   <div data-has-many-target="container">
     <template data-has-many-target="template">
       <%= form.fields_for field_name, template_record, child_index: 'NEW_RECORD' do |nested_form| %>
