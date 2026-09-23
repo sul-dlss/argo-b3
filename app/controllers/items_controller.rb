@@ -50,7 +50,7 @@ class ItemsController < ApplicationController
   end
 
   def set_apo_options
-    @apo_options = Searchers::AdminPolicyList.call
+    @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
   end
 
   def create_redirect_path
