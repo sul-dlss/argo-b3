@@ -22,13 +22,14 @@ RSpec.describe Searchers::AdminPolicyList do
     allow(Search::SolrService).to receive(:post).and_return(solr_response)
   end
 
-  it 'returns [title, druid] pairs from Solr' do
+  it 'returns [title, druid] pairs from Solr, sorted by title' do
     expect(apo_options).to eq([['APO One', 'druid:bc123df4567'], ['APO Two', 'druid:xz987wv6543']])
 
     expect(Search::SolrService).to have_received(:post) do |args|
       solr_query = args[:request].with_indifferent_access
       expect(solr_query['fq']).to eq(["#{Search::Fields::OBJECT_TYPES}:APO"])
       expect(solr_query['fl']).to eq([Search::Fields::ID, Search::Fields::TITLE])
+      expect(solr_query['sort']).to eq("#{Search::Fields::SORT_TITLE} asc, id asc")
     end
   end
 
