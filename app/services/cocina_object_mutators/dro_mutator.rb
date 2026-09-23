@@ -14,6 +14,7 @@ module CocinaObjectMutators
         new_cocina_props[:type] = cocina_model.content_type
         new_cocina_props[:structural] ||= {}
         new_cocina_props[:structural][:hasMemberOrders] = build_member_orders
+        new_cocina_props[:structural][:isMemberOf] = cocina_model.collection_druids
 
         update_embargo(new_cocina_props[:access])
       end

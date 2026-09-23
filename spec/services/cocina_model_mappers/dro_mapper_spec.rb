@@ -53,6 +53,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
         barcode: nil,
         content_type: cocina_object.type,
         viewing_direction: nil,
+        collection_druids: [],
         folio_catalog_links_attributes: [],
         apo_druid: cocina_object.administrative.hasAdminPolicy
       )
@@ -122,6 +123,15 @@ RSpec.describe CocinaModelMappers::DroMapper do
 
       it 'maps the barcode' do
         expect(result).to include(barcode:)
+      end
+    end
+
+    context 'when the cocina object is a member of collections' do
+      let(:collection_druids) { %w[druid:bc123df4567 druid:gh456jk7890] }
+      let(:cocina_object) { build(:dro_with_metadata, source_id:, collection_ids: collection_druids) }
+
+      it 'maps collection_druids from isMemberOf' do
+        expect(result).to include(collection_druids:)
       end
     end
 
