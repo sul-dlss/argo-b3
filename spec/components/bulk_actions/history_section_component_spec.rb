@@ -6,8 +6,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
   include ActionView::RecordIdentifier
 
   let(:component) do
-    described_class.new(bulk_actions: [bulk_action, bulk_action_with_files], page: 1, total_pages: 1,
-                        total_results: 2, per_page: 20)
+    described_class.new(bulk_actions: BulkAction.where(id: [bulk_action.id, bulk_action_with_files.id])
+                                                .page(1).per(20))
   end
 
   let(:bulk_action) do
@@ -55,9 +55,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
   end
 
   context 'when there are multiple pages' do
+    before { create_list(:bulk_action, 5) }
+
     let(:component) do
-      described_class.new(bulk_actions: [bulk_action, bulk_action_with_files], page: 2, total_pages: 3,
-                          total_results: 45, per_page: 20)
+      described_class.new(bulk_actions: BulkAction.all.page(2).per(2))
     end
 
     it 'renders pagination controls' do

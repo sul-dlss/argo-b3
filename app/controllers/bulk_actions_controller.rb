@@ -8,11 +8,7 @@ class BulkActionsController < ApplicationController
   skip_verify_authorized only: %i[index new]
 
   def index
-    bulk_actions = Current.user.bulk_actions.order(created_at: :desc, id: :desc)
-    @total_results = bulk_actions.count
-    @page = [params[:page].to_i, 1].max
-    @total_pages = (@total_results.to_f / PER_PAGE).ceil
-    @bulk_actions = bulk_actions.limit(PER_PAGE).offset((@page - 1) * PER_PAGE)
+    @bulk_actions = Current.user.bulk_actions.order(created_at: :desc, id: :desc).page(params[:page]).per(PER_PAGE)
   end
 
   def show

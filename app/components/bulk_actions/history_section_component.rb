@@ -3,16 +3,14 @@
 module BulkActions
   # Component for rendering the bulk actions history section
   class HistorySectionComponent < ApplicationComponent
-    def initialize(bulk_actions:, page:, total_pages:, total_results:, per_page:)
+    def initialize(bulk_actions:)
       @bulk_actions = bulk_actions
-      @page = page
-      @total_pages = total_pages
-      @total_results = total_results
-      @per_page = per_page
       super()
     end
 
-    attr_reader :bulk_actions, :page, :total_pages, :total_results, :per_page
+    attr_reader :bulk_actions
+
+    delegate :current_page, :total_pages, :limit_value, :total_count, to: :bulk_actions
 
     def path_func
       ->(new_page) { bulk_actions_path(page: new_page) }

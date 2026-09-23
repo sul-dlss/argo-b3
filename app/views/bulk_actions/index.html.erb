@@ -4,5 +4,4 @@
 <% end %>
 
 <%= turbo_stream_from 'bulk_actions_history', current_user %>
-<%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions, page: @page, total_pages: @total_pages,
-                                                    total_results: @total_results, per_page: BulkActionsController::PER_PAGE) %>
+<%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions) %>

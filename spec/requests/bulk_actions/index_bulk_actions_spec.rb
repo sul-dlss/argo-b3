@@ -11,27 +11,22 @@ RSpec.describe 'Listing bulk actions history' do
 
   context 'when there are more bulk actions than fit on one page' do
     let!(:bulk_actions) do
-      Array.new(BulkActionsController::PER_PAGE + 1) do |i|
-        create(:bulk_action, user:, created_at: i.hours.ago)
-      end
+      create_list(:bulk_action, BulkActionsController::PER_PAGE + 1, user:)
     end
 
     it 'paginates the first page' do
       get bulk_actions_path
 
       expect(response).to have_http_status(:ok)
-      newest_bulk_action = bulk_actions.max_by(&:created_at)
-      oldest_bulk_action = bulk_actions.min_by(&:created_at)
-      expect(response.body).to include(bulk_action_path(newest_bulk_action))
-      expect(response.body).not_to include(bulk_action_path(oldest_bulk_action))
+      expect(response.body).to include(bulk_action_path(bulk_actions.last))
+      expect(response.body).not_to include(bulk_action_path(bulk_actions.first))
     end
 
     it 'paginates the second page' do
       get bulk_actions_path(page: 2)
 
       expect(response).to have_http_status(:ok)
-      oldest_bulk_action = bulk_actions.min_by(&:created_at)
-      expect(response.body).to include(bulk_action_path(oldest_bulk_action))
+      expect(response.body).to include(bulk_action_path(bulk_actions.first))
     end
   end
 
