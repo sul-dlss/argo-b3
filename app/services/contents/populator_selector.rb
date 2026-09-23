@@ -32,10 +32,6 @@ module Contents
     POPULATORS_BY_NAME = [FALLBACK_POPULATOR, *POPULATORS_FOR_CONTENT_TYPES.values]
                          .index_by { |populator| populator.name.demodulize }.freeze
 
-    # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).
-    POPULATORS_BY_NAME = [FALLBACK_POPULATOR, *POPULATORS_FOR_CONTENT_TYPES.values]
-                         .index_by { |populator| populator.name.demodulize }.freeze
-
     def self.call(...)
       new(...).call
     end
