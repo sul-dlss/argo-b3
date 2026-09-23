@@ -60,7 +60,7 @@ class MultipleItemsController < ApplicationController
   private
 
   def set_apo_options
-    @apo_options = Searchers::AdminPolicyList.call
+    @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
   end
 
   def items_registration_form_params

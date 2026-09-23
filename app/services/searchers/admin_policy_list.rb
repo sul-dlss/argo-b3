@@ -9,6 +9,11 @@ module Searchers
       new(...).call
     end
 
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    def initialize(user_scope:)
+      @user_scope = user_scope
+    end
+
     # @return [Array<Array(String, String)>] list of [title, druid] pairs, sorted by title
     def call
       # Sorting here because title field is not indexed in Solr for sorting.
@@ -17,6 +22,8 @@ module Searchers
 
     private
 
+    attr_reader :user_scope
+
     def solr_response
       Search::SolrService.post(request: solr_request)
     end
@@ -24,7 +31,7 @@ module Searchers
     def solr_request
       {
         q: '*:*',
-        fq: "#{OBJECT_TYPES}:APO",
+        fq: ["#{OBJECT_TYPES}:APO", Search::PermissionFilter.call(user_scope:)].compact,
         fl: [ID, TITLE],
         rows: 10_000
       }

@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Searchers::AdminPolicyList do
-  let(:apo_options) { described_class.call }
+  let(:apo_options) { described_class.call(user_scope:) }
+  let(:user) { create(:user, :admin) }
+  let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
   let(:solr_response) do
     {
       'response' => {
@@ -25,8 +27,29 @@ RSpec.describe Searchers::AdminPolicyList do
 
     expect(Search::SolrService).to have_received(:post) do |args|
       solr_query = args[:request].with_indifferent_access
-      expect(solr_query['fq']).to eq("#{Search::Fields::OBJECT_TYPES}:APO")
+      expect(solr_query['fq']).to eq(["#{Search::Fields::OBJECT_TYPES}:APO"])
       expect(solr_query['fl']).to eq([Search::Fields::ID, Search::Fields::TITLE])
+    end
+  end
+
+  context 'with a non-admin user' do
+    let(:user) { create(:user) }
+
+    before do
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
+    end
+
+    it 'restricts the APOs to those the user can access' do
+      apo_options
+
+      expect(Search::SolrService).to have_received(:post) do |args|
+        expect(args[:request][:fq]).to eq(
+          ["#{Search::Fields::OBJECT_TYPES}:APO",
+           "(#{Search::Fields::ID}:(\"druid\\:bc123df4567\") OR " \
+           "#{Search::Fields::COLLECTION_DRUIDS}:(\"druid\\:bc123df4567\") OR " \
+           "#{Search::Fields::APO_DRUID}:(\"druid\\:bc123df4567\"))"]
+        )
+      end
     end
   end
 end
