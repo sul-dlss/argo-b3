@@ -85,6 +85,69 @@ RSpec.describe 'Dashboard' do
     end
   end
 
+  describe 'Admin section' do
+    let(:rendered_page) { Capybara.string(response.body) }
+    let(:admin_section) { rendered_page.find('h2', exact_text: 'Admin').find(:xpath, '..') }
+
+    context 'when signed in as an admin who is not impersonating' do
+      let(:admin_user) { create(:user, :admin) }
+
+      before do
+        sign_in(admin_user)
+        get root_path
+      end
+
+      it 'renders the Admin section with an enabled Impersonate button' do
+        expect(admin_section).to have_button('Manage permissions')
+        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button", text: 'Impersonate')
+        expect(admin_section).to have_no_css('.disabled', text: 'Impersonate')
+      end
+    end
+
+    context 'when signed in as an admin who is impersonating an admin group' do
+      let(:admin_user) { create(:user, :admin) }
+
+      before do
+        sign_in(admin_user)
+        patch admin_impersonate_path, params: { impersonation: { workgroups: [AuthenticationHelpers::ADMIN_GROUP] } }
+        get root_path
+      end
+
+      it 'renders the Admin section with a disabled Impersonate button' do
+        expect(admin_section).to have_button('Manage permissions')
+        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button.disabled",
+                                          text: 'Impersonate')
+      end
+    end
+
+    context 'when signed in as an admin who is impersonating a non-admin group' do
+      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
+
+      before do
+        sign_in(admin_user)
+        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+        get root_path
+      end
+
+      it 'does not render the Admin section' do
+        expect(rendered_page).to have_no_css('h2', exact_text: 'Admin')
+        expect(rendered_page).to have_no_button('Manage permissions')
+      end
+    end
+
+    context 'when signed in as a non-admin' do
+      before do
+        sign_in(user)
+        get root_path
+      end
+
+      it 'does not render the Admin section' do
+        expect(rendered_page).to have_no_css('h2', exact_text: 'Admin')
+        expect(rendered_page).to have_no_button('Manage permissions')
+      end
+    end
+  end
+
   describe 'POST /go_to_druid' do
     before do
       sign_in(user)
