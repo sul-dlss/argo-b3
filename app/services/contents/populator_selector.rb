@@ -24,7 +24,13 @@ module Contents
     # the content type cannot handle the content.
     FALLBACK_POPULATOR = Contents::Populators::FileSetPerFile
 
-    POPULATORS_FOR_CONTENT_TYPES = {}.freeze
+    POPULATORS_FOR_CONTENT_TYPES = {
+      Cocina::Models::ObjectType.book => Contents::Populators::Book
+    }.freeze
+
+    # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).
+    POPULATORS_BY_NAME = [FALLBACK_POPULATOR, *POPULATORS_FOR_CONTENT_TYPES.values]
+                         .index_by { |populator| populator.name.demodulize }.freeze
 
     # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).
     POPULATORS_BY_NAME = [FALLBACK_POPULATOR, *POPULATORS_FOR_CONTENT_TYPES.values]
