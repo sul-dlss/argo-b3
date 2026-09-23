@@ -21,7 +21,7 @@ module Search
     end
 
     def content_type_values
-      [result.content_type]
+      [result.content_type.capitalize]
     end
 
     def admin_policy_values
@@ -36,12 +36,20 @@ module Search
       [safe_join(project_links, ', ')]
     end
 
-    def identifier_values
-      [result.identifiers.join(', ')]
+    def released_to_values
+      return ['Not released'] if result.released_to.blank?
+
+      [result.released_to.to_sentence]
     end
 
-    def released_to_values
-      [result.released_to.to_sentence]
+    def tag_values
+      [safe_join(tag_links, ', ')]
+    end
+
+    def display_tags
+      Array(result.all_tags).reject do |tag|
+        tag.start_with?(ProjectTagForm::PROJECT_TAG_PREFIX, TicketTagForm::TICKET_TAG_PREFIX)
+      end
     end
 
     def ticket_values
@@ -57,7 +65,7 @@ module Search
     end
 
     def access_rights_values
-      [result.access_rights.join(', ')]
+      [result.access_rights.map(&:capitalize).join(', ')]
     end
 
     def pinnable?
@@ -87,6 +95,13 @@ module Search
       result.tickets.map do |ticket|
         search_form = ResultsSearchForm.new(tickets: [ticket])
         helpers.link_to(ticket, helpers.url_for(search_form), data: { turbo_frame: '_top' })
+      end
+    end
+
+    def tag_links
+      display_tags.map do |tag|
+        search_form = ResultsSearchForm.new(tags: [tag])
+        helpers.link_to(tag, helpers.url_for(search_form), data: { turbo_frame: '_top' })
       end
     end
   end

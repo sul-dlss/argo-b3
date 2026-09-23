@@ -12,27 +12,28 @@
           <% end %>
         <% end %>
 
-        <% component.with_row(label: 'DRUID', values: [druid]) %>
+        <% component.with_row(label: 'Druid', values: [bare_druid]) %>
 
         <%# Only items have content types. %>
-        <% component.with_row(label: 'Content Type', values: content_type_values) if result.content_types.present? %>
+        <% component.with_row(label: 'Content type', values: content_type_values) if result.content_types.present? %>
 
         <%# In tests, items may not have an APO. %>
         <% component.with_row(label: 'APO', values: admin_policy_values) if result.apo_druid.present? %>
-        <% component.with_row(label: 'Collections', values: collections_values) if result.collection_druids.present? %>
-        <% component.with_row(label: 'Projects', values: projects_values) if result.projects.present? %>
+        <% component.with_row(label: 'Collection', values: collections_values) if result.collection_druids.present? %>
         <% component.with_row(label: 'Source ID', values: [result.source_id]) if result.source_id.present? %>
-        <% component.with_row(label: 'IDs', values: identifier_values) if result.identifiers.present? %>
-        <% component.with_row(label: 'Released to', values: released_to_values) if result.released_to.present? %>
-        <% component.with_row(label: 'Tickets', values: ticket_values) if result.tickets.present? %>
+        <% component.with_row(label: 'FOLIO Instance HRID', values: Array(result.catalog_record_id)) if result.catalog_record_id.present? %>
+        <% component.with_row(label: 'Released to', values: released_to_values) %>
+        <% component.with_row(label: 'Tag', values: tag_values) if display_tags.present? %>
+        <% component.with_row(label: 'Project', values: projects_values) if result.projects.present? %>
+        <% component.with_row(label: 'Ticket', values: ticket_values) if result.tickets.present? %>
         <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
         <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
-        <% component.with_row(label: 'Access Rights', values: access_rights_values) if result.access_rights.present? %>
+        <% component.with_row(label: 'Access rights', values: access_rights_values) if result.access_rights.present? %>
         <% component.with_row(label: 'Old Argo', values: [helpers.link_to_old_argo(title, druid)]) %>
       <% end %>
     </div>
     <div class="col-md-2 mx-auto align-self-start pt-5 <%= result.object_type_class %>">
-      <div class="object-type-bg fw-bold text-center text-uppercase rounded-pill small px-3 py-1 mb-3">
+      <div class="object-type-bg fw-bold text-center text-uppercase rounded-pill px-3 py-1 mb-3">
         <%= result.object_type_label %>
       </div>
       <%= render ThumbnailComponent.new(result:) %>
