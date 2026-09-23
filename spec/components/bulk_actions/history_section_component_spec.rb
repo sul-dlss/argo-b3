@@ -6,7 +6,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
   include ActionView::RecordIdentifier
 
   let(:component) do
-    described_class.new(bulk_actions: [bulk_action, bulk_action_with_files])
+    described_class.new(bulk_actions: [bulk_action, bulk_action_with_files], page: 1, total_pages: 1,
+                        total_results: 2, per_page: 20)
   end
 
   let(:bulk_action) do
@@ -51,5 +52,20 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) a', text: 'Log')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.export_label)
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
+  end
+
+  context 'when there are multiple pages' do
+    let(:component) do
+      described_class.new(bulk_actions: [bulk_action, bulk_action_with_files], page: 2, total_pages: 3,
+                          total_results: 45, per_page: 20)
+    end
+
+    it 'renders pagination controls' do
+      render_inline(component)
+
+      expect(page).to have_css('nav.paginate-section')
+      expect(page).to have_css('.page-item.active', text: '2')
+      expect(page).to have_link('Next »', href: '/bulk_actions?page=3')
+    end
   end
 end
