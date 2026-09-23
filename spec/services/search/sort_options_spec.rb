@@ -15,6 +15,7 @@ RSpec.describe Search::SortOptions do
       expect(described_class.find_config_by_sort_field('registered_date_desc'))
         .to eq(Search::SortOptions::REGISTERED_DATE_DESC)
       expect(described_class.find_config_by_sort_field('source_id')).to eq(Search::SortOptions::SOURCE_ID)
+      expect(described_class.find_config_by_sort_field('title')).to eq(Search::SortOptions::TITLE)
       expect(described_class.find_config_by_sort_field('druid')).to eq(Search::SortOptions::DRUID)
     end
 

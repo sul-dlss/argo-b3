@@ -11,6 +11,7 @@ FactoryBot.define do
     transient do
       druid { generate(:unique_druid) }
       sequence(:title) { |n| "Test Item #{n}" }
+      sort_title { title.downcase }
       object_type { 'item' }
       content_type { 'book' }
       apo_druid { generate(:unique_druid) }
@@ -50,6 +51,7 @@ FactoryBot.define do
         Search::Fields::ID => druid,
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
+        Search::Fields::SORT_TITLE => sort_title,
         Search::Fields::AUTHOR => author,
         Search::Fields::OBJECT_TYPES => [object_type],
         Search::Fields::CONTENT_TYPES => [content_type],
