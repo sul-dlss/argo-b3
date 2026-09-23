@@ -333,6 +333,58 @@ RSpec.describe ItemForm do
     end
   end
 
+  describe 'collection_druids' do
+    subject(:item_form) { described_class.new(collection_druids: ['', 'druid:bc123df4567']) }
+
+    it 'removes the blank value submitted by the multiple select' do
+      expect(item_form.collection_druids).to eq(['druid:bc123df4567'])
+    end
+  end
+
+  describe 'when built from a cocina object' do
+    subject(:item_form) { described_class.build_from_cocina_object(cocina_object) }
+
+    let(:cocina_object) { build(:dro_with_metadata, collection_ids: %w[druid:bc123df4567 druid:gh456jk7890]) }
+
+    it 'is not changed' do
+      expect(item_form).not_to be_changed
+    end
+
+    context 'when collections are updated' do
+      before { item_form.update(collection_druids: ['', 'druid:mn789pq0123']) }
+
+      it 'is changed' do
+        expect(item_form).to be_changed
+      end
+    end
+
+    context 'when all collections are removed' do
+      before { item_form.update(collection_druids: ['']) }
+
+      it 'removes the collections' do
+        expect(item_form.collection_druids).to be_empty
+        expect(item_form).to be_changed
+      end
+    end
+
+    context 'when saved after the collections are updated' do
+      before do
+        allow(Sdr::Repository).to receive(:update)
+        # A title is required when the description choice is title.
+        item_form.title = 'The Title'
+        item_form.update(collection_druids: ['', 'druid:mn789pq0123'])
+      end
+
+      it 'updates the object with the new collections' do
+        item_form.save!(user_name: 'jcoyne85')
+
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(structural: having_attributes(isMemberOf: ['druid:mn789pq0123'])),
+                user_name: 'jcoyne85', description: nil)
+      end
+    end
+  end
+
   describe 'with_embargo' do
     context 'when not provided and the embargo release date is present' do
       subject(:item_form) do

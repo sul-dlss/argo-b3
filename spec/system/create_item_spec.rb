@@ -15,6 +15,9 @@ RSpec.describe 'Create an item' do
     create(:permission, :edit, workgroup:, target_druid: apo_druid)
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
+    allow(Searchers::CollectionList).to receive(:call).and_return(
+      [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
+    )
   end
 
   context 'when valid' do
@@ -64,6 +67,19 @@ RSpec.describe 'Create an item' do
       click_button 'Next'
       expect(page).to have_css('#rights-tab.active')
       select apo_title, from: 'APO'
+
+      check 'Only view collections in selected APO'
+      collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
+      collection_input.fill_in(with: 'Art')
+      find('.ts-dropdown .option', text: 'Art History Slides').click
+      # The input is cleared after selecting.
+      expect(collection_input.value).to be_empty
+      collection_input.fill_in(with: 'Art')
+      find('.ts-dropdown .option', text: 'Art Maps').click
+      expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
+      expect(page).to have_css('.ts-control .item', text: 'Art Maps')
+      expect(Searchers::CollectionList).to have_received(:call)
+        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:).at_least(:once)
 
       # Only the section for the selected access settings toggle option is shown. The other
       # section is disabled so that its fields are not submitted.
@@ -120,6 +136,7 @@ RSpec.describe 'Create an item' do
         expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.image)
         expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
         expect(request_cocina_object.administrative.hasAdminPolicy).to eq(apo_druid)
+        expect(request_cocina_object.structural.isMemberOf).to eq(%w[druid:bc123df4567 druid:gh456jk7890])
         expect(request_cocina_object.description.title.first.value).to eq('The Title')
         expect(request_cocina_object.access.view).to eq('world')
         expect(request_cocina_object.access.download).to eq('world')

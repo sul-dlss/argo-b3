@@ -14,6 +14,7 @@ class ItemsController < ApplicationController
     @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path
 
     set_apo_options
+    set_collection_options
   end
 
   def create
@@ -27,6 +28,7 @@ class ItemsController < ApplicationController
       redirect_to create_redirect_path
     else
       set_apo_options
+      set_collection_options
       render :new, status: :unprocessable_content
     end
   end
@@ -51,6 +53,13 @@ class ItemsController < ApplicationController
 
   def set_apo_options
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
+  end
+
+  # Only the selected collections are options, since other options are loaded as the user types.
+  def set_collection_options
+    druids = @item_form.collection_druids
+    titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
+    @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
   end
 
   def create_redirect_path

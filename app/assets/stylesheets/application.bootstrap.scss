@@ -14,6 +14,7 @@ $search-color: rgb(#{$search-color-rgb});
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+@import 'tom-select/dist/scss/tom-select.bootstrap5';
 @import 'dropzone';
 @import 'bl_facets';
 @import 'search';

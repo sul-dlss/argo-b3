@@ -76,6 +76,35 @@ RSpec.describe CocinaModels::Collection do
         expect { collection.create!(user_name:) }.to raise_error(/already been persisted/)
       end
     end
+
+    context 'when building the real request cocina object' do
+      let(:new_collection) do
+        described_class.new(source_id: 'new:source-id', access_view: 'world', apo_druid: 'druid:hv992ry2431',
+                            description_hash: { title: [{ value: 'My collection' }] })
+      end
+      let(:registered_cocina_object) { build(:collection_with_metadata) }
+
+      before do
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'constructs and registers a valid Cocina::Models::RequestCollection' do
+        new_collection.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          request_cocina_object = args[:request_cocina_object]
+          expect(request_cocina_object).to be_a(Cocina::Models::RequestCollection)
+          expect(request_cocina_object.type).to eq(Cocina::Models::ObjectType.collection)
+          expect(request_cocina_object.identification.sourceId).to eq('new:source-id')
+          expect(request_cocina_object.administrative.hasAdminPolicy).to eq('druid:hv992ry2431')
+          expect(request_cocina_object.access.view).to eq('world')
+          expect(request_cocina_object.description.title.first.value).to eq('My collection')
+
+          expect(args[:user_name]).to eq(user_name)
+        end
+        expect(new_collection.external_identifier).to eq(registered_cocina_object.externalIdentifier)
+      end
+    end
   end
 
   describe 'type predicates' do
