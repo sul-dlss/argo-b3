@@ -128,6 +128,25 @@ RSpec.describe Searchers::Item do
     end
   end
 
+  context 'when sorting by title', :solr do
+    let(:search_form) { ResultsSearchForm.new(query: 'atlas', sort: 'title') }
+    # Created out of alphabetical order, and mixed case, since the sort key DSA indexes is downcased.
+    let!(:zebra) { create(:solr_item, title: 'Zebra atlas') }
+    let!(:apple) { create(:solr_item, title: 'apple atlas') }
+    let!(:banana) { create(:solr_item, title: 'Banana atlas') }
+    let(:alphabetical_druids) do
+      [apple, banana, zebra].map { |solr_doc| solr_doc.fetch(Search::Fields::ID) }
+    end
+
+    before do
+      allow(Search::SolrService).to receive(:post).and_call_original
+    end
+
+    it 'returns the results in case-insensitive title order' do
+      expect(results.map(&:druid)).to eq(alphabetical_druids)
+    end
+  end
+
   context 'with specific permission targets', :solr do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }

@@ -18,6 +18,7 @@ RSpec.describe Search::SortComponent, type: :component do
                                                               'Registered date (ascending)',
                                                               'Registered date (descending)',
                                                               'Source ID',
+                                                              'Title',
                                                               'Druid'])
       expect(page).to have_link('Relevance', href: '/search/items?sort=relevance')
       expect(page).to have_link('Last deposited date (ascending)',
@@ -27,6 +28,7 @@ RSpec.describe Search::SortComponent, type: :component do
       expect(page).to have_link('Registered date (ascending)', href: '/search/items?sort=registered_date_asc')
       expect(page).to have_link('Registered date (descending)', href: '/search/items?sort=registered_date_desc')
       expect(page).to have_link('Source ID', href: '/search/items?sort=source_id')
+      expect(page).to have_link('Title', href: '/search/items?sort=title')
       expect(page).to have_link('Druid', href: '/search/items?sort=druid')
     end
   end

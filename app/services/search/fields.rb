@@ -71,6 +71,7 @@ module Search
     RELEASED_TO_SEARCHWORKS = 'released_to_searchworks_dtpsidv'
     RESOURCE_COUNT = 'resource_count_itsi'
     SHELVED_FILE_COUNT = 'shelved_content_file_count_itsi'
+    SORT_TITLE = 'sort_title_ssidv'
     SOURCE_ID = 'source_id_ssi'
     STATUS = 'status_ssi'
     TICKETS = 'ticket_tag_ssim'

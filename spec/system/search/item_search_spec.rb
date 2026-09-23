@@ -97,6 +97,7 @@ RSpec.describe 'Item search', :solr do
                                                                 'Registered date (ascending)',
                                                                 'Registered date (descending)',
                                                                 'Source ID',
+                                                                'Title',
                                                                 'Druid'])
 
           click_link_or_button('Registered date (descending)')
