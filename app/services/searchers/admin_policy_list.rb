@@ -16,8 +16,7 @@ module Searchers
 
     # @return [Array<Array(String, String)>] list of [title, druid] pairs, sorted by title
     def call
-      # Sorting here because title field is not indexed in Solr for sorting.
-      solr_response['response']['docs'].map { |doc| [doc[TITLE], doc[ID]] }.sort_by { |title, _druid| title.downcase }
+      solr_response['response']['docs'].map { |doc| [doc[TITLE], doc[ID]] }
     end
 
     private
@@ -33,6 +32,7 @@ module Searchers
         q: '*:*',
         fq: ["#{OBJECT_TYPES}:APO", Search::PermissionFilter.call(user_scope:)].compact,
         fl: [ID, TITLE],
+        sort: Search::SortOptions::TITLE.sort_value,
         rows: 10_000
       }
     end
