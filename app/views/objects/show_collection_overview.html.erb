@@ -1,7 +1,7 @@
 <%= turbo_frame_tag(@solr_doc.druid, 'overview') do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'overview-table', classes: 'mb-5') do |component| %>
     <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Overview') %><% end %>
-    <% component.with_row(label: 'Druid', value: @solr_doc.id) %>
+    <% component.with_row(label: 'Druid', value: @solr_doc.bare_druid) %>
     <% component.with_row(label: 'Folio Instance HRID', value: @solr_doc.catalog_record_id) %>
     <% component.with_row(label: 'Status', value: @solr_doc.status) %>
     <% component.with_row(label: '# of items') do |row_component| %>

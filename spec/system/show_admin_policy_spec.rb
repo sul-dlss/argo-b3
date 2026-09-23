@@ -97,7 +97,7 @@ RSpec.describe 'Show APO' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
-    expect(page).to have_table_value('overview-table', 'Druid', druid)
+    expect(page).to have_table_value('overview-table', 'Druid', 'bb123cd4567')
     within(find_table_value_cell('overview-table', 'Agreement')) do
       expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
     end

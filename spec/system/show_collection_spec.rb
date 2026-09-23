@@ -93,6 +93,7 @@ RSpec.describe 'Show collection' do
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
+    expect(page).to have_table_value('overview-table', 'Druid', 'bb123cd4567')
     within(find_table_value_cell('overview-table', '# of items')) do
       expect(page).to have_link('12', href: search_path(collection_druids: [druid], object_types: ['item']))
     end
