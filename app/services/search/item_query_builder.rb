@@ -92,7 +92,7 @@ module Search
       form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.send(form_field).blank?
 
-      values = search_form.send(form_field).map { |value| "\"#{value}\"" }.join(' OR ')
+      values = search_form.send(form_field).map { |value| "\"#{RSolr.solr_escape(value)}\"" }.join(' OR ')
       query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
       # Tagging is used to exclude the filter from the facet counts.
       # This is useful for checkbox facets (in all values for the facet should be returned).
