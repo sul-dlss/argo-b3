@@ -13,8 +13,8 @@ module Search
 
     Config = Struct.new(:label, :sort_value)
 
-    # Secondary sorts on druid keep paging stable when objects share a date or source id.
-    RELEVANCE = Config.new(label: 'Relevance', sort_value: 'score desc')
+    # Secondary sorts on druid (id) keep paging stable when objects share the primary sorted attribute.
+    RELEVANCE = Config.new(label: 'Relevance', sort_value: 'score desc, id asc')
     LAST_DEPOSITED_DATE_ASC = Config.new(label: 'Last deposited date (ascending)',
                                          sort_value: "#{Search::Fields::LAST_DEPOSITED_DATE} asc, id asc")
     LAST_DEPOSITED_DATE_DESC = Config.new(label: 'Last deposited date (descending)',
