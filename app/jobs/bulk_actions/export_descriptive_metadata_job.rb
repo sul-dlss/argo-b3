@@ -11,7 +11,7 @@ module BulkActions
 
       CSV.open(bulk_action.export_filepath, 'w', write_headers: true, headers: %w[druid] + ordered_headers) do |csv|
         grouped_descriptions.each do |druid, description|
-          csv << ([druid] + description.values_at(*ordered_headers))
+          csv << ([DruidSupport.bare_druid_from(druid)] + description.values_at(*ordered_headers))
         end
       end
     end

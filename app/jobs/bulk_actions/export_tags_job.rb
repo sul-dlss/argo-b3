@@ -10,7 +10,7 @@ module BulkActions
     # Export tags for single object
     class JobItem < BaseJobItem
       def perform
-        export_file << [druid, *export_tags]
+        export_file << [DruidSupport.bare_druid_from(druid), *export_tags]
         success!(message: 'Exported tags')
       end
 

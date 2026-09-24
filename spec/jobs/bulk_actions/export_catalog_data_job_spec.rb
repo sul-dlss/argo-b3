@@ -6,6 +6,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bc123df4567' }
+  let(:bare_druid) { 'bc123df4567' }
   let(:bulk_action) { create(:bulk_action, action_type: 'export_catalog_data') }
   let(:log) { StringIO.new }
 
@@ -46,7 +47,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
     expect(File).to exist(bulk_action.export_filepath)
     csv = CSV.read(bulk_action.export_filepath, headers: true)
     expect(csv.headers).to eq %w[druid folio_instance_hrid refresh part_label sort_key barcode]
-    expect(csv[0].to_h.values).to eq [druid, 'in00000012345', 'true', 'Part 1', '1', '36105010101010']
+    expect(csv[0].to_h.values).to eq [bare_druid, 'in00000012345', 'true', 'Part 1', '1', '36105010101010']
   end
 
   context 'when the object has no FOLIO catalog link' do
@@ -60,7 +61,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
       expect(bulk_action.reload.druid_count_success).to eq(1)
       csv = CSV.read(bulk_action.export_filepath, headers: true)
-      expect(csv[0].to_h.values).to eq [druid, nil, nil, nil, nil, '36105010101010']
+      expect(csv[0].to_h.values).to eq [bare_druid, nil, nil, nil, nil, '36105010101010']
     end
   end
 
@@ -89,7 +90,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
       expect(bulk_action.reload.druid_count_success).to eq(1)
       csv = CSV.read(bulk_action.export_filepath, headers: true)
-      expect(csv[0].to_h.values).to eq [druid, 'in00000012345', 'true', 'Part 1', '1', nil]
+      expect(csv[0].to_h.values).to eq [bare_druid, 'in00000012345', 'true', 'Part 1', '1', nil]
     end
   end
 

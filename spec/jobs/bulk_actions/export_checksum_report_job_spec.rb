@@ -6,6 +6,7 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bc123df4567' }
+  let(:bare_druid) { 'bc123df4567' }
   let(:bulk_action) { create(:bulk_action, action_type: 'export_checksum_report') }
   let(:log) { StringIO.new }
 
@@ -56,8 +57,8 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
     expect(File.read(bulk_action.export_filepath)).to eq(
       <<~CSV
         druid,filename,md5,sha1,sha256,size
-        #{druid},bc123df4567_img_1.tif,ffc0cc90e4215e0a3d822b04a8eab980,d2703add746d7b6e2e5f8a73ef7c06b087b3fae5,6b66cc2df50427d03dca8608af20b3fd96d76b67ba41c148901aa1a60527032f,4403882
-        #{druid},bc123df4567_img_2.tif,ggc0cc90e4215e0a3d822b04a8eab991,e3703add746d7b6e2e5f8a73ef7c06b087b3faf6,7c66cc2df50427d03dca8608af20b3fd96d76b67ba41c148901aa1a60527033g,5503893
+        #{bare_druid},bc123df4567_img_1.tif,ffc0cc90e4215e0a3d822b04a8eab980,d2703add746d7b6e2e5f8a73ef7c06b087b3fae5,6b66cc2df50427d03dca8608af20b3fd96d76b67ba41c148901aa1a60527032f,4403882
+        #{bare_druid},bc123df4567_img_2.tif,ggc0cc90e4215e0a3d822b04a8eab991,e3703add746d7b6e2e5f8a73ef7c06b087b3faf6,7c66cc2df50427d03dca8608af20b3fd96d76b67ba41c148901aa1a60527033g,5503893
       CSV
     )
 
@@ -92,7 +93,7 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
       expect(File.read(bulk_action.export_filepath)).to eq(
         <<~CSV
           druid,filename,md5,sha1,sha256,size
-          #{druid},object not found or not fully accessioned
+          #{bare_druid},object not found or not fully accessioned
         CSV
       )
 
