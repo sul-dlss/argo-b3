@@ -60,7 +60,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for admin policy druids' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::APO_DRUID}:(\"druid:bc123df4567\")")
+      expect(Array(result[:fq])).to include("#{Search::Fields::APO_DRUID}:(\"druid\\:bc123df4567\")")
     end
   end
 
@@ -69,7 +69,16 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for collection druids' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::COLLECTION_DRUIDS}:(\"druid:bc123df4567\")")
+      expect(Array(result[:fq])).to include("#{Search::Fields::COLLECTION_DRUIDS}:(\"druid\\:bc123df4567\")")
+    end
+  end
+
+  context 'with a facet value containing a double quote (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(projects: ['2" quad']) }
+
+    it 'escapes the double quote so the filter query is valid Solr syntax' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::PROJECTS_EXPLODED}:(\"2\\\" quad\")")
     end
   end
 
