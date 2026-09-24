@@ -1,5 +1,5 @@
 <div class="container b3-form my-3">
-  <h1 class="mb-5"><%= label %></h1>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-5') %>
   <%= content %>
 
   <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
