@@ -11,11 +11,13 @@
         container_classes: 'my-field'
       ) %>
 
-  <%= render SdrViewComponents::Forms::CheckboxComponent.new(
-        form:,
-        field_name: :limit_collection_by_apo,
-        label_text: t('edit.items.fields.collection_druids.limit_label'),
-        input_include_hidden: false,
-        container_classes: 'my-field'
-      ) %>
+  <% if show_limit_by_apo %>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+          form:,
+          field_name: :limit_collection_by_apo,
+          label_text: t('edit.items.fields.collection_druids.limit_label'),
+          input_include_hidden: false,
+          container_classes: 'my-field'
+        ) %>
+  <% end %>
 <% end %>

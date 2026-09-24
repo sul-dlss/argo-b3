@@ -26,4 +26,16 @@ RSpec.describe Edit::CollectionsComponent, type: :component do
     expect(page).to have_unchecked_field('Only view collections in selected APO')
     expect(page).to have_no_field('item[limit_collection_by_apo]', type: 'hidden', visible: :all)
   end
+
+  context 'when show_limit_by_apo is false' do
+    let(:component) { described_class.new(form:, options:, show_limit_by_apo: false) }
+
+    it 'does not render the limit by APO checkbox or its form params' do
+      render_inline(component)
+
+      expect(page).to have_no_field('Only view collections in selected APO')
+      form_params = page.find('select', visible: :all)['data-tom-select-form-params-value']
+      expect(form_params).to be_nil
+    end
+  end
 end

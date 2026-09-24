@@ -189,7 +189,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   MANAGE_COLLECTIONS = Config.new(
     label: 'Update collections',
-    help_text: 'Add items to a collection or remove items from a collection.'
+    help_text: 'Add items to a collection or remove items from a collection.',
+    job: BulkActions::ManageCollectionsJob,
+    path_helper: to_path_helper(:new_bulk_actions_manage_collections_path),
+    form: BulkActions::ManageCollectionsForm
   )
 
   MANAGE_CONTENT_TYPE = Config.new(
