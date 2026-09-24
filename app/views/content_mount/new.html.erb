@@ -1,0 +1,18 @@
+<%= turbo_frame_tag @content, 'mount' do %>
+  <%= render Elements::FlashToastComponent.new %>
+  <% if @files_discovered %>
+    <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: '.dropzone-files' } %>
+  <% end %>
+  <%= form_with model: @mount_form,
+                url: content_mount_path(@content_token) do |form| %>
+    <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+          form:,
+          field_name: :path,
+          label_text: t('edit.items.fields.mount_path.label')
+        ) %>
+
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.discover_files'),
+                                                             classes: 'mt-3') %>
+
+  <% end %>
+<% end %>

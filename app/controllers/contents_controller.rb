@@ -2,7 +2,7 @@
 
 # Controller for managing content (structural)
 class ContentsController < ContentsApplicationController
-  skip_verify_authorized only: %i[update show]
+  skip_verify_authorized only: %i[show]
 
   def show
     verified_content_id = verify_token(params[:id])
@@ -18,21 +18,10 @@ class ContentsController < ContentsApplicationController
     @content = find_or_create_content(cocina_object:)
     @solr_doc = fetch_solr_doc(druid:)
     @content_token = generate_token(@content.id)
-  end
-
-  def update
-    verified_content_id = verify_token(params[:id])
-    content = Content.find(verified_content_id)
-    build_content_file_binaries(content:)
-
-    head :ok
+    @content_form = ContentForm.new
   end
 
   private
-
-  def build_content_file_binaries(content:)
-    Contents::BinaryBuilder.call(content:, files: params[:content][:files], paths: params[:content][:paths])
-  end
 
   def find_or_create_content(cocina_object:)
     Content.find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false) ||

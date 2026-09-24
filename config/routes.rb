@@ -204,7 +204,9 @@ Rails.application.routes.draw do
 
   resources :multiple_items, only: %i[new create show]
 
-  resources :contents, only: %i[edit update show] do
+  resources :contents, only: %i[edit show] do
+    resource :dropzone, only: %i[update], controller: 'content_dropzone'
+    resource :mount, only: %i[new create show], controller: 'content_mount'
     resource :structure, only: %i[edit update], controller: 'content_structure'
   end
 

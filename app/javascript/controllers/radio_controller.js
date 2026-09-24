@@ -3,9 +3,15 @@ import { Controller } from '@hotwired/stimulus'
 // Disable/enable associated inputs and buttons based on radio button selection
 // Borrowed from H3.
 // Mark the radio buttons with: <input data-radio-target="radio" data-action="radio#toggle" type="radio" ></input>
+// If inputs are loaded later (e.g., in a turbo-frame), add data-action="turbo:frame-load->radio#refresh"
+// to the controller element so that the inputs are disabled/enabled once loaded.
 export default class extends Controller {
   static targets = ['radio']
   connect () {
+    this.refresh()
+  }
+
+  refresh () {
     this.radioTargets.forEach((radio) => {
       if (radio.checked) {
         this.toggle({ target: radio })

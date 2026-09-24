@@ -7,6 +7,7 @@ reload_intervals:
   bulk_action_show: 5000
   workflow_grid: 10000
   multiple_items: 2000
+  mount_discovery: 2000
 
 argo:
   url: https://argo.stanford.edu
@@ -68,3 +69,27 @@ folio:
     username: "app_sdr"
     password: "supersecret"
   tenant_id: "sul"
+
+rosette_spinner_speed: 2.0
+
+mount_locations:
+  - /ars
+  - /datasets
+  - /dor/staging
+  - /dpgthumper2
+  - /dpgthumper
+  - /evis
+  - /gis_workflow_data
+  - /maps
+  - /pwrvault
+  - /smpl2
+  - /spec1
+  - /spec2
+  - /spec3
+  - /third_party
+  - /thumpers/dpgthumper-se1
+  - /thumpers/dpgthumper-se2
+  - /thumpers/dpgthumper-staging
+  - /thumpers/dpgthumper2-se1
+  - /thumpers/se9
+  - /was_unaccessioned_data

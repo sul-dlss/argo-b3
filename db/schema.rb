@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_24_132418) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_24_170659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_24_132418) do
     t.string "druid", null: false
     t.boolean "immutable", default: true, null: false
     t.string "lock", null: false
+    t.string "mount_state", default: "discovery_not_in_progress", null: false
     t.string "staging_state", default: "staging_not_in_progress", null: false
     t.datetime "updated_at", null: false
     t.index ["druid", "lock", "immutable"], name: "index_contents_on_druid_and_lock_and_immutable", unique: true

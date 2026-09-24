@@ -3,3 +3,6 @@ solr:
 
 feature_flags:
   bulk_actions: true
+
+mount_locations:
+  - <%= Rails.root.join('tmp') %>

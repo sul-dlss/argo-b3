@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
     return if cookies.signed[:last_search].blank?
 
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
-    @last_search_form = ResultsSearchForm.new(form_params)
+    # Slicing drops attributes from cookies written by older versions of the form.
+    @last_search_form = ResultsSearchForm.new(form_params.to_h.slice(*ResultsSearchForm.attribute_names))
   end
 end

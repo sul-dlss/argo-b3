@@ -1,0 +1,14 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= turbo_frame_tag @content, 'mount' do %>
+  <%= tag.div data: { controller: 'frame-reload', frame_reload_interval_value: Settings.reload_intervals.mount_discovery } do %>
+    <%= render SdrViewComponents::Elements::SpinnerComponent.new(
+          message: 'Discovering files...',
+          image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
+          speed: Settings.rosette_spinner_speed
+        ) %>
+  <% end %>
+<% end %>
