@@ -122,23 +122,14 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
-    context 'when the file location is not attached' do
+    context 'when the file is on a mount' do
       let(:content_file_binary) do
-        create(:content_file_binary, file_location: 'deposited', md5_digest: 'existing-md5',
-                                     sha1_digest: 'existing-sha1')
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path,
+                                     filepath: 'catalog_record_id_and_barcode.xlsx',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
       end
 
-      before do
-        content_file_binary.file.attach(
-          io: Rails.root.join('spec/fixtures/files/catalog_record_id_and_barcode.xlsx').open,
-          filename: 'catalog_record_id_and_barcode.xlsx',
-          content_type: 'application/octet-stream',
-          identify: false
-        )
-        content_file_binary.file.blob.update!(metadata: { analyzed: true })
-      end
-
-      it 'sniffs the mime type from the file contents on disk instead of using the blob content type' do
+      it 'sniffs the mime type from the file contents on disk' do
         call
 
         expect(content_file_binary.mime_type).to eq('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -199,22 +190,14 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
-    context 'when the file location is not attached and the size is not yet set' do
+    context 'when the file is on a mount and the size is not yet set' do
       let(:content_file_binary) do
-        create(:content_file_binary, file_location: 'deposited', md5_digest: 'existing-md5',
-                                     sha1_digest: 'existing-sha1', mime_type: 'text/plain')
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path,
+                                     filepath: 'catalog_record_id_and_barcode.xlsx',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1', mime_type: 'text/plain')
       end
 
-      before do
-        content_file_binary.file.attach(
-          io: Rails.root.join('spec/fixtures/files/catalog_record_id_and_barcode.xlsx').open,
-          filename: 'catalog_record_id_and_barcode.xlsx',
-          content_type: 'application/octet-stream',
-          identify: false
-        )
-      end
-
-      it 'reads the size from the file on disk instead of using the blob byte size' do
+      it 'reads the size from the file on disk' do
         filepath_on_disk = content_file_binary.filepath_on_disk
 
         call

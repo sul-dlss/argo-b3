@@ -45,6 +45,64 @@ RSpec.describe ContentFileBinary do
     end
   end
 
+  describe '#filepath_on_disk' do
+    context 'when the file is attached' do
+      subject(:content_file_binary) { create(:content_file_binary, file_location: 'attached') }
+
+      before do
+        content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
+      end
+
+      it 'returns the path of the Active Storage blob' do
+        expect(content_file_binary.filepath_on_disk)
+          .to eq(ActiveStorage::Blob.service.path_for(content_file_binary.file.blob.key))
+      end
+    end
+
+    context 'when the file is on a mount' do
+      subject(:content_file_binary) do
+        build(:content_file_binary, file_location: 'mount', mount_path: '/mnt/sdr', filepath: 'folder1/image1.tif')
+      end
+
+      it 'returns the filepath joined to the mount path' do
+        expect(content_file_binary.filepath_on_disk).to eq('/mnt/sdr/folder1/image1.tif')
+      end
+    end
+
+    context 'when the file is on globus' do
+      subject(:content_file_binary) { build(:content_file_binary, file_location: 'globus') }
+
+      it 'raises NotImplementedError' do
+        expect { content_file_binary.filepath_on_disk }.to raise_error(NotImplementedError)
+      end
+    end
+
+    context 'when the file is not on disk' do
+      subject(:content_file_binary) { build(:content_file_binary, file_location: 'deposited') }
+
+      it 'raises an error' do
+        expect { content_file_binary.filepath_on_disk }.to raise_error('File is not on disk')
+      end
+    end
+  end
+
+  describe 'mount_path validation' do
+    it 'is invalid without a mount_path when the file is on a mount' do
+      content_file_binary = build(:content_file_binary, file_location: 'mount', mount_path: nil)
+
+      expect(content_file_binary).not_to be_valid
+      expect(content_file_binary.errors[:mount_path]).to include("can't be blank")
+    end
+
+    it 'is valid with a mount_path when the file is on a mount' do
+      expect(build(:content_file_binary, file_location: 'mount', mount_path: '/mnt/sdr')).to be_valid
+    end
+
+    it 'is valid without a mount_path when the file is not on a mount' do
+      expect(build(:content_file_binary, file_location: 'attached', mount_path: nil)).to be_valid
+    end
+  end
+
   describe '#hierarchical?' do
     context 'when the filepath includes directories' do
       subject(:content_file_binary) { create(:content_file_binary, filepath: 'folder1/image1.tif') }
