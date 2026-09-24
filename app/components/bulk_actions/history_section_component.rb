@@ -10,6 +10,12 @@ module BulkActions
 
     attr_reader :bulk_actions
 
+    delegate :current_page, :total_pages, :limit_value, :total_count, to: :bulk_actions
+
+    def path_func
+      ->(new_page) { bulk_actions_path(page: new_page) }
+    end
+
     def data
       {
         controller: 'bulk-actions-history',

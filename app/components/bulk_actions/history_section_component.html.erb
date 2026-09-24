@@ -1,5 +1,7 @@
 <%= tag.div class: 'container mt-3', data: do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, variant: :h4, text: label) %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-4') %>
+  <%= render Elements::Pagination::BriefComponent.new(total_pages:, current_page:, path_func:, total_results: total_count, per_page: limit_value) %>
+
   <%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
     <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Action', style: 'width: 10%;') %>
@@ -14,4 +16,6 @@
                          id: dom_id(bulk_action, 'row')) %>
     <% end %>
   <% end %>
+
+  <%= render Elements::Pagination::FullComponent.new(total_pages:, current_page:, path_func:) %>
 <% end %>

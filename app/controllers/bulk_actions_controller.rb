@@ -2,11 +2,13 @@
 
 # Controller for bulk actions.
 class BulkActionsController < ApplicationController
+  PER_PAGE = 20
+
   before_action :set_bulk_action, only: %i[destroy file show]
   skip_verify_authorized only: %i[index new]
 
   def index
-    @bulk_actions = Current.user.bulk_actions.order(created_at: :desc)
+    @bulk_actions = Current.user.bulk_actions.order(created_at: :desc, id: :desc).page(params[:page]).per(PER_PAGE)
   end
 
   def show
