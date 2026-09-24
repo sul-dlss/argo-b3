@@ -33,7 +33,7 @@ RSpec.describe BulkActions::ExportTagsJob do
 
     expect(File).to exist(csv_path)
     output = CSV.read(csv_path)
-    expect(output.first.to_csv).to eq "druid:bc123df4567,Project : Testing 2,Test Tag : Testing 3\n"
+    expect(output.first.to_csv).to eq "bc123df4567,Project : Testing 2,Test Tag : Testing 3\n"
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)

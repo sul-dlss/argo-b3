@@ -61,9 +61,8 @@ class RegistrationCsvConverter
   end
 
   def administrative(row)
-    {
-      hasAdminPolicy: params[:administrative_policy_object] || row.fetch('administrative_policy_object')
-    }
+    admin_policy_object = params[:administrative_policy_object] || row.fetch('administrative_policy_object')
+    { hasAdminPolicy: DruidSupport.prefixed_druid_from(admin_policy_object) }
   end
 
   def identification(row)
@@ -136,7 +135,7 @@ class RegistrationCsvConverter
   def structural(row)
     {}.tap do |structural|
       collection = params[:collection] || row['collection']
-      structural[:isMemberOf] = [collection] if collection
+      structural[:isMemberOf] = [DruidSupport.prefixed_druid_from(collection)] if collection
       reading_order = params[:reading_order] || row['reading_order']
       structural[:hasMemberOrders] = [{ viewingDirection: reading_order }] if reading_order.present?
     end

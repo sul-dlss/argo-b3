@@ -38,6 +38,21 @@ RSpec.describe RegistrationCsvConverter do
     end
   end
 
+  context 'when druids in CSV lack the druid: prefix' do
+    let(:csv_string) do
+      <<~CSV
+        administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download
+        bc123df4567,bk024qs1808,accessionWF,book,foo:123,My new object,world,world
+      CSV
+    end
+
+    it 'adds the druid: prefix to the admin policy and collection' do
+      expect(results.size).to be 1
+      expect(results.first.success?).to be true
+      expect(results.first.value![:request_cocina_object]).to eq(expected_cocina)
+    end
+  end
+
   context 'when values provided in params' do
     let(:csv_string) do
       <<~CSV

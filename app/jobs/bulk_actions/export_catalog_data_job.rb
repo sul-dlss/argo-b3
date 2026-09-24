@@ -17,7 +17,7 @@ module BulkActions
       def perform
         return unless check_object_type?(allow_admin_policy: false)
 
-        export_file << [druid, *catalog_data]
+        export_file << [DruidSupport.bare_druid_from(druid), *catalog_data]
         success!(message: 'Exported catalog data')
       end
 

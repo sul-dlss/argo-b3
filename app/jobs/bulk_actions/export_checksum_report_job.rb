@@ -16,12 +16,13 @@ module BulkActions
         return unless check_read_ability?
 
         Preservation::Client.objects.checksum(druid:).each do |hash|
-          export_file << [druid, hash['filename'], hash['md5'], hash['sha1'], hash['sha256'], hash['filesize']]
+          export_file << [DruidSupport.bare_druid_from(druid), hash['filename'], hash['md5'],
+                          hash['sha1'], hash['sha256'], hash['filesize']]
         end
 
         success!(message: 'Exported checksum report')
       rescue Preservation::Client::NotFoundError
-        export_file << [druid, 'object not found or not fully accessioned']
+        export_file << [DruidSupport.bare_druid_from(druid), 'object not found or not fully accessioned']
         failure!(message: 'Object not found or not fully accessioned')
       end
     end
