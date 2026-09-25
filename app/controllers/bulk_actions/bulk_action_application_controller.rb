@@ -6,6 +6,7 @@ module BulkActions
     skip_verify_authorized
     before_action :set_from_last_search_cookie
     before_action :set_bulk_action_config
+    before_action :set_form_options
 
     def new
       @bulk_action_form = form_class.new
@@ -37,6 +38,11 @@ module BulkActions
     def job_params
       raise NotImplementedError
     end
+
+    # Subclasses may override as needed to set instance variables (e.g. select options) needed to
+    # render the bulk action form. This runs before both `new` and `create` so that the options
+    # are available on a new form render and also if validation fails (e.g. user enters no druids)
+    def set_form_options; end
 
     def form_class
       bulk_action_config.form
