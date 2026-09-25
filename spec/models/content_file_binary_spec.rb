@@ -37,6 +37,18 @@ RSpec.describe ContentFileBinary do
     end
   end
 
+  describe '.path_order' do
+    let(:content) { create(:content, druid: 'druid:dg234hj5678') }
+    let!(:image10_tif) { create(:content_file_binary, content:, filepath: 'image10.tif') }
+    let!(:folder_image1_tif) { create(:content_file_binary, content:, filepath: 'folder/image1.tif') }
+    let!(:image2_tif) { create(:content_file_binary, content:, filepath: 'image2.tif') }
+    let!(:image2_jpg) { create(:content_file_binary, content:, filepath: 'image2.jpg') }
+
+    it 'orders by path, then numerically by basename, then by extension' do
+      expect(described_class.path_order).to eq([image2_jpg, image2_tif, image10_tif, folder_image1_tif])
+    end
+  end
+
   describe '#filename' do
     subject(:content_file_binary) { build(:content_file_binary, filepath: 'folder1/folder2/image1.tif') }
 

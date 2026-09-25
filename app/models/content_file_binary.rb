@@ -14,6 +14,8 @@ class ContentFileBinary < ApplicationRecord
   scope :unassociated, -> { where.missing(:content_files) }
   # distinct is necessary since a binary may be referenced by multiple files.
   scope :associated, -> { where.associated(:content_files).distinct }
+  # Orders by directory, then basename (with embedded numbers ordered numerically), then extension.
+  scope :path_order, -> { order(path_parts: :asc).order('basename COLLATE "numeric"').order(extname: :asc) }
 
   # Note that the flow of a file to different locations is: attached or globus or mount -> stage -> deposited
   enum :file_location,

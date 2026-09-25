@@ -20,7 +20,7 @@ module Contents
 
       # New file sets are positioned at the end of the existing file sets by the positioning gem.
       def create_content_file_sets
-        unassociated_content_file_binaries.order(:id).each do |content_file_binary|
+        unassociated_content_file_binaries.path_order.each do |content_file_binary|
           create_content_file(content_file_binary:)
         end
       end

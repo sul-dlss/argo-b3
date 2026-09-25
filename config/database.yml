@@ -12,6 +12,8 @@ development:
   primary:
     <<: *default
     database: "<%= ENV.fetch('DATABASE_NAME', 'argo_development') %>"
+    # structure.sql is required to capture the numeric collation.
+    schema_format: sql
   queue:
     <<: *default
     database: "<%= ENV.fetch('DATABASE_QUEUE_NAME', 'argo_development_queue') %>"
@@ -28,11 +30,13 @@ development:
 test:
   <<: *default
   database: "<%= ENV.fetch('DATABASE_NAME', 'argo_test') %><%= ENV['TEST_ENV_NUMBER'] %>"
+  schema_format: sql
 
 production:
   primary:
     <<: *default
     database: "<%= ENV.fetch('DATABASE_NAME', 'argo_production') %>"
+    schema_format: sql
   queue:
     <<: *default
     database: "<%= ENV.fetch('DATABASE_QUEUE_NAME', 'argo_production_queue') %>"
