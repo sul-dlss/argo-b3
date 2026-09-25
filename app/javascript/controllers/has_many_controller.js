@@ -10,8 +10,13 @@ import { Controller } from '@hotwired/stimulus'
 //     <button data-action="has-many#add">Add</button>
 //   </div>
 // Each row's Remove button is marked with data-action="has-many#remove".
+//
+// Set has_many_field_name_value to the association name so that sibling controllers can tell
+// several has-many sections apart. multiple_tags_controller calls addValue() to populate
+// the various tag sections.
 export default class extends Controller {
   static targets = ['container', 'row', 'template']
+  static values = { fieldName: String }
 
   add (event) {
     event.preventDefault()
@@ -25,10 +30,29 @@ export default class extends Controller {
     if (this.rowTargets.length === 0 && this.hasTemplateTarget) this.appendRow()
   }
 
+  // Fills the first blank row with value, or appends a new row if every row is already filled.
+  // Blank rows are filled in DOM order, so a value can land above an already-filled row.
+  addValue (value) {
+    const input = this.blankInput ?? this.inputFor(this.appendRow())
+    input.value = value
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+
+  get blankInput () {
+    return this.rowTargets
+      .map((row) => this.inputFor(row))
+      .find((input) => input.value.trim() === '')
+  }
+
+  inputFor (row) {
+    return row.querySelector('input:not([type="hidden"]), textarea, select')
+  }
+
   appendRow () {
     const row = this.templateTarget.content.cloneNode(true).firstElementChild
     this.reindex(row, this.nextIndex)
     this.containerTarget.appendChild(row)
+    return row
   }
 
   get nextIndex () {

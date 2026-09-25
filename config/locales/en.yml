@@ -185,6 +185,11 @@ en:
           label: "License"
           label_caption: "Get help selecting a license"
           help_text: "Assigning a license may improve discovery of your work in web searches."
+        multiple_tags:
+          label: 'Enter multiple tags'
+          button: 'Add tags'
+          help_text: >-
+            Enter a list of tags separated by tabs or new lines. You can add Project and Ticket tags here as well.
         other_tag:
           label: 'Tag'
         part_label:

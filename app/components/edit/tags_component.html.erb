@@ -1,20 +1,41 @@
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.items.fields.other_tag.label').pluralize) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :other_tags,
-                                                   form_component: Edit::OtherTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another tag') %>
-<% end %>
+<%= tag.div data: { controller: 'multiple-tags',
+                    multiple_tags_has_many_outlet: tag_fields_selector,
+                    multiple_tags_section_labels_value: section_labels } do %>
+  <div class="my-fieldset">
+    <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
+                                                               field_name: :multiple_tags,
+                                                               label_text: t('edit.items.fields.multiple_tags.label'),
+                                                               label_classes: 'fw-bold',
+                                                               help_text: t('edit.items.fields.multiple_tags.help_text'),
+                                                               input_rows: 3,
+                                                               input_data: { multiple_tags_target: 'input' }) %>
 
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.items.fields.project_tag.label').pluralize) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :project_tags,
-                                                   form_component: Edit::ProjectTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another project') %>
-<% end %>
+    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: t('edit.items.fields.multiple_tags.button'),
+                                                                variant: :'outline-primary',
+                                                                classes: 'mt-2',
+                                                                data: { action: 'multiple-tags#add' }) %>
 
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.items.fields.ticket_tag.label').pluralize) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :ticket_tags,
-                                                   form_component: Edit::TicketTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another ticket') %>
+    <%= tag.div class: 'visually-hidden', role: 'status', data: { multiple_tags_target: 'status' } %>
+  </div>
+
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: other_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :other_tags,
+                                                     form_component: Edit::OtherTagComponent,
+                                                     container_classes: tag_fields_classes,
+                                                     add_button_label: 'Add another tag') %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: project_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :project_tags,
+                                                     form_component: Edit::ProjectTagComponent,
+                                                     container_classes: tag_fields_classes,
+                                                     add_button_label: 'Add another project') %>
+  <% end %>
+
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: ticket_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :ticket_tags,
+                                                     form_component: Edit::TicketTagComponent,
+                                                     container_classes: tag_fields_classes,
+                                                     add_button_label: 'Add another ticket') %>
+  <% end %>
 <% end %>

@@ -429,6 +429,44 @@ RSpec.describe 'Create an item' do
       end
     end
 
+    it 'registers a valid cocina object after entering multiple tags at once' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
+      # the tabs as real keystrokes, which blur the text area. It also sends the first four and
+      # last three characters as keystrokes, so keep the delimiters away from both ends.
+      fill_in 'Enter multiple tags',
+              with: "Registered By : mjgiarlo\tProject : Argo\nTicket : ABC-123\tRemediated By : 5.0.0"
+      click_button 'Add tags'
+
+      # The first tag fills the blank row that is already there; the second is appended.
+      expect(page).to have_field('item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo')
+      expect(page).to have_field('item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0')
+      # Project and ticket tags are filed under their own sections with the prefix removed.
+      expect(page).to have_field('item[project_tags_attributes][0][tag]', with: 'Argo')
+      expect(page).to have_field('item[ticket_tags_attributes][0][tag]', with: 'ABC-123')
+      expect(page).to have_field('Enter multiple tags', with: '')
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq(['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
+                                   'Project : Argo', 'Ticket : ABC-123'])
+      end
+    end
+
     it 'registers and redirects to add files' do
       visit new_item_path
 
