@@ -14,19 +14,22 @@ RSpec.describe 'Listing bulk actions history' do
       create_list(:bulk_action, BulkActionsController::PER_PAGE + 1, user:)
     end
 
+    # bulk_action_path is checked as a quoted href value rather than a bare substring, since a bare
+    # numeric id (e.g. "/bulk_actions/1") can otherwise be a substring of another rendered row's path
+    # (e.g. "/bulk_actions/19"), causing spurious matches depending on the ids assigned by the database.
     it 'paginates the first page' do
       get bulk_actions_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(bulk_action_path(bulk_actions.last))
-      expect(response.body).not_to include(bulk_action_path(bulk_actions.first))
+      expect(response.body).to include(%(href="#{bulk_action_path(bulk_actions.last)}"))
+      expect(response.body).not_to include(%(href="#{bulk_action_path(bulk_actions.first)}"))
     end
 
     it 'paginates the second page' do
       get bulk_actions_path(page: 2)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(bulk_action_path(bulk_actions.first))
+      expect(response.body).to include(%(href="#{bulk_action_path(bulk_actions.first)}"))
     end
   end
 
