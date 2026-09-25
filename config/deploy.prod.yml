@@ -7,11 +7,6 @@ servers:
     hosts:
       - argo-b3-prod-a.stanford.edu
 
-# Build natively on the deploy target itself (already has Docker via Puppet)
-# rather than emulating amd64 via QEMU on an arm64 developer laptop.
-builder:
-  remote: ssh://lyberadmin@argo-b3-prod-a.stanford.edu
-
 env:
   clear:
     SETTINGS__SOLR__URL: https://sul-solr.stanford.edu/solr/argo_prod

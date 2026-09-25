@@ -20,6 +20,7 @@ require 'kamal'
 require 'pathname'
 require 'securerandom'
 require 'tmpdir'
+require 'uri'
 
 destination = ARGV.shift
 if destination.nil?
@@ -28,7 +29,10 @@ if destination.nil?
 end
 
 config = Kamal::Configuration.create_from(config_file: Pathname.new('config/deploy.yml'), destination: destination)
-hosts = config.roles.flat_map(&:hosts).uniq
+# The remote builder (config/deploy.yml's `builder.remote`, shared by all destinations) needs the
+# key too, since qa/prod deploys build on the stage host.
+builder_hosts = config.builder.remote ? [URI(config.builder.remote).host] : []
+hosts = (config.roles.flat_map(&:hosts) + builder_hosts).uniq
 user = config.ssh.user
 
 def ssh_exec!(user, host, command)
