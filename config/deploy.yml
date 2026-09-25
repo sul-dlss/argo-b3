@@ -10,10 +10,12 @@ image: suldlss/argo-b3
 registry:
   server: localhost:5555
 
-# Configure builder setup. Destination-specific config (config/deploy.<destination>.yml)
-# points `remote` at the deploy target itself, for a native (non-QEMU) amd64 build.
+# Build natively on the stage server (already has Docker via Puppet) rather than
+# emulating amd64 via QEMU on an arm64 developer laptop. This allows for efficient
+# caching of layers.
 builder:
   arch: amd64
+  remote: ssh://lyberadmin@argo-b3-stage-a.stanford.edu
 
 logging:
   driver: json-file
@@ -120,7 +122,7 @@ env:
     - SETTINGS__RABBITMQ__PASSWORD
     - DATABASE_PASSWORD
 
-# Destination-specific configuration (hosts, builder.remote, and the env vars
+# Destination-specific configuration (hosts and the env vars
 # that vary per environment: SETTINGS__SOLR__URL, SETTINGS__DOR_SERVICES__URL,
 # SETTINGS__PRESERVATION_CATALOG__URL, HONEYBADGER_ENV) lives in
 # config/deploy.<destination>.yml, e.g. config/deploy.qa.yml. Run with:

@@ -108,7 +108,7 @@ Note:
 * Secrets are retrieved directly using the Vault CLI. See `.kamal/secrets-common` and environment specific secrets files.
 * The Dockerfile configures the lyberadmin (50:503) user to match the host server.
 * `/workspace/bulk` and `/var/log/argo` are shared with the containers.
-* The docker image is build on the host server (AMD64) to avoid emulation on the developer Mac.
+* The docker image is built on the stage server (AMD64) for all environments to avoid emulation on the developer Mac. Sharing one builder keeps its layer cache warm across environments.
 
 
 ### Deploy
@@ -117,6 +117,16 @@ To build and deploy the local, committed code:
 
 ```
 bin/kamal-otk qa deploy
+```
+
+#### Deploying faster when deploying to all environments
+
+To avoid rebuilding images:
+
+```
+bin/kamal-otk qa deploy
+bin/kamal-otk stage deploy --skip-push
+bin/kamal-otk prod deploy --skip-push
 ```
 
 #### Rollback

@@ -45,6 +45,11 @@
 
 # Ignore development files
 /.devcontainer
+/.claude
+
+# Ignore tests and test output
+/spec
+/coverage
 
 # Ignore Docker-related files
 /.dockerignore
