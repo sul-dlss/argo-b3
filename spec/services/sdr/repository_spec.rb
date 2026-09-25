@@ -129,7 +129,7 @@ RSpec.describe Sdr::Repository do
     let(:administrative_tags_client) { instance_double(Dor::Services::Client::AdministrativeTags, create: nil) }
     let(:workflow_client) { instance_double(Dor::Services::Client::ObjectWorkflow, create: true) }
 
-    let(:workflow_name) { 'registrationWF' }
+    let(:workflow_name) { 'goobiWF' }
     let(:tags) { %w[tag1 tag2] }
 
     before do
@@ -144,16 +144,18 @@ RSpec.describe Sdr::Repository do
         expect(objects_client).to have_received(:register).with(params: request_cocina_object, user_name:)
         expect(Dor::Services::Client).to have_received(:object).with(druid)
         expect(administrative_tags_client).to have_received(:create).with(tags:)
+        expect(object_client).to have_received(:workflow).with('goobiWF')
         expect(workflow_client).to have_received(:create).with(version: '1')
       end
     end
 
     context 'when no workflow_name is given' do
-      it 'registers with SDR and does not create a workflow' do
+      it 'registers with SDR and creates registrationWF' do
         expect(described_class.register(request_cocina_object:, user_name:)).to eq(registered_cocina_object)
 
         expect(objects_client).to have_received(:register).with(params: request_cocina_object, user_name:)
-        expect(workflow_client).not_to have_received(:create)
+        expect(object_client).to have_received(:workflow).with('registrationWF')
+        expect(workflow_client).to have_received(:create).with(version: '1')
       end
     end
 

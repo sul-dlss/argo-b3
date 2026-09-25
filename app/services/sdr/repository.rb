@@ -56,7 +56,7 @@ module Sdr
     # @param [Cocina::Models::RequestDRO,Cocina::Models::RequestCollection,Cocina::Models::RequestAdminPolicy]
     #   request_cocina_object
     # @param [String] user_name the sunetid of the user performing the action
-    # @param [String] workflow_name the name of the workflow to start upon registration, if any
+    # @param [String] workflow_name the name of the workflow to start upon registration otherwise registrationWF
     # @param [Array<String>] tags administrative tags to add upon registration
     # @return [Cocina::Models::DRO,Cocina::Models::Collection,Cocina::Models::AdminPolicy] the registered cocina object
     # @raise [Error] if there is an error depositing the work
@@ -69,7 +69,7 @@ module Sdr
       #       that rely on admin tags (e.g., `goobiWF`) could sporadically fail.
       object_client.administrative_tags.create(tags:) unless tags.empty?
 
-      object_client.workflow(workflow_name).create(version: '1') if workflow_name
+      object_client.workflow(workflow_name || Constants::DEFAULT_WORKFLOW).create(version: '1')
 
       response_cocina_object
     rescue Dor::Services::Client::Error => e
