@@ -63,7 +63,7 @@ module Search
       if values.one?
         "#{label}: #{'NOT ' if exclude}#{values.first}"
       else
-        "#{label}: #{'NOT ' if exclude}(#{values.join(' OR ')})"
+        "#{label}: #{'NOT ' if exclude}(#{values.join(' AND ')})"
       end
     end
 

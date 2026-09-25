@@ -92,13 +92,12 @@ module Search
       form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.send(form_field).blank?
 
-      values = search_form.send(form_field).map { |value| "\"#{RSolr.solr_escape(value)}\"" }.join(' OR ')
+      values = search_form.send(form_field).map { |value| "\"#{RSolr.solr_escape(value)}\"" }.join(' AND ')
       query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
-      # Tagging is used to exclude the filter from the facet counts.
-      # This is useful for checkbox facets (in all values for the facet should be returned).
-      # It is also used for facets that have an exclude_form_field.
+      # Tagging is used to exclude the exclusion filter from the facet counts, so that excluded values are still
+      # returned for the facet.
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
-      facet_config.exclude || exclude ? "{!tag=#{facet_config.field}}#{query}" : query
+      exclude ? "{!tag=#{facet_config.field}}#{query}" : query
     end
 
     # Construct a facet filter query for the given dynamic facet configuration.
@@ -112,7 +111,7 @@ module Search
       query_parts << date_range_query_part if date_range_query_part.present?
       return if query_parts.empty?
 
-      query_parts.compact.join(' OR ')
+      query_parts.compact.join(' AND ')
     end
 
     def date_range_query_part(facet_config:)

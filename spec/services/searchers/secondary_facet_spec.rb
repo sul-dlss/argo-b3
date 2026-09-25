@@ -39,4 +39,23 @@ RSpec.describe Searchers::SecondaryFacet do
       expect(solr_query['rows']).to eq(0)
     end
   end
+
+  context 'with specific permission targets', :solr do
+    let(:user) { create(:user, :reader) }
+    let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let(:search_form) { ResultsSearchForm.new(query: 'Test', access_rights_exclude: ['dark']) }
+
+    before do
+      allow(Search::SolrService).to receive(:post).and_call_original
+      create(:solr_item)
+      create(:solr_item, apo_druid: restricted_apo_druid)
+      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
+    end
+
+    it 'retains authorization when a facet excludes its own selected filter' do
+      expect(results.total_results).to eq(0)
+      expect(results.solr_response.fetch('facets').fetch(Search::Fields::ACCESS_RIGHTS).fetch('buckets'))
+        .to eq([{ 'val' => 'dark', 'count' => 1 }, { 'val' => 'stanford', 'count' => 1 }])
+    end
+  end
 end
