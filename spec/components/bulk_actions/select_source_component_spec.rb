@@ -24,7 +24,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
 
   context 'when last search form is provided' do
     let(:search_form) { ResultsSearchForm.new(query: 'test') }
-    let(:total_results) { 42 }
+    let(:total_results) { 12_345 }
     let(:bulk_action_form) { BulkActions::BasicForm.new(source: 'results') }
 
     it 'renders the select source form with last search option' do
@@ -32,7 +32,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
 
       expect(page).to have_css('fieldset legend', text: 'Select source of items for bulk action')
       expect(page).to have_field('From last search', type: 'radio', checked: true)
-      expect(page).to have_css('p', text: '42 items for: "test"')
+      expect(page).to have_css('p', text: '12,345 items for: "test"')
 
       expect(page).to have_field('From druid list', type: 'radio', checked: false)
       expect(page).to have_field('Enter druid list', type: 'textarea')
