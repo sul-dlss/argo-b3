@@ -25,14 +25,15 @@ RSpec.describe Contents::Populators::FileSetPerFile do
     end
 
     context 'when there are multiple unassociated binaries' do
-      let!(:other_content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image2.tif') }
+      let!(:other_content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image10.tif') }
+      let!(:another_content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image0.tif') }
 
-      it 'creates a file set per binary, in creation order' do
+      it 'creates a file set per binary, in path order' do
         structure
 
         expect(content.content_file_sets.map { |file_set| file_set.content_files.sole.content_file_binary })
-          .to eq([content_file_binary, other_content_file_binary])
-        expect(content.content_file_sets.pluck(:position)).to eq([1, 2])
+          .to eq([another_content_file_binary, content_file_binary, other_content_file_binary])
+        expect(content.content_file_sets.pluck(:position)).to eq([1, 2, 3])
       end
     end
 
