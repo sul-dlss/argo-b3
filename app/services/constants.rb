@@ -15,6 +15,8 @@ module Constants # rubocop:disable Metrics/ModuleLength
     wasSeedPreassemblyWF
   ].freeze
 
+  DEFAULT_WORKFLOW = 'registrationWF'
+
   LICENSE_OPTIONS = [
     # CC4 licenses
     { label: 'CC Attribution 4.0 International',
