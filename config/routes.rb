@@ -198,6 +198,7 @@ Rails.application.routes.draw do
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
       get 'files', to: 'objects#show_files'
+      get 'constituents', to: 'objects#show_constituents'
     end
   end
 
