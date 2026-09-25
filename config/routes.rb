@@ -169,6 +169,7 @@ Rails.application.routes.draw do
                                                            controller: 'import_read_restricted_and_edit_permissions'
     resource :import_read_unrestricted_workgroups, only: %i[new create],
                                                    controller: 'import_read_unrestricted_workgroups'
+    resource :manage_collections, only: %i[new create], controller: 'manage_collections'
     resource :manage_embargo, only: %i[new create], controller: 'manage_embargo'
     resource :manage_content_type, only: %i[new create], controller: 'manage_content_type'
     resource :manage_license_and_rights_statements, only: %i[new create],
