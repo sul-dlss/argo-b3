@@ -18,6 +18,8 @@ RSpec.describe Search::FacetsBuilder do
       Search::Fields::OBJECT_TYPES,
       Search::Fields::ACCESS_RIGHTS
     )
+    expect(facet_json[Search::Fields::OBJECT_TYPES])
+      .to include(domain: { excludeTags: [Search::Fields::OBJECT_TYPES] })
     expect(facet_json[Search::Fields::ACCESS_RIGHTS])
       .to match({
                   field: Search::Fields::ACCESS_RIGHTS,

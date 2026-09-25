@@ -32,7 +32,7 @@ RSpec.describe Search::Serializer do
              'Last accessioned date: 2024-01-01 TO 2024-12-31 AND ' \
              'Last opened date: 2024-02-01 TO * AND ' \
              'Last published date: * TO 2024-11-30 AND ' \
-             'Object types: ("item" AND "collection") AND ' \
+             'Object types: ("item" OR "collection") AND ' \
              'Registered date: ("Last month" AND 2021-02-01 TO 2022-02-01)')
   end
 end

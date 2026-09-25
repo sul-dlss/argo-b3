@@ -31,19 +31,18 @@ RSpec.describe 'Current filters', :solr do
       click_button('Filter')
     end
 
-    # Values selected from the same facet are ANDed, and no object is both an item and an agreement.
-    expect(page).to have_current_filter('test')
-    expect(page).to have_current_filter('Object types', 'item')
-    expect(page).to have_current_filter('Object types', 'agreement')
-    expect(page).not_to have_item_result(item_doc)
-
-    within(find_current_filters_section) do
-      click_link('Remove Object types > agreement')
-    end
-
-    expect(page).to have_result_count(1)
+    # Values selected from the object types facet are ORed and displayed as a single current filter.
+    expect(page).to have_result_count(2)
     expect(page).to have_item_result(item_doc)
     expect(page).to have_current_filter('test')
-    expect(page).not_to have_current_filter('Object types', 'agreement', wait: 0)
+    expect(page).to have_current_filter('Object types', 'agreement OR item')
+
+    within(find_current_filters_section) do
+      click_link('Remove Object types > agreement OR item')
+    end
+
+    expect(page).to have_result_count(3)
+    expect(page).to have_current_filter('test')
+    expect(page).not_to have_current_filter('Object types', 'agreement OR item', wait: 0)
   end
 end

@@ -42,7 +42,8 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for object types' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::OBJECT_TYPES}:(\"dro\" AND \"collection\")")
+      expect(Array(result[:fq]))
+        .to include("{!tag=#{Search::Fields::OBJECT_TYPES}}#{Search::Fields::OBJECT_TYPES}:(\"dro\" OR \"collection\")")
     end
   end
 

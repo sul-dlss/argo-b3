@@ -266,7 +266,8 @@ The following will help illustrate the discovery system components involved for 
 
 Notes:
 * On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
-* Multiple values selected from the same facet are ANDed, including for checkbox, dynamic, and exclude selections. Facet counts therefore reflect the current selection. The one exception is excluded values, which remain listed so that they can be un-excluded.
+* By default, multiple values selected from the same facet are ANDed (including for dynamic and exclude selections), so facet counts reflect the current selection. Excluded values remain listed so that they can be un-excluded.
+* Facets configured with `operator: :or` (the checkbox facets, e.g., object types) OR their selected values instead. Their counts ignore the facet's own selection, so that all values remain selectable, and their selected values are displayed as a single current filter (e.g., "Object types ❯ item OR collection").
 * Putting Turbo stream replace elements directly in HTML is not a typical pattern for turbo streams.
 
 ### Debugging

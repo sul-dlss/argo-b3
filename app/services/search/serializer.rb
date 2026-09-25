@@ -63,7 +63,7 @@ module Search
       if values.one?
         "#{label}: #{'NOT ' if exclude}#{values.first}"
       else
-        "#{label}: #{'NOT ' if exclude}(#{values.join(' AND ')})"
+        "#{label}: #{'NOT ' if exclude}(#{values.join(" #{facet_config.operator.upcase} ")})"
       end
     end
 

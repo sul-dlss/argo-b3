@@ -167,5 +167,14 @@ RSpec.describe Searchers::Item do
       expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))
         .to eq([{ 'val' => 'book', 'count' => 1 }])
     end
+
+    it 'retains authorization when a facet excludes its own selected filter' do
+      results = described_class.call(search_form: ResultsSearchForm.new(query: 'Test', content_types: ['image']),
+                                     user_scope:)
+
+      expect(results.total_results).to eq(0)
+      expect(results.solr_response.fetch('facets').fetch(Search::Fields::CONTENT_TYPES).fetch('buckets'))
+        .to eq([{ 'val' => 'book', 'count' => 1 }])
+    end
   end
 end

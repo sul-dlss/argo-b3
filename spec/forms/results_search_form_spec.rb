@@ -149,19 +149,26 @@ RSpec.describe ResultsSearchForm do
     context 'when attributes are set' do
       subject(:form) { described_class.new(query: 'test') }
 
-      it 'returns current filters as attribute name/value pairs' do
-        expect(form.current_filters).to eq([%w[query test]])
+      it 'returns current filters as attribute name/values pairs' do
+        expect(form.current_filters).to eq([['query', ['test']]])
       end
     end
 
     context 'when facet attributes are set' do
-      it 'returns the current filters as attribute name/value pairs' do
+      it 'returns the current filters, grouping the values of ORed facets' do
         expect(form.current_filters).to contain_exactly(
-          %w[query test],
-          %w[object_types item],
-          %w[object_types collection],
-          ['projects', 'Project 1']
+          ['query', ['test']],
+          ['object_types', %w[item collection]],
+          ['projects', ['Project 1']]
         )
+      end
+    end
+
+    context 'when multiple values are set for an ANDed facet' do
+      subject(:form) { described_class.new(languages: %w[English German]) }
+
+      it 'returns a separate current filter for each value' do
+        expect(form.current_filters).to eq([['languages', ['English']], ['languages', ['German']]])
       end
     end
 
