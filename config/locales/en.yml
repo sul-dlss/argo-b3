@@ -42,17 +42,6 @@ en:
       # To hide banners, set to ''. Banners can include links or other HTML
       dashboard_html: >-
         Welcome to the new Argo application! View a demo of enhancements that have been developed.
-  object_types:
-    agreement:
-      label: "Agreement"
-    apo:
-      label: "APO"
-    collection:
-      label: "Collection"
-    item:
-      label: "Item"
-    virtual_object:
-      label: "Virtual object"
   pinned:
     pin_added: 'Pin added'
     pin_removed: 'Pin removed'
