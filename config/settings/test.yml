@@ -17,3 +17,6 @@ reload_intervals:
   bulk_actions_history: 500
   workflow_grid: 500
   multiple_items: 500
+
+mount_locations:
+  - <%= Rails.root.join('tmp') %>

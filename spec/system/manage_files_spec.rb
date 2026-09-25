@@ -55,6 +55,11 @@ RSpec.describe 'Manage files' do
     it 'reports that there are no files' do
       visit "/contents/#{druid}/edit"
 
+      within("turbo-frame[id^='show_content_']") do
+        expect(page).to have_css('p', text: 'No files yet')
+        expect(page).to have_no_css('li')
+      end
+
       click_on 'Structure'
 
       expect(page).to have_css('p', text: 'No files yet.')
@@ -213,6 +218,46 @@ RSpec.describe 'Manage files' do
       expect(ContentFileSet.exists?(original_content_file_set.id)).to be false
       expect(ContentFile.exists?(original_content_file.id)).to be false
       expect(content.content_files.map(&:filepath)).to eq(['dropzone_upload.txt', 'dropzone_upload2.txt'])
+    end
+  end
+
+  context 'when discovering files on a mount' do
+    let(:mount_path) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
+
+    before do
+      FileUtils.mkdir_p(File.join(mount_path, 'folder'))
+      FileUtils.cp(file_fixture('dropzone_upload.txt'), File.join(mount_path, 'folder/dropzone_upload.txt'))
+      allow(Settings.reload_intervals).to receive(:mount_discovery).and_return(100)
+    end
+
+    after do
+      FileUtils.rm_rf(mount_path)
+    end
+
+    it 'discovers the files' do
+      visit "/contents/#{druid}/edit"
+
+      choose 'Use files from mount'
+      fill_in 'Mount path', with: mount_path
+      click_button 'Discover files'
+
+      expect(page).to have_text('Discovering files...')
+
+      content = Content.find_by!(druid:)
+      expect(content.mount_state).to eq('discovering')
+
+      DiscoverFilesJob.perform_now(content:, mount_path:)
+
+      expect(page).to have_toast('Completed discovering files')
+      expect(page).to have_field('Mount path')
+      expect(page).to have_css('li', text: 'folder/dropzone_upload.txt')
+
+      click_on 'Structure'
+
+      expect(page).to have_css('p', text: 'There is 1 file that has not been added to the structure.')
+
+      expect(content.content_file_binaries.sole)
+        .to have_attributes(filepath: 'folder/dropzone_upload.txt', file_location: 'mount', mount_path:)
     end
   end
 end

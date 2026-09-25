@@ -5,64 +5,103 @@
 
   <% form_id = 'tabbed_form' %>
 
-  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @content, id: form_id) %>
+  <%# Note that this form isn't submittable yet. %>
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @content_form, url: '#', id: form_id) %>
 
   <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :add_files) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.add_files.label'), tab_name: :add_files) %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.structural.label'), tab_name: :structural) %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
-    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
-                                                                        label: t('edit.contents.tabs.add_files.label'))) do %>
-      <%= turbo_frame_tag @content, 'edit' do %>
-        <%= form_with model: @content,
-                      url: content_path(@content_token),
-                      data: {
-                        controller: 'dropzone',
-                        dropzone_max_filesize_value: Settings.file_upload.max_filesize,
-                        dropzone_dropzone_files_outlet: '.dropzone-files'
-                      }, id: 'file-dropzone', class: 'dropzone mb-3' do |form| %>
-          <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
-            <span data-dropzone-target="folderAlertText"></span>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
+    <% form_with(model: @content_form, url: '#', html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
+                                                                          label: t('edit.contents.tabs.add_files.label'))) do %>
+
+        <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+              label: t('edit.items.fields.file_choice.label'),
+              mark_required: true,
+              data: { controller: 'radio', action: 'turbo:frame-load->radio#refresh' }
+            ) do %>
+
+          <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+                form:,
+                field_name: :file_location_choice,
+                label_text: t('edit.items.fields.file_choice.upload.label'),
+                input_value: ContentForm::UPLOAD_FILE_LOCATION_CHOICE,
+                input_data: { radio_target: 'radio', action: 'radio#toggle' },
+                container_classes: 'my-fieldset'
+              ) do |component| %>
+            <% component.with_additional_container_content do %>
+              <%= form_with model: @content,
+                            url: content_dropzone_path(@content_token),
+                            data: {
+                              controller: 'dropzone',
+                              dropzone_max_filesize_value: Settings.file_upload.max_filesize,
+                              dropzone_dropzone_files_outlet: '.dropzone-files'
+                            }, id: 'file-dropzone', class: 'dropzone my-fieldset' do %>
+                <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
+                  <span data-dropzone-target="folderAlertText"></span>
+                  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
+                <% end %>
+                <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
+                <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
+                <div class="dz-message">
+                  <div class="fs-1"><%= cloud_upload_icon %></div>
+                  <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
+                  <div class="fs-5">or</div>
+                  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
+                </div>
+                <div id="dropzone-hidden-input-container"></div>
+              <% end %>
+            <% end %>
           <% end %>
-          <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
-          <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
-          <div class="dz-message">
-            <div class="fs-1"><%= cloud_upload_icon %></div>
-            <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
-            <div class="fs-5">or</div>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
-          </div>
-          <div id="dropzone-hidden-input-container"></div>
-      <% end %>
 
-      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
-
-      <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
-        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-      <% end %>
-    <% end %>
-                                                                          <% end %>
-    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
-                                                                        label: t('edit.contents.tabs.structural.label'))) do %>
-      <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
-        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-        <%# Until the structure section has loaded, assume there are unassociated files. %>
-        <span hidden data-unassociated-files-target="unassociated"></span>
-      <% end %>
-    <% end %>
-
-    <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
-                                                                        label: t('edit.contents.tabs.deposit.label'),
-                                                                        mark_required: true)) do %>
-      <div class="d-flex justify-content-end">
-        <%= form_with url: item_path(@content.druid), method: :patch do %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ItemsController::DRAFT_VALUE, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ItemsController::DEPOSIT_VALUE, data: { unassociated_files_target: 'submit' }) %>
+          <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+                form:,
+                field_name: :file_location_choice,
+                label_text: t('edit.items.fields.file_choice.mount.label'),
+                input_value: ContentForm::MOUNT_FILE_LOCATION_CHOICE,
+                input_data: { radio_target: 'radio', action: 'radio#toggle' },
+                container_classes: 'my-fieldset'
+              ) do |component| %>
+            <% component.with_additional_container_content do %>
+              <div class="my-fieldset">
+                <%= turbo_frame_tag @content, 'mount', src: new_content_mount_path(@content_token) do %>
+                  <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
         <% end %>
-      </div>
-    <% end %>
 
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.edit.files_section.label')) %>
+
+        <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
+          <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
+                                                                          label: t('edit.contents.tabs.structural.label'))) do %>
+        <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
+          <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+          <%# Until the structure section has loaded, assume there are unassociated files. %>
+          <span hidden data-unassociated-files-target="unassociated"></span>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.contents.tabs.deposit.label'),
+                                                                          mark_required: true)) do %>
+        <div class="d-flex justify-content-end">
+          <%= form_with url: item_path(@content.druid), method: :patch do %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ItemsController::DRAFT_VALUE, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ItemsController::DEPOSIT_VALUE, data: { unassociated_files_target: 'submit' }) %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

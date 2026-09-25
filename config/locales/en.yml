@@ -104,10 +104,16 @@ en:
   edit:
     contents:
       edit:
+        files_section:
+          label: 'Files'
         title: "Manage files"
         buttons:
           deposit: "Deposit"
+          discover_files: "Discover files"
           draft: "Save as draft"
+      mount:
+        toasts:
+          discovery_completed: "Completed discovering files"
       structure:
         unassociated_files:
           one: "There is 1 file that has not been added to the structure."
@@ -190,12 +196,23 @@ en:
             extra_rows: "Only one row of description is allowed."
             missing_title: "Title value not found."
             no_rows: "Description row not found."
+        file_choice:
+          label: 'Select how to upload files'
+          upload:
+            label: 'Upload files from computer'
+          mount:
+            label: 'Use files from mount'
         goobi:
           deposit: 'Deposit with Goobi'
         license:
           label: "License"
           label_caption: "Get help selecting a license"
           help_text: "Assigning a license may improve discovery of your work in web searches."
+        mount_path:
+          label: "Mount path"
+          validations:
+            not_found: "does not exist"
+            not_in_mount_location: "must be within a mount location"
         multiple_tags:
           label: 'Enter multiple tags'
           button: 'Add tags'

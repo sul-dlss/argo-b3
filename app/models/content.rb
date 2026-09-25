@@ -23,4 +23,14 @@ class Content < ApplicationRecord
       transition staging: :staging_not_in_progress
     end
   end
+
+  state_machine :mount_state, initial: :discovery_not_in_progress do
+    event :discovery_started do
+      transition discovery_not_in_progress: :discovering
+    end
+
+    event :discovery_completed do
+      transition discovering: :discovery_not_in_progress
+    end
+  end
 end

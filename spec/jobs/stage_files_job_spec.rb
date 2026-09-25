@@ -18,6 +18,10 @@ RSpec.describe StageFilesJob do
   let(:deposited_content_file_binary) do
     create(:content_file_binary, content:, file_location: 'deposited', filepath: 'image2.tif')
   end
+  let(:mount_content_file_binary) do
+    create(:content_file_binary, content:, file_location: 'mount', mount_path: file_fixture_path,
+                                 filepath: 'catalog_record_id_and_barcode.xlsx')
+  end
 
   let(:content_file_set) { create(:content_file_set, content:) }
 
@@ -27,6 +31,7 @@ RSpec.describe StageFilesJob do
     attached_content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
     create(:content_file, content_file_set:, content_file_binary: attached_content_file_binary, position: 1)
     create(:content_file, content_file_set:, content_file_binary: deposited_content_file_binary, position: 2)
+    create(:content_file, content_file_set:, content_file_binary: mount_content_file_binary, position: 3)
 
     allow(Contents::ExternalIdentifierMinter).to receive(:call)
     allow(Contents::Analyzer).to receive(:call)
@@ -51,17 +56,20 @@ RSpec.describe StageFilesJob do
       expect(Contents::ExternalIdentifierMinter).to have_received(:call).with(content:)
     end
 
-    it 'analyzes only the attached content file binaries' do
+    it 'analyzes only the attached and mount content file binaries' do
       job.perform(content:, user:)
 
       expect(Contents::Analyzer).to have_received(:call).with(content_file_binary: attached_content_file_binary)
+      expect(Contents::Analyzer).to have_received(:call).with(content_file_binary: mount_content_file_binary)
       expect(Contents::Analyzer).not_to have_received(:call).with(content_file_binary: deposited_content_file_binary)
     end
 
-    it 'stages only the attached content file binaries' do
+    it 'stages only the attached and mount content file binaries' do
       job.perform(content:, user:)
 
       expect(File.binread(staging_filepath)).to eq(attached_content_file_binary.file.download)
+      expect(File.binread(StagingSupport.staging_filepath(druid:, filepath: 'catalog_record_id_and_barcode.xlsx')))
+        .to eq(file_fixture('catalog_record_id_and_barcode.xlsx').binread)
       expect(File.exist?(StagingSupport.staging_filepath(druid:, filepath: 'image2.tif'))).to be false
     end
 
@@ -69,6 +77,7 @@ RSpec.describe StageFilesJob do
       job.perform(content:, user:)
 
       expect(attached_content_file_binary.reload.file_location).to eq('stage')
+      expect(mount_content_file_binary.reload.file_location).to eq('stage')
       expect(deposited_content_file_binary.reload.file_location).to eq('deposited')
     end
 

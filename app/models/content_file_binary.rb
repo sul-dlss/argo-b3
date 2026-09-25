@@ -31,13 +31,23 @@ class ContentFileBinary < ApplicationRecord
   validates :size, :md5_digest, :sha1_digest, :mime_type, presence: true, on: :deposit
   validates :file_location, inclusion: { in: %w[stage deposited] }, on: :deposit
 
+  validates :mount_path, presence: true, if: :file_location_mount?
+
   def filename
     FilenameSupport.filename(filepath:)
   end
 
   def filepath_on_disk
-    # Globus and mount to be added.
-    ActiveStorageSupport.filepath_for_blob(file.blob)
+    case file_location
+    when 'attached'
+      ActiveStorageSupport.filepath_for_blob(file.blob)
+    when 'mount'
+      File.join(mount_path, filepath)
+    when 'globus'
+      raise NotImplementedError
+    else
+      raise 'File is not on disk'
+    end
   end
 
   # @return [Boolean] true if the filepath includes directories (e.g., folder1/image1.tif)
