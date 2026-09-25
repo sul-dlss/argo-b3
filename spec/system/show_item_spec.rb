@@ -442,44 +442,49 @@ RSpec.describe 'Show item' do
     end
 
     # Pinning and unpinning the object
-    within('h1') do
-      expect(page).to have_css('.bi-pin')
-      expect(page).to have_no_css('.bi-pin-fill')
-      expect(page).to have_button('Pin')
-
-      click_button 'Pin'
-    end
-
-    expect(page).to have_toast('Pin added')
-    within('h1') do
-      expect(page).to have_css('.bi-pin-fill')
-      expect(page).to have_no_css('.bi-pin')
-      expect(page).to have_button('Unpin')
-
-      click_button 'Unpin'
-    end
-
-    expect(page).to have_toast('Pin removed')
-    within('h1') do
-      expect(page).to have_css('.bi-pin')
-      expect(page).to have_no_css('.bi-pin-fill')
-    end
-
-    # Pinning and unpinning a tag
-    within('.card', text: 'Tags') do
-      within('li', text: 'Ticket : TESTREQ-1') do
+    # Pin/unpin round-trips through a real request (Turbo morph refresh + turbo-stream
+    # toast), which is slower than the client-side-only interactions elsewhere in this
+    # spec, so give it more room than Capybara's default wait to avoid flakiness.
+    using_wait_time(10) do
+      within('h1') do
         expect(page).to have_css('.bi-pin')
         expect(page).to have_no_css('.bi-pin-fill')
+        expect(page).to have_button('Pin')
 
-        find('.bi-pin').click
+        click_button 'Pin'
       end
-    end
 
-    expect(page).to have_toast('Pin added')
-    within('.card', text: 'Tags') do
-      within('li', text: 'Ticket : TESTREQ-1') do
+      expect(page).to have_toast('Pin added')
+      within('h1') do
         expect(page).to have_css('.bi-pin-fill')
         expect(page).to have_no_css('.bi-pin')
+        expect(page).to have_button('Unpin')
+
+        click_button 'Unpin'
+      end
+
+      expect(page).to have_toast('Pin removed')
+      within('h1') do
+        expect(page).to have_css('.bi-pin')
+        expect(page).to have_no_css('.bi-pin-fill')
+      end
+
+      # Pinning and unpinning a tag
+      within('.card', text: 'Tags') do
+        within('li', text: 'Ticket : TESTREQ-1') do
+          expect(page).to have_css('.bi-pin')
+          expect(page).to have_no_css('.bi-pin-fill')
+
+          find('.bi-pin').click
+        end
+      end
+
+      expect(page).to have_toast('Pin added')
+      within('.card', text: 'Tags') do
+        within('li', text: 'Ticket : TESTREQ-1') do
+          expect(page).to have_css('.bi-pin-fill')
+          expect(page).to have_no_css('.bi-pin')
+        end
       end
     end
   end
