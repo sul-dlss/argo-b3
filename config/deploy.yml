@@ -70,8 +70,32 @@ volumes:
   - "/workspace/bulk:/workspace/bulk"
   - "/var/log/argo:/var/log/argo"
   - "/sdr-deposit-staging:/sdr-deposit-staging"
-  - "/globus:/globus"
   - "/data/argo-files:/data/argo-files"
+  # File locations in all environments
+  - "/globus:/globus"
+  - "/dor/staging:/dor/staging"
+  - "/gis_workflow_data:/gis_workflow_data"
+  - "/was_unaccessioned_data:/was_unaccessioned_data"
+  # File locations in prod only
+<% if ENV["KAMAL_DESTINATION"] == "prod" -%>
+  - "/ars:/ars"
+  - "/datasets:/datasets"
+  - "/dpgthumper2:/dpgthumper2"
+  - "/dpgthumper:/dpgthumper"
+  - "/evis:/evis"
+  - "/maps:/maps"
+  - "/pwrvault:/pwrvault"
+  - "/smpl2:/smpl2"
+  - "/spec1:/spec1"
+  - "/spec2:/spec2"
+  - "/spec3:/spec3"
+  - "/third_party:/third_party"
+  - "/thumpers/dpgthumper-se1:/thumpers/dpgthumper-se1"
+  - "/thumpers/dpgthumper-se2:/thumpers/dpgthumper-se2"
+  - "/thumpers/dpgthumper-staging:/thumpers/dpgthumper-staging"
+  - "/thumpers/dpgthumper2-se1:/thumpers/dpgthumper2-se1"
+  - "/thumpers/se9:/thumpers/se9"
+<% end -%>
 
 env:
   clear:
