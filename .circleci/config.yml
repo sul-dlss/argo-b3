@@ -19,6 +19,10 @@ workflows:
       - ruby-rails/test-rails:
           name: test
           context: dlss
+          # Postgres 15+ is required for NULLS NOT DISTINCT indexes in structure.sql.
+          executor:
+            name: ruby-rails/ruby-postgres
+            postgres-tag: '16.15'
           install-chrome: true
           parallelism: 4
           db-prepare-command: db:reset
