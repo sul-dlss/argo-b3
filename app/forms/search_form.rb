@@ -177,13 +177,17 @@ class SearchForm < ApplicationForm
     attributes.except(*self.class.non_query_attributes, 'query')
   end
 
-  # @return [Array<Array(String, String)>] current filters as attribute name/value pairs
+  # The values of a facet whose values are ORed are grouped into a single filter;
+  # otherwise, each value is a separate filter.
+  # @return [Array<Array(String, Array<String>)>] current filters as attribute name/values pairs
   def current_filters
     @current_filters ||= [].tap do |filters|
-      filters << ['query', query] if query.present?
+      filters << ['query', [query]] if query.present?
       facet_attributes.each do |attr_name, values|
-        Array(values).map do |value|
-          filters << [attr_name, value]
+        if Search::Facets.find_config_by_form_field(attr_name)&.operator == :or
+          filters << [attr_name, Array(values)]
+        else
+          Array(values).each { |value| filters << [attr_name, [value]] }
         end
       end
     end

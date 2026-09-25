@@ -92,12 +92,20 @@ module Search
       form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.send(form_field).blank?
 
-      values = search_form.send(form_field).map { |value| "\"#{RSolr.solr_escape(value)}\"" }.join(' AND ')
+      values = join_values(search_form.send(form_field), operator: facet_config.operator)
       query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
-      # Tagging is used to exclude the exclusion filter from the facet counts, so that excluded values are still
-      # returned for the facet.
+      # Tagging is used to exclude the filter from the facet counts.
+      # This is used for :or facets (so that all values for the facet are returned) and for exclusion filters
+      # (so that excluded values are still returned).
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
-      exclude ? "{!tag=#{facet_config.field}}#{query}" : query
+      exclude || facet_config.operator == :or ? "{!tag=#{facet_config.field}}#{query}" : query
+    end
+
+    # @param values [Array<String>] the selected facet values
+    # @param operator [Symbol] :and or :or
+    # @return [String] the quoted and escaped values joined with the operator
+    def join_values(values, operator:)
+      values.map { |value| "\"#{RSolr.solr_escape(value)}\"" }.join(" #{operator.upcase} ")
     end
 
     # Construct a facet filter query for the given dynamic facet configuration.

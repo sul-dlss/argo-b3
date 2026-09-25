@@ -37,6 +37,10 @@ module Search
                         :facet_children,
                         # True if the facet has a search endpoint. If true, search will be enabled.
                         :facet_search,
+                        # How multiple selected values for the facet are combined: :and or :or.
+                        # An :or facet's counts ignore the facet's own selection (see FacetBuilder), so that all
+                        # of its values remain selectable. This is used, for example, for a checkbox facet.
+                        :operator,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
                         :dynamic_facet,
@@ -54,7 +58,7 @@ module Search
     end
 
     def Config.with_defaults(**)
-      defaults = { alpha_sort: false, limit: 100,
+      defaults = { alpha_sort: false, limit: 100, operator: :and,
                    facet_index: false, facet_children: false, facet_search: false }
       new(**defaults, **)
     end
@@ -192,13 +196,15 @@ module Search
     CONTENT_TYPES = Config.with_defaults(
       form_field: :content_types,
       field: Search::Fields::CONTENT_TYPES,
-      limit: 25
+      limit: 25,
+      operator: :or
     )
 
     FILE_ROLES = Config.with_defaults(
       form_field: :file_roles,
       field: Search::Fields::FILE_ROLES,
-      limit: 20
+      limit: 20,
+      operator: :or
     )
 
     FORMATS = Config.with_defaults(
@@ -239,13 +245,15 @@ module Search
 
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
-      field: Search::Fields::OBJECT_TYPES
+      field: Search::Fields::OBJECT_TYPES,
+      operator: :or
     )
 
     PROCESSING_STATUSES = Config.with_defaults(
       form_field: :processing_statuses,
       field: Search::Fields::PROCESSING_STATUS,
-      limit: 10
+      limit: 10,
+      operator: :or
     )
 
     PROJECTS = Config.with_defaults(
