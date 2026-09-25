@@ -7,7 +7,7 @@ module Search
 
     # @param result [SearchResults::Item]
     def initialize(result:, pinned_object_druids:)
-      @result = result
+      @result = SolrDocPresenter.new(solr_doc: result.solr_doc, index: result.index)
       @pinned_object_druids = pinned_object_druids
       super()
     end

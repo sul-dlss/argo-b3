@@ -12,6 +12,22 @@ RSpec.describe SolrDocPresenter do
     }
   end
 
+  describe '#object_type_label' do
+    let(:object_type) { 'virtual object' }
+
+    it 'returns the display label for the object type' do
+      expect(presenter.object_type_label).to eq('Virtual object')
+    end
+  end
+
+  describe '#object_type_class' do
+    let(:object_type) { 'APO' }
+
+    it 'returns the CSS class for the object type' do
+      expect(presenter.object_type_class).to eq('object-type-apo')
+    end
+  end
+
   describe '#collection?' do
     context 'when the object type is collection' do
       let(:object_type) { 'collection' }
