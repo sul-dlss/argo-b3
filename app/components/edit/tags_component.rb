@@ -23,14 +23,6 @@ module Edit
       ".#{TAG_FIELDS_CLASS}"
     end
 
-    def text_area_id
-      form.field_id(:multiple_tags)
-    end
-
-    def help_text_id
-      form.field_id(:multiple_tags, :help)
-    end
-
     # Maps each has_many field name to the legend of the section it is rendered under, so that the
     # controller can announce where the tags went using the labels the user can see.
     def section_labels

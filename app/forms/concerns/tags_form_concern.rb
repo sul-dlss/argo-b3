@@ -11,6 +11,8 @@ module TagsFormConcern
     has_many :other_tags
     has_many :project_tags
     has_many :ticket_tags
+    # only used for text entry; text is parsed and added to the tag fields above
+    attribute :multiple_tags, :string
 
     after_validation :populate_tags
   end

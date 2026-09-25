@@ -2,23 +2,20 @@
                     multiple_tags_has_many_outlet: tag_fields_selector,
                     multiple_tags_section_labels_value: section_labels } do %>
   <div class="my-fieldset">
-    <%= tag.label t('edit.items.fields.multiple_tags.label'), for: text_area_id, class: 'form-label fw-bold' %>
-
-    <%= render SdrViewComponents::Forms::HelpTextComponent.new(id: help_text_id,
-                                                               text: t('edit.items.fields.multiple_tags.help_text')) %>
-
-    <%# Deliberately not bound to the form object and intentionally without a name: this is a
-        client-side convenience that is parsed into the sections below and must never be submitted. %>
-    <%= tag.textarea nil, id: text_area_id, rows: 3, class: 'form-control',
-                          aria: { describedby: help_text_id },
-                          data: { multiple_tags_target: 'input' } %>
+    <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
+                                                               field_name: :multiple_tags,
+                                                               label_text: t('edit.items.fields.multiple_tags.label'),
+                                                               label_classes: 'fw-bold',
+                                                               help_text: t('edit.items.fields.multiple_tags.help_text'),
+                                                               input_rows: 3,
+                                                               input_data: { multiple_tags_target: 'input' }) %>
 
     <%= render SdrViewComponents::Elements::ButtonComponent.new(label: t('edit.items.fields.multiple_tags.button'),
                                                                 variant: :'outline-primary',
                                                                 classes: 'mt-2',
                                                                 data: { action: 'multiple-tags#add' }) %>
 
-    <%= tag.div nil, class: 'visually-hidden', role: 'status', data: { multiple_tags_target: 'status' } %>
+    <%= tag.div class: 'visually-hidden', role: 'status', data: { multiple_tags_target: 'status' } %>
   </div>
 
   <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: other_tag_label) do %>
