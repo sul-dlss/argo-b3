@@ -14,8 +14,8 @@ RSpec.describe Search::FacetSearchComponent, type: :component do
                              '"/search/tag_facets/search?query=test&tags%5B%5D=test+%3A+tag"]')
     expect(page).to have_field('Search these tags', type: 'text')
     expect(page).to have_css("form[action='/search'][method='get']")
-    expect(page).to have_field('search[query]', with: 'test', type: 'hidden')
-    expect(page).to have_field('search[tags][]', with: 'test : tag', type: 'hidden')
+    expect(page).to have_field('query', with: 'test', type: 'hidden')
+    expect(page).to have_field('tags[]', with: 'test : tag', type: 'hidden')
   end
 
   context 'when no facet_search_path_helper is provided' do

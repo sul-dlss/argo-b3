@@ -25,7 +25,7 @@ RSpec.describe Search::FormComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css("form[action='/search']")
-      expect(page).to have_field('search[projects][]', type: :hidden, with: 'Google Books')
+      expect(page).to have_field('projects[]', type: :hidden, with: 'Google Books')
       expect(page).to have_field('Search for', type: :search, with: 'test')
     end
   end

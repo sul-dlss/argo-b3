@@ -14,7 +14,7 @@ RSpec.describe WorkflowGrid::ResetButtonComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('form[action="/workflow_grid/reset?process_name=update-doi&workflow_name=accessionWF"]')
-    expect(page).to have_field('search[query]', with: 'test', type: 'hidden')
+    expect(page).to have_field('query', with: 'test', type: 'hidden')
     expect(page).to have_button('Reset', type: 'submit')
   end
 
