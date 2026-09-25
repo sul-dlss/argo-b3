@@ -20,7 +20,7 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
     expect(page).to have_css('section[aria-label="Object types"] h3', text: 'Object types')
 
     expect(page).to have_css('form[action="/search"][method="get"]')
-    expect(page).to have_field('search[query]', with: 'test', type: 'hidden')
+    expect(page).to have_field('query', with: 'test', type: 'hidden')
     expect(page).to have_field('collection', type: 'checkbox', checked: true)
     expect(page).to have_field('item', type: 'checkbox', checked: false)
     check_section = page.first('.facet-values .form-check')

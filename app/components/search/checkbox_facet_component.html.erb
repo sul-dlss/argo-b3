@@ -1,5 +1,5 @@
 <%= render Search::FacetSectionComponent.new(label:, show: search_form.selected?(key: form_field)) do %>
-  <%= helpers.form_with model: search_form, scope: :search, url: url_for(search_form.class.new), method: :get, class: 'facet-values' do |form| %>
+  <%= helpers.form_with model: search_form, scope: '', url: url_for(search_form.class.new), method: :get, class: 'facet-values' do |form| %>
     <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field:) %>
     <%= render Search::CheckboxFacetInputComponent.with_collection(facet_counts, search_form:, form_field:, form_builder: form) %>
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter', variant: :primary,

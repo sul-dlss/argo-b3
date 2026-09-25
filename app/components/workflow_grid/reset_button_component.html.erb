@@ -1,4 +1,4 @@
-<%= helpers.form_with model: search_form, scope: :search, url: path do |form| %>
+<%= helpers.form_with model: search_form, scope: '', url: path do |form| %>
   <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:) %>
 | <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Reset', variant: :link, classes: 'text-danger mx-0 px-1') %>
 <% end %>

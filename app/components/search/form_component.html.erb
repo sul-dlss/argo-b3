@@ -2,7 +2,7 @@
   <nav aria-label="Search form" class="container py-2 mb-3">
     <!-- From component library: https://sul-dlss.github.io/component-library/forms/ -->
     <search class="search-card d-flex position-relative flex-column py-2 rounded">
-      <%= helpers.form_with model: search_form, scope: :search, url:, method: :get, class: 'search-query-form col-md-12 col-lg-8' do |form| %>
+      <%= helpers.form_with model: search_form, scope: '', url:, method: :get, class: 'search-query-form col-md-12 col-lg-8' do |form| %>
         <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :query) %>
         <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
                                                                 field_name: :object_types,
@@ -15,7 +15,7 @@
                                                                              options: object_type_options,
                                                                              prompt: 'All object types',
                                                                              # Hack to use a single select (instead of multiselect) submitting to an array field.
-                                                                             name: 'search[object_types][]') %>
+                                                                             name: 'object_types[]') %>
 
           <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
                                                                   field_name: :query,
