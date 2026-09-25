@@ -3,16 +3,6 @@
 module BulkActions
   # Controller for update governing APO bulk action.
   class UpdateGoverningApoController < BulkActionApplicationController
-    def new
-      set_apo_options
-      super
-    end
-
-    def create
-      set_apo_options
-      super
-    end
-
     private
 
     def bulk_action_config
@@ -27,7 +17,7 @@ module BulkActions
       }
     end
 
-    def set_apo_options
+    def set_form_options
       @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
     end
   end

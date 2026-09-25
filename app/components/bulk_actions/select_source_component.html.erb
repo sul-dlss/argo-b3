@@ -6,7 +6,7 @@
                                                                 input_value: 'results', input_disabled: !last_search?, input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
     <%= component.with_additional_container_content do %>
       <% if last_search? %>
-        <p><%= total_results %> items for: <%= search_form.to_s %></p>
+        <p><%= number_with_delimiter(total_results) %> items for: <%= search_form.to_s %></p>
       <% end %>
     <% end %>
   <% end %>

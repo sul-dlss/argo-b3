@@ -47,4 +47,21 @@ RSpec.describe 'Create a new add workflow bulk action' do
         .to have_been_enqueued.with(druids:, bulk_action:, workflow_name: 'goobiWF', close_version: true)
     end
   end
+
+  context 'when no druids are provided' do
+    it 'shows validation errors' do
+      visit new_bulk_actions_add_workflow_path
+
+      expect(page).to have_css('h1', text: bulk_action_label)
+
+      select 'goobiWF', from: 'Workflow'
+      choose 'From druid list' # but don't enter any druids!
+
+      click_button 'Submit'
+
+      expect(page).to have_current_path(new_bulk_actions_add_workflow_path)
+
+      expect(page).to have_invalid_feedback('Enter druid list', 'can\'t be blank')
+    end
+  end
 end

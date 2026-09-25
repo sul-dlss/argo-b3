@@ -3,12 +3,11 @@
 module BulkActions
   # Controller for add workflow bulk action.
   class AddWorkflowController < BulkActionApplicationController
-    def new
-      super
+    private
+
+    def set_form_options
       @workflow_options = (Constants::WORKFLOWS - %w[accessionWF registrationWF]).map { |workflow| [workflow, workflow] }
     end
-
-    private
 
     def bulk_action_config
       BulkActions::ADD_WORKFLOW
