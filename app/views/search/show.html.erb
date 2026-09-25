@@ -26,7 +26,9 @@
         <% end %>
       <% end %>
 
-      <%= turbo_frame_tag 'items-search', src: search_items_path(@search_form.attributes) do %>
+      <%= turbo_frame_tag 'items-search', src: search_items_path(@search_form.attributes),
+                                          data: { controller: 'frame-url',
+                                                  action: 'turbo:frame-load->frame-url#updateURL' } do %>
         <%= render Search::LoadingItemResultsComponent.new if @search_form.present? %>
       <% end %>
 

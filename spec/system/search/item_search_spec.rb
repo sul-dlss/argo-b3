@@ -81,6 +81,14 @@ RSpec.describe 'Item search', :solr do
 
           expect(page).to have_current_results_page(2)
         end
+
+        expect(page).to have_current_path(%r{/search\?.*page=2})
+
+        visit page.current_url
+
+        within('turbo-frame#items-search') do
+          expect(page).to have_current_results_page(2)
+        end
       end
 
       it 'verifies sort options' do
@@ -103,6 +111,14 @@ RSpec.describe 'Item search', :solr do
           click_link_or_button('Registered date (descending)')
           expect(page).to have_button('Sort by Registered date (descending)')
           expect(page).to have_result_count(11)
+        end
+
+        expect(page).to have_current_path(%r{/search\?.*sort=registered_date_desc})
+
+        visit page.current_url
+
+        within(find_item_results_section) do
+          expect(page).to have_button('Sort by Registered date (descending)')
         end
       end
     end
