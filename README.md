@@ -276,6 +276,7 @@ The following will help illustrate the discovery system components involved for 
 
 Notes:
 * On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
+* Multiple values selected from the same facet are ANDed, including for checkbox, dynamic, and exclude selections. Facet counts therefore reflect the current selection. The one exception is excluded values, which remain listed so that they can be un-excluded.
 * Putting Turbo stream replace elements directly in HTML is not a typical pattern for turbo streams.
 
 ### Debugging
@@ -329,13 +330,6 @@ Note:
 
 ### Composite (label + druid) facets
 Some facets need to filter on a unique identifier (a druid) but display a human-friendly, searchable label (a title) — e.g., the APO and Collections facets. A title isn't unique, so faceting directly on the display value of the facet (like most facets do) would be ambiguous. Instead, DSA indexes a composite Solr field whose values are `"<label>:<druid>"` (see`Indexing::CompositeFacetValue` in dor-services-app), and the APO and Collection facet (and links) are built using that composite field.
-
-### Rendering all of the values for a facet
-1. Set `exclude: true` in the configuration constant in `Search::Facets`.
-
-Note:
-* The default is to only return the facet values for items that match the query.
-* This is a good candidate for a `Search::CheckboxFacetComponent`, e.g., for object types.
 
 ### Making a facet hierarchical
 1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:tag_facets`. This should provide the `children` route.

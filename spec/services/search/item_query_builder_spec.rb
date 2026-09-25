@@ -42,7 +42,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct filter query for object types' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("{!tag=#{Search::Fields::OBJECT_TYPES}}#{Search::Fields::OBJECT_TYPES}:(\"dro\" OR \"collection\")") # rubocop:disable Layout/LineLength
+      expect(Array(result[:fq])).to include("#{Search::Fields::OBJECT_TYPES}:(\"dro\" AND \"collection\")")
     end
   end
 
@@ -52,6 +52,15 @@ RSpec.describe Search::ItemQueryBuilder do
     it 'builds the correct filter query for access rights' do
       result = described_class.call(search_form:, user_scope:)
       expect(Array(result[:fq])).to include("#{Search::Fields::ACCESS_RIGHTS}:(\"dark\")")
+    end
+  end
+
+  context 'with multiple languages (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English German]) }
+
+    it 'ANDs the values in the filter query' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::LANGUAGES}:(\"English\" AND \"German\")")
     end
   end
 
@@ -91,13 +100,23 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with multiple access rights exclude (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(access_rights_exclude: %w[dark world]) }
+
+    it 'ANDs the values in the tagged filter query' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq]))
+        .to include("{!tag=#{Search::Fields::ACCESS_RIGHTS}}-#{Search::Fields::ACCESS_RIGHTS}:(\"dark\" AND \"world\")")
+    end
+  end
+
   context 'with released to earthworks (dynamic facet)' do
     let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[last_year never]) }
 
     it 'builds the correct filter query for released to earthworks' do
       result = described_class.call(search_form:, user_scope:)
       expect(Array(result[:fq]))
-        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO *]) OR " \
+        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO *]) AND " \
                     "(-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *])")
     end
   end

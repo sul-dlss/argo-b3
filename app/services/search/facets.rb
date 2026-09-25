@@ -37,11 +37,6 @@ module Search
                         :facet_children,
                         # True if the facet has a search endpoint. If true, search will be enabled.
                         :facet_search,
-                        # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
-                        # See FacetBuilder.
-                        # This is used, for example, for a checkbox facet like object types.
-                        # Exclude is also true if exclude_form_field is provided, but does not need to be set here.
-                        :exclude,
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
                         :dynamic_facet,
@@ -59,7 +54,7 @@ module Search
     end
 
     def Config.with_defaults(**)
-      defaults = { alpha_sort: false, limit: 100, exclude: false,
+      defaults = { alpha_sort: false, limit: 100,
                    facet_index: false, facet_children: false, facet_search: false }
       new(**defaults, **)
     end
@@ -197,15 +192,13 @@ module Search
     CONTENT_TYPES = Config.with_defaults(
       form_field: :content_types,
       field: Search::Fields::CONTENT_TYPES,
-      limit: 25,
-      exclude: true
+      limit: 25
     )
 
     FILE_ROLES = Config.with_defaults(
       form_field: :file_roles,
       field: Search::Fields::FILE_ROLES,
-      limit: 20,
-      exclude: true
+      limit: 20
     )
 
     FORMATS = Config.with_defaults(
@@ -246,15 +239,13 @@ module Search
 
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
-      field: Search::Fields::OBJECT_TYPES,
-      exclude: true
+      field: Search::Fields::OBJECT_TYPES
     )
 
     PROCESSING_STATUSES = Config.with_defaults(
       form_field: :processing_statuses,
       field: Search::Fields::PROCESSING_STATUS,
-      limit: 10,
-      exclude: true
+      limit: 10
     )
 
     PROJECTS = Config.with_defaults(
