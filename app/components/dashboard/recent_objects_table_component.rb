@@ -4,7 +4,7 @@ module Dashboard
   # Render the object show pages most recently visited by the user.
   class RecentObjectsTableComponent < ApplicationComponent
     def initialize(recent_object_docs:)
-      @recent_object_docs = recent_object_docs
+      @recent_object_docs = recent_object_docs.map { |object_doc| SolrDocPresenter.new(solr_doc: object_doc.solr_doc) }
       super()
     end
 
