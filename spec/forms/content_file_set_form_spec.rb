@@ -150,4 +150,67 @@ RSpec.describe ContentFileSetForm do
       end
     end
   end
+
+  describe '#destroy' do
+    it 'deletes the file set, its files, and their unreferenced binaries' do
+      form.destroy
+
+      expect(ContentFileSet.exists?(content_file_set.id)).to be false
+      expect(ContentFile.where(id: [content_file.id, other_content_file.id])).to be_empty
+      expect(ContentFileBinary.where(id: [content_file.content_file_binary_id,
+                                          other_content_file.content_file_binary_id])).to be_empty
+      expect(form.content_file_binaries_destroyed?).to be true
+    end
+
+    context 'when a file shares its binary with another file set' do
+      let(:other_content_file_set) { create(:content_file_set, content:, position: 2) }
+
+      before do
+        create(:content_file, content_file_set: other_content_file_set,
+                              content_file_binary: content_file.content_file_binary)
+      end
+
+      it 'keeps the shared binary' do
+        form.destroy
+
+        expect(ContentFileBinary.exists?(content_file.content_file_binary_id)).to be true
+        expect(ContentFileBinary.exists?(other_content_file.content_file_binary_id)).to be false
+      end
+    end
+
+    context 'when the file set has no files' do
+      let(:content_file_set) { create(:content_file_set, content:) }
+      let!(:content_file) { nil }
+      let!(:other_content_file) { nil }
+
+      it 'deletes the file set' do
+        form.destroy
+
+        expect(ContentFileSet.exists?(content_file_set.id)).to be false
+        expect(form.content_file_binaries_destroyed?).to be false
+      end
+    end
+
+    context 'when a file has been staged' do
+      let(:staging_filepath) do
+        StagingSupport.staging_filepath(druid: content.druid, filepath: content_file.content_file_binary.filepath)
+      end
+
+      before do
+        content_file.content_file_binary.update!(file_location: 'stage')
+        FileUtils.mkdir_p(File.dirname(staging_filepath))
+        FileUtils.touch(staging_filepath)
+      end
+
+      after do
+        FileUtils.rm_f(staging_filepath)
+      end
+
+      it 'deletes the staged file' do
+        form.destroy
+
+        expect(File.exist?(staging_filepath)).to be false
+      end
+    end
+  end
 end

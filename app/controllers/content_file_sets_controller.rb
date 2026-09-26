@@ -3,8 +3,9 @@
 # Controller for showing and editing a file set (resource) of a content
 class ContentFileSetsController < ContentsApplicationController
   # Authorization is coming from the verified content_id token.
-  skip_verify_authorized only: %i[update edit show]
-  before_action :set_content_file_set_and_counter
+  skip_verify_authorized only: %i[update edit show destroy]
+  before_action :set_content_file_set
+  before_action :set_counter, except: :destroy
 
   def show
     @files_deleted = params[:files_deleted] == 'true' # Triggers a reload of files sections.
@@ -26,6 +27,11 @@ class ContentFileSetsController < ContentsApplicationController
     end
   end
 
+  def destroy
+    ContentFileSetForm.from_model(@content_file_set).destroy
+    render_destroyed
+  end
+
   private
 
   # The resource no longer exists, so the files sections (including the structure) are reloaded.
@@ -41,12 +47,15 @@ class ContentFileSetsController < ContentsApplicationController
     redirect_to content_content_file_set_path(@content_token, @content_file_set, counter: @counter, files_deleted:)
   end
 
-  def set_content_file_set_and_counter
+  def set_content_file_set
     @content_token = params[:content_id]
     verified_content_id = verify_token(@content_token)
     @content_file_set = ContentFileSet.find(params.expect(:id))
-    @counter = params.expect(:counter).to_i
     forbidden_access if @content_file_set.content_id != verified_content_id
+  end
+
+  def set_counter
+    @counter = params.expect(:counter).to_i
   end
 
   def content_file_set_params

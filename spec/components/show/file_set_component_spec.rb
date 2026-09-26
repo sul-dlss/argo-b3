@@ -84,4 +84,26 @@ RSpec.describe Show::FileSetComponent, type: :component do
       expect(page).to have_no_css('.card-title', text: 'Label:')
     end
   end
+
+  it 'does not render edit or delete buttons' do
+    render_inline(component)
+
+    expect(page).to have_no_link('Edit resource 2')
+    expect(page).to have_no_button('Delete resource 2')
+  end
+
+  context 'when a content token is provided' do
+    let(:component) { described_class.new(content_file_set:, content_file_set_counter: 1, content_token: 'abc123') }
+    let(:content_file_set) { create(:content_file_set) }
+
+    it 'renders a delete button that confirms' do
+      render_inline(component)
+
+      expect(page).to have_css("form[action='/contents/abc123/content_file_sets/#{content_file_set.id}']" \
+                               "[data-turbo-confirm='Delete resource 2 and its files?']")
+      expect(page).to have_css('input[name="_method"][value="delete"]', visible: :hidden)
+      expect(page).to have_button('Delete resource 2')
+      expect(page).to have_no_css('form[data-turbo-frame="_top"]')
+    end
+  end
 end

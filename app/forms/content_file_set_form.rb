@@ -31,10 +31,20 @@ class ContentFileSetForm < ApplicationForm
       destroy_content_file_set_if_all_files_removed
       destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
     end
-    @content_file_binaries_destroyed = destroyed_content_file_binaries.any?
-    # Staged files are deleted after commit, since deleting a file cannot be rolled back.
-    FileUtils.rm_f(staging_filepaths_for(destroyed_content_file_binaries))
+    after_commit_destroying(content_file_binaries: destroyed_content_file_binaries)
     true
+  end
+
+  # Deletes the resource and its files, as well as their binaries (including any staged copies)
+  # when no other file references them. Unlike save, this also deletes a resource that has no files.
+  def destroy
+    destroyed_content_file_binaries = ActiveRecord::Base.transaction do
+      # Captured before destroying, since destroying the resource destroys the files.
+      content_file_binary_ids = content_file_set.content_files.pluck(:content_file_binary_id)
+      content_file_set.destroy!
+      destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
+    end
+    after_commit_destroying(content_file_binaries: destroyed_content_file_binaries)
   end
 
   # @return [Boolean] true if the save deleted the resource
@@ -93,6 +103,12 @@ class ContentFileSetForm < ApplicationForm
                                              .includes(:content)
                                              .to_a
     content_file_binaries.each(&:destroy!)
+  end
+
+  # Staged files are deleted after commit, since deleting a file cannot be rolled back.
+  def after_commit_destroying(content_file_binaries:)
+    @content_file_binaries_destroyed = content_file_binaries.any?
+    FileUtils.rm_f(staging_filepaths_for(content_file_binaries))
   end
 
   # @return [Array<String>] the staging filepaths of the binaries that had been staged

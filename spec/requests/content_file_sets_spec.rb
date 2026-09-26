@@ -94,4 +94,35 @@ RSpec.describe 'Content file sets' do
       end
     end
   end
+
+  describe 'destroy' do
+    before do
+      create(:content_file, content_file_set:)
+    end
+
+    it 'deletes the resource and reloads the files sections' do
+      delete content_content_file_set_path(content_token, content_file_set),
+             headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include(
+        %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
+      )
+      expect(response.body).to include('data-controller="dropzone-files-reload"')
+      expect(response.body).to include('Resource deleted')
+      expect(ContentFileSet.exists?(content_file_set.id)).to be false
+    end
+
+    context 'when the file set belongs to a different content' do
+      let(:other_content) { create(:content, druid: 'druid:df456gh7890') }
+      let(:content_token) { Rails.application.message_verifier(:argo).generate(other_content.id, purpose: 'contents') }
+
+      it 'returns forbidden' do
+        delete content_content_file_set_path(content_token, content_file_set)
+
+        expect(response).to have_http_status(:forbidden)
+        expect(ContentFileSet.exists?(content_file_set.id)).to be true
+      end
+    end
+  end
 end
