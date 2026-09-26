@@ -135,6 +135,23 @@ en:
           label: "Structure"
         deposit:
           label: "Deposit"
+    content_file_sets:
+      all_files_removed: 'Saving will delete this resource.'
+      buttons:
+        remove_file: 'Remove %{filepath}'
+      fields:
+        content_files:
+          mime_type:
+            label: 'MIME type'
+          use:
+            label: 'Role'
+        file_set_type:
+          label: 'Resource type'
+        label:
+          label: 'Label'
+      toasts:
+        deleted: 'Resource deleted'
+        updated: 'Resource updated'
     items:
       new:
         title: "Register an item"

@@ -3,8 +3,6 @@
 module CocinaObjectMutators
   # Mutator for rebuilding a Cocina DRO's structural.contains from a Content.
   class StructuralMutator
-    FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
-
     def self.call(...)
       new(...).call
     end
@@ -51,7 +49,7 @@ module CocinaObjectMutators
 
     def build_file_set(content_file_set)
       {
-        type: "#{FILE_SET_TYPE_PREFIX}#{content_file_set.file_set_type}",
+        type: "#{Constants::FILE_SET_TYPE_PREFIX}#{content_file_set.file_set_type}",
         externalIdentifier: content_file_set.external_identifier,
         label: content_file_set.label,
         version: cocina_object.version,

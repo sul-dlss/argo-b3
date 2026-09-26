@@ -120,6 +120,9 @@ module Constants # rubocop:disable Metrics/ModuleLength
   CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| uri.split('/').last }.freeze
 
   # content types selectable by the user on a registration form
+  # Prefix of Cocina FileSet types; ContentFileSet#file_set_type is stored without it.
+  FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
+
   REGISTRATION_CONTENT_TYPES = {
     'book' => Cocina::Models::ObjectType.book,
     'file' => Cocina::Models::ObjectType.object,

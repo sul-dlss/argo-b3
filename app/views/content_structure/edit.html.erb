@@ -37,7 +37,13 @@
         <% end %>
       </div>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
-      <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, classes: 'mb-2') %>
+      <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
+        <div class='mb-2'>
+          <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>
+            <%= render Show::FileSetComponent.new(content_file_set:, content_token: @content_token, content_file_set_counter: index) %>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
