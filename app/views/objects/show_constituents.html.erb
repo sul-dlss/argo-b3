@@ -1,0 +1,23 @@
+<%= turbo_frame_tag(@druid, 'constituents') do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: "Items in this virtual object (#{@constituents.size})", classes: 'mb-3') %>
+
+  <%= render SdrViewComponents::Tables::TableComponent.new(
+        label: 'Items in this virtual object',
+        show_label: false,
+        empty_message: 'This virtual object has no constituent items.',
+        responsive: true
+      ) do |component| %>
+    <% component.with_header(label: 'Title') %>
+    <% component.with_header(label: 'Druid') %>
+    <% @constituents.each do |title, druid| %>
+      <% component.with_row do |row_component| %>
+        <% row_component.with_cell do %>
+          <%= link_to_object title, druid %>
+        <% end %>
+        <% row_component.with_cell do %>
+          <%= DruidSupport.bare_druid_from(druid) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
