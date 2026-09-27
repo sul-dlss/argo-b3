@@ -6,6 +6,20 @@
                                                      data: { action: 'content-files#remove' }) %>
     </div>
     <%= form.hidden_field :_destroy, data: { content_files_target: 'destroy' } %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.content_file_sets.fields.content_files.access.label'),
+                                                               classes: 'my-fieldset') do %>
+      <%= render Edit::AccessRightsComponent.new(form:, citation_only: false, container_classes: 'my-field') %>
+    <% end %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.content_file_sets.fields.content_files.administrative.label'),
+                                                               mark_required: true,
+                                                               classes: 'my-fieldset') do %>
+      <% ContentFileForm::ADMINISTRATIVE_OPTIONS.each do |administrative_option| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :administrative,
+                                                                      input_value: administrative_option,
+                                                                      label_text: t("edit.content_file_sets.fields.content_files.administrative.options.#{administrative_option}")) %>
+      <% end %>
+      <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :administrative_options) %>
+    <% end %>
     <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :use,
                                                                 label_text: t('edit.content_file_sets.fields.content_files.use.label'),
                                                                 label_classes: 'fw-bold',

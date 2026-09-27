@@ -31,6 +31,14 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_css('[data-controller="content-files"] [data-content-files-target="row"]', count: 1)
     expect(page).to have_css('.card[data-content-files-target="row"] .card-title .h4', text: 'image1.tif')
     expect(page).to have_field('Role', with: 'transcription')
+    expect(page).to have_css('fieldset legend', text: 'Administrative') { |legend| legend.has_css?('span.required') }
+    expect(page).to have_checked_field('Publish and preserve')
+    expect(page).to have_unchecked_field('Publish only')
+    expect(page).to have_unchecked_field('Preserve only')
+    expect(page).to have_select('View access', selected: 'World',
+                                               options: ['World', 'Dark', 'Stanford', 'Location Based'])
+    expect(page).to have_select('Download access', selected: 'World')
+    expect(page).to have_select('Location')
     expect(page).to have_field('MIME type', with: 'image/tiff')
     expect(page).to have_css('label', text: 'MIME type') { |label| label.has_css?('span.required') }
     expect(page).to have_field("#{field_prefix}[id]", with: content_file.id, type: :hidden)

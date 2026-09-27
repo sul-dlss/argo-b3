@@ -143,6 +143,14 @@ en:
         remove_file: 'Remove %{filepath}'
       fields:
         content_files:
+          access:
+            label: 'Access'
+          administrative:
+            label: 'Administrative'
+            options:
+              preserve_only: 'Preserve only'
+              publish_and_preserve: 'Publish and preserve'
+              publish_only: 'Publish only'
           mime_type:
             label: 'MIME type'
           use:
