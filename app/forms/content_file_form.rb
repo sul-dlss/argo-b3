@@ -10,7 +10,7 @@ class ContentFileForm < ApplicationForm
   # NOTE: A file that is being deleted does not need to be valid so some validation
   # are limited to marked_for_destruction?
 
-  inherit_attributes_from ContentFile, only: %i[id use view download location]
+  inherit_attributes_from ContentFile, only: %i[id use view download location language_tag]
   # Stored on the ContentFileBinary, so shared by every file that references the binary.
   attribute :mime_type, :string
   # For display only; not editable.
@@ -19,7 +19,7 @@ class ContentFileForm < ApplicationForm
   attribute :administrative, :string
   validate :validate_administrative, unless: :marked_for_destruction?
 
-  normalizes_whitespace :use, :mime_type
+  normalizes_whitespace :use, :mime_type, :language_tag
 
   validates :mime_type, presence: true, unless: :marked_for_destruction?
   validate :validate_access, unless: :marked_for_destruction?

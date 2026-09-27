@@ -148,10 +148,15 @@ en:
               publish_only: 'Publish only'
             validations:
               required: 'must be selected'
+          language_tag:
+            label: 'Language'
+            placeholder: 'Select or enter a language'
           mime_type:
             label: 'MIME type'
+            placeholder: 'Select or enter a MIME type'
           use:
             label: 'Role'
+            placeholder: 'Select or enter a role'
         file_set_type:
           label: 'Resource type'
         label:
