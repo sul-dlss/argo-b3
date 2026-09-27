@@ -1,0 +1,4 @@
+<%= turbo_frame_tag @content_file_set do %>
+  <%= render Elements::FlashToastComponent.new %>
+  <%= render Show::FileSetComponent.new(content_file_set: @content_file_set, content_token: @content_token, content_file_set_counter: @counter) %>
+<% end %>

@@ -221,6 +221,34 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when editing a resource' do
+    let(:content) { Content.find_by!(druid:) }
+
+    def build_structure_then_edit_resource
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+
+      click_link('Edit resource 1')
+    end
+
+    it 'updates the role of a file' do
+      build_structure_then_edit_resource
+
+      fill_in 'Role', with: 'transcription'
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource updated')
+      expect(page).to have_css('td', text: 'Transcription')
+      expect(content.content_files.sole.use).to eq('transcription')
+    end
+  end
+
   context 'when discovering files on a mount' do
     let(:mount_path) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
 

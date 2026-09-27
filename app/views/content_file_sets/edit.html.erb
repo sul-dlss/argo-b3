@@ -1,0 +1,3 @@
+<%= turbo_frame_tag @content_file_set do %>
+  <%= render Edit::FileSetComponent.new(content_file_set_form: @content_file_set_form, content_token: @content_token, counter: @counter) %>
+<% end %>
