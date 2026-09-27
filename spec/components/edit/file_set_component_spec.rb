@@ -10,7 +10,7 @@ RSpec.describe Edit::FileSetComponent, type: :component do
 
   let(:field_prefix) { 'content_file_set[content_files_attributes][0]' }
   let!(:content_file) do
-    create(:content_file, content_file_set:, use: 'transcription',
+    create(:content_file, content_file_set:, use: 'transcription', language_tag: 'en',
                           content_file_binary: create(:content_file_binary, content: content_file_set.content,
                                                                             mime_type: 'image/tiff'))
   end
@@ -40,6 +40,7 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_select('Download access', selected: 'World')
     expect(page).to have_select('Location')
     expect(page).to have_field('MIME type', with: 'image/tiff')
+    expect(page).to have_field('Language', with: 'en')
     expect(page).to have_css('label', text: 'MIME type') { |label| label.has_css?('span.required') }
     expect(page).to have_field("#{field_prefix}[id]", with: content_file.id, type: :hidden)
     expect(page).to have_field("#{field_prefix}[_destroy]", with: 'false', type: :hidden)

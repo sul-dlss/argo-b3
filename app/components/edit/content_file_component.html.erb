@@ -20,14 +20,8 @@
       <% end %>
       <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :administrative_options) %>
     <% end %>
-    <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :use,
-                                                                label_text: t('edit.content_file_sets.fields.content_files.use.label'),
-                                                                label_classes: 'fw-bold',
-                                                                container_classes: 'my-field') %>
-    <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :mime_type,
-                                                                label_text: t('edit.content_file_sets.fields.content_files.mime_type.label'),
-                                                                label_mark_required: true,
-                                                                label_classes: 'fw-bold',
-                                                                container_classes: 'my-field') %>
+    <%= render Edit::UseComponent.new(form:) %>
+    <%= render Edit::MimeTypeComponent.new(form:) %>
+    <%= render Edit::LanguageTagComponent.new(form:) %>
   </div>
 <% end %>

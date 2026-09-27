@@ -29,6 +29,13 @@ RSpec.describe ContentFileSetForm do
       expect(content_file.content_file_binary.mime_type).to eq('image/jp2')
     end
 
+    it 'updates the language of a file' do
+      form.assign_attributes(content_files_attributes: [{ id: content_file.id, language_tag: ' en-US ' }])
+
+      expect(form.save).to be true
+      expect(content_file.reload.language_tag).to eq('en-US')
+    end
+
     it 'normalizes a blank use to nil' do
       form.assign_attributes(content_files_attributes: [{ id: content_file.id, use: ' ' }])
 

@@ -151,10 +151,15 @@ en:
               preserve_only: 'Preserve only'
               publish_and_preserve: 'Publish and preserve'
               publish_only: 'Publish only'
+          language_tag:
+            label: 'Language'
+            placeholder: 'Select or enter a language'
           mime_type:
             label: 'MIME type'
+            placeholder: 'Select or enter a MIME type'
           use:
             label: 'Role'
+            placeholder: 'Select or enter a role'
         file_set_type:
           label: 'Resource type'
         label:

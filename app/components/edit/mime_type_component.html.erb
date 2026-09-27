@@ -1,0 +1,8 @@
+<%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :mime_type,
+                                                              options:,
+                                                              prompt: t('edit.content_file_sets.fields.content_files.mime_type.placeholder'),
+                                                              label_text: t('edit.content_file_sets.fields.content_files.mime_type.label'),
+                                                              label_mark_required: true,
+                                                              label_classes: 'fw-bold',
+                                                              input_data: { controller: 'creatable-select' },
+                                                              container_classes: 'my-field') %>

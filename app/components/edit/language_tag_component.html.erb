@@ -1,0 +1,7 @@
+<%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :language_tag,
+                                                              options:,
+                                                              prompt: t('edit.content_file_sets.fields.content_files.language_tag.placeholder'),
+                                                              label_text: t('edit.content_file_sets.fields.content_files.language_tag.label'),
+                                                              label_classes: 'fw-bold',
+                                                              input_data: { controller: 'creatable-select' },
+                                                              container_classes: 'my-field') %>
