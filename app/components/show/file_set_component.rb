@@ -33,5 +33,9 @@ module Show
     def edit_path
       edit_content_content_file_set_path(@content_token, content_file_set, counter:)
     end
+
+    def delete_path
+      content_content_file_set_path(@content_token, content_file_set)
+    end
   end
 end

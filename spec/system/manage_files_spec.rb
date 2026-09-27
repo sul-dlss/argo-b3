@@ -247,6 +247,46 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('td', text: 'Transcription')
       expect(content.content_files.sole.use).to eq('transcription')
     end
+
+    it 'deletes the resource' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+
+      accept_confirm('Delete resource 1 and its files?') do
+        click_button 'Delete resource 1'
+      end
+
+      expect(page).to have_toast('Resource deleted')
+      # The structure is reloaded and the deleted file's binary is gone.
+      expect(page).to have_css('p', text: 'No files yet.')
+      expect(content.content_file_sets).to be_empty
+      expect(content.content_file_binaries).to be_empty
+    end
+
+    it 'deletes the resource when every file is removed' do
+      build_structure_then_edit_resource
+
+      content_file_binary = content.content_file_binaries.sole
+
+      expect(page).to have_no_text('Saving will delete this resource.')
+      click_button 'Remove dropzone_upload.txt'
+      expect(page).to have_no_field('Role')
+      expect(page).to have_text('Saving will delete this resource.')
+
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource deleted')
+      # The structure is reloaded and the deleted file's binary is gone.
+      expect(page).to have_css('p', text: 'No files yet.')
+      expect(content.content_file_sets).to be_empty
+      expect(ContentFileBinary.exists?(content_file_binary.id)).to be false
+    end
   end
 
   context 'when discovering files on a mount' do

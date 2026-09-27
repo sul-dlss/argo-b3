@@ -17,6 +17,15 @@
             <span class="fw-bold">Label:</span> <%= label %>
           </div>
         <% end %>
+        <% if editable? %>
+          <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path,
+                                                                              icon: :delete,
+                                                                              label: t('edit.content_file_sets.buttons.delete', index:),
+                                                                              method: :delete,
+                                                                              confirm: t('edit.content_file_sets.buttons.delete_confirm', index:),
+                                                                              top: false,
+                                                                              classes: 'ms-2') %>
+        <% end %>
       </div>
     </div>
     <div class="card-body">
