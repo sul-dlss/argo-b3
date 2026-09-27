@@ -73,4 +73,15 @@ RSpec.describe Edit::AccessRightsComponent, type: :component do
       expect(page).to have_css('select[data-access-rights-target="location"]')
     end
   end
+
+  context 'when citation-only is excluded' do
+    let(:component) { described_class.new(form:, citation_only: false) }
+    let(:manage_rights_form) { BulkActions::ManageRightsForm.new }
+
+    it 'renders the view access select without citation-only' do
+      render_inline(component)
+
+      expect(page).to have_select('View access', options: ['World', 'Dark', 'Stanford', 'Location Based'])
+    end
+  end
 end

@@ -5,8 +5,6 @@ module Contents
   # object's structural metadata. Cocina files that share the same filename within the Content are
   # deduplicated into a single ContentFileBinary, referenced by multiple ContentFiles.
   class Builder
-    FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
-
     # Adding in batches with insert_all! is much faster than individual creates.
     BATCH_SIZE = 1000
 
@@ -61,7 +59,7 @@ module Contents
       {
         content_id: content.id,
         position:,
-        file_set_type: cocina_file_set.type.delete_prefix(FILE_SET_TYPE_PREFIX),
+        file_set_type: cocina_file_set.type.delete_prefix(Constants::FILE_SET_TYPE_PREFIX),
         label: cocina_file_set.label,
         external_identifier: cocina_file_set.externalIdentifier
       }
