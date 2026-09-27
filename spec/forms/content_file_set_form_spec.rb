@@ -136,6 +136,84 @@ RSpec.describe ContentFileSetForm do
       end
     end
 
+    it 'updates the access rights of a file' do
+      form.assign_attributes(content_files_attributes: [{ id: content_file.id, view: 'stanford',
+                                                          download: 'stanford' }])
+
+      expect(form.save).to be true
+      expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford', location: nil)
+    end
+
+    it 'updates location-based access rights of a file' do
+      form.assign_attributes(content_files_attributes: [{ id: content_file.id, view: 'location-based',
+                                                          download: 'none', location: 'spec' }])
+
+      expect(form.save).to be true
+      expect(content_file.reload).to have_attributes(view: 'location-based', download: 'none', location: 'spec')
+    end
+
+    context 'when the access rights change from location-based and no location is submitted' do
+      before do
+        content_file.update!(view: 'location-based', download: 'location-based', location: 'spec')
+        form.assign_attributes(content_files_attributes: [{ id: content_file.id, view: 'world', download: 'world' }])
+      end
+
+      it 'clears the location' do
+        expect(form.save).to be true
+        expect(content_file.reload).to have_attributes(view: 'world', download: 'world', location: nil)
+      end
+    end
+
+    context 'when the view is citation-only' do
+      before do
+        form.assign_attributes(content_files_attributes: [{ id: content_file.id, view: 'citation-only',
+                                                            download: 'none' }])
+      end
+
+      it 'is invalid and does not save' do
+        expect(form.save).to be false
+
+        expect(form.errors.attribute_names).to include(:'content_files[0].view')
+        expect(content_file.reload.view).to eq('world')
+      end
+    end
+
+    {
+      'publish_and_preserve' => { publish: true, preserve: true, shelve: true },
+      'publish_only' => { publish: true, preserve: false, shelve: true },
+      'preserve_only' => { publish: false, preserve: true, shelve: false }
+    }.each do |administrative, expected_attributes|
+      it "saves publish, preserve, and shelve for #{administrative}" do
+        form.assign_attributes(content_files_attributes: [{ id: content_file.id, administrative: }])
+
+        expect(form.save).to be true
+        expect(content_file.reload).to have_attributes(expected_attributes)
+      end
+    end
+
+    context 'when a file is neither published nor preserved' do
+      before do
+        content_file.update!(publish: false, preserve: false, shelve: false)
+      end
+
+      it 'has no administrative option and is invalid until one is selected' do
+        expect(form.content_files[0].administrative).to be_nil
+
+        form.assign_attributes(label: 'New label')
+
+        expect(form.save).to be false
+        expect(form.errors.attribute_names).to include(:'content_files[0].administrative_options')
+        expect(content_file_set.reload.label).to eq('Original label')
+      end
+
+      it 'can be deleted without selecting an option' do
+        form.assign_attributes(content_files_attributes: [{ id: content_file.id, _destroy: 'true' }])
+
+        expect(form.save).to be true
+        expect(ContentFile.exists?(content_file.id)).to be false
+      end
+    end
+
     context 'when a mime type is blank' do
       before do
         form.assign_attributes(label: 'New label', content_files_attributes: [{ id: content_file.id, mime_type: ' ' }])

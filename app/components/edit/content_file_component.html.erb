@@ -6,6 +6,11 @@
                                                      data: { action: 'content-files#remove' }) %>
     </div>
     <%= form.hidden_field :_destroy, data: { content_files_target: 'destroy' } %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.content_file_sets.fields.content_files.access.label'),
+                                                               classes: 'my-fieldset') do %>
+      <%= render Edit::AccessRightsComponent.new(form:, citation_only: false, container_classes: 'my-field') %>
+    <% end %>
+    <%= render Edit::FileAdministrativeComponent.new(form:, container_classes: 'my-fieldset') %>
     <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :use,
                                                                 label_text: t('edit.content_file_sets.fields.content_files.use.label'),
                                                                 label_classes: 'fw-bold',
