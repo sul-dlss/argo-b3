@@ -13,6 +13,16 @@ RSpec.describe Edit::ContentTypeComponent, type: :component do
     expect(page).to have_select('Content type', selected: 'image', options: Constants::REGISTRATION_CONTENT_TYPES.keys)
   end
 
+  context 'with input data' do
+    let(:component) { described_class.new(form:, input_data: { action: 'change->my-controller#toggle' }) }
+
+    it 'adds the data to the select' do
+      render_inline(component)
+
+      expect(page).to have_css('select[data-action="change->my-controller#toggle"]')
+    end
+  end
+
   it 'applies the container classes' do
     render_inline(component)
 

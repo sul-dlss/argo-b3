@@ -31,6 +31,7 @@ class ItemsRegistrationForm < ApplicationForm
   CSV_REQUIRED_HEADERS = %w[source_id].freeze
 
   attribute :deposit_with_goobi, :boolean, default: false
+  before_validation :normalize_deposit_with_goobi
 
   attribute :items_choice, :string, default: ENTER_EACH_CHOICE
 
@@ -70,6 +71,11 @@ class ItemsRegistrationForm < ApplicationForm
   end
 
   private
+
+  # Only some content types may be deposited with Goobi.
+  def normalize_deposit_with_goobi
+    self.deposit_with_goobi = false unless Constants::GOOBI_CONTENT_TYPES.include?(content_type)
+  end
 
   # Replaces the item registrations with ones parsed from the tab-delimited items.
   # Rows with fewer than TAB_DELIMITED_FIELDS.size values leave the trailing fields blank (and so will
