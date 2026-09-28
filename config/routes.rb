@@ -212,6 +212,7 @@ Rails.application.routes.draw do
     resource :structure, only: %i[edit update], controller: 'content_structure'
 
     resources :content_file_sets, only: %i[edit update show destroy]
+    resources :content_file_binaries, only: %i[destroy]
   end
 
   resources :collection_options, only: %i[index], defaults: { format: :json }

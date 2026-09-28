@@ -10,6 +10,7 @@ class ContentMountController < ContentsApplicationController
       flash[:toast] = t('edit.contents.mount.toasts.discovery_completed')
       redirect_to new_content_mount_path(@content_token, files_discovered: true)
     else
+      @discovery_started = params[:discovery_started] == 'true' # Triggers a reload of files section.
       render layout: false
     end
   end
@@ -26,7 +27,7 @@ class ContentMountController < ContentsApplicationController
     if @mount_form.valid?
       @content.discovery_started!
       DiscoverFilesJob.perform_later(content: @content, mount_path: @mount_form.path)
-      redirect_to content_mount_path(@content_token)
+      redirect_to content_mount_path(@content_token, discovery_started: true)
     else
       render :new, layout: false, status: :unprocessable_content
     end

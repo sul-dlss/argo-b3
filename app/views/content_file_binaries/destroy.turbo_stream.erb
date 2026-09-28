@@ -1,0 +1,5 @@
+<%= render Elements::FlashToastComponent.new %>
+<%# Reloading the files sections also reloads the structure, which no longer includes the deleted files. %>
+<%= turbo_stream.append dom_id(@content, :show) do %>
+  <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: '.dropzone-files' } %>
+<% end %>

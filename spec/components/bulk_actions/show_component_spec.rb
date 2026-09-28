@@ -162,18 +162,19 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       File.write(bulk_action.export_filepath(:tracking_sheets), 'PDF content')
     end
 
-    it 'renders a row for each export file and a table only for the shown export' do
+    it 'renders a download link for each export file and a tab only for the shown export' do
       render_inline(component)
 
-      table = page.find('table#bulk-action-details-table')
-      expect(table).to have_css('tr:nth-of-type(5) th', text: 'Registration report')
-      expect(table).to have_css('tr:nth-of-type(5) td a', text: 'registration_report.csv')
-      expect(table).to have_css('tr:nth-of-type(6) th', text: 'Tracking sheets')
-      expect(table).to have_css(
-        "tr:nth-of-type(6) td a[href='/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf'][download]",
-        text: 'tracking_sheets.pdf'
+      downloads_box = page.find('h2', text: 'Downloads').ancestor('.card')
+      expect(downloads_box).to have_link('Registration report',
+                                         href: "/bulk_actions/#{bulk_action.id}/file?filename=registration_report.csv")
+      expect(downloads_box).to have_css(
+        "a[href='/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf'][download]",
+        text: 'Tracking sheets'
       )
 
+      expect(page).to have_button('Registration report', class: 'active')
+      expect(page).to have_no_button('Tracking sheets')
       expect(page).to have_table('bulk-action-registration-report-table')
       expect(page).to have_no_table('bulk-action-tracking-sheets-table')
     end
