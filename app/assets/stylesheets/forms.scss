@@ -16,6 +16,11 @@
     margin-bottom: $spacer;
   }
 
+  // Bootstrap only fades a radio or checkbox label that follows its disabled input.
+  fieldset:disabled .form-check-label {
+    opacity: $form-check-label-disabled-opacity;
+  }
+
   .form-label ~ span {
     margin-left: $spacer;
   }

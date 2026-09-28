@@ -204,6 +204,36 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
+    it 'disables the choice to deposit with Goobi unless the content type is book or image' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+      choose 'Yes'
+
+      select 'map', from: 'Content type'
+      expect(page).to have_field('Yes', type: 'radio', checked: true, disabled: true)
+      expect(page).to have_field('No', type: 'radio', disabled: true)
+
+      select 'book', from: 'Content type'
+      expect(page).to have_field('Yes', type: 'radio', checked: true, disabled: false)
+      expect(page).to have_field('No', type: 'radio', disabled: false)
+
+      select 'map', from: 'Content type'
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(deposit_with_goobi: false)
+      )
+    end
+
     # Turbo renders a redirect's HTML before updating the URL to the redirect target, so the
     # scheduled-refresh controller on the bulk action page connects while the URL is still the
     # multiple items URL. Refreshes must keep working after that.

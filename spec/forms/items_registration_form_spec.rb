@@ -8,6 +8,30 @@ RSpec.describe ItemsRegistrationForm do
     allow(CatalogRepository).to receive(:exists?).and_return(true)
   end
 
+  describe 'deposit with Goobi' do
+    let(:form) { described_class.new(content_type:, deposit_with_goobi: true) }
+
+    context 'when the content type may be deposited with Goobi' do
+      let(:content_type) { Cocina::Models::ObjectType.book }
+
+      it 'retains the choice to deposit with Goobi' do
+        form.valid?
+
+        expect(form.deposit_with_goobi).to be true
+      end
+    end
+
+    context 'when the content type may not be deposited with Goobi' do
+      let(:content_type) { Cocina::Models::ObjectType.map }
+
+      it 'does not deposit with Goobi' do
+        form.valid?
+
+        expect(form.deposit_with_goobi).to be false
+      end
+    end
+  end
+
   describe 'validation of item_registrations' do
     context 'when some item registrations are blank and some are not' do
       let(:form) do

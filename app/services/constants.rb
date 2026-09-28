@@ -117,6 +117,12 @@ module Constants # rubocop:disable Metrics/ModuleLength
     Cocina::Models::ObjectType.image
   ].freeze
 
+  # content types that may be deposited with Goobi
+  GOOBI_CONTENT_TYPES = [
+    Cocina::Models::ObjectType.book,
+    Cocina::Models::ObjectType.image
+  ].freeze
+
   CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| uri.split('/').last }.freeze
 
   # content types selectable by the user on a registration form
