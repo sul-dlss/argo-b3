@@ -275,7 +275,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   )
 
   REGISTER_EXPORTS = [
-    Export.new(key: :registration_report, filename: 'registration_report.csv', label: 'Registration report', show: true)
+    Export.new(key: :registration_report, filename: 'registration_report.csv', label: 'Registration report',
+               show: true),
+    Export.new(key: :tracking_sheets, filename: 'tracking_sheets.pdf', label: 'Tracking sheets')
   ].freeze
 
   REGISTER_CSV = Config.new(

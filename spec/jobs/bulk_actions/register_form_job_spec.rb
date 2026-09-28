@@ -37,10 +37,14 @@ RSpec.describe BulkActions::RegisterFormJob do
   end
 
   let(:csv_filepath) { "#{bulk_action.output_directory}/registration_report.csv" }
+  let(:pdf) { instance_double(Prawn::Document, render_file: nil) }
 
   before do
     allow(Sdr::Repository).to receive(:register).and_return(first_cocina_object, second_cocina_object)
     allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+    allow(Sdr::Repository).to receive(:find_solr) { |druid:| { Search::Fields::ID => druid } }
+    allow(TracksheetService).to receive(:call).and_return(pdf)
+    allow(Honeybadger).to receive(:notify)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -93,6 +97,51 @@ RSpec.describe BulkActions::RegisterFormJob do
         "bc123df4567,,,sul:1234,A title\n" \
         "dj123qx4568,36105212345678,in11403803,sul:5678,Another title\n"
       )
+    end
+
+    it 'writes the tracking sheets for the registered objects' do
+      job.perform_now
+
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters.map(&:druid)).to eq ['druid:bc123df4567', 'druid:dj123qx4568']
+      end
+      expect(pdf).to have_received(:render_file).with(bulk_action.export_filepath(:tracking_sheets))
+    end
+  end
+
+  context 'when fetching the Solr document for a tracking sheet fails' do
+    before do
+      allow(Sdr::Repository).to receive(:find_solr).with(druid: 'druid:bc123df4567')
+                                                   .and_raise(Sdr::Repository::NotFoundResponse, 'Object not found')
+    end
+
+    it 'logs the error and writes the tracking sheets for the remaining objects' do
+      job.perform_now
+
+      expect(log).to have_received(:puts)
+        .with(/druid:bc123df4567\tError: Unable to create tracking sheet: Sdr::Repository::NotFoundResponse/)
+      expect(Honeybadger).to have_received(:notify).with(Sdr::Repository::NotFoundResponse)
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters.map(&:druid)).to eq ['druid:dj123qx4568']
+      end
+      expect(bulk_action.druid_count_success).to eq 2
+      expect(bulk_action.druid_count_fail).to eq 0
+    end
+  end
+
+  context 'when rendering the tracking sheets fails' do
+    before do
+      allow(pdf).to receive(:render_file).and_raise(StandardError, 'disk full')
+    end
+
+    it 'logs the error without failing the registrations' do
+      job.perform_now
+
+      expect(log).to have_received(:puts).with(/Error: Unable to create tracking sheets: StandardError disk full/)
+      expect(Honeybadger).to have_received(:notify).with(StandardError)
+      expect(bulk_action.druid_count_success).to eq 2
+      expect(bulk_action.druid_count_fail).to eq 0
+      expect(bulk_action).to be_completed
     end
   end
 
@@ -157,6 +206,7 @@ RSpec.describe BulkActions::RegisterFormJob do
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 2
       expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\n")
+      expect(TracksheetService).not_to have_received(:call)
     end
   end
 
@@ -179,6 +229,9 @@ RSpec.describe BulkActions::RegisterFormJob do
 
       expect(Sdr::Repository).to have_received(:register).once
       expect(log).to have_received(:puts).with(/line 1\t\tError: ActiveModel::ValidationError/)
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters.map(&:druid)).to eq ['druid:bc123df4567']
+      end
       expect(bulk_action.druid_count_success).to eq 1
       expect(bulk_action.druid_count_fail).to eq 1
     end
