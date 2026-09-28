@@ -70,7 +70,8 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
     let(:export_content) do
       "Druid,Barcode,Folio Instance HRID,Source Id,Title\n" \
         "druid:bc123df4567,36105111111111,a1234,sul:1,First title\n" \
-        ",,,sul:2,Second title\n"
+        ",,,sul:2,Second title\n" \
+        "hj456kl7890,,,sul:3,Third title\n"
     end
     let(:bulk_action) do
       create(:bulk_action, :with_export,
@@ -91,13 +92,37 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(table).to have_css('thead th:nth-of-type(3)', text: 'Folio Instance HRID')
       expect(table).to have_css('thead th:nth-of-type(4)', text: 'Source Id')
       expect(table).to have_css('thead th:nth-of-type(5)', text: 'Title')
-      expect(table).to have_css('tbody tr', count: 2)
+      expect(table).to have_css('tbody tr', count: 3)
       expect(table).to have_css('tbody tr:nth-of-type(1) td', count: 5)
-      expect(table).to have_css('tbody tr:nth-of-type(1) td:nth-of-type(1)', text: 'druid:bc123df4567')
+      expect(table).to have_css("tbody tr:nth-of-type(1) td:nth-of-type(1) a[href='/objects/druid:bc123df4567']",
+                                text: 'druid:bc123df4567')
       expect(table).to have_css('tbody tr:nth-of-type(1) td:nth-of-type(5)', text: 'First title')
       # The druid is blank for a failed registration, but the row still has a cell for every column.
       expect(table).to have_css('tbody tr:nth-of-type(2) td', count: 5)
       expect(table).to have_css('tbody tr:nth-of-type(2) td:nth-of-type(5)', text: 'Second title')
+      expect(table).to have_no_css('tbody tr:nth-of-type(2) td:nth-of-type(1) a')
+      # A bare druid is linked as a full druid.
+      expect(table).to have_css("tbody tr:nth-of-type(3) td:nth-of-type(1) a[href='/objects/druid:hj456kl7890']",
+                                text: 'druid:hj456kl7890')
+    end
+  end
+
+  context 'when the export has a lowercase druid header' do
+    let(:export_content) { "druid,Title\ndruid:mn789pq1234,First title\n" }
+    let(:bulk_action) do
+      create(:bulk_action, :with_export,
+             action_type: :register_csv,
+             status: :completed,
+             export_content:)
+    end
+
+    it 'links the druid to the object show page' do
+      render_inline(component)
+
+      table = page.find('table#bulk-action-registration-report-table')
+      expect(table).to have_css("tbody td:nth-of-type(1) a[href='/objects/druid:mn789pq1234']",
+                                text: 'druid:mn789pq1234')
+      expect(table).to have_no_css('tbody td:nth-of-type(2) a')
     end
   end
 end

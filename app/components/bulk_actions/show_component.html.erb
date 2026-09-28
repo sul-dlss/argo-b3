@@ -33,7 +33,7 @@
         <% component.with_header(label: header) %>
       <% end %>
       <% export_csv.each do |row| %>
-        <% component.with_row(values: row.fields) %>
+        <% component.with_row(values: export_row_values(row)) %>
       <% end %>
     <% end %>
   <% end %>

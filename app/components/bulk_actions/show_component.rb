@@ -40,6 +40,16 @@ module BulkActions
       CSV.parse(File.read(bulk_action.export_filepath(export.key)), headers: true)
     end
 
+    # @return [Array<String>] the row's cell values, with druid column values linked to the object show page
+    def export_row_values(row)
+      row.map do |header, value|
+        next value unless header&.casecmp?('druid') && value.present?
+
+        druid = DruidSupport.prefixed_druid_from(value.strip)
+        helpers.link_to_object(druid, druid)
+      end
+    end
+
     def export_table_id(export)
       "bulk-action-#{export.key.to_s.dasherize}-table"
     end
