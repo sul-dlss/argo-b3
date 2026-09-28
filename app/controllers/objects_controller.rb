@@ -108,7 +108,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_constituents
     @druid = verified_druid
-    @constituents = object_titles(Array(cocina_object.structural.hasMemberOrders.first&.members))
+    @constituents = object_rows(Array(cocina_object.structural.hasMemberOrders.first&.members))
 
     render layout: false
   end
@@ -219,12 +219,19 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
       Contents::Builder.call(cocina_object:)
   end
 
+  # Looks up titles/permissions of given druids without filtering by view permission, so that an object
+  # can be shown for every constituent object even when the user is not permitted to link to some of them.
   # @param druids [Array] the list of druids to look up
-  # @return [Array<Array(String, String)>] [title, druid] pairs, in the given order
-  def object_titles(druids)
-    fields = [Search::Fields::ID, Search::Fields::TITLE]
-    docs_by_druid = Searchers::ItemByDruid.call(druids:, user_scope: current_user_scope, fields:).index_by(&:druid)
-    druids.filter_map { |druid| docs_by_druid[druid] }.map { |doc| [doc.title, doc.druid] }
+  # @return [Array<Array(String, String, Boolean)>] [title, druid, viewable] tuples, in the given order
+  def object_rows(druids)
+    fields = [Search::Fields::ID, Search::Fields::TITLE, Search::Fields::COLLECTION_DRUIDS, Search::Fields::APO_DRUID]
+    docs_by_druid = Searchers::ItemByDruid.call(druids:, user_scope: nil, fields:).index_by(&:druid)
+    druids.filter_map do |druid|
+      doc = docs_by_druid[druid]
+      next unless doc
+
+      [doc.title, doc.druid, allowed_to?(:show?, doc, with: ObjectPolicy)]
+    end
   end
 
   def druid_param

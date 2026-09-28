@@ -51,21 +51,25 @@ RSpec.describe 'Show constituents' do
     }
   end
 
+  let(:restricted_apo_druid) { 'druid:fh940mz2717' }
+
   before do
-    sign_in(create(:user))
+    sign_in(create(:user, :reader))
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(Searchers::ItemByDruid).to receive(:call).and_return(
       [
         SearchResults::Item.new(solr_doc: { Search::Fields::ID => first_constituent_druid,
                                             Search::Fields::TITLE => 'Constituent one' }),
         SearchResults::Item.new(solr_doc: { Search::Fields::ID => second_constituent_druid,
-                                            Search::Fields::TITLE => 'Constituent two' })
+                                            Search::Fields::TITLE => 'Constituent two',
+                                            Search::Fields::APO_DRUID => restricted_apo_druid })
       ]
     )
+    create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
   end
 
   describe 'GET /objects/:druid/constituents' do
-    it 'renders the list of constituent items, in member order' do
+    it 'renders a row for every constituent, in member order, but only links viewable ones' do
       get "/objects/#{token}/constituents"
 
       expect(response).to have_http_status(:ok)
@@ -73,6 +77,13 @@ RSpec.describe 'Show constituents' do
       expect(response.body).to include('Constituent two')
       expect(response.body).to include('jh330cm3013')
       expect(response.body).to include('mn667qr8901')
+      expect(Searchers::ItemByDruid).to have_received(:call).with(
+        druids: [first_constituent_druid, second_constituent_druid],
+        user_scope: nil,
+        fields: anything
+      )
+      expect(response.body).to include("href=\"/objects/#{first_constituent_druid}\"")
+      expect(response.body).not_to include("href=\"/objects/#{second_constituent_druid}\"")
     end
 
     it 'raises when token verification fails' do

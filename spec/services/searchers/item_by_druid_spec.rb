@@ -53,5 +53,12 @@ RSpec.describe Searchers::ItemByDruid do
 
       expect(results.map(&:druid)).to eq([visible_document.fetch(Search::Fields::ID)])
     end
+
+    it 'returns all items regardless of permission when user_scope is nil' do
+      druids = [visible_document, hidden_document].pluck(Search::Fields::ID)
+      results = described_class.call(druids:, user_scope: nil)
+
+      expect(results.map(&:druid)).to match_array(druids)
+    end
   end
 end
