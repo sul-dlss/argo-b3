@@ -101,7 +101,7 @@ RSpec.describe 'Show APO' do
     within(find_table_value_cell('overview-table', 'Agreement')) do
       expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
     end
-    expect(page).to have_table_value('overview-table', 'Access rights', 'View: World')
+    expect(find_table('overview-table')).to have_no_css('th', text: 'Access rights')
     within(find_table_value_cell('overview-table', '# of collections')) do
       expect(page).to have_link('12', href: search_path(admin_policy_druids: [druid], object_types: ['collection']))
     end
