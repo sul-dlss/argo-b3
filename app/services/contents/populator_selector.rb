@@ -25,7 +25,8 @@ module Contents
     FALLBACK_POPULATOR = Contents::Populators::FileSetPerFile
 
     POPULATORS_FOR_CONTENT_TYPES = {
-      Cocina::Models::ObjectType.book => Contents::Populators::Book
+      Cocina::Models::ObjectType.book => Contents::Populators::Book,
+      Cocina::Models::ObjectType.document => Contents::Populators::Document
     }.freeze
 
     # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).

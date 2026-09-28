@@ -34,6 +34,30 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when the content type is document and there is a PDF' do
+    let(:cocina_type) { Cocina::Models::ObjectType.document }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'report.pdf', mime_type: 'application/pdf')
+    end
+
+    it 'selects the document populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Document,
+                                        actual_populator: Contents::Populators::Document,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is document and there are no PDFs' do
+    let(:cocina_type) { Cocina::Models::ObjectType.document }
+
+    it 'falls back to the file set per file populator' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Document,
+                                        actual_populator: Contents::Populators::FileSetPerFile,
+                                        reasons: [:no_pdfs])
+    end
+  end
+
   context 'when the object is dark' do
     let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
 

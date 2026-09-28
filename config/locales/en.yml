@@ -123,11 +123,13 @@ en:
           append: "Files appended to structure"
         populators:
           book: "Book (resource per page)"
+          document: "Document (resource per PDF)"
           file_set_per_file: "Default (resource per file)"
         populator_reasons:
           dark: "the object is dark"
           hierarchical_files: "the files are organized into folders"
           no_images: "there are no image files"
+          no_pdfs: "there are no PDF files"
       tabs:
         add_files:
           label: "Add files"
