@@ -27,17 +27,12 @@ module Contents
 
       def create_content_file(content_file_binary:)
         content_file_set = content.content_file_sets.create!(file_set_type: 'object', label: '')
-        content_file_set.content_files.create!(content_file_binary:, **file_attributes)
-      end
-
-      def file_attributes
-        {
+        content_file_set.content_files.create!(
+          content_file_binary:,
           label: '',
-          preserve: true,
-          publish: true,
-          shelve: true,
+          **Contents::FileAttributes.call(mime_type: content_file_binary.mime_type, dark: dark?),
           **file_access_attributes
-        }
+        )
       end
     end
   end
