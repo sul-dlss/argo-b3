@@ -126,3 +126,14 @@
     color: black;
   }
 }
+
+.object-type-bulk-action {
+  @include object-type-colors($search-color, $search-color-rgb);
+}
+
+// Bulk action show page
+.bulk-action-show {
+  .show-box {
+    max-width: 300px;
+  }
+}

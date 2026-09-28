@@ -18,39 +18,31 @@ RSpec.describe 'Show a bulk action' do
     visit bulk_action_path(bulk_action)
 
     expect(page).to have_css('h1', text: BulkActions::EXPORT_COCINA_JSON.label)
+    expect(page).to have_css('.object-type-bulk-action span.object-type-bg', text: /bulk action/i)
 
-    table = page.find('table#bulk-action-details-table')
-    expect(table).to have_css('th', text: 'Submitted')
-    expect(table).to have_css('td', text: 'My bulk action')
-    expect(table).to have_css('td', text: 'Created')
-    expect(table).to have_css('td', text: '0 / 0 / 0')
-    expect(table).to have_no_css('th', text: 'Log file')
-
-    # The spinner is shown while the bulk action is processing.
-    expect(page).to have_css('img[alt="Spinner"]')
-    expect(page).to have_text('Processing...')
+    expect(page).to have_css('h2', text: 'Processing')
+    expect(page).to have_text('My bulk action')
+    expect(page).to have_css('h2', text: 'Total / Success / Failed')
+    expect(page).to have_css('.show-box', text: '0 / 0 / 0')
+    expect(page).to have_no_css('h2', text: 'Downloads')
 
     File.write(bulk_action.log_filepath, 'Log content')
     File.write(bulk_action.export_filepath(:cocina_json), 'Export content')
     bulk_action.update!(status: :completed, druid_count_success: 1, druid_count_fail: 2, druid_count_total: 3)
 
     # The page refreshes on an interval, so the completed bulk action is shown without reloading.
-    expect(page).to have_css('table#bulk-action-details-table td', text: 'Completed')
-    expect(page).to have_css('table#bulk-action-details-table td', text: '3 / 1 / 2')
+    expect(page).to have_css('h2', text: 'Completed with errors')
+    expect(page).to have_css('.show-box', text: '3 / 1 / 2')
 
-    # The spinner is removed once the bulk action is completed.
-    expect(page).to have_no_css('img[alt="Spinner"]')
-    expect(page).to have_no_text('Processing...')
-
-    expect(page).to have_css('th', text: 'Log file')
+    expect(page).to have_link('Log file')
     log_txt = with_download('log.txt') do
-      click_link_or_button('log.txt')
+      click_link_or_button('Log file')
     end
     expect(log_txt).to eq('Log content')
 
-    expect(page).to have_css('th', text: 'Cocina JSON')
+    expect(page).to have_link('Cocina JSON')
     export_txt = with_download('cocina.jsonl.gz') do
-      click_link_or_button('cocina.jsonl.gz')
+      click_link_or_button('Cocina JSON')
     end
     expect(export_txt).to eq('Export content')
   end
@@ -69,18 +61,20 @@ RSpec.describe 'Show a bulk action' do
       File.write(bulk_action.export_filepath(:registration_report), export_content)
     end
 
-    it 'shows the export as a table' do
+    it 'shows the export as a table in a tab labeled with the export label' do
       visit bulk_action_path(bulk_action)
 
+      expect(page).to have_button('Registration report')
+      expect(page).to have_no_button('Export')
+
       table = page.find('table#bulk-action-registration-report-table')
-      expect(table).to have_css('caption h2', text: 'Registration report')
       expect(table).to have_css('thead th', text: 'Druid')
       expect(table).to have_css('thead th', text: 'Folio Instance HRID')
       expect(table).to have_css('tbody td', text: 'druid:bc123df4567')
       expect(table).to have_css('tbody td', text: 'First title')
 
       # The download link is still available.
-      expect(page).to have_css('table#bulk-action-details-table td a', text: 'registration_report.csv')
+      expect(page).to have_link('Registration report')
     end
   end
 end

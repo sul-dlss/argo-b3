@@ -248,14 +248,14 @@ RSpec.describe 'Create multiple items' do
 
       bulk_action = BulkAction.last
       expect(page).to have_current_path(bulk_action_path(bulk_action))
-      expect(page).to have_text('Processing...')
+      expect(page).to have_css('h2', text: 'Processing')
 
       bulk_action.update!(status: :completed, druid_count_success: 2, druid_count_total: 2)
 
       # The page refreshes on an interval, so the completed bulk action is shown without reloading.
-      expect(page).to have_css('table#bulk-action-details-table td', text: 'Completed')
-      expect(page).to have_css('table#bulk-action-details-table td', text: '2 / 2 / 0')
-      expect(page).to have_no_text('Processing...')
+      expect(page).to have_css('h2', text: 'Completed')
+      expect(page).to have_css('.show-box', text: '2 / 2 / 0')
+      expect(page).to have_no_css('h2', text: 'Processing')
     end
   end
 

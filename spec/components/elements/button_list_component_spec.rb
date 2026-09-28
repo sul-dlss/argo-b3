@@ -49,6 +49,19 @@ RSpec.describe Elements::ButtonListComponent, type: :component do
     end
   end
 
+  context 'without a title' do
+    let(:component) { described_class.new }
+
+    it 'does not render a heading' do
+      render_inline(component) do |component|
+        component.with_button(link: '/reindex', label: 'Reindex', variant: 'outline-primary')
+      end
+
+      expect(page).to have_no_css('h2')
+      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary')
+    end
+  end
+
   context 'without buttons' do
     let(:component) { described_class.new(title: 'Actions') }
 
