@@ -17,46 +17,39 @@ module CocinaModels
       validate :validate_access
 
       def validate_access
-        return if dark_access? ||
-                  citation_only_access? ||
-                  location_based_access? ||
-                  location_based_download_access? ||
-                  stanford_access? ||
-                  world_access?
+        return if AccessRightsSupport.valid?(**access_rights)
 
         errors.add(:access, 'is not valid')
       end
 
       def dark_access?
-        match_access?(view: 'dark', download: 'none')
+        AccessRightsSupport.dark?(**access_rights)
       end
 
       def citation_only_access?
-        match_access?(view: 'citation-only', download: 'none')
+        AccessRightsSupport.citation_only?(**access_rights)
       end
 
       def location_based_access?
-        match_access?(view: 'location-based', download: %w[location-based none], location: Constants::ACCESS_LOCATIONS)
+        AccessRightsSupport.location_based?(**access_rights)
       end
 
       def location_based_download_access?
-        match_access?(view: %w[stanford world], download: 'location-based', location: Constants::ACCESS_LOCATIONS)
+        AccessRightsSupport.location_based_download?(**access_rights)
       end
 
       def stanford_access?
-        match_access?(view: 'stanford', download: 'stanford')
+        AccessRightsSupport.stanford?(**access_rights)
       end
 
       def world_access?
-        match_access?(view: 'world', download: %w[world stanford none])
+        AccessRightsSupport.world?(**access_rights)
       end
 
       private
 
-      def match_access?(view:, download:, location: [nil])
-        Array(view).include?(access_view) &&
-          Array(download).include?(access_download) &&
-          Array(location).include?(access_location)
+      def access_rights
+        { view: access_view, download: access_download, location: access_location }
       end
     end
   end

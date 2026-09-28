@@ -6,8 +6,10 @@ module Edit
     VIEW_RIGHTS = %w[world dark citation-only stanford location-based].freeze
     DOWNLOAD_RIGHTS = %w[world stanford location-based none].freeze
 
-    def initialize(form:, fieldname_prefix: nil, label_classes: [], container_classes: [])
+    # @param citation_only [Boolean] false to exclude the citation-only view option (e.g., for files)
+    def initialize(form:, fieldname_prefix: nil, label_classes: [], container_classes: [], citation_only: true)
       @form = form
+      @citation_only = citation_only
       @fieldname_prefix = fieldname_prefix
       @label_classes = label_classes
       @container_classes = container_classes
@@ -21,7 +23,8 @@ module Edit
     end
 
     def view_options
-      VIEW_RIGHTS.map { |view_right| [view_right.titleize, view_right] }
+      view_rights = @citation_only ? VIEW_RIGHTS : VIEW_RIGHTS - ['citation-only']
+      view_rights.map { |view_right| [view_right.titleize, view_right] }
     end
 
     def download_options

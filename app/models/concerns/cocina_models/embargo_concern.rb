@@ -15,27 +15,27 @@ module CocinaModels
     end
 
     def embargo_dark_access?
-      match_embargo_access?(view: 'dark', download: 'none')
+      AccessRightsSupport.dark?(**embargo_access_rights)
     end
 
     def embargo_citation_only_access?
-      match_embargo_access?(view: 'citation-only', download: 'none')
+      AccessRightsSupport.citation_only?(**embargo_access_rights)
     end
 
     def embargo_location_based_access?
-      match_embargo_access?(view: 'location-based', download: %w[location-based none], location: Constants::ACCESS_LOCATIONS)
+      AccessRightsSupport.location_based?(**embargo_access_rights)
     end
 
     def embargo_location_based_download_access?
-      match_embargo_access?(view: %w[stanford world], download: 'location-based', location: Constants::ACCESS_LOCATIONS)
+      AccessRightsSupport.location_based_download?(**embargo_access_rights)
     end
 
     def embargo_stanford_access?
-      match_embargo_access?(view: 'stanford', download: 'stanford')
+      AccessRightsSupport.stanford?(**embargo_access_rights)
     end
 
     def embargo_world_access?
-      match_embargo_access?(view: 'world', download: %w[world stanford none])
+      AccessRightsSupport.world?(**embargo_access_rights)
     end
 
     def embargo_release_date?
@@ -45,20 +45,13 @@ module CocinaModels
     private
 
     def validate_embargo_access
-      return if embargo_dark_access? ||
-                embargo_citation_only_access? ||
-                embargo_location_based_access? ||
-                embargo_location_based_download_access? ||
-                embargo_stanford_access? ||
-                embargo_world_access?
+      return if AccessRightsSupport.valid?(**embargo_access_rights)
 
       errors.add(:embargo_access, 'is not valid')
     end
 
-    def match_embargo_access?(view:, download:, location: [nil])
-      Array(view).include?(embargo_view) &&
-        Array(download).include?(embargo_download) &&
-        Array(location).include?(embargo_location)
+    def embargo_access_rights
+      { view: embargo_view, download: embargo_download, location: embargo_location }
     end
   end
 end
