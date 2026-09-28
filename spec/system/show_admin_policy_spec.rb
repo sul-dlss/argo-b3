@@ -36,7 +36,8 @@ RSpec.describe 'Show APO' do
       Search::Fields::AGREEMENT_DRUID => agreement_druid,
       Search::Fields::AGREEMENT_TITLE => agreement_title,
       Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
-      Search::Fields::TICKETS => ['TESTREQ-1']
+      Search::Fields::TICKETS => ['TESTREQ-1'],
+      Search::Fields::ACCESS_RIGHTS => ['dark']
     }
   end
 
@@ -101,7 +102,7 @@ RSpec.describe 'Show APO' do
     within(find_table_value_cell('overview-table', 'Agreement')) do
       expect(page).to have_link(agreement_title, href: "/objects/#{agreement_druid}")
     end
-    expect(page).to have_table_value('overview-table', 'Access rights', 'View: World')
+    expect(page).to have_table_value('overview-table', 'Access rights', 'Dark')
     within(find_table_value_cell('overview-table', '# of collections')) do
       expect(page).to have_link('12', href: search_path(admin_policy_druids: [druid], object_types: ['collection']))
     end
