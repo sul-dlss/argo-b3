@@ -153,7 +153,8 @@ RSpec.describe StageFilesJob do
       it 'accessions the object' do
         job.perform(content:, user:, accession: true)
 
-        expect(Sdr::Repository).to have_received(:accession).with(druid:, user_name: user.sunetid)
+        expect(Sdr::Repository).to have_received(:accession).with(cocina_object: updated_cocina_object,
+                                                                  user_name: user.sunetid)
       end
     end
 

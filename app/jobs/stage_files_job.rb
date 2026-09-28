@@ -23,7 +23,7 @@ class StageFilesJob < ApplicationJob
     content.update!(lock: updated_cocina_object.lock, immutable: true)
 
     # Optionally start accessioning.
-    Sdr::Repository.accession(druid:, user_name: user.sunetid) if accession
+    Sdr::Repository.accession(cocina_object: updated_cocina_object, user_name: user.sunetid) if accession
     content.staging_completed!
 
     perform_broadcast
