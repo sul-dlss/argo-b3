@@ -81,6 +81,12 @@ $search-color: rgb(#{$search-color-rgb});
   background-color: var(--stanford-20-black);
 }
 
+.impersonation-banner {
+  background-color: #EDEFE1;
+  margin-top: -1rem; // remove margins from above/below so not whitespace gaps remain around impersonation banner
+  margin-bottom: -1rem;
+}
+
 // Pin-related
 // Note that pin colors for objects are defined in object-type-colors mixin in show.scss.
 .pin {
