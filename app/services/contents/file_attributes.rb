@@ -4,7 +4,10 @@ module Contents
   # Determines the default preserve / shelve / publish flags and role for a file from its mime type.
   # Ported from pre-assembly's PreAssembly::FromStagingLocation::File.
   class FileAttributes
-    DEFAULT = { preserve: true, shelve: false, publish: false, use: nil }.freeze
+    DEFAULT = { preserve: true, shelve: true, publish: true, use: nil }.freeze
+
+    # Overrides the flags (but not the use) for a file that is preserved only.
+    DARK = { preserve: true, shelve: false, publish: false }.freeze
 
     # Attributes for a file that is not accompanied by OCR.
     ATTRIBUTES_FOR_MIME_TYPE = {
@@ -39,20 +42,25 @@ module Contents
     end
 
     # @param [String,nil] mime_type the mime type of the file
+    # @param [Boolean] dark when true, the file is preserved only
     # @param [Boolean] ocr when true, the file is part of a file set that contains OCR
-    def initialize(mime_type:, ocr: false)
+    def initialize(mime_type:, dark:, ocr: false)
       @mime_type = mime_type
       @ocr = ocr
+      @dark = dark
     end
 
     # @return [Hash] the preserve, shelve, publish, and use attributes for the file
     def call
-      DEFAULT.merge(attributes_for_mime_type)
+      attributes = DEFAULT.merge(attributes_for_mime_type)
+      return attributes.merge(DARK) if dark
+
+      attributes
     end
 
     private
 
-    attr_reader :mime_type, :ocr
+    attr_reader :mime_type, :ocr, :dark
 
     def attributes_for_mime_type
       return ATTRIBUTES_FOR_MIME_TYPE_WITH_OCR.fetch(mime_type) if ocr &&

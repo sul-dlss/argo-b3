@@ -96,7 +96,7 @@ module Contents
         return unless ocr && !was_ocr
 
         existing_content_files.each do |content_file|
-          content_file.update!(**Contents::FileAttributes.call(mime_type: content_file.mime_type, ocr:))
+          content_file.update!(**Contents::FileAttributes.call(mime_type: content_file.mime_type, ocr:, dark: dark?))
         end
       end
 
@@ -112,7 +112,7 @@ module Contents
           content_file_set.content_files.create!(
             content_file_binary:,
             label: content_file_binary.filepath,
-            **Contents::FileAttributes.call(mime_type: content_file_binary.mime_type, ocr:),
+            **Contents::FileAttributes.call(mime_type: content_file_binary.mime_type, ocr:, dark: dark?),
             **file_access_attributes
           )
         end

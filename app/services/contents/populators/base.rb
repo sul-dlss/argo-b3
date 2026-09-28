@@ -52,12 +52,18 @@ module Contents
 
       # The access attributes for a ContentFile, derived from the object's (possibly embargoed) access.
       def file_access_attributes
-        access = cocina_object.access.embargo.presence || cocina_object.access
-        {
-          view: access.view == 'citation-only' ? 'dark' : access.view,
-          download: access.download,
-          location: access.location
-        }
+        @file_access_attributes ||= begin
+          access = cocina_object.access.embargo.presence || cocina_object.access
+          {
+            view: access.view == 'citation-only' ? 'dark' : access.view,
+            download: access.download,
+            location: access.location
+          }
+        end
+      end
+
+      def dark?
+        file_access_attributes[:view] == 'dark'
       end
     end
   end

@@ -6,7 +6,9 @@ RSpec.describe Contents::Populators::Book do
   subject(:structure) { described_class.structure(content:, cocina_object:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
-  let(:cocina_object) { build(:dro_with_metadata, id: content.druid) }
+  let(:cocina_object) do
+    build(:dro_with_metadata, id: content.druid).new(access: { view: 'world', download: 'world' })
+  end
 
   describe '.structure' do
     context 'when a page has a master and a deliverable' do
@@ -110,7 +112,27 @@ RSpec.describe Contents::Populators::Book do
         structure
 
         expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'object', label: 'Object 1')
-        expect(content.content_files.sole).to have_attributes(preserve: true, shelve: false, publish: false, use: nil)
+        expect(content.content_files.sole).to have_attributes(preserve: true, shelve: true, publish: true, use: nil)
+      end
+    end
+
+    context 'when the object is dark' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: content.druid).new(access: { view: 'dark', download: 'none' })
+      end
+
+      before do
+        create(:content_file_binary, content:, filepath: 'page_0001.jp2', mime_type: 'image/jp2')
+        create(:content_file_binary, content:, filepath: 'page_0001.xml', mime_type: 'application/xml')
+      end
+
+      it 'preserves but does not shelve or publish the files, retaining the transcription use' do
+        structure
+
+        expect(content.content_files.find_by(label: 'page_0001.jp2'))
+          .to have_attributes(preserve: true, shelve: false, publish: false, use: nil, view: 'dark')
+        expect(content.content_files.find_by(label: 'page_0001.xml'))
+          .to have_attributes(preserve: true, shelve: false, publish: false, use: 'transcription', view: 'dark')
       end
     end
 
@@ -183,6 +205,25 @@ RSpec.describe Contents::Populators::Book do
 
         expect(content.content_files.find_by(label: 'page_0001.jp2'))
           .to have_attributes(preserve: true, shelve: true, publish: true)
+      end
+    end
+
+    context 'when the object is dark and the new binary makes the file set contain OCR' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: content.druid).new(access: { view: 'dark', download: 'none' })
+      end
+
+      before do
+        create(:content_file_binary, content:, filepath: 'page_0001.xml', mime_type: 'application/xml')
+      end
+
+      it 'preserves but does not shelve or publish the new and existing files' do
+        append
+
+        expect(content.content_files.find_by(label: 'page_0001.xml'))
+          .to have_attributes(preserve: true, shelve: false, publish: false)
+        expect(content.content_files.find_by(label: 'page_0001.jp2'))
+          .to have_attributes(preserve: true, shelve: false, publish: false)
       end
     end
 

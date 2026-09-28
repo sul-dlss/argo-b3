@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Contents::FileAttributes do
-  subject(:file_attributes) { described_class.call(mime_type:, **options) }
+  subject(:file_attributes) { described_class.call(mime_type:, dark:, **options) }
 
+  let(:dark) { false }
   let(:options) { {} }
 
   describe 'without OCR' do
@@ -28,7 +29,7 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { 'application/xml' }
 
       it 'falls back to the default attributes' do
-        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
       end
     end
 
@@ -36,7 +37,7 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { 'application/octet-stream' }
 
       it 'falls back to the default attributes' do
-        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
       end
     end
 
@@ -44,7 +45,7 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { nil }
 
       it 'falls back to the default attributes' do
-        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
       end
     end
   end
@@ -89,6 +90,27 @@ RSpec.describe Contents::FileAttributes do
 
       it 'falls back to the mapping without OCR' do
         expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+      end
+    end
+  end
+
+  describe 'when dark' do
+    let(:dark) { true }
+
+    context 'when the mime type is a deliverable image' do
+      let(:mime_type) { 'image/jp2' }
+
+      it 'preserves only' do
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+      end
+    end
+
+    context 'when the file set contains OCR' do
+      let(:mime_type) { 'application/xml' }
+      let(:options) { { ocr: true } }
+
+      it 'preserves only but is still a transcription' do
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: 'transcription' })
       end
     end
   end
