@@ -3,6 +3,8 @@
 module Search
   # Controller for tag searches
   class TagsController < SearchApplicationController
+    include TurboFrameOnlyConcern
+
     layout false
 
     def index

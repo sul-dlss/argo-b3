@@ -3,6 +3,8 @@
 module Search
   # Controller for ticket searches
   class TicketsController < SearchApplicationController
+    include TurboFrameOnlyConcern
+
     layout false
 
     def index

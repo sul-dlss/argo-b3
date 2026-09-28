@@ -3,6 +3,8 @@
 module Search
   # Controller for item searches
   class ItemsController < SearchApplicationController
+    include TurboFrameOnlyConcern
+
     layout false
 
     def index
