@@ -229,6 +229,75 @@ RSpec.describe 'Create multiple items' do
     end
   end
 
+  context 'when collections are selected' do
+    before do
+      allow(Searchers::CollectionList).to receive(:call).and_return(
+        [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
+      )
+      allow(Searchers::CollectionListByDruid).to receive(:call)
+        .and_return([['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']])
+    end
+
+    it 'enqueues a register form bulk action with the collections' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+
+      check 'Only view collections in selected APO'
+      collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
+      collection_input.fill_in(with: 'Art')
+      find('.ts-dropdown .option', text: 'Art History Slides').click
+      collection_input.fill_in(with: 'Art')
+      find('.ts-dropdown .option', text: 'Art Maps').click
+      expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
+      expect(page).to have_css('.ts-control .item', text: 'Art Maps')
+      expect(Searchers::CollectionList).to have_received(:call)
+        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:).at_least(:once)
+
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(
+          collection_druids: %w[druid:bc123df4567 druid:gh456jk7890]
+        )
+      )
+    end
+
+    it 'retains the collections when invalid' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+
+      collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
+      collection_input.fill_in(with: 'Art')
+      find('.ts-dropdown .option', text: 'Art History Slides').click
+      expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
+
+      fill_in_valid_and_invalid_item
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_css('.invalid-feedback')
+      expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
+      expect(page).to have_no_css('.ts-control .item', text: 'Art Maps')
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+    end
+  end
+
   context 'when no license or rights statements are provided' do
     it 'enqueues a register form bulk action without a license or rights statements' do
       visit new_multiple_item_path

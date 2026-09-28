@@ -7,9 +7,11 @@ class ItemsRegistrationForm < ApplicationForm
   include CocinaModels::AccessConcern
   include CocinaModels::ContentTypeConcern
   include CocinaModels::ApoConcern
+  include CocinaModels::CollectionConcern
   include CocinaModels::EmbargoConcern
   include EmbargoFormConcern
   include TagsFormConcern
+  include CollectionFormConcern
 
   UPLOAD_CSV_CHOICE = 'upload_csv'
   ENTER_TAB_DELIMITED_CHOICE = 'enter_tab_delimited'
