@@ -1,0 +1,31 @@
+<%= tag.div class: classes do %>
+  <div class="card-body">
+    <div class="card-title">
+      <div class="h3">Resource (<%= index %>):</div>
+    </div>
+    <div class="card-body">
+      <%= form_with model: content_file_set_form, url: path do |form| %>
+      <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :file_set_type,
+                                                                    options: file_set_type_options,
+                                                                    label_text: t('edit.content_file_sets.fields.file_set_type.label'),
+                                                                    label_mark_required: true,
+                                                                    label_classes: 'fw-bold',
+                                                                    container_classes: 'my-field') %>
+
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :label,
+                                                                  label_text: t('edit.content_file_sets.fields.label.label'),
+                                                                  label_classes: 'fw-bold',
+                                                                  container_classes: 'my-field') %>
+
+      <%= form.fields_for :content_files do |content_file_form| %>
+        <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
+      <% end %>
+
+        <div class="d-flex align-items-center mt-5">
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', classes: 'me-3') %>
+          <%= link_to 'Cancel', path %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

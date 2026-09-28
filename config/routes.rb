@@ -210,6 +210,8 @@ Rails.application.routes.draw do
     resource :dropzone, only: %i[update], controller: 'content_dropzone'
     resource :mount, only: %i[new create show], controller: 'content_mount'
     resource :structure, only: %i[edit update], controller: 'content_structure'
+
+    resources :content_file_sets, only: %i[edit update show]
   end
 
   resources :collection_options, only: %i[index], defaults: { format: :json }

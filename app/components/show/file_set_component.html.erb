@@ -3,12 +3,21 @@
     <div class="card-title d-flex justify-content-between">
       <div>
         <span class="h3">Resource (<%= index %>):</span> <%= file_set_type %>
+                <%= if editable?
+                      render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :edit,
+                                                                                      label: "Edit resource #{index}",
+                                                                                      link: edit_path,
+                                                                                      classes: 'ms-2')
+                    end %>
+
       </div>
-      <% if label.present? %>
-        <div>
-          <span class="fw-bold">Label:</span> <%= label %>
-        </div>
-      <% end %>
+      <div class="d-flex align-items-center">
+        <% if label.present? %>
+          <div>
+            <span class="fw-bold">Label:</span> <%= label %>
+          </div>
+        <% end %>
+      </div>
     </div>
     <div class="card-body">
       <%= render(SdrViewComponents::Tables::TableComponent.new(label: "Files for resource #{index}",
