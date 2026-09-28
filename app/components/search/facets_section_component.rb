@@ -9,9 +9,5 @@ module Search
     end
 
     attr_reader :search_form
-
-    def blank_search?
-      search_form.blank?
-    end
   end
 end
