@@ -9,7 +9,7 @@ class BulkAction < ApplicationRecord
   after_create :create_output_directory!
   before_destroy :remove_output_directory!
 
-  delegate :export_filename, :label, to: :bulk_action_config
+  delegate :exports, :label, to: :bulk_action_config
 
   def bulk_action_config
     @bulk_action_config ||= BulkActions.find_config(action_type)
@@ -32,16 +32,19 @@ class BulkAction < ApplicationRecord
     File.exist?(log_filepath)
   end
 
-  def export_file?
-    export_filename.present? && File.exist?(export_filepath)
+  # @param key [Symbol] key of the export in the bulk action config
+  def export_filepath(key)
+    filepath_for(filename: bulk_action_config.find_export(key).filename)
   end
 
-  def export_filepath
-    @export_filepath ||= filepath_for(filename: export_filename)
+  # @return [Array<BulkActions::Export>] the exports whose files have been created
+  def existing_exports
+    exports.select { |export| File.exist?(filepath_for(filename: export.filename)) }
   end
 
-  def export_label
-    bulk_action_config.export_label || export_filename
+  # Only the log and export files may be downloaded.
+  def downloadable_filename?(filename)
+    filename == log_filename || exports.any? { |export| export.filename == filename }
   end
 
   def reset_druid_counts!
@@ -60,12 +63,6 @@ class BulkAction < ApplicationRecord
     return if filename.nil?
 
     File.join(output_directory, filename)
-  end
-
-  def show_csv_export?
-    bulk_action_config.show_export.present? &&
-      export_file? &&
-      export_filename.ends_with?('.csv')
   end
 
   private

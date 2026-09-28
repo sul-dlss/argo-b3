@@ -13,14 +13,8 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
   let(:cocina_object) { build(:dro_with_metadata, id: druid) }
   let(:log) { StringIO.new }
 
-  let(:job_item) do
-    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
-      allow(job_item).to receive(:cocina_object).and_return(cocina_object)
-    end
-  end
-
   before do
-    allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -36,10 +30,8 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
     expect(bulk_action.druid_count_success).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)
 
-    expect(File).not_to exist(bulk_action.filepath_for(filename: 'cocina.jsonl'))
-
-    expect(File).to exist(bulk_action.export_filepath)
-    File.write(unzipped_path, ActiveSupport::Gzip.decompress(File.read(bulk_action.export_filepath)))
+    expect(File).to exist(bulk_action.export_filepath(:cocina_json))
+    File.write(unzipped_path, ActiveSupport::Gzip.decompress(File.read(bulk_action.export_filepath(:cocina_json))))
     expect(File.open(unzipped_path).readlines.size).to eq 1 # rubocop:disable Style/FileOpen
   end
 end

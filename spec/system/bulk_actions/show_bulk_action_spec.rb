@@ -31,7 +31,7 @@ RSpec.describe 'Show a bulk action' do
     expect(page).to have_text('Processing...')
 
     File.write(bulk_action.log_filepath, 'Log content')
-    File.write(bulk_action.export_filepath, 'Export content')
+    File.write(bulk_action.export_filepath(:cocina_json), 'Export content')
     bulk_action.update!(status: :completed, druid_count_success: 1, druid_count_fail: 2, druid_count_total: 3)
 
     # The page refreshes on an interval, so the completed bulk action is shown without reloading.
@@ -48,9 +48,9 @@ RSpec.describe 'Show a bulk action' do
     end
     expect(log_txt).to eq('Log content')
 
-    expect(page).to have_css('th', text: BulkActions::EXPORT_COCINA_JSON.export_label)
-    export_txt = with_download(BulkActions::EXPORT_COCINA_JSON.export_filename) do
-      click_link_or_button(BulkActions::EXPORT_COCINA_JSON.export_filename)
+    expect(page).to have_css('th', text: 'Cocina JSON')
+    export_txt = with_download('cocina.jsonl.gz') do
+      click_link_or_button('cocina.jsonl.gz')
     end
     expect(export_txt).to eq('Export content')
   end
@@ -66,14 +66,14 @@ RSpec.describe 'Show a bulk action' do
     end
 
     before do
-      File.write(bulk_action.export_filepath, export_content)
+      File.write(bulk_action.export_filepath(:registration_report), export_content)
     end
 
     it 'shows the export as a table' do
       visit bulk_action_path(bulk_action)
 
-      table = page.find('table#bulk-action-export-table')
-      expect(table).to have_css('caption h2', text: BulkActions::REGISTER_CSV.export_label)
+      table = page.find('table#bulk-action-registration-report-table')
+      expect(table).to have_css('caption h2', text: 'Registration report')
       expect(table).to have_css('thead th', text: 'Druid')
       expect(table).to have_css('thead th', text: 'Folio Instance HRID')
       expect(table).to have_css('tbody td', text: 'druid:bc123df4567')

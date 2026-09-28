@@ -7,7 +7,6 @@ RSpec.describe BulkActions::BaseCsvJob do
   let(:bulk_action) { create(:bulk_action, druid_count_success: 100, druid_count_fail: 100, druid_count_total: 100) }
   let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222] }
   let(:log) { instance_double(File, puts: nil, close: true) }
-  let(:export_file) { instance_double(File, close: true) }
 
   before do
     bulk_action_job_class = Class.new(described_class)

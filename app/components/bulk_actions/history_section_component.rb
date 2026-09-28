@@ -31,7 +31,7 @@ module BulkActions
         bulk_action.status.titleize,
         "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}",
         log_file_link_for(bulk_action),
-        export_link_for(bulk_action),
+        export_links_for(bulk_action),
         button_to('Delete', bulk_action_path(bulk_action),
                   method: :delete,
                   data: { turbo_confirm: 'Are you sure you want to delete this bulk action?' },
@@ -56,11 +56,11 @@ module BulkActions
       link_to('Log', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
     end
 
-    def export_link_for(bulk_action)
-      return '' unless bulk_action.export_file?
-
-      link_to(bulk_action.export_label,
-              file_bulk_action_path(bulk_action, filename: bulk_action.export_filename), download: true)
+    def export_links_for(bulk_action)
+      links = bulk_action.existing_exports.map do |export|
+        link_to(export.label, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
+      end
+      safe_join(links, tag.br)
     end
   end
 end

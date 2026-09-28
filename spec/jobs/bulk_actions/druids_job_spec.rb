@@ -9,7 +9,6 @@ RSpec.describe BulkActions::DruidsJob do
   let(:bulk_action) { create(:bulk_action, druid_count_success: 100, druid_count_fail: 100, druid_count_total: 100) }
   let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222] }
   let(:log) { instance_double(File, puts: nil, close: true) }
-  let(:export_file) { instance_double(File, close: true) }
 
   before do
     travel_to(Time.zone.parse('2026-07-29 21:56:58 UTC'))
@@ -17,7 +16,6 @@ RSpec.describe BulkActions::DruidsJob do
     bulk_action_job_class = Class.new(described_class)
     stub_const('TestBulkActionJob', bulk_action_job_class)
 
-    allow_any_instance_of(TestBulkActionJob).to receive(:export_file).and_return(export_file) # rubocop:disable RSpec/AnyInstance
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
@@ -55,7 +53,6 @@ RSpec.describe BulkActions::DruidsJob do
       expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: Testing successful/o)
       expect(log).to have_received(:puts).with(/#{druids.second}\tError: Testing failed/o)
       expect(log).to have_received(:close)
-      expect(export_file).to have_received(:close)
 
       expect(bulk_action.reload.druid_count_total).to eq(2)
       expect(bulk_action.druid_count_success).to eq(1)

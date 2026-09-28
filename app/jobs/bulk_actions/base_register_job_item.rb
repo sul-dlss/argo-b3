@@ -4,12 +4,13 @@ module BulkActions
   # Superclass for registering a single object in a bulk action job.
   # Subclasses must implement the `#register` method.
   class BaseRegisterJobItem < BaseJobItem
-    def initialize(registration:, **args)
+    def initialize(registration:, registration_report_csv:, **args)
       @registration = registration
+      @registration_report_csv = registration_report_csv
       super(druid: nil, **args)
     end
 
-    attr_reader :registration
+    attr_reader :registration, :registration_report_csv
 
     def perform
       return unless valid?
@@ -19,7 +20,7 @@ module BulkActions
       @druid = cocina_object.externalIdentifier
 
       success!(message: 'Registration successful')
-      export_file << row
+      registration_report_csv << row
     end
 
     # Subclasses may override to report a failure before registration is attempted.

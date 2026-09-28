@@ -19,9 +19,10 @@ module BulkActions
     # Invokes a bulk action item for each druid
     # Each bulk action job class should implement a nested class called BulkActionItem
     # that is a subclass of BulkActionItem.
-    def perform_bulk_action
+    # @param [Hash] item_params additional parameters passed to each bulk action item, e.g., an open export file
+    def perform_bulk_action(**item_params)
       druids.each_with_index do |druid, index|
-        perform_item_class.new(druid:, index:, job: self).perform
+        perform_item_class.new(druid:, index:, job: self, **item_params).perform
       rescue Sdr::Repository::NotFoundResponse
         failure!(druid:, message: 'Error: Object not found')
       rescue StandardError => e

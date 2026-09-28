@@ -6,7 +6,7 @@ module BulkActions
   class ExportTrackingSheetsJob < DruidsJob
     def perform_bulk_action
       pdf = TracksheetService.call(solr_doc_presenters:)
-      pdf.render_file(bulk_action.export_filepath)
+      pdf.render_file(bulk_action.export_filepath(:tracking_sheets))
     rescue StandardError => e
       log("ExportTrackingSheetsJob failed #{e.class} #{e.message}")
       Honeybadger.notify(e)

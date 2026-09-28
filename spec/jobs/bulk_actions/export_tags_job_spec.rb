@@ -8,7 +8,7 @@ RSpec.describe BulkActions::ExportTagsJob do
   let(:druid) { 'druid:bc123df4567' }
 
   let(:bulk_action) { create(:bulk_action, action_type: 'export_tags') }
-  let(:csv_path) { bulk_action.export_filepath }
+  let(:csv_path) { bulk_action.export_filepath(:tags) }
   let(:log) { StringIO.new }
 
   let(:object_client) { instance_double(Dor::Services::Client::Object, administrative_tags: tags_client) }

@@ -20,12 +20,15 @@
     <% component.with_row(label: 'Status', value: bulk_action.status.titleize) %>
     <% component.with_row(label: 'Total / Success / Failed', value: "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}") %>
     <% component.with_row(label: 'Log file', value: log_file_link) if bulk_action.log_file? %>
-    <% component.with_row(label: bulk_action.export_label, value: export_link) if bulk_action.export_file? %>
+    <% existing_exports.each do |export| %>
+      <% component.with_row(label: export.label, value: export_link(export)) %>
+    <% end %>
   <% end %>
 
-  <% if show_export? %>
-    <%= render SdrViewComponents::Tables::TableComponent.new(id: 'bulk-action-export-table', variant: :data, responsive: true, empty_message: 'No records.') do |component| %>
-      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: bulk_action.export_label) %><% end %>
+  <% shown_exports.each do |export| %>
+    <% export_csv = export_csv(export) %>
+    <%= render SdrViewComponents::Tables::TableComponent.new(id: export_table_id(export), variant: :data, responsive: true, empty_message: 'No records.') do |component| %>
+      <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: export.label) %><% end %>
       <% export_csv.headers.each do |header| %>
         <% component.with_header(label: header) %>
       <% end %>
