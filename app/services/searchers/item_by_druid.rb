@@ -8,7 +8,7 @@ module Searchers
     end
 
     # @param druids [Array<String>]
-    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
+    # @param user_scope [Permissions::UserScope] the permission scope of the requesting user, nil skips checks
     # @param fields [Array<String>] fields to include in the results
     def initialize(druids:, user_scope:, fields: Item::FIELD_LIST)
       @druids = druids
@@ -31,10 +31,14 @@ module Searchers
 
     def solr_request
       {
-        fq: [solr_fq, Search::PermissionFilter.call(user_scope:)].compact,
+        fq: [solr_fq, permission_filter].compact,
         fl: fields,
         rows: druids.size
       }
+    end
+
+    def permission_filter
+      Search::PermissionFilter.call(user_scope:) if user_scope
     end
 
     def solr_fq

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # Controller for objects (DRO, collection, adminPolicy)
-class ObjectsController < ApplicationController
+class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassLength
   RECENT_OBJECTS_LIMIT = 5
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
-                                  show_purl_preview show_solr_doc show_files]
+                                  show_purl_preview show_solr_doc show_files show_constituents]
 
   include TokenConcern
 
@@ -102,6 +102,13 @@ class ObjectsController < ApplicationController
 
   def show_files
     @content = fetch_content(verified_druid)
+
+    render layout: false
+  end
+
+  def show_constituents
+    @druid = verified_druid
+    @constituents = object_rows(Array(cocina_object.structural.hasMemberOrders.first&.members))
 
     render layout: false
   end
@@ -203,10 +210,28 @@ class ObjectsController < ApplicationController
     nil
   end
 
+  def cocina_object
+    CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
+  end
+
   def fetch_content(druid)
-    cocina_object = CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(druid))
     Content.find_by(druid:, lock: cocina_object.lock, immutable: true) ||
       Contents::Builder.call(cocina_object:)
+  end
+
+  # Looks up titles/permissions of given druids without filtering by view permission, so that an object
+  # can be shown for every constituent object even when the user is not permitted to link to some of them.
+  # @param druids [Array] the list of druids to look up
+  # @return [Array<Array(String, String, Boolean)>] [title, druid, viewable] tuples, in the given order
+  def object_rows(druids)
+    fields = [Search::Fields::ID, Search::Fields::TITLE, Search::Fields::COLLECTION_DRUIDS, Search::Fields::APO_DRUID]
+    docs_by_druid = Searchers::ItemByDruid.call(druids:, user_scope: nil, fields:).index_by(&:druid)
+    druids.filter_map do |druid|
+      doc = docs_by_druid[druid]
+      next unless doc
+
+      [doc.title, doc.druid, allowed_to?(:show?, doc, with: ObjectPolicy)]
+    end
   end
 
   def druid_param

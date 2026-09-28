@@ -535,4 +535,64 @@ RSpec.describe 'Show item' do
       end
     end
   end
+
+  context 'when the object is a virtual object' do
+    let(:first_constituent_druid) { 'druid:jh330cm3013' }
+    let(:second_constituent_druid) { 'druid:mn667qr8901' }
+
+    let(:virtual_object_solr_doc) do
+      {
+        Search::Fields::ID => druid,
+        Search::Fields::OBJECT_TYPES => ['virtual object'],
+        Search::Fields::TITLE => original_title,
+        Search::Fields::APO_DRUID => [apo_druid],
+        Search::Fields::APO_TITLE => ['My APO'],
+        Search::Fields::CONTENT_TYPES => ['book'],
+        Search::Fields::ALL_TAGS => []
+      }
+    end
+
+    let(:virtual_object_cocina_object) do
+      build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
+        .new(
+          structural: {
+            hasMemberOrders: [{ members: [first_constituent_druid, second_constituent_druid] }]
+          },
+          description: {
+            title: [{ value: original_title }],
+            purl: 'https://purl.stanford.edu/bb123cd4567'
+          }
+        )
+    end
+
+    before do
+      allow(Sdr::Repository).to receive_messages(find_solr: virtual_object_solr_doc,
+                                                 find: virtual_object_cocina_object)
+      allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
+      allow(Searchers::ItemByDruid).to receive(:call).and_return(
+        [
+          SearchResults::Item.new(solr_doc: { Search::Fields::ID => first_constituent_druid,
+                                              Search::Fields::TITLE => 'Constituent one' }),
+          SearchResults::Item.new(solr_doc: { Search::Fields::ID => second_constituent_druid,
+                                              Search::Fields::TITLE => 'Constituent two' })
+        ]
+      )
+    end
+
+    it 'shows the Constituents tab in place of Files, listing the constituent items' do
+      visit "/objects/#{druid}"
+
+      expect(page).to have_css('.object-show.object-type-virtual-object .object-type-badge', text: 'VIRTUAL OBJECT')
+      expect(page).to have_css('.nav-link', text: 'Constituents')
+      expect(page).to have_no_css('.nav-link', text: 'Files')
+
+      click_button 'Constituents'
+
+      expect(page).to have_css('h2', text: 'Items in this virtual object (2)')
+      expect(page).to have_link('Constituent one', href: "/objects/#{first_constituent_druid}")
+      expect(page).to have_link('Constituent two', href: "/objects/#{second_constituent_druid}")
+      expect(page).to have_css('td', text: 'jh330cm3013')
+      expect(page).to have_css('td', text: 'mn667qr8901')
+    end
+  end
 end
