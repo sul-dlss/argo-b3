@@ -44,8 +44,8 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
     expect(log.string).to include "#{druid}\tSuccess: Exported catalog data"
 
-    expect(File).to exist(bulk_action.export_filepath)
-    csv = CSV.read(bulk_action.export_filepath, headers: true)
+    expect(File).to exist(bulk_action.export_filepath(:catalog_data))
+    csv = CSV.read(bulk_action.export_filepath(:catalog_data), headers: true)
     expect(csv.headers).to eq %w[druid folio_instance_hrid refresh part_label sort_key barcode]
     expect(csv[0].to_h.values).to eq [bare_druid, 'in00000012345', 'true', 'Part 1', '1', '36105010101010']
   end
@@ -60,7 +60,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
       job.perform_now
 
       expect(bulk_action.reload.druid_count_success).to eq(1)
-      csv = CSV.read(bulk_action.export_filepath, headers: true)
+      csv = CSV.read(bulk_action.export_filepath(:catalog_data), headers: true)
       expect(csv[0].to_h.values).to eq [bare_druid, nil, nil, nil, nil, '36105010101010']
     end
   end
@@ -74,7 +74,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
       job.perform_now
 
       expect(bulk_action.reload.druid_count_success).to eq(1)
-      csv = CSV.read(bulk_action.export_filepath, headers: true)
+      csv = CSV.read(bulk_action.export_filepath(:catalog_data), headers: true)
       expect(csv[0]['barcode']).to be_nil
     end
   end
@@ -89,7 +89,7 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
       job.perform_now
 
       expect(bulk_action.reload.druid_count_success).to eq(1)
-      csv = CSV.read(bulk_action.export_filepath, headers: true)
+      csv = CSV.read(bulk_action.export_filepath(:catalog_data), headers: true)
       expect(csv[0].to_h.values).to eq [bare_druid, 'in00000012345', 'true', 'Part 1', '1', nil]
     end
   end

@@ -13,7 +13,7 @@ module BulkActions
       Honeybadger.context(druid:)
     end
 
-    delegate :log, :user, :user_id, :export_file, :close_version?, to: :job
+    delegate :log, :user, :user_id, :close_version?, to: :job
 
     attr_reader :druid, :index, :job
 

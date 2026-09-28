@@ -16,16 +16,30 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :label,
                       :help_text,
                       :path_helper,
-                      # Filename for the export created by this bulk action, if any.
-                      :export_filename,
-                      # When true and export file is a CSV, displays the CSV as a table on bulk action show page.
-                      :show_export,
-                      :export_label) do
+                      # Array of Export for the files created by this bulk action, if any.
+                      :exports) do
                         # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
                         def action_type
                           job.to_s.demodulize.delete_suffix('Job').underscore.upcase
                         end
+
+                        def exports
+                          self[:exports] || []
+                        end
+
+                        def find_export(key)
+                          exports.find { |export| export.key == key } ||
+                            raise(ArgumentError, "Unknown export #{key} for #{action_type}")
+                        end
                       end
+
+  # A file created by a bulk action.
+  # When show is true and the file is a CSV, the CSV is displayed as a table on the bulk action show page.
+  Export = Data.define(:key, :filename, :label, :show) do
+    def initialize(key:, filename:, label:, show: false)
+      super
+    end
+  end
 
   ADD_WORKFLOW = Config.new(
     label: 'Add workflow',
@@ -59,8 +73,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_CATALOG_DATA = Config.new(
     label: 'Export FOLIO instance HRIDs, barcodes and serials metadata',
     help_text: 'Download a spreadsheet containing FOLIO instance HRIDs, barcodes, part labels and sort keys.',
-    export_filename: 'catalog_data.csv',
-    export_label: 'Catalog data',
+    exports: [Export.new(key: :catalog_data, filename: 'catalog_data.csv', label: 'Catalog data')],
     job: BulkActions::ExportCatalogDataJob,
     path_helper: to_path_helper(:new_bulk_actions_export_catalog_data_path),
     form: BulkActions::BasicForm
@@ -69,8 +82,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_CHECKSUM_REPORT = Config.new(
     label: 'Download checksum report',
     help_text: 'Download a spreadsheet listing checksums and file size for each file.',
-    export_filename: 'checksum_report.csv',
-    export_label: 'Checksum report',
+    exports: [
+      Export.new(key: :checksum_report, filename: 'checksum_report.csv', label: 'Checksum report')
+    ],
     job: BulkActions::ExportChecksumReportJob,
     path_helper: to_path_helper(:new_bulk_actions_export_checksum_report_path),
     form: BulkActions::BasicForm
@@ -79,8 +93,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_COCINA_JSON = Config.new(
     label: 'Download full Cocina JSON',
     help_text: nil,
-    export_filename: 'cocina.jsonl.gz',
-    export_label: 'Cocina JSON',
+    exports: [Export.new(key: :cocina_json, filename: 'cocina.jsonl.gz', label: 'Cocina JSON')],
     job: BulkActions::ExportCocinaJsonJob,
     path_helper: to_path_helper(:new_bulk_actions_export_cocina_json_path),
     form: BulkActions::BasicForm
@@ -89,8 +102,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_DESCRIPTIVE_METADATA = Config.new(
     label: 'Download descriptive metadata spreadsheet',
     help_text: 'Download a spreadsheet listing Cocina descriptive metadata.',
-    export_filename: 'descriptive.csv',
-    export_label: 'Descriptive metadata spreadsheet',
+    exports: [
+      Export.new(key: :descriptive_metadata, filename: 'descriptive.csv', label: 'Descriptive metadata spreadsheet')
+    ],
     job: BulkActions::ExportDescriptiveMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_export_descriptive_metadata_path),
     form: BulkActions::BasicForm
@@ -99,8 +113,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_MODS = Config.new(
     label: 'Download descriptive metadata as MODS XML',
     help_text: nil,
-    export_filename: 'mods_export.zip',
-    export_label: 'MODS XML',
+    exports: [Export.new(key: :mods, filename: 'mods_export.zip', label: 'MODS XML')],
     job: BulkActions::ExportModsJob,
     path_helper: to_path_helper(:new_bulk_actions_export_mods_path),
     form: BulkActions::BasicForm
@@ -109,8 +122,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Export structural metadata',
     help_text: "Download a spreadsheet of objects' structural metadata.",
-    export_filename: 'structural_metadata.csv',
-    export_label: 'Structural metadata spreadsheet',
+    exports: [
+      Export.new(key: :structural_metadata, filename: 'structural_metadata.csv',
+                 label: 'Structural metadata spreadsheet')
+    ],
     job: BulkActions::ExportStructuralMetadataJob,
     path_helper: to_path_helper(:new_bulk_actions_export_structural_metadata_path),
     form: BulkActions::BasicForm
@@ -119,8 +134,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_TRACKING_SHEETS = Config.new(
     label: 'Download tracking sheets',
     help_text: 'Download PDF tracking sheets to use in digitization workflows.',
-    export_filename: 'tracking_sheets.pdf',
-    export_label: 'Tracking sheets',
+    exports: [
+      Export.new(key: :tracking_sheets, filename: 'tracking_sheets.pdf', label: 'Tracking sheets')
+    ],
     job: BulkActions::ExportTrackingSheetsJob,
     path_helper: to_path_helper(:new_bulk_actions_export_tracking_sheets_path),
     form: BulkActions::BasicForm
@@ -129,8 +145,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   EXPORT_TAGS = Config.new(
     label: 'Export tags',
     help_text: "Download a spreadsheet listing objects' tags, including project and ticket tags.",
-    export_filename: 'tags.csv',
-    export_label: 'Tags',
+    exports: [Export.new(key: :tags, filename: 'tags.csv', label: 'Tags')],
     job: BulkActions::ExportTagsJob,
     path_helper: to_path_helper(:new_bulk_actions_export_tags_path),
     form: BulkActions::BasicForm
@@ -259,12 +274,14 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     form: BulkActions::BasicForm
   )
 
+  REGISTER_EXPORTS = [
+    Export.new(key: :registration_report, filename: 'registration_report.csv', label: 'Registration report', show: true)
+  ].freeze
+
   REGISTER_CSV = Config.new(
     label: 'Register items',
     help_text: 'Register items with item-specific settings by uploading a spreadsheet.',
-    export_filename: 'registration_report.csv',
-    export_label: 'Registration report',
-    show_export: true,
+    exports: REGISTER_EXPORTS,
     job: BulkActions::RegisterCsvJob,
     path_helper: to_path_helper(:new_bulk_actions_register_csv_path),
     form: BulkActions::RegisterForm
@@ -273,9 +290,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   REGISTER_FORM = Config.new(
     label: 'Register new druids (via a form)',
     help_text: 'Register druids.',
-    export_filename: 'registration_report.csv',
-    export_label: 'Registration report',
-    show_export: true,
+    exports: REGISTER_EXPORTS,
     job: BulkActions::RegisterFormJob
   )
 

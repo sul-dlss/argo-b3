@@ -10,10 +10,13 @@ module BulkActions
     HEADERS = ['Druid', 'Barcode', 'Folio Instance HRID', 'Source Id', 'Title'].freeze
 
     def perform_bulk_action
-      registrations.each.with_index(index_offset) do |registration, index|
-        perform_item_class.new(index:, job: self, registration:).perform
-      rescue StandardError => e
-        failure!(message: "Error: #{e.class} #{e.message}", index:)
+      registration_report_filepath = bulk_action.export_filepath(:registration_report)
+      CSV.open(registration_report_filepath, 'wb', write_headers: true, headers: HEADERS) do |registration_report_csv|
+        registrations.each.with_index(index_offset) do |registration, index|
+          perform_item_class.new(index:, job: self, registration:, registration_report_csv:).perform
+        rescue StandardError => e
+          failure!(message: "Error: #{e.class} #{e.message}", index:)
+        end
       end
     end
 
@@ -43,10 +46,6 @@ module BulkActions
 
     def druid_count
       registrations.length
-    end
-
-    def export_file
-      @export_file ||= CSV.open(bulk_action.export_filepath, 'wb', write_headers: true, headers: HEADERS)
     end
   end
 end

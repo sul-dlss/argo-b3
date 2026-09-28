@@ -31,14 +31,10 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
 
   let(:cocina_object) { build(:dro_with_metadata, id: druid) }
 
-  let(:job_item) do
-    described_class::JobItem.new(druid:, index: 0, job:).tap do |item|
-      allow(item).to receive_messages(cocina_object:, check_read_ability?: true)
-    end
-  end
-
   before do
-    allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    create(:permission, :read_unrestricted, workgroup: bulk_action.user.groups.first)
+
+    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Preservation::Client.objects).to receive(:checksum).with(druid:).and_return(checksum_response)
@@ -53,8 +49,8 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
 
     expect(Preservation::Client.objects).to have_received(:checksum).with(druid:)
 
-    expect(File).to exist(bulk_action.export_filepath)
-    expect(File.read(bulk_action.export_filepath)).to eq(
+    expect(File).to exist(bulk_action.export_filepath(:checksum_report))
+    expect(File.read(bulk_action.export_filepath(:checksum_report))).to eq(
       <<~CSV
         druid,filename,md5,sha1,sha256,size
         #{bare_druid},bc123df4567_img_1.tif,ffc0cc90e4215e0a3d822b04a8eab980,d2703add746d7b6e2e5f8a73ef7c06b087b3fae5,6b66cc2df50427d03dca8608af20b3fd96d76b67ba41c148901aa1a60527032f,4403882
@@ -68,9 +64,9 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
   end
 
   context 'when not authorized to read the object' do
-    let(:job_item) do
-      described_class::JobItem.new(druid:, index: 0, job:).tap do |item|
-        allow(item).to receive_messages(cocina_object:, check_read_ability?: false)
+    before do
+      allow(described_class::JobItem).to receive(:new).and_wrap_original do |original, **args|
+        original.call(**args).tap { |job_item| allow(job_item).to receive(:check_read_ability?).and_return(false) }
       end
     end
 
@@ -90,7 +86,7 @@ RSpec.describe BulkActions::ExportChecksumReportJob do
     it 'records the object as not found and counts it as a failure' do
       job.perform_now
 
-      expect(File.read(bulk_action.export_filepath)).to eq(
+      expect(File.read(bulk_action.export_filepath(:checksum_report))).to eq(
         <<~CSV
           druid,filename,md5,sha1,sha256,size
           #{bare_druid},object not found or not fully accessioned

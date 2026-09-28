@@ -41,7 +41,7 @@ RSpec.describe BulkActions::ExportTrackingSheetsJob do
   it 'renders the PDF to the export filepath' do
     job.perform_now
 
-    expect(pdf).to have_received(:render_file).with(bulk_action.export_filepath)
+    expect(pdf).to have_received(:render_file).with(bulk_action.export_filepath(:tracking_sheets))
   end
 
   it 'records the correct counts' do

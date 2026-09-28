@@ -8,20 +8,29 @@ module BulkActions
   class ExportCatalogDataJob < DruidsJob
     HEADERS = %w[druid folio_instance_hrid refresh part_label sort_key barcode].freeze
 
-    def export_file
-      @export_file ||= CSV.open(bulk_action.export_filepath, 'w', write_headers: true, headers: HEADERS)
+    def perform_bulk_action
+      CSV.open(bulk_action.export_filepath(:catalog_data), 'w', write_headers: true, headers: HEADERS) do |export_csv|
+        super(export_csv:)
+      end
     end
 
     # Exports catalog data for a single object
     class JobItem < BaseJobItem
+      def initialize(export_csv:, **)
+        @export_csv = export_csv
+        super(**)
+      end
+
       def perform
         return unless check_object_type?(allow_admin_policy: false)
 
-        export_file << [DruidSupport.bare_druid_from(druid), *catalog_data]
+        export_csv << [DruidSupport.bare_druid_from(druid), *catalog_data]
         success!(message: 'Exported catalog data')
       end
 
       private
+
+      attr_reader :export_csv
 
       def catalog_data
         catalog_record_id = cocina_model.folio_catalog_links.first&.catalog_record_id

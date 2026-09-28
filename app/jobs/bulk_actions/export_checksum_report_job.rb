@@ -6,25 +6,37 @@ module BulkActions
   class ExportChecksumReportJob < DruidsJob
     HEADERS = %w[druid filename md5 sha1 sha256 size].freeze
 
-    def export_file
-      @export_file ||= CSV.open(bulk_action.export_filepath, 'w', write_headers: true, headers: HEADERS)
+    def perform_bulk_action
+      export_filepath = bulk_action.export_filepath(:checksum_report)
+      CSV.open(export_filepath, 'w', write_headers: true, headers: HEADERS) do |export_csv|
+        super(export_csv:)
+      end
     end
 
     # Export checksums for a single object
     class JobItem < BaseJobItem
+      def initialize(export_csv:, **)
+        @export_csv = export_csv
+        super(**)
+      end
+
       def perform # rubocop:disable Metrics/AbcSize
         return unless check_read_ability?
 
         Preservation::Client.objects.checksum(druid:).each do |hash|
-          export_file << [DruidSupport.bare_druid_from(druid), hash['filename'], hash['md5'],
-                          hash['sha1'], hash['sha256'], hash['filesize']]
+          export_csv << [DruidSupport.bare_druid_from(druid), hash['filename'], hash['md5'],
+                         hash['sha1'], hash['sha256'], hash['filesize']]
         end
 
         success!(message: 'Exported checksum report')
       rescue Preservation::Client::NotFoundError
-        export_file << [DruidSupport.bare_druid_from(druid), 'object not found or not fully accessioned']
+        export_csv << [DruidSupport.bare_druid_from(druid), 'object not found or not fully accessioned']
         failure!(message: 'Object not found or not fully accessioned')
       end
+
+      private
+
+      attr_reader :export_csv
     end
   end
 end

@@ -88,97 +88,65 @@ RSpec.describe BulkAction do
     end
   end
 
-  describe '.export_file?' do
+  describe '.export_filepath' do
+    subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+
+    it 'returns the export file path for the key' do
+      expect(bulk_action.export_filepath(:cocina_json))
+        .to eq(File.join(Settings.bulk_actions.directory, "export_cocina_json_#{bulk_action.id}", 'cocina.jsonl.gz'))
+    end
+
+    context 'when the key is not configured' do
+      it 'raises' do
+        expect { bulk_action.export_filepath(:tags) }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe '.existing_exports' do
     context 'when the export file exists' do
       subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
       before do
-        File.write(bulk_action.export_filepath, 'Report content')
+        File.write(bulk_action.export_filepath(:cocina_json), 'Report content')
       end
 
-      it 'returns true' do
-        expect(bulk_action.export_file?).to be true
+      it 'returns the export' do
+        expect(bulk_action.existing_exports).to eq(BulkActions::EXPORT_COCINA_JSON.exports)
       end
     end
 
     context 'when the export file does not exist' do
       subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
-      it 'returns false' do
-        expect(bulk_action.export_file?).to be false
+      it 'returns no exports' do
+        expect(bulk_action.existing_exports).to be_empty
       end
     end
 
-    context 'when there is no export filename configured' do
+    context 'when there are no exports configured' do
       subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 
-      it 'returns false' do
-        expect(bulk_action.export_file?).to be false
+      it 'returns no exports' do
+        expect(bulk_action.existing_exports).to be_empty
       end
     end
   end
 
-  describe '.show_csv_export?' do
-    context 'when the export is configured to be shown and the CSV export file exists' do
-      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
-
-      before do
-        File.write(bulk_action.export_filepath, 'druid,status')
-      end
-
-      it 'returns true' do
-        expect(bulk_action.show_csv_export?).to be true
-      end
-    end
-
-    context 'when the export is not configured to be shown' do
-      subject(:bulk_action) { described_class.create!(action_type: :export_catalog_data, user:) }
-
-      before do
-        File.write(bulk_action.export_filepath, 'druid,barcode')
-      end
-
-      it 'returns false' do
-        expect(bulk_action.show_csv_export?).to be false
-      end
-    end
-
-    context 'when the export file does not exist' do
-      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
-
-      it 'returns false' do
-        expect(bulk_action.show_csv_export?).to be false
-      end
-    end
-
-    context 'when the export file is not a CSV' do
-      subject(:bulk_action) { described_class.create!(action_type: :register_csv, user:) }
-
-      before do
-        allow(bulk_action.bulk_action_config).to receive(:export_filename).and_return('report.pdf')
-        File.write(bulk_action.export_filepath, 'Report content')
-      end
-
-      it 'returns false' do
-        expect(bulk_action.show_csv_export?).to be false
-      end
-    end
-  end
-
-  describe '.export_filepath' do
+  describe '.downloadable_filename?' do
     subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
-    it 'returns the correct export file path' do
-      expect(bulk_action.export_filepath)
-        .to eq(File.join(Settings.bulk_actions.directory, "export_cocina_json_#{bulk_action.id}", 'cocina.jsonl.gz'))
+    it 'allows the log file' do
+      expect(bulk_action.downloadable_filename?('log.txt')).to be true
     end
-  end
 
-  describe '.export_label' do
-    subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
+    it 'allows a configured export file' do
+      expect(bulk_action.downloadable_filename?('cocina.jsonl.gz')).to be true
+    end
 
-    it 'returns the configured export label' do
-      expect(bulk_action.export_label).to eq('Cocina JSON')
+    it 'does not allow other files' do
+      expect(bulk_action.downloadable_filename?('tags.csv')).to be false
+      expect(bulk_action.downloadable_filename?('../../secrets.yml')).to be false
     end
   end
 

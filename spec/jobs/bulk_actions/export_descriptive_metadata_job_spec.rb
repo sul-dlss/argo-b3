@@ -7,7 +7,7 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
   subject(:job) { described_class.new(bulk_action:, druids:) }
 
   let(:bulk_action) { create(:bulk_action, action_type: 'export_descriptive_metadata') }
-  let(:csv_path) { bulk_action.export_filepath }
+  let(:csv_path) { bulk_action.export_filepath(:descriptive_metadata) }
   let(:log) { instance_double(File, puts: nil, close: true) }
 
   let(:druids) { [druid1, druid2, druid3] }

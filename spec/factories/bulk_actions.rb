@@ -17,11 +17,14 @@ FactoryBot.define do
     trait :with_export do
       transient do
         export_content { 'Export content' }
+        # Defaults to the first export configured for the action type.
+        export_key { nil }
       end
       after(:create) do |bulk_action, evaluator|
-        raise 'No export filename configured for this action type' if bulk_action.export_filename.nil?
+        raise 'No exports configured for this action type' if bulk_action.exports.empty?
 
-        File.write(bulk_action.export_filepath, evaluator.export_content)
+        export_key = evaluator.export_key || bulk_action.exports.first.key
+        File.write(bulk_action.export_filepath(export_key), evaluator.export_content)
       end
     end
   end

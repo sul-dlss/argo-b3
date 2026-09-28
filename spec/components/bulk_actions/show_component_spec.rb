@@ -56,14 +56,13 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
         "tr:nth-of-type(5) td a[href='/bulk_actions/#{bulk_action.id}/file?filename=log.txt'][download]",
         text: 'log.txt'
       )
-      expect(table).to have_css('tr:nth-of-type(6) th', text: bulk_action.export_label)
+      expect(table).to have_css('tr:nth-of-type(6) th', text: 'Cocina JSON')
       expect(table).to have_css(
-        "tr:nth-of-type(6) td a[href='/bulk_actions/#{bulk_action.id}/" \
-        "file?filename=#{bulk_action.export_filename}'][download]",
-        text: bulk_action.export_filename
+        "tr:nth-of-type(6) td a[href='/bulk_actions/#{bulk_action.id}/file?filename=cocina.jsonl.gz'][download]",
+        text: 'cocina.jsonl.gz'
       )
       expect(table).to have_css('tbody tr', count: 6)
-      expect(page).to have_no_table('bulk-action-export-table')
+      expect(page).to have_no_table('bulk-action-cocina-json-table')
     end
   end
 
@@ -83,9 +82,9 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
     it 'renders the export as a data table' do
       render_inline(component)
 
-      table = page.find('table#bulk-action-export-table')
+      table = page.find('table#bulk-action-registration-report-table')
       expect(table[:class]).to include('table-data')
-      expect(table).to have_css('caption h2', text: BulkActions::REGISTER_CSV.export_label)
+      expect(table).to have_css('caption h2', text: 'Registration report')
       expect(table).to have_css('thead th', count: 5)
       expect(table).to have_css('thead th:nth-of-type(1)', text: 'Druid')
       expect(table).to have_css('thead th:nth-of-type(2)', text: 'Barcode')

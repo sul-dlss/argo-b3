@@ -18,6 +18,25 @@ RSpec.describe 'Getting bulk action file' do
       expect(response.body).to eq('Log content')
       expect(response.header['Content-Disposition']).to include('attachment; filename="log.txt"')
     end
+
+    context 'when the file is an export' do
+      let!(:bulk_action) { create(:bulk_action, :with_export, action_type: :export_tags, user:) }
+
+      it 'allows downloading the export file' do
+        get file_bulk_action_path(bulk_action, filename: 'tags.csv')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq('Export content')
+      end
+    end
+
+    context 'when the file is not a log or export file' do
+      it 'returns not found' do
+        get file_bulk_action_path(bulk_action, filename: '../../config/database.yml')
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   context 'when not authorized' do

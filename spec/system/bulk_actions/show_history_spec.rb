@@ -47,9 +47,9 @@ RSpec.describe 'Show bulk actions history' do
     end
     expect(log_txt).to eq('Log content')
 
-    expect(row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.export_label)
-    export_txt = with_download(BulkActions::EXPORT_COCINA_JSON.export_filename) do
-      row.click_link(BulkActions::EXPORT_COCINA_JSON.export_label)
+    expect(row).to have_css('td:nth-of-type(7) a', text: 'Cocina JSON')
+    export_txt = with_download('cocina.jsonl.gz') do
+      row.click_link('Cocina JSON')
     end
     expect(export_txt).to eq('Export content')
 

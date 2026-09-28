@@ -168,14 +168,9 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
     build(:dro, id: druid).new(structural:, access: { view: 'world', download: 'world' })
   end
 
-  let(:job_item) do
-    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
-      allow(job_item).to receive(:cocina_object).and_return(cocina_object)
-    end
-  end
-
   before do
-    allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    allow(described_class::JobItem).to receive(:new).and_call_original
+    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -187,7 +182,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   it 'performs the job' do
     job.perform_now
 
-    expect(described_class::JobItem).to have_received(:new).with(druid:, index: 0, job:)
+    expect(described_class::JobItem).to have_received(:new).with(druid:, index: 0, job:, export_csv: instance_of(CSV))
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -195,8 +190,8 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
 
     expect(log.string).to include "#{druid}\tSuccess: Exported structural metadata"
 
-    expect(File).to exist(bulk_action.export_filepath)
-    output = CSV.read(bulk_action.export_filepath, headers: true)
+    expect(File).to exist(bulk_action.export_filepath(:structural_metadata))
+    output = CSV.read(bulk_action.export_filepath(:structural_metadata), headers: true)
     expect(output.size).to eq 4 # header + 2 filesets + 2 files
     expect(output.first.to_csv).to eq "bc123df4567,Image 1,image,1,bb045jk9908_0001.tiff,bb045jk9908_0001.tiff,no,no,yes,world,world,,image/tiff,,,false,false\n" # rubocop:disable Layout/LineLength
   end
@@ -210,8 +205,8 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(log.string).to include "#{druid}\tError: No structural metadata to export"
 
-      expect(File).to exist(bulk_action.export_filepath)
-      File.open(bulk_action.export_filepath, 'r') do |file|
+      expect(File).to exist(bulk_action.export_filepath(:structural_metadata))
+      File.open(bulk_action.export_filepath(:structural_metadata), 'r') do |file|
         expect(file.readlines.size).to eq 1 # just a header row
       end
     end

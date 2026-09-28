@@ -27,6 +27,7 @@ class BulkActionsController < ApplicationController
 
   def file
     authorize! @bulk_action
+    return head :not_found unless @bulk_action.downloadable_filename?(params[:filename])
 
     send_file(@bulk_action.filepath_for(filename: params[:filename]))
   end

@@ -28,7 +28,6 @@ module BulkActions
       bulk_action.completed!
       perform_broadcast
     ensure
-      export_file&.close
       log_file&.close
     end
 
@@ -70,14 +69,6 @@ module BulkActions
     def perform_item_class
       # For example, the bulk action item for AddWorkflowJob is AddWorkflowJob::JobItem
       self.class.const_get('JobItem')
-    end
-
-    # Open file to use for export output, if any.
-    # By default, there is no export file.
-    # It will be closed automatically when the job ends and available to BulkActionItem.
-    # For example: @export_file ||= CSV.open(csv_download_path, 'w', write_headers: true, headers: HEADERS)
-    def export_file
-      @export_file ||= nil
     end
 
     private
