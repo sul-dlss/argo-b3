@@ -3,6 +3,8 @@
 module Search
   # Controller for project searches
   class ProjectsController < SearchApplicationController
+    include TurboFrameOnlyConcern
+
     layout false
 
     def index
