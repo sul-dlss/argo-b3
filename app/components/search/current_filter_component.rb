@@ -44,7 +44,7 @@ module Search
       facet_config = Search::Facets.find_config_by_form_field(form_field)
       # Values for dynamic facets may need to be mapped to user-friendly labels.
       return helpers.facet_value_label(value) if facet_config&.dynamic_facet
-      # Composite facet values are selected by druid, so resolve the title to display instead.
+      # Composite facet values are selected by id (e.g., druid), so resolve the label to display instead.
       return facet_labels.fetch(value, value) if facet_config&.composite_facet_field
 
       value

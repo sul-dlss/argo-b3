@@ -83,6 +83,17 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with licenses (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(licenses: ['https://creativecommons.org/publicdomain/zero/1.0/legalcode']) }
+
+    it 'builds the correct filter query for license URIs' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include(
+        "#{Search::Fields::LICENSE_URI}:(\"https\\:\\/\\/creativecommons.org\\/publicdomain\\/zero\\/1.0\\/legalcode\")"
+      )
+    end
+  end
+
   context 'with a facet value containing a double quote (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(projects: ['2" quad']) }
 
