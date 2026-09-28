@@ -44,6 +44,7 @@ module Search
     LAST_DEPOSITED_DATE = 'deposited_latest_dtpsidv'
     LAST_OPENED_DATE = 'opened_latest_dtpsidv'
     LAST_PUBLISHED_DATE = 'published_latest_dtpsidv'
+    LICENSE_LABEL = 'use_license_label_ss'
     LICENSES = 'use_license_machine_ssidv'
     METADATA_SOURCE = 'metadata_source_ssimdv'
     MIMETYPES = 'content_file_mimetypes_ssimdv'

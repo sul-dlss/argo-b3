@@ -73,7 +73,7 @@ RSpec.describe 'Show item' do
     ]
   end
 
-  def build_solr_doc(title:, last_deposited: '2026-07-26')
+  def build_solr_doc(title:, last_deposited: '2026-07-26', license_label: 'CC Attribution 4.0 International')
     {
       Search::Fields::ID => druid,
       Search::Fields::OBJECT_TYPES => ['item'],
@@ -90,6 +90,7 @@ RSpec.describe 'Show item' do
       Search::Fields::CONTENT_TYPES => ['book'],
       Search::Fields::STATUS => 'v2 deposited',
       Search::Fields::HUMAN_PRESERVED_SIZE => '30 MB',
+      Search::Fields::LICENSE_LABEL => license_label,
       Search::Fields::FORMATTED_REGISTERED_EARLIEST_DATE => '2025-01-08',
       Search::Fields::FORMATTED_DEPOSITED_LATEST_DATE => last_deposited,
       Search::Fields::FORMATTED_EMBARGO_RELEASE_DATE => '2040-06-15 12:00:00 PM',
@@ -274,7 +275,7 @@ RSpec.describe 'Show item' do
 
     # Access rows
     expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: Dark, Download: None')
-    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
+    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'CC Attribution 4.0 International')
     expect(page).to have_table_value('apo-collection-rights-table', 'Embargo',
                                      '2040-06-15 - View: World, Download: World')
 
@@ -391,7 +392,7 @@ RSpec.describe 'Show item' do
 
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr)
-      .and_return(build_solr_doc(title: updated_title, last_deposited: nil))
+      .and_return(build_solr_doc(title: updated_title, last_deposited: nil, license_label: 'CC Zero 1.0'))
     allow(Sdr::Repository).to receive(:find)
       .and_return(build_cocina_object(title: updated_title,
                                       access: {
@@ -411,7 +412,7 @@ RSpec.describe 'Show item' do
     click_button 'Overview'
     expect(find_table('overview-table')).to have_no_css('th', text: 'Last deposited')
     expect(page).to have_table_value('apo-collection-rights-table', 'Access rights', 'View: World, Download: World')
-    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
+    expect(page).to have_table_value('apo-collection-rights-table', 'License', 'CC Zero 1.0')
     expect(page).to have_table_value('serials-table', 'Part label', 'Part 2')
     expect(find_table('serials-table')).to have_no_css('th', text: 'Sort key')
     within('.card', text: 'Use and reproduction') do
