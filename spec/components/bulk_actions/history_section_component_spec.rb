@@ -54,6 +54,29 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
   end
 
+  context 'when a bulk action has multiple export files' do
+    let(:component) do
+      described_class.new(bulk_actions: BulkAction.where(id: bulk_action.id).page(1).per(20))
+    end
+
+    let(:bulk_action) { create(:bulk_action, :with_export, action_type: :register_csv, status: :completed) }
+
+    before do
+      File.write(bulk_action.export_filepath(:tracking_sheets), 'PDF content')
+    end
+
+    it 'renders a link for each export file' do
+      render_inline(component)
+
+      row = page.find("tr##{dom_id(bulk_action, 'row')}")
+      expect(row).to have_css('td:nth-of-type(7) a', count: 2)
+      expect(row).to have_link('Registration report',
+                               href: "/bulk_actions/#{bulk_action.id}/file?filename=registration_report.csv")
+      expect(row).to have_link('Tracking sheets',
+                               href: "/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf")
+    end
+  end
+
   context 'when there are multiple pages' do
     before { create_list(:bulk_action, 5) }
 

@@ -125,4 +125,33 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(table).to have_no_css('tbody td:nth-of-type(2) a')
     end
   end
+
+  context 'when the bulk action is completed with multiple export files' do
+    let(:bulk_action) do
+      create(:bulk_action, :with_export,
+             action_type: :register_csv,
+             status: :completed,
+             export_content: "Druid,Barcode,Folio Instance HRID,Source Id,Title\n")
+    end
+
+    before do
+      File.write(bulk_action.export_filepath(:tracking_sheets), 'PDF content')
+    end
+
+    it 'renders a row for each export file and a table only for the shown export' do
+      render_inline(component)
+
+      table = page.find('table#bulk-action-details-table')
+      expect(table).to have_css('tr:nth-of-type(5) th', text: 'Registration report')
+      expect(table).to have_css('tr:nth-of-type(5) td a', text: 'registration_report.csv')
+      expect(table).to have_css('tr:nth-of-type(6) th', text: 'Tracking sheets')
+      expect(table).to have_css(
+        "tr:nth-of-type(6) td a[href='/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf'][download]",
+        text: 'tracking_sheets.pdf'
+      )
+
+      expect(page).to have_table('bulk-action-registration-report-table')
+      expect(page).to have_no_table('bulk-action-tracking-sheets-table')
+    end
+  end
 end

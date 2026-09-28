@@ -29,8 +29,12 @@ RSpec.describe BulkActions::RegisterCsvJob do
     CSV
   end
 
+  let(:pdf) { instance_double(Prawn::Document, render_file: nil) }
+
   before do
     allow(Sdr::Repository).to receive(:register).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find_solr) { |druid:| { Search::Fields::ID => druid } }
+    allow(TracksheetService).to receive(:call).and_return(pdf)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -98,6 +102,10 @@ RSpec.describe BulkActions::RegisterCsvJob do
       expect(log).to have_received(:puts).with(/druid:df123df4567\tSuccess: Registration successful/).twice
       expect(bulk_action.druid_count_success).to eq 2
       expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\ndf123df4567,36105010101010,in12345,foo:bar1,factory DRO title\n") # rubocop:disable Layout/LineLength
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters.map(&:druid)).to eq ['druid:df123df4567', 'druid:df123df4567']
+      end
+      expect(pdf).to have_received(:render_file).with(bulk_action.export_filepath(:tracking_sheets))
     end
   end
 
