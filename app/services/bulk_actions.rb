@@ -35,11 +35,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   # A file created by a bulk action.
   # When show is true and the file is a CSV, the CSV is displayed as a table on the bulk action show page.
-  Export = Data.define(:key, :filename, :label, :show) do
-    def initialize(key:, filename:, label:, show: false)
-      super
-    end
-  end
+  Export = Struct.new('BulkActionExport', :key, :filename, :label, :show)
 
   ADD_WORKFLOW = Config.new(
     label: 'Add workflow',
