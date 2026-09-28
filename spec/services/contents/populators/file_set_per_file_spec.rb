@@ -6,7 +6,9 @@ RSpec.describe Contents::Populators::FileSetPerFile do
   subject(:structure) { described_class.structure(content:, cocina_object:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
-  let(:cocina_object) { build(:dro_with_metadata, id: content.druid) }
+  let(:cocina_object) do
+    build(:dro_with_metadata, id: content.druid).new(access: { view: 'world', download: 'world' })
+  end
   let!(:content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image1.tif') }
 
   describe '.structure' do
@@ -47,6 +49,31 @@ RSpec.describe Contents::Populators::FileSetPerFile do
       it 'does not create another file set for it' do
         expect { structure }.not_to change(ContentFileSet, :count)
         expect(content.content_files.sole.content_file_binary).to eq(content_file_binary)
+      end
+    end
+
+    context 'when the binary has a mime type' do
+      let!(:content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'folder/image1.tif', mime_type: 'image/tiff')
+      end
+
+      it 'uses the attributes for its mime type' do
+        structure
+
+        expect(content.content_files.sole).to have_attributes(preserve: true, publish: false, shelve: false, use: nil)
+      end
+    end
+
+    context 'when the object is dark' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: content.druid).new(access: { view: 'dark', download: 'none' })
+      end
+
+      it 'preserves but does not shelve or publish the file' do
+        structure
+
+        expect(content.content_files.sole).to have_attributes(preserve: true, publish: false, shelve: false,
+                                                              view: 'dark')
       end
     end
 
