@@ -23,7 +23,7 @@ RSpec.describe 'Show collection' do
   let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
-  def build_solr_doc(title:)
+  def build_solr_doc(title:, license_label: 'CC Attribution 4.0 International')
     {
       Search::Fields::ID => druid,
       Search::Fields::OBJECT_TYPES => ['collection'],
@@ -32,6 +32,7 @@ RSpec.describe 'Show collection' do
       Search::Fields::APO_TITLE => ['My APO'],
       Search::Fields::SOURCE_ID => 'googlebooks:stanford_36105114203446',
       Search::Fields::CATALOG_RECORD_ID => ['a6525053'],
+      Search::Fields::LICENSE_LABEL => license_label,
       Search::Fields::ALL_TAGS => ['Registered By : jdoe', 'Remediated By : labtech', 'Ticket : TESTREQ-1'],
       Search::Fields::TICKETS => ['TESTREQ-1']
     }
@@ -107,7 +108,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_table_caption('access-table', 'APO and rights')
     expect(page).to have_table_value('access-table', 'Access rights', 'View: Dark')
     expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
-    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/licenses/by/4.0/legalcode')
+    expect(page).to have_table_value('access-table', 'License', 'CC Attribution 4.0 International')
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
 
     # Tags card
@@ -129,7 +130,8 @@ RSpec.describe 'Show collection' do
     expect(page).to have_link('View PURL page',
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
-    allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
+    allow(Sdr::Repository).to receive(:find_solr)
+      .and_return(build_solr_doc(title: updated_title, license_label: 'CC Zero 1.0'))
     allow(Sdr::Repository).to receive(:find)
       .and_return(build_cocina_object(title: updated_title, access: {
                                         view: 'world',
@@ -143,7 +145,7 @@ RSpec.describe 'Show collection' do
     click_button 'Overview'
     expect(page).to have_table_value('access-table', 'Access rights', 'View: World')
     expect(page).to have_table_value('access-table', 'Copyright', 'My updated copyright statement')
-    expect(page).to have_table_value('access-table', 'License', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode')
+    expect(page).to have_table_value('access-table', 'License', 'CC Zero 1.0')
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My updated use statement')
 
     click_button 'Cocina JSON'

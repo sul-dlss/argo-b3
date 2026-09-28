@@ -32,7 +32,7 @@
     <% end %>
     <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
     <% component.with_row(label: 'Embargo', value: @cocina_model.embargo) %>
-    <% component.with_row(label: 'License', value: @cocina_model.license) %>
+    <% component.with_row(label: 'License', value: @solr_doc.license_label) %>
   <% end %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'identification-table', classes: 'mb-5') do |component| %>

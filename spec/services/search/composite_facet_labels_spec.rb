@@ -5,7 +5,11 @@ require 'rails_helper'
 RSpec.describe Search::CompositeFacetLabels do
   let(:apo_druid) { 'druid:bc123df4567' }
   let(:collection_druid) { 'druid:gh456jk7890' }
-  let(:search_form) { ResultsSearchForm.new(admin_policy_druids: [apo_druid], collection_druids: [collection_druid]) }
+  let(:license_uri) { 'https://creativecommons.org/publicdomain/zero/1.0/legalcode' }
+  let(:search_form) do
+    ResultsSearchForm.new(admin_policy_druids: [apo_druid], collection_druids: [collection_druid],
+                          licenses: [license_uri])
+  end
 
   before do
     allow(Search::SolrService).to receive(:post) do |request:|
@@ -13,16 +17,18 @@ RSpec.describe Search::CompositeFacetLabels do
       bucket_val = case field
                    when Search::Fields::APO_TITLE_DRUID then "University Archives:#{apo_druid}"
                    when Search::Fields::COLLECTION_TITLE_DRUIDS then "David Rumsey Map Collection:#{collection_druid}"
+                   when Search::Fields::LICENSE_LABEL_URI then "CC Zero 1.0:#{license_uri}"
                    end
       { 'facets' => { field => { 'buckets' => [{ 'val' => bucket_val }] } } }
     end
   end
 
   describe '.call' do
-    it 'returns a hash of druid to label for each selected composite facet value' do
+    it 'returns a hash of id to label for each selected composite facet value' do
       expect(described_class.call(search_form:)).to eq(
         apo_druid => 'University Archives',
-        collection_druid => 'David Rumsey Map Collection'
+        collection_druid => 'David Rumsey Map Collection',
+        license_uri => 'CC Zero 1.0'
       )
     end
   end

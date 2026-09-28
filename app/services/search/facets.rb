@@ -44,8 +44,10 @@ module Search
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
                         :dynamic_facet,
-                        # `composite_facet_field` is a solr field whose values encode "<label>:<druid>"
-                        # (see Search::CompositeFacetValue), e.g. "Stanford Theses:druid:bc123df4567".
+                        # `composite_facet_field` is a solr field whose values encode "<label>:<id>"
+                        # (see Search::CompositeFacetValue), where the id is a druid or a URI,
+                        # e.g. "Stanford Theses:druid:bc123df4567" or
+                        # "CC Zero 1.0:https://creativecommons.org/publicdomain/zero/1.0/legalcode".
                         # Set this when a facet needs to filter on an identifier (eg druid) but display and
                         # text-search a human-readable label (eg object title). Since a title alone isn't unique
                         # faceting on the display label directly (like most facets do) is ambiguous for
@@ -178,9 +180,11 @@ module Search
       }
     )
 
+    # Facets and filters on the license URI, but displays the license label via the composite field.
     LICENSES = Config.with_defaults(
       form_field: :licenses,
-      field: Search::Fields::LICENSES,
+      field: Search::Fields::LICENSE_URI,
+      composite_facet_field: Search::Fields::LICENSE_LABEL_URI,
       limit: 50
     )
 

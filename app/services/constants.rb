@@ -17,6 +17,8 @@ module Constants # rubocop:disable Metrics/ModuleLength
 
   DEFAULT_WORKFLOW = 'registrationWF'
 
+  # This should be kept in sync with LICENSES in
+  # https://github.com/sul-dlss/dor-services-app/blob/main/app/services/indexing/indexers/rights_metadata_indexer.rb
   LICENSE_OPTIONS = [
     # CC4 licenses
     { label: 'CC Attribution 4.0 International',
