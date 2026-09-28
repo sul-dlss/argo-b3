@@ -23,7 +23,7 @@ class MultipleItemsController < ApplicationController
       flash[:toast] = "#{bulk_action_config.label} submitted"
       redirect_to bulk_action_path(bulk_action)
     when 'invalid', 'failed'
-      set_apo_options
+      set_apo_and_collection_options
       flash.now[:warning] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
       render :new, status: :unprocessable_content
     else
@@ -35,7 +35,7 @@ class MultipleItemsController < ApplicationController
     authorize! with: ItemPolicy
 
     @items_registration_form = ItemsRegistrationForm.new
-    set_apo_options
+    set_apo_and_collection_options
   end
 
   def create
@@ -45,7 +45,7 @@ class MultipleItemsController < ApplicationController
 
     if params[:commit] == CLEAR_VALUE
       @items_registration_form.item_registrations.clear
-      set_apo_options
+      set_apo_and_collection_options
       render :new, status: :unprocessable_content
     else
       form_validation_action = FormValidationAction.create!(user: current_user, form: @items_registration_form,
@@ -59,8 +59,12 @@ class MultipleItemsController < ApplicationController
 
   private
 
-  def set_apo_options
+  def set_apo_and_collection_options
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
+    # Only the selected collections are options, since other options are loaded as the user types.
+    druids = @items_registration_form.collection_druids
+    titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
+    @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
   end
 
   def items_registration_form_params

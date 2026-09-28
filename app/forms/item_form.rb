@@ -7,6 +7,7 @@ class ItemForm < CocinaModels::Dro
   include EmbargoFormConcern
   include TitleFormConcern
   include TagsFormConcern
+  include CollectionFormConcern
   include CocinaModels::CatalogRecordIdConcern
 
   SOURCE_ID_PROVIDED_CHOICE = 'provide'
@@ -23,9 +24,6 @@ class ItemForm < CocinaModels::Dro
   validates :source_id_prefix, presence: true, if: -> { source_id_choice == SOURCE_ID_GENERATE_CHOICE }
 
   has_one :release_tags
-
-  # Removes the blank value submitted by the multiple select.
-  normalizes_array_compact_blank :collection_druids
 
   attribute :description_choice, :string, default: DESCRIPTION_TITLE_CHOICE
 
@@ -44,8 +42,6 @@ class ItemForm < CocinaModels::Dro
   before_validation :generate_source_id, if: lambda {
     source_id_choice == SOURCE_ID_GENERATE_CHOICE && source_id_prefix.present?
   }
-
-  attribute :limit_collection_by_apo, :boolean, default: false
 
   def initialize(attributes = {})
     super

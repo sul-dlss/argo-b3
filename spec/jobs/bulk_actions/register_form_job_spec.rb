@@ -130,6 +130,24 @@ RSpec.describe BulkActions::RegisterFormJob do
     end
   end
 
+  context 'when the form has collections' do
+    before do
+      items_registration_form.collection_druids = %w[druid:hv992ry2431 druid:kq123mn4567]
+    end
+
+    it 'registers every object as a member of the collections' do
+      job.perform_now
+
+      request_cocina_objects = []
+      expect(Sdr::Repository).to have_received(:register).twice do |request_cocina_object:, **|
+        request_cocina_objects << request_cocina_object
+      end
+
+      expect(request_cocina_objects.map { |request| request.structural.isMemberOf })
+        .to all(eq(%w[druid:hv992ry2431 druid:kq123mn4567]))
+    end
+  end
+
   context 'when depositing with Goobi' do
     before do
       items_registration_form.deposit_with_goobi = true

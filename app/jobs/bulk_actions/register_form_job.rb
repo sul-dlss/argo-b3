@@ -48,6 +48,7 @@ module BulkActions
         items_registration_form.attributes.symbolize_keys.slice(
           :content_type,
           :apo_druid,
+          :collection_druids,
           :use_and_reproduction_statement,
           :license,
           :copyright,

@@ -9,8 +9,7 @@ module CocinaModels
     include EmbargoConcern
     include SourceIdConcern
     include BarcodeConcern
-
-    attribute :collection_druids, array: true, default: -> { [] }
+    include CollectionConcern
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build this model from
     def self.build_from_cocina_object(cocina_object)
