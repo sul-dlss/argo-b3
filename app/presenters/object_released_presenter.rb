@@ -17,7 +17,9 @@ class ObjectReleasedPresenter
   end
 
   def release_tag_links
-    released_release_tags.map { |release_tag| { label: release_tag.to, url: release_tag_url(release_tag) } }
+    released_release_tags.map do |release_tag|
+      { label: Constants::RELEASE_TARGETS.to_h.invert.fetch(release_tag.to, release_tag.to), url: release_tag_url(release_tag) }
+    end
   end
 
   private

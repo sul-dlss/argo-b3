@@ -78,7 +78,7 @@ RSpec.describe ObjectReleasedPresenter do
         [
           { label: 'Searchworks', url: 'https://searchworks.stanford.edu/view/bc123df4567' },
           { label: 'Earthworks', url: 'https://earthworks.stanford.edu/catalog/stanford-bc123df4567' },
-          { label: 'PURL sitemap', url: 'https://purl.stanford.edu/bc123df4567' }
+          { label: 'Search engines', url: 'https://purl.stanford.edu/bc123df4567' }
         ]
       )
     end
