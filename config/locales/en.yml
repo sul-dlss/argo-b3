@@ -113,6 +113,7 @@ en:
         populators:
           book: "Book (resource per page)"
           document: "Document (resource per PDF)"
+          geo: "Geo (single resource)"
           image: "Image (resource per image)"
           file_set_per_file: "Default (resource per file)"
         populator_reasons:

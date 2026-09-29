@@ -65,6 +65,16 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when the content type is geo' do
+    let(:cocina_type) { Cocina::Models::ObjectType.geo }
+
+    it 'selects the geo populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Geo,
+                                        actual_populator: Contents::Populators::Geo,
+                                        reasons: [])
+    end
+  end
+
   context 'when the content type is document and there is a PDF' do
     let(:cocina_type) { Cocina::Models::ObjectType.document }
 
