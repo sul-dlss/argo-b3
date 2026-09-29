@@ -1,10 +1,13 @@
 <div class="container py-2">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multiple_items.new.title'), classes: 'mb-3') %>
   <%= form_with(model: @items_registration_form, url: multiple_items_path, class: 'b3-form',
-                data: { controller: 'content-type-dependent',
-                        content_type_dependent_allowed_value: Constants::GOOBI_CONTENT_TYPES }) do |form| %>
+                data: { controller: 'content-type-dependent' }) do |form| %>
     <%= render Edit::ContentTypeComponent.new(form:, input_data: { content_type_dependent_target: 'contentType',
                                                                    action: 'content-type-dependent#toggle' }) %>
+
+    <%= render Edit::ViewingDirectionComponent.new(form:, container_classes: 'my-fieldset', label_classes: 'fw-bold',
+                                                   input_data: { content_type_dependent_target: 'dependent',
+                                                                 content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
@@ -31,7 +34,8 @@
     <%= render SdrViewComponents::Forms::FieldsetComponent.new(classes: 'my-fieldset',
                                                                hidden_label: true,
                                                                label: t('edit.items.fields.goobi.deposit'),
-                                                               data: { content_type_dependent_target: 'dependent' }) do %>
+                                                               data: { content_type_dependent_target: 'dependent',
+                                                                       content_type_dependent_allowed: Constants::GOOBI_CONTENT_TYPES }) do %>
       <div class="row align-items-center">
         <div class="col-3 form-label fw-bold" aria-hidden="true"><%= t('edit.items.fields.goobi.deposit') %></div>
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :deposit_with_goobi,

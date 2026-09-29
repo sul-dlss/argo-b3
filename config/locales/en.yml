@@ -257,6 +257,8 @@ en:
             required: "title is required if a FOLIO Instance HRID is not provided"
         use_and_reproduction_statement:
           label: "Use and reproduction"
+        viewing_direction:
+          label: "Viewing direction"
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."

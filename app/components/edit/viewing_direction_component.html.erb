@@ -1,0 +1,7 @@
+<%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+      form:,
+      field_name: :viewing_direction,
+      options: Constants::VIEWING_DIRECTIONS,
+      label_text: t('edit.items.fields.viewing_direction.label'),
+      **select_options
+    ) %>

@@ -197,6 +197,42 @@ RSpec.describe BulkActions::RegisterFormJob do
     end
   end
 
+  context 'when the form has a viewing direction' do
+    before do
+      items_registration_form.viewing_direction = 'right-to-left'
+    end
+
+    it 'registers every object with the viewing direction' do
+      job.perform_now
+
+      request_cocina_objects = []
+      expect(Sdr::Repository).to have_received(:register).twice do |request_cocina_object:, **|
+        request_cocina_objects << request_cocina_object
+      end
+
+      expect(request_cocina_objects.map { |request| request.structural.hasMemberOrders.map(&:viewingDirection) })
+        .to all(eq(['right-to-left']))
+    end
+  end
+
+  context 'when the form has a viewing direction but the content type does not have viewing directions' do
+    before do
+      items_registration_form.content_type = Cocina::Models::ObjectType.map
+      items_registration_form.viewing_direction = 'right-to-left'
+    end
+
+    it 'registers every object without the viewing direction' do
+      job.perform_now
+
+      request_cocina_objects = []
+      expect(Sdr::Repository).to have_received(:register).twice do |request_cocina_object:, **|
+        request_cocina_objects << request_cocina_object
+      end
+
+      expect(request_cocina_objects.map { |request| request.structural.hasMemberOrders }).to all(be_empty)
+    end
+  end
+
   context 'when depositing with Goobi' do
     before do
       items_registration_form.deposit_with_goobi = true
