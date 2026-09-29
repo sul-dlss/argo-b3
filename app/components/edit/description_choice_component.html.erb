@@ -29,10 +29,44 @@
         container_classes: 'my-fieldset'
       ) do |component| %>
     <% component.with_additional_container_content do %>
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_record_id,
-                                                                  label_text: t('edit.items.fields.catalog_record_id.label'),
-                                                                  label_mark_required: true,
-                                                                  container_classes: 'my-field') %>
+      <%= tag.div data: { controller: 'catalog-title',
+                          catalog_title_url_value: catalog_titles_path,
+                          catalog_title_error_message_value: t('edit.items.fields.catalog_record_id.errors.catalog_error') } do %>
+        <div class="my-field">
+          <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :catalog_record_id,
+                                                                  text: t('edit.items.fields.catalog_record_id.label'),
+                                                                  mark_required: true) %>
+          <%# The button is a standalone button beside the input rather than part of an input group.
+              Aligning to the start keeps it level with the input as feedback appears below the input. %>
+          <div class="d-flex align-items-start gap-2">
+            <div class="flex-grow-1">
+              <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(
+                    form:, field_name: :catalog_record_id, aria: catalog_record_id_aria,
+                    data: { catalog_title_target: 'hrid', action: 'input->catalog-title#reset' }
+                  ) %>
+              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :catalog_record_id) %>
+              <%# Populated by the catalog-title Stimulus controller when the title cannot be retrieved. %>
+              <%= tag.div class: 'invalid-feedback d-block d-none', data: { catalog_title_target: 'error' } %>
+            </div>
+            <%= render SdrViewComponents::Elements::ButtonComponent.new(
+                  label: t('edit.items.fields.catalog_record_id.retrieve_title'),
+                  variant: :'outline-primary',
+                  data: { catalog_title_target: 'button', action: 'catalog-title#retrieve' }
+                ) %>
+          </div>
+        </div>
+
+        <%# The retrieved title confirms that the catalog record id is the intended one. It is read only
+            because it comes from the catalog rather than from the user. %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+              form:, field_name: :retrieved_title,
+              label_text: t('edit.items.fields.retrieved_title.label'),
+              container_classes: retrieved_title_container_classes,
+              container_data: { catalog_title_target: 'titleContainer' },
+              input_readonly: true,
+              input_data: { catalog_title_target: 'title' }
+            ) %>
+      <% end %>
 
       <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
                                                                   label_text: t('edit.items.fields.barcode.label'),

@@ -8,7 +8,10 @@
   <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @item_form, id: form_id, url: items_path,
                                                                        html_options: { enctype: 'multipart/form-data' }) %>
 
-  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details) do |tab_list| %>
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.items.tabs.details.label'), tab_name: :details, mark_required: true) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.description.label'), tab_name: :description, mark_required: true) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.rights.label'), tab_name: :rights, mark_required: true) %>

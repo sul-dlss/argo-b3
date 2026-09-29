@@ -30,12 +30,43 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_field('Use FOLIO Instance HRID to retrieve title', type: 'radio', checked: true)
-      expect(page).to have_field('Folio Instance HRID', type: 'text', with: 'in11403803')
+      expect(page).to have_field('FOLIO Instance HRID', type: 'text', with: 'in11403803')
       expect(page).to have_field('Barcode', type: 'text', with: '36105010362304')
       expect(page).to have_field('Part label', type: 'text', with: 'v. 1')
       expect(page).to have_field('Sort key', type: 'text', with: '1')
 
       expect(page).to have_field('Enter title myself', type: 'radio', checked: false)
+    end
+
+    context 'when a title has already been retrieved' do
+      let(:item_form) do
+        ItemForm.new(description_choice: ItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
+                     retrieved_title: 'Pride and prejudice')
+      end
+
+      it 'renders the retrieved title without hiding it' do
+        render_inline(component)
+
+        title_container = page.find('[data-catalog-title-target="titleContainer"]')
+        expect(title_container[:class]).not_to include('d-none')
+        expect(title_container).to have_field('Title', type: 'text', with: 'Pride and prejudice', readonly: true)
+      end
+    end
+
+    it 'renders the retrieve title button beside the HRID input and a hidden title' do
+      render_inline(component)
+
+      expect(page).to have_css('[data-controller="catalog-title"][data-catalog-title-url-value="/catalog_titles"]')
+
+      field_row = page.find('input[data-catalog-title-target="hrid"]').ancestor('.d-flex')
+      expect(field_row).to have_button('Retrieve title', type: 'button')
+      expect(field_row).to have_no_css('.input-group')
+      expect(field_row).to have_css('.invalid-feedback.d-none[data-catalog-title-target="error"]')
+
+      title_container = page.find('.d-none[data-catalog-title-target="titleContainer"]')
+      title_field = title_container.find('input[data-catalog-title-target="title"]')
+      expect(title_field[:readonly]).to be_present
+      expect(title_container).to have_css("label.form-label[for='#{title_field[:id]}']", text: 'Title')
     end
   end
 

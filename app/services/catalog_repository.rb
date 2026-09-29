@@ -28,4 +28,21 @@ class CatalogRepository
 
     true
   end
+
+  # Retrieves the title of the catalog record for the given catalog record id (HRID).
+  #
+  # A catalog record id that matches multiple records is treated as not found, since it cannot
+  # be used to unambiguously identify a single catalog record.
+  #
+  # @param catalog_record_id [String] the catalog record id (Folio HRID, e.g., "a12345")
+  # @return [String, nil] the title of the matching catalog record, or nil if no matching or
+  #   multiple matching records were found
+  # @raise [CatalogRepository::Error] if the catalog request fails
+  def self.title(catalog_record_id:)
+    FolioClient.fetch_instance_info(hrid: catalog_record_id)['title']
+  rescue FolioClient::ResourceNotFound, FolioClient::MultipleResourcesFound
+    nil
+  rescue FolioClient::Error => e
+    raise Error, e.message
+  end
 end

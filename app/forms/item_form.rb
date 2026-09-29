@@ -30,6 +30,11 @@ class ItemForm < CocinaModels::Dro
   validates :title, presence: true, if: -> { description_choice == DESCRIPTION_TITLE_CHOICE }
   validates :catalog_record_id, presence: true, if: -> { description_choice == DESCRIPTION_CATALOG_ID_CHOICE }
 
+  # The title retrieved from the catalog, shown read only to confirm that the catalog record id is the
+  # intended one. The description is refreshed from the catalog, so this is never written to the Cocina
+  # object; it is an attribute of the form so that it survives a submission that fails validation.
+  attribute :retrieved_title, :string
+
   attribute :description_csv_file, :uploaded_file
   validate :description_csv_must_be_valid, if: -> { description_choice == DESCRIPTION_SPREADSHEET_CHOICE }
 

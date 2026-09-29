@@ -208,7 +208,12 @@ en:
         barcode:
           label: "Barcode"
         catalog_record_id:
-          label: "Folio Instance HRID"
+          label: "FOLIO Instance HRID"
+          retrieve_title: "Retrieve title"
+          errors:
+            blank: "Enter a FOLIO Instance HRID."
+            not_found: "FOLIO record not found"
+            catalog_error: "Connection with FOLIO couldn't be established"
           validations:
             not_found: "was not found in FOLIO"
         collection_druids:
@@ -261,6 +266,8 @@ en:
           label: 'Part label'
         project_tag:
           label: 'Project name'
+        retrieved_title:
+          label: 'Title'
         serials:
           label: 'Serials metadata'
         sort_key:
