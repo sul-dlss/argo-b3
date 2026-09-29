@@ -13,6 +13,7 @@ module Constants # rubocop:disable Metrics/ModuleLength
     goobiWF
     registrationWF
     wasSeedPreassemblyWF
+    gisDerivativeWF
   ].freeze
 
   DEFAULT_WORKFLOW = 'registrationWF'
