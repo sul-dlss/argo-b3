@@ -31,18 +31,6 @@ class ItemsController < ApplicationController
     end
   end
 
-  def update
-    druid = params[:id]
-    cocina_object = Sdr::Repository.find(druid:)
-    authorize! cocina_object, with: ItemPolicy
-
-    content = find_content(cocina_object:)
-    content.staging_started!
-    StageFilesJob.perform_later(content:, accession: params[:commit] == DEPOSIT_VALUE, user: current_user)
-    flash[:toast] = t('edit.items.new.toasts.staging_started')
-    redirect_to object_path(druid)
-  end
-
   private
 
   def item_form_params
@@ -63,11 +51,5 @@ class ItemsController < ApplicationController
     else
       object_path(@item_form.druid)
     end
-  end
-
-  def find_content(cocina_object:)
-    Content.find_by(druid: cocina_object.externalIdentifier,
-                    lock: cocina_object.lock,
-                    immutable: false)
   end
 end

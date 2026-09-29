@@ -33,7 +33,7 @@ RSpec.describe CocinaModels::Collection do
     let(:description) { 'Changed source id' }
 
     before do
-      allow(Sdr::Repository).to receive(:update)
+      allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object }
     end
 
     context 'with valid and changed attributes' do

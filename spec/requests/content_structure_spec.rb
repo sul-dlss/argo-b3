@@ -40,6 +40,33 @@ RSpec.describe 'Content structure' do
     end
   end
 
+  describe 'editing with a selected content type' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' })
+    end
+
+    before do
+      create(:content_file_binary, content:, filepath: 'page_0001.tif', mime_type: 'image/tiff')
+    end
+
+    it 'uses the populator for the selected content type' do
+      get edit_content_structure_path(content_id: content_token, content_type: Cocina::Models::ObjectType.book)
+
+      expect(response.body).to include('Strategy for structuring: Book (resource per page)')
+    end
+  end
+
+  describe 'updating with a selected content type' do
+    it 'redirects to edit with the selected content type' do
+      patch content_structure_path(content_id: content_token),
+            params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: 'FileSetPerFile',
+                      content_type: Cocina::Models::ObjectType.book }
+
+      expect(response).to redirect_to(edit_content_structure_path(content_id: content_token, structure_changed: true,
+                                                                  content_type: Cocina::Models::ObjectType.book))
+    end
+  end
+
   describe 'updating with an unknown populator' do
     it 'returns bad request' do
       patch content_structure_path(content_id: content_token),

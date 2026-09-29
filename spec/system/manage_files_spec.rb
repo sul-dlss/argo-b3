@@ -29,6 +29,7 @@ RSpec.describe 'Manage files' do
 
     allow(Sdr::Repository).to receive_messages(find: cocina_object,
                                                find_solr: build(:solr_item, druid:, title:))
+    allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
     allow(StageFilesJob).to receive(:perform_later)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
@@ -49,6 +50,31 @@ RSpec.describe 'Manage files' do
     expect(page).to have_css('.nav-link', text: 'Add files')
     expect(page).to have_css('.nav-link', text: 'Structure')
     expect(page).to have_css('.nav-link', text: 'Deposit')
+  end
+
+  it 'updates the item details and deposits' do
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+
+    expect(page).to have_select('Viewing direction', disabled: true)
+
+    select 'book', from: 'Content type'
+    select 'right-to-left', from: 'Viewing direction'
+
+    click_on 'Deposit'
+    click_button('Deposit')
+
+    expect(page).to have_current_path("/objects/#{druid}")
+
+    expect(Sdr::Repository).to have_received(:update)
+      .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.book,
+                                             structural: having_attributes(
+                                               hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]
+                                             )),
+            user_name: user.sunetid, description: nil)
+    expect(StageFilesJob).to have_received(:perform_later)
+      .with(content: Content.find_by!(druid:, immutable: false), accession: true, user:)
   end
 
   context 'when no files have been uploaded yet' do
@@ -146,6 +172,37 @@ RSpec.describe 'Manage files' do
       click_button('Structure files')
 
       expect(page).to have_toast('Structure built from files')
+
+      content = Content.find_by!(druid:)
+      expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'page', label: 'Page 1')
+    end
+  end
+
+  context 'when the content type is changed to book' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' })
+    end
+
+    it 'structures the files with the populator for the selected content type' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('page_0001.png')
+
+      click_on 'Structure'
+
+      expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
+
+      click_on 'Item details'
+      select 'book', from: 'Content type'
+
+      click_on 'Structure'
+
+      expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
+
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+      expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
 
       content = Content.find_by!(druid:)
       expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'page', label: 'Page 1')

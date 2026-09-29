@@ -10,7 +10,10 @@ class ContentStructureController < ContentsApplicationController
 
   def edit
     @structure_changed = params[:structure_changed] == 'true' # Triggers a reload of the files section.
-    @populator_selection = Contents::PopulatorSelector.call(content: @content, cocina_object: @cocina_object)
+    # The selected content type, which may not have been saved yet.
+    @content_type = params[:content_type]
+    @populator_selection = Contents::PopulatorSelector.call(content: @content, cocina_object: @cocina_object,
+                                                            content_type: @content_type)
 
     render layout: false
   end
@@ -25,7 +28,8 @@ class ContentStructureController < ContentsApplicationController
       flash[:toast] = t('edit.contents.structure.toasts.structure')
     end
 
-    redirect_to edit_content_structure_path(@content_token, structure_changed: true)
+    redirect_to edit_content_structure_path(@content_token, structure_changed: true,
+                                                            content_type: params[:content_type].presence)
   end
 
   private

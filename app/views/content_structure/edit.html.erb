@@ -17,7 +17,7 @@
     <% if @content.content_file_sets.none? %>
       <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
                                                                       label: 'Structure files',
-                                                                      params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: },
+                                                                      params: { commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_type: @content_type },
                                                                       top: false,
                                                                       method: :patch,
                                                                       variant: :'outline-primary') %>
@@ -25,7 +25,7 @@
       <div class="d-flex">
         <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
                                                                         label: 'Clear and structure files again',
-                                                                        params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: },
+                                                                        params: { commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_type: @content_type },
                                                                         top: false,
                                                                         method: :patch,
                                                                         variant: :'outline-primary') %>
@@ -33,7 +33,7 @@
         <% if unassociated_count.positive? %>
           <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
                                                                           label: 'Append files to structure',
-                                                                          params: { commit: ContentStructureController::APPEND_VALUE, populator: },
+                                                                          params: { commit: ContentStructureController::APPEND_VALUE, populator:, content_type: @content_type },
                                                                           classes: 'ms-3',
                                                                           top: false,
                                                                           method: :patch,

@@ -100,6 +100,8 @@ en:
           deposit: "Deposit"
           discover_files: "Discover files"
           draft: "Save as draft"
+        toasts:
+          stale: "This item was changed since you opened it. Review your changes and resubmit."
       mount:
         toasts:
           discovery_completed: "Completed discovering files"
@@ -122,6 +124,8 @@ en:
           no_images: "there are no image files"
           no_pdfs: "there are no PDF files"
       tabs:
+        details:
+          label: "Item details"
         add_files:
           label: "Add files"
         structural:

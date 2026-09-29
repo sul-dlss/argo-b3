@@ -29,7 +29,8 @@ module CocinaModels
       return unless changed?
 
       validate!
-      Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
+      updated_cocina_object = Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
+      refresh_cocina_object(updated_cocina_object)
       changes_applied
     end
 
