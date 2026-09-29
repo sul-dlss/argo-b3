@@ -39,7 +39,7 @@ RSpec.describe 'Content mount' do
       it 'starts discovery and redirects to show' do
         post content_mount_path(content_id: content_token), params: { mount: { path: mount_path } }
 
-        expect(response).to redirect_to(content_mount_path(content_id: content_token))
+        expect(response).to redirect_to(content_mount_path(content_id: content_token, discovery_started: true))
         expect(content.reload.mount_state).to eq('discovering')
         expect(DiscoverFilesJob).to have_been_enqueued.with(content:, mount_path:)
       end
@@ -66,6 +66,16 @@ RSpec.describe 'Content mount' do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('Discovering files...')
         expect(response.body).to include('data-controller="frame-reload"')
+        expect(response.body).to include(%(data-frame-reload-url-value="/contents/#{content_token}/mount"))
+        expect(response.body).not_to include('data-controller="dropzone-files-reload"')
+      end
+
+      context 'when discovery has just started' do
+        it 'renders the reload of the files sections' do
+          get content_mount_path(content_id: content_token, discovery_started: true)
+
+          expect(response.body).to include('data-controller="dropzone-files-reload"')
+        end
       end
     end
 

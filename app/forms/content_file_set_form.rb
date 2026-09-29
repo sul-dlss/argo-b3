@@ -23,7 +23,7 @@ class ContentFileSetForm < ApplicationForm
   def save # rubocop:disable Naming/PredicateMethod
     return false unless valid?
 
-    destroyed_content_file_binaries = ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction do
       # Captured before saving, since saving destroys the files.
       content_file_binary_ids = removed_content_file_binary_ids
       content_file_set.update!(label:, file_set_type:, content_files_attributes:)
@@ -31,20 +31,18 @@ class ContentFileSetForm < ApplicationForm
       destroy_content_file_set_if_all_files_removed
       destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
     end
-    after_commit_destroying(content_file_binaries: destroyed_content_file_binaries)
     true
   end
 
   # Deletes the resource and its files, as well as their binaries (including any staged copies)
   # when no other file references them. Unlike save, this also deletes a resource that has no files.
   def destroy
-    destroyed_content_file_binaries = ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction do
       # Captured before destroying, since destroying the resource destroys the files.
       content_file_binary_ids = content_file_set.content_files.pluck(:content_file_binary_id)
       content_file_set.destroy!
       destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
     end
-    after_commit_destroying(content_file_binaries: destroyed_content_file_binaries)
   end
 
   # @return [Boolean] true if the save deleted the resource
@@ -104,25 +102,13 @@ class ContentFileSetForm < ApplicationForm
     content_file_set.content_files.where(id: content_file_ids).pluck(:content_file_binary_id)
   end
 
-  # @return [Array<ContentFileBinary>] the destroyed binaries (those no longer referenced by any file)
+  # Staged copies of the destroyed binaries are deleted by Contents::ContentFileBinaryDestroyer.
   def destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
     content_file_binaries = ContentFileBinary.unassociated
                                              .where(id: content_file_binary_ids)
                                              .includes(:content)
                                              .to_a
-    content_file_binaries.each(&:destroy!)
-  end
-
-  # Staged files are deleted after commit, since deleting a file cannot be rolled back.
-  def after_commit_destroying(content_file_binaries:)
     @content_file_binaries_destroyed = content_file_binaries.any?
-    FileUtils.rm_f(staging_filepaths_for(content_file_binaries))
-  end
-
-  # @return [Array<String>] the staging filepaths of the binaries that had been staged
-  def staging_filepaths_for(content_file_binaries)
-    content_file_binaries.select(&:file_location_stage?).map do |content_file_binary|
-      StagingSupport.staging_filepath(druid: content_file_binary.content.druid, filepath: content_file_binary.filepath)
-    end
+    Contents::ContentFileBinaryDestroyer.call(content_file_binaries:)
   end
 end

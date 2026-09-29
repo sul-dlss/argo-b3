@@ -6,13 +6,29 @@ import { Controller } from '@hotwired/stimulus'
 // so reloading stops once the server responds with content that doesn't include this controller.
 export default class extends Controller {
   static values = {
-    interval: Number
+    interval: Number,
+    // Optional url to reload from instead of the frame's current src.
+    url: String
   }
 
   connect () {
-    this.reloadTimeout = setTimeout(() => {
-      this.element.closest('turbo-frame')?.reload()
-    }, this.intervalValue)
+    this.reloadTimeout = setTimeout(() => this.reload(), this.intervalValue)
+  }
+
+  reload () {
+    const frame = this.element.closest('turbo-frame')
+    if (!frame) return
+
+    // Setting src loads the frame from the url; once src is the url, reloading is sufficient.
+    if (this.hasUrlValue && this.absoluteUrl(this.urlValue) !== this.absoluteUrl(frame.src)) {
+      frame.src = this.urlValue
+    } else {
+      frame.reload()
+    }
+  }
+
+  absoluteUrl (url) {
+    return new URL(url, window.location.href).href
   }
 
   disconnect () {

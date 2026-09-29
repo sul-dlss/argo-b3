@@ -5,7 +5,8 @@ class ContentsController < ContentsApplicationController
   skip_verify_authorized only: %i[show]
 
   def show
-    verified_content_id = verify_token(params[:id])
+    @content_token = params[:id]
+    verified_content_id = verify_token(@content_token)
     @content = Content.with_structural_associations.find(verified_content_id)
   end
 

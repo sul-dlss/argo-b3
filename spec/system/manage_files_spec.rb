@@ -300,6 +300,51 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when deleting a file' do
+    let(:content) { Content.find_by!(druid:) }
+
+    it 'deletes a file that has not been added to the structure without confirming' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_button 'Delete dropzone_upload.txt'
+
+      expect(page).to have_toast('File deleted')
+      within("turbo-frame[id^='show_content_']") do
+        expect(page).to have_css('p', text: 'No files yet')
+      end
+      expect(content.content_file_binaries).to be_empty
+    end
+
+    it 'confirms and deletes the resource that deleting the file empties' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+
+      click_on 'Add files'
+      accept_confirm('Deleting dropzone_upload.txt will also delete resource 1. Continue?') do
+        click_button 'Delete dropzone_upload.txt'
+      end
+
+      expect(page).to have_toast('File deleted')
+      within("turbo-frame[id^='show_content_']") do
+        expect(page).to have_css('p', text: 'No files yet')
+      end
+
+      # The structure is reloaded and no longer includes the resource.
+      click_on 'Structure'
+      expect(page).to have_css('p', text: 'No files yet.')
+      expect(content.content_file_sets).to be_empty
+      expect(content.content_file_binaries).to be_empty
+    end
+  end
+
   context 'when discovering files on a mount' do
     let(:mount_path) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
 
@@ -337,6 +382,27 @@ RSpec.describe 'Manage files' do
 
       expect(content.content_file_binaries.sole)
         .to have_attributes(filepath: 'folder/dropzone_upload.txt', file_location: 'mount', mount_path:)
+    end
+
+    it 'disables deleting files until discovery completes' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('page_0001.png')
+
+      expect(page).to have_button('Delete page_0001.png', disabled: false)
+
+      choose 'Use files from mount'
+      fill_in 'Mount path', with: mount_path
+      click_button 'Discover files'
+
+      expect(page).to have_text('Discovering files...')
+      expect(page).to have_button('Delete page_0001.png', class: 'disabled')
+
+      DiscoverFilesJob.perform_now(content: Content.find_by!(druid:), mount_path:)
+
+      expect(page).to have_toast('Completed discovering files')
+      expect(page).to have_css('li', text: 'folder/dropzone_upload.txt')
+      expect(page).to have_no_button(class: 'disabled')
     end
   end
 end

@@ -1,0 +1,11 @@
+<li class="d-flex align-items-center">
+  <%= filepath %>
+  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path,
+                                                                      icon: :delete,
+                                                                      label: t('edit.content_file_binaries.buttons.delete', filepath:),
+                                                                      method: :delete,
+                                                                      confirm:,
+                                                                      disabled: disabled?,
+                                                                      top: false,
+                                                                      classes: 'ms-2') %>
+</li>

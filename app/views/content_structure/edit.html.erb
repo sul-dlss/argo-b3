@@ -1,5 +1,9 @@
 <%= turbo_frame_tag @content, 'edit-structure' do %>
   <%= render Elements::FlashToastComponent.new %>
+  <% if @structure_changed %>
+    <%# The files section depends on the structure (e.g., which resources deleting a file would also delete). %>
+    <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: "##{dom_id(@content, :show)}" } %>
+  <% end %>
 
   <% if @content.content_file_binaries.none? %>
     <p>No files yet.</p>

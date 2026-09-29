@@ -4,7 +4,14 @@
 <% end %>
 
 <%= turbo_frame_tag @content, 'mount' do %>
-  <%= tag.div data: { controller: 'frame-reload', frame_reload_interval_value: Settings.reload_intervals.mount_discovery } do %>
+  <% if @discovery_started %>
+    <%# Reloading the files sections disables deleting files during discovery. %>
+    <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: '.dropzone-files' } %>
+  <% end %>
+  <%# Reloading from the url (rather than the frame's src) drops discovery_started, so the files sections are only reloaded once. %>
+  <%= tag.div data: { controller: 'frame-reload',
+                      frame_reload_interval_value: Settings.reload_intervals.mount_discovery,
+                      frame_reload_url_value: content_mount_path(@content_token) } do %>
     <%= render SdrViewComponents::Elements::SpinnerComponent.new(
           message: 'Discovering files...',
           image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
