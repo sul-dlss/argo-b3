@@ -65,6 +65,20 @@ module Contents
       def dark?
         file_access_attributes[:view] == 'dark'
       end
+
+      # Labels are numbered per file set type, e.g., Page 1, Page 2, Object 1. When appending,
+      # numbering continues from the file sets that already exist.
+      def label_for(file_set_type)
+        file_set_type_counts[file_set_type] += 1
+        "#{file_set_type.capitalize} #{file_set_type_counts[file_set_type]}"
+      end
+
+      def file_set_type_counts
+        @file_set_type_counts ||= content.content_file_sets.reorder(nil).group(:file_set_type).count
+                                         .tap do |counts|
+          counts.default = 0
+        end
+      end
     end
   end
 end
