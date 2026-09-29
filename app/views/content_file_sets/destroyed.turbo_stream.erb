@@ -1,0 +1,5 @@
+<%= render Elements::FlashToastComponent.new %>
+<%# Reloading the files sections also reloads the structure, which no longer includes this resource. %>
+<%= turbo_stream.replace @content_file_set do %>
+  <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: '.dropzone-files' } %>
+<% end %>

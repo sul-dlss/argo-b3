@@ -10,9 +10,14 @@ class ContentFileForm < ApplicationForm
 
   normalizes_whitespace :use, :mime_type
 
-  validates :mime_type, presence: true
+  # A file that is being deleted does not need to be valid.
+  validates :mime_type, presence: true, unless: :marked_for_destruction?
 
   def self.immutable_attributes
     [:filepath]
+  end
+
+  def self.permitted_params
+    super + [:_destroy]
   end
 end

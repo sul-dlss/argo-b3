@@ -127,6 +127,11 @@ en:
         deposit:
           label: "Deposit"
     content_file_sets:
+      all_files_removed: 'Saving will delete this resource.'
+      buttons:
+        delete: 'Delete resource %{index}'
+        delete_confirm: 'Delete resource %{index} and its files?'
+        remove_file: 'Remove %{filepath}'
       fields:
         content_files:
           mime_type:
@@ -138,6 +143,7 @@ en:
         label:
           label: 'Label'
       toasts:
+        deleted: 'Resource deleted'
         updated: 'Resource updated'
     items:
       new:

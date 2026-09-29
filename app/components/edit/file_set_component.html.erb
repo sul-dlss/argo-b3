@@ -17,9 +17,12 @@
                                                                   label_classes: 'fw-bold',
                                                                   container_classes: 'my-field') %>
 
-      <%= form.fields_for :content_files do |content_file_form| %>
-        <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
-      <% end %>
+      <div data-controller="content-files">
+        <%= form.fields_for :content_files do |content_file_form| %>
+          <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
+        <% end %>
+        <p class="text-danger" hidden data-content-files-target="allRemovedNote"><%= t('edit.content_file_sets.all_files_removed') %></p>
+      </div>
 
         <div class="d-flex align-items-center mt-5">
           <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', classes: 'me-3') %>
