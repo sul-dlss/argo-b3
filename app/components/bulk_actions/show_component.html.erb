@@ -1,12 +1,12 @@
 <%= tag.div class: 'container bulk-action-show object-type-bulk-action mb-4', data: do %>
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Bulk action', classes: 'ps-0',
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: "← #{t('bulk_actions.label')}", classes: 'ps-0',
                                                                       variant: :link, link: bulk_actions_path) %>
 
       <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-0') %>
-        <span class="object-type-bg fw-bold text-uppercase rounded-pill fs-4 px-3 py-1">Bulk action</span>
+        <span class="object-type-bg text-white fw-bold text-uppercase rounded-pill fs-4 px-3 py-1"><%= t('bulk_actions.label') %></span>
       </div>
     <% end %>
 

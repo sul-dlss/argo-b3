@@ -135,5 +135,9 @@
 .bulk-action-show {
   .show-box {
     max-width: 300px;
+
+    .card-title {
+      text-align: center;
+    }
   }
 }

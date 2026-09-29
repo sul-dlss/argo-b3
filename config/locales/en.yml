@@ -268,6 +268,7 @@ en:
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
   bulk_actions:
+    label: 'Bulk action'
     menu: 'Bulk actions menu'
     history: 'Bulk actions history'
   admin:
