@@ -85,20 +85,34 @@ module Sdr
       false
     end
 
-    # @param [String] druid the druid of the object
+    # Objects with files are assembled (e.g., to create derivatives) before accessioning:
+    # gisAssemblyWF for geo objects, otherwise assemblyWF. Assembly closes the version.
+    # Objects without files skip assembly; closing the version starts accessioning.
+    # @param [Cocina::Models::DRO] cocina_object the object to accession
     # @param [String] user_name the sunetid of the user performing the action
-    # @param [String,nil] version_description the description of the version or nil to leave unchanged
-    # @param [String] lane_id the lane to use for accessioning, defaults to 'high'
+    # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
     # @raise [Error] if there is an error initiating accession
-    def self.accession(druid:, user_name:, version_description: nil, lane_id: 'high')
-      # Close the version, which will also start accessioning
-      Dor::Services::Client.object(druid)
-                           .version.close(user_name:,
-                                          description: version_description,
-                                          lane_id:)
+    def self.accession(cocina_object:, user_name:, lane_id: 'high')
+      object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
+      if files?(cocina_object:)
+        object_client.workflow(assembly_workflow_name(cocina_object:))
+                     .create(version: cocina_object.version, lane_id:)
+      else
+        object_client.version.close(user_name:, lane_id:)
+      end
     rescue Dor::Services::Client::Error => e
       raise Error, "Initiating accession failed: #{e.message}"
     end
+
+    def self.files?(cocina_object:)
+      cocina_object.structural.contains.any? { |file_set| file_set.structural.contains.any? }
+    end
+    private_class_method :files?
+
+    def self.assembly_workflow_name(cocina_object:)
+      cocina_object.type == Cocina::Models::ObjectType.geo ? 'gisAssemblyWF' : 'assemblyWF'
+    end
+    private_class_method :assembly_workflow_name
 
     # @param [String] druid the druid of the object
     # @param [String] user_name the sunetid of the user performing the action

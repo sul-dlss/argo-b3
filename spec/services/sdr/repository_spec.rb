@@ -196,51 +196,98 @@ RSpec.describe Sdr::Repository do
 
   describe '#accession' do
     let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, close: true) }
-    let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
-    let(:version_description) { 'a new version' }
+    let(:workflow_client) { instance_double(Dor::Services::Client::ObjectWorkflow, create: true) }
+    let(:object_client) do
+      instance_double(Dor::Services::Client::Object, version: version_client, workflow: workflow_client)
+    end
+    let(:type) { Cocina::Models::ObjectType.image }
+    let(:cocina_object) { build(:dro, id: druid, type:, version: 2).new(structural:) }
+    let(:structural) do
+      {
+        contains: [
+          {
+            type: Cocina::Models::FileSetType.file,
+            externalIdentifier: 'bc123df4567_1',
+            label: 'Fileset 1',
+            version: 2,
+            structural: { contains: files }
+          }
+        ]
+      }
+    end
+    let(:files) do
+      [
+        {
+          type: Cocina::Models::ObjectType.file,
+          externalIdentifier: 'https://cocina.sul.stanford.edu/file/bc123df4567-1/image1.tif',
+          label: 'image1.tif',
+          filename: 'image1.tif',
+          version: 2
+        }
+      ]
+    end
 
     before do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     end
 
-    context 'when successful' do
-      it 'closes the version to initiate accessioning' do
-        described_class.accession(druid:, user_name:, version_description:)
+    context 'when the object has files' do
+      it 'creates an assemblyWF' do
+        described_class.accession(cocina_object:, user_name:)
 
-        expect(Dor::Services::Client).to have_received(:object).with(druid)
-        expect(version_client).to have_received(:close).with(user_name:,
-                                                             description: version_description,
-                                                             lane_id: 'high')
+        expect(object_client).to have_received(:workflow).with('assemblyWF')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high')
+        expect(version_client).not_to have_received(:close)
       end
     end
 
-    context 'when no version_description or lane_id is given' do
-      it 'closes the version with defaults' do
-        described_class.accession(druid:, user_name:)
+    context 'when the object is geo and has files' do
+      let(:type) { Cocina::Models::ObjectType.geo }
 
-        expect(version_client).to have_received(:close).with(user_name:,
-                                                             description: nil,
-                                                             lane_id: 'high')
+      it 'creates a gisAssemblyWF' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(object_client).to have_received(:workflow).with('gisAssemblyWF')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high')
+      end
+    end
+
+    context 'when the object has file sets without files' do
+      let(:files) { [] }
+
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(object_client).not_to have_received(:workflow)
+      end
+    end
+
+    context 'when the object has no file sets' do
+      let(:structural) { {} }
+
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
       end
     end
 
     context 'when a lane_id is given' do
-      it 'closes the version with the given lane_id' do
-        described_class.accession(druid:, user_name:, lane_id: 'low')
+      it 'creates the workflow with the given lane_id' do
+        described_class.accession(cocina_object:, user_name:, lane_id: 'low')
 
-        expect(version_client).to have_received(:close).with(user_name:,
-                                                             description: nil,
-                                                             lane_id: 'low')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'low')
       end
     end
 
     context 'when accessioning fails' do
       before do
-        allow(version_client).to receive(:close).and_raise(Dor::Services::Client::Error, 'Failed to close version')
+        allow(workflow_client).to receive(:create).and_raise(Dor::Services::Client::Error, 'Failed to create')
       end
 
       it 'raises' do
-        expect { described_class.accession(druid:, user_name:) }.to raise_error(Sdr::Repository::Error)
+        expect { described_class.accession(cocina_object:, user_name:) }.to raise_error(Sdr::Repository::Error)
       end
     end
   end
