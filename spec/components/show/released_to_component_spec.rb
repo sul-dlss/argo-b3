@@ -9,7 +9,7 @@ RSpec.describe Show::ReleasedToComponent, type: :component do
   let(:release_tag_links) do
     [
       { label: 'Searchworks', url: 'https://searchworks.stanford.edu/view/bc123df4567' },
-      { label: 'PURL sitemap', url: 'https://purl.stanford.edu/bc123df4567' }
+      { label: 'Search engines', url: 'https://purl.stanford.edu/bc123df4567' }
     ]
   end
   let(:object_released_presenter) do
@@ -21,7 +21,7 @@ RSpec.describe Show::ReleasedToComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('Searchworks', href: 'https://searchworks.stanford.edu/view/bc123df4567')
-      expect(page).to have_link('PURL sitemap', href: 'https://purl.stanford.edu/bc123df4567')
+      expect(page).to have_link('Search engines', href: 'https://purl.stanford.edu/bc123df4567')
     end
   end
 

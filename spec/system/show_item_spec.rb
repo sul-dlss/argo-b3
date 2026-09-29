@@ -222,7 +222,7 @@ RSpec.describe 'Show item' do
     # Released to box
     expect(page).to have_css('h2', text: 'Released to')
     expect(page).to have_link('Searchworks', href: 'https://searchworks.stanford.edu/view/a6525053')
-    expect(page).to have_link('PURL sitemap', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
+    expect(page).to have_link('Search engines', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
 
     expect(page).to have_link('← Search results', href: /search\?page=5&query=test/)
 

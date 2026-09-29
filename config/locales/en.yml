@@ -57,7 +57,7 @@ en:
       mimetypes: "MIME types"
       mods_resource_types: "MODS resource types"
       released_to_earthworks: "Released to Earthworks"
-      released_to_purl_sitemap: "Released to PURL sitemap"
+      released_to_purl_sitemap: "Released to Search engines"
       released_to_searchworks: "Released to Searchworks"
       wps_workflows: "Workflow > Process > Status"
     facet_values:
