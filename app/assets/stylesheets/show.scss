@@ -1,3 +1,17 @@
+.show-box {
+  max-width: 300px;
+
+  > .border {
+    height: 180px;
+    overflow-y: auto;
+    scrollbar-color: var(--stanford-70-black) transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--stanford-70-black);
+    }
+  }
+}
+
 // Object show page
 .object-show {
   .embargo-banner {
@@ -11,20 +25,6 @@
 
     h2 {
       margin-bottom: 0;
-    }
-  }
-
-  .show-box {
-    max-width: 300px;
-
-    > .border {
-      height: 180px;
-      overflow-y: auto;
-      scrollbar-color: var(--stanford-70-black) transparent;
-
-      &::-webkit-scrollbar-thumb {
-        background-color: var(--stanford-70-black);
-      }
     }
   }
 
@@ -129,15 +129,4 @@
 
 .object-type-bulk-action {
   @include object-type-colors($search-color, $search-color-rgb);
-}
-
-// Bulk action show page
-.bulk-action-show {
-  .show-box {
-    max-width: 300px;
-
-    .card-title {
-      text-align: center;
-    }
-  }
 }

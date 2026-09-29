@@ -38,6 +38,10 @@ a[aria-expanded="false"] {
 	border-color: var(--stanford-60-black);
 }
 
+.object-type-pill {
+  min-width: min-content;
+}
+
 // View toggle (search results / workflow status).
 // Search::ViewToggleComponent renders links rather than the radio inputs that
 // SdrViewComponents::Forms::ToggleComponent uses, so these mirror the gem's
