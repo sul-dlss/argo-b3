@@ -64,6 +64,7 @@ class ContentFileSetForm < ApplicationForm
       {
         id: content_file_form.id,
         use: content_file_form.use,
+        language_tag: content_file_form.language_tag,
         view: content_file_form.view,
         download: content_file_form.download,
         location: content_file_form.location,

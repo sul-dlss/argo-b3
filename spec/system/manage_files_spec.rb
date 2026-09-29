@@ -240,12 +240,23 @@ RSpec.describe 'Manage files' do
     it 'updates the role of a file' do
       build_structure_then_edit_resource
 
-      fill_in 'Role', with: 'transcription'
+      select_multi_option('transcription', from: 'Role')
       click_button 'Save'
 
       expect(page).to have_toast('Resource updated')
       expect(page).to have_css('td', text: 'Transcription')
       expect(content.content_files.sole.use).to eq('transcription')
+    end
+
+    it 'updates the role of a file to one that is not listed' do
+      build_structure_then_edit_resource
+
+      find_multi_select('Role').find('.ts-control input').set('supplement')
+      find('.ts-dropdown .create', text: 'supplement').click
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource updated')
+      expect(content.content_files.sole.use).to eq('supplement')
     end
 
     it 'deletes the resource' do
