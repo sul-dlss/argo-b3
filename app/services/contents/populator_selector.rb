@@ -26,7 +26,9 @@ module Contents
 
     POPULATORS_FOR_CONTENT_TYPES = {
       Cocina::Models::ObjectType.book => Contents::Populators::Book,
-      Cocina::Models::ObjectType.document => Contents::Populators::Document
+      Cocina::Models::ObjectType.document => Contents::Populators::Document,
+      Cocina::Models::ObjectType.image => Contents::Populators::Image,
+      Cocina::Models::ObjectType.map => Contents::Populators::Image
     }.freeze
 
     # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).

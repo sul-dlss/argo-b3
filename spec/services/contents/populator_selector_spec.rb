@@ -17,7 +17,7 @@ RSpec.describe Contents::PopulatorSelector do
   end
 
   context 'when the content type has no populator of its own' do
-    let(:cocina_type) { Cocina::Models::ObjectType.image }
+    let(:cocina_type) { Cocina::Models::ObjectType.object }
 
     it 'selects the fallback populator without reasons' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileSetPerFile,
@@ -31,6 +31,37 @@ RSpec.describe Contents::PopulatorSelector do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Book,
                                         actual_populator: Contents::Populators::Book,
                                         reasons: [])
+    end
+  end
+
+  context 'when the content type is image and the image populator can be used' do
+    let(:cocina_type) { Cocina::Models::ObjectType.image }
+
+    it 'selects the image populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
+                                        actual_populator: Contents::Populators::Image,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is map and the image populator can be used' do
+    let(:cocina_type) { Cocina::Models::ObjectType.map }
+
+    it 'selects the image populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
+                                        actual_populator: Contents::Populators::Image,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is image and the image populator cannot be used' do
+    let(:cocina_type) { Cocina::Models::ObjectType.image }
+    let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
+
+    it 'falls back to the file set per file populator' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
+                                        actual_populator: Contents::Populators::FileSetPerFile,
+                                        reasons: [:dark])
     end
   end
 
