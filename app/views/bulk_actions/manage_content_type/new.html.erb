@@ -20,10 +20,7 @@
                                                                  label_text: 'Change viewing direction (books and images only)',
                                                                  input_data: { controller: 'checkbox', action: 'checkbox#toggle' }) do |component| %>
         <%= component.with_additional_container_content do %>
-          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :viewing_direction,
-                                                                        options: Constants::VIEWING_DIRECTIONS,
-                                                                        label_text: 'Viewing direction',
-                                                                        container_classes: 'mt-3') %>
+          <%= render Edit::ViewingDirectionComponent.new(form:, container_classes: 'mt-3') %>
         <% end %>
       <% end %>
     </fieldset>

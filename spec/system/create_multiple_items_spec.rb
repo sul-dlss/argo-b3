@@ -234,6 +234,36 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
+    it 'sets the viewing direction' do
+      visit new_multiple_item_path
+
+      fill_in_registration_settings
+      select 'right-to-left', from: 'Viewing direction'
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(viewing_direction: 'right-to-left')
+      )
+    end
+
+    it 'disables the viewing direction unless the content type is book or image' do
+      visit new_multiple_item_path
+
+      select 'map', from: 'Content type'
+      expect(page).to have_select('Viewing direction', disabled: true)
+
+      select 'book', from: 'Content type'
+      expect(page).to have_select('Viewing direction', disabled: false)
+    end
+
     # Turbo renders a redirect's HTML before updating the URL to the redirect target, so the
     # scheduled-refresh controller on the bulk action page connects while the URL is still the
     # multiple items URL. Refreshes must keep working after that.

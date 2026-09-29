@@ -40,7 +40,7 @@ module BulkActions
             dro.folio_catalog_links.new(catalog_record_id: item_registration_form.catalog_record_id)
             dro.catalog_link_refresh = true
           end
-          dro.update(item_registration_form_attributes)
+          dro.update(item_registration_form_attributes.merge(viewing_direction_attributes))
         end
       end
 
@@ -60,6 +60,13 @@ module BulkActions
           :embargo_download,
           :embargo_location
         )
+      end
+
+      # Viewing direction only applies to some content types.
+      def viewing_direction_attributes
+        return {} unless Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS.include?(items_registration_form.content_type)
+
+        { viewing_direction: items_registration_form.viewing_direction }
       end
     end
   end
