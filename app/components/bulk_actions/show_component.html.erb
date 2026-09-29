@@ -12,8 +12,8 @@
 
     <% layout.with_left_content do %>
       <%= render Elements::ButtonListComponent.new do |component| %>
-        <% component.with_button(link: new_bulk_action_path, label: 'Bulk actions menu', variant: 'outline-primary') %>
-        <% component.with_button(link: bulk_actions_path, label: 'Bulk actions history', variant: 'outline-primary') %>
+        <% component.with_button(link: new_bulk_action_path, label: t('bulk_actions.menu'), variant: 'outline-primary') %>
+        <% component.with_button(link: bulk_actions_path, label: t('bulk_actions.history'), variant: 'outline-primary') %>
       <% end %>
     <% end %>
 

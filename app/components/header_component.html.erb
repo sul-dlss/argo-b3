@@ -11,7 +11,7 @@
           <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Recent bulk actions', link: bulk_actions_path) %>
         <% end %>
         <% dropdown.with_item do %>
-          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Bulk actions menu', link: new_bulk_action_path) %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
         <% end %>
       <% end %>
     <% end %>

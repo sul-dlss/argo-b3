@@ -41,7 +41,7 @@ module BulkActions
     end
 
     def label
-      'Bulk actions history'
+      I18n.t('bulk_actions.history')
     end
 
     private
