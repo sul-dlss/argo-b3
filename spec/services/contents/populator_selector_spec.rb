@@ -75,6 +75,28 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when a selected content type is provided' do
+    subject(:result) { described_class.call(content:, cocina_object:, content_type: Cocina::Models::ObjectType.book) }
+
+    let(:cocina_type) { Cocina::Models::ObjectType.image }
+
+    it 'selects the populator for the selected content type' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Book,
+                                        actual_populator: Contents::Populators::Book)
+    end
+  end
+
+  context 'when a blank selected content type is provided' do
+    subject(:result) { described_class.call(content:, cocina_object:, content_type: '') }
+
+    let(:cocina_type) { Cocina::Models::ObjectType.image }
+
+    it 'selects the populator for the content type of the cocina object' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
+                                        actual_populator: Contents::Populators::Image)
+    end
+  end
+
   context 'when the content type is document and there is a PDF' do
     let(:cocina_type) { Cocina::Models::ObjectType.document }
 

@@ -84,9 +84,10 @@ RSpec.describe CocinaModels::Dro do
   describe '#save!' do
     let(:user_name) { 'test_user' }
     let(:description) { 'Changed source id' }
+    let(:updated_cocina_object) { cocina_object.new(lock: 'updated-lock') }
 
     before do
-      allow(Sdr::Repository).to receive(:update)
+      allow(Sdr::Repository).to receive(:update).and_return(updated_cocina_object)
     end
 
     context 'with valid and changed attributes' do
@@ -115,6 +116,12 @@ RSpec.describe CocinaModels::Dro do
           expect(args[:description]).to eq(description)
         end
         expect(dro.changed?).to be false
+      end
+
+      it 'refreshes the previous cocina object' do
+        dro.save!(user_name:, description:)
+
+        expect(dro.previous_cocina_object).to eq(updated_cocina_object)
       end
     end
 

@@ -23,6 +23,17 @@ RSpec.describe Edit::ContentTypeComponent, type: :component do
     end
   end
 
+  context 'when the content type is not a registration content type' do
+    let(:item_form) { ItemForm.new(content_type: Cocina::Models::ObjectType.manuscript) }
+
+    it 'adds the content type to the options' do
+      render_inline(component)
+
+      expect(page).to have_select('Content type', selected: 'manuscript',
+                                                  options: Constants::REGISTRATION_CONTENT_TYPES.keys + ['manuscript'])
+    end
+  end
+
   it 'applies the container classes' do
     render_inline(component)
 

@@ -15,5 +15,16 @@ module Edit
     def container_classes
       merge_classes(@container_classes)
     end
+
+    # The registration content types, plus the current content type if it is not one of them,
+    # so that an existing content type is not changed by the select defaulting to another option.
+    def options
+      content_type = form.object&.content_type
+      if content_type.blank? || Constants::REGISTRATION_CONTENT_TYPES.value?(content_type)
+        return Constants::REGISTRATION_CONTENT_TYPES
+      end
+
+      Constants::REGISTRATION_CONTENT_TYPES.merge(UriSupport.last(uri: content_type) => content_type)
+    end
   end
 end

@@ -42,9 +42,12 @@ module Contents
 
     # @param [Content] content
     # @param [Cocina::Models::DROWithMetadata] cocina_object
-    def initialize(content:, cocina_object:)
+    # @param [String, nil] content_type the selected content type, which may not have been saved yet;
+    #   when blank, the content type of the cocina object is used
+    def initialize(content:, cocina_object:, content_type: nil)
       @content = content
       @cocina_object = cocina_object
+      @content_type = content_type.presence || cocina_object.type
     end
 
     # @return [Result] the selected populator and why it was selected
@@ -59,10 +62,10 @@ module Contents
 
     private
 
-    attr_reader :content, :cocina_object
+    attr_reader :content, :cocina_object, :content_type
 
     def populator_for_content_type
-      POPULATORS_FOR_CONTENT_TYPES.fetch(cocina_object.type, FALLBACK_POPULATOR)
+      POPULATORS_FOR_CONTENT_TYPES.fetch(content_type, FALLBACK_POPULATOR)
     end
 
     # A mime type is needed both for selecting a populator and for performing the structuring.

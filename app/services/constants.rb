@@ -125,7 +125,7 @@ module Constants # rubocop:disable Metrics/ModuleLength
     Cocina::Models::ObjectType.image
   ].freeze
 
-  CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| uri.split('/').last }.freeze
+  CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| UriSupport.last(uri:) }.freeze
 
   # Prefix of Cocina FileSet types; ContentFileSet#file_set_type is stored without it.
   FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
@@ -144,5 +144,5 @@ module Constants # rubocop:disable Metrics/ModuleLength
     'webarchive-seed' => Cocina::Models::ObjectType.webarchive_seed
   }.freeze
 
-  RESOURCE_TYPES = Cocina::Models::FileSet::TYPES.index_by { |uri| uri.split('/').last }.freeze
+  RESOURCE_TYPES = Cocina::Models::FileSet::TYPES.index_by { |uri| UriSupport.last(uri:) }.freeze
 end
