@@ -33,7 +33,7 @@
       <% end %>
     </div>
     <div class="col-md-2 mx-auto align-self-start pt-5 <%= result.object_type_class %>">
-      <div class="object-type-bg fw-bold text-center text-uppercase rounded-pill px-3 py-1 mb-3">
+      <div class="object-type-bg object-type-pill fw-bold text-center text-uppercase rounded-pill px-3 py-1 mb-3">
         <%= result.object_type_label %>
       </div>
       <%= render ThumbnailComponent.new(result:) %>
