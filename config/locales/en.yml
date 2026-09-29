@@ -135,6 +135,18 @@ en:
         remove_file: 'Remove %{filepath}'
       fields:
         content_files:
+          access:
+            label: 'Access'
+            validations:
+              invalid: 'is not a valid combination of view, download, and location'
+          administrative:
+            label: 'Administrative'
+            options:
+              preserve_only: 'Preserve only'
+              publish_and_preserve: 'Publish and preserve'
+              publish_only: 'Publish only'
+            validations:
+              required: 'must be selected'
           mime_type:
             label: 'MIME type'
           use:
