@@ -5,7 +5,7 @@ module Elements
   class ButtonListComponent < ApplicationComponent
     renders_many :buttons, ->(classes: 'mb-2', **args) { SdrViewComponents::Elements::ButtonFormComponent.new(classes:, **args) }
 
-    def initialize(title:, help_text: nil, classes: [])
+    def initialize(title: nil, help_text: nil, classes: [])
       @title = title
       @help_text = help_text
       @classes = classes

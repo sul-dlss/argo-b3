@@ -12,7 +12,7 @@ module BulkActions
 
     attr_reader :bulk_action
 
-    delegate :completed?, to: :bulk_action
+    delegate :completed?, :log_file?, to: :bulk_action
 
     def data
       return {} if completed?
@@ -54,17 +54,71 @@ module BulkActions
       "bulk-action-#{export.key.to_s.dasherize}-table"
     end
 
+    def export_tab_id(export)
+      "bulk-action-#{export.key.to_s.dasherize}-tab"
+    end
+
+    def export_pane_id(export)
+      "bulk-action-#{export.key.to_s.dasherize}-pane"
+    end
+
+    # @return [Boolean] true if we are need to show the tabs area with items or errors
+    def tabs?
+      shown_exports.present? || error_lines.present?
+    end
+
+    # @return [String] the heading (with icon, when applicable) for the status box
+    def status_heading
+      case bulk_action.status.to_sym
+      when :completed
+        if bulk_action.druid_count_fail.positive?
+          safe_join([helpers.warning_icon(classes: 'text-warning me-2', aria: { hidden: true }),
+                     'Completed with errors'], ' ')
+        else
+          safe_join([helpers.success_icon(classes: 'text-success me-2', aria: { hidden: true }), 'Completed'], ' ')
+        end
+      else
+        'Processing'
+      end
+    end
+
+    # @return [Array<String>] the lines of the log file reporting an error
+    def error_lines
+      return [] unless completed? && log_file?
+
+      @error_lines ||= File.readlines(bulk_action.log_filepath, chomp: true).select { |line| line.include?("\tError:") }
+    end
+
+    # @return [Array<ActiveSupport::SafeBuffer>] download links for the log file and any exports
+    def downloads
+      [].tap do |downloads|
+        downloads << log_file_link if log_file?
+        existing_exports.each { |export| downloads << export_link(export) }
+      end
+    end
+
+    def errors_tab_id
+      'bulk-action-errors-tab'
+    end
+
+    def errors_pane_id
+      'bulk-action-errors-pane'
+    end
+
+    def active_tab_id
+      return export_tab_id(shown_exports.first) if shown_exports.present?
+
+      errors_tab_id if error_lines.present?
+    end
+
     private
 
     def log_file_link
-      return '' unless bulk_action.log_file?
-
-      link_to(bulk_action.log_filename, file_bulk_action_path(bulk_action, filename: bulk_action.log_filename),
-              download: true)
+      link_to('Log file', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
     end
 
     def export_link(export)
-      link_to(export.filename, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
+      link_to(export.label, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
     end
   end
 end

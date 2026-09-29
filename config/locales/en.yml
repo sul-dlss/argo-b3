@@ -293,6 +293,10 @@ en:
       art: "Art"
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
+  bulk_actions:
+    label: 'Bulk action'
+    menu: 'Bulk actions menu'
+    history: 'Bulk actions history'
   admin:
     impersonation:
       start: "You are now impersonating the selected workgroups."

@@ -1,5 +1,5 @@
 <%= tag.div class: classes do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: title) %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: title) if title.present? %>
   <% if help_text.present? %>
     <p class="mb-0"><small><%= help_text %></small></p>
   <% end %>
