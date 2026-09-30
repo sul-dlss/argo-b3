@@ -8,7 +8,7 @@ module BulkActions
     private
 
     def authorize_manage_permissions!
-      authorize! :manage_permissions?, with: AdminPolicy
+      authorize! to: :manage_permissions?, with: AdminPolicy
     end
 
     def bulk_action_config
