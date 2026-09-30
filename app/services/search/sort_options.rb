@@ -11,6 +11,14 @@ module Search
       nil
     end
 
+    # Relevance (with its id tiebreaker) is the implicit default sort: without it, ties would be
+    # broken by Solr's internal doc order, which is not guaranteed stable across separate requests
+    # and would make search result navigation (previous/next) unreliable.
+    # @return [String] the Solr sort value for the given sort field, defaulting to relevance
+    def self.sort_value_for(sort_field)
+      (find_config_by_sort_field(sort_field) || RELEVANCE).sort_value
+    end
+
     Config = Struct.new(:label, :sort_value)
 
     # Secondary sorts on druid (id) keep paging stable when objects share the primary sorted attribute.

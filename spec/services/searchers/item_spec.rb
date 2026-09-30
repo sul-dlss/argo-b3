@@ -40,6 +40,7 @@ RSpec.describe Searchers::Item do
       )
       expect(solr_query['rows']).to eq(50)
       expect(solr_query['start']).to eq(0)
+      expect(solr_query['sort']).to eq(Search::SortOptions::RELEVANCE.sort_value)
     end
   end
 
