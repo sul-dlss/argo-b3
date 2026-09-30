@@ -292,6 +292,40 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '#publish' do
+    let(:object_client) { instance_double(Dor::Services::Client::Object, publish: 'https://sdr.stanford.edu/job/1') }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    end
+
+    context 'when successful' do
+      it 'publishes with the default lane_id' do
+        described_class.publish(druid:)
+
+        expect(object_client).to have_received(:publish).with(lane_id: 'low')
+      end
+    end
+
+    context 'when a lane_id is given' do
+      it 'publishes with the given lane_id' do
+        described_class.publish(druid:, lane_id: 'high')
+
+        expect(object_client).to have_received(:publish).with(lane_id: 'high')
+      end
+    end
+
+    context 'when publishing fails' do
+      before do
+        allow(object_client).to receive(:publish).and_raise(Dor::Services::Client::Error, 'Failed to publish')
+      end
+
+      it 'raises' do
+        expect { described_class.publish(druid:) }.to raise_error(Sdr::Repository::Error)
+      end
+    end
+  end
+
   describe '#create_release_tag' do
     let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, create: true) }
     let(:object_client) { instance_double(Dor::Services::Client::Object, release_tags: release_tags_client) }

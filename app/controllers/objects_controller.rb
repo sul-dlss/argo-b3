@@ -43,6 +43,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                                          content:)
     release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
+    @previously_published = republishable?(@solr_doc)
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
@@ -137,7 +138,25 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     redirect_to object_path(druid: druid_param), status: :see_other
   end
 
+  # Republishes an object that has previously been published.
+  def republish
+    druid = druid_param
+    solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(druid))
+    authorize! solr_doc, to: :update?, with: ObjectPolicy
+    raise ActionController::RoutingError, 'Not Found' unless republishable?(solr_doc)
+
+    Sdr::Repository.publish(druid:)
+    flash[:toast] = t('show.toasts.republish_started')
+    redirect_to object_path(druid:)
+  end
+
   private
+
+  def republishable?(solr_doc)
+    return false if solr_doc.agreement? || solr_doc.admin_policy?
+
+    Sdr::WorkflowService.published?(druid: solr_doc.druid)
+  end
 
   # Determines the previous/next druids within the current search results, based on the
   # "search_position" (1-based position within the search result set) recorded for this druid in

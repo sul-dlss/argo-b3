@@ -32,7 +32,7 @@ RSpec.describe 'Show item' do
                                                                          version: 2)
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones) }
+  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones, date: true) }
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: release_tags) }
   let(:version_inventory) do
     [
