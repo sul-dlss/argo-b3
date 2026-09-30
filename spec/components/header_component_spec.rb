@@ -22,30 +22,11 @@ RSpec.describe HeaderComponent, type: :component do
   end
 
   describe 'bulk actions dropdown' do
-    context 'when the bulk_actions feature flag is enabled' do
-      before do
-        allow(Settings.feature_flags).to receive(:bulk_actions).and_return(true)
-      end
+    it 'renders links to the bulk actions pages' do
+      render_inline(component)
 
-      it 'renders links to the bulk actions pages' do
-        render_inline(component)
-
-        expect(page).to have_link('Recent bulk actions', href: '/bulk_actions')
-        expect(page).to have_link('Bulk actions menu', href: '/bulk_actions/new')
-      end
-    end
-
-    context 'when the bulk_actions feature flag is disabled' do
-      before do
-        allow(Settings.feature_flags).to receive(:bulk_actions).and_return(false)
-      end
-
-      it 'does not render the bulk actions dropdown' do
-        render_inline(component)
-
-        expect(page).to have_no_link('Recent bulk actions')
-        expect(page).to have_no_link('Bulk actions menu')
-      end
+      expect(page).to have_link('Recent bulk actions', href: '/bulk_actions')
+      expect(page).to have_link('Bulk actions menu', href: '/bulk_actions/new')
     end
   end
 
