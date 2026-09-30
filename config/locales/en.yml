@@ -117,11 +117,13 @@ en:
           document: "Document (resource per PDF)"
           geo: "Geo (single resource)"
           image: "Image (resource per image)"
+          three_dimensional: "3D (resource for model)"
           file_set_per_file: "Default (resource per file)"
         populator_reasons:
           dark: "the object is dark"
           hierarchical_files: "the files are organized into folders"
           no_images: "there are no image files"
+          no_models: "there are no 3D model files"
           no_pdfs: "there are no PDF files"
       tabs:
         details:

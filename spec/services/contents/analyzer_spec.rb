@@ -136,6 +136,19 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
+    context 'when the file on a mount is a GLB model' do
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path, filepath: 'model.glb',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+      end
+
+      it 'sniffs the model mime type' do
+        call
+
+        expect(content_file_binary.mime_type).to eq('model/gltf-binary')
+      end
+    end
+
     context 'when the size is not yet set' do
       let(:content_file_binary) do
         create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',

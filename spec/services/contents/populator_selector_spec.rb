@@ -121,6 +121,30 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when the content type is 3d and there is a model' do
+    let(:cocina_type) { Cocina::Models::ObjectType.three_dimensional }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'model.glb', mime_type: 'model/gltf-binary')
+    end
+
+    it 'selects the 3d populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::ThreeDimensional,
+                                        actual_populator: Contents::Populators::ThreeDimensional,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is 3d and there are no models' do
+    let(:cocina_type) { Cocina::Models::ObjectType.three_dimensional }
+
+    it 'falls back to the file set per file populator' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::ThreeDimensional,
+                                        actual_populator: Contents::Populators::FileSetPerFile,
+                                        reasons: [:no_models])
+    end
+  end
+
   context 'when the object is dark' do
     let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
 
