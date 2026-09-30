@@ -46,4 +46,45 @@ RSpec.describe 'Show object' do
       end
     end
   end
+
+  describe 'GET /objects/:druid/track' do
+    it 'redirects to the clean object show page' do
+      get "/objects/#{druid}/track", params: { search_position: 3 }
+
+      expect(response).to redirect_to("/objects/#{druid}")
+      expect(response).to have_http_status(:see_other)
+    end
+
+    it 'records the search_position in the last_search cookie' do
+      get "/objects/#{druid}/track", params: { search_position: 3 }
+
+      expect(response.cookies['last_search']).to be_present
+    end
+
+    context 'without a search_position param' do
+      it 'redirects without setting a cookie' do
+        get "/objects/#{druid}/track"
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(response.cookies['last_search']).to be_nil
+      end
+    end
+
+    context 'when the request is a Turbo prefetch' do
+      it 'redirects without recording the search_position' do
+        get "/objects/#{druid}/track", params: { search_position: 3 }, headers: { 'X-Sec-Purpose' => 'prefetch' }
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(response.cookies['last_search']).to be_nil
+      end
+    end
+
+    context 'when the druid is malformed' do
+      it 'renders a 404 without redirecting' do
+        get '/objects/druid%5B%5D=x/track'
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

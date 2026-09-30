@@ -5,7 +5,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   RECENT_OBJECTS_LIMIT = 5
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
-                                  show_purl_preview show_solr_doc show_files show_constituents]
+                                  show_purl_preview show_solr_doc show_files show_constituents track]
 
   include TokenConcern
 
@@ -113,13 +113,22 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     render layout: false
   end
 
+  # Records the search_position (used for previous/next navigation between search results) for this
+  # druid in the last_search cookie, then redirects to the object's show page.
+  def track
+    position = Integer(params[:search_position], exception: false)
+    remember_search_position(druid_param, position) if position && !turbo_prefetch?
+
+    redirect_to object_path(druid: druid_param), status: :see_other
+  end
+
   private
 
   # Determines the previous/next druids within the current search results, based on the
-  # "search_position" (1-based position within the search result set) that was passed along
-  # from the search results list.
+  # "search_position" (1-based position within the search result set) recorded for this druid in
+  # the last_search cookie by #track.
   def set_search_navigation
-    position = Integer(params[:search_position], exception: false)
+    position = search_position(druid_param)
     total_results = Integer(@total_results, exception: false)
     return if @last_search_form.blank? || position.nil? || total_results.nil?
     return unless position.positive?
@@ -130,6 +139,19 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
     @search_position = position
     @navigation = navigation
+  end
+
+  def search_position(druid)
+    last_search = cookies.signed[:last_search]
+    return nil if last_search.blank? || last_search['search_position_druid'] != druid
+
+    Integer(last_search['search_position'], exception: false)
+  end
+
+  def remember_search_position(druid, position)
+    last_search = cookies.signed[:last_search] || {}
+    cookies.signed[:last_search] =
+      { value: last_search.merge('search_position' => position, 'search_position_druid' => druid) }
   end
 
   def track_recent_object(druid)

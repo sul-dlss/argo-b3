@@ -17,7 +17,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
 
       caption = page.find('table#item-result-bb123cd4567 caption')
       expect(caption).to have_css('span', text: '2.')
-      expect(caption).to have_link('Test Title', href: "/objects/#{druid}?search_position=2")
+      expect(caption).to have_link('Test Title', href: "/objects/#{druid}/track?search_position=2")
       expect(caption).to have_button('Pin')
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'Druid', 'bb123cd4567')

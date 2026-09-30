@@ -35,11 +35,11 @@ module Search
     end
 
     def previous_path
-      object_path(druid: previous_druid, search_position: current_position - 1)
+      track_object_path(druid: previous_druid, search_position: current_position - 1)
     end
 
     def next_path
-      object_path(druid: next_druid, search_position: current_position + 1)
+      track_object_path(druid: next_druid, search_position: current_position + 1)
     end
 
     def previous_label
