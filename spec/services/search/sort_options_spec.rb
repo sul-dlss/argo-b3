@@ -23,4 +23,18 @@ RSpec.describe Search::SortOptions do
       expect(described_class.find_config_by_sort_field('unknown_field')).to be_nil
     end
   end
+
+  describe '#sort_value_for' do
+    it 'returns the sort value for a given sort field' do
+      expect(described_class.sort_value_for('title')).to eq(Search::SortOptions::TITLE.sort_value)
+    end
+
+    it 'defaults to relevance when the sort field is blank' do
+      expect(described_class.sort_value_for(nil)).to eq(Search::SortOptions::RELEVANCE.sort_value)
+    end
+
+    it 'defaults to relevance when the sort field is unknown' do
+      expect(described_class.sort_value_for('unknown_field')).to eq(Search::SortOptions::RELEVANCE.sort_value)
+    end
+  end
 end

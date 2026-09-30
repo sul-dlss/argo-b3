@@ -67,9 +67,9 @@ module Searchers
       [position - 2, 0].max
     end
 
-    # @return [String, nil] Solr sort value or nil if none
+    # @return [String] Solr sort value
     def sort
-      Search::SortOptions.find_config_by_sort_field(search_form.sort)&.sort_value
+      Search::SortOptions.sort_value_for(search_form.sort)
     end
   end
 end
