@@ -16,8 +16,8 @@ RSpec.describe Search::ItemNavigationComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_link('← Search results', href: /search\?page=2&query=cats/)
-    expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}?search_position=2")
-    expect(page).to have_link('Next »', href: "/objects/#{next_druid}?search_position=4")
+    expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}/track?search_position=2")
+    expect(page).to have_link('Next »', href: "/objects/#{next_druid}/track?search_position=4")
     expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
     expect(page).to have_css('span.fw-bold', text: '3')
     expect(page).to have_css('span.fw-bold', text: '10')

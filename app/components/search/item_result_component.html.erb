@@ -6,7 +6,8 @@
           <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
             <%= component.with_link do %>
               <%# Prefetching would record hovered objects as recently viewed. %>
-              <%= helpers.link_to_object(title, druid, path_params: { search_position: index }, data: { turbo_frame: '_top' }) %>
+              <%= link_to(title, track_object_path(druid:, search_position: index),
+                          data: { turbo_frame: '_top', turbo_prefetch: false }) %>
               <%= render Pin::PinnedObjectComponent.new(druid:, pinned: pinned?) if pinnable? %>
             <% end %>
           <% end %>

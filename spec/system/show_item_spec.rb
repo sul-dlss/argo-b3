@@ -504,17 +504,38 @@ RSpec.describe 'Show item' do
                                     'docs' => [{ 'id' => previous_druid }, { 'id' => druid }, { 'id' => next_druid }] })
     end
 
-    it 'renders previous and next links to the neighboring search results' do
-      visit "/objects/#{druid}?search_position=3"
+    it 'redirects through /track to a clean URL and renders previous/next links' do
+      visit "/objects/#{druid}/track?search_position=3"
 
+      expect(page).to have_current_path("/objects/#{druid}")
       expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
-      expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}?search_position=2")
-      expect(page).to have_link('Next »', href: "/objects/#{next_druid}?search_position=4")
+      expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}/track?search_position=2")
+      expect(page).to have_link('Next »', href: "/objects/#{next_druid}/track?search_position=4")
       expect(Search::SolrService).to have_received(:post).once
     end
 
+    it 'remembers the position for a later visit to the same object with a clean URL' do
+      visit "/objects/#{druid}/track?search_position=3"
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      visit "/objects/#{druid}"
+
+      expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
+      expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}/track?search_position=2")
+    end
+
     it 'does not render item navigation for an invalid position' do
-      visit "/objects/#{druid}?search_position=-1"
+      visit "/objects/#{druid}/track?search_position=-1"
+
+      expect(page).to have_css('h1', text: original_title)
+      expect(page).to have_no_css('.item-search-navigation')
+      expect(Search::SolrService).not_to have_received(:post)
+    end
+
+    it 'does not use a position remembered for a different object' do
+      set_last_search_cookie(search_position: 3, search_position_druid: 'druid:zz999zz9999')
+
+      visit "/objects/#{druid}"
 
       expect(page).to have_css('h1', text: original_title)
       expect(page).to have_no_css('.item-search-navigation')
@@ -527,12 +548,20 @@ RSpec.describe 'Show item' do
       end
 
       it 'does not render search navigation' do
-        visit "/objects/#{druid}?search_position=3"
+        visit "/objects/#{druid}/track?search_position=3"
 
+        expect(page).to have_current_path("/objects/#{druid}")
         expect(page).to have_css('h1', text: original_title)
         expect(page).to have_no_link('← Search results')
         expect(page).to have_no_css('.item-search-navigation')
         expect(Search::SolrService).not_to have_received(:post)
+      end
+
+      it 'does not error when visiting without a search_position param' do
+        visit "/objects/#{druid}"
+
+        expect(page).to have_css('h1', text: original_title)
+        expect(page).to have_no_css('.item-search-navigation')
       end
     end
   end
