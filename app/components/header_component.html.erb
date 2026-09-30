@@ -5,14 +5,12 @@
   <% end %>
   <%= header.with_secondary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>
-    <% if Settings.feature_flags.bulk_actions %>
-      <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
-        <% dropdown.with_item do %>
-          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Recent bulk actions', link: bulk_actions_path) %>
-        <% end %>
-        <% dropdown.with_item do %>
-          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
-        <% end %>
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Recent bulk actions', link: bulk_actions_path) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
       <% end %>
     <% end %>
 

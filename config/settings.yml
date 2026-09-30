@@ -33,7 +33,6 @@ bulk_actions:
   directory: "tmp/bulk_jobs"
 
 feature_flags:
-  bulk_actions: false
   ocr_workflow: true
 
 stacks:
