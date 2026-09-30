@@ -119,7 +119,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # "search_position" (1-based position within the search result set) that was passed along
   # from the search results list.
   def set_search_navigation
-    position = Integer(params[:search_position], exception: false)
+    position = search_position(druid_param)
     total_results = Integer(@total_results, exception: false)
     return if @last_search_form.blank? || position.nil? || total_results.nil?
     return unless position.positive?
@@ -130,6 +130,27 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
     @search_position = position
     @navigation = navigation
+  end
+
+  # The "search_position" querystring param is only present on the request that follows a link from
+  # a search result (or a previous/next navigation link). It is persisted to the last_search cookie,
+  # keyed to this druid, so that reloading the page after the browser strips the param from the URL
+  # (see app/javascript/controllers/strip_search_position_controller.js) still knows the position.
+  def search_position(druid)
+    param_position = Integer(params[:search_position], exception: false)
+    return remember_search_position(druid, param_position) if param_position
+
+    last_search = cookies.signed[:last_search]
+    return nil if last_search.blank? || last_search['search_position_druid'] != druid
+
+    Integer(last_search['search_position'], exception: false)
+  end
+
+  def remember_search_position(druid, position)
+    last_search = cookies.signed[:last_search] || {}
+    cookies.signed[:last_search] =
+      { value: last_search.merge('search_position' => position, 'search_position_druid' => druid) }
+    position
   end
 
   def track_recent_object(druid)

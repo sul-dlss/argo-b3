@@ -513,6 +513,33 @@ RSpec.describe 'Show item' do
       expect(Search::SolrService).to have_received(:post).once
     end
 
+    it 'strips the search_position param from the URL once the page has loaded' do
+      visit "/objects/#{druid}?search_position=3"
+
+      expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
+      expect(page).to have_current_path("/objects/#{druid}")
+    end
+
+    it 'remembers the position for a later visit to the same object with a clean URL' do
+      visit "/objects/#{druid}?search_position=3"
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      visit "/objects/#{druid}"
+
+      expect(page).to have_css('.item-search-navigation', text: /3\s+of\s+10/)
+      expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}?search_position=2")
+    end
+
+    it 'does not use a position remembered for a different object' do
+      set_last_search_cookie(search_position: 3, search_position_druid: 'druid:zz999zz9999')
+
+      visit "/objects/#{druid}"
+
+      expect(page).to have_css('h1', text: original_title)
+      expect(page).to have_no_css('.item-search-navigation')
+      expect(Search::SolrService).not_to have_received(:post)
+    end
+
     it 'does not render item navigation for an invalid position' do
       visit "/objects/#{druid}?search_position=-1"
 
@@ -533,6 +560,13 @@ RSpec.describe 'Show item' do
         expect(page).to have_no_link('← Search results')
         expect(page).to have_no_css('.item-search-navigation')
         expect(Search::SolrService).not_to have_received(:post)
+      end
+
+      it 'does not error when visiting without a search_position param' do
+        visit "/objects/#{druid}"
+
+        expect(page).to have_css('h1', text: original_title)
+        expect(page).to have_no_css('.item-search-navigation')
       end
     end
   end
