@@ -6,7 +6,7 @@
 <%= turbo_stream_from 'objects', @solr_doc.druid %>
 
 <%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
-      controller: 'cocina-model-show',
+      controller: 'cocina-model-show strip-search-position',
       cocina_model_show_interval_value: Settings.reload_intervals.cocina_model
     } do %>
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
