@@ -24,4 +24,11 @@
   .form-label ~ span {
     margin-left: $spacer;
   }
+
+  // A validation message waiting to be filled in by JavaScript must not take up space. Bootstrap
+  // reveals every .invalid-feedback following an .is-invalid input, so an empty one would otherwise
+  // add its margin below the message that is actually set.
+  .invalid-feedback:empty {
+    display: none;
+  }
 }

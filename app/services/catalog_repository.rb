@@ -5,6 +5,11 @@ class CatalogRepository
   # Raised when the catalog cannot answer the question, e.g., Folio is unavailable.
   class Error < StandardError; end
 
+  # Raised when the catalog record id does not identify exactly one catalog record. Distinct from Error
+  # so that callers can tell an unusable catalog record id (which the user can correct) apart from a
+  # catalog that is not answering (which they cannot).
+  class NotFoundResponse < Error; end
+
   # Checks whether a catalog record exists for the given catalog record id (HRID).
   #
   # A catalog record id that matches multiple records is treated as not found, since it cannot
@@ -27,5 +32,22 @@ class CatalogRepository
     raise Error, e.message unless allow_catalog_errors
 
     true
+  end
+
+  # Retrieves the title of the catalog record for the given catalog record id (HRID).
+  #
+  # A catalog record id that matches multiple records is treated as not found, since it cannot
+  # be used to unambiguously identify a single catalog record.
+  #
+  # @param catalog_record_id [String] the catalog record id (Folio HRID, e.g., "a12345")
+  # @return [String] the title of the matching catalog record
+  # @raise [CatalogRepository::NotFoundResponse] if the catalog record id matches no records or multiple records
+  # @raise [CatalogRepository::Error] if the catalog request fails
+  def self.title(catalog_record_id:)
+    FolioClient.fetch_instance_info(hrid: catalog_record_id)['title']
+  rescue FolioClient::ResourceNotFound, FolioClient::MultipleResourcesFound => e
+    raise NotFoundResponse, e.message
+  rescue FolioClient::Error => e
+    raise Error, e.message
   end
 end

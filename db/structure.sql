@@ -332,12 +332,12 @@ ALTER SEQUENCE public.contents_id_seq OWNED BY public.contents.id;
 
 CREATE TABLE public.form_validation_actions (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    error_data jsonb,
+    user_id bigint NOT NULL,
     form_payload jsonb NOT NULL,
+    error_data jsonb,
     status character varying DEFAULT 'created'::character varying NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    user_id bigint NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
