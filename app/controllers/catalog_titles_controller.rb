@@ -13,6 +13,8 @@ class CatalogTitlesController < ApplicationController
     return render_error(:not_found, :not_found) if title.blank?
 
     render json: { title: }
+  rescue CatalogRepository::NotFoundResponse
+    render_error(:not_found, :not_found)
   rescue CatalogRepository::Error
     render_error(:catalog_error, :bad_gateway)
   end

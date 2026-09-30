@@ -738,17 +738,22 @@ RSpec.describe 'Create an item' do
         fill_in 'FOLIO Instance HRID', with: 'in999'
 
         expect(page).to have_no_field('item_retrieved_title', with: title)
+        expect(page).to have_no_css('#item_catalog_record_id.is-invalid')
       end
     end
 
     context 'when the catalog record is not found' do
-      let(:title) { nil }
+      before do
+        allow(CatalogRepository).to receive(:title).and_raise(CatalogRepository::NotFoundResponse)
+      end
 
       it 'displays an error' do
         choose 'Use FOLIO Instance HRID to retrieve title'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
         click_button 'Retrieve title'
 
+        # Marking the input is what reveals the message, and gives it the server-side red border.
+        expect(page).to have_css('#item_catalog_record_id.is-invalid')
         expect(page).to have_invalid_feedback('item_catalog_record_id', 'FOLIO record not found')
         expect(page).to have_no_field('item_retrieved_title')
       end

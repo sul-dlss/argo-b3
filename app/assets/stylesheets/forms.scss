@@ -25,16 +25,10 @@
     margin-left: $spacer;
   }
 
-  // Prefix validation messages with a warning icon, per the design. A pseudo-element keeps the icon out
-  // of the accessibility tree and out of the message text, which is announced by the message's role.
-  .invalid-feedback::before {
-    content: "\f33a"; // bootstrap-icons exclamation-triangle-fill
-    display: inline-block;
-    margin-right: $spacer * 0.25;
-    font-family: bootstrap-icons, sans-serif;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    vertical-align: -0.125em;
+  // A validation message waiting to be filled in by JavaScript must not take up space. Bootstrap
+  // reveals every .invalid-feedback following an .is-invalid input, so an empty one would otherwise
+  // add its margin below the message that is actually set.
+  .invalid-feedback:empty {
+    display: none;
   }
 }

@@ -74,9 +74,9 @@ RSpec.describe CatalogRepository do
       end
     end
 
-    context 'when the catalog record is not found' do
+    context 'when the catalog record has no title' do
       before do
-        allow(FolioClient).to receive(:fetch_instance_info).and_raise(FolioClient::ResourceNotFound)
+        allow(FolioClient).to receive(:fetch_instance_info).and_return({ 'id' => '123' })
       end
 
       it 'returns nil' do
@@ -84,13 +84,25 @@ RSpec.describe CatalogRepository do
       end
     end
 
-    context 'when the catalog record id matches multiple records' do
+    context 'when the catalog record is not found' do
       before do
-        allow(FolioClient).to receive(:fetch_instance_info).and_raise(FolioClient::MultipleResourcesFound)
+        allow(FolioClient).to receive(:fetch_instance_info)
+          .and_raise(FolioClient::ResourceNotFound, 'No matching instance')
       end
 
-      it 'returns nil' do
-        expect(title).to be_nil
+      it 'raises a not found error' do
+        expect { title }.to raise_error(described_class::NotFoundResponse, 'No matching instance')
+      end
+    end
+
+    context 'when the catalog record id matches multiple records' do
+      before do
+        allow(FolioClient).to receive(:fetch_instance_info)
+          .and_raise(FolioClient::MultipleResourcesFound, 'Expected 1 record')
+      end
+
+      it 'raises a not found error' do
+        expect { title }.to raise_error(described_class::NotFoundResponse, 'Expected 1 record')
       end
     end
 
@@ -100,7 +112,9 @@ RSpec.describe CatalogRepository do
       end
 
       it 'raises an error wrapping the catalog error' do
-        expect { title }.to raise_error(described_class::Error, 'Folio is down')
+        # an_instance_of, since NotFoundResponse would also match a described_class::Error expectation.
+        expect { title }.to raise_error(an_instance_of(described_class::Error)
+                                          .and(having_attributes(message: 'Folio is down')))
       end
     end
   end

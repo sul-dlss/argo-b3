@@ -16,10 +16,10 @@ module Edit
       SdrViewComponents::Forms::InvalidFeedbackSupport.arias_for(field_name: :catalog_record_id, form:)
     end
 
-    # The retrieved title is hidden until a title has been retrieved, whether by the catalog-title
-    # Stimulus controller or by a previous submission of the form.
-    def retrieved_title_container_classes
-      ['my-field', ('d-none' if form.object.retrieved_title.blank?)].compact
+    # The retrieved title field is disabled until a title has been retrieved, whether by the
+    # catalog-title Stimulus controller or by a previous submission of the form.
+    def retrieved_title_disabled?
+      form.object.retrieved_title.blank?
     end
   end
 end

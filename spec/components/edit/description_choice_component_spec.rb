@@ -44,16 +44,15 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
                      retrieved_title: 'Pride and prejudice')
       end
 
-      it 'renders the retrieved title without hiding it' do
+      it 'renders the retrieved title in an enabled field' do
         render_inline(component)
 
-        title_container = page.find('[data-catalog-title-target="titleContainer"]')
-        expect(title_container[:class]).not_to include('d-none')
-        expect(title_container).to have_field('Title', type: 'text', with: 'Pride and prejudice', readonly: true)
+        expect(page).to have_field('Title', type: 'text', with: 'Pride and prejudice', readonly: true)
+        expect(page.find('input[data-catalog-title-target="title"]')[:disabled]).to be_blank
       end
     end
 
-    it 'renders the retrieve title button beside the HRID input and a hidden title' do
+    it 'renders the retrieve title button beside the HRID input and a disabled title field' do
       render_inline(component)
 
       expect(page).to have_css('[data-controller="catalog-title"][data-catalog-title-url-value="/catalog_titles"]')
@@ -61,12 +60,15 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       field_row = page.find('input[data-catalog-title-target="hrid"]').ancestor('.d-flex')
       expect(field_row).to have_button('Retrieve title', type: 'button')
       expect(field_row).to have_no_css('.input-group')
-      expect(field_row).to have_css('.invalid-feedback.d-none[data-catalog-title-target="error"]')
+      # Bootstrap reveals the message when the input is marked invalid, so it carries no d-block/d-none.
+      expect(field_row).to have_css('div.invalid-feedback[data-catalog-title-target="error"]', visible: :all)
+      expect(field_row).to have_no_css('[data-catalog-title-target="error"].d-block', visible: :all)
 
-      title_container = page.find('.d-none[data-catalog-title-target="titleContainer"]')
-      title_field = title_container.find('input[data-catalog-title-target="title"]')
+      # Disabled until a title is retrieved, rather than hidden.
+      title_field = page.find('input[data-catalog-title-target="title"]')
+      expect(title_field[:disabled]).to be_present
       expect(title_field[:readonly]).to be_present
-      expect(title_container).to have_css("label.form-label[for='#{title_field[:id]}']", text: 'Title')
+      expect(page).to have_css("label.form-label[for='#{title_field[:id]}']", text: 'Title')
     end
   end
 

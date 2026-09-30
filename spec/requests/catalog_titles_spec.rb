@@ -25,6 +25,19 @@ RSpec.describe 'Catalog titles' do
 
   context 'when the catalog record is not found' do
     before do
+      allow(CatalogRepository).to receive(:title).and_raise(CatalogRepository::NotFoundResponse)
+    end
+
+    it 'returns a not found error' do
+      get '/catalog_titles', params: { catalog_record_id: 'in11403803' }
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.parsed_body).to eq({ 'error' => 'FOLIO record not found' })
+    end
+  end
+
+  context 'when the catalog record has no title' do
+    before do
       allow(CatalogRepository).to receive(:title).and_return(nil)
     end
 

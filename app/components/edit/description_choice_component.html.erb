@@ -29,7 +29,10 @@
         container_classes: 'my-fieldset'
       ) do |component| %>
     <% component.with_additional_container_content do %>
+      <%# The radio inputs are siblings of this element, so their events are only observable on document. %>
       <%= tag.div data: { controller: 'catalog-title',
+                          action: 'input@document->catalog-title#syncDisabled ' \
+                                  'change@document->catalog-title#syncDisabled',
                           catalog_title_url_value: catalog_titles_path,
                           catalog_title_error_message_value: t('edit.items.fields.catalog_record_id.errors.catalog_error') } do %>
         <div class="my-field">
@@ -44,9 +47,14 @@
                     form:, field_name: :catalog_record_id, aria: catalog_record_id_aria,
                     data: { catalog_title_target: 'hrid', action: 'input->catalog-title#reset' }
                   ) %>
-              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :catalog_record_id) %>
-              <%# Populated by the catalog-title Stimulus controller when the title cannot be retrieved. %>
-              <%= tag.div class: 'invalid-feedback d-block d-none', data: { catalog_title_target: 'error' } %>
+              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(
+                    form:, field_name: :catalog_record_id,
+                    data: { catalog_title_target: 'submissionError' }
+                  ) %>
+              <%# Populated by the catalog-title Stimulus controller when the title cannot be retrieved.
+                  Bootstrap reveals it via `.is-invalid ~ .invalid-feedback`, so the controller marks the
+                  input rather than this element. %>
+              <%= tag.div class: 'invalid-feedback', data: { catalog_title_target: 'error' } %>
             </div>
             <%= render SdrViewComponents::Elements::ButtonComponent.new(
                   label: t('edit.items.fields.catalog_record_id.retrieve_title'),
@@ -61,9 +69,9 @@
         <%= render SdrViewComponents::Forms::TextFieldComponent.new(
               form:, field_name: :retrieved_title,
               label_text: t('edit.items.fields.retrieved_title.label'),
-              container_classes: retrieved_title_container_classes,
-              container_data: { catalog_title_target: 'titleContainer' },
+              container_classes: 'my-field',
               input_readonly: true,
+              input_disabled: retrieved_title_disabled?,
               input_data: { catalog_title_target: 'title' }
             ) %>
       <% end %>
