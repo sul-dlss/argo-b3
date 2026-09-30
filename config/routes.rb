@@ -233,10 +233,9 @@ Rails.application.routes.draw do
   resources :pinned_tags, only: %i[create destroy]
 
   namespace :admin do
-    get 'groups'
-    get 'impersonate'
-    patch 'impersonate', to: 'update_impersonation'
-    delete 'impersonate', to: 'stop_impersonating', as: :stop_impersonate
+    get 'impersonate', to: 'impersonation#edit'
+    patch 'impersonate', to: 'impersonation#update'
+    delete 'impersonate', to: 'impersonation#destroy', as: :stop_impersonate
     resources :workgroup_permissions, only: %i[index]
   end
 
