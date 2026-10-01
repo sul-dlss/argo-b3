@@ -16,6 +16,23 @@ module Contents
       new(...).build
     end
 
+    # Finds the Content for the Cocina object's lock, building it if it does not exist yet.
+    # Concurrent requests (e.g., for the same object show page) may race to build the same Content;
+    # the request that loses the race returns the Content built by the winner.
+    # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to find or build Content for
+    # @param immutable [Boolean] true if the Content should be marked as non-changing
+    # @return [Content]
+    def self.find_or_create(cocina_object:, immutable: true)
+      find_content = lambda do
+        Content.find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable:)
+      end
+
+      find_content.call || ActiveRecord::Base.transaction(requires_new: true) { call(cocina_object:, immutable:) }
+    rescue ActiveRecord::RecordNotUnique
+      # Re-raise if the uniqueness violation was not caused by a concurrently built Content.
+      find_content.call || raise
+    end
+
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build Content for
     # @param immutable [Boolean] true if the Content should be marked as non-changing
     def initialize(cocina_object:, immutable: true)

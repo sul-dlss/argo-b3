@@ -1,0 +1,4 @@
+<%= turbo_frame_tag(@content.druid, 'structure') do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Structural metadata', classes: 'mb-3') %>
+  <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, classes: 'mb-2') %>
+<% end %>

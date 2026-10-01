@@ -5,7 +5,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   RECENT_OBJECTS_LIMIT = 5
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
-                                  show_purl_preview show_solr_doc show_files show_constituents
+                                  show_purl_preview show_solr_doc show_files show_structure show_constituents
                                   show_structural_csv track]
 
   include TokenConcern
@@ -102,7 +102,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_files
-    @content = fetch_content(verified_druid)
+    @content = fetch_content
+
+    render layout: false
+  end
+
+  def show_structure
+    @content = fetch_content
 
     render layout: false
   end
@@ -118,7 +124,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     return head :not_found unless cocina_object.dro?
 
     # The immutable Content reflects the structural of the cocina object.
-    send_data StructuralCsv::Export.as_csv(content: fetch_content(verified_druid)),
+    send_data StructuralCsv::Export.as_csv(content: fetch_content),
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_structural.csv"
   end
 
@@ -245,9 +251,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
   end
 
-  def fetch_content(druid)
-    Content.find_by(druid:, lock: cocina_object.lock, immutable: true) ||
-      Contents::Builder.call(cocina_object:)
+  def fetch_content
+    Contents::Builder.find_or_create(cocina_object:)
   end
 
   # Looks up titles/permissions of given druids without filtering by view permission, so that an object

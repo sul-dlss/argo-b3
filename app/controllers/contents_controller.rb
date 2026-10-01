@@ -74,7 +74,7 @@ class ContentsController < ContentsApplicationController
   end
 
   def find_or_create_content(cocina_object:)
-    find_content(cocina_object:) || Contents::Builder.call(cocina_object:, immutable: false)
+    Contents::Builder.find_or_create(cocina_object:, immutable: false)
   end
 
   def fetch_solr_doc(druid:)
