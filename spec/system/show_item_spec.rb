@@ -191,8 +191,11 @@ RSpec.describe 'Show item' do
   end
 
   it 'displays the object' do
+    create(:permission, :edit, workgroup: 'sdr:argo-access', target_druid: druid)
+
     # Defining the solr doc and cocina object inline because going to change the title to test refresh.
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: original_title))
+    allow(Sdr::Repository).to receive(:publish)
     allow(Sdr::Repository).to receive(:find).and_return(
       build_cocina_object(title: original_title, access: {
                             copyright: 'My copyright statement',
@@ -497,6 +500,16 @@ RSpec.describe 'Show item' do
           expect(page).to have_no_css('.bi-pin')
         end
       end
+    end
+
+    # Republishing the object
+    # Republish is also a real round-trip (full-page redirect + flash toast), so give it the
+    # same extra wait as the pin/unpin interactions above to avoid flakiness.
+    using_wait_time(10) do
+      click_button 'Republish'
+
+      expect(Sdr::Repository).to have_received(:publish).with(druid:)
+      expect(page).to have_toast('Republishing started')
     end
   end
 
