@@ -200,6 +200,7 @@ Rails.application.routes.draw do
       get 'solr_doc', to: 'objects#show_solr_doc'
       get 'files', to: 'objects#show_files'
       get 'constituents', to: 'objects#show_constituents'
+      get 'structural_csv', to: 'objects#show_structural_csv'
     end
   end
 
