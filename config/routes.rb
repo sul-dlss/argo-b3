@@ -211,7 +211,9 @@ Rails.application.routes.draw do
   resources :contents, only: %i[edit show update] do
     resource :dropzone, only: %i[update], controller: 'content_dropzone'
     resource :mount, only: %i[new create show], controller: 'content_mount'
-    resource :structure, only: %i[edit update], controller: 'content_structure'
+    resource :structure, only: %i[edit update], controller: 'content_structure' do
+      get 'csv'
+    end
 
     resources :content_file_sets, only: %i[edit update show destroy]
     resources :content_file_binaries, only: %i[destroy]
