@@ -5,7 +5,7 @@ module BulkActions
   class ExportStructuralMetadataJob < DruidsJob
     def perform_bulk_action
       export_filepath = bulk_action.export_filepath(:structural_metadata)
-      CSV.open(export_filepath, 'w', write_headers: true, headers: StructureSerializer::HEADERS) do |export_csv|
+      CSV.open(export_filepath, 'w', write_headers: true, headers: StructuralCsv::Export::HEADERS) do |export_csv|
         super(export_csv:)
       end
     end
@@ -24,7 +24,8 @@ module BulkActions
       def perform
         return failure!(message: 'No structural metadata to export') if no_structural?
 
-        StructureSerializer.new(druid, cocina_object.structural).rows do |row|
+        content = Contents::Builder.build(cocina_object:)
+        StructuralCsv::Export.new(content:).rows do |row|
           export_csv << row
         end
         success!(message: 'Exported structural metadata')

@@ -165,7 +165,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   end
 
   let(:cocina_object) do
-    build(:dro, id: druid).new(structural:, access: { view: 'world', download: 'world' })
+    build(:dro_with_metadata, id: druid).new(structural:, access: { view: 'world', download: 'world' })
   end
 
   before do
@@ -197,7 +197,7 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   end
 
   context 'when no structural metadata is present' do
-    let(:cocina_object) { build(:dro, id: druid) }
+    let(:cocina_object) { build(:dro_with_metadata, id: druid) }
 
     it 'records a failure' do
       job.perform_now

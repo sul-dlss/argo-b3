@@ -2,13 +2,13 @@
 
 require 'rails_helper'
 
-RSpec.describe StructureSerializer do
+RSpec.describe StructuralCsv::Export do
   subject(:csv) do
-    described_class.as_csv(cocina.externalIdentifier, cocina.structural)
+    described_class.as_csv(content: Contents::Builder.build(cocina_object: cocina))
   end
 
   let(:cocina) do
-    Cocina::Models.build(JSON.parse(json))
+    Cocina::Models.with_metadata(Cocina::Models.build(JSON.parse(json)), 'abc123')
   end
 
   let(:druid) { 'druid:qr773tm1060' }

@@ -4,12 +4,16 @@ module Contents
   # Builds a Content (with its ContentFileSets, ContentFileBinaries, and ContentFiles) from a Cocina
   # object's structural metadata. Cocina files that share the same filename within the Content are
   # deduplicated into a single ContentFileBinary, referenced by multiple ContentFiles.
-  class Builder
+  class Builder # rubocop:disable Metrics/ClassLength
     # Adding in batches with insert_all! is much faster than individual creates.
     BATCH_SIZE = 1000
 
     def self.call(...)
       new(...).call
+    end
+
+    def self.build(...)
+      new(...).build
     end
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object to build Content for
@@ -31,7 +35,27 @@ module Contents
       end
     end
 
+    # @return [Content] an unsaved, in-memory Content built from the Cocina object's structural metadata
+    def build
+      content = Content.new(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable:)
+      content_file_binaries_by_filepath = {}
+      cocina_file_sets.each.with_index(1) do |cocina_file_set, position|
+        content_file_set = content.content_file_sets.build(content_file_set_attrs(cocina_file_set:, position:))
+        build_in_memory_content_files(content:, content_file_set:, cocina_file_set:, content_file_binaries_by_filepath:)
+      end
+      content
+    end
+
     private
+
+    def build_in_memory_content_files(content:, content_file_set:, cocina_file_set:, content_file_binaries_by_filepath:)
+      Array(cocina_file_set.structural&.contains).each.with_index(1) do |cocina_file, position|
+        filepath = cocina_file.filename
+        content_file_binary = content_file_binaries_by_filepath[filepath] ||=
+          content.content_file_binaries.build(content_file_binary_attrs(filepath:, cocina_file:))
+        content_file_set.content_files.build(content_file_binary:, **content_file_attrs(cocina_file:, position:))
+      end
+    end
 
     attr_reader :cocina_object, :immutable
 
@@ -44,8 +68,8 @@ module Contents
     def build_content_file_sets(content:)
       return [] if cocina_file_sets.empty?
 
-      attrs = cocina_file_sets.each_with_index.map do |cocina_file_set, index|
-        content_file_set_attrs(content:, cocina_file_set:, position: index + 1)
+      attrs = cocina_file_sets.each.with_index(1).map do |cocina_file_set, position|
+        { content_id: content.id, **content_file_set_attrs(cocina_file_set:, position:) }
       end
 
       ids = attrs.each_slice(BATCH_SIZE).flat_map do |batch|
@@ -55,9 +79,8 @@ module Contents
       cocina_file_sets.zip(ids) # Pairs id with cocina file
     end
 
-    def content_file_set_attrs(content:, cocina_file_set:, position:)
+    def content_file_set_attrs(cocina_file_set:, position:)
       {
-        content_id: content.id,
         position:,
         file_set_type: cocina_file_set.type.delete_prefix(Constants::FILE_SET_TYPE_PREFIX),
         label: cocina_file_set.label,
@@ -82,7 +105,7 @@ module Contents
 
       filepaths = cocina_files_by_filepath.keys
       attrs = cocina_files_by_filepath.map do |filepath, cocina_file|
-        content_file_binary_attrs(content:, filepath:, cocina_file:)
+        { content_id: content.id, **content_file_binary_attrs(filepath:, cocina_file:) }
       end
 
       ids = attrs.each_slice(BATCH_SIZE).flat_map do |batch|
@@ -92,9 +115,8 @@ module Contents
       filepaths.zip(ids).to_h
     end
 
-    def content_file_binary_attrs(content:, filepath:, cocina_file:)
+    def content_file_binary_attrs(filepath:, cocina_file:)
       {
-        content_id: content.id,
         file_location: 'deposited',
         filepath:,
         **filepath_attributes(filepath:),
@@ -108,7 +130,7 @@ module Contents
       attrs = file_set_pairs.flat_map do |cocina_file_set, content_file_set_id|
         Array(cocina_file_set.structural&.contains).each_with_index.map do |cocina_file, index|
           content_file_binary_id = binary_ids_by_filepath.fetch(cocina_file.filename)
-          content_file_attrs(content_file_set_id:, content_file_binary_id:, cocina_file:, position: index + 1)
+          { content_file_set_id:, content_file_binary_id:, **content_file_attrs(cocina_file:, position: index + 1) }
         end
       end
 
@@ -119,10 +141,8 @@ module Contents
       end
     end
 
-    def content_file_attrs(content_file_set_id:, content_file_binary_id:, cocina_file:, position:)
+    def content_file_attrs(cocina_file:, position:)
       {
-        content_file_set_id:,
-        content_file_binary_id:,
         position:,
         label: cocina_file.label,
         external_identifier: cocina_file.externalIdentifier,
