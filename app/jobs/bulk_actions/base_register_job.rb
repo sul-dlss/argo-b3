@@ -51,15 +51,22 @@ module BulkActions
       registration_report_filepath = bulk_action.export_filepath(:registration_report)
       CSV.open(registration_report_filepath, 'wb', write_headers: true, headers: HEADERS) do |registration_report_csv|
         registrations.each.with_index(index_offset).filter_map do |registration, index|
-          job_item = perform_item_class.new(index:, job: self, registration:, registration_report_csv:)
-          job_item.perform
-          # The druid is only set once the object has been registered.
-          job_item.druid
-        rescue StandardError => e
-          failure!(message: "Error: #{e.class} #{e.message}", index:)
-          nil
+          register_object(registration:, index:, registration_report_csv:)
         end
       end
+    end
+
+    # @return [String, nil] druid of the registered object, or nil if registration failed
+    def register_object(registration:, index:, registration_report_csv:)
+      job_item = perform_item_class.new(index:, job: self, registration:, registration_report_csv:)
+      job_item.perform
+      # The druid is only set once the object has been registered.
+      job_item.druid
+    rescue StandardError => e
+      failure!(message: "Error: #{e.class} #{e.message}", index:)
+      Rails.logger.error(e.full_message)
+      Honeybadger.notify(e)
+      nil
     end
 
     # Failing to create the tracking sheets does not fail the registrations.
@@ -70,6 +77,7 @@ module BulkActions
       TracksheetService.call(solr_doc_presenters:).render_file(bulk_action.export_filepath(:tracking_sheets))
     rescue StandardError => e
       log("Error: Unable to create tracking sheets: #{e.class} #{e.message}")
+      Rails.logger.error(e.full_message)
       Honeybadger.notify(e)
     end
 
@@ -78,6 +86,7 @@ module BulkActions
         SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid:))
       rescue StandardError => e
         log(delimited_log_message(message: "Error: Unable to create tracking sheet: #{e.class} #{e.message}", druid:))
+        Rails.logger.error(e.full_message)
         Honeybadger.notify(e)
         nil
       end

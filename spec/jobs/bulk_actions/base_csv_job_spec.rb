@@ -64,6 +64,34 @@ RSpec.describe BulkActions::BaseCsvJob do
     end
   end
 
+  context 'when an item raises an error' do
+    let(:csv_file) { "druid,test\n#{druids.first},test1\n#{druids.second},test2" }
+
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseCsvJobItem) do
+        def perform
+          success!(message: 'Testing successful') if druid == 'druid:bb111cc2222'
+          raise StandardError, 'Something bad happened' if druid == 'druid:cc111dd2222'
+        end
+      end
+      stub_const('TestBulkActionCsvJob::JobItem', bulk_action_item_class)
+
+      allow(Honeybadger).to receive(:notify)
+      allow(Rails.logger).to receive(:error)
+    end
+
+    it 'records the failure, logs, notifies Honeybadger, and completes the remaining items' do
+      TestBulkActionCsvJob.perform_now(bulk_action:, csv_file:)
+
+      expect(log).to have_received(:puts).with(/line 2\t#{druids.first}\tSuccess: Testing successful/o)
+      expect(log).to have_received(:puts).with(/line 3\t#{druids.second}\tError: StandardError Something bad happened/o)
+      expect(Rails.logger).to have_received(:error).with(/Something bad happened/)
+      expect(Honeybadger).to have_received(:notify).with(instance_of(StandardError))
+      expect(bulk_action.reload.druid_count_success).to eq(1)
+      expect(bulk_action.druid_count_fail).to eq(1)
+    end
+  end
+
   context 'when an object is missing' do
     let(:druids) { %w[druid:bc123df4567 druid:gh123jk4589] }
     let(:cocina_object) { instance_double(Cocina::Models::DRO) }

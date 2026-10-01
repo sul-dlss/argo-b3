@@ -76,11 +76,13 @@ RSpec.describe BulkActions::ExportTrackingSheetsJob do
     before do
       allow(pdf).to receive(:render_file).and_raise(StandardError, 'disk full')
       allow(Honeybadger).to receive(:notify)
+      allow(Rails.logger).to receive(:error)
     end
 
     it 'logs the error and notifies Honeybadger' do
       job.perform_now
 
+      expect(Rails.logger).to have_received(:error).with(/disk full/)
       expect(Honeybadger).to have_received(:notify)
       expect(log.string).to include('ExportTrackingSheetsJob failed StandardError disk full')
     end

@@ -52,6 +52,8 @@ module BulkActions
       failure!(druid:, message: 'Error: Object not found', index:)
     rescue StandardError => e
       failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
+      Rails.logger.error(e.full_message)
+      Honeybadger.notify(e)
     end
 
     def check_required_columns?

@@ -217,6 +217,23 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
     end
   end
 
+  context 'when the import raises an error' do
+    before do
+      allow(StructuralCsv::Import).to receive(:call).and_raise(StandardError, 'Something bad happened')
+      allow(Honeybadger).to receive(:notify)
+      allow(Rails.logger).to receive(:error)
+    end
+
+    it 'records the failure, logs, and notifies Honeybadger' do
+      job.perform_now
+
+      expect(log.string).to include("#{druid}\tError: StandardError Something bad happened")
+      expect(Rails.logger).to have_received(:error).with(/Something bad happened/)
+      expect(Honeybadger).to have_received(:notify).with(instance_of(StandardError))
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+    end
+  end
+
   context 'when the object is not an item' do
     let(:cocina_object) { build(:collection_with_metadata, id: druid) }
     let(:csv_file) do

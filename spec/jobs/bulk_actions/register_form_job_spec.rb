@@ -45,6 +45,7 @@ RSpec.describe BulkActions::RegisterFormJob do
     allow(Sdr::Repository).to receive(:find_solr) { |druid:| { Search::Fields::ID => druid } }
     allow(TracksheetService).to receive(:call).and_return(pdf)
     allow(Honeybadger).to receive(:notify)
+    allow(Rails.logger).to receive(:error)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
   end
@@ -120,6 +121,7 @@ RSpec.describe BulkActions::RegisterFormJob do
 
       expect(log).to have_received(:puts)
         .with(/druid:bc123df4567\tError: Unable to create tracking sheet: Sdr::Repository::NotFoundResponse/)
+      expect(Rails.logger).to have_received(:error).with(/Object not found/)
       expect(Honeybadger).to have_received(:notify).with(Sdr::Repository::NotFoundResponse)
       expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
         expect(solr_doc_presenters.map(&:druid)).to eq ['druid:dj123qx4568']
@@ -138,6 +140,7 @@ RSpec.describe BulkActions::RegisterFormJob do
       job.perform_now
 
       expect(log).to have_received(:puts).with(/Error: Unable to create tracking sheets: StandardError disk full/)
+      expect(Rails.logger).to have_received(:error).with(/disk full/)
       expect(Honeybadger).to have_received(:notify).with(StandardError)
       expect(bulk_action.druid_count_success).to eq 2
       expect(bulk_action.druid_count_fail).to eq 0
@@ -257,6 +260,8 @@ RSpec.describe BulkActions::RegisterFormJob do
 
       expect(log).to have_received(:puts).with(/line 1\t\tError: StandardError connection problem/)
       expect(log).to have_received(:puts).with(/line 2\t\tError: StandardError connection problem/)
+      expect(Rails.logger).to have_received(:error).with(/connection problem/).twice
+      expect(Honeybadger).to have_received(:notify).with(StandardError).twice
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 2
       expect(File.read(csv_filepath)).to eq("Druid,Barcode,Folio Instance HRID,Source Id,Title\n")
