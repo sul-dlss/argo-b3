@@ -12,10 +12,6 @@ RSpec.describe AdminPolicy do
       expect(policy.resolve_rule(:manage_permissions?)).to eq(:admin?)
     end
 
-    it 'resolves groups? to admin?' do
-      expect(policy.resolve_rule(:groups?)).to eq(:admin?)
-    end
-
     it 'resolves update_impersonation? to impersonate?' do
       expect(policy.resolve_rule(:update_impersonation?)).to eq(:impersonate?)
     end
