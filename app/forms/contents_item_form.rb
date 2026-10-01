@@ -4,15 +4,12 @@
 # Note that this is a subclass of CocinaModels::Dro, not ApplicationForm.
 class ContentsItemForm < CocinaModels::Dro
   include PermittedParamsConcern
+  include TextExtractionConcern
 
   # The OCR settings are not part of the Cocina object; they are form-only attributes that
   # #workflow_context hands to the assembly workflow instead. A consequence is that changing only
-  # these issues still a Cocina update that is a no-op.
+  # these still issues a Cocina update that is a no-op.
   attribute :run_ocr, :boolean, default: false
-  attribute :text_extraction_languages, array: true, default: []
-
-  # The multiple select submits a blank value alongside the selected languages.
-  normalizes_array_compact_blank :text_extraction_languages
 
   # The disabled viewing direction select is not submitted, so a previous viewing direction is retained
   # when changing to a content type that does not have viewing directions.
