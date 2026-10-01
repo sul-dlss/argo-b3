@@ -98,7 +98,8 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'renders the Admin section with an enabled Impersonate button' do
-        expect(admin_section).to have_button('Manage permissions')
+        expect(admin_section).to have_css("form[action='#{admin_workgroup_permissions_path}'] button",
+                                          text: 'Manage permissions')
         expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button", text: 'Impersonate')
         expect(admin_section).to have_no_css('.disabled', text: 'Impersonate')
       end
@@ -114,7 +115,8 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'renders the Admin section with a disabled Impersonate button' do
-        expect(admin_section).to have_button('Manage permissions')
+        expect(admin_section).to have_css("form[action='#{admin_workgroup_permissions_path}'] button",
+                                          text: 'Manage permissions')
         expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button.disabled",
                                           text: 'Impersonate')
       end

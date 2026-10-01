@@ -1,0 +1,13 @@
+<div class="container pb-3">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Workgroup permissions', classes: 'mb-4') %>
+
+  <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Workgroups', show_label: false, variant: :h3, id: 'workgroup-permissions-table', empty_message: 'No workgroup permissions.') do |table| %>
+    <%= table.with_header(label: 'Workgroup') %>
+    <%= table.with_header(label: 'Number of permissions') %>
+    <%= table.with_header(label: 'Read unrestricted') %>
+    <% @workgroup_results.each do |workgroup_result| %>
+      <%= table.with_row(first_value: workgroup_result.workgroup,
+                         values: [workgroup_result.permission_count, workgroup_result.read_unrestricted ? 'Yes' : 'No']) %>
+    <% end %>
+  <% end %>
+</div>
