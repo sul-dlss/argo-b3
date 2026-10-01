@@ -299,19 +299,19 @@ RSpec.describe Sdr::Repository do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     end
 
-    context 'when successful' do
-      it 'publishes with the default lane_id' do
+    context 'when no lane_id is given' do
+      it 'publishes without a lane_id' do
         described_class.publish(druid:)
 
-        expect(object_client).to have_received(:publish).with(lane_id: 'low')
+        expect(object_client).to have_received(:publish).with(lane_id: nil)
       end
     end
 
     context 'when a lane_id is given' do
       it 'publishes with the given lane_id' do
-        described_class.publish(druid:, lane_id: 'high')
+        described_class.publish(druid:, lane_id: 'low')
 
-        expect(object_client).to have_received(:publish).with(lane_id: 'high')
+        expect(object_client).to have_received(:publish).with(lane_id: 'low')
       end
     end
 

@@ -115,9 +115,9 @@ module Sdr
     private_class_method :assembly_workflow_name
 
     # @param [String] druid the druid of the object
-    # @param [String] lane_id lane to use for publishWF (default or low)
+    # @param [String] lane_id lane to use for publishWF (defaults to nil)
     # @raise [Error] if there is an error initiating publish
-    def self.publish(druid:, lane_id: 'low')
+    def self.publish(druid:, lane_id: nil)
       Dor::Services::Client.object(druid).publish(lane_id:)
     rescue Dor::Services::Client::Error => e
       raise Error, "Publishing failed: #{e.message}"

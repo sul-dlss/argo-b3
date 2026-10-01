@@ -9,7 +9,7 @@ module BulkActions
         return failure!(message: 'Not an item or collection') if not_publishable?
         return failure!(message: 'Never previously published') unless Sdr::WorkflowService.published?(druid:)
 
-        Sdr::Repository.publish(druid:)
+        Sdr::Repository.publish(druid:, lane_id: 'low')
         success!(message: 'Successfully republished')
       end
 

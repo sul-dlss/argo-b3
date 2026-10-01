@@ -43,7 +43,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                                          content:)
     release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
-    @previously_published = republishable?(@solr_doc)
+    @previously_published = republishable?
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
@@ -141,21 +141,24 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # Republishes an object that has previously been published.
   def republish
     druid = druid_param
-    solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(druid))
-    authorize! solr_doc, to: :update?, with: ObjectPolicy
-    raise ActionController::RoutingError, 'Not Found' unless republishable?(solr_doc)
+    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(druid))
+    authorize! @solr_doc, to: :update?, with: ObjectPolicy
 
-    Sdr::Repository.publish(druid:)
-    flash[:toast] = t('show.toasts.republish_started')
+    if republishable?
+      Sdr::Repository.publish(druid:, lane_id: 'low')
+      flash[:toast] = t('show.toasts.republish_started')
+    else
+      flash[:warning] = t('show.warnings.republish_failed')
+    end
     redirect_to object_path(druid:)
   end
 
   private
 
-  def republishable?(solr_doc)
-    return false if solr_doc.agreement? || solr_doc.admin_policy?
+  def republishable?
+    return false unless @solr_doc.dro_or_collection?
 
-    Sdr::WorkflowService.published?(druid: solr_doc.druid)
+    Sdr::WorkflowService.published?(druid: @solr_doc.druid)
   end
 
   # Determines the previous/next druids within the current search results, based on the

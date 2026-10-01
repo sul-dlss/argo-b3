@@ -508,7 +508,7 @@ RSpec.describe 'Show item' do
     using_wait_time(10) do
       click_button 'Republish'
 
-      expect(Sdr::Repository).to have_received(:publish).with(druid:)
+      expect(Sdr::Repository).to have_received(:publish).with(druid:, lane_id: 'low')
       expect(page).to have_toast('Republishing started')
     end
   end
