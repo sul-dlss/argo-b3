@@ -22,7 +22,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
   let(:opened_cocina_object) { cocina_object.new(version: 2) }
 
   # The CSV as exported, which can then be modified.
-  let(:exported_csv) { StructureSerializer.as_csv(druid, cocina_object.structural) }
+  let(:exported_csv) { StructuralCsv::Export.as_csv(content: Contents::Builder.build(cocina_object:)) }
   let(:csv_file) { exported_csv }
 
   let(:job_items) { [] }
