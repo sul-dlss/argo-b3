@@ -120,7 +120,6 @@ module StructuralCsv
 
     def save(built_content_file_sets)
       ActiveRecord::Base.transaction do
-        # Not clear, which deletes with SQL and so would not destroy the ContentFiles.
         content.content_file_sets.destroy_all
         # Saved in order, so that the file sets (and their files) are positioned in order.
         built_content_file_sets.each { |built_content_file_set| built_content_file_set.content_file_set.save! }

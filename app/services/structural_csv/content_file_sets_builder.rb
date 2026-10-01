@@ -84,7 +84,7 @@ module StructuralCsv
       {
         publish: row.boolean('publish'),
         preserve: row.boolean('preserve'),
-        shelve: row.fetch_boolean('shelve') { row.boolean('publish') }
+        shelve: row.fetch_boolean('shelve') { row.boolean('publish') } # Use publish if no value for shelve.
       }
     end
 
