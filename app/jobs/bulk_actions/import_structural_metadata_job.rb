@@ -6,7 +6,7 @@ module BulkActions
   class ImportStructuralMetadataJob < ClosingCsvJob
     def perform_bulk_action
       # Check that the druid column is present (check_druid_column?).
-      # Check that StructuralCsv::Import::REQUIRED_COLUMNS are present. If any are missing, log
+      # Check that StructuralCsv::Validator::REQUIRED_COLUMNS are present. If any are missing, log
       # "Missing required column \"<name>\"" for each and fail every druid (as check_druid_column? does).
       #
       # Pair each row with its spreadsheet row number (starting with 2).
