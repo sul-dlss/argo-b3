@@ -14,4 +14,24 @@ class ContentFile < ApplicationRecord
   # The deposit validation scope validates that the File can be updated in SDR.
   # In earlier parts of the flow for managing files, some of these fields may not be populated / in correct state.
   validates :external_identifier, presence: true, on: :deposit
+
+  validate :validate_shelve
+  validate :validate_access
+
+  private
+
+  # A shelved file that is neither published nor preserved would be deleted from all systems at the end of
+  # accessioning.
+  def validate_shelve
+    return unless shelve && !publish && !preserve
+
+    errors.add(:shelve, 'requires publish or preserve')
+  end
+
+  # Files do not support citation-only access.
+  def validate_access
+    return if AccessRightsSupport.valid?(view:, download:, location:, citation_only: false)
+
+    errors.add(:base, 'Access rights are not a valid combination of view, download, and location')
+  end
 end

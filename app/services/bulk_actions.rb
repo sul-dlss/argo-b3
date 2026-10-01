@@ -190,7 +190,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_STRUCTURAL_METADATA = Config.new(
     label: 'Import structural metadata',
-    help_text: 'Update structural metadata by uploading a spreadsheet.'
+    help_text: 'Update structural metadata by uploading a spreadsheet.',
+    job: BulkActions::ImportStructuralMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_structural_metadata_path),
+    form: BulkActions::ImportStructuralMetadataForm
   )
 
   IMPORT_TAGS = Config.new(

@@ -9,6 +9,7 @@ module BulkActions
       pdf.render_file(bulk_action.export_filepath(:tracking_sheets))
     rescue StandardError => e
       log("ExportTrackingSheetsJob failed #{e.class} #{e.message}")
+      Rails.logger.error(e.full_message)
       Honeybadger.notify(e)
     end
 

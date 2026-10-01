@@ -72,12 +72,16 @@ RSpec.describe BulkActions::RegisterCsvJob do
 
     before do
       allow(Sdr::Repository).to receive(:register).and_raise(StandardError, 'connection problem')
+      allow(Honeybadger).to receive(:notify)
+      allow(Rails.logger).to receive(:error)
     end
 
     it 'logs the error' do
       job.perform_now
 
       expect(log).to have_received(:puts).with(/line 2\t\tError: StandardError connection problem/)
+      expect(Rails.logger).to have_received(:error).with(/connection problem/)
+      expect(Honeybadger).to have_received(:notify).with(StandardError)
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
     end

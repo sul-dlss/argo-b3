@@ -88,12 +88,13 @@ module CocinaObjectMutators
       ]
     end
 
+    # Compacted so that location is omitted (rather than nil) when not location-based, matching SDR.
     def access_props(content_file)
       {
         view: content_file.view,
         download: content_file.download,
         location: content_file.location
-      }
+      }.compact
     end
 
     def administrative_props(content_file)
