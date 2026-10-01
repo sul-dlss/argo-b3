@@ -272,6 +272,8 @@ en:
           label: 'Project name'
         retrieved_title:
           label: 'Title'
+        run_ocr:
+          label: 'Run OCR?'
         serials:
           label: 'Serials metadata'
         sort_key:

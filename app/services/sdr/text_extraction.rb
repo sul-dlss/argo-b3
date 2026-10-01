@@ -36,10 +36,8 @@ module Sdr
                            .create(version:, lane_id: 'low', context:)
     end
 
-    # ocrWF should only run when enabled and on DROs with supported object types
+    # ocrWF should only run on DROs with supported object types
     def ocr_able?
-      return false unless Settings.feature_flags.ocr_workflow
-
       cocina_object.dro? && SUPPORTED_TYPES.include?(cocina_object.type)
     end
 

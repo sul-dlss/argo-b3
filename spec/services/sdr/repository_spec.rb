@@ -236,7 +236,7 @@ RSpec.describe Sdr::Repository do
         described_class.accession(cocina_object:, user_name:)
 
         expect(object_client).to have_received(:workflow).with('assemblyWF')
-        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
         expect(version_client).not_to have_received(:close)
       end
     end
@@ -248,7 +248,7 @@ RSpec.describe Sdr::Repository do
         described_class.accession(cocina_object:, user_name:)
 
         expect(object_client).to have_received(:workflow).with('gisAssemblyWF')
-        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
       end
     end
 
@@ -277,7 +277,7 @@ RSpec.describe Sdr::Repository do
       it 'creates the workflow with the given lane_id' do
         described_class.accession(cocina_object:, user_name:, lane_id: 'low')
 
-        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'low')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'low', context: nil)
       end
     end
 

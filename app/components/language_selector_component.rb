@@ -6,8 +6,10 @@ class LanguageSelectorComponent < ApplicationComponent
   MAX_RECOMMENDED_LANGUAGES = 8
   ABBYY_LANGUAGES = YAML.load_file(Rails.root.join('config/abbyy_languages.yml')).freeze
 
-  def initialize(form:)
+  def initialize(form:, container_data: {}, **select_options)
     @form = form
+    @container_data = container_data
+    @select_options = select_options
     super()
   end
 
@@ -19,5 +21,11 @@ class LanguageSelectorComponent < ApplicationComponent
     ABBYY_LANGUAGES.map { |language| [language, language.gsub(/[ ()]/, '')] }
   end
 
-  attr_reader :form
+  # Merged rather than overridable so that a caller cannot detach the multi-select controller.
+  def container_data
+    { controller: 'multi-select',
+      'multi-select-max-recommended-value': MAX_RECOMMENDED_LANGUAGES }.merge(@container_data)
+  end
+
+  attr_reader :form, :select_options
 end

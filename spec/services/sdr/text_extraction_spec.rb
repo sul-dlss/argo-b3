@@ -13,10 +13,6 @@ RSpec.describe Sdr::TextExtraction do
   let(:object_type) { Cocina::Models::ObjectType.document }
   let(:already_opened) { true }
 
-  before do
-    allow(Settings.feature_flags).to receive(:ocr_workflow).and_return(true)
-  end
-
   describe '#ocr_able?' do
     context 'when the object is a document' do
       let(:object_type) { Cocina::Models::ObjectType.document }
@@ -39,16 +35,6 @@ RSpec.describe Sdr::TextExtraction do
 
       it 'returns true' do
         expect(text_extraction.ocr_able?).to be true
-      end
-
-      context 'when ocr_workflow is disabled' do
-        before do
-          allow(Settings.feature_flags).to receive(:ocr_workflow).and_return(false)
-        end
-
-        it 'returns false' do
-          expect(text_extraction.ocr_able?).to be false
-        end
       end
     end
 

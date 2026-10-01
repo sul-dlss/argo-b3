@@ -51,7 +51,7 @@ class ContentsController < ContentsApplicationController
 
     content.staging_started!
     StageFilesJob.perform_later(content:, accession: params[:commit] == ItemsController::DEPOSIT_VALUE,
-                                user: current_user)
+                                user: current_user, workflow_context: @contents_item_form.workflow_context)
   end
 
   def set_edit_form(cocina_object:, content:)
