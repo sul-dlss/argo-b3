@@ -157,13 +157,6 @@ module StructuralCsv
       # Return Success
     end
 
-    # New validations to add to models (default context):
-    # ContentFileSet:
-    # - file_set_type is a key of Cocina::Models::FileSetType.properties
-    # ContentFile:
-    # - if shelve=true, publish or preserve must be true (otherwise the file will be deleted from all systems)
-    # - view / download / location are a valid combination (AccessRightsSupport.valid?(..., citation_only: false))
-
     private
 
     attr_reader :rows, :content

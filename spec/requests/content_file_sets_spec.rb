@@ -76,7 +76,7 @@ RSpec.describe 'Content file sets' do
 
     context 'when no administrative option is selected' do
       let(:content_file) do
-        create(:content_file, content_file_set:, publish: false, preserve: false,
+        create(:content_file, content_file_set:, publish: false, preserve: false, shelve: false,
                               content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
       end
 
