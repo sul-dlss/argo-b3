@@ -23,10 +23,14 @@ module Search
 
     # Secondary sorts on druid (id) keep paging stable when objects share the primary sorted attribute.
     RELEVANCE = Config.new(label: 'Relevance', sort_value: 'score desc, id asc')
+    # Use exists(FIELD) desc first returns true/false on that field sorted true first,
+    # ensuring the next sort on FIELD applies only to that those with values first, then others next
     LAST_DEPOSITED_DATE_ASC = Config.new(label: 'Last deposited date (ascending)',
-                                         sort_value: "#{Search::Fields::LAST_DEPOSITED_DATE} asc, id asc")
+                                         sort_value: "exists(#{Search::Fields::LAST_DEPOSITED_DATE}) desc, " \
+                                                     "#{Search::Fields::LAST_DEPOSITED_DATE} asc, id asc")
     LAST_DEPOSITED_DATE_DESC = Config.new(label: 'Last deposited date (descending)',
-                                          sort_value: "#{Search::Fields::LAST_DEPOSITED_DATE} desc, id asc")
+                                          sort_value: "exists(#{Search::Fields::LAST_DEPOSITED_DATE}) desc, " \
+                                                      "#{Search::Fields::LAST_DEPOSITED_DATE} desc, id asc")
     REGISTERED_DATE_ASC = Config.new(label: 'Registered date (ascending)',
                                      sort_value: "#{Search::Fields::EARLIEST_REGISTERED_DATE} asc, id asc")
     REGISTERED_DATE_DESC = Config.new(label: 'Registered date (descending)',
