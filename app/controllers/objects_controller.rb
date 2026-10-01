@@ -5,7 +5,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   RECENT_OBJECTS_LIMIT = 5
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
-                                  show_purl_preview show_solr_doc show_files show_constituents track]
+                                  show_purl_preview show_solr_doc show_files show_constituents
+                                  show_structural_csv track]
 
   include TokenConcern
 
@@ -111,6 +112,14 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @constituents = object_rows(Array(cocina_object.structural.hasMemberOrders.first&.members))
 
     render layout: false
+  end
+
+  def show_structural_csv
+    return head :not_found unless cocina_object.dro?
+
+    # The immutable Content reflects the structural of the cocina object.
+    send_data StructuralCsv::Export.as_csv(content: fetch_content(verified_druid)),
+              type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_structural.csv"
   end
 
   # Records the search_position (used for previous/next navigation between search results) for this

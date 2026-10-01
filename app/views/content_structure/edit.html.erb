@@ -40,6 +40,9 @@
                                                                           variant: :'outline-primary') %>
         <% end %>
       </div>
+      <div class="text-end">
+        <span class="fw-bold">Download:</span> <%= link_to 'structural metadata', csv_content_structure_path(content_id: @content_token), data: { turbo: false } %>
+      </div>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
       <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
         <div class='mb-2'>

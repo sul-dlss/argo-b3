@@ -31,6 +31,27 @@ RSpec.describe 'Content structure' do
     end
   end
 
+  describe 'csv' do
+    let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
+    let(:content_file_binary) { create(:content_file_binary, content:, filepath: 'page_0001.tif') }
+
+    before do
+      create(:content_file, content_file_set:, content_file_binary:)
+    end
+
+    it 'sends the current structure of the content as a CSV' do
+      get csv_content_structure_path(content_id: content_token)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/csv')
+      expect(response.headers['Content-Disposition']).to include('filename="bc123df4567_structural.csv"')
+      csv = CSV.parse(response.body, headers: true)
+      expect(csv.headers).to eq(StructuralCsv::Export::HEADERS)
+      expect(csv.sole.to_h).to include('druid' => 'bc123df4567', 'resource_label' => 'Page 1',
+                                       'resource_type' => 'page', 'filename' => 'page_0001.tif')
+    end
+  end
+
   describe 'updating' do
     it 'redirects to edit with a reload of the files section' do
       patch content_structure_path(content_id: content_token),

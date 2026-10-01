@@ -39,7 +39,9 @@
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
         <% component.with_button(link: '/', label: 'Use as template', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Download description', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '/', label: 'Download structural metadata', variant: 'outline-primary', disabled: true) %>
+        <% if @solr_doc.dro? && !@solr_doc.virtual_object? %>
+          <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
+        <% end %>
         <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary', disabled: true) %>
       <% end %>

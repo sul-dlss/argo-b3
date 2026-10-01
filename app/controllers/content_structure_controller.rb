@@ -5,7 +5,7 @@ class ContentStructureController < ContentsApplicationController
   STRUCTURE_VALUE = 'structure'
   APPEND_VALUE = 'append'
 
-  skip_verify_authorized only: %i[edit update]
+  skip_verify_authorized only: %i[edit update csv]
   before_action :set_content_and_cocina_object
 
   def edit
@@ -30,6 +30,12 @@ class ContentStructureController < ContentsApplicationController
 
     redirect_to edit_content_structure_path(@content_token, structure_changed: true,
                                                             content_type: params[:content_type].presence)
+  end
+
+  # Exports the current (possibly in-progress) structure, not necessarily what has been saved to SDR.
+  def csv
+    send_data StructuralCsv::Export.as_csv(content: @content),
+              type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(@content.druid)}_structural.csv"
   end
 
   private

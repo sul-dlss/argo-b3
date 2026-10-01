@@ -200,6 +200,7 @@ Rails.application.routes.draw do
       get 'solr_doc', to: 'objects#show_solr_doc'
       get 'files', to: 'objects#show_files'
       get 'constituents', to: 'objects#show_constituents'
+      get 'structural_csv', to: 'objects#show_structural_csv'
     end
   end
 
@@ -210,7 +211,9 @@ Rails.application.routes.draw do
   resources :contents, only: %i[edit show update] do
     resource :dropzone, only: %i[update], controller: 'content_dropzone'
     resource :mount, only: %i[new create show], controller: 'content_mount'
-    resource :structure, only: %i[edit update], controller: 'content_structure'
+    resource :structure, only: %i[edit update], controller: 'content_structure' do
+      get 'csv'
+    end
 
     resources :content_file_sets, only: %i[edit update show destroy]
     resources :content_file_binaries, only: %i[destroy]

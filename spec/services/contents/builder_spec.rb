@@ -237,6 +237,30 @@ RSpec.describe Contents::Builder do
         width: nil
       )
     end
+
+    context 'when building in memory' do
+      subject(:content) { described_class.build(cocina_object:) }
+
+      it 'builds an unsaved Content with ContentFileSets and ContentFiles' do
+        expect(content).to be_new_record
+        expect(content).to have_attributes(druid:, lock: 'abc123', immutable: true)
+        expect(Content.count).to eq(0)
+
+        file_sets = content.content_file_sets
+        expect(file_sets.map(&:position)).to eq([1, 2])
+        expect(file_sets.first).to have_attributes(file_set_type: 'image', label: 'Image 1')
+        expect(file_sets.first.content_files.sole).to have_attributes(
+          position: 1,
+          label: 'Image 1 file',
+          filepath: 'folder1/qr773tm1060_0001.tiff',
+          md5_digest: 'b6ce12a1dd5db09f10b51659c83f90a3',
+          view: 'location-based',
+          publish: true,
+          height: 5833
+        )
+        expect(file_sets.second.content_files.sole).to have_attributes(position: 1, filepath: 'qr773tm1060_0002.tiff')
+      end
+    end
   end
 
   context 'with multiple files in one file set' do
@@ -444,6 +468,18 @@ RSpec.describe Contents::Builder do
       expect(file_sets.map { |file_set| file_set.content_files.sole.content_file_binary }).to all(
         eq(content_file_binary)
       )
+    end
+
+    context 'when building in memory' do
+      subject(:content) { described_class.build(cocina_object:) }
+
+      it 'builds a single ContentFileBinary shared by a ContentFile in each file set' do
+        content_file_binary = content.content_file_binaries.sole
+
+        expect(content.content_file_sets.map { |file_set| file_set.content_files.sole.content_file_binary }).to all(
+          be(content_file_binary)
+        )
+      end
     end
   end
 

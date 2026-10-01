@@ -299,6 +299,8 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('li', text: 'Remediated By : labtech')
     end
 
+    expect(page).to have_button('Download structural metadata')
+
     # Cocina model tab
     click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
@@ -615,6 +617,7 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('.object-show.object-type-virtual-object .object-type-badge', text: 'VIRTUAL OBJECT')
       expect(page).to have_css('.nav-link', text: 'Constituents')
       expect(page).to have_no_css('.nav-link', text: 'Files')
+      expect(page).to have_no_button('Download structural metadata')
 
       click_button 'Constituents'
 
