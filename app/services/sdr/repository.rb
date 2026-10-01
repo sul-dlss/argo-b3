@@ -91,12 +91,14 @@ module Sdr
     # @param [Cocina::Models::DRO] cocina_object the object to accession
     # @param [String] user_name the sunetid of the user performing the action
     # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
+    # @param [Hash] context the workflow context for the assembly workflow. Note that closing the
+    #   version does not accept a context, so it is ignored for objects without files.
     # @raise [Error] if there is an error initiating accession
-    def self.accession(cocina_object:, user_name:, lane_id: 'high')
+    def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
       if files?(cocina_object:)
         object_client.workflow(assembly_workflow_name(cocina_object:))
-                     .create(version: cocina_object.version, lane_id:)
+                     .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
         object_client.version.close(user_name:, lane_id:)
       end

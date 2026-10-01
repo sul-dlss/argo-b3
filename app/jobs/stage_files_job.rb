@@ -6,7 +6,8 @@ class StageFilesJob < ApplicationJob
   # @param [Content] content the content whose files should be staged
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging
-  def perform(content:, user:, accession: false) # rubocop:disable Metrics/AbcSize
+  # @param [Hash] workflow_context the context for the assembly workflow started by accessioning
+  def perform(content:, user:, accession: false, workflow_context: {}) # rubocop:disable Metrics/AbcSize
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
 
@@ -23,7 +24,10 @@ class StageFilesJob < ApplicationJob
     content.update!(lock: updated_cocina_object.lock, immutable: true)
 
     # Optionally start accessioning.
-    Sdr::Repository.accession(cocina_object: updated_cocina_object, user_name: user.sunetid) if accession
+    if accession
+      Sdr::Repository.accession(cocina_object: updated_cocina_object, user_name: user.sunetid,
+                                context: workflow_context)
+    end
     content.staging_completed!
 
     perform_broadcast

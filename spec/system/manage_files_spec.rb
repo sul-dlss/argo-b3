@@ -58,9 +58,21 @@ RSpec.describe 'Manage files' do
     click_on 'Item details'
 
     expect(page).to have_select('Viewing direction', disabled: true)
+    # The default content type cannot be OCRed.
+    expect(page).to have_field('Yes', type: 'radio', disabled: true)
+    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
 
     select 'book', from: 'Content type'
     select 'right-to-left', from: 'Viewing direction'
+
+    expect(page).to have_field('Yes', type: 'radio', disabled: false)
+    # The languages remain disabled until OCR is requested.
+    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
+
+    choose 'Yes'
+
+    expect(find_multi_select('Search for a language')[:class]).not_to include('disabled')
+    select_multi_option('English', from: 'Search for a language')
 
     click_on 'Deposit'
     click_button('Deposit')
@@ -74,7 +86,44 @@ RSpec.describe 'Manage files' do
                                              )),
             user_name: user.sunetid, description: nil)
     expect(StageFilesJob).to have_received(:perform_later)
-      .with(content: Content.find_by!(druid:, immutable: false), accession: true, user:)
+      .with(content: Content.find_by!(druid:, immutable: false), accession: true, user:,
+            workflow_context: { runOcr: true, ocrLanguages: ['English'] })
+  end
+
+  it 'warns about embedded text when running OCR on a document' do
+    warning = 'Do not run OCR for files that already have embedded text.'
+
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+
+    select 'document', from: 'Content type'
+
+    expect(page).to have_no_text(warning)
+
+    choose 'Yes'
+
+    expect(page).to have_text(warning)
+
+    # The warning is specific to documents.
+    select 'book', from: 'Content type'
+
+    expect(page).to have_no_text(warning)
+  end
+
+  it 'disables the OCR options again when the content type can no longer be OCRed' do
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+
+    select 'book', from: 'Content type'
+    choose 'Yes'
+    select_multi_option('English', from: 'Search for a language')
+
+    select 'map', from: 'Content type'
+
+    expect(page).to have_field('Yes', type: 'radio', disabled: true)
+    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
   end
 
   context 'when no files have been uploaded yet' do
@@ -126,7 +175,8 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_current_path("/objects/#{druid}")
 
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                  workflow_context: {})
     end
   end
 

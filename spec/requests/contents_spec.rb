@@ -28,7 +28,8 @@ RSpec.describe 'Contents' do
             hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]
           )), user_name: user.sunetid, description: nil)
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                    workflow_context: {})
       end
     end
 
@@ -38,7 +39,8 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
+                                                                    workflow_context: {})
       end
     end
 
@@ -50,7 +52,35 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq(cocina_object.lock)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                    workflow_context: {})
+      end
+    end
+
+    context 'when requesting OCR' do
+      it 'stages the object' do
+        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+                                             contents_item: { run_ocr: 'true',
+                                                              text_extraction_languages: ['', 'English'] } }
+
+        expect(response).to redirect_to(object_path(druid))
+        # The OCR settings are not written to Cocina, but they do make the form dirty, so the
+        # object is updated with an unchanged payload.
+        expect(Sdr::Repository).to have_received(:update)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:,
+                workflow_context: { runOcr: true, ocrLanguages: ['English'] })
+      end
+    end
+
+    context 'when requesting OCR without a language' do
+      it 'renders the edit page' do
+        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+                                             contents_item: { run_ocr: 'true' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(StageFilesJob).not_to have_received(:perform_later)
       end
     end
 

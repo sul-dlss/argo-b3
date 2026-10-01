@@ -1,3 +1,4 @@
+
 <div class="container py-2" data-controller="unassociated-files structure-content-type">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.contents.edit.title')) %>
 
@@ -22,13 +23,16 @@
                  builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
                                                                           label: t('edit.contents.tabs.details.label'))) do %>
-        <div data-controller="content-type-dependent">
+        <div data-controller="content-type-dependent ocr-options"
+             data-ocr-options-allowed-content-types-value="<%= Sdr::TextExtraction::SUPPORTED_TYPES.to_json %>">
           <%= render Edit::ContentTypeComponent.new(form:, input_data: { content_type_dependent_target: 'contentType',
-                                                                         action: 'content-type-dependent#toggle structure-content-type#update' }) %>
+                                                                         ocr_options_target: 'contentType',
+                                                                         action: 'content-type-dependent#toggle ocr-options#toggle structure-content-type#update' }) %>
 
           <%= render Edit::ViewingDirectionComponent.new(form:, container_classes: 'my-fieldset', label_classes: 'fw-bold',
                                                          input_data: { content_type_dependent_target: 'dependent',
                                                                        content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
+          <%= render Edit::OcrComponent.new(form:) %>
         </div>
       <% end %>
     <% end %>

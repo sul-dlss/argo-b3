@@ -32,9 +32,6 @@ preservation_catalog:
 bulk_actions:
   directory: "tmp/bulk_jobs"
 
-feature_flags:
-  ocr_workflow: true
-
 stacks:
   url: "http://stacks.stanford.edu/image"
 

@@ -31,6 +31,16 @@ RSpec.describe LanguageSelectorComponent, type: :component do
                              text: 'Selecting more than eight text-extraction languages')
   end
 
+  context 'with container data from the caller' do
+    let(:component) { described_class.new(form:, container_data: { ocr_options_target: 'languages' }) }
+
+    it 'adds it without detaching the multi-select controller' do
+      render_inline(component)
+
+      expect(page).to have_css('div[data-controller="multi-select"][data-ocr-options-target="languages"]')
+    end
+  end
+
   context 'when languages are already selected' do
     let(:bulk_action_form) { BulkActions::TextExtractionForm.new(text_extraction_languages: %w[English Danish]) }
 

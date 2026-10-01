@@ -1,0 +1,38 @@
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      label: t('edit.items.fields.run_ocr.label'),
+      classes: 'my-fieldset',
+      data: { ocr_options_target: 'section' }
+    ) do %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :run_ocr,
+        label_text: 'Yes',
+        input_value: 'true',
+        input_data: { ocr_options_target: 'runOcr', action: 'ocr-options#toggle' },
+        container_classes: 'd-flex align-items-center gap-2 ps-0',
+        input_classes: 'order-first ms-0'
+      ) %>
+
+  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+        form:,
+        field_name: :run_ocr,
+        label_text: 'No',
+        input_value: 'false',
+        input_data: { ocr_options_target: 'runOcr', action: 'ocr-options#toggle' },
+        container_classes: 'd-flex align-items-center gap-2 ps-0',
+        input_classes: 'order-first ms-0'
+      ) %>
+
+  <%= render SdrViewComponents::Elements::AlertComponent.new(
+        variant: :info,
+        classes: 'd-none mt-2',
+        data: { ocr_options_target: 'warning',
+                ocr_options_warn_content_types: EMBEDDED_TEXT_CONTENT_TYPES.to_json }
+      ) do %>
+    <p class="mb-0">Do not run OCR for files that already have embedded text.</p>
+  <% end %>
+
+  <%= render LanguageSelectorComponent.new(form:, label_classes: 'fw-bold',
+                                           container_data: { ocr_options_target: 'languages' }) %>
+<% end %>
