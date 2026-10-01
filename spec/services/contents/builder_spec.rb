@@ -57,6 +57,52 @@ RSpec.describe Contents::Builder do
         expect(content).to have_attributes(immutable: false)
       end
     end
+
+    describe '.find_or_create' do
+      subject(:content) { described_class.find_or_create(cocina_object:) }
+
+      context 'when the Content does not exist' do
+        it 'creates the Content' do
+          expect { content }.to change(Content, :count).by(1)
+          expect(content).to have_attributes(druid:, lock: 'abc123', immutable: true)
+        end
+      end
+
+      context 'when the Content exists' do
+        let!(:existing_content) { described_class.call(cocina_object:) }
+
+        it 'returns the existing Content' do
+          expect(content).to eq(existing_content)
+        end
+      end
+
+      context 'when the Content is created concurrently' do
+        let!(:existing_content) { described_class.call(cocina_object:) }
+
+        before do
+          # Not found by the initial lookup (as though it is created by another request after the lookup).
+          lookups = 0
+          allow(Content).to receive(:find_by).and_wrap_original do |original, **attributes|
+            lookups += 1
+            original.call(**attributes) unless lookups == 1
+          end
+        end
+
+        it 'returns the concurrently created Content' do
+          expect(content).to eq(existing_content)
+        end
+      end
+
+      context 'when the uniqueness violation is not caused by a concurrently created Content' do
+        before do
+          allow(described_class).to receive(:call).and_raise(ActiveRecord::RecordNotUnique)
+        end
+
+        it 'raises' do
+          expect { content }.to raise_error(ActiveRecord::RecordNotUnique)
+        end
+      end
+    end
   end
 
   context 'with file sets and files' do

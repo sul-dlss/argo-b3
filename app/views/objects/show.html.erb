@@ -91,6 +91,7 @@
             <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') %>
           <% else %>
             <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
+            <% component.with_tab(id: 'structure-tab', pane_id: 'structure-pane', label: 'Structure') %>
           <% end %>
         <% end %>
         <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') if @solr_doc.dro? %>
@@ -125,6 +126,12 @@
           <% else %>
             <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
               <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+                <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+              <% end %>
+            <% end %>
+
+            <%= component.with_pane(id: 'structure-pane', tab_id: 'structure-tab') do %>
+              <%= turbo_frame_tag(@solr_doc.druid, 'structure', src: structure_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
                 <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
               <% end %>
             <% end %>

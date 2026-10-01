@@ -199,6 +199,7 @@ Rails.application.routes.draw do
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
       get 'files', to: 'objects#show_files'
+      get 'structure', to: 'objects#show_structure'
       get 'constituents', to: 'objects#show_constituents'
       get 'structural_csv', to: 'objects#show_structural_csv'
     end
