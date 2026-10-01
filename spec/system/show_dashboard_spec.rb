@@ -61,7 +61,7 @@ RSpec.describe 'Show dashboard', :rack_test do
       visit root_path
 
       expect(page).to have_css('h2', text: 'Admin')
-      expect(page).to have_button('Manage permissions', class: 'disabled')
+      expect(page).to have_link('Manage permissions', href: admin_workgroup_permissions_path)
       expect(page).to have_link('Impersonate', href: admin_impersonate_path)
     end
   end

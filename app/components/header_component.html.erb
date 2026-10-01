@@ -61,7 +61,7 @@
       <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Admin') do |dropdown| %>
         <% if admin? %>
           <% dropdown.with_item do %>
-            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: '#', disabled: true) %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: admin_workgroup_permissions_path) %>
           <% end %>
         <% end %>
 

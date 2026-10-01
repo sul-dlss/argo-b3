@@ -106,7 +106,7 @@ RSpec.describe HeaderComponent, type: :component do
       it 'renders admin links including impersonate' do
         render_inline(component)
 
-        expect(page).to have_css('a.dropdown-item.disabled', text: 'Manage permissions')
+        expect(page).to have_link('Manage permissions', href: '/admin/workgroup_permissions')
         expect(page).to have_link('Impersonate', href: '/admin/impersonate')
       end
     end
