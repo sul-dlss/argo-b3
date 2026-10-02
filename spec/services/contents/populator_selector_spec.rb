@@ -75,6 +75,26 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when the content type is file' do
+    let(:cocina_type) { Cocina::Models::ObjectType.file }
+
+    it 'selects the file type populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileType,
+                                        actual_populator: Contents::Populators::FileType,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is webarchive-binary' do
+    let(:cocina_type) { Cocina::Models::ObjectType.webarchive_binary }
+
+    it 'selects the file type populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileType,
+                                        actual_populator: Contents::Populators::FileType,
+                                        reasons: [])
+    end
+  end
+
   context 'when a selected content type is provided' do
     subject(:result) { described_class.call(content:, cocina_object:, content_type: Cocina::Models::ObjectType.book) }
 

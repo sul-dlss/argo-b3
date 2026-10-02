@@ -6,6 +6,18 @@ module Contents
     # that are not yet part of its structure.
     # It uses a one FileSet per file strategy.
     class FileSetPerFile < Base
+      OBJECT_FILE_SET_TYPE = 'object'
+
+      # @param [Content] content
+      # @param [Cocina::Models::DROWithMetadata] cocina_object
+      # @param [String] file_set_type type to use for each file set
+      def initialize(content:, cocina_object:, file_set_type: OBJECT_FILE_SET_TYPE)
+        @file_set_type = file_set_type
+        super(content:, cocina_object:)
+      end
+
+      attr_reader :file_set_type
+
       # For this strategy, structuring and appending are the same: Populator clears the structure before
       # structuring, which leaves every binary unassociated.
       def structure
@@ -26,7 +38,7 @@ module Contents
       end
 
       def create_content_file(content_file_binary:)
-        content_file_set = content.content_file_sets.create!(file_set_type: 'object', label: '')
+        content_file_set = content.content_file_sets.create!(file_set_type:, label: '')
         content_file_set.content_files.create!(
           content_file_binary:,
           label: '',
