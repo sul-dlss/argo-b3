@@ -1,8 +1,4 @@
 <%= turbo_frame_tag(@content.druid, 'files') do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Files', classes: 'mb-3') %>
-  <ul>
-    <% @content.content_file_binaries.each do |content_file_binary| %>
-      <li><%= content_file_binary.filepath %></li>
-    <% end %>
-  </ul>
+  <%= render Show::ContentFileBinariesComponent.new(content_record: @content) %>
 <% end %>
