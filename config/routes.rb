@@ -202,6 +202,7 @@ Rails.application.routes.draw do
       get 'files', to: 'objects#show_files'
       get 'structure', to: 'objects#show_structure'
       get 'constituents', to: 'objects#show_constituents'
+      post 'republish', to: 'objects#republish'
       get 'structural_csv', to: 'objects#show_structural_csv'
     end
   end

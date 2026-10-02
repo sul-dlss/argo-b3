@@ -88,6 +88,10 @@ en:
         heading: "Released to"
       unreleased:
         heading: "Not released"
+    toasts:
+      republish_started: "Republishing started"
+    warnings:
+      republish_failed: "Republish is not possible"
   workflow_grid:
     label: "Workflow status"
   edit:

@@ -55,6 +55,7 @@ RSpec.describe 'Dashboard' do
         allow(Sdr::Repository).to receive(:find) { |druid:| build(:dro_with_metadata, id: druid) }
         allow(Sdr::Repository).to receive(:release_tags).and_return([])
         allow(Sdr::VersionService).to receive(:new).and_return(version_service)
+        allow(Sdr::WorkflowService).to receive(:published?).and_return(false)
         allow(Searchers::ItemByDruid).to receive(:call).and_return(
           recent_object_druids.map do |recent_object_druid|
             SearchResults::Item.new(solr_doc: solr_doc_for.call(recent_object_druid))

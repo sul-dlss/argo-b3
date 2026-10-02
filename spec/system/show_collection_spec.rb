@@ -20,7 +20,7 @@ RSpec.describe 'Show collection' do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: false)
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
+  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: [], date: false) }
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
   def build_solr_doc(title:, license_label: 'CC Attribution 4.0 International')

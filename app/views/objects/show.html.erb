@@ -43,7 +43,12 @@
           <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
         <% component.with_button(link: '/', label: 'Reindex', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '/', label: 'Republish', variant: 'outline-primary', disabled: true) %>
+        <%# Only show the republish button for object types that can be republished, but disable if never published or user doesn't have a permission to edit %>
+        <% if @solr_doc.dro_or_collection? %>
+          <% component.with_button(link: republish_object_path(@solr_doc.druid), method: :post, label: 'Republish',
+                                   variant: 'outline-primary',
+                                   disabled: !allowed_to?(:update?, @solr_doc, with: ObjectPolicy) || !@previously_published) %>
+        <% end %>
       <% end %>
 
       <%= render Elements::ButtonListComponent.new(title: 'Update', help_text: '(requires new version)', classes: 'mt-4') do |component| %>
