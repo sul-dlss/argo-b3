@@ -384,7 +384,7 @@ RSpec.describe 'Show item' do
     click_button 'Files'
 
     expect(page).to have_css('h2', text: 'Files')
-    expect(page).to have_css('li', text: 'rr624wq8610_00_0001.jp2')
+    expect(page).to have_css('tbody th', text: 'rr624wq8610_00_0001.jp2')
     expect(page).to have_no_css('h2', text: 'Structural metadata')
 
     # Structure tab

@@ -1,0 +1,15 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(label: 'Files',
+                                                         variant: :h3,
+                                                         show_label: false,
+                                                         classes: 'table-sm',
+                                                         empty_message: 'No files yet') do |component| %>
+  <% component.with_header(label: 'File name', style: 'width: 60%;') %>
+  <% component.with_header(label: 'Size') %>
+  <% component.with_header(label: 'Type') %>
+  <% content_file_binaries.each do |content_file_binary| %>
+    <% component.with_row(label: content_file_binary.filepath) do |row_component| %>
+      <% row_component.with_cell do %><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %><% end %>
+      <% row_component.with_cell do %><%= content_file_binary.mime_type %><% end %>
+    <% end %>
+  <% end %>
+<% end %>

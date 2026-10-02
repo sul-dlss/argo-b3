@@ -1,15 +1,6 @@
 <%= turbo_frame_tag @content, 'show' do %>
-  <% if @content.content_file_binaries.present? %>
-    <ul>
-      <% @content.content_file_binaries.each do |content_file_binary| %>
-        <%# Deleting is disabled during discovery, since discovery may be adding files. %>
-        <%= render Show::ContentFileBinaryComponent.new(content_file_binary:,
-                                                        content_file_sets: @content.content_file_sets,
-                                                        content_token: @content_token,
-                                                        disabled: @content.discovering?) %>
-      <% end %>
-    </ul>
-  <% else %>
-    <p>No files yet</p>
-  <% end %>
+  <%# Deleting is disabled during discovery, since discovery may be adding files. %>
+  <%= render Edit::ContentFileBinariesComponent.new(content_record: @content,
+                                                    content_token: @content_token,
+                                                    disabled: @content.discovering?) %>
 <% end %>
