@@ -24,11 +24,11 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
   it 'renders the history section with bulk actions' do
     render_inline(component)
 
-    expect(page).to have_css('h1', text: 'Bulk actions history')
+    expect(page).to have_css('h1', text: 'Bulk actions')
 
-    table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions history']")
+    table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions']")
     expect(table).to have_css('thead th', text: 'Submitted')
-    expect(table).to have_css('thead th', count: 8)
+    expect(table).to have_css('thead th', count: 6)
     expect(table).to have_css('tbody tr', count: 2)
 
     bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
@@ -36,11 +36,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
                                         text: '2026-04-16 03:00:00 PT')
     expect(bulk_action_row).to have_css('td:nth-of-type(2)', text: BulkActions::REINDEX.label)
     expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: 'Test description')
-    expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Created')
+    expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Processing')
+    expect(bulk_action_row).to have_no_css('td:nth-of-type(4) i.bi')
     expect(bulk_action_row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
-    expect(bulk_action_row).to have_no_css('td:nth-of-type(6) a', text: 'Log')
-    expect(bulk_action_row).to have_css('td:nth-of-type(7)', text: '')
-    expect(bulk_action_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
+    expect(bulk_action_row).to have_no_css('td:nth-of-type(6) a')
 
     bulk_action_with_files_row = table.find("tr##{dom_id(bulk_action_with_files, 'row')}")
     expect(bulk_action_with_files_row)
@@ -48,10 +47,11 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(2)', text: BulkActions::EXPORT_COCINA_JSON.label)
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(3)', text: '')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4)', text: 'Completed')
+    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4) i.bi-exclamation-triangle-fill.text-warning')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')
+    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) ul > li', count: 2)
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) a', text: 'Log')
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(7) a', text: BulkActions::EXPORT_COCINA_JSON.exports.first.label)
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(8) form button[type="submit"]', text: 'Delete')
+    expect(bulk_action_with_files_row).to have_link(BulkActions::EXPORT_COCINA_JSON.exports.first.label)
   end
 
   context 'when a bulk action has multiple export files' do
@@ -69,7 +69,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
       render_inline(component)
 
       row = page.find("tr##{dom_id(bulk_action, 'row')}")
-      expect(row).to have_css('td:nth-of-type(7) a', count: 2)
+      expect(row).to have_css('td:nth-of-type(6) ul > li', count: 2)
+      expect(row).to have_css('td:nth-of-type(6) a', count: 2)
       expect(row).to have_link('Registration report',
                                href: "/bulk_actions/#{bulk_action.id}/file?filename=registration_report.csv")
       expect(row).to have_link('Tracking sheets',
