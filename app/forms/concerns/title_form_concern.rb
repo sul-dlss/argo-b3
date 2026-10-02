@@ -8,4 +8,10 @@ module TitleFormConcern
     attribute :title, :string
     normalizes :title, with: ->(title) { title.strip }
   end
+
+  private
+
+  def populate_description_hash_from_title
+    self.description_hash = { title: [{ value: title }] }
+  end
 end

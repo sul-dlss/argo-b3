@@ -13,6 +13,7 @@ RSpec.describe 'Show dashboard', :rack_test do
 
       expect(page).to have_css('h2', text: 'Register & deposit single object')
       expect(page).to have_button('Item', class: 'disabled')
+      expect(page).to have_button('APO', class: 'disabled')
 
       expect(page).to have_css('h2', text: 'Register or deposit multiple items')
       expect(page).to have_button('Register multiple items')
@@ -63,6 +64,13 @@ RSpec.describe 'Show dashboard', :rack_test do
       expect(page).to have_css('h2', text: 'Admin')
       expect(page).to have_link('Manage permissions', href: admin_workgroup_permissions_path)
       expect(page).to have_link('Impersonate', href: admin_impersonate_path)
+    end
+
+    it 'enables the APO button' do
+      visit root_path
+
+      expect(page).to have_link('APO', href: new_apo_path)
+      expect(page).to have_no_css('a.disabled', exact_text: 'APO')
     end
   end
 

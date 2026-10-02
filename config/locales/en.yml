@@ -95,6 +95,29 @@ en:
   workflow_grid:
     label: "Workflow status"
   edit:
+    apos:
+      new:
+        title: "Register and deposit APO"
+        buttons:
+          register: "Register and deposit APO"
+        toasts:
+          register: "APO registered and deposit started"
+      fields:
+        access_defaults:
+          label: "Default object rights"
+        agreement_druid:
+          label: "Agreement"
+        copyright:
+          label: "Default copyright"
+        license:
+          label: "Default license"
+        title:
+          label: "Title"       
+        object_defaults:
+          label: "Object defaults"
+          help_text: "The following defaults will apply to all newly registered objects."
+        use_and_reproduction_statement:
+          label: "Default use and reproduction"
     contents:
       edit:
         files_section:
@@ -235,6 +258,8 @@ en:
           label: "Content type"
         copyright:
           label: "Copyright"
+          help_text_html: >-
+            See <a href="%{url}" target="_blank" rel="noopener">sample copyright statements</a>.
         description_choice:
           label: "How would you like to enter description?"
           catalog_id:
@@ -259,7 +284,8 @@ en:
           deposit: 'Deposit with Goobi'
         license:
           label: "License"
-          label_caption: "Get help selecting a license"
+          label_caption_html: >-
+            <a href="%{url}" target="_blank" rel="noopener">Get help selecting a license</a>
           help_text: "Assigning a license may improve discovery of your work in web searches."
         mount_path:
           label: "Mount path"
@@ -304,6 +330,8 @@ en:
             required: "title is required if a FOLIO Instance HRID is not provided"
         use_and_reproduction_statement:
           label: "Use and reproduction"
+          help_text_html: >-
+            See <a href="%{url}" target="_blank" rel="noopener">sample statements</a>.
         viewing_direction:
           label: "Viewing direction"
     multiple_items:

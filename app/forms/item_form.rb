@@ -62,10 +62,6 @@ class ItemForm < CocinaModels::Dro
 
   private
 
-  def populate_description_hash_from_title
-    self.description_hash = { title: [{ value: title }] }
-  end
-
   # The description is refreshed from the catalog, so no title is set here.
   def populate_folio_catalog_link
     return if find_folio_catalog_link(catalog_record_id:)

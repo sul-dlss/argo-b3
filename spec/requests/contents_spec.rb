@@ -19,7 +19,7 @@ RSpec.describe 'Contents' do
   describe 'update' do
     context 'when depositing' do
       it 'updates the object and stages with accessioning' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
@@ -46,7 +46,7 @@ RSpec.describe 'Contents' do
 
     context 'when nothing has changed' do
       it 'stages without updating the object' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { content_type: Cocina::Models::ObjectType.book } }
 
         expect(response).to redirect_to(object_path(druid))
@@ -59,7 +59,7 @@ RSpec.describe 'Contents' do
 
     context 'when requesting OCR' do
       it 'stages the object' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { run_ocr: 'true',
                                                               text_extraction_languages: ['', 'English'] } }
 
@@ -75,7 +75,7 @@ RSpec.describe 'Contents' do
 
     context 'when requesting OCR without a language' do
       it 'renders the edit page' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { run_ocr: 'true' } }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -86,7 +86,7 @@ RSpec.describe 'Contents' do
 
     context 'when invalid' do
       it 'renders the edit page' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { viewing_direction: 'upside-down' } }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -99,7 +99,7 @@ RSpec.describe 'Contents' do
       let!(:content) { create(:content, druid:, lock: 'stale-lock', immutable: false) }
 
       it 'redirects to the edit page' do
-        patch content_path(druid), params: { commit: ItemsController::DEPOSIT_VALUE,
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(edit_content_path(druid))

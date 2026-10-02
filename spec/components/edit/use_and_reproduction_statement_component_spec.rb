@@ -19,4 +19,21 @@ RSpec.describe Edit::UseAndReproductionStatementComponent, type: :component do
 
     expect(page).to have_css('.my-fieldset', text: 'Use and reproduction')
   end
+
+  it 'renders the help link, opening in a new tab' do
+    render_inline(component)
+
+    expect(page).to have_link('sample statements', href: Settings.links.use_and_reproduction_statement)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'sample statements')
+  end
+
+  context 'with a label' do
+    let(:component) { described_class.new(form:, label_text: 'Default use and reproduction') }
+
+    it 'renders the label' do
+      render_inline(component)
+
+      expect(page).to have_field('Default use and reproduction', type: 'textarea')
+    end
+  end
 end

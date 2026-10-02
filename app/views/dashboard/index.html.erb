@@ -30,7 +30,7 @@
       <%= render Elements::ButtonListComponent.new(title: 'Register & deposit single object') do |component| %>
         <% component.with_button(link: new_item_path, label: 'Item', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
         <% component.with_button(link: '#', label: 'Collection', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '#', label: 'APO', variant: 'outline-primary', disabled: true) %>
+        <% component.with_button(link: new_apo_path, label: 'APO', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ApoPolicy)) %>
         <% component.with_button(link: '#', label: 'Agreement', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
