@@ -11,7 +11,7 @@ RSpec.describe CsvUpload::Normalizer do
       let(:filepath) { file_fixture('catalog_record_id_and_barcode.xls') }
 
       it 'raises an exception since the legacy xls format is not supported' do
-        expect { csv }.to raise_error(RuntimeError, /Unsupported upload file type/)
+        expect { csv }.to raise_error(described_class::Error, /Unsupported upload file type/)
       end
     end
 
@@ -35,7 +35,23 @@ RSpec.describe CsvUpload::Normalizer do
       let(:filepath) { file_fixture('catalog_record_id_and_barcode.bogus') }
 
       it 'raises an exception' do
-        expect { csv }.to raise_error(RuntimeError, /Unsupported upload file type/)
+        expect { csv }.to raise_error(described_class::Error, /Unsupported upload file type/)
+      end
+    end
+
+    context 'with malformed CSV' do
+      let(:filepath) { tempfile_with(extension: '.csv', content: "druid,sequence\nbc123df4567,\"1\n").path }
+
+      it 'raises an exception' do
+        expect { csv }.to raise_error(described_class::Error)
+      end
+    end
+
+    context 'with corrupt spreadsheet' do
+      let(:filepath) { tempfile_with(extension: '.xlsx', content: 'not a spreadsheet').path }
+
+      it 'raises an exception describing the error' do
+        expect { csv }.to raise_error(described_class::Error, /Spreadsheet could not be opened: /)
       end
     end
 
@@ -59,7 +75,7 @@ RSpec.describe CsvUpload::Normalizer do
       let(:filepath) { file_fixture('invalid_bulk_upload_nonutf8.csv') }
 
       it 'raises an exception describing the encoding error' do
-        expect { csv }.to raise_error(RuntimeError, /CSV could not be opened due to an encoding error: /)
+        expect { csv }.to raise_error(described_class::Error, /CSV could not be opened due to an encoding error: /)
       end
     end
 
@@ -94,5 +110,9 @@ RSpec.describe CsvUpload::Normalizer do
         expect(csv).to eq(expected_csv)
       end
     end
+  end
+
+  def tempfile_with(extension:, content:)
+    Tempfile.new(['upload', extension]).tap { |file| file.write(content) && file.flush }
   end
 end

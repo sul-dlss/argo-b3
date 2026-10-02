@@ -116,6 +116,7 @@ en:
         toasts:
           structure: "Structure built from files"
           append: "Files appended to structure"
+          csv: "Structure updated from CSV"
         populators:
           book: "Book (resource per page)"
           document: "Document (resource per PDF)"
