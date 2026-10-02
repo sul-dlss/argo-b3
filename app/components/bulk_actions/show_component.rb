@@ -67,19 +67,9 @@ module BulkActions
       shown_exports.present? || error_lines.present?
     end
 
-    # @return [String] the heading (with icon, when applicable) for the status box
+    # @return [ActiveSupport::SafeBuffer] the heading for the status box
     def status_heading
-      case bulk_action.status.to_sym
-      when :completed
-        if bulk_action.druid_count_fail.positive?
-          safe_join([helpers.warning_icon(classes: 'text-warning me-2', aria: { hidden: true }),
-                     'Completed with errors'], ' ')
-        else
-          safe_join([helpers.success_icon(classes: 'text-success me-2', aria: { hidden: true }), 'Completed'], ' ')
-        end
-      else
-        'Processing'
-      end
+      render StatusComponent.new(bulk_action:)
     end
 
     # @return [Array<String>] the lines of the log file reporting an error

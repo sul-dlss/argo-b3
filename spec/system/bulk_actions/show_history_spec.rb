@@ -19,7 +19,7 @@ RSpec.describe 'Show bulk actions history' do
   it 'shows the bulk actions for the current user' do
     visit bulk_actions_path
 
-    expect(page).to have_css('h1', text: 'Bulk actions history')
+    expect(page).to have_css('h1', text: 'Bulk actions')
 
     expect(page).to have_table('bulk-actions-history-table')
     expect(page).to have_no_css('table#bulk-actions-history-table tbody tr')
@@ -32,6 +32,7 @@ RSpec.describe 'Show bulk actions history' do
     expect(row).to have_css("td:nth-of-type(1) a[href='#{bulk_action_path(bulk_action)}']",
                             text: format_datetime(bulk_action.created_at))
     expect(row).to have_css('td:nth-of-type(3)', text: 'First bulk action')
+    expect(row).to have_css('td:nth-of-type(4)', text: 'Processing')
     expect(row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
     expect(page).to have_css("tr##{dom_id(bulk_action, 'row')}", text: 'First bulk action')
     expect(page).to have_no_css('p', text: 'No bulk actions.')
@@ -41,26 +42,19 @@ RSpec.describe 'Show bulk actions history' do
 
     expect(row).to have_css('td:nth-of-type(5)', text: '3 / 1 / 2')
 
-    expect(row).to have_css('td:nth-of-type(6) a', text: 'Log')
+    expect(row).to have_css('td:nth-of-type(6) ul > li', count: 2)
+    expect(row).to have_css('td:nth-of-type(6) a', text: 'Log file')
     log_txt = with_download('log.txt') do
-      row.click_link('Log')
+      row.click_link('Log file')
     end
     expect(log_txt).to eq('Log content')
 
-    expect(row).to have_css('td:nth-of-type(7) a', text: 'Cocina JSON')
+    expect(row).to have_css('td:nth-of-type(6) a', text: 'Cocina JSON')
     export_txt = with_download('cocina.jsonl.gz') do
       row.click_link('Cocina JSON')
     end
     expect(export_txt).to eq('Export content')
-
-    accept_confirm do
-      row.click_button('Delete')
-    end
-
-    expect(page).to have_css('p', text: 'No bulk actions.')
-    expect(page).to have_toast("#{bulk_action.label} deleted")
-
-    expect(BulkAction.exists?(bulk_action.id)).to be false
+    expect(BulkAction.exists?(bulk_action.id)).to be true
   end
 
   it 'links to the show page for a bulk action' do

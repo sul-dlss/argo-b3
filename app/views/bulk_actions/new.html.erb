@@ -1,5 +1,5 @@
 <div class="container mt-3">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, variant: :h4, text: 'New bulk actions') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'New bulk actions', classes: 'mb-4') %>
   <div class="row mt-2 gy-3">
     <%= render BulkActions::ListSectionComponent.new(
           label: 'Perform actions',

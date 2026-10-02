@@ -4,7 +4,7 @@
 class BulkActionsController < ApplicationController
   PER_PAGE = 20
 
-  before_action :set_bulk_action, only: %i[destroy file show]
+  before_action :set_bulk_action, only: %i[file show]
   skip_verify_authorized only: %i[index new]
 
   def index
@@ -16,14 +16,6 @@ class BulkActionsController < ApplicationController
   end
 
   def new; end
-
-  def destroy
-    authorize! @bulk_action
-
-    @bulk_action.destroy
-    flash[:toast] = "#{@bulk_action.label} deleted"
-    redirect_to bulk_actions_path
-  end
 
   def file
     authorize! @bulk_action

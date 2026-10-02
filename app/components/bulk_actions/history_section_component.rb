@@ -28,15 +28,9 @@ module BulkActions
         show_link_for(bulk_action),
         bulk_action.bulk_action_config.label,
         bulk_action.description,
-        bulk_action.status.titleize,
+        render(StatusComponent.new(bulk_action:)),
         "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}",
-        log_file_link_for(bulk_action),
-        export_links_for(bulk_action),
-        button_to('Delete', bulk_action_path(bulk_action),
-                  method: :delete,
-                  data: { turbo_confirm: 'Are you sure you want to delete this bulk action?' },
-                  form: { data: { action: 'turbo:submit-start->bulk-actions-history#disconnect' } },
-                  class: 'btn btn-primary btn-sm')
+        download_links_for(bulk_action)
       ]
     end
 
@@ -51,16 +45,24 @@ module BulkActions
     end
 
     def log_file_link_for(bulk_action)
-      return '' unless bulk_action.log_file?
+      return unless bulk_action.log_file?
 
-      link_to('Log', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
+      link_to('Log file', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
     end
 
     def export_links_for(bulk_action)
-      links = bulk_action.existing_exports.map do |export|
+      return unless bulk_action.existing_exports
+
+      bulk_action.existing_exports.map do |export|
         link_to(export.label, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
       end
-      safe_join(links, tag.br)
+    end
+
+    def download_links_for(bulk_action)
+      links = Array(log_file_link_for(bulk_action)) + Array(export_links_for(bulk_action)).compact
+      return if links.blank?
+
+      tag.ul { safe_join(links.map { |link| tag.li(link) }) }
     end
   end
 end
