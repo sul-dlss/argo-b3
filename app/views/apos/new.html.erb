@@ -1,0 +1,45 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.apos.new.title'), classes: 'mb-3') %>
+  <%= form_with(model: @apo_form, url: apos_path, class: 'b3-form') do |form| %>
+    <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                                label_text: t('edit.apos.fields.title.label'),
+                                                                label_classes: 'fw-bold',
+                                                                label_mark_required: true,
+                                                                container_classes: 'my-field') %>
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :agreement_druid,
+                                                                  options: @agreement_options,
+                                                                  label_text: t('edit.apos.fields.agreement_druid.label'),
+                                                                  label_classes: 'fw-bold',
+                                                                  label_mark_required: true,
+                                                                  container_classes: 'my-field') %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.apos.fields.object_defaults.label'),
+                                                               label_classes: 'h3',
+                                                               help_text: t('edit.apos.fields.object_defaults.help_text'),
+                                                               classes: 'my-fieldset') do %>
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.apos.fields.access_defaults.label'),
+                                                                 classes: 'my-fieldset') do %>
+
+        <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+      <% end %>
+
+      <%= render Edit::UseAndReproductionStatementComponent.new(form:,
+                                                                container_classes: 'my-fieldset',
+                                                                label_text: t('edit.apos.fields.use_and_reproduction_statement.label')) %>
+
+      <%= render Edit::CopyrightComponent.new(form:,
+                                              label_text: t('edit.apos.fields.copyright.label'),
+                                              container_classes: 'my-fieldset') %>
+
+        <%= render Edit::LicenseComponent.new(form:,
+                                              hide_help_text: true,
+                                              label_text: t('edit.apos.fields.license.label'),
+                                              container_classes: 'my-fieldset') %>
+    <% end %>
+
+    <div class="d-flex align-items-center mt-5">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: @cancel_path || root_path, variant: :link, classes: 'me-3') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.new.buttons.register')) %>
+    </div>
+  <% end %>
+</div>
