@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Search::LoadingFacetResultsComponent, type: :component do
+RSpec.describe Search::LoadingFieldValueResultsComponent, type: :component do
   let(:component) do
     described_class.new(label: 'Projects')
   end

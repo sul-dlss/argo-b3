@@ -1,15 +1,5 @@
 <%= turbo_frame_tag 'tickets-search' do %>
-  <% if @tickets.any? %>
-    <section aria-label="Ticket results" class="mb-5">
-      <h3>
-        Ticket results (<%= number_with_delimiter(@tickets.count) %> found)
-      </h3>
-
-      <ul class="list-unstyled">
-        <%= render Search::FacetResultComponent.with_collection(@tickets, form_field: 'tickets') %>
-      </ul>
-    </section>
-  <% end %>
+  <%= render Search::FieldValueResultsComponent.new(label: 'Ticket results', values: @tickets, form_field: 'tickets') %>
 
   <%= render Search::DebugComponent.new(search_form: @search_form, results: @tickets) %>
 <% end %>

@@ -1,3 +1,3 @@
-<%= tag.li id: do %>
+<%= tag.li id:, **hidden_attributes do %>
   <%= render Search::ResultHeadingComponent.new(index:, label: value, path:) %>
 <% end %>

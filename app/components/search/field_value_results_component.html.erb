@@ -1,0 +1,15 @@
+<%= tag.section 'aria-label': label, class: 'mb-5', data: { controller: 'show-more' } do %>
+  <h3><%= label %> (<%= number_with_delimiter(values.size) %> found)</h3>
+
+  <ul class="list-unstyled">
+    <%= render Search::FieldValueResultComponent.with_collection(values, form_field:, visible_limit: initial_limit) %>
+  </ul>
+
+  <% if more? %>
+    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'More »',
+                                                                variant: :link,
+                                                                classes: 'px-0',
+                                                                data: { show_more_target: 'link',
+                                                                        action: 'show-more#showAll' }) %>
+  <% end %>
+<% end %>
