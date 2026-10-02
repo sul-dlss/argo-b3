@@ -38,7 +38,7 @@ RSpec.describe 'Manage files' do
 
   def upload_file(filename)
     click_on 'Add files'
-    attach_file(nil, Rails.root.join("spec/fixtures/files/#{filename}"), make_visible: true)
+    attach_file(nil, Rails.root.join("spec/fixtures/files/#{filename}"), class: 'dz-hidden-input', make_visible: true)
     expect(page).to have_css('tbody th', text: filename)
   end
 

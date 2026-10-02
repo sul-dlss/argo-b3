@@ -40,6 +40,25 @@
                                                                           variant: :'outline-primary') %>
         <% end %>
       </div>
+
+      <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3' do |form| %>
+        <%= hidden_field_tag :content_type, @content_type %>
+        <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
+        <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                               field_name: :csv_file,
+                                                               label_text: 'Upload structural CSV:',
+                                                               label_classes: 'fw-bold',
+                                                               label_default_class: 'col-form-label text-nowrap',
+                                                               container_classes: 'inline-upload-field',
+                                                               input_classes: 'form-control-sm',
+                                                               input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(','),
+                                                               error_classes: 'order-last') do |component| %>
+          <% component.with_additional_container_content do %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload', variant: :'outline-primary', classes: 'btn-sm', value: ContentStructureController::CSV_VALUE) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
       <div class="text-end">
         <span class="fw-bold">Download:</span> <%= link_to 'structural metadata', csv_content_structure_path(content_id: @content_token), data: { turbo: false } %>
       </div>

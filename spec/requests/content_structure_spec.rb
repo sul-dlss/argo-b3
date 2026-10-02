@@ -96,4 +96,78 @@ RSpec.describe 'Content structure' do
       expect(response).to have_http_status(:bad_request)
     end
   end
+
+  describe 'uploading a structural CSV' do
+    let(:content) { create(:content, druid:, lock: cocina_object.lock, immutable: false) }
+    let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
+    let(:content_file_binary) do
+      create(:content_file_binary, content:, filepath: 'page_0001.tif', mime_type: 'image/tiff')
+    end
+    let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('Page 1', 'New label') }
+    let(:csv_file) do
+      Rack::Test::UploadedFile.new(StringIO.new(csv_string), 'text/csv', original_filename: 'structure.csv')
+    end
+
+    before do
+      create(:content_file, content_file_set:, content_file_binary:)
+    end
+
+    def upload(params = { structural_csv: { csv_file: } })
+      patch content_structure_path(content_id: content_token),
+            params: { commit: ContentStructureController::CSV_VALUE, content_type: Cocina::Models::ObjectType.book,
+                      **params }
+    end
+
+    it 'updates the structure and redirects to edit with a reload of the files section' do
+      upload
+
+      expect(response).to redirect_to(edit_content_structure_path(content_id: content_token, structure_changed: true,
+                                                                  content_type: Cocina::Models::ObjectType.book))
+      expect(content.content_file_sets.reload.sole.label).to eq('New label')
+    end
+
+    context 'when no file is uploaded' do
+      it 'renders the error' do
+        upload({})
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('can&#39;t be blank')
+      end
+    end
+
+    context 'when a row has a different druid' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', 'xy987wv6543') }
+
+      it 'renders the error without changing the structure' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: Druid druid:xy987wv6543 does not match this object')
+        expect(content.content_file_sets.reload.sole.label).to eq('Page 1')
+      end
+    end
+
+    context 'when a row has a missing druid' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', '') }
+
+      it 'renders the error' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: Missing druid')
+      end
+    end
+
+    context 'when the import fails' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('page_0001.tif', 'page_0002.tif') }
+
+      it 'renders the errors without changing the structure' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: page_0002.tif is not an existing file (files cannot be added)')
+        expect(content.content_file_sets.reload.sole.content_files.sole.content_file_binary).to eq(content_file_binary)
+      end
+    end
+  end
 end

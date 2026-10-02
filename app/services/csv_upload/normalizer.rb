@@ -3,6 +3,9 @@
 module CsvUpload
   # Reads and normalizes a CSV that is uploaded as part of Bulk Actions.
   class Normalizer
+    # Raised when the uploaded file cannot be read, e.g., unsupported file type, encoding error, or malformed CSV.
+    class Error < StandardError; end
+
     # Note that .xls is not supported because roo-xls has not been updated for roo 3.x (see Gemfile).
     SUPPORTED_FILE_EXTENSIONS = %w[.csv .ods .xlsx].freeze
 
@@ -18,10 +21,9 @@ module CsvUpload
     # Reads uploaded file (could be csv or Excel) and normalizes to CSV.
     # This includes handling BOM and druids without prefixes.
     # @return [String] csv
-    # @raise [RuntimeError] if unsupported file type or the file cannot be read, e.g., invalid byte sequence
-    # @raise [CSV::MalformedCSVError] if malformed CSV
-    def read # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize
-      raise 'Unsupported upload file type' unless normalized_file_extension.in?(SUPPORTED_FILE_EXTENSIONS)
+    # @raise [Error] if unsupported file type or the file cannot be read, e.g., invalid byte sequence or malformed CSV
+    def read # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/MethodLength
+      raise Error, 'Unsupported upload file type' unless normalized_file_extension.in?(SUPPORTED_FILE_EXTENSIONS)
 
       # If handed *anything but* a CSV file, first pre-process into a CSV string with Roo.
       csv_string = normalized_file_extension == '.csv' ? normalized_csv_string : Roo::Spreadsheet.open(path).to_csv
@@ -47,7 +49,11 @@ module CsvUpload
 
       table.to_csv
     rescue ArgumentError => e
-      raise "CSV could not be opened due to an encoding error: #{e.message}"
+      raise Error, "CSV could not be opened due to an encoding error: #{e.message}"
+    rescue CSV::MalformedCSVError => e
+      raise Error, e.message
+    rescue Zip::Error => e
+      raise Error, "Spreadsheet could not be opened: #{e.message}"
     end
 
     private

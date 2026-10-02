@@ -32,3 +32,19 @@
     display: none;
   }
 }
+
+// A label, input, and submit on a single right-aligned row, with the validation errors below the input.
+.inline-upload-field {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: end;
+  align-items: center;
+  column-gap: $spacer * .5;
+
+  .invalid-feedback {
+    grid-column: 2 / -1;
+
+    // So that long errors wrap rather than widening the input and submit columns.
+    contain: inline-size;
+  }
+}
