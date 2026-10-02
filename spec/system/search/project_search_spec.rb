@@ -25,4 +25,27 @@ RSpec.describe 'Project search', :solr do
 
     expect(page).to have_selected_facet_value('Project 2a', facet: 'Projects')
   end
+
+  context 'when there are more results than are initially displayed' do
+    before do
+      7.times { |index| create(:solr_item, projects: ["Showme #{index}"]) }
+    end
+
+    it 'displays the first five results until More is clicked' do
+      visit search_path
+
+      find_search_field.fill_in(with: 'Showme')
+      click_button('Search')
+
+      within(find_project_results_section) do
+        expect(page).to have_result_count(7)
+        expect(page).to have_css('li', count: 5)
+
+        click_button('More »')
+
+        expect(page).to have_css('li', count: 7)
+        expect(page).to have_no_button('More »')
+      end
+    end
+  end
 end

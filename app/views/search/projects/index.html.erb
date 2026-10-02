@@ -1,16 +1,5 @@
 <%= turbo_frame_tag 'projects-search' do %>
-  <% if @project_tags.any? %>
-    <section aria-label="Project results" class="mb-5">
-      <h3>
-        Project results (<%= number_with_delimiter(@project_tags.count) %>
-        found)
-      </h3>
-
-      <ul class="list-unstyled">
-        <%= render Search::FacetResultComponent.with_collection(@project_tags, form_field: 'projects') %>
-      </ul>
-    </section>
-  <% end %>
+  <%= render Search::FieldValueResultsComponent.new(label: 'Project results', values: @project_tags, form_field: 'projects') %>
 
   <%= render Search::DebugComponent.new(search_form: @search_form, results: @project_tags) %>
 <% end %>
