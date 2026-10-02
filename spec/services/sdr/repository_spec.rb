@@ -143,9 +143,29 @@ RSpec.describe Sdr::Repository do
 
         expect(objects_client).to have_received(:register).with(params: request_cocina_object, user_name:)
         expect(Dor::Services::Client).to have_received(:object).with(druid)
-        expect(administrative_tags_client).to have_received(:create).with(tags:)
+        expect(administrative_tags_client).to have_received(:create)
+          .with(tags: [*tags, "Registered By : #{user_name}"])
         expect(object_client).to have_received(:workflow).with('goobiWF')
         expect(workflow_client).to have_received(:create).with(version: '1')
+      end
+    end
+
+    context 'when no tags are given' do
+      it 'adds only the "Registered By" tag' do
+        described_class.register(request_cocina_object:, user_name:, workflow_name:)
+
+        expect(administrative_tags_client).to have_received(:create).with(tags: ["Registered By : #{user_name}"])
+      end
+    end
+
+    context 'when the given tags already include a "Registered By" tag' do
+      let(:tags) { ["Registered By : #{user_name}", 'tag1'] }
+
+      it 'does not duplicate the tag' do
+        described_class.register(request_cocina_object:, user_name:, workflow_name:, tags:)
+
+        expect(administrative_tags_client).to have_received(:create)
+          .with(tags: ["Registered By : #{user_name}", 'tag1'])
       end
     end
 

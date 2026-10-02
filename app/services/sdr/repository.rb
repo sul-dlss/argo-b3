@@ -6,6 +6,8 @@ module Sdr
     class Error < StandardError; end
     class NotFoundResponse < Error; end
 
+    REGISTERED_BY_TAG_PREFIX = 'Registered By : '
+
     # @param [String] druid the druid of the object
     # @return [Cocina::Models::DROWithMetadata] the returned model
     # @raise [Error] if there is an error retrieving the object
@@ -65,9 +67,12 @@ module Sdr
 
       object_client = Dor::Services::Client.object(response_cocina_object.externalIdentifier)
 
+      # append the "Registered by : SUNET" tag, and then uniq the array so it's not duped if the user enters it manually
+      all_tags = (tags + ["#{REGISTERED_BY_TAG_PREFIX}#{user_name}"]).uniq
+
       # NOTE: Create administrative tags before the workflow is created, else workflows
       #       that rely on admin tags (e.g., `goobiWF`) could sporadically fail.
-      object_client.administrative_tags.create(tags:) unless tags.empty?
+      object_client.administrative_tags.create(tags: all_tags)
 
       object_client.workflow(workflow_name || Constants::DEFAULT_WORKFLOW).create(version: '1')
 
