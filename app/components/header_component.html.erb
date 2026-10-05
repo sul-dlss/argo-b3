@@ -25,7 +25,7 @@
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: '#', disabled: true) %>
       <% end %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'APO', link: '#', disabled: true) %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'APO', link: new_apo_path, disabled: !register_apo?) %>
       <% end %>
       <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Agreement', link: '#', disabled: true) %>

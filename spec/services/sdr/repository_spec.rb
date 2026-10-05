@@ -293,6 +293,17 @@ RSpec.describe Sdr::Repository do
       end
     end
 
+    context 'when the object is an APO' do
+      let(:cocina_object) { build(:admin_policy, id: druid, version: 2) }
+
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(object_client).not_to have_received(:workflow)
+      end
+    end
+
     context 'when a lane_id is given' do
       it 'creates the workflow with the given lane_id' do
         described_class.accession(cocina_object:, user_name:, lane_id: 'low')

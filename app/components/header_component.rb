@@ -21,4 +21,8 @@ class HeaderComponent < ApplicationComponent
   def register_item?
     helpers.allowed_to?(:new?, nil, with: ItemPolicy)
   end
+
+  def register_apo?
+    helpers.allowed_to?(:new?, nil, with: ApoPolicy)
+  end
 end

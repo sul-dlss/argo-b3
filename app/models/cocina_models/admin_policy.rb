@@ -34,9 +34,10 @@ module CocinaModels
               view: access_view,
               download: access_download,
               location: access_location,
-              copyright:,
-              license:,
-              useAndReproductionStatement: use_and_reproduction_statement
+              # Blank values (e.g., from form fields left empty) are omitted.
+              copyright: copyright.presence,
+              license: license.presence,
+              useAndReproductionStatement: use_and_reproduction_statement.presence
             }
           },
           description: description_hash,

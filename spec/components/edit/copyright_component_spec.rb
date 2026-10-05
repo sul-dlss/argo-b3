@@ -18,4 +18,21 @@ RSpec.describe Edit::CopyrightComponent, type: :component do
 
     expect(page).to have_css('.my-fieldset', text: 'Copyright')
   end
+
+  it 'renders the help link, opening in a new tab' do
+    render_inline(component)
+
+    expect(page).to have_link('sample copyright statements', href: Settings.links.copyright)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'sample copyright statements')
+  end
+
+  context 'with a label' do
+    let(:component) { described_class.new(form:, label_text: 'Default copyright') }
+
+    it 'renders the label' do
+      render_inline(component)
+
+      expect(page).to have_field('Default copyright', type: 'textarea')
+    end
+  end
 end

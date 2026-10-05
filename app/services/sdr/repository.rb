@@ -93,7 +93,7 @@ module Sdr
     # Objects with files are assembled (e.g., to create derivatives) before accessioning:
     # gisAssemblyWF for geo objects, otherwise assemblyWF. Assembly closes the version.
     # Objects without files skip assembly; closing the version starts accessioning.
-    # @param [Cocina::Models::DRO] cocina_object the object to accession
+    # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
     # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
     # @param [Hash] context the workflow context for the assembly workflow. Note that closing the
@@ -101,7 +101,7 @@ module Sdr
     # @raise [Error] if there is an error initiating accession
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
-      if files?(cocina_object:)
+      if cocina_object.dro? && files?(cocina_object:)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
