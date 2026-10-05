@@ -237,10 +237,23 @@ After a migration: `bin/rake parallel:migrate`
 
 Note: By convention, `CocinaModels::*` instances are referred to as "cocina models" and instances of `Cocina::Models::*` are referred to as "cocina objects".
 
+Translation between cocina objects and cocina models is handled in both directions by separate service classes:
+* **Mappers** (`CocinaModelMappers::*`) map a cocina object to the hash of attributes used to build a cocina model. This happens when a cocina model is built from a cocina object (e.g., one retrieved from DSA).
+* **Mutators** (`CocinaObjectMutators::*`) produce a new cocina object by merging a cocina model's attributes into a cocina object. When saving, the mutator starts from the cocina object the model was built from, so any parts of the cocina object that the model does not represent are retained unchanged. When creating, the mutator starts from a minimal request cocina object.
+
+Since the cocina model only represents a subset of the cocina object, the mappers and mutators must be kept in sync: an attribute that is mapped from a cocina object should be written back by the corresponding mutator.
+
 ## Model presenters
 `CocinaModels::*Presenter` are `SimpleDelegator` wrappers around cocina models primarily for use in views. Model presenters are immutable and should enhance cocina models with additional display fields and convenience methods.
 
 Note: Where possible, `CocinaDisplay` should be used for extracting description from cocina objects.
+
+## Forms
+Form objects (`app/forms`) back the application's HTML forms. They are Active Model objects built on Voids, so they support attributes, normalization, validation, and nested associations, and they declare the params that controllers should permit (via `PermittedParamsConcern`).
+
+There are two kinds of forms:
+* Forms that create or edit a cocina object (e.g., `ItemForm`, `ContentsItemForm`) subclass the relevant cocina model (e.g., `CocinaModels::Dro`) rather than `ApplicationForm`. This allows them to reuse the cocina model's attributes, mapping, mutation, and persistence (`create!` / `save!`), while adding form-only concerns: attributes that exist only to drive the UI (e.g., choosing between providing or generating a source ID), conditional validations, and callbacks that derive cocina model attributes from those form-only attributes before validation. Different editing contexts for the same type of object get their own form (and endpoint) so that each only permits and validates the attributes it edits.
+* All other forms subclass `ApplicationForm` (e.g., `TicketTagForm`, `ReleaseTagsForm`, search forms, bulk action forms). These are not backed by a cocina object, though some still perform an action (e.g., `ReleaseTagsForm#create!`).
 
 ## Discovery
 
