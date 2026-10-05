@@ -16,6 +16,8 @@ module CocinaModelMappers
     def call # rubocop:disable Metrics/AbcSize
       {
         source_id: cocina_object.identification.sourceId,
+        # Mapped so that saving retains the description rather than replacing it with the default.
+        description_hash: cocina_object.description.to_h,
         use_and_reproduction_statement: cocina_object.access.useAndReproductionStatement,
         license: cocina_object.access.license,
         copyright: cocina_object.access.copyright,

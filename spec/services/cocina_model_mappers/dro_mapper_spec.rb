@@ -40,6 +40,7 @@ RSpec.describe CocinaModelMappers::DroMapper do
     it 'returns a hash from the cocina object' do
       expect(result).to eq(
         source_id:,
+        description_hash: cocina_object.description.to_h,
         use_and_reproduction_statement:,
         license:,
         copyright:,

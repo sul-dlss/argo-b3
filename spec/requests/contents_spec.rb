@@ -24,9 +24,10 @@ RSpec.describe 'Contents' do
 
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).to have_received(:update)
-          .with(cocina_object: having_attributes(structural: having_attributes(
-            hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]
-          )), user_name: user.sunetid, description: nil)
+          .with(cocina_object: having_attributes(
+            structural: having_attributes(hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]),
+            description: cocina_object.description
+          ), user_name: user.sunetid, description: nil)
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
                                                                     workflow_context: {})
