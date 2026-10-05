@@ -125,6 +125,21 @@ RSpec.describe CocinaModels::Dro do
       end
     end
 
+    context 'when attributes other than the description have changed' do
+      let(:cocina_object) { build(:dro_with_metadata, title: 'Original Title') }
+
+      before do
+        dro.source_id = 'changed:source-id'
+      end
+
+      it 'retains the description' do
+        dro.save!(user_name:, description:)
+        expect(Sdr::Repository).to have_received(:update) do |args|
+          expect(args[:cocina_object].description).to eq(cocina_object.description)
+        end
+      end
+    end
+
     context 'with invalid attributes' do
       before do
         dro.source_id = 'invalid-source-id'

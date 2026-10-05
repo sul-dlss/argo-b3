@@ -24,6 +24,7 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
     it 'returns a hash with the source_id from the cocina object' do
       expect(result).to eq(
         source_id:,
+        description_hash: cocina_object.description.to_h,
         access_view: view,
         folio_catalog_links_attributes: [
           { catalog_record_id: 'in11403803' }
