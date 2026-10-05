@@ -120,8 +120,8 @@
                                                                           label: t('edit.contents.tabs.deposit.label'),
                                                                           mark_required: true)) do %>
         <div class="d-flex justify-content-end">
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ItemsController::DRAFT_VALUE, form_id: item_form_id, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ItemsController::DEPOSIT_VALUE, form_id: item_form_id, data: { unassociated_files_target: 'submit' }) %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ContentsController::DRAFT_VALUE, form_id: item_form_id, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ContentsController::DEPOSIT_VALUE, form_id: item_form_id, data: { unassociated_files_target: 'submit' }) %>
         </div>
       <% end %>
     <% end %>

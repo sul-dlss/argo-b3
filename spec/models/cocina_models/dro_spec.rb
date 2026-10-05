@@ -219,6 +219,7 @@ RSpec.describe CocinaModels::Dro do
       before do
         allow(new_dro).to receive(:request_cocina_object).and_return(request_cocina_object)
         allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+        allow(Sdr::Repository).to receive(:accession)
       end
 
       it 'registers the object and repopulates the model' do
@@ -236,6 +237,18 @@ RSpec.describe CocinaModels::Dro do
 
         expect(Sdr::Repository).to have_received(:register)
           .with(request_cocina_object:, user_name:, tags:, workflow_name: 'goobiWF')
+      end
+
+      it 'does not accession the object by default' do
+        new_dro.create!(user_name:)
+
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+
+      it 'accessions the registered object when requested' do
+        new_dro.create!(user_name:, accession: true)
+
+        expect(Sdr::Repository).to have_received(:accession).with(cocina_object: registered_cocina_object, user_name:)
       end
     end
 
