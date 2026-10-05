@@ -255,6 +255,25 @@ There are two kinds of forms:
 * Forms that create or edit a cocina object (e.g., `ItemForm`, `ContentsItemForm`) subclass the relevant cocina model (e.g., `CocinaModels::Dro`) rather than `ApplicationForm`. This allows them to reuse the cocina model's attributes, mapping, mutation, and persistence (`create!` / `save!`), while adding form-only concerns: attributes that exist only to drive the UI (e.g., choosing between providing or generating a source ID), conditional validations, and callbacks that derive cocina model attributes from those form-only attributes before validation. Different editing contexts for the same type of object get their own form (and endpoint) so that each only permits and validates the attributes it edits.
 * All other forms subclass `ApplicationForm` (e.g., `TicketTagForm`, `ReleaseTagsForm`, search forms, bulk action forms). These are not backed by a cocina object, though some still perform an action (e.g., `ReleaseTagsForm#create!`).
 
+## Structural metadata
+Unlike other parts of a cocina object, structural metadata (file sets and files) is not wrapped by a cocina model. Instead, it is held in the DB as Active Record models, since it can be large and is edited incrementally (e.g., uploading files, discovering files, reordering file sets) over many requests:
+* `Content` - the structure of a DRO for a particular version of the cocina object, identified by the druid and the cocina object's lock.
+* `ContentFileSet` - a cocina file set, ordered within the `Content`.
+* `ContentFile` - a cocina file as it occurs within a particular file set, ordered within the `ContentFileSet` and holding the file-level attributes (e.g., access, preserve / shelve / publish).
+* `ContentFileBinary` - the physical file, identified by its filepath. Since the same file may be referenced by more than one file set, a binary may have multiple `ContentFile`s. A binary that is not referenced by any `ContentFile` ("unassociated") is not part of the structure (e.g., a file that has been uploaded but not yet placed in a file set).
+
+A `Content` is either **immutable**, in which case it exactly reflects the structural metadata of the cocina object version identified by its lock (e.g., for display and structural CSV export), or **mutable**, in which case it is being edited and may have deviated from the cocina object.
+
+Mapping to and from cocina structural metadata:
+* `Contents::Builder` builds a `Content` from a cocina object's structural metadata, deduplicating files with the same filepath into a single `ContentFileBinary`.
+* `CocinaObjectMutators::StructuralMutator` rebuilds a cocina object's structural metadata from a `Content`. Before doing so, it validates that every file set, file, and binary is ready for deposit (the `:deposit` validation context); earlier in the editing flow these records are allowed to be incomplete.
+
+Each `ContentFileBinary` records where its physical file is located (`file_location`). Files move from where they were added (`attached` for files uploaded via the browser and stored with Active Storage, `mount` for files on a mounted filesystem, and `globus` for files on the Globus filesystem) to `stage`, and binaries built from an existing cocina object are `deposited` (already accessioned and stored in preservation / stacks).
+
+Files are added to a mutable `Content` as unassociated binaries, either by upload or by **discovery** (`DiscoverFilesJob` recursively lists the files in a directory on a mount). Ignored files (e.g., `.DS_Store`) never become binaries. The `Contents::Populators` then structure the unassociated binaries into file sets and files, using a strategy appropriate to the content type (e.g., for a book, files that share a filename apart from the extension, such as the image and OCR for a page, are grouped into one file set). `Contents::PopulatorSelector` picks the populator and falls back to one file set per file when the content type's populator cannot handle the files.
+
+**Staging** (`StageFilesJob`) deposits a mutable `Content`. It mints identifiers for new file sets and files, computes digests / size / mime type, copies the files to the staging location, and updates the cocina object's structural metadata. It then marks the `Content` as immutable for the new lock and optionally starts accessioning. Discovery and staging run in the background, and `Content` tracks their progress with state machines so the UI can reflect them.
+
 ## Discovery
 
 Search results are restricted to objects readable by the current user's effective workgroups (logged in or impersonated).`Permissions::UserScope` resolves permissions from PostgreSQL, and `Search::PermissionFilter` constructs a Solr filter over the object ID, collection IDs, and APO ID using the same rules as `ObjectPolicy#show?`.
