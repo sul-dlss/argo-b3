@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Form object for creating/updating an Item (DRO)
-# Note that this is a subclass of CocinaModels::Dro, not ApplicationForm.
+# Note that this is a subclass of CocinaModels::Dro, not ApplicationForm. See README for explanation.
 class ItemForm < CocinaModels::Dro
   include PermittedParamsConcern
   include EmbargoFormConcern

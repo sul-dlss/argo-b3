@@ -63,6 +63,17 @@ RSpec.describe HeaderComponent, type: :component do
       end
     end
 
+    context 'when the user is an admin' do
+      let(:user) { build_stubbed(:user, :admin, name: 'Admin User') }
+
+      it 'renders an enabled link for APO registration' do
+        render_inline(component)
+
+        expect(page).to have_link('APO', href: '/apos/new')
+        expect(page).to have_no_css('a.dropdown-item.disabled', text: 'APO')
+      end
+    end
+
     context 'when the user does not belong to a workgroup with edit permission' do
       it 'renders a disabled link for item registration' do
         render_inline(component)
