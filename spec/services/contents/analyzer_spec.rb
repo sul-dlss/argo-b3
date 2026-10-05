@@ -16,15 +16,13 @@ RSpec.describe Contents::Analyzer do
       end
 
       it 'computes and persists the digests, mime type, and size' do
-        filepath_on_disk = content_file_binary.filepath_on_disk
-
         call
 
         expect(content_file_binary.reload).to have_attributes(
-          md5_digest: Digest::MD5.file(filepath_on_disk).hexdigest,
-          sha1_digest: Digest::SHA1.file(filepath_on_disk).hexdigest,
+          md5_digest: '9d30b5a5e132b233e2626b791d6ec6d0',
+          sha1_digest: '2e465fe62e5d67b6da4c7220698ddaf51759d5ec',
           mime_type: 'text/plain',
-          size: File.size(filepath_on_disk)
+          size: 52
         )
       end
     end
@@ -50,13 +48,11 @@ RSpec.describe Contents::Analyzer do
       end
 
       it 'recomputes both digests from the file' do
-        filepath_on_disk = content_file_binary.filepath_on_disk
-
         call
 
         expect(content_file_binary).to have_attributes(
-          md5_digest: Digest::MD5.file(filepath_on_disk).hexdigest,
-          sha1_digest: Digest::SHA1.file(filepath_on_disk).hexdigest
+          md5_digest: '9d30b5a5e132b233e2626b791d6ec6d0',
+          sha1_digest: '2e465fe62e5d67b6da4c7220698ddaf51759d5ec'
         )
       end
     end
@@ -162,7 +158,7 @@ RSpec.describe Contents::Analyzer do
       it "uses the attached blob's byte size" do
         call
 
-        expect(content_file_binary.size).to eq(content_file_binary.file.blob.byte_size)
+        expect(content_file_binary.size).to eq(52)
       end
     end
 
@@ -211,11 +207,9 @@ RSpec.describe Contents::Analyzer do
       end
 
       it 'reads the size from the file on disk' do
-        filepath_on_disk = content_file_binary.filepath_on_disk
-
         call
 
-        expect(content_file_binary.size).to eq(File.size(filepath_on_disk))
+        expect(content_file_binary.size).to eq(8391)
       end
     end
   end

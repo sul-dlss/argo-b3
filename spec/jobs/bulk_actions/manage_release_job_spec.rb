@@ -35,7 +35,7 @@ RSpec.describe BulkActions::ManageReleaseJob do
     expect(job_item).to have_received(:check_update_ability?)
     expect(Sdr::WorkflowService).to have_received(:published?).with(druid:)
     expect(Sdr::Repository).to have_received(:create_release_tag)
-      .with(druid:, user_name: job_item.user_id, release_target: 'SEARCHWORKS', release: true, release_what: 'self',
+      .with(druid:, user_name: 'bergeraj', release_target: 'SEARCHWORKS', release: true, release_what: 'self',
             lane_id: 'low')
 
     expect(bulk_action.reload.druid_count_total).to eq(1)

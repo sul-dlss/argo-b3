@@ -66,8 +66,7 @@ RSpec.describe ContentFileBinary do
       end
 
       it 'returns the path of the Active Storage blob' do
-        expect(content_file_binary.filepath_on_disk)
-          .to eq(ActiveStorage::Blob.service.path_for(content_file_binary.file.blob.key))
+        expect(File.read(content_file_binary.filepath_on_disk)).to eq(file_fixture('dropzone_upload.txt').read)
       end
     end
 

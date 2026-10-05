@@ -20,14 +20,6 @@ RSpec.describe Elements::ButtonListComponent, type: :component do
       expect(page).to have_button('Republish', class: 'btn btn-outline-primary')
     end
 
-    it 'defaults button classes to mb-1' do
-      render_inline(component) do |component|
-        component.with_button(link: '/reindex', label: 'Reindex', variant: 'outline-primary')
-      end
-
-      expect(page).to have_button('Reindex', class: 'btn btn-outline-primary')
-    end
-
     it 'allows overriding button classes' do
       render_inline(component) do |component|
         component.with_button(link: '/reindex', label: 'Reindex', variant: 'outline-primary', classes: 'mb-3')

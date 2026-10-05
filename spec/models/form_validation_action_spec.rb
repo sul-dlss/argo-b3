@@ -114,7 +114,14 @@ RSpec.describe FormValidationAction do
       form_validation_action.mark_invalid!(invalid_form)
 
       expect(form_validation_action.reload).to be_status_invalid
-      expect(form_validation_action.error_data).to eq(FormErrorsSerializer.serialize(invalid_form).as_json)
+      expect(form_validation_action.error_data).to eq(
+        'errors' => [
+          { 'attribute' => 'title',
+            'type' => 'title is required if a FOLIO Instance HRID is not provided',
+            'type_class' => 'String',
+            'options' => {} }
+        ]
+      )
       expect(form_validation_action.form.attributes).to eq(invalid_form.attributes)
     end
   end

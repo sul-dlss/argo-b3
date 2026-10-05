@@ -393,9 +393,9 @@ RSpec.describe ItemsRegistrationForm do
   describe '.permitted_params' do
     it 'permits the nested tag attributes' do
       expect(described_class.permitted_params).to include(
-        { other_tags_attributes: OtherTagForm.permitted_params },
-        { project_tags_attributes: ProjectTagForm.permitted_params },
-        { ticket_tags_attributes: TicketTagForm.permitted_params }
+        { other_tags_attributes: [:tag] },
+        { project_tags_attributes: [:tag] },
+        { ticket_tags_attributes: [:tag] }
       )
     end
 
