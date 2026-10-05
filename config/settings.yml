@@ -58,6 +58,8 @@ staging_location: 'tmp/sdr-deposit-staging'
 
 links:
   license: 'https://sdr.library.stanford.edu/documentation/license-options'
+  use_and_reproduction_statement: 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements'
+  copyright: 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements'
 
 folio:
   okapi:

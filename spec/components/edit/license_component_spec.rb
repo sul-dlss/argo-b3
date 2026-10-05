@@ -15,10 +15,11 @@ RSpec.describe Edit::LicenseComponent, type: :component do
                                            options: [''] + Constants::LICENSE_OPTIONS.pluck(:label))
   end
 
-  it 'renders the help link' do
+  it 'renders the help link, opening in a new tab' do
     render_inline(component)
 
     expect(page).to have_link('Get help selecting a license', href: Settings.links.license)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'Get help selecting a license')
   end
 
   it 'renders the help text' do
@@ -31,5 +32,25 @@ RSpec.describe Edit::LicenseComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('.my-fieldset', text: 'License')
+  end
+
+  context 'with a label' do
+    let(:component) { described_class.new(form:, label_text: 'Default license') }
+
+    it 'renders the label' do
+      render_inline(component)
+
+      expect(page).to have_select('Default license')
+    end
+  end
+
+  context 'when hiding the help text' do
+    let(:component) { described_class.new(form:, hide_help_text: true) }
+
+    it 'does not render the help text' do
+      render_inline(component)
+
+      expect(page).to have_no_text('Assigning a license may improve discovery of your work in web searches.')
+    end
   end
 end

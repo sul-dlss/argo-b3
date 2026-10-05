@@ -1,7 +1,10 @@
 .b3-form, .tab-form {
   fieldset legend {
     font-size: unset;
-    font-weight: bold;
+
+    label {
+      font-weight: bold;
+    }
   }
 
   // Margin between fieldsets
