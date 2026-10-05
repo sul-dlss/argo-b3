@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
 namespace :development do
-  desc 'Bootstrap an AdminPolicy for local development use (optional: TITLE=...)'
+  desc 'Bootstrap an AdminPolicy for local development use (optional: TITLE=..., AGREEMENT_DRUID=...)'
   task bootstrap_apo: :environment do
     raise 'This task can only be run in the development environment' unless Rails.env.development?
 
+    agreement_druid = ENV.fetch('AGREEMENT_DRUID', 'druid:hp308wm0436')
     title = ENV.fetch('TITLE') { "#{Faker::Creature::Animal.name.titleize} #{Faker::Food.dish} APO" }
 
     admin_policy = CocinaModels::AdminPolicy.new(
       # This contains arbitrary hardcoded values; in the future, may want to make more flexible.
-      apo_druid: 'druid:hv992ry2431',
-      agreement_druid: 'druid:hp308wm0436',
+      apo_druid: Settings.ur_apo_druid,
+      agreement_druid:,
       access_view: 'world',
       access_download: 'world',
       description_hash: { title: [{ value: title }] }
@@ -18,6 +19,25 @@ namespace :development do
     admin_policy.create!(user_name: 'auser')
 
     puts "#{title} (#{admin_policy.druid})"
+  end
+
+  desc 'Bootstrap an Agreement for local development use (optional: TITLE=...)'
+  task bootstrap_agreement: :environment do
+    raise 'This task can only be run in the development environment' unless Rails.env.development?
+
+    title = ENV.fetch('TITLE') { "#{Faker::Job.title} Agreement" }
+
+    agreement = CocinaModels::Dro.new(
+      apo_druid: Settings.ur_apo_druid,
+      content_type: Cocina::Models::ObjectType.agreement,
+      source_id: "development:#{SecureRandom.uuid}",
+      access_view: 'world',
+      access_download: 'world',
+      description_hash: { title: [{ value: title }] }
+    )
+    agreement.create!(user_name: 'auser')
+
+    puts "#{title} (#{agreement.druid})"
   end
 
   desc 'Bootstrap a Collection for local development use (optional: TITLE=...)'
