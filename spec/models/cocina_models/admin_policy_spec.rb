@@ -110,5 +110,30 @@ RSpec.describe CocinaModels::AdminPolicy do
         end
       end
     end
+
+    context 'when building the real request cocina object with blank access template values' do
+      let(:new_admin_policy) do
+        described_class.new(agreement_druid: 'druid:bb008zm4587',
+                            access_view: 'world', access_download: 'world',
+                            license: '', copyright: '', use_and_reproduction_statement: '',
+                            apo_druid: 'druid:hv992ry2431')
+      end
+      let(:registered_cocina_object) { build(:admin_policy_with_metadata) }
+
+      before do
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'omits the blank values' do
+        new_admin_policy.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          access_template = args[:request_cocina_object].administrative.accessTemplate
+          expect(access_template.license).to be_nil
+          expect(access_template.copyright).to be_nil
+          expect(access_template.useAndReproductionStatement).to be_nil
+        end
+      end
+    end
   end
 end

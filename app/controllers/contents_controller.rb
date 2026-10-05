@@ -4,6 +4,10 @@
 class ContentsController < ContentsApplicationController
   skip_verify_authorized only: %i[show]
 
+  # Values for submit buttons
+  DEPOSIT_VALUE = 'deposit'
+  DRAFT_VALUE = 'draft'
+
   def show
     @content_token = params[:id]
     verified_content_id = verify_token(@content_token)
@@ -50,7 +54,7 @@ class ContentsController < ContentsApplicationController
     content.update!(lock: @contents_item_form.previous_cocina_object.lock)
 
     content.staging_started!
-    StageFilesJob.perform_later(content:, accession: params[:commit] == ItemsController::DEPOSIT_VALUE,
+    StageFilesJob.perform_later(content:, accession: params[:commit] == ContentsController::DEPOSIT_VALUE,
                                 user: current_user, workflow_context: @contents_item_form.workflow_context)
   end
 

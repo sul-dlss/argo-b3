@@ -3,7 +3,6 @@
 # Controller for items (DRO)
 class ItemsController < ApplicationController
   # Values for submit buttons
-  DEPOSIT_VALUE = 'deposit'
   DRAFT_VALUE = 'draft'
   DRAFT_TO_ADD_FILES_VALUE = 'add_files'
 
