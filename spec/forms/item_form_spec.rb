@@ -328,7 +328,7 @@ RSpec.describe ItemForm do
   describe '.permitted_params' do
     it 'includes nested release_tags_attributes' do
       expect(described_class.permitted_params).to include(
-        release_tags_attributes: ReleaseTagsForm.permitted_params
+        release_tags_attributes: %i[release_choice searchworks_target earthworks_target purl_sitemap_target]
       )
     end
   end

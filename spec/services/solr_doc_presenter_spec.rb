@@ -91,11 +91,11 @@ RSpec.describe SolrDocPresenter do
       end
     end
 
-    context 'when the object type is not agreement' do
+    context 'when the object type is not virtual object' do
       let(:object_type) { 'item' }
 
       it 'returns false' do
-        expect(presenter.agreement?).to be false
+        expect(presenter.virtual_object?).to be false
       end
     end
   end

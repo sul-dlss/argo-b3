@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 
-# rubocop:disable-next RSpec/SubjectStub
 RSpec.describe Sdr::VersionService do
   subject(:service) { described_class.new(druid:) }
 
@@ -18,13 +17,12 @@ RSpec.describe Sdr::VersionService do
 
   describe '.close' do
     before do
-      allow(described_class).to receive(:new).and_return(service)
-      allow(service).to receive(:close)
+      allow(version_client).to receive(:close)
     end
 
-    it 'calls #close on a new instance' do
-      described_class.close(druid:)
-      expect(service).to have_received(:close).once
+    it 'closes the version for the druid' do
+      described_class.close(druid:, description: 'best version ever', user_name: 'mjgiarlo')
+      expect(version_client).to have_received(:close).with(description: 'best version ever', user_name: 'mjgiarlo')
     end
   end
 

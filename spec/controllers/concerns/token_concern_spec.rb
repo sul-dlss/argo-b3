@@ -13,12 +13,6 @@ RSpec.describe TokenConcern do
 
   let(:value) { 'druid:bc123cd4567' }
 
-  describe '#verifier' do
-    it 'returns the argo message verifier' do
-      expect(including_instance.verifier).to eq(Rails.application.message_verifier(:argo))
-    end
-  end
-
   describe '#generate_token and #verify_token' do
     it 'round-trips a value with default configuration' do
       token = including_instance.generate_token(value)

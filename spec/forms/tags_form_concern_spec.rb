@@ -182,19 +182,19 @@ RSpec.describe TagsFormConcern do
   describe '.permitted_params' do
     it 'includes nested other_tags_attributes' do
       expect(ItemForm.permitted_params).to include(
-        other_tags_attributes: OtherTagForm.permitted_params
+        other_tags_attributes: [:tag]
       )
     end
 
     it 'includes nested project_tags_attributes' do
       expect(ItemForm.permitted_params).to include(
-        project_tags_attributes: ProjectTagForm.permitted_params
+        project_tags_attributes: [:tag]
       )
     end
 
     it 'includes nested ticket_tags_attributes' do
       expect(ItemForm.permitted_params).to include(
-        ticket_tags_attributes: TicketTagForm.permitted_params
+        ticket_tags_attributes: [:tag]
       )
     end
   end
