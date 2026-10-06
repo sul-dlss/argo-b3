@@ -52,5 +52,9 @@ RSpec.describe 'Show agreement' do
     # No pin
     expect(rendered_page).to have_no_css('.bi-pin')
     expect(rendered_page).to have_no_css('.bi-pin-fill')
+
+    # Events tab (events are lazily loaded; see show_events_spec)
+    expect(rendered_page).to have_css('.nav-link', text: 'Events')
+    expect(rendered_page).to have_css('#events-pane turbo-frame[src*="/events"]')
   end
 end

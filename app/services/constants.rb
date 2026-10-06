@@ -2,6 +2,9 @@
 
 # A module for including constants throughout the Argo application
 module Constants # rubocop:disable Metrics/ModuleLength
+  # Time zone in which times are displayed and entered.
+  TIME_ZONE = 'Pacific Time (US & Canada)'
+
   RELEASE_TARGETS = [
     %w[Searchworks Searchworks],
     %w[Earthworks Earthworks],

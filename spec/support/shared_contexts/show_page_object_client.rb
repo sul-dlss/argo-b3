@@ -4,8 +4,8 @@
 # When a new DSA client call is added to the show page, add it here so every spec that lands on the show page
 # picks it up.
 #
-# Requires `druid`. Override the value lets (e.g., `version_inventory`, `milestones`, `release_tags`) or the
-# `version_status` double for the data a spec cares about.
+# Requires `druid`. Override the value lets (e.g., `version_inventory`, `milestones`, `release_tags`, `events`,
+# `event_types`) or the `version_status` double for the data a spec cares about.
 #
 # Usage:
 #   include_context 'with show page object client'
@@ -16,11 +16,14 @@ RSpec.shared_context 'with show page object client' do
   let(:milestones) { [] }
   let(:milestone_date) { false }
   let(:release_tags) { [] }
+  let(:events) { [] }
+  let(:event_types) { %w[version_open] }
 
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
                                                    release_tags: release_tags_client,
-                                                   user_version: user_version_client, lock: object_lock)
+                                                   user_version: user_version_client, events: events_client,
+                                                   lock: object_lock)
   end
   let(:version_client) do
     instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)
@@ -33,8 +36,15 @@ RSpec.shared_context 'with show page object client' do
     instance_double(Dor::Services::Client::Milestones, list: milestones, date: milestone_date)
   end
   let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: release_tags) }
+  let(:events_client) { instance_double(Dor::Services::Client::Events) }
+  let(:event_types_client) { instance_double(Dor::Services::Client::EventTypes, list: event_types) }
 
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+    allow(Dor::Services::Client).to receive(:event_types).and_return(event_types_client)
+    # Filters by event type when given, as DSA does.
+    allow(events_client).to receive(:list) do |event_types:, **|
+      event_types ? events.select { |event| event_types.include?(event.event_type) } : events
+    end
   end
 end

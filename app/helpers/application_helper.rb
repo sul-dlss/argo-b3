@@ -18,7 +18,7 @@ module ApplicationHelper
   def format_datetime(datetime, format: :date_time)
     return if datetime.blank?
 
-    I18n.l(datetime.in_time_zone('Pacific Time (US & Canada)'), format:)
+    I18n.l(datetime.in_time_zone(Constants::TIME_ZONE), format:)
   end
 
   def format_hash(hash, compact: true, pretty: true)

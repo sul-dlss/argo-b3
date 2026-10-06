@@ -174,7 +174,7 @@ GEM
       activesupport (>= 4.2)
       bunny (~> 2.17)
       zeitwerk (~> 2.1)
-    dor-services-client (15.67.0)
+    dor-services-client (15.68.0)
       activesupport (>= 7.0.0)
       cocina-models (~> 0.133.0)
       deprecation

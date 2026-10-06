@@ -130,3 +130,36 @@
 .object-type-bulk-action {
   @include object-type-colors($search-color, $search-color-rgb);
 }
+
+// The when (row header) cells of the events table are not bold.
+#events-table tbody th {
+  font-weight: normal;
+}
+
+// The toggled event data. Bootstrap tables set the cell background from --bs-table-bg.
+#events-table .event-data > td {
+  --bs-table-bg: var(--stanford-fog-light);
+}
+
+// Rows in the events table that can be clicked to show / hide the event data.
+// The indicator mirrors the Bootstrap accordion button chevron.
+.event-toggle {
+  cursor: pointer;
+
+  .event-toggle-indicator {
+    display: block;
+    width: $accordion-icon-width;
+    height: $accordion-icon-width;
+    margin-left: auto;
+    background-image: escape-svg($accordion-button-icon);
+    background-repeat: no-repeat;
+    background-size: $accordion-icon-width;
+
+    @include transition($accordion-icon-transition);
+  }
+
+  &:not(.collapsed) .event-toggle-indicator {
+    background-image: escape-svg($accordion-button-active-icon);
+    transform: $accordion-icon-transform;
+  }
+}
