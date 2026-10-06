@@ -156,7 +156,9 @@
         <% end %>
 
         <%= component.with_pane(id: 'events-pane', tab_id: 'events-tab') do %>
-          <p>Not implemented yet</p>
+          <%= turbo_frame_tag(@solr_doc.druid, 'events', src: events_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+          <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'history-pane', tab_id: 'history-tab') do %>

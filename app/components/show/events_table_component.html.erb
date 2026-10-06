@@ -1,0 +1,29 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(id: 'events-table',
+                                                         label: 'Events', show_label: false) do |component| %>
+  <% component.with_header(label: 'When') %>
+  <% component.with_header(label: 'Event type') %>
+  <% component.with_header(label: 'Who') %>
+  <% component.with_header(label: 'Version') %>
+  <% component.with_header(label: tag.span('Show data', class: 'visually-hidden')) %>
+  <% events.each_with_index do |event, index| %>
+    <% component.with_row(label: when_label(event), values: [event_type_label(event), who(event), version(event), toggle_indicator(event)], **toggle_row_options(event, index)) %>
+    <% if data?(event) %>
+      <% component.with_row(id: data_id(index), class: 'event-data collapse') do |row_component| %>
+        <% row_component.with_cell(colspan: 5) do %>
+          <dl class="row mb-0">
+            <% display_data(event).each do |key, value| %>
+              <dt class="col-sm-3"><%= key_label(key) %></dt>
+              <dd class="col-sm-9">
+                <% if json?(value) %>
+                  <%= render Elements::JsonViewerComponent.new(hash: value, expanded: 1, show_toolbar: false) %>
+                <% else %>
+                  <%= value %>
+                <% end %>
+              </dd>
+            <% end %>
+          </dl>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

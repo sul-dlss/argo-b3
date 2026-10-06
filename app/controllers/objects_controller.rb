@@ -4,7 +4,7 @@
 class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassLength
   RECENT_OBJECTS_LIMIT = 5
 
-  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
+  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
                                   show_structural_csv track]
 
@@ -90,6 +90,20 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                                 user_version_inventory: object_client.user_version.inventory)
   end
 
+  def show_events
+    @druid = verified_druid
+    @event_types = Rails.cache.fetch('events/event-types', expires_in: 1.hour) { Sdr::Event.types }
+    # By default, the default event types (that are valid event types) are selected.
+    @events_filter_form = if params.key?(EventsFilterForm.model_name.param_key)
+                            EventsFilterForm.new(events_filter_params)
+                          else
+                            EventsFilterForm.new(event_types: EventsFilterForm::DEFAULT_EVENT_TYPES & @event_types)
+                          end
+    @events = fetch_events
+
+    render layout: false
+  end
+
   def show_solr_doc
     @solr_doc_hash = fetch_solr_doc(verified_druid)
 
@@ -154,6 +168,23 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  def events_filter_params
+    param_key = EventsFilterForm.model_name.param_key
+    params.permit(param_key => EventsFilterForm.permitted_params)[param_key]
+  end
+
+  # The hidden field for the event types select submits a blank value, so that deselecting all
+  # event types can be distinguished from the default (all event types).
+  def fetch_events
+    selected_event_types = @events_filter_form.event_types.compact_blank
+    return [] if selected_event_types.empty?
+
+    # When all event types are selected, no event type filter is needed.
+    event_types = (@event_types - selected_event_types).empty? ? nil : selected_event_types
+    Sdr::Event.list(druid: @druid, event_types:, from: @events_filter_form.from_time,
+                    to: @events_filter_form.to_time)
+  end
 
   def republishable?
     return false unless @solr_doc.dro_or_collection?
