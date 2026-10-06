@@ -26,6 +26,7 @@ RSpec.describe 'Create an item' do
 
     let(:object_client) do
       instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
+                                                     events: events_client,
                                                      user_version: user_version_client,
                                                      release_tags: release_tags_client)
     end
@@ -35,6 +36,8 @@ RSpec.describe 'Create an item' do
     end
     let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
     let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: [], date: false) }
+    let(:events_client) { instance_double(Dor::Services::Client::Events, list: []) }
+    let(:event_types_client) { instance_double(Dor::Services::Client::EventTypes, list: %w[version_open]) }
     let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
     before do
@@ -46,6 +49,7 @@ RSpec.describe 'Create an item' do
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+      allow(Dor::Services::Client).to receive(:event_types).and_return(event_types_client)
     end
 
     it 'registers a valid cocina object' do

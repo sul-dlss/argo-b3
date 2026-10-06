@@ -1,3 +1,18 @@
+GIT
+  remote: https://github.com/sul-dlss/dor-services-client.git
+  revision: af889bdf783d118d97f4c76b7501ba20b1feb53d
+  branch: events
+  specs:
+    dor-services-client (15.67.0)
+      activesupport (>= 7.0.0)
+      cocina-models (~> 0.133.0)
+      deprecation
+      faraday (~> 2.0)
+      faraday-retry
+      hashie
+      nokogiri
+      zeitwerk (~> 2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -173,15 +188,6 @@ GEM
     dor-event-client (1.2.0)
       activesupport (>= 4.2)
       bunny (~> 2.17)
-      zeitwerk (~> 2.1)
-    dor-services-client (15.67.0)
-      activesupport (>= 7.0.0)
-      cocina-models (~> 0.133.0)
-      deprecation
-      faraday (~> 2.0)
-      faraday-retry
-      hashie
-      nokogiri
       zeitwerk (~> 2.1)
     dotenv (3.2.0)
     drb (2.2.3)
@@ -750,7 +756,7 @@ DEPENDENCIES
   cyperful
   debug
   dor-event-client
-  dor-services-client
+  dor-services-client!
   druid-tools
   dry-monads
   erb_lint

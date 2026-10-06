@@ -1,0 +1,31 @@
+<%= turbo_frame_tag(@druid, 'events') do %>
+  <%# The form is permanent so that the filter values (and Tom Select) are retained when the frame reloads. %>
+  <%= form_with model: @events_filter_form, url: events_object_path(druid: params[:druid]), method: :get,
+                id: 'events-filter', class: 'row g-3 align-items-end mb-4',
+                data: { turbo_permanent: true, turbo_frame: "#{@druid}_events" } do |form| %>
+    <div class="col-md-3">
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :from, text: 'From') %>
+      <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(form:, field_name: :from, type: 'datetime-local') %>
+    </div>
+    <div class="col-md-3">
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :to, text: 'To') %>
+      <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(form:, field_name: :to, type: 'datetime-local') %>
+    </div>
+    <div class="col-md-4">
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :event_types, text: 'Event types') %>
+      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :event_types,
+                                                                         options: @event_types.map { |event_type| [event_type.humanize, event_type] },
+                                                                         multiple: true,
+                                                                         data: { controller: 'checkbox-tom-select' }) %>
+    </div>
+    <div class="col-md-2">
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter') %>
+    </div>
+  <% end %>
+
+  <% if @events.empty? %>
+    <p>No events.</p>
+  <% else %>
+    <%= render Show::EventsTableComponent.new(events: @events) %>
+  <% end %>
+<% end %>
