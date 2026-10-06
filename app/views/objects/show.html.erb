@@ -102,7 +102,6 @@
         <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') if @solr_doc.dro? %>
         <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') if @solr_doc.dro? %>
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
-        <% component.with_tab(id: 'history-tab', pane_id: 'history-pane', label: 'History') %>
         <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
         <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
@@ -156,10 +155,6 @@
         <% end %>
 
         <%= component.with_pane(id: 'events-pane', tab_id: 'events-tab') do %>
-          <p>Not implemented yet</p>
-        <% end %>
-
-        <%= component.with_pane(id: 'history-pane', tab_id: 'history-tab') do %>
           <p>Not implemented yet</p>
         <% end %>
 
