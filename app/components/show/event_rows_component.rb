@@ -55,7 +55,7 @@ module Show
     def toggle_indicator
       return unless data?
 
-      tag.span(class: 'event-toggle-indicator')
+      tag.span(class: 'toggle-row-indicator')
     end
 
     def toggle_row_options
@@ -64,7 +64,7 @@ module Show
       {
         data: { bs_toggle: 'collapse', bs_target: "##{data_id}" },
         aria: { expanded: false, controls: data_id },
-        class: 'event-toggle collapsed'
+        class: 'toggle-row collapsed'
       }
     end
   end

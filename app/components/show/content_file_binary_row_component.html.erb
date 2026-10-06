@@ -1,0 +1,17 @@
+<%= render SdrViewComponents::Tables::RowComponent.new(label: content_file_binary.filepath, **toggle_row_options) do |row_component| %>
+  <% row_component.with_cell do %><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %><% end %>
+  <% row_component.with_cell do %><%= content_file_binary.mime_type %><% end %>
+  <% row_component.with_cell do %><%= toggle_indicator %><% end %>
+<% end %>
+<% if technical_metadata? %>
+  <%= render SdrViewComponents::Tables::RowComponent.new(id: technical_metadata_id, class: 'toggle-row-data collapse') do |row_component| %>
+    <% row_component.with_cell(colspan: 4) do %>
+      <%= helpers.turbo_frame_tag(technical_metadata_frame_id,
+                                  src: object_technical_metadata_path(druid_token, filepath: content_file_binary.filepath),
+                                  loading: :lazy,
+                                  data: { turbo_permanent: true }) do %>
+        <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

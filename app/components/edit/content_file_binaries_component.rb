@@ -2,14 +2,19 @@
 
 module Edit
   # Component for displaying a table of the file binaries of a content, with a button to delete each.
-  class ContentFileBinariesComponent < Show::ContentFileBinariesComponent
+  class ContentFileBinariesComponent < ApplicationComponent
     # @param content_record [Content] (named to avoid ViewComponent's reserved content parameter)
     # @param content_token [String] signed content id
     # @param disabled [Boolean] true to disable deleting
     def initialize(content_record:, content_token:, disabled: false)
+      @content_record = content_record
       @content_token = content_token
       @disabled = disabled
-      super(content_record:)
+      super()
+    end
+
+    def content_file_binaries
+      @content_file_binaries ||= content_record.content_file_binaries.path_order.to_a
     end
 
     def delete_path(content_file_binary)
@@ -33,7 +38,7 @@ module Edit
 
     private
 
-    attr_reader :content_token
+    attr_reader :content_record, :content_token
 
     # A resource is emptied (and so deleted) when all of its files reference the same binary.
     # @return [Hash{Integer => Array<Integer>}] binary id => the indexes (as displayed) of the resources

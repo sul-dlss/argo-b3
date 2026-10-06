@@ -21,7 +21,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
       row = table.find('tr[data-bs-target="#event-0-data"]')
       expect(row['data-bs-toggle']).to eq('collapse')
       expect(row[:class]).to include('collapsed')
-      expect(row).to have_css('td .event-toggle-indicator')
+      expect(row).to have_css('td .toggle-row-indicator')
       expect(row).to have_css('th', text: '2026-04-16 03:00:00 PT')
       cells = row.all('td')
       expect(cells[0]).to have_text('Version open')
@@ -63,7 +63,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
       cells = row.all('td')
       expect(cells[1]).to have_text('asmith')
       expect(cells[2]).to have_text('3')
-      expect(row).to have_no_css('.event-toggle-indicator')
+      expect(row).to have_no_css('.toggle-row-indicator')
       expect(table).to have_no_css('tr#event-0-data')
     end
   end
@@ -77,7 +77,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
     it 'does not render a toggleable row' do
       row = table.find('tr', text: 'Publishing complete')
       expect(row['data-bs-toggle']).to be_nil
-      expect(row).to have_no_css('.event-toggle-indicator')
+      expect(row).to have_no_css('.toggle-row-indicator')
       expect(table).to have_no_css('tr#event-0-data')
     end
   end

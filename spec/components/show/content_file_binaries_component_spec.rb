@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::ContentFileBinariesComponent, type: :component do
-  let(:component) { described_class.new(content_record: content) }
+  let(:component) { described_class.new(content_record: content, druid_token: 'abc123token') }
 
   let(:content) { create(:content) }
 
@@ -21,6 +21,7 @@ RSpec.describe Show::ContentFileBinariesComponent, type: :component do
       expect(page).to have_css('th', text: 'File name')
       expect(page).to have_css('th', text: 'Size')
       expect(page).to have_css('th', text: 'Type')
+      expect(page).to have_css('th span.visually-hidden', text: 'Show technical metadata')
       expect(page).to have_css('tbody tr:nth-child(1) th', text: 'image1.tif')
       expect(page).to have_css('tbody tr:nth-child(1) td', text: '1 KB')
       expect(page).to have_css('tbody tr:nth-child(1) td', text: 'image/tiff')
