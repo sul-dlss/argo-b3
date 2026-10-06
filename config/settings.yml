@@ -29,6 +29,10 @@ preservation_catalog:
   url: "https://preservation-catalog-stage-01.stanford.edu"
   token: "mint-token-with-target-preservation-catalog-rake-generate-token"
 
+tech_md_service:
+  url: 'https://techmd-stage.stanford.edu'
+  token: "mint-token-with-target-techmd-service-rake-generate-token"
+
 bulk_actions:
   directory: "tmp/bulk_jobs"
 

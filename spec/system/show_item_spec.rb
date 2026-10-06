@@ -237,12 +237,10 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Files')
     expect(page).to have_css('.nav-link', text: 'Structure')
-    expect(page).to have_css('.nav-link', text: 'Technical metadata')
+    expect(page).to have_no_css('.nav-link', text: 'Technical metadata')
     expect(page).to have_css('.nav-link', text: 'Description preview')
-    # Tabs that do not fit are moved into the "More" menu.
-    click_button 'More'
-    expect(page).to have_css('.dropdown-item', text: 'Cocina JSON')
-    click_button 'More'
+    expect(page).to have_css('.nav-link', text: 'Cocina JSON')
+    expect(page).to have_css('.nav-link', text: 'SOLR doc')
 
     # Overview table
     expect(page).to have_table_caption('overview-table', 'Overview')
@@ -309,7 +307,6 @@ RSpec.describe 'Show item' do
     expect(page).to have_button('Download structural metadata')
 
     # Cocina model tab
-    click_button 'More'
     click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
     expect(page).to have_css('andypf-json-viewer', text: druid)
@@ -434,7 +431,6 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('.card-text', text: 'My updated copyright statement')
     end
 
-    click_button 'More'
     click_button 'Cocina JSON'
     expect(page).to have_css('andypf-json-viewer', text: updated_title)
 

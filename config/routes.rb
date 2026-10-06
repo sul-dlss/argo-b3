@@ -205,6 +205,7 @@ Rails.application.routes.draw do
       post 'republish', to: 'objects#republish'
       get 'structural_csv', to: 'objects#show_structural_csv'
     end
+    resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end
 
   resources :items, only: %i[new create]

@@ -104,6 +104,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_files
     @content = fetch_content
+    @druid_token = params[:druid]
 
     render layout: false
   end

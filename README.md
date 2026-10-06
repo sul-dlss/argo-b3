@@ -60,6 +60,13 @@ SETTINGS__RABBITMQ__ENABLED=true SETTINGS__RABBITMQ__HOSTNAME='sul-rabbitmq-qa-a
 SETTINGS__PRESERVATION_CATALOG__URL='https://preservation-catalog-qa.stanford.edu' SETTINGS__PRESERVATION_CATALOG__TOKEN='fgJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.FhjtP5vOd1xIX7h6oRBNZrf' bin/setup
 ```
 
+#### Technical Metadata Service
+Obtain a token for the techmd instance (generated on the server with `bundle exec rake generate_token`; see the [techmd README](https://github.com/sul-dlss/technical-metadata-service#integration)) and then:
+
+```
+SETTINGS__TECH_MD_SERVICE__URL='https://dor-techmd-qa-a.stanford.edu' SETTINGS__TECH_MD_SERVICE__TOKEN='eyJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.Kd8aPq2mXvR7tLw3NcZbHfe' bin/setup
+```
+
 #### Other
 ```
 SETTINGS__PURL_FETCHER__URL='https://purl-fetcher-stage.stanford.edu' SETTINGS__STACKS__URL='https://stacks-stage.stanford.edu/image' bin/setup
@@ -71,7 +78,7 @@ For running code in localhost pointing to real data on a server environment, `bi
 
 1. Ensure you are on VPN, have a valid kerberos ticket, and docker desktop client is running.
 2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, ensures required docker containers are up, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server.  The script can be passed a parameter of "stage", "qa" or "prod" and will auto-configure the service URLs (e.g. `bin/dev-server stage`).  It defaults to "qa" if no environment is passed.
-3. In order to authenticate with DSA and Prescat (to display and edit objects),, you will need valid DSA and Prescat tokens for the remote environments you are connected to.  While you can pass these into the bin script via env variables as described in the sections above, it is easier to setup a `.env-server` file in the root of the app, and put the tokens in there as env variables.  The `.env-server` file will be gitignored and automatically picked up by the `bin/dev-server` script. The `.env-server` file can also contain the service URLs as env variables if you do not want them automatically configured by the script.  If the tokens are different per environment (e.g. stage vs qa vs prod), you will need to change them in the `.env-server` file (e.g. comment/uncomment out as needed) before starting `bin/dev-server`.
+3. In order to authenticate with DSA, Prescat, and techmd (to display and edit objects), you will need valid DSA, Prescat, and techmd tokens for the remote environments you are connected to.  While you can pass these into the bin script via env variables as described in the sections above, it is easier to setup a `.env-server` file in the root of the app, and put the tokens in there as env variables.  The `.env-server` file will be gitignored and automatically picked up by the `bin/dev-server` script. The `.env-server` file can also contain the service URLs as env variables if you do not want them automatically configured by the script.  If the tokens are different per environment (e.g. stage vs qa vs prod), you will need to change them in the `.env-server` file (e.g. comment/uncomment out as needed) before starting `bin/dev-server`.
 
 ### Bootstrapping an agreement, APO, and collection
 

@@ -130,3 +130,31 @@
 .object-type-bulk-action {
   @include object-type-colors($search-color, $search-color-rgb);
 }
+
+// Table rows that can be clicked to show / hide a following data row (e.g., technical metadata for a file).
+// The indicator mirrors the Bootstrap accordion button chevron.
+.toggle-row {
+  cursor: pointer;
+
+  .toggle-row-indicator {
+    display: block;
+    width: $accordion-icon-width;
+    height: $accordion-icon-width;
+    margin-left: auto;
+    background-image: escape-svg($accordion-button-icon);
+    background-repeat: no-repeat;
+    background-size: $accordion-icon-width;
+
+    @include transition($accordion-icon-transition);
+  }
+
+  &:not(.collapsed) .toggle-row-indicator {
+    background-image: escape-svg($accordion-button-active-icon);
+    transform: $accordion-icon-transform;
+  }
+}
+
+// The toggled data row. Bootstrap tables set the cell background from --bs-table-bg.
+.toggle-row-data > td {
+  --bs-table-bg: var(--stanford-fog-light);
+}

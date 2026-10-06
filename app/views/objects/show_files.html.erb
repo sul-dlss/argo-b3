@@ -1,4 +1,4 @@
 <%= turbo_frame_tag(@content.druid, 'files') do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Files', classes: 'mb-3') %>
-  <%= render Show::ContentFileBinariesComponent.new(content_record: @content) %>
+  <%= render Show::ContentFileBinariesComponent.new(content_record: @content, druid_token: @druid_token) %>
 <% end %>
