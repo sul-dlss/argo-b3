@@ -18,7 +18,11 @@ class HeaderComponent < ApplicationComponent
 
   delegate :impersonating?, to: :Current
 
-  def register_item?
+  def can_register_item?
     helpers.allowed_to?(:new?, nil, with: ItemPolicy)
+  end
+
+  def can_register_apo?
+    helpers.allowed_to?(:new?, nil, with: ApoPolicy)
   end
 end

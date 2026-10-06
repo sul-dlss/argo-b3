@@ -95,6 +95,29 @@ en:
   workflow_grid:
     label: "Workflow status"
   edit:
+    apos:
+      new:
+        title: "Register and deposit APO"
+        buttons:
+          register: "Register and deposit APO"
+        toasts:
+          register: "APO registered and deposit started"
+      fields:
+        access_defaults:
+          label: "Default object rights"
+        agreement_druid:
+          label: "Agreement"
+        copyright:
+          label: "Default copyright"
+        license:
+          label: "Default license"
+        title:
+          label: "Title"
+        object_defaults:
+          label: "Object defaults"
+          help_text: "The following defaults will apply to all newly registered objects."
+        use_and_reproduction_statement:
+          label: "Default use and reproduction"
     contents:
       edit:
         files_section:
