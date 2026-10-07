@@ -6,10 +6,24 @@
   <% component.with_header(label: 'File name', style: 'width: 60%;') %>
   <% component.with_header(label: 'Size') %>
   <% component.with_header(label: 'Type') %>
+  <% component.with_header(label: tag.span('Show technical metadata', class: 'visually-hidden')) %>
   <% content_file_binaries.each do |content_file_binary| %>
-    <% component.with_row(label: content_file_binary.filepath) do |row_component| %>
+    <% component.with_row(label: content_file_binary.filepath, **toggle_row_options(content_file_binary)) do |row_component| %>
       <% row_component.with_cell do %><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %><% end %>
       <% row_component.with_cell do %><%= content_file_binary.mime_type %><% end %>
+      <% row_component.with_cell do %><%= toggle_indicator(content_file_binary) %><% end %>
+    <% end %>
+    <% if technical_metadata?(content_file_binary) %>
+      <% component.with_row(id: technical_metadata_id(content_file_binary), class: 'toggle-row-data collapse') do |row_component| %>
+        <% row_component.with_cell(colspan: 4) do %>
+          <%= helpers.turbo_frame_tag(technical_metadata_frame_id(content_file_binary),
+                                      src: object_technical_metadata_path(druid_token, filepath: content_file_binary.filepath),
+                                      loading: :lazy,
+                                      data: { turbo_permanent: true }) do %>
+            <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

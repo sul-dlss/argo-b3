@@ -9,7 +9,7 @@ module Edit
     def initialize(content_record:, content_token:, disabled: false)
       @content_token = content_token
       @disabled = disabled
-      super(content_record:)
+      super(content_record:, druid_token: nil) # Technical metadata is not shown when editing.
     end
 
     def delete_path(content_file_binary)
