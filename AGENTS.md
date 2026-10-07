@@ -20,17 +20,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - Druids should match the pattern "^druid:[b-df-hjkmnp-tv-z]{2}[0-9]{3}[b-df-hjkmnp-tv-z]{2}[0-9]{4}$", e.g., "druid:bc123df4567".
 - When creating multiple, unique druids for the same spec, vary at least the first 2 characters and the last 2 characters.
 - For cocina factories, see https://github.com/sul-dlss/cocina-models/blob/main/lib/cocina/rspec/factories.rb
-- Prefer instance_doubles instead of doubles.
-- Unless specifically told to, do not write tests for:
-  - Memoization
-  - Caching
-  - Getters
-  - Defaults
-- Expected values must be independent of the implementation. Do not compute them with the code under test or the helpers, constants, or expressions it uses (e.g., `DruidSupport.bare_druid_from`, `Form.permitted_params`, `File.size(filepath_on_disk)`); use literals instead (e.g., `'bc123df4567'`, `[:tag]`, `52`).
-- Do not stub the class under test (e.g., `allow(described_class).to receive(:new)`); stub at external boundaries (Solr, `Dor::Services::Client`) and assert on what the code sends or returns.
-- For mocking, place allow statements in a before block and expect statements after the action is performed. Prefer testing argument (with) in expect; do not test in both allow and expect.
-- Place "let" statements before "before "blocks.
-- When writing CSS matchers, do not test padding or margins (e.g., ps-3, mt-1).
+- Before writing or reviewing specs or code, read `CODING_STANDARDS.md` (judgement calls; linters enforce the mechanical rules).
 
 ## References
 For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
