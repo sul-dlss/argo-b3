@@ -77,6 +77,7 @@ group :development, :test do
   gem 'debug', require: 'debug/prelude'
   gem 'factory_bot_rails'
   gem 'herb'
+  gem 'i18n-tasks', require: false
   gem 'parallel_tests'
   gem 'rspec_junit_formatter' # used by CircleCI
   gem 'rspec-rails'

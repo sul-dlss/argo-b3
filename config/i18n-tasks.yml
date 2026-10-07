@@ -1,0 +1,21 @@
+# i18n-tasks finds missing and unused translations: https://github.com/glebm/i18n-tasks
+base_locale: en
+
+data:
+  read:
+    - config/locales/%{locale}.yml
+    - config/locales/**/*.%{locale}.yml
+  yaml:
+    write:
+      # do not wrap lines at 80 characters
+      line_width: -1
+
+search:
+  paths:
+    - app/
+
+ignore_unused:
+  # Looked up by I18n.l via format_datetime(format: :date_only / :date_time) in ApplicationHelper.
+  - 'time.formats.*'
+  # Called as helpers.t(...) in ApplicationController, which i18n-tasks does not scan.
+  - 'errors.not_authorized'
