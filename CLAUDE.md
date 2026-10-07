@@ -1,2 +1,2 @@
 @AGENTS.md
-@CONTEXT.md
+@GLOSSARY.md
