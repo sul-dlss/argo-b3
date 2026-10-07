@@ -4,6 +4,12 @@ import { Turbo } from '@hotwired/turbo-rails'
 const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordion-collapse']
 
 // Controller for the Cocina model show page.
+//
+// The show page periodically refreshes itself with a Turbo morph refresh (see scheduleReload), which
+// resets element attributes (e.g., class, aria-expanded) to what the server rendered. Interactive UI
+// state that must survive the refresh (e.g., the active tab or expanded/collapsed rows) is only kept if
+// the element's attributes are skipped by the turbo:before-morph-attribute hook (preserveTab): either add
+// the element's class to PRESERVED_CLASSES or extend that hook.
 export default class extends Controller {
   static values = {
     interval: Number

@@ -3,20 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'Pin and unpin a tag' do
+  include_context 'with show page object client'
+
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
   let(:title) { 'My agreement title' }
 
-  let(:object_client) do
-    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   user_version: user_version_client, lock: 'lock1')
-  end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
   end
-  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
 
   let(:solr_doc) do
     {
@@ -39,7 +34,6 @@ RSpec.describe 'Pin and unpin a tag' do
   before do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
 
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
     allow(Sdr::Repository).to receive_messages(find_solr: solr_doc, find: cocina_object)
 

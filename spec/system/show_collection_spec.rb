@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Show collection' do
+  include_context 'with show page object client'
+
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
 
@@ -10,18 +12,6 @@ RSpec.describe 'Show collection' do
   let(:updated_title) { 'My updated collection title' }
 
   # Versions are tested in show_dro_spec so returning [].
-  let(:object_client) do
-    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   release_tags: release_tags_client,
-                                                   user_version: user_version_client, lock: 'lock1')
-  end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
-  let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: false)
-  end
-  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: [], date: false) }
-  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
   def build_solr_doc(title:, license_label: 'CC Attribution 4.0 International')
     {
@@ -52,7 +42,6 @@ RSpec.describe 'Show collection' do
   before do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
 
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
     allow(Searchers::CollectionItemCount).to receive(:call).and_return(12)

@@ -88,6 +88,7 @@
         </div>
       </div>
 
+      <%# Tabs that don't fit on one row overflow into a "More" dropdown (sdr_view_components' tab overflow controller), so adding or removing tabs changes which tabs end up there. spec/system/show_item_spec.rb clicks "More" to reach overflowed tabs. %>
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl, overflow_menu: true) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.dro_or_collection? %>

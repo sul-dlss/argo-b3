@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Create an APO' do
+  include_context 'with show page object client'
+
   let(:user) { create(:user, :admin) }
 
   let(:agreement_druid) { 'druid:bc123df4567' }
@@ -13,16 +15,9 @@ RSpec.describe 'Create an APO' do
   end
   let(:druid) { 'druid:xz987wv6543' }
 
-  let(:object_client) do
-    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   user_version: user_version_client, lock: 'lock1')
-  end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
   end
-  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: []) }
   let(:solr_doc) do
     {
       Search::Fields::ID => druid,
@@ -41,7 +36,6 @@ RSpec.describe 'Create an APO' do
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
     allow(Searchers::AdminPolicyObjectCounts).to receive(:call)
       .and_return(Searchers::AdminPolicyObjectCounts::Result.new(item_count: 0, collection_count: 0))
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
 
     sign_in(user)
   end
