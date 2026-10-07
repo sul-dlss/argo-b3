@@ -17,6 +17,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 ## Testing notes
 
+- Run only the specs relevant to the change (`bin/rspec <files>`); for broad or full runs use `bin/parallel_rspec`. Set `COVERAGE=false` to drop SimpleCov output.
 - Druids should match the pattern "^druid:[b-df-hjkmnp-tv-z]{2}[0-9]{3}[b-df-hjkmnp-tv-z]{2}[0-9]{4}$", e.g., "druid:bc123df4567".
 - When creating multiple, unique druids for the same spec, vary at least the first 2 characters and the last 2 characters.
 - For cocina factories, see https://github.com/sul-dlss/cocina-models/blob/main/lib/cocina/rspec/factories.rb
