@@ -22,3 +22,21 @@ Governs the administrative/access rules applied to the objects under it. "APO" a
 
 ### Governing APO
 The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has exactly one governing APO. The relationship means the same thing regardless of the subject's type — including when the subject is itself an APO (an APO can be governed by another APO).
+
+## Structural Metadata Terms
+Structural metadata (file sets and files) is held in Active Record models rather than cocina models. See README "Structural metadata" for the full model and flows.
+
+### Lock
+The cocina object's optimistic locking key (`cocina_object.lock`, only present on `*WithMetadata` cocina objects). It changes whenever the object is updated, so a lock identifies one state of the object.
+
+### Content
+The structure of a DRO for one lock: ordered `ContentFileSet`s holding ordered `ContentFile`s, each pointing to a `ContentFileBinary` (the physical file, identified by filepath and possibly shared by several `ContentFile`s). Identified by druid + lock + immutable (a unique index), so a druid/lock has at most one immutable and one mutable Content.
+
+### Immutable Content
+A Content that exactly reflects the cocina object's structural metadata at its lock. Use it for anything that shows or exports what was deposited (e.g., the Files tab, structural CSV download from the object page).
+
+### Mutable Content
+A Content being edited (uploads, discovery, reordering, structural CSV import); it may deviate from the cocina object. It reaches the cocina object only through **staging**.
+
+### Staging
+Depositing a mutable Content (`StageFilesJob`): `CocinaObjectMutators::StructuralMutator` rebuilds the cocina structural metadata from the Content, `Sdr::Repository.update` saves it, and the Content becomes immutable for the new lock.
