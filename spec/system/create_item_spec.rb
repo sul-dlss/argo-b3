@@ -21,21 +21,10 @@ RSpec.describe 'Create an item' do
   end
 
   context 'when valid' do
+    include_context 'with show page object client'
+
     let(:registered_cocina_object) { build(:dro_with_metadata, admin_policy_id: apo_druid) }
     let(:druid) { registered_cocina_object.externalIdentifier }
-
-    let(:object_client) do
-      instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                     user_version: user_version_client,
-                                                     release_tags: release_tags_client)
-    end
-    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
-    let(:version_status) do
-      instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: false)
-    end
-    let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-    let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: [], date: false) }
-    let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
 
     before do
       allow(Sdr::Repository).to receive_messages(accession: nil, create_release_tag: nil,
@@ -45,7 +34,6 @@ RSpec.describe 'Create an item' do
                                                  source_id_exists?: false)
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
-      allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     end
 
     it 'registers a valid cocina object' do

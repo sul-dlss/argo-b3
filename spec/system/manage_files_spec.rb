@@ -3,24 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'Manage files' do
+  include_context 'with show page object client'
+
   let(:druid) { 'druid:bc123df4567' }
   let(:title) { 'My title' }
 
   let(:cocina_object) { build(:dro_with_metadata, id: druid) }
   let!(:user) { create(:user) }
 
-  let(:object_client) do
-    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   user_version: user_version_client, lock: 'abc123',
-                                                   release_tags: release_tags_client)
-  end
-  let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [], status: version_status) }
-  let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: false)
-  end
-  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: []) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: [], date: false) }
-  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: []) }
+  let(:object_lock) { 'abc123' }
 
   before do
     create(:permission, :read_unrestricted, workgroup: user.groups.first)
@@ -33,7 +24,6 @@ RSpec.describe 'Manage files' do
     allow(StageFilesJob).to receive(:perform_later)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
   end
 
   def upload_file(filename)

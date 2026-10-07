@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Show item' do
+  include_context 'with show page object client'
+
   let(:druid) { 'druid:bb123cd4567' }
   let(:apo_druid) { 'druid:cc123cd4578' }
   let(:collection_druid) { 'druid:dd123cd4589' }
@@ -19,21 +21,11 @@ RSpec.describe 'Show item' do
     Dor::Services::Response::Workflow.new(xml:)
   end
 
-  let(:object_client) do
-    instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
-                                                   release_tags: release_tags_client,
-                                                   user_version: user_version_client, lock: 'lock1')
-  end
-  let(:version_client) do
-    instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)
-  end
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: true,
                                                                          version: 2)
   end
-  let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
-  let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones, date: true) }
-  let(:release_tags_client) { instance_double(Dor::Services::Client::ReleaseTags, list: release_tags) }
+  let(:milestone_date) { true }
   let(:version_inventory) do
     [
       Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
@@ -183,7 +175,6 @@ RSpec.describe 'Show item' do
   before do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
 
-    allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
 
     sign_in(create(:user))
