@@ -32,6 +32,10 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - Place "let" statements before "before "blocks.
 - When writing CSS matchers, do not test padding or margins (e.g., ps-3, mt-1).
 
+## Checks
+
+- Before reporting work done, run `bin/rake lint` (rubocop, erb_lint, herb, JS and SCSS linters); fix offenses before committing.
+
 ## References
 For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
 
