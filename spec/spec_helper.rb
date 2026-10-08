@@ -15,26 +15,29 @@
 # it.
 #
 
-require 'simplecov'
+# Set COVERAGE=false to skip coverage (and its output), e.g., when running a few specs.
+unless ENV['COVERAGE'] == 'false'
+  require 'simplecov'
 
-SKIPPABLE_TEST_COVERAGE_CONCERNS = %w[assets javascript views].freeze
+  SKIPPABLE_TEST_COVERAGE_CONCERNS = %w[assets javascript views].freeze
 
-SimpleCov.start(:rails) do
-  skip '/lib/tasks/'
+  SimpleCov.start(:rails) do
+    skip '/lib/tasks/'
 
-  # Use SimpleCov groups to break down test coverage per application concern, e.g.,
-  # controllers, models, & jobs. See https://github.com/simplecov-ruby/simplecov#groups
-  Dir.glob('app/*').each do |concern_path|
-    concern = File.basename(concern_path)
-    next if SKIPPABLE_TEST_COVERAGE_CONCERNS.include?(concern)
+    # Use SimpleCov groups to break down test coverage per application concern, e.g.,
+    # controllers, models, & jobs. See https://github.com/simplecov-ruby/simplecov#groups
+    Dir.glob('app/*').each do |concern_path|
+      concern = File.basename(concern_path)
+      next if SKIPPABLE_TEST_COVERAGE_CONCERNS.include?(concern)
 
-    group concern.capitalize, concern_path
-  end
+      group concern.capitalize, concern_path
+    end
 
-  if ENV['CI']
-    require 'simplecov_json_formatter'
+    if ENV['CI']
+      require 'simplecov_json_formatter'
 
-    formatter SimpleCov::Formatter::JSONFormatter
+      formatter SimpleCov::Formatter::JSONFormatter
+    end
   end
 end
 
