@@ -26,6 +26,16 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - For cocina factories, see https://github.com/sul-dlss/cocina-models/blob/main/lib/cocina/rspec/factories.rb
 - Before writing or reviewing specs or code, read `CODING_STANDARDS.md` (judgement calls; linters enforce the mechanical rules).
 
+## Integration tests
+
+End-to-end Argo-B3 functionality is covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`). Current specs and the functionality they cover:
+
+- `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, searching, and viewing the item and its PURL.
+
+When writing or reviewing a change to this functionality, remind the developer to run the integration tests before merging.
+
+If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update this list.
+
 ## Checks
 
 - Before reporting work done, run `bin/rake lint` (rubocop, erb_lint, herb, JS and SCSS linters); fix offenses before committing.
