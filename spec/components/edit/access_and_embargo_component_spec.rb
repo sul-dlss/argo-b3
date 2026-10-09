@@ -27,11 +27,13 @@ RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
     expect(page).to have_select('View access', name: 'item[embargo_view]', count: 1)
   end
 
-  it 'renders the fieldset labels' do
+  it 'renders the object access as during the embargo and the embargo access as once the embargo ends' do
     render_inline(component)
 
-    expect(page).to have_css('legend', text: 'Access settings during embargo')
-    expect(page).to have_css('legend', text: 'Access settings once embargo ends')
+    expect(page).to have_css('fieldset:has(> legend:contains("Access settings during embargo")) ' \
+                             'select[name="item[access_view]"]')
+    expect(page).to have_css('fieldset:has(> legend:contains("Access settings once embargo ends")) ' \
+                             'select[name="item[embargo_view]"]')
   end
 
   it 'renders the targets that the toggle Stimulus controller expects' do
