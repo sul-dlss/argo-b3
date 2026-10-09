@@ -17,8 +17,6 @@ module Contents
       'image/png' => { preserve: true, shelve: false, publish: false },
       'audio/wav' => { preserve: true, shelve: false, publish: false },
       'audio/x-wav' => { preserve: true, shelve: false, publish: false },
-      'audio/mp3' => { preserve: false, shelve: true, publish: true },
-      'audio/mpeg' => { preserve: false, shelve: true, publish: true },
       'application/pdf' => { preserve: true, shelve: true, publish: true },
       'text/plain' => { preserve: true, shelve: true, publish: true },
       'application/zip' => { preserve: true, shelve: false, publish: false },
