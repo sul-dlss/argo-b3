@@ -110,6 +110,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_structure
     @content = fetch_content
+    @content_validation_result = fetch_content_validation_result(content: @content, cocina_object:)
 
     render layout: false
   end
@@ -275,6 +276,15 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def fetch_content
     Contents::Builder.find_or_create(cocina_object:)
+  end
+
+  # The immutable Content is fixed for a lock, so its validation result for a content type is too.
+  def fetch_content_validation_result(content:, cocina_object:)
+    cache_key = "objects/content-validation/#{content.druid}/#{content.lock}/#{cocina_object.type}"
+    result_hash = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
+      Contents::Validator.call(content:, cocina_object:).to_h
+    end
+    Contents::Validators::Result.new(**result_hash)
   end
 
   # Looks up titles/permissions of given druids without filtering by view permission, so that an object
