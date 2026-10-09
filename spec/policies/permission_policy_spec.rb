@@ -22,4 +22,58 @@ RSpec.describe PermissionPolicy do
       end
     end
   end
+
+  describe '#edit?' do
+    context 'when an admin' do
+      let(:user) { build_stubbed(:user, groups: [AuthenticationHelpers::ADMIN_GROUP]) }
+
+      it 'authorizes' do
+        expect(policy.apply(:edit?)).to be true
+      end
+    end
+
+    context 'when a non-admin' do
+      let(:user) { build_stubbed(:user, groups: ['sdr:user-group']) }
+
+      it 'does not authorize' do
+        expect(policy.apply(:edit?)).to be false
+      end
+    end
+  end
+
+  describe '#update?' do
+    context 'when an admin' do
+      let(:user) { build_stubbed(:user, groups: [AuthenticationHelpers::ADMIN_GROUP]) }
+
+      it 'authorizes' do
+        expect(policy.apply(:update?)).to be true
+      end
+    end
+
+    context 'when a non-admin' do
+      let(:user) { build_stubbed(:user, groups: ['sdr:user-group']) }
+
+      it 'does not authorize' do
+        expect(policy.apply(:update?)).to be false
+      end
+    end
+  end
+
+  describe '#destroy?' do
+    context 'when an admin' do
+      let(:user) { build_stubbed(:user, groups: [AuthenticationHelpers::ADMIN_GROUP]) }
+
+      it 'authorizes' do
+        expect(policy.apply(:destroy?)).to be true
+      end
+    end
+
+    context 'when a non-admin' do
+      let(:user) { build_stubbed(:user, groups: ['sdr:user-group']) }
+
+      it 'does not authorize' do
+        expect(policy.apply(:destroy?)).to be false
+      end
+    end
+  end
 end
