@@ -29,6 +29,14 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { 'application/xml' }
 
       it 'falls back to the default attributes' do
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+      end
+    end
+
+    context 'when the mime type is a 3d model' do
+      let(:mime_type) { 'model/gltf-binary' }
+
+      it 'preserves, shelves, and publishes' do
         expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
       end
     end
@@ -37,7 +45,7 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { 'application/octet-stream' }
 
       it 'falls back to the default attributes' do
-        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
       end
     end
 
@@ -45,7 +53,7 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { nil }
 
       it 'falls back to the default attributes' do
-        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
       end
     end
   end

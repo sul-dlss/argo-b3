@@ -4,7 +4,8 @@ module Contents
   # Determines the default preserve / shelve / publish flags and role for a file from its mime type.
   # Ported from pre-assembly's PreAssembly::FromStagingLocation::File.
   class FileAttributes
-    DEFAULT = { preserve: true, shelve: true, publish: true, use: nil }.freeze
+    # A file with an unmapped mime type is preserved only.
+    DEFAULT = { preserve: true, shelve: false, publish: false, use: nil }.freeze
 
     # Overrides the flags (but not the use) for a file that is preserved only.
     DARK = { preserve: true, shelve: false, publish: false }.freeze
@@ -17,12 +18,11 @@ module Contents
       'image/png' => { preserve: true, shelve: false, publish: false },
       'audio/wav' => { preserve: true, shelve: false, publish: false },
       'audio/x-wav' => { preserve: true, shelve: false, publish: false },
-      'audio/mp3' => { preserve: false, shelve: true, publish: true },
-      'audio/mpeg' => { preserve: false, shelve: true, publish: true },
       'application/pdf' => { preserve: true, shelve: true, publish: true },
       'text/plain' => { preserve: true, shelve: true, publish: true },
       'application/zip' => { preserve: true, shelve: false, publish: false },
-      'application/json' => { preserve: true, shelve: true, publish: true }
+      'application/json' => { preserve: true, shelve: true, publish: true },
+      'model/gltf-binary' => { preserve: true, shelve: true, publish: true }
     }.freeze
 
     # Attributes for a file that is accompanied by OCR. Note that application/xml is only present here,

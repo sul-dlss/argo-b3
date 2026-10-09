@@ -112,7 +112,7 @@ RSpec.describe Contents::Populators::Image do
         structure
 
         expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'object', label: 'Object 1')
-        expect(content.content_files.sole).to have_attributes(preserve: true, shelve: true, publish: true, use: nil)
+        expect(content.content_files.sole).to have_attributes(preserve: true, shelve: false, publish: false, use: nil)
       end
     end
 

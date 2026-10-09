@@ -19,7 +19,7 @@ RSpec.describe Contents::Populators::FileSetPerFile do
       expect(content_file_set).to have_attributes(file_set_type: 'object', label: '')
 
       content_file = content_file_set.content_files.sole
-      expect(content_file).to have_attributes(label: '', preserve: true, publish: true, shelve: true,
+      expect(content_file).to have_attributes(label: '', preserve: true, publish: false, shelve: false,
                                               view: cocina_object.access.view,
                                               download: cocina_object.access.download,
                                               location: cocina_object.access.location)
