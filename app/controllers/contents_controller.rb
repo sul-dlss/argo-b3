@@ -33,8 +33,8 @@ class ContentsController < ContentsApplicationController
     content = find_content(cocina_object:)
     return redirect_to edit_content_path(druid), flash: { toast: t('edit.contents.edit.toasts.stale') } if content.nil?
 
-    @contents_item_form = build_submitted_contents_item_form(cocina_object:)
-    return render_invalid_edit(cocina_object:, content:) unless @contents_item_form.valid?
+    @contents_item_form = build_submitted_contents_item_form(cocina_object:, content:)
+    return render_invalid_edit(cocina_object:, content:) unless contents_item_form_valid?
 
     save_and_stage(content:)
     redirect_to object_path(druid), flash: { toast: t('edit.items.new.toasts.staging_started') }
@@ -46,6 +46,11 @@ class ContentsController < ContentsApplicationController
     cache_cocina_hash(cocina_object:)
     set_edit_form(cocina_object:, content:)
     render :edit, status: :unprocessable_content
+  end
+
+  # Depositing additionally validates the content (see ContentsItemForm).
+  def contents_item_form_valid?
+    @contents_item_form.valid?(params[:commit] == DEPOSIT_VALUE ? :deposit : nil)
   end
 
   def save_and_stage(content:)
@@ -65,8 +70,11 @@ class ContentsController < ContentsApplicationController
     @content_form = ContentForm.new
   end
 
-  def build_submitted_contents_item_form(cocina_object:)
-    ContentsItemForm.build_from_cocina_object(cocina_object).tap { |form| form.update(contents_item_form_params) }
+  def build_submitted_contents_item_form(cocina_object:, content:)
+    ContentsItemForm.build_from_cocina_object(cocina_object).tap do |form|
+      form.update(contents_item_form_params)
+      form.content = content
+    end
   end
 
   def contents_item_form_params

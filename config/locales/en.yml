@@ -119,6 +119,10 @@ en:
         use_and_reproduction_statement:
           label: "Default use and reproduction"
     contents:
+      fields:
+        content:
+          validations:
+            invalid: "Content errors must be fixed."
       edit:
         files_section:
           label: 'Files'

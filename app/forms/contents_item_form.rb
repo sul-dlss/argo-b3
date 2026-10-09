@@ -11,6 +11,9 @@ class ContentsItemForm < CocinaModels::Dro
   # these still issues a Cocina update that is a no-op.
   attribute :run_ocr, :boolean, default: false
 
+  # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
+  attr_accessor :content
+
   # The disabled viewing direction select is not submitted, so a previous viewing direction is retained
   # when changing to a content type that does not have viewing directions.
   before_validation :clear_viewing_direction, unless: lambda {
@@ -24,6 +27,9 @@ class ContentsItemForm < CocinaModels::Dro
   before_validation :clear_text_extraction_languages, unless: :run_ocr
 
   validates :text_extraction_languages, presence: true, if: :run_ocr
+  # Only depositing requires the structure (content) to be valid for the content type.
+  # The content errors themselves are shown by the structure validation frame.
+  validate :content_valid_for_content_type, on: :deposit
 
   def self.permitted_params
     [:content_type, :viewing_direction, :run_ocr, { text_extraction_languages: [] }]
@@ -49,5 +55,11 @@ class ContentsItemForm < CocinaModels::Dro
 
   def clear_text_extraction_languages
     self.text_extraction_languages = []
+  end
+
+  def content_valid_for_content_type
+    return if Contents::Validator.call(content:, cocina_object: previous_cocina_object, content_type:).valid?
+
+    errors.add(:content, I18n.t('edit.contents.fields.content.validations.invalid'))
   end
 end

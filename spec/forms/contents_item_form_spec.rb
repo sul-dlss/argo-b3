@@ -104,4 +104,38 @@ RSpec.describe ContentsItemForm do
       expect(contents_item_form.errors[:viewing_direction]).to be_present
     end
   end
+
+  context 'with content that is invalid for the content type' do
+    # A dark object's content errors are only warnings.
+    let(:cocina_object) do
+      build(:dro_with_metadata, type: Cocina::Models::ObjectType.book).new(access: { view: 'world', download: 'world' })
+    end
+    let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+    before do
+      # Published files in a file resource are an error for a book.
+      create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
+                            publish: true)
+      contents_item_form.content = content
+    end
+
+    it 'is not valid when depositing' do
+      expect(contents_item_form.valid?(:deposit)).to be false
+      expect(contents_item_form.errors[:content]).to eq(['Content errors must be fixed.'])
+    end
+
+    it 'is valid when not depositing' do
+      expect(contents_item_form).to be_valid
+    end
+
+    it 'is valid when depositing as a content type for which the content is valid' do
+      contents_item_form.update(content_type: Cocina::Models::ObjectType.object)
+
+      expect(contents_item_form.valid?(:deposit)).to be true
+    end
+
+    it 'is not changed by setting the content' do
+      expect(contents_item_form).not_to be_changed
+    end
+  end
 end
