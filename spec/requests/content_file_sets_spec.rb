@@ -14,12 +14,33 @@ RSpec.describe 'Content file sets' do
     sign_in(create(:user))
   end
 
+  describe 'show' do
+    it 'does not reload the structure validation' do
+      get content_content_file_set_path(content_token, content_file_set, counter: 0)
+
+      expect(response.body).not_to include('data-controller="frame-reloader"')
+    end
+
+    context 'when the structure has just changed' do
+      it 'reloads the structure validation' do
+        get content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
+
+        expect(response.body).to include('data-controller="frame-reloader"')
+        expect(response.body).to include(
+          %(data-frame-reloader-reloadable-frame-outlet="#structure-validation_content_#{content.id}")
+        )
+      end
+    end
+  end
+
   describe 'update' do
     it 'updates the file set and redirects to show with a toast' do
       patch content_content_file_set_path(content_token, content_file_set, counter: 0),
             params: { content_file_set: { label: 'New label', file_set_type: 'image' } }
 
-      expect(response).to redirect_to(content_content_file_set_path(content_token, content_file_set, counter: 0))
+      expect(response).to redirect_to(
+        content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
+      )
       expect(flash[:toast]).to eq('Resource updated')
       content_file_set.reload
       expect(content_file_set.label).to eq('New label')
@@ -39,7 +60,9 @@ RSpec.describe 'Content file sets' do
                                                                                  download: 'stanford',
                                                                                  administrative: 'preserve_only' } } } }
 
-        expect(response).to redirect_to(content_content_file_set_path(content_token, content_file_set, counter: 0))
+        expect(response).to redirect_to(
+          content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
+        )
         expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford',
                                                        publish: false, preserve: true, shelve: false)
       end
@@ -103,10 +126,11 @@ RSpec.describe 'Content file sets' do
               params: destroy_params
 
         expect(response).to redirect_to(
-          content_content_file_set_path(content_token, content_file_set, counter: 0, files_deleted: true)
+          content_content_file_set_path(content_token, content_file_set, counter: 0, files_deleted: true,
+                                                                         structure_changed: true)
         )
         follow_redirect!
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
       end
     end
 
@@ -122,7 +146,7 @@ RSpec.describe 'Content file sets' do
         expect(response.body).to include(
           %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
         )
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
         expect(response.body).to include('Resource deleted')
         expect(ContentFileSet.exists?(content_file_set.id)).to be false
       end
@@ -142,7 +166,7 @@ RSpec.describe 'Content file sets' do
       expect(response.body).to include(
         %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
       )
-      expect(response.body).to include('data-controller="dropzone-files-reload"')
+      expect(response.body).to include('data-controller="frame-reloader"')
       expect(response.body).to include('Resource deleted')
       expect(ContentFileSet.exists?(content_file_set.id)).to be false
     end

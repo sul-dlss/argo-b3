@@ -3,7 +3,7 @@ import Dropzone from 'dropzone'
 
 // Copied from H3
 export default class extends Controller {
-  static outlets = ['dropzone-files', 'sdr-tab-error', 'form-error', 'disableable']
+  static outlets = ['reloadable-frame', 'sdr-tab-error', 'form-error', 'disableable']
   static targets = ['progress', 'error', 'folderAlert', 'folderAlertText']
   static values = {
     maxFilesize: Number,
@@ -54,8 +54,8 @@ export default class extends Controller {
       this.dropzone.element.classList.remove('dz-started')
       this.progressTarget.classList.add('d-none')
       this.updateProgress(0, true)
-      // Reload the files section to show the newly uploaded files.
-      this.dropzoneFilesOutlets.forEach(dropzoneFiles => dropzoneFiles.reload())
+      // Reload the files sections (reloadable-frame outlets) to show the newly uploaded files.
+      this.reloadableFrameOutlets.forEach(reloadableFrame => reloadableFrame.reload())
       if (this.hasSdrTabErrorOutlet) this.sdrTabErrorOutlet.clearInvalidStatus('files')
       if (this.hasFormErrorOutlet) this.formErrorOutlet.changedFiles()
       this.disableableOutlets.forEach(disableable => disableable.enable())

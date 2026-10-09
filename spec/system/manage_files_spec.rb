@@ -266,6 +266,41 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when depositing a book whose content is invalid for a book' do
+    # A dark object's content errors are only warnings.
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+        .new(access: { view: 'world', download: 'world' })
+    end
+
+    it 'shows the content errors on the structure tab and does not deposit' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+
+      # Published files in a file resource are an error for a book.
+      click_link('Edit resource 1')
+      select 'file', from: 'Resource type'
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource updated')
+      expect(page).to have_css('.alert-danger', text: 'Content errors')
+
+      click_on 'Deposit'
+      click_button('Deposit')
+
+      expect(page).to have_css('#structural-tab.active.is-invalid')
+      expect(page).to have_css('.invalid-feedback', text: 'Content errors must be fixed.')
+      expect(page).to have_css('.alert-danger', text: 'Content errors')
+      expect(StageFilesJob).not_to have_received(:perform_later)
+    end
+  end
+
   context 'when the structure has been built and another file is uploaded' do
     let(:content) { Content.find_by!(druid:) }
 

@@ -96,6 +96,56 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when the content is invalid for the saved content type' do
+      # A dark object's content errors are only warnings.
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+          .new(access: { view: 'world', download: 'world' })
+      end
+
+      before do
+        # Published files in a file resource are an error for a book.
+        create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
+                              publish: true)
+      end
+
+      context 'when depositing' do
+        it 'renders the edit page with an error' do
+          patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                               contents_item: { content_type: Cocina::Models::ObjectType.book } }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          # Marked invalid so that the structure tab is shown (by the sdr-tab-error controller).
+          expect(Capybara.string(response.body))
+            .to have_css('#structural-pane .is-invalid', text: 'Content errors must be fixed.')
+          expect(Sdr::Repository).not_to have_received(:update)
+          expect(StageFilesJob).not_to have_received(:perform_later)
+        end
+      end
+
+      context 'when saving as draft' do
+        it 'stages without accessioning' do
+          patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                               contents_item: { content_type: Cocina::Models::ObjectType.book } }
+
+          expect(response).to redirect_to(object_path(druid))
+          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
+                                                                      workflow_context: {})
+        end
+      end
+
+      context 'when depositing with a content type for which the content is valid' do
+        it 'stages with accessioning' do
+          patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                               contents_item: { content_type: Cocina::Models::ObjectType.object } }
+
+          expect(response).to redirect_to(object_path(druid))
+          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                      workflow_context: {})
+        end
+      end
+    end
+
     context 'when the object has changed since the edit page was loaded' do
       let!(:content) { create(:content, druid:, lock: 'stale-lock', immutable: false) }
 
