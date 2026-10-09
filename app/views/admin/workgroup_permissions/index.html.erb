@@ -6,7 +6,7 @@
     <%= table.with_header(label: 'Number of permissions') %>
     <%= table.with_header(label: 'Read unrestricted') %>
     <% @workgroup_results.each do |workgroup_result| %>
-      <%= table.with_row(first_value: workgroup_result.workgroup,
+      <%= table.with_row(first_value: link_to(workgroup_result.workgroup, edit_admin_workgroup_permission_path(workgroup_result.workgroup)),
                          values: [workgroup_result.permission_count, workgroup_result.read_unrestricted ? 'Yes' : 'No']) %>
     <% end %>
   <% end %>

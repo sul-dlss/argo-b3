@@ -364,3 +364,9 @@ en:
       start: "You are now impersonating the selected workgroups."
       stop: "You have stopped impersonating."
       invalid: "You must select workgroups to enable impersonation."
+    workgroup_permissions:
+      buttons:
+        delete: 'Delete permission for %{target}'
+      toasts:
+        updated: 'Permission updated'
+        deleted: 'Permission deleted'

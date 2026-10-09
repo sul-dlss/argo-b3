@@ -238,7 +238,8 @@ Rails.application.routes.draw do
     get 'impersonate', to: 'impersonation#edit'
     patch 'impersonate', to: 'impersonation#update'
     delete 'impersonate', to: 'impersonation#destroy', as: :stop_impersonate
-    resources :workgroup_permissions, only: %i[index]
+    resources :workgroup_permissions, only: %i[index edit update], param: :workgroup
+    resources :permissions, only: %i[destroy], controller: 'workgroup_permissions'
   end
 
   mount MissionControl::Jobs::Engine, at: '/jobs'
