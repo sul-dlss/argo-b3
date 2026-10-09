@@ -327,11 +327,11 @@ RSpec.describe 'Create an item' do
 
       expect(Sdr::Repository).to have_received(:register) do |args|
         access = args[:request_cocina_object].access
-        expect(access.view).to eq('stanford')
-        expect(access.download).to eq('stanford')
+        expect(access.view).to eq('dark')
+        expect(access.download).to eq('none')
         expect(access.embargo.releaseDate).to eq(DateTime.parse('2040-06-01'))
-        expect(access.embargo.view).to eq('dark')
-        expect(access.embargo.download).to eq('none')
+        expect(access.embargo.view).to eq('stanford')
+        expect(access.embargo.download).to eq('stanford')
       end
     end
 

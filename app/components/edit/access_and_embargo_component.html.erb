@@ -29,14 +29,15 @@
                                                                   input_type: 'date') %>
     <% end %>
 
+    <%# The object's access applies during the embargo; the embargo's access replaces it when the embargo is released. %>
     <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings during embargo',
                                                                classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field') %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
     <% end %>
 
     <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings once embargo ends',
                                                                classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field') %>
     <% end %>
   </div>
 </div>
