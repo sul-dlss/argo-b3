@@ -274,6 +274,8 @@ Each `ContentFileBinary` records where its physical file is located (`file_locat
 
 Files are added to a mutable `Content` as unassociated binaries, either by upload or by **discovery** (`DiscoverFilesJob` recursively lists the files in a directory on a mount). Ignored files (e.g., `.DS_Store`) never become binaries. The `Contents::Populators` then structure the unassociated binaries into file sets and files, using a strategy appropriate to the content type (e.g., for a book, files that share a filename apart from the extension, such as the image and OCR for a page, are grouped into one file set). `Contents::PopulatorSelector` picks the populator and falls back to one file set per file when the content type's populator cannot handle the files.
 
+**Content type validation** (`Contents::Validator`) checks whether a `Content`'s structure suits the item's content type, so that a deposited item won't break the embed viewer (e.g., for a book, each `page` resource may publish only one JP2 plus its OCR files). Each content type has its own validator (content types without one are not validated), and a result has **errors**, which block deposit, and **warnings**, which don't (e.g., no resource has an image the viewer can display).
+
 **Staging** (`StageFilesJob`) deposits a mutable `Content`. It mints identifiers for new file sets and files, computes digests / size / mime type, copies the files to the staging location, and updates the cocina object's structural metadata. It then marks the `Content` as immutable for the new lock and optionally starts accessioning. Discovery and staging run in the background, and `Content` tracks their progress with state machines so the UI can reflect them.
 
 ## Discovery
