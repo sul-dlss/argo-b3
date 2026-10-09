@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Dashboard' do
   let(:user) { create(:user) }
   let(:druid) { 'druid:bc123df4567' }
+  let(:rendered_page) { Capybara.string(response.body) }
 
   context 'when unauthenticated' do
     it 'redirects to login' do
@@ -86,8 +87,65 @@ RSpec.describe 'Dashboard' do
     end
   end
 
+  describe 'Register and deposit sections' do
+    context 'when signed in as a regular user' do
+      before do
+        sign_in(user)
+        get root_path
+      end
+
+      it 'renders the sections and tables with disabled register buttons' do
+        expect(rendered_page).to have_css('h1', text: 'Argo dashboard')
+
+        expect(rendered_page).to have_css('h2', text: 'Register & deposit single object')
+        expect(rendered_page).to have_button('Item', class: 'disabled')
+        expect(rendered_page).to have_button('APO', class: 'disabled')
+
+        expect(rendered_page).to have_css('h2', text: 'Register or deposit multiple items')
+        expect(rendered_page).to have_button('Register multiple items')
+        expect(rendered_page).to have_css('a.disabled', exact_text: 'Register multiple items')
+
+        expect(rendered_page).to have_css('table[aria-label="Recent objects"]')
+        expect(rendered_page).to have_css('table[aria-label="Pinned searches"]')
+        expect(rendered_page).to have_css('table[aria-label="Pinned items"]')
+        expect(rendered_page).to have_css('table[aria-label="Pinned collections"]')
+        expect(rendered_page).to have_css('table[aria-label="Pinned APOs"]')
+        expect(rendered_page).to have_css('table[aria-label="Pinned virtual objects"]')
+      end
+    end
+
+    context 'when signed in as a user with edit permission' do
+      let(:workgroup) { 'sdr:test-workgroup' }
+
+      before do
+        create(:permission, :edit, workgroup:)
+        sign_in(create(:user, groups: [workgroup]))
+        get root_path
+      end
+
+      it 'enables the Item and Register multiple items buttons' do
+        expect(rendered_page).to have_link('Item', href: new_item_path)
+        expect(rendered_page).to have_no_css('a.disabled', text: 'Item')
+
+        expect(rendered_page).to have_link('Register multiple items', href: new_multiple_item_path)
+        expect(rendered_page).to have_no_css('a.disabled', exact_text: 'Register multiple items')
+      end
+    end
+
+    context 'when signed in as an admin user' do
+      before do
+        sign_in(create(:user, :admin))
+        get root_path
+      end
+
+      it 'enables the APO button' do
+        expect(rendered_page).to have_link('APO', href: new_apo_path)
+        expect(rendered_page).to have_no_css('a.disabled', exact_text: 'APO')
+      end
+    end
+  end
+
   describe 'Admin section' do
-    let(:rendered_page) { Capybara.string(response.body) }
     let(:admin_section) { rendered_page.find('h2', exact_text: 'Admin').find(:xpath, '..') }
 
     context 'when signed in as an admin who is not impersonating' do
