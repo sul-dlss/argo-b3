@@ -11,7 +11,7 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:workflow_errors) { [] }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, accessioning?: accessioning, closed?: closed)
+    instance_double(Sdr::VersionService, assembling?: false, accessioning?: accessioning, closed?: closed)
   end
   let(:closed) { false }
   let(:accessioning) { false }
@@ -85,6 +85,19 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Staging files')
+    end
+  end
+
+  context 'when the content failed staging' do
+    let(:content) { build(:content, staging_state: 'staging_failed') }
+
+    it 'renders the staging failed status with the support email' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Staging failed')
+      expect(page).to have_css('h2 i.bi-exclamation-triangle-fill')
+      expect(page).to have_text("Files could not be staged. Contact SDR support at #{Settings.support_email}")
+      expect(page).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
     end
   end
 end

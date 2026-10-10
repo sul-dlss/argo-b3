@@ -16,11 +16,10 @@ class ObjectStatusPresenter
     # is in draft.
     # Thus, the order of these statements is potentially significant.
     return :staging if content&.staging?
+    return :staging_failed if content&.staging_failed?
     return :error if workflow_errors.present?
-    return :depositing if version_service.accessioning?
-    return :deposited if version_service.closed?
 
-    :draft
+    version_status
   end
 
   def workflow_error_messages
@@ -30,6 +29,14 @@ class ObjectStatusPresenter
   private
 
   attr_reader :document, :version_service, :content
+
+  def version_status
+    return :assembling if version_service.assembling?
+    return :depositing if version_service.accessioning?
+    return :deposited if version_service.closed?
+
+    :draft
+  end
 
   # See https://github.com/sul-dlss/argo/blob/main/app/helpers/value_helper.rb#L6-L9
   def format_workflow_error(workflow_error)

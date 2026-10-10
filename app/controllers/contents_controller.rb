@@ -53,9 +53,16 @@ class ContentsController < ContentsApplicationController
     # Saving changes the lock, which staging checks against the content's lock.
     content.update!(lock: @contents_item_form.previous_cocina_object.lock)
 
+    clear_other_staging_failures(content:)
     content.staging_started!
     StageFilesJob.perform_later(content:, accession: params[:commit] == ContentsController::DEPOSIT_VALUE,
                                 user: current_user, workflow_context: @contents_item_form.workflow_context)
+  end
+
+  # A failure for another Content (e.g., one for an earlier lock) is superseded by this staging.
+  def clear_other_staging_failures(content:)
+    Content.where(druid: content.druid).where.not(id: content.id).with_staging_state(:staging_failed)
+           .find_each(&:staging_failure_cleared!)
   end
 
   def set_edit_form(cocina_object:, content:)
