@@ -16,7 +16,8 @@ RSpec.describe 'Show APO' do
   # Versions are tested in show_dro_spec so returning [].
 
   let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: true,
+                                                                         closed?: true)
   end
   let(:object_counts) do
     Searchers::AdminPolicyObjectCounts::Result.new(item_count: 12, collection_count: 12)

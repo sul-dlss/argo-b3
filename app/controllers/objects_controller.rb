@@ -38,7 +38,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     set_search_navigation
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
-    content = Content.find_by(druid:, lock:, immutable: false)
+    content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:,
                                                          content:)
     release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []

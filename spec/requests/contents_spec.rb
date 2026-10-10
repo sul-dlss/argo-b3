@@ -34,6 +34,38 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when the content previously failed staging' do
+      let!(:content) do
+        create(:content, druid:, lock: cocina_object.lock, immutable: false, staging_state: 'staging_failed')
+      end
+
+      it 'stages again' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(content.reload.staging_state).to eq('staging')
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                    workflow_context: {})
+      end
+    end
+
+    context 'when other content failed staging' do
+      let!(:failed_content) { create(:content, druid:, lock: 'earlier-lock', staging_state: 'staging_failed') }
+      let!(:other_object_failed_content) do
+        create(:content, druid: 'druid:df123bc4589', lock: 'earlier-lock', staging_state: 'staging_failed')
+      end
+
+      it 'clears the failure for the object only' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(failed_content.reload.staging_state).to eq('staging_not_in_progress')
+        expect(other_object_failed_content.reload.staging_state).to eq('staging_failed')
+        expect(content.reload.staging_state).to eq('staging')
+      end
+    end
+
     context 'when saving as draft' do
       it 'stages without accessioning' do
         patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,

@@ -33,7 +33,8 @@ RSpec.describe 'Dashboard' do
         ]
       end
       let(:version_service) do
-        instance_double(Sdr::VersionService, accessioning?: false, closed?: false, open?: true, version: 1)
+        instance_double(Sdr::VersionService, assembling?: false, accessioning?: false, closed?: false, open?: true,
+                                             version: 1)
       end
       let(:solr_doc_for) do
         lambda do |object_druid|

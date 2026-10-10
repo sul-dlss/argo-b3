@@ -32,6 +32,23 @@ RSpec.describe ObjectStatusPresenter do
       end
     end
 
+    context 'when the content failed staging' do
+      let(:content) { build(:content, staging_state: 'staging_failed') }
+
+      it 'returns staging_failed' do
+        expect(presenter.status).to eq(:staging_failed)
+      end
+    end
+
+    context 'when the content failed staging and there are workflow errors' do
+      let(:content) { build(:content, staging_state: 'staging_failed') }
+      let(:workflow_errors) { ['accessionWF:end-accession:Object cannot be OCRd'] }
+
+      it 'returns staging_failed' do
+        expect(presenter.status).to eq(:staging_failed)
+      end
+    end
+
     context 'when the content is staging and there are workflow errors' do
       let(:content) { build(:content, staging_state: 'staging') }
       let(:workflow_errors) { ['accessionWF:end-accession:Object cannot be OCRd'] }
@@ -52,8 +69,8 @@ RSpec.describe ObjectStatusPresenter do
     context 'when the version is assembling' do
       let(:assembling) { true }
 
-      it 'returns depositing' do
-        expect(presenter.status).to eq(:depositing)
+      it 'returns assembling' do
+        expect(presenter.status).to eq(:assembling)
       end
     end
 

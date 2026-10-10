@@ -12,6 +12,8 @@ reload_intervals:
 argo:
   url: https://argo.stanford.edu
 
+support_email: argo-feedback@lists.stanford.edu
+
 dor_services:
   url: "http://localhost:3003"
   # To generate the token: docker-compose run dor-services-app rake generate_token
