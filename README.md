@@ -276,6 +276,8 @@ Files are added to a mutable `Content` as unassociated binaries, either by uploa
 
 **Staging** (`StageFilesJob`) deposits a mutable `Content`. It mints identifiers for new file sets and files, computes digests / size / mime type, copies the files to the staging location, and updates the cocina object's structural metadata. It then marks the `Content` as immutable for the new lock and optionally starts accessioning. Discovery and staging run in the background, and `Content` tracks their progress with state machines so the UI can reflect them.
 
+Since a `Content` is only ever used for the cocina object's current lock, `Content`s for a lock that is no longer current are deleted by a daily scheduled job (`ContentCleanupJob`, configured in `config/recurring.yml`) once they are a few days old.
+
 ## Discovery
 
 Search results are restricted to objects readable by the current user's effective workgroups (logged in or impersonated).`Permissions::UserScope` resolves permissions from PostgreSQL, and `Search::PermissionFilter` constructs a Solr filter over the object ID, collection IDs, and APO ID using the same rules as `ObjectPolicy#show?`.
