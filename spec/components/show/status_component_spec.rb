@@ -11,10 +11,11 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:workflow_errors) { [] }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, accessioning?: accessioning, closed?: closed)
+    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed)
   end
   let(:closed) { false }
   let(:accessioning) { false }
+  let(:assembling) { false }
   let(:content) { nil }
 
   context 'when the version is open' do
@@ -54,6 +55,17 @@ RSpec.describe Show::StatusComponent, type: :component do
     end
   end
 
+  context 'when the version is assembling' do
+    let(:assembling) { true }
+
+    it 'renders the assembling status' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Assembling...')
+      expect(page).to have_text('Actions unavailable until deposit is complete.')
+    end
+  end
+
   context 'when there are workflow errors' do
     let(:workflow_errors) { ['accessionWF:end-accession:Object cannot be OCRd'] }
 
@@ -85,6 +97,20 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Staging files')
+      expect(page).to have_text('Actions unavailable until deposit is complete.')
+    end
+  end
+
+  context 'when the content failed staging' do
+    let(:content) { build(:content, staging_state: 'staging_failed') }
+
+    it 'renders the staging failed status with the support email' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Staging failed')
+      expect(page).to have_css('h2 i.bi-exclamation-triangle-fill')
+      expect(page).to have_text("Files could not be staged. Contact SDR support at #{Settings.support_email}")
+      expect(page).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
     end
   end
 end

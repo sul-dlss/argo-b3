@@ -31,6 +31,8 @@ class StageFilesJob < ApplicationJob
     content.staging_completed!
 
     perform_broadcast
+  rescue StandardError => e
+    handle_failure(error: e, content:, user:)
   end
 
   attr_reader :content, :user
@@ -81,5 +83,17 @@ class StageFilesJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_refresh_to('objects', druid)
 
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_completed'), user:, disappearing: true)
+  end
+
+  # Uses the arguments passed to #perform, since the failure may have happened before they were assigned.
+  def handle_failure(error:, content:, user:)
+    Rails.logger.error(error.full_message)
+    Honeybadger.notify(error)
+
+    content.staging_errored! if content.staging?
+    Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
+    broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'),
+                    text: I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email),
+                    user:, disappearing: false, variant: :red)
   end
 end

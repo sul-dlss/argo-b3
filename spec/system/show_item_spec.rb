@@ -22,8 +22,8 @@ RSpec.describe 'Show item' do
   end
 
   let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: false, closed?: true,
-                                                                         version: 2)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
+                                                                         closed?: true, version: 2)
   end
   let(:milestone_date) { true }
   let(:version_inventory) do

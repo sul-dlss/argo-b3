@@ -53,6 +53,7 @@ class ContentsController < ContentsApplicationController
     # Saving changes the lock, which staging checks against the content's lock.
     content.update!(lock: @contents_item_form.previous_cocina_object.lock)
 
+    content.clear_other_staging_failures!
     content.staging_started!
     StageFilesJob.perform_later(content:, accession: params[:commit] == ContentsController::DEPOSIT_VALUE,
                                 user: current_user, workflow_context: @contents_item_form.workflow_context)
