@@ -19,7 +19,7 @@ RSpec.describe 'Content file binaries' do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq('text/vnd.turbo-stream.html')
       expect(response.body).to include(%(<turbo-stream action="append" target="show_content_#{content.id}">))
-      expect(response.body).to include('data-controller="dropzone-files-reload"')
+      expect(response.body).to include('data-controller="frame-reloader"')
       expect(response.body).to include('File deleted')
       expect(ContentFileBinary.exists?(content_file_binary.id)).to be false
     end
@@ -44,7 +44,7 @@ RSpec.describe 'Content file binaries' do
 
         expect(response).to have_http_status(:conflict)
         expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
         expect(response.body).not_to include('File deleted')
         expect(ContentFileBinary.exists?(content_file_binary.id)).to be true
       end

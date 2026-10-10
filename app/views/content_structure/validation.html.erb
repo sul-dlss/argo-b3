@@ -1,0 +1,3 @@
+<%= turbo_frame_tag @content, 'structure-validation' do %>
+  <%= render Item::ContentValidationAlertsComponent.new(content_validation_result: @content_validation_result) %>
+<% end %>

@@ -6,7 +6,7 @@ class ContentStructureController < ContentsApplicationController
   APPEND_VALUE = 'append'
   CSV_VALUE = 'csv'
 
-  skip_verify_authorized only: %i[edit update csv]
+  skip_verify_authorized only: %i[edit update csv validation]
   before_action :set_content_and_cocina_object
 
   def edit
@@ -36,6 +36,16 @@ class ContentStructureController < ContentsApplicationController
   def csv
     send_data StructuralCsv::Export.as_csv(content: @content),
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(@content.druid)}_structural.csv"
+  end
+
+  # Validates the current (possibly in-progress) structure against the selected content type.
+  # This is a separate frame so that it can be reloaded when a resource changes without reloading the structure,
+  # which may contain resources that are being edited.
+  def validation
+    @content_validation_result = Contents::Validator.call(content: @content, cocina_object: @cocina_object,
+                                                          content_type: params[:content_type])
+
+    render layout: false
   end
 
   private

@@ -88,6 +88,21 @@ RSpec.describe 'Show structure' do
       expect(response.body).to include('folder1/bc123df4567_0001.tiff')
     end
 
+    context 'when the content is invalid for the content type' do
+      # Published files in a file resource are an error for a book.
+      let(:cocina_object) do
+        Cocina::Models.with_metadata(Cocina::Models.build(cocina_hash.merge(type: Cocina::Models::ObjectType.book)),
+                                     'abc123')
+      end
+
+      it 'renders the content errors after the heading' do
+        get "/objects/#{token}/structure"
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to match(/Structural metadata.*Content errors.*Resource 1 \(Image 1\) has published/m)
+      end
+    end
+
     it 'raises when token verification fails' do
       get "/objects/#{invalid_token}/structure"
 

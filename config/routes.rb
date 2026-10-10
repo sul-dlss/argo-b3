@@ -218,6 +218,7 @@ Rails.application.routes.draw do
     resource :mount, only: %i[new create show], controller: 'content_mount'
     resource :structure, only: %i[edit update], controller: 'content_structure' do
       get 'csv'
+      get 'validation'
     end
 
     resources :content_file_sets, only: %i[edit update show destroy]

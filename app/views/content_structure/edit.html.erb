@@ -2,7 +2,7 @@
   <%= render Elements::FlashToastComponent.new %>
   <% if @structure_changed %>
     <%# The files section depends on the structure (e.g., which resources deleting a file would also delete). %>
-    <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: "##{dom_id(@content, :show)}" } %>
+    <%= tag.div data: { controller: 'frame-reloader', frame_reloader_reloadable_frame_outlet: "##{dom_id(@content, :show)}" } %>
   <% end %>
 
   <% if @content.content_file_binaries.none? %>
@@ -40,6 +40,8 @@
                                                                           variant: :'outline-primary') %>
         <% end %>
       </div>
+      <%# Reloaded when a resource changes (see content_file_sets/show). %>
+      <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token, content_type: @content_type), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
 
       <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3' do |form| %>
         <%= hidden_field_tag :content_type, @content_type %>
