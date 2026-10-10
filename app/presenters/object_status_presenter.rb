@@ -17,7 +17,8 @@ class ObjectStatusPresenter
     # Thus, the order of these statements is potentially significant.
     return :staging if content&.staging?
     return :error if workflow_errors.present?
-    return :depositing if version_service.assembling? || version_service.accessioning?
+    return :assembling if version_service.assembling?
+    return :depositing if version_service.accessioning?
     return :deposited if version_service.closed?
 
     :draft

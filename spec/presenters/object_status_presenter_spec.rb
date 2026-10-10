@@ -10,9 +10,10 @@ RSpec.describe ObjectStatusPresenter do
   let(:workflow_errors) { [] }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, accessioning?: accessioning, closed?: closed)
+    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed)
   end
   let(:closed) { false }
+  let(:assembling) { false }
   let(:accessioning) { false }
   let(:content) { nil }
 
@@ -45,6 +46,14 @@ RSpec.describe ObjectStatusPresenter do
 
       it 'returns deposited' do
         expect(presenter.status).to eq(:deposited)
+      end
+    end
+
+    context 'when the version is assembling' do
+      let(:assembling) { true }
+
+      it 'returns depositing' do
+        expect(presenter.status).to eq(:depositing)
       end
     end
 

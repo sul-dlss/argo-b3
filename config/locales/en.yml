@@ -68,6 +68,8 @@ en:
     label: "Search results"
   show:
     status:
+      assembling:
+        heading: "Assembling..."
       deposited:
         heading: "Deposited"
       draft:
