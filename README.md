@@ -114,6 +114,19 @@ Note:
 * `/workspace/bulk` and `/var/log/argo` are shared with the containers.
 * The docker image is built on the stage server (AMD64) for all environments to avoid emulation on the developer Mac. Sharing one builder keeps its layer cache warm across environments.
 
+### Adding a secret
+
+Secrets are stored in Vault and provided to the containers as environment variables. Settings secrets are named `SETTINGS__<SECTION>__<KEY>` (e.g., `SETTINGS__TECH_MD_SERVICE__TOKEN` overrides `Settings.tech_md_service.token`).
+
+To add a secret:
+
+1. Add the secret to Vault (as the `content` field), e.g., `vault kv put puppet/application/argo-b3/qa/my-secret content=...`.
+   * For a secret that varies by environment, add one per destination at `puppet/application/argo-b3/<qa|stage|prod>/<secret-name>`.
+   * For a secret shared by all environments, add it at `puppet/application/argo-b3/<secret-name>`.
+2. Add the environment variable to `env.secret` in `config/deploy.yml`.
+3. Add `NAME=${NAME}` to `.kamal/secrets-common`.
+4. Add the environment variable to `REQUIRED_DEPLOY_SECRETS` and its Vault path to `vault_secret_path` in `bin/kamal-otk` (for local deploys).
+5. Add the environment variable to `secrets` in `Jenkinsfile` (for continuous deployment to stage). Use the stage path, omitting the `puppet/` prefix (e.g., `application/argo-b3/stage/<secret-name>`).
 
 ### Deploy
 
