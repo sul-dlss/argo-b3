@@ -70,12 +70,12 @@ RSpec.describe 'Admin workgroup permissions' do
         get edit_admin_workgroup_permission_path('sdr:alpha')
       end
 
-      it 'renders the workgroup, the read unrestricted toggle, and the other permissions table' do
+      it 'renders the workgroup, the read unrestricted toggle, and the additional permissions table' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'sdr:alpha')
         expect(rendered_page).to have_checked_field('Yes')
 
-        rows = rendered_page.all('#other-permissions-table tbody tr')
+        rows = rendered_page.all('#additional-permissions-table tbody tr')
         expect(rows.map { |row| row.all('td')[0..3].map { |cell| cell.text.strip } }).to eq(
           [['Restricted collection', 'druid:bc123df4567', 'Collection', 'Read restricted']]
         )
@@ -130,6 +130,22 @@ RSpec.describe 'Admin workgroup permissions' do
           expect(flash[:toast]).to eq('Permission updated')
           expect(Permission.permission_type_read_unrestricted.find_by(workgroup: 'sdr:alpha',
                                                                       target_druid: nil)).to be_nil
+        end
+      end
+
+      context 'when the form cannot be saved' do
+        before do
+          allow(Admin::WorkgroupPermissionForm).to receive(:for_workgroup).and_wrap_original do |original, workgroup|
+            original.call(workgroup).tap { |form| allow(form).to receive(:save).and_return(false) }
+          end
+        end
+
+        it 're-renders the edit page with an unprocessable content status' do
+          patch admin_workgroup_permission_path('sdr:alpha'),
+                params: { admin_workgroup_permission: { read_unrestricted: true } }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include('Return to all workgroups')
         end
       end
     end

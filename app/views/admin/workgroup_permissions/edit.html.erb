@@ -25,14 +25,14 @@
 
   <hr class="my-4">
 
-  <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Other permissions', show_label: false, variant: :h3,
-                                                           id: 'other-permissions-table', empty_message: 'No other permissions.') do |table| %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Additional permissions', show_label: false, variant: :h3,
+                                                           id: 'additional-permissions-table', empty_message: 'No additional permissions.') do |table| %>
     <%= table.with_header(label: 'Title') %>
     <%= table.with_header(label: 'Druid') %>
     <%= table.with_header(label: 'Object type') %>
     <%= table.with_header(label: 'Permission') %>
     <%= table.with_header(label: '') %>
-    <% @other_permissions.each do |permission| %>
+    <% @additional_permissions.each do |permission| %>
       <% object_doc = @object_docs_by_druid[permission.target_druid] %>
       <% table.with_row(id: dom_id(permission)) do |row| %>
         <% row.with_cell do %><%= object_doc ? link_to_object(object_doc.title, object_doc.druid) : permission.target_druid %><% end %>
