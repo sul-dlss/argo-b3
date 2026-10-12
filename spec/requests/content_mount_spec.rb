@@ -16,14 +16,14 @@ RSpec.describe 'Content mount' do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Mount path')
-      expect(response.body).not_to include('data-controller="dropzone-files-reload"')
+      expect(response.body).not_to include('data-controller="frame-reloader"')
     end
 
     context 'when files have just been discovered' do
       it 'renders the reload of the files sections' do
         get new_content_mount_path(content_id: content_token, files_discovered: true)
 
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
       end
     end
   end
@@ -67,14 +67,14 @@ RSpec.describe 'Content mount' do
         expect(response.body).to include('Discovering files...')
         expect(response.body).to include('data-controller="frame-reload"')
         expect(response.body).to include(%(data-frame-reload-url-value="/contents/#{content_token}/mount"))
-        expect(response.body).not_to include('data-controller="dropzone-files-reload"')
+        expect(response.body).not_to include('data-controller="frame-reloader"')
       end
 
       context 'when discovery has just started' do
         it 'renders the reload of the files sections' do
           get content_mount_path(content_id: content_token, discovery_started: true)
 
-          expect(response.body).to include('data-controller="dropzone-files-reload"')
+          expect(response.body).to include('data-controller="frame-reloader"')
         end
       end
     end

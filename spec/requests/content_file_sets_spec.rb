@@ -106,7 +106,7 @@ RSpec.describe 'Content file sets' do
           content_content_file_set_path(content_token, content_file_set, counter: 0, files_deleted: true)
         )
         follow_redirect!
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
       end
     end
 
@@ -122,7 +122,7 @@ RSpec.describe 'Content file sets' do
         expect(response.body).to include(
           %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
         )
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
         expect(response.body).to include('Resource deleted')
         expect(ContentFileSet.exists?(content_file_set.id)).to be false
       end
@@ -142,7 +142,7 @@ RSpec.describe 'Content file sets' do
       expect(response.body).to include(
         %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
       )
-      expect(response.body).to include('data-controller="dropzone-files-reload"')
+      expect(response.body).to include('data-controller="frame-reloader"')
       expect(response.body).to include('Resource deleted')
       expect(ContentFileSet.exists?(content_file_set.id)).to be false
     end

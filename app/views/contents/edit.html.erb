@@ -61,7 +61,7 @@
                             data: {
                               controller: 'dropzone',
                               dropzone_max_filesize_value: Settings.file_upload.max_filesize,
-                              dropzone_dropzone_files_outlet: '.dropzone-files'
+                              dropzone_reloadable_frame_outlet: '.content-files-frame'
                             }, id: 'file-dropzone', class: 'dropzone my-fieldset' do %>
                 <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
                   <span data-dropzone-target="folderAlertText"></span>
@@ -102,14 +102,14 @@
 
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.edit.files_section.label')) %>
 
-        <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'dropzone-files' }, class: 'dropzone-files' do %>
+        <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'reloadable-frame' }, class: 'content-files-frame' do %>
           <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
         <% end %>
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
                                                                           label: t('edit.contents.tabs.structural.label'))) do %>
-        <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'dropzone-files', structure_content_type_target: 'frame' }, class: 'dropzone-files' do %>
+        <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
           <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <%# Until the structure section has loaded, assume there are unassociated files. %>
           <span hidden data-unassociated-files-target="unassociated"></span>

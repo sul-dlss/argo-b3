@@ -50,20 +50,16 @@ module Contents
         content.content_file_binaries.unassociated
       end
 
-      # The access attributes for a ContentFile, derived from the object's (possibly embargoed) access.
+      def default_file_access
+        @default_file_access ||= Contents::DefaultFileAccess.new(cocina_object:)
+      end
+
       def file_access_attributes
-        @file_access_attributes ||= begin
-          access = cocina_object.access.embargo.presence || cocina_object.access
-          {
-            view: access.view == 'citation-only' ? 'dark' : access.view,
-            download: access.download,
-            location: access.location
-          }
-        end
+        default_file_access.attributes
       end
 
       def dark?
-        file_access_attributes[:view] == 'dark'
+        default_file_access.dark?
       end
 
       # Labels are numbered per file set type, e.g., Page 1, Page 2, Object 1. When appending,

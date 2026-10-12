@@ -17,16 +17,16 @@ RSpec.describe 'Content structure' do
     it 'does not reload the files section' do
       get edit_content_structure_path(content_id: content_token)
 
-      expect(response.body).not_to include('data-controller="dropzone-files-reload"')
+      expect(response.body).not_to include('data-controller="frame-reloader"')
     end
 
     context 'when the structure has just changed' do
       it 'reloads the files section' do
         get edit_content_structure_path(content_id: content_token, structure_changed: true)
 
-        expect(response.body).to include('data-controller="dropzone-files-reload"')
+        expect(response.body).to include('data-controller="frame-reloader"')
         expect(response.body)
-          .to include(%(data-dropzone-files-reload-dropzone-files-outlet="#show_content_#{content.id}"))
+          .to include(%(data-frame-reloader-reloadable-frame-outlet="#show_content_#{content.id}"))
       end
     end
   end

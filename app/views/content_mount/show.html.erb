@@ -6,7 +6,7 @@
 <%= turbo_frame_tag @content, 'mount' do %>
   <% if @discovery_started %>
     <%# Reloading the files sections disables deleting files during discovery. %>
-    <%= tag.div data: { controller: 'dropzone-files-reload', dropzone_files_reload_dropzone_files_outlet: '.dropzone-files' } %>
+    <%= tag.div data: { controller: 'frame-reloader', frame_reloader_reloadable_frame_outlet: '.content-files-frame' } %>
   <% end %>
   <%# Reloading from the url (rather than the frame's src) drops discovery_started, so the files sections are only reloaded once. %>
   <%= tag.div data: { controller: 'frame-reload',
