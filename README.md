@@ -224,6 +224,9 @@ Solr document test fixtures can be created with the Solr factories. For example:
 let!(:solr_doc) { create(:solr_item) }
 ```
 
+### Request specs vs. system specs
+Prefer request specs, which are much faster than system specs. Reserve system specs for behavior that requires a browser, such as JavaScript (Stimulus controllers, lazy Turbo frames, auto-refresh) or file downloads. If a system spec does not need JavaScript (e.g., a multi-page flow), mark it `:rack_test`.
+
 ### Running tests in parallel
 [parallel_tests](https://github.com/grosser/parallel_tests) will significantly speed up running tests locally.
 
@@ -434,7 +437,7 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 4. Add the bulk action to the list of bulk actions in `views/bulk_actions/new.html.erb`.
 5. Add a controller for the bulk action that is a subclass of `BulkActionApplicationController`.
 6. Add a `new.html.erb` view.
-7. Add a system test. (The job can be stubbed out.)
+7. Add a request spec. For bulk actions that use `BulkActions::BasicForm` without additional fields, use the `'a simple bulk action controller'` shared examples (see for example, `spec/requests/bulk_actions/purge_spec.rb`). Add a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
 ## Conventions
 
