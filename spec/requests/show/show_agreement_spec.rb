@@ -42,13 +42,15 @@ RSpec.describe 'Show agreement' do
   end
 
   it 'displays the agreement' do
-    visit "/objects/#{druid}"
+    get "/objects/#{druid}"
 
-    expect(page).to have_css('h1', text: title)
-    expect(page).to have_css('.object-show.object-type-agreement .object-type-badge', text: 'AGREEMENT')
+    expect(response).to have_http_status(:ok)
+    rendered_page = Capybara.string(response.body)
+    expect(rendered_page).to have_css('h1', text: title)
+    expect(rendered_page).to have_css('.object-show.object-type-agreement .object-type-badge', text: /agreement/i)
 
     # No pin
-    expect(page).to have_no_css('.bi-pin')
-    expect(page).to have_no_css('.bi-pin-fill')
+    expect(rendered_page).to have_no_css('.bi-pin')
+    expect(rendered_page).to have_no_css('.bi-pin-fill')
   end
 end
