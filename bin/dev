@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-# Overmind refuses to start if .overmind.sock exists. If nothing is listening on
-# it, it is left over from an unclean exit, so remove it and carry on.
-if [ -S .overmind.sock ] && ! nc -z -U .overmind.sock 2>/dev/null; then
+# Overmind refuses to start if .overmind.sock exists. But if no overmind process is running from this
+# directory, the socket must be left over from an unclean exit, so just remove it and carry on.
+if [ -e .overmind.sock ] && ! lsof -a -c overmind -d cwd -Fn 2>/dev/null | grep -qx "n$PWD"; then
   echo "Removing stale .overmind.sock"
   rm -f .overmind.sock
 fi
