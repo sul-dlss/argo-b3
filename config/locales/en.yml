@@ -68,6 +68,8 @@ en:
     label: "Search results"
   show:
     status:
+      assembling:
+        heading: "Assembling..."
       deposited:
         heading: "Deposited"
       draft:
@@ -79,6 +81,9 @@ en:
         heading: "Error"
       staging:
         heading: "Staging files"
+      staging_failed:
+        heading: "Staging failed"
+        body_html: "Files could not be staged. Contact SDR support at %{email} for assistance."
       actions:
         edit_item: "Edit item"
         manage_files: "Manage files"
@@ -217,6 +222,8 @@ en:
           register: 'Item registered.'
           staging_started: 'Staging started'
           staging_completed: 'Staging completed'
+          staging_failed: 'Staging failed'
+          staging_failed_text: 'Contact SDR support at %{email} for assistance.'
       tabs:
         deposit:
           label: "Register"

@@ -13,8 +13,10 @@
                                                                     variant: :primary, size: :sm, disabled: true) %>
       <% end %>
     </div>
-  <% when :depositing %>
+  <% when :staging, :assembling, :depositing %>
     <p><%= I18n.t('show.status.depositing.body') %></p>
+  <% when :staging_failed %>
+    <p><%= staging_failed_body %></p>
   <% when :error %>
     <% workflow_error_messages.each do |workflow_error_message| %>
       <p><%= workflow_error_message %></p>

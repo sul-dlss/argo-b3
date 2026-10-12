@@ -16,7 +16,8 @@ RSpec.describe 'Create an APO' do
   let(:druid) { 'druid:xz987wv6543' }
 
   let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: true,
+                                                                         closed?: true)
   end
   let(:solr_doc) do
     {

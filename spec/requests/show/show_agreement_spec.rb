@@ -12,7 +12,8 @@ RSpec.describe 'Show agreement' do
   # Versions and workflows are tested in show_dro_spec, so returning minimal/empty values here.
 
   let(:version_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, accessioning?: true, closed?: true)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: true,
+                                                                         closed?: true)
   end
 
   let(:solr_doc) do

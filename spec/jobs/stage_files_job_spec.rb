@@ -172,13 +172,51 @@ RSpec.describe StageFilesJob do
     context "when the content's lock does not match the current cocina object's lock" do
       let(:content) { create(:content, druid:, lock: 'stale-lock', staging_state: 'staging') }
 
-      it 'raises without minting identifiers, analyzing, staging, or updating SDR' do
-        expect { job.perform(content:, user:) }.to raise_error(/Lock mismatch for #{druid}/)
+      it 'does not mint identifiers, analyze, stage, or update SDR' do
+        job.perform(content:, user:)
 
         expect(Contents::ExternalIdentifierMinter).not_to have_received(:call)
         expect(Contents::Analyzer).not_to have_received(:call)
         expect(Sdr::Repository).not_to have_received(:update)
         expect(File.exist?(staging_filepath)).to be false
+        expect(content.reload.staging_state).to eq('staging_failed')
+      end
+    end
+
+    context 'when accessioning fails' do
+      let(:error) { Sdr::Repository::Error.new('Initiating accession failed') }
+
+      before do
+        allow(Sdr::Repository).to receive(:accession).and_raise(error)
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'marks the content as failed staging' do
+        job.perform(content:, user:, accession: true)
+
+        expect(content.reload).to have_attributes(staging_state: 'staging_failed', lock: 'druid-version-2',
+                                                  immutable: true)
+      end
+
+      it 'notifies Honeybadger' do
+        job.perform(content:, user:, accession: true)
+
+        expect(Honeybadger).to have_received(:notify).with(error)
+      end
+
+      it 'broadcasts a refresh to the object' do
+        job.perform(content:, user:, accession: true)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('objects', druid)
+      end
+
+      it 'broadcasts an error toast with the support email' do
+        job.perform(content:, user:, accession: true)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+          .with('notifications', user, target: 'toast-container',
+                                       html: a_string_including('Staging failed', Settings.support_email,
+                                                                'bg-stanford-digital-red'))
       end
     end
   end
