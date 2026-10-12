@@ -54,4 +54,12 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_css('p[data-content-files-target="allRemovedNote"]',
                              text: 'Saving will delete this resource.', visible: :hidden)
   end
+
+  it 'renders the corrected for accessibility checkbox' do
+    content_file.update!(corrected_for_accessibility: true)
+
+    render_inline(component)
+
+    expect(page).to have_checked_field('Corrected for accessibility')
+  end
 end

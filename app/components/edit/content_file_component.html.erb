@@ -14,5 +14,11 @@
     <%= render Edit::UseComponent.new(form:) %>
     <%= render Edit::MimeTypeComponent.new(form:) %>
     <%= render Edit::FileLanguageComponent.new(form:) %>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+          form:,
+          field_name: :corrected_for_accessibility,
+          label_text: t('edit.content_file_sets.fields.content_files.corrected_for_accessibility.label'),
+          container_classes: 'my-field'
+        ) %>
   </div>
 <% end %>
