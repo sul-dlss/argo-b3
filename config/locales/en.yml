@@ -196,6 +196,8 @@ en:
               publish_only: 'Publish only'
             validations:
               required: 'must be selected'
+          corrected_for_accessibility:
+            label: 'Corrected for accessibility'
           language_tag:
             label: 'Language'
             placeholder: 'Select or enter a language'

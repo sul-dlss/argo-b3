@@ -58,6 +58,25 @@ RSpec.describe 'Content file sets' do
       end
     end
 
+    { '1' => true, '0' => false }.each do |submitted_value, expected_value|
+      context "when corrected for accessibility is submitted as #{submitted_value}" do
+        let(:content_file) do
+          create(:content_file, content_file_set:, corrected_for_accessibility: !expected_value,
+                                content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
+        end
+
+        it 'saves the checkbox value' do
+          patch content_content_file_set_path(content_token, content_file_set, counter: 0),
+                params: { content_file_set: { content_files_attributes: {
+                  '0' => { id: content_file.id, corrected_for_accessibility: submitted_value }
+                } } }
+
+          expect(response).to redirect_to(content_content_file_set_path(content_token, content_file_set, counter: 0))
+          expect(content_file.reload.corrected_for_accessibility).to be expected_value
+        end
+      end
+    end
+
     context 'when the update is invalid' do
       let(:content_file) { create(:content_file, content_file_set:) }
 
