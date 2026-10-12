@@ -50,6 +50,23 @@ RSpec.describe 'Show agreement' do
     expect(rendered_page).to have_css('h1', text: title)
     expect(rendered_page).to have_css('.object-show.object-type-agreement .object-type-badge', text: /agreement/i)
 
+    # Published but not released
+    expect(rendered_page).to have_link('View PURL page')
+    expect(rendered_page).to have_button('Republish')
+    expect(rendered_page).to have_no_css('h2', text: 'Released to')
+    expect(rendered_page).to have_no_css('h2', text: 'Not released')
+
+    # Tabs
+    expect(rendered_page).to have_css('.nav-link', text: 'Files')
+    expect(rendered_page).to have_css('.nav-link', text: 'Structure')
+    expect(rendered_page).to have_css('.nav-link', text: 'Workflows')
+    expect(rendered_page).to have_css('.nav-link', text: 'Versions')
+    expect(rendered_page).to have_css('.nav-link', text: 'Description preview')
+    expect(rendered_page).to have_no_css('.nav-link', text: 'Constituents')
+    expect(rendered_page).to have_no_css('.nav-link', text: 'Technical metadata')
+    expect(rendered_page).to have_css('#files-pane')
+    expect(rendered_page).to have_css('#structure-pane')
+
     # No pin
     expect(rendered_page).to have_no_css('.bi-pin')
     expect(rendered_page).to have_no_css('.bi-pin-fill')

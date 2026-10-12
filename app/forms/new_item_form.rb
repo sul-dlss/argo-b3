@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-# Form object for creating/updating an Item (DRO)
+# Form object for registering a new Item (DRO)
 # Note that this is a subclass of CocinaModels::Dro, not ApplicationForm. See README for explanation.
-class ItemForm < CocinaModels::Dro
+class NewItemForm < CocinaModels::Dro
+  # Keeps the "item" param key and field names (e.g., item[title]) rather than "new_item".
+  model_name_for :item
+
   include PermittedParamsConcern
   include EmbargoFormConcern
   include TitleFormConcern

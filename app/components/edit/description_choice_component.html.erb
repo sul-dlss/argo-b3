@@ -8,7 +8,7 @@
         form:,
         field_name: :description_choice,
         label_text: t('edit.items.fields.description_choice.title.label'),
-        input_value: ItemForm::DESCRIPTION_TITLE_CHOICE,
+        input_value: NewItemForm::DESCRIPTION_TITLE_CHOICE,
         input_data: { radio_target: 'radio', action: 'radio#toggle' },
         container_classes: 'my-fieldset'
       ) do |component| %>
@@ -24,7 +24,7 @@
         form:,
         field_name: :description_choice,
         label_text: t('edit.items.fields.description_choice.catalog_id.label'),
-        input_value: ItemForm::DESCRIPTION_CATALOG_ID_CHOICE,
+        input_value: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE,
         input_data: { radio_target: 'radio', action: 'radio#toggle' },
         container_classes: 'my-fieldset'
       ) do |component| %>
@@ -97,7 +97,7 @@
         form:,
         field_name: :description_choice,
         label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
-        input_value: ItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
+        input_value: NewItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
         input_data: { radio_target: 'radio', action: 'radio#toggle' },
         container_classes: 'my-fieldset'
       ) do |component| %>

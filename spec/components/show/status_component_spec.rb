@@ -3,17 +3,20 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:) }
+  subject(:component) { described_class.new(object_status_presenter:, solr_doc: document) }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
-  let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
+  let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }
   let(:druid) { 'druid:bc123df4567' }
   let(:workflow_errors) { [] }
+  let(:object_type) { 'item' }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed)
+    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed,
+                                         editable?: editable)
   end
   let(:closed) { false }
+  let(:editable) { false }
   let(:accessioning) { false }
   let(:assembling) { false }
   let(:content) { nil }
@@ -26,6 +29,118 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_button('Edit item', class: 'disabled')
       expect(page).to have_button('Manage files', class: 'disabled')
       expect(page).to have_button('Deposit', class: 'disabled')
+    end
+  end
+
+  context 'when the item version is editable and the user can edit' do
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders an enabled edit item link' do
+      render_inline(component)
+
+      expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
+      expect(page).to have_no_css('a.disabled', text: 'Edit item')
+    end
+  end
+
+  context 'when the item version is not editable' do
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders a disabled edit item button' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_no_link('Edit item')
+    end
+  end
+
+  context 'when the item version is editable but the user cannot edit' do
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      allow(Current).to receive(:user).and_return(create(:user))
+    end
+
+    it 'renders a disabled edit item button' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_no_link('Edit item')
+    end
+  end
+
+  context 'when the object is a collection whose version is editable and the user can edit' do
+    let(:object_type) { 'collection' }
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders a disabled edit collection button' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit collection', class: 'disabled')
+      expect(page).to have_no_link('Edit collection')
+    end
+  end
+
+  context 'when the object is an agreement' do
+    let(:object_type) { 'agreement' }
+
+    it 'renders the edit agreement button without manage files' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit agreement', class: 'disabled')
+      expect(page).to have_no_button('Manage files')
+    end
+  end
+
+  context 'when the object is a collection' do
+    let(:object_type) { 'collection' }
+
+    it 'renders the edit collection button without manage files' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit collection', class: 'disabled')
+      expect(page).to have_no_button('Manage files')
+    end
+  end
+
+  context 'when the object is an APO' do
+    let(:object_type) { 'APO' }
+
+    it 'renders the edit APO button without manage files' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit APO', class: 'disabled')
+      expect(page).to have_no_button('Manage files')
+    end
+  end
+
+  context 'when the object is a virtual object' do
+    let(:object_type) { 'virtual object' }
+
+    it 'renders the edit virtual object button without manage files' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit virtual object', class: 'disabled')
+      expect(page).to have_no_button('Manage files')
     end
   end
 

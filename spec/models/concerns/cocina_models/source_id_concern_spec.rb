@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe CocinaModels::SourceIdConcern do
-  # ItemForm and CocinaModels::Dro are used as representative models that include the concern.
-  # ItemForm is never persisted; CocinaModels::Dro covers the persisted (edit) cases.
-  subject(:item_form) do
-    ItemForm.new(
+  # NewItemForm and CocinaModels::Dro are used as representative models that include the concern.
+  # NewItemForm is never persisted; CocinaModels::Dro covers the persisted (edit) cases.
+  subject(:new_item_form) do
+    NewItemForm.new(
       source_id:,
       title: 'The Title',
       apo_druid: 'druid:bc123df4567',
@@ -25,7 +25,7 @@ RSpec.describe CocinaModels::SourceIdConcern do
   describe 'uniqueness of source_id' do
     context 'when the source_id does not already exist' do
       it 'is valid and checks for existence' do
-        expect(item_form).to be_valid
+        expect(new_item_form).to be_valid
         expect(Sdr::Repository).to have_received(:source_id_exists?).with(source_id:)
       end
     end
@@ -36,8 +36,8 @@ RSpec.describe CocinaModels::SourceIdConcern do
       end
 
       it 'is not valid' do
-        expect(item_form).not_to be_valid
-        expect(item_form.errors[:source_id]).to include('already exists')
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:source_id]).to include('already exists')
       end
     end
 
@@ -45,8 +45,8 @@ RSpec.describe CocinaModels::SourceIdConcern do
       let(:source_id) { 'no-colon' }
 
       it 'does not check for existence' do
-        expect(item_form).not_to be_valid
-        expect(item_form.errors[:source_id]).to include('is invalid')
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:source_id]).to include('is invalid')
         expect(Sdr::Repository).not_to have_received(:source_id_exists?)
       end
     end
@@ -55,8 +55,8 @@ RSpec.describe CocinaModels::SourceIdConcern do
       let(:source_id) { nil }
 
       it 'does not check for existence' do
-        expect(item_form).not_to be_valid
-        expect(item_form.errors[:source_id]).to include("can't be blank")
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:source_id]).to include("can't be blank")
         expect(Sdr::Repository).not_to have_received(:source_id_exists?)
       end
     end

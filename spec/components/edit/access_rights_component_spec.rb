@@ -49,8 +49,10 @@ RSpec.describe Edit::AccessRightsComponent, type: :component do
 
   context 'when a fieldname prefix is provided' do
     let(:component) { described_class.new(form:, fieldname_prefix: 'embargo_') }
-    let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-    let(:item_form) { ItemForm.new(embargo_view: 'stanford', embargo_download: 'none', embargo_location: 'music') }
+    let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+    let(:new_item_form) do
+      NewItemForm.new(embargo_view: 'stanford', embargo_download: 'none', embargo_location: 'music')
+    end
 
     it 'prefixes the field names' do
       render_inline(component)

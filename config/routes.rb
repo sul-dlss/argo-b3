@@ -209,7 +209,7 @@ Rails.application.routes.draw do
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end
 
-  resources :items, only: %i[new create]
+  resources :items, only: %i[new create edit update]
 
   resources :apos, only: %i[new create]
 

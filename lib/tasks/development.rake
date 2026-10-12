@@ -57,4 +57,29 @@ namespace :development do
 
     puts "#{title} (#{collection.druid})"
   end
+
+  desc 'Complete incomplete assemblyWF and accessionWF steps, e.g., complete_workflows[druid:bc123df4567]'
+  task :complete_workflows, [:druid] => :environment do |_t, args|
+    raise 'This task can only be run in the development environment' unless Rails.env.development?
+
+    druid = args.fetch(:druid) { raise 'Druid is required, e.g., complete_workflows[druid:bc123df4567]' }
+    object_client = Dor::Services::Client.object(druid)
+    version = object_client.version.status.version
+
+    complete_steps = lambda do |workflow_name, only: nil, except: []|
+      object_workflow = object_client.workflow(workflow_name)
+      object_workflow.find.incomplete_processes_for(version:).each do |process|
+        next if except.include?(process.name) || (only && only != process.name)
+
+        object_workflow.process(process.name).update(status: 'completed', version:)
+        puts "Completed #{workflow_name} #{process.name}"
+      end
+    end
+
+    # accessioning-initiate closes the version, which starts accessionWF.
+    complete_steps.call('assemblyWF', except: ['accessioning-initiate'])
+    object_client.version.close(user_name: 'auser') if object_client.version.status.open?
+    complete_steps.call('assemblyWF', only: 'accessioning-initiate')
+    complete_steps.call('accessionWF')
+  end
 end

@@ -100,12 +100,20 @@ RSpec.describe SolrDocPresenter do
     end
   end
 
-  describe '#dro?' do
-    context 'when the object type is collection' do
-      let(:object_type) { 'collection' }
+  describe '#item?' do
+    context 'when the object type is item' do
+      let(:object_type) { 'item' }
+
+      it 'returns true' do
+        expect(presenter.item?).to be true
+      end
+    end
+
+    context 'when the object type is virtual object' do
+      let(:object_type) { 'virtual object' }
 
       it 'returns false' do
-        expect(presenter.dro?).to be false
+        expect(presenter.item?).to be false
       end
     end
 
@@ -113,41 +121,45 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'agreement' }
 
       it 'returns false' do
-        expect(presenter.dro?).to be false
-      end
-    end
-
-    context 'when the object type is an APO' do
-      let(:object_type) { 'APO' }
-
-      it 'returns false' do
-        expect(presenter.dro?).to be false
-      end
-    end
-
-    context 'when the object type is neither collection nor APO' do
-      let(:object_type) { 'item' }
-
-      it 'returns true' do
-        expect(presenter.dro?).to be true
+        expect(presenter.item?).to be false
       end
     end
   end
 
-  describe '#dro_or_collection?' do
+  describe '#object_type?' do
+    let(:object_type) { 'virtual object' }
+
+    context 'when the object type matches one of the provided object types' do
+      it 'returns true' do
+        expect(presenter.object_type?('item', 'virtual object')).to be true
+      end
+    end
+
+    context 'when the object type matches the single provided object type' do
+      it 'returns true' do
+        expect(presenter.object_type?('virtual object')).to be true
+      end
+    end
+
+    context 'when the object type does not match any of the provided object types' do
+      it 'returns false' do
+        expect(presenter.object_type?('item', 'collection')).to be false
+      end
+    end
+
+    context 'when no object types are provided' do
+      it 'returns false' do
+        expect(presenter.object_type?).to be false
+      end
+    end
+  end
+
+  describe '#releasable_type?' do
     context 'when the object type is item' do
       let(:object_type) { 'item' }
 
       it 'returns true' do
-        expect(presenter.dro_or_collection?).to be true
-      end
-    end
-
-    context 'when the object type is collection' do
-      let(:object_type) { 'collection' }
-
-      it 'returns true' do
-        expect(presenter.dro_or_collection?).to be true
+        expect(presenter.releasable_type?).to be true
       end
     end
 
@@ -155,15 +167,23 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'virtual object' }
 
       it 'returns true' do
-        expect(presenter.dro_or_collection?).to be true
+        expect(presenter.releasable_type?).to be true
       end
     end
 
-    context 'when the object type is an APO' do
+    context 'when the object type is collection' do
+      let(:object_type) { 'collection' }
+
+      it 'returns true' do
+        expect(presenter.releasable_type?).to be true
+      end
+    end
+
+    context 'when the object type is APO' do
       let(:object_type) { 'APO' }
 
       it 'returns false' do
-        expect(presenter.dro_or_collection?).to be false
+        expect(presenter.releasable_type?).to be false
       end
     end
 
@@ -171,7 +191,49 @@ RSpec.describe SolrDocPresenter do
       let(:object_type) { 'agreement' }
 
       it 'returns false' do
-        expect(presenter.dro_or_collection?).to be false
+        expect(presenter.releasable_type?).to be false
+      end
+    end
+  end
+
+  describe '#publishable_type?' do
+    context 'when the object type is item' do
+      let(:object_type) { 'item' }
+
+      it 'returns true' do
+        expect(presenter.publishable_type?).to be true
+      end
+    end
+
+    context 'when the object type is virtual object' do
+      let(:object_type) { 'virtual object' }
+
+      it 'returns true' do
+        expect(presenter.publishable_type?).to be true
+      end
+    end
+
+    context 'when the object type is collection' do
+      let(:object_type) { 'collection' }
+
+      it 'returns true' do
+        expect(presenter.publishable_type?).to be true
+      end
+    end
+
+    context 'when the object type is APO' do
+      let(:object_type) { 'APO' }
+
+      it 'returns false' do
+        expect(presenter.publishable_type?).to be false
+      end
+    end
+
+    context 'when the object type is agreement' do
+      let(:object_type) { 'agreement' }
+
+      it 'returns true' do
+        expect(presenter.publishable_type?).to be true
       end
     end
   end

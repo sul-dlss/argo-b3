@@ -90,18 +90,18 @@ module Sdr
       false
     end
 
-    # Objects with files are assembled (e.g., to create derivatives) before accessioning:
+    # DROs with files in staging are assembled (e.g., to create derivatives) before accessioning:
     # gisAssemblyWF for geo objects, otherwise assemblyWF. Assembly closes the version.
-    # Objects without files skip assembly; closing the version starts accessioning.
+    # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
     # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
     # @param [Hash] context the workflow context for the assembly workflow. Note that closing the
-    #   version does not accept a context, so it is ignored for objects without files.
+    #   version does not accept a context, so it is ignored when assembly is skipped.
     # @raise [Error] if there is an error initiating accession
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
-      if cocina_object.dro? && files?(cocina_object:)
+      if cocina_object.dro? && StagingSupport.staged_files?(druid: cocina_object.externalIdentifier)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
@@ -110,11 +110,6 @@ module Sdr
     rescue Dor::Services::Client::Error => e
       raise Error, "Initiating accession failed: #{e.message}"
     end
-
-    def self.files?(cocina_object:)
-      cocina_object.structural.contains.any? { |file_set| file_set.structural.contains.any? }
-    end
-    private_class_method :files?
 
     def self.assembly_workflow_name(cocina_object:)
       cocina_object.type == Cocina::Models::ObjectType.geo ? 'gisAssemblyWF' : 'assemblyWF'

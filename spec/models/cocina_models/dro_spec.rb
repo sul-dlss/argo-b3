@@ -157,6 +157,46 @@ RSpec.describe CocinaModels::Dro do
       end
     end
 
+    context 'when accessioning' do
+      before do
+        allow(Sdr::Repository).to receive(:accession)
+      end
+
+      context 'with changed attributes' do
+        before { dro.source_id = 'changed:source-id' }
+
+        it 'saves and then starts accessioning the updated object' do
+          dro.save!(user_name:, description:, accession: true)
+
+          expect(Sdr::Repository).to have_received(:update).ordered
+          expect(Sdr::Repository).to have_received(:accession)
+            .with(cocina_object: updated_cocina_object, user_name:).ordered
+        end
+      end
+
+      context 'when no attributes have changed' do
+        it 'starts accessioning without saving' do
+          dro.save!(user_name:, description:, accession: true)
+
+          expect(Sdr::Repository).not_to have_received(:update)
+          expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name:)
+        end
+      end
+    end
+
+    context 'when not accessioning' do
+      before do
+        allow(Sdr::Repository).to receive(:accession)
+        dro.source_id = 'changed:source-id'
+      end
+
+      it 'does not start accessioning' do
+        dro.save!(user_name:, description:)
+
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
     context 'when saving with a folio catalog link' do
       let(:cocina_object) { build(:dro_with_metadata, folio_instance_hrids: ['in11403803']) }
 

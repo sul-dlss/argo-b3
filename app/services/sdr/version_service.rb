@@ -41,6 +41,10 @@ module Sdr
         new(...).closeable?
       end
 
+      def editable?(...)
+        new(...).editable?
+      end
+
       def version(...)
         new(...).version
       end
@@ -48,8 +52,9 @@ module Sdr
 
     attr_reader :druid
 
-    delegate :close, :open, to: :version_client
-    delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :version, to: :status
+    delegate :close, :open, :update_description, to: :version_client
+    delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :version, :version_description,
+             to: :status
 
     def initialize(druid:)
       @druid = druid
@@ -57,6 +62,12 @@ module Sdr
 
     def open_and_not_assembling?
       open? && !assembling?
+    end
+
+    # @return [Boolean] true if the object can be edited: the version is closed and can be opened, or the
+    #   version is open and can still be closed (e.g., it is not being assembled or accessioned)
+    def editable?
+      openable? || closeable?
     end
 
     private

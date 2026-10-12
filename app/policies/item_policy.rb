@@ -2,7 +2,7 @@
 
 # Policy for items.
 class ItemPolicy < ApplicationPolicy
-  alias_rule :update?, to: :edit?
+  # NOTE: Use ObjectPolicy for show?, edit?, and update? permissions.
 
   def new?
     # User belongs to a workgroup that has edit permissions on anything.
@@ -12,10 +12,6 @@ class ItemPolicy < ApplicationPolicy
   end
 
   def create?
-    true
-  end
-
-  def edit?
     true
   end
 end

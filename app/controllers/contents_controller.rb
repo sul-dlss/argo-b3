@@ -18,7 +18,7 @@ class ContentsController < ContentsApplicationController
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     cache_cocina_hash(cocina_object:)
-    authorize! cocina_object, with: ItemPolicy
+    authorize! cocina_object, with: ObjectPolicy
 
     @contents_item_form = ContentsItemForm.build_from_cocina_object(cocina_object)
     set_edit_form(cocina_object:, content: find_or_create_content(cocina_object:))
@@ -27,7 +27,7 @@ class ContentsController < ContentsApplicationController
   def update
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
-    authorize! cocina_object, with: ItemPolicy
+    authorize! cocina_object, with: ObjectPolicy
 
     # The content was built for the lock when the edit page was loaded, so it is missing if the object has changed.
     content = find_content(cocina_object:)

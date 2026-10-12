@@ -55,6 +55,62 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '#update_description' do
+    before do
+      allow(version_client).to receive(:update_description)
+    end
+
+    it 'delegates to the version client' do
+      service.update_description(description: 'Fixed the title', user_name: 'jlittman')
+      expect(version_client).to have_received(:update_description)
+        .with(description: 'Fixed the title', user_name: 'jlittman')
+    end
+  end
+
+  describe '#editable?' do
+    before do
+      allow(status).to receive_messages(openable?: openable, closeable?: closeable)
+    end
+
+    context 'when the version is closed and can be opened' do
+      let(:openable) { true }
+      let(:closeable) { false }
+
+      it 'returns true' do
+        expect(service.editable?).to be true
+      end
+    end
+
+    context 'when the version is open and can be closed' do
+      let(:openable) { false }
+      let(:closeable) { true }
+
+      it 'returns true' do
+        expect(service.editable?).to be true
+      end
+    end
+
+    # For example, when the version is being assembled or accessioned.
+    context 'when the version can be neither opened nor closed' do
+      let(:openable) { false }
+      let(:closeable) { false }
+
+      it 'returns false' do
+        expect(service.editable?).to be false
+      end
+    end
+  end
+
+  describe '.editable?' do
+    before do
+      allow(status).to receive_messages(openable?: false, closeable?: true)
+    end
+
+    it 'returns whether the object for the druid can be edited' do
+      expect(described_class.editable?(druid:)).to be true
+    end
+  end
+
   describe 'status methods' do
     it 'delegates to the version client' do
       %i[open? openable? assembling? accessioning? closed? closeable? version].each do |method|

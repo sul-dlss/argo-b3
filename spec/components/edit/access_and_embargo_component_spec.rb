@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
   let(:component) { described_class.new(form:) }
-  let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new }
+  let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new }
 
   it 'renders the embargo toggle' do
     render_inline(component)

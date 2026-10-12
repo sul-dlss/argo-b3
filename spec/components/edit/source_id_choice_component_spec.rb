@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Edit::SourceIdChoiceComponent, type: :component do
   let(:component) { described_class.new(form:) }
-  let(:form) { ActionView::Helpers::FormBuilder.new(nil, item_form, vc_test_view_context, {}) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(nil, new_item_form, vc_test_view_context, {}) }
 
   context 'when source id is provided' do
-    let(:item_form) { ItemForm.new(source_id: 'sul:1234') }
+    let(:new_item_form) { NewItemForm.new(source_id: 'sul:1234') }
 
     it 'renders the provided state' do
       render_inline(component)
@@ -20,8 +20,8 @@ RSpec.describe Edit::SourceIdChoiceComponent, type: :component do
   end
 
   context 'when source id is generated' do
-    let(:item_form) do
-      ItemForm.new(source_id_choice: ItemForm::SOURCE_ID_GENERATE_CHOICE, source_id_prefix: 'sul')
+    let(:new_item_form) do
+      NewItemForm.new(source_id_choice: NewItemForm::SOURCE_ID_GENERATE_CHOICE, source_id_prefix: 'sul')
     end
 
     it 'renders the generate state' do
