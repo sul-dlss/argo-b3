@@ -111,6 +111,10 @@ RSpec.describe 'Show APO' do
       expect(page).to have_css('li', text: 'Remediated By : labtech')
     end
 
+    # Events tab
+    click_button 'Events'
+    expect(page).to have_css('#events-pane p', text: 'No events.')
+
     # Cocina model tab
     click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.

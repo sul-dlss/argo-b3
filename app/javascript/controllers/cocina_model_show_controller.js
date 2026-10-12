@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 
-const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordion-collapse']
+const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'accordion-button', 'accordion-collapse', 'event-toggle', 'event-data']
 
 // Controller for the Cocina model show page.
 //
@@ -17,6 +17,7 @@ export default class extends Controller {
 
   connect () {
     document.addEventListener('turbo:before-morph-attribute', this.preserveTab)
+    document.addEventListener('turbo:before-morph-element', this.preserveNavigatedFrame)
     document.addEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.addEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
@@ -34,6 +35,7 @@ export default class extends Controller {
     }
 
     document.removeEventListener('turbo:before-morph-attribute', this.preserveTab)
+    document.removeEventListener('turbo:before-morph-element', this.preserveNavigatedFrame)
     document.removeEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.removeEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.removeEventListener('turbo:frame-missing', this.handleMissingFrame)
@@ -41,11 +43,37 @@ export default class extends Controller {
 
   // This preserves the active tab when the page is refreshed
   // by preventing Turbo from morphing the tab list, tab pane, accordion button,
-  // and accordion body attributes
+  // accordion body, and event row / data attributes
   preserveTab = (event) => {
     if (PRESERVED_CLASSES.some((className) => event.target.classList.contains(className))) {
       event.preventDefault()
     }
+  }
+
+  // A frame that has navigated (e.g., the events frame after filtering) has a different src than the frame in
+  // the refreshed page. Rather than morphing it back to the original src (which loses the navigation),
+  // this reloads the frame from its current src.
+  // A busy frame (e.g., while a filter form submission is in flight) is left alone, since its src is not updated
+  // until the response arrives; reloading it would race the submission and could restore the original src.
+  preserveNavigatedFrame = (event) => {
+    const { currentElement, newElement } = event.detail
+    if (currentElement.tagName !== 'TURBO-FRAME' || currentElement.getAttribute('refresh') !== 'morph') return
+
+    if (currentElement.hasAttribute('busy')) {
+      event.preventDefault()
+      return
+    }
+
+    const currentSrc = currentElement.getAttribute('src')
+    const newSrc = newElement.getAttribute('src')
+    if (!currentSrc || !newSrc || this.absoluteUrl(currentSrc) === this.absoluteUrl(newSrc)) return
+
+    event.preventDefault()
+    currentElement.reload()
+  }
+
+  absoluteUrl (url) {
+    return new URL(url, window.location.href).href
   }
 
   // Refreshes the whole page (via Turbo's morph-based page refresh) on each interval, rather than

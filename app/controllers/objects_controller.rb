@@ -4,7 +4,7 @@
 class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassLength
   RECENT_OBJECTS_LIMIT = 5
 
-  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions
+  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
                                   show_structural_csv track]
 
@@ -90,6 +90,19 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                                 user_version_inventory: object_client.user_version.inventory)
   end
 
+  def show_events
+    @druid = verified_druid
+    @event_types = Rails.cache.fetch('events/event-types', expires_in: 1.hour) { Sdr::Event.types }
+    @events_filter_form = if params.key?(EventsFilterForm.model_name.param_key)
+                            EventsFilterForm.new(events_filter_params)
+                          else
+                            EventsFilterForm.with_defaults(available_event_types: @event_types)
+                          end
+    @events = fetch_events
+
+    render layout: false
+  end
+
   def show_solr_doc
     @solr_doc_hash = fetch_solr_doc(verified_druid)
 
@@ -154,6 +167,19 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  def events_filter_params
+    param_key = EventsFilterForm.model_name.param_key
+    params.permit(param_key => EventsFilterForm.permitted_params)[param_key]
+  end
+
+  def fetch_events
+    return [] unless @events_filter_form.event_types_selected?
+
+    Sdr::Event.list(druid: @druid,
+                    event_types: @events_filter_form.event_types_filter(available_event_types: @event_types),
+                    from: @events_filter_form.from_time, to: @events_filter_form.to_time)
+  end
 
   def republishable?
     return false unless @solr_doc.dro_or_collection?

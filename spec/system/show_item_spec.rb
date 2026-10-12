@@ -26,6 +26,17 @@ RSpec.describe 'Show item' do
                                                                          closed?: true, version: 2)
   end
   let(:milestone_date) { true }
+  let(:event_types) { %w[publishing_complete version_open] }
+  let(:events) do
+    [
+      Dor::Services::Client::Events::Event.new(event_type: 'publishing_complete', data: {},
+                                               timestamp: '2021-03-31T21:01:20.000Z'),
+      Dor::Services::Client::Events::Event.new(event_type: 'version_open',
+                                               data: { 'version' => '2', 'who' => 'jdoe',
+                                                       'description' => 'Fix title' },
+                                               timestamp: '2021-03-31T20:23:30.000Z')
+    ]
+  end
   let(:version_inventory) do
     [
       Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
@@ -370,6 +381,52 @@ RSpec.describe 'Show item' do
     expect(cells[3]).to have_text('2021-03-31 13:23:35 PT')
     expect(cells[4]).to have_text('2021-03-31 14:02:03 PT')
 
+    # Events tab
+    click_button 'Events'
+
+    within(find_table('events-table')) do
+      expect(page).to have_css('th', text: 'When')
+      expect(page).to have_css('th', text: 'Event type')
+      expect(page).to have_css('th', text: 'Who')
+      expect(page).to have_css('th', text: 'Version')
+    end
+
+    row = find_table_row('events-table', '2021-03-31 14:01:20 PT')
+    cells = row.all('td')
+    expect(cells[0]).to have_text('Publishing complete')
+    expect(cells[1]).to have_text('')
+
+    row = find_table_row('events-table', '2021-03-31 13:23:30 PT')
+    cells = row.all('td')
+    expect(cells[0]).to have_text('Version open')
+    expect(cells[1]).to have_text('jdoe')
+    expect(cells[2]).to have_text('2')
+
+    # Toggle the event data
+    expect(page).to have_no_css('#events-table dt', text: 'Description')
+    expect(page).to have_css('#events-table tr.event-toggle.collapsed .event-toggle-indicator')
+    row.click
+    expect(page).to have_css('#events-table tr.event-toggle:not(.collapsed) .event-toggle-indicator')
+    within('#events-table tr.collapse.show') do
+      expect(page).to have_css('dt', text: 'Description')
+      expect(page).to have_css('dd', text: 'Fix title')
+    end
+    row.click
+    expect(page).to have_no_css('#events-table dt', text: 'Description')
+
+    # Filter the events
+    expect(page).to have_css('#events-filter .ts-count', text: '2 selected')
+    find('#events-filter .ts-control').click
+    find('.ts-dropdown .option', text: 'Publishing complete').click
+    expect(page).to have_css('#events-filter .ts-count', text: '1 selected')
+    fill_in 'From', with: Time.zone.local(2021, 3, 31, 13, 0, 0)
+    click_button 'Filter'
+
+    expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
+    expect(page).to have_css('#events-table td', text: 'Version open')
+    expect(events_client).to have_received(:list)
+      .with(event_types: ['version_open'], from: Time.utc(2021, 3, 31, 20, 0, 0), to: nil)
+
     # Files tab
     click_button 'Files'
 
@@ -392,6 +449,11 @@ RSpec.describe 'Show item' do
     expect(page).to have_link('View PURL page',
                               href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}", count: 2)
 
+    # Expand the event data, to check that it remains expanded after the page refreshes.
+    click_button 'Events'
+    find_table_row('events-table', '2021-03-31 13:23:30 PT').click
+    expect(page).to have_css('#events-table tr.event-data.show dt', text: 'Description')
+
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr)
       .and_return(build_solr_doc(title: updated_title, last_deposited: nil, license_label: 'CC Zero 1.0'))
@@ -410,6 +472,12 @@ RSpec.describe 'Show item' do
                                                                        build_accession_workflow(complete: true)])
 
     expect(page).to have_css('h1', text: updated_title, wait: 15)
+
+    click_button 'Events'
+    expect(page).to have_css('#events-table tr.event-data.show dt', text: 'Description')
+    # The filter is retained after the page refreshes.
+    expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
+    expect(page).to have_css('#events-filter .ts-count', text: '1 selected')
 
     click_button 'Overview'
     expect(find_table('overview-table')).to have_no_css('th', text: 'Last deposited')
