@@ -13,6 +13,14 @@ RSpec.describe 'Manage files' do
 
   let(:object_lock) { 'abc123' }
 
+  # The initial version is open, so no version description is requested.
+  let(:version_status) do
+    Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 1, open: true, openable: false,
+                                                            closeable: true, assembling: false,
+                                                            accessioning: false, discardable: false,
+                                                            versionDescription: 'Initial version')
+  end
+
   before do
     create(:permission, :read_unrestricted, workgroup: user.groups.first)
     create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)

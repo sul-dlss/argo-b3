@@ -34,6 +34,10 @@ module Show
       edit_item_path(druid)
     end
 
+    def manage_files_button
+      Show::ManageFilesButtonComponent.new(druid:, enabled: edit?)
+    end
+
     def staging_failed_body
       t('show.status.staging_failed.body_html', email: helpers.mail_to(Settings.support_email))
     end

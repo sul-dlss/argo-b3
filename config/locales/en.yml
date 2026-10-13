@@ -140,6 +140,8 @@ en:
           deposit: "Deposit"
           discover_files: "Discover files"
           draft: "Save as draft"
+        errors:
+          save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
         toasts:
           stale: "This item was changed since you opened it. Review your changes and resubmit."
       mount:

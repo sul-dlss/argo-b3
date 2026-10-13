@@ -5,6 +5,13 @@
 class ContentsItemForm < CocinaModels::Dro
   include PermittedParamsConcern
   include TextExtractionConcern
+  include VersionDescriptionConcern
+
+  # The initial version's description is set at registration, so it is not entered.
+  validates :version_description, presence: true, unless: :initial_version?
+
+  # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
+  FORM_ONLY_ATTRIBUTES = %w[version_description].freeze
 
   # The OCR settings are not part of the Cocina object; they are form-only attributes that
   # #workflow_context hands to the assembly workflow instead. A consequence is that changing only
@@ -32,7 +39,24 @@ class ContentsItemForm < CocinaModels::Dro
   validate :content_valid_for_content_type, on: :deposit
 
   def self.permitted_params
-    [:content_type, :viewing_direction, :run_ocr, { text_extraction_languages: [] }]
+    [:content_type, :viewing_direction, :run_ocr, :version_description, { text_extraction_languages: [] }]
+  end
+
+  # Before saving, opens a new version if the version is closed (since staging always updates the structure);
+  # otherwise updates the description of the open version if it changed.
+  # @param [String] user_name the sunetid of the user performing the action
+  # @raise [ActiveModel::ValidationError] if the form is invalid
+  def save!(user_name:)
+    validate!
+    prepare_version!(user_name:, open_version: true)
+    super
+  ensure
+    # Keeps the content on the object's current lock, even if saving failed after opening a version.
+    content&.update!(lock: previous_cocina_object.lock)
+  end
+
+  def changed?
+    (changed - FORM_ONLY_ATTRIBUTES).any? || tracked_associations_changed?
   end
 
   # The assembly workflow reads these from its context to decide whether to run OCR.

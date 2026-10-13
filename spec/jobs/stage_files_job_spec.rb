@@ -183,6 +183,43 @@ RSpec.describe StageFilesJob do
       end
     end
 
+    context 'when updating SDR does not change the lock' do
+      # The structure is unchanged, so an immutable Content for the lock may already exist.
+      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+      let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
+      let!(:existing_content) { create(:content, druid:, lock: 'druid-version-1', immutable: true) }
+
+      it 'replaces the existing immutable content' do
+        job.perform(content:, user:, accession: true)
+
+        expect(Content.exists?(existing_content.id)).to be false
+        expect(content.reload).to have_attributes(staging_state: 'staging_not_in_progress', lock: 'druid-version-1',
+                                                  immutable: true)
+        expect(Sdr::Repository).to have_received(:accession)
+      end
+    end
+
+    context 'when making the content immutable fails' do
+      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+      let(:error) { ActiveRecord::RecordInvalid.new(content) }
+
+      before do
+        allow(content).to receive(:update!) do |attributes|
+          content.assign_attributes(attributes)
+          raise error
+        end
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'marks the content as failed staging without the unsaved changes' do
+        job.perform(content:, user:, accession: true)
+
+        expect(content.reload).to have_attributes(staging_state: 'staging_failed', lock: 'druid-version-1',
+                                                  immutable: false)
+        expect(Honeybadger).to have_received(:notify).with(error)
+      end
+    end
+
     context 'when accessioning fails' do
       let(:error) { Sdr::Repository::Error.new('Initiating accession failed') }
 
