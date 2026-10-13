@@ -88,6 +88,16 @@ bin/rake development:bootstrap_apo
 bin/rake "development:bootstrap_collection[<APO DRUID>]"
 ```
 
+### Completing assembly and accessioning
+
+Without robots running locally, deposited objects get stuck in assemblyWF / accessionWF. To mark the incomplete steps as completed (closing the version if necessary):
+
+```
+bin/rake "development:complete_workflows[<DRUID>]"
+```
+
+Note that this only updates workflow step statuses; the work of the robots (e.g., shelving, publishing, preservation) is not performed.
+
 ### Linters
 
 To run all configured linters, run `bin/rake lint`.
