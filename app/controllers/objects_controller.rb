@@ -41,7 +41,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:,
                                                          content:)
-    release_tags = @solr_doc.dro_or_collection? ? Sdr::Repository.release_tags(druid:) : []
+    release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
 
@@ -183,7 +183,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def republishable?
-    return false unless @solr_doc.dro_or_collection?
+    return false unless @solr_doc.publishable_type?
 
     Sdr::WorkflowService.published?(druid: @solr_doc.druid)
   end

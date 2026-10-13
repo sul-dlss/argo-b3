@@ -77,6 +77,11 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
     expect(page).to have_css('.nav-link', text: 'Description preview')
+    expect(page).to have_css('.nav-link', text: 'Workflows')
+    expect(page).to have_css('.nav-link', text: 'Versions')
+    expect(page).to have_no_css('.nav-link', text: 'Files')
+    expect(page).to have_no_css('.nav-link', text: 'Structure')
+    expect(page).to have_no_css('.nav-link', text: 'Technical metadata')
 
     # PURL link in side nav
     expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")

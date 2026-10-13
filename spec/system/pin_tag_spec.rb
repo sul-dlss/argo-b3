@@ -36,6 +36,7 @@ RSpec.describe 'Pin and unpin a tag' do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
 
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
+    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
     allow(Sdr::Repository).to receive_messages(find_solr: solr_doc, find: cocina_object)
 
     sign_in(create(:user))

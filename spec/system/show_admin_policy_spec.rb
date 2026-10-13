@@ -89,6 +89,11 @@ RSpec.describe 'Show APO' do
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
     expect(page).to have_no_css('.nav-link', text: 'Description preview')
+    expect(page).to have_css('.nav-link', text: 'Workflows')
+    expect(page).to have_css('.nav-link', text: 'Versions')
+    expect(page).to have_no_css('.nav-link', text: 'Files')
+    expect(page).to have_no_css('.nav-link', text: 'Structure')
+    expect(page).to have_no_css('.nav-link', text: 'Technical metadata')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')

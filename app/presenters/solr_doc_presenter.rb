@@ -32,12 +32,22 @@ class SolrDocPresenter < SearchResults::Item
     object_type == 'virtual object'
   end
 
-  def dro?
-    !collection? && !admin_policy? && !agreement?
+  def item?
+    object_type == 'item'
   end
 
-  # items with a purl page/description overviews
-  def dro_or_collection?
-    dro? || collection?
+  # @param object_types [Array<String>] object types to match, e.g., 'item', 'virtual object', 'collection',
+  #   'APO', 'agreement'
+  # @return [Boolean] true if the object type is any of the provided object types
+  def object_type?(*object_types)
+    object_types.include?(object_type)
+  end
+
+  def releasable_type?
+    object_type?('item', 'virtual object', 'collection')
+  end
+
+  def publishable_type?
+    object_type?('item', 'virtual object', 'collection')
   end
 end

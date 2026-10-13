@@ -33,17 +33,17 @@
         <%= render ThumbnailComponent.new(result: @solr_doc, dimension: 160, classes: 'mb-4') %>
       </div>
 
-      <% if @solr_doc.dro_or_collection? %>
+      <% if @solr_doc.publishable_type? %>
         <p><%= link_to_purl(@solr_doc.druid) %></p>
       <% end %>
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
         <% component.with_button(link: '/', label: 'Use as template', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Download description', variant: 'outline-primary', disabled: true) %>
-        <% if @solr_doc.dro? && !@solr_doc.virtual_object? %>
+        <% if @solr_doc.object_type?('item', 'agreement') %>
           <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
         <%# Only show the republish button for object types that can be republished, but disable if never published or user doesn't have a permission to edit %>
-        <% if @solr_doc.dro_or_collection? %>
+        <% if @solr_doc.publishable_type? %>
           <% component.with_button(link: republish_object_path(@solr_doc.druid), method: :post, label: 'Republish',
                                    variant: 'outline-primary',
                                    disabled: !allowed_to?(:update?, @solr_doc, with: ObjectPolicy) || !@previously_published) %>
@@ -70,7 +70,7 @@
         <div class="show-box flex-fill">
           <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter) %>
         </div>
-        <% if @solr_doc.dro_or_collection? %>
+        <% if @solr_doc.releasable_type? %>
           <div class="show-box flex-fill">
             <%= render Show::ReleasedToComponent.new(object_released_presenter: @object_released_presenter) %>
           </div>
@@ -90,17 +90,15 @@
       <%# Tabs that don't fit on one row overflow into a "More" dropdown (sdr_view_components' tab overflow controller), so adding or removing tabs changes which tabs end up there. spec/system/show_item_spec.rb clicks "More" to reach overflowed tabs. %>
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl, overflow_menu: true) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
-        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.dro_or_collection? %>
-        <% if @solr_doc.dro? %>
-          <% if @solr_doc.virtual_object? %>
-            <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') %>
-          <% else %>
-            <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
-            <% component.with_tab(id: 'structure-tab', pane_id: 'structure-pane', label: 'Structure') %>
-          <% end %>
+        <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.publishable_type? %>
+        <% if @solr_doc.virtual_object? %>
+          <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') %>
+        <% elsif @solr_doc.object_type?('item', 'agreement') %>
+          <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
+          <% component.with_tab(id: 'structure-tab', pane_id: 'structure-pane', label: 'Structure') %>
         <% end %>
-        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') if @solr_doc.dro? %>
-        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') if @solr_doc.dro? %>
+        <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
+        <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
         <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
@@ -111,7 +109,7 @@
           <% end %>
         <% end %>
 
-        <% if @solr_doc.dro_or_collection? %>
+        <% if @solr_doc.publishable_type? %>
           <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
             <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
@@ -119,24 +117,22 @@
           <% end %>
         <% end %>
 
-        <% if @solr_doc.dro? %>
-          <% if @solr_doc.virtual_object? %>
-            <%= component.with_pane(id: 'constituents-pane', tab_id: 'constituents-tab') do %>
-              <%= turbo_frame_tag(@solr_doc.druid, 'constituents', src: constituents_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-                <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-              <% end %>
+        <% if @solr_doc.virtual_object? %>
+          <%= component.with_pane(id: 'constituents-pane', tab_id: 'constituents-tab') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'constituents', src: constituents_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+              <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
-          <% else %>
-            <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
-              <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-                <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-              <% end %>
+          <% end %>
+        <% elsif @solr_doc.object_type?('item', 'agreement') %>
+          <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+              <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
+          <% end %>
 
-            <%= component.with_pane(id: 'structure-pane', tab_id: 'structure-tab') do %>
-              <%= turbo_frame_tag(@solr_doc.druid, 'structure', src: structure_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
-                <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-              <% end %>
+          <%= component.with_pane(id: 'structure-pane', tab_id: 'structure-tab') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'structure', src: structure_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+              <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
         <% end %>
