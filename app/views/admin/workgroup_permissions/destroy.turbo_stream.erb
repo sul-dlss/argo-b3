@@ -1,0 +1,3 @@
+<%= render Elements::FlashToastComponent.new %>
+<%# Omit the request ID so Turbo refreshes the browser that submitted the deletion. %>
+<%= turbo_stream.refresh(request_id: nil) %>

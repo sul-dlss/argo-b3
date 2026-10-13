@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Admin
-  # Controller for listing the permissions held by workgroups
+  # Controller for listing and editing the permissions held by workgroups
   class WorkgroupPermissionsController < ApplicationController
     WorkgroupResult = Struct.new(:workgroup, :read_unrestricted, :permission_count) do
       def initialize(workgroup:, read_unrestricted: false, permission_count: 0)
@@ -9,13 +9,81 @@ module Admin
       end
     end
 
+    before_action :set_workgroup, only: %i[edit update]
+
     def index
       authorize! to: :index?, with: PermissionPolicy
 
       @workgroup_results = workgroup_results
     end
 
+    def edit
+      authorize! to: :edit?, with: PermissionPolicy
+
+      @workgroup_permission_form = WorkgroupPermissionForm.new(read_unrestricted: read_unrestricted_permission.present?)
+      set_additional_permissions
+    end
+
+    def update
+      authorize! to: :update?, with: PermissionPolicy
+
+      @workgroup_permission_form = WorkgroupPermissionForm.new(workgroup_permission_params)
+      save_read_unrestricted_permission
+
+      flash[:toast] = t('admin.workgroup_permissions.toasts.updated')
+      redirect_to admin_workgroup_permissions_path
+    end
+
+    def destroy
+      authorize! to: :destroy?, with: PermissionPolicy
+
+      @permission = Permission.find(params.expect(:id))
+      @permission.destroy!
+
+      flash.now[:toast] = t('admin.workgroup_permissions.toasts.deleted')
+      render formats: :turbo_stream
+    end
+
     private
+
+    def set_workgroup
+      @workgroup = params.expect(:workgroup)
+    end
+
+    def workgroup_permission_params
+      params.permit(admin_workgroup_permission: WorkgroupPermissionForm.permitted_params)[:admin_workgroup_permission]
+    end
+
+    def read_unrestricted_permission
+      Permission.permission_type_read_unrestricted.find_by(workgroup: @workgroup, target_druid: nil)
+    end
+
+    def save_read_unrestricted_permission
+      permission = read_unrestricted_permission
+      if @workgroup_permission_form.read_unrestricted
+        Permission.create!(workgroup: @workgroup, permission_type: :read_unrestricted) unless permission
+      else
+        permission&.destroy!
+      end
+    end
+
+    def set_additional_permissions
+      @additional_permissions = Permission.where(workgroup: @workgroup)
+                                          .where.not(id: read_unrestricted_permission&.id)
+                                          .order(:permission_type)
+      @object_docs_by_druid = object_docs_by_druid(@additional_permissions)
+    end
+
+    def object_docs_by_druid(permissions)
+      target_druids = permissions.filter_map(&:target_druid).uniq
+      return {} if target_druids.empty?
+
+      # query for names of objects in the list of target druids
+      Searchers::ItemByDruid.call(druids: target_druids, user_scope: current_user_scope,
+                                  fields: [Search::Fields::ID, Search::Fields::TITLE, Search::Fields::OBJECT_TYPES])
+                            .map { |doc| SolrDocPresenter.new(solr_doc: doc.solr_doc) }
+                            .index_by(&:druid)
+    end
 
     def workgroup_results
       {}.tap do |result_map|
