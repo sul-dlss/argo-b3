@@ -13,7 +13,21 @@ RSpec.describe 'Contents' do
     allow(Sdr::Repository).to receive_messages(find: cocina_object, update: updated_cocina_object,
                                                find_solr: build(:solr_item, druid:))
     allow(StageFilesJob).to receive(:perform_later)
+    create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
     sign_in(user)
+  end
+
+  describe 'edit' do
+    context 'when the user cannot edit the object' do
+      before { Permission.permission_type_edit.destroy_all }
+
+      it 'denies access' do
+        get edit_content_path(druid)
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq(I18n.t('errors.not_authorized'))
+      end
+    end
   end
 
   describe 'update' do
@@ -175,6 +189,19 @@ RSpec.describe 'Contents' do
           expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
                                                                       workflow_context: {})
         end
+      end
+    end
+
+    context 'when the user cannot edit the object' do
+      before { Permission.permission_type_edit.destroy_all }
+
+      it 'denies access without updating' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(response).to redirect_to(root_path)
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(StageFilesJob).not_to have_received(:perform_later)
       end
     end
 
