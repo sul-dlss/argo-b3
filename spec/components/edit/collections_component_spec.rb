@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::CollectionsComponent, type: :component do
   let(:component) { described_class.new(form:, options:) }
-  let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new(collection_druids: %w[druid:bc123df4567 druid:xz987wv6543]) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new(collection_druids: %w[druid:bc123df4567 druid:xz987wv6543]) }
   let(:options) { [['Art History Slides', 'druid:bc123df4567'], %w[xz987wv6543 druid:xz987wv6543]] }
 
   it 'renders the collections select with the selected collections' do

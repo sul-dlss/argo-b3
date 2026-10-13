@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::LicenseComponent, type: :component do
   let(:component) { described_class.new(form:, container_classes: 'my-fieldset') }
-  let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new(license: license_uri) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new(license: license_uri) }
   let(:license_uri) { Constants::LICENSE_OPTIONS.first[:uri] }
 
   it 'renders the license select with a blank option' do

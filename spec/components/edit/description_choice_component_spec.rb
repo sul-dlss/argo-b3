@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   let(:component) { described_class.new(form:) }
-  let(:form) { ActionView::Helpers::FormBuilder.new(nil, item_form, vc_test_view_context, {}) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(nil, new_item_form, vc_test_view_context, {}) }
 
   context 'when the title is entered' do
-    let(:item_form) { ItemForm.new(title: 'The Title') }
+    let(:new_item_form) { NewItemForm.new(title: 'The Title') }
 
     it 'renders the title state' do
       render_inline(component)
@@ -21,9 +21,9 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   end
 
   context 'when the title is retrieved from the catalog' do
-    let(:item_form) do
-      ItemForm.new(description_choice: ItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
-                   barcode: '36105010362304', catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
+    let(:new_item_form) do
+      NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
+                      barcode: '36105010362304', catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
     end
 
     it 'renders the catalog id state' do
@@ -39,9 +39,9 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
     end
 
     context 'when a title has already been retrieved' do
-      let(:item_form) do
-        ItemForm.new(description_choice: ItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
-                     retrieved_title: 'Pride and prejudice')
+      let(:new_item_form) do
+        NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
+                        retrieved_title: 'Pride and prejudice')
       end
 
       it 'renders the retrieved title in an enabled field' do
@@ -73,7 +73,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   end
 
   context 'when a description spreadsheet is uploaded' do
-    let(:item_form) { ItemForm.new(description_choice: ItemForm::DESCRIPTION_SPREADSHEET_CHOICE) }
+    let(:new_item_form) { NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_SPREADSHEET_CHOICE) }
 
     it 'renders the spreadsheet state' do
       render_inline(component)

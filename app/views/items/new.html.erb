@@ -5,7 +5,7 @@
 
   <%# enctype is necessary to support file upload. %>
   <%# Rails normally handles magically, but doesn't because the file input isn't nested in the form. %>
-  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @item_form, id: form_id, url: items_path,
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @new_item_form, id: form_id, url: items_path,
                                                                        html_options: { enctype: 'multipart/form-data' }) %>
 
   <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
@@ -19,7 +19,7 @@
     <% tab_list.with_tab(label: t('edit.items.tabs.release.label'), tab_name: :release) %>
     <% tab_list.with_tab(label: t('edit.items.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
-    <% form_with(model: @item_form, url: items_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+    <% form_with(model: @new_item_form, url: items_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
                                                                           label: t('edit.items.tabs.details.label'),
                                                                           mark_required: true)) do |pane| %>

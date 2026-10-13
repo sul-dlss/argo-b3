@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::ContentTypeComponent, type: :component do
   let(:component) { described_class.new(form:, container_classes: 'mb-3') }
-  let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new(content_type: Cocina::Models::ObjectType.image) }
+  let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new(content_type: Cocina::Models::ObjectType.image) }
 
   it 'renders the content type select' do
     render_inline(component)
@@ -24,7 +24,7 @@ RSpec.describe Edit::ContentTypeComponent, type: :component do
   end
 
   context 'when the content type is not a registration content type' do
-    let(:item_form) { ItemForm.new(content_type: Cocina::Models::ObjectType.manuscript) }
+    let(:new_item_form) { NewItemForm.new(content_type: Cocina::Models::ObjectType.manuscript) }
 
     it 'adds the content type to the options' do
       render_inline(component)
