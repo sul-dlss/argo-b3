@@ -10,9 +10,11 @@ RSpec.describe ObjectStatusPresenter do
   let(:workflow_errors) { [] }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed)
+    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed,
+                                         editable?: editable)
   end
   let(:closed) { false }
+  let(:editable) { false }
   let(:assembling) { false }
   let(:accessioning) { false }
   let(:content) { nil }
@@ -98,6 +100,22 @@ RSpec.describe ObjectStatusPresenter do
 
       it 'returns error' do
         expect(presenter.status).to eq(:error)
+      end
+    end
+  end
+
+  describe '#version_editable?' do
+    context 'when the version is editable' do
+      let(:editable) { true }
+
+      it 'returns true' do
+        expect(presenter.version_editable?).to be true
+      end
+    end
+
+    context 'when the version is not editable' do
+      it 'returns false' do
+        expect(presenter.version_editable?).to be false
       end
     end
   end

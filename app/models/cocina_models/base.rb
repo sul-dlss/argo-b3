@@ -22,16 +22,14 @@ module CocinaModels
 
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
-    # @raise [Sdr::Repository::Error] if there is an error updating the object
+    # @param [Boolean] accession whether to start accessioning after saving (even if nothing changed)
+    # @raise [Sdr::Repository::Error] if there is an error updating or accessioning the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def save!(user_name:, description: nil)
+    def save!(user_name:, description: nil, accession: false)
       raise 'Cannot save an object that has not been persisted; call #create! instead' unless persisted?
-      return unless changed?
 
-      validate!
-      updated_cocina_object = Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
-      refresh_cocina_object(updated_cocina_object)
-      changes_applied
+      update_cocina_object!(user_name:, description:) if changed?
+      Sdr::Repository.accession(cocina_object: previous_cocina_object, user_name:) if accession
     end
 
     # @param [String] user_name the sunetid of the user performing the action
@@ -96,6 +94,13 @@ module CocinaModels
     end
 
     private
+
+    def update_cocina_object!(user_name:, description:)
+      validate!
+      updated_cocina_object = Sdr::Repository.update(cocina_object: mutated_cocina_object, user_name:, description:)
+      refresh_cocina_object(updated_cocina_object)
+      changes_applied
+    end
 
     def assign_from_cocina_object(cocina_object)
       @external_identifier = cocina_object.externalIdentifier

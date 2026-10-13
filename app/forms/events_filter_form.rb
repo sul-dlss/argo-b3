@@ -19,6 +19,7 @@ class EventsFilterForm < ApplicationForm
     user_version_permanently_withdrawn
     user_version_withdrawn
     version_close
+    version_description_update
     version_discard
     version_open
     druid_version_replicated
