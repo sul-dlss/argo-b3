@@ -5,10 +5,13 @@ module Edit
   class CopyrightComponent < ApplicationComponent
     INPUT_ROWS = 3
 
-    def initialize(form:, container_classes: [], label_text: nil)
+    # @param apo_defaults [Boolean] true to show the selected APO's default copyright, using the
+    #   apo-defaults Stimulus controller
+    def initialize(form:, container_classes: [], label_text: nil, apo_defaults: false)
       @form = form
       @container_classes = container_classes
       @label_text = label_text
+      @apo_defaults = apo_defaults
       super()
     end
 
@@ -23,7 +26,14 @@ module Edit
     end
 
     def help_text
-      t('edit.items.fields.copyright.help_text_html', url: Settings.links.copyright)
+      help_text = t('edit.items.fields.copyright.help_text_html', url: Settings.links.copyright)
+      return help_text unless @apo_defaults
+
+      safe_join([help_text, tag.span(data: { apo_defaults_target: 'copyrightText' })], tag.br)
+    end
+
+    def input_data
+      @apo_defaults ? { apo_defaults_target: 'copyright' } : {}
     end
   end
 end

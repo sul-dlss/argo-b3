@@ -45,4 +45,27 @@ RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
     expect(page).to have_css('[data-toggle-target="section"][data-toggle-section="without-embargo"]')
     expect(page).to have_css('[data-toggle-target="section"][data-toggle-section="with-embargo"]')
   end
+
+  context 'when showing APO defaults' do
+    let(:component) { described_class.new(form:, apo_defaults: true) }
+
+    it 'shows APO defaults for the access without embargo and once the embargo ends, but not during the embargo' do
+      render_inline(component)
+
+      expect(page).to have_css('fieldset:has(> legend:contains("Access settings without embargo")) ' \
+                               '[data-apo-defaults-group="without_embargo"] select[name="item[access_view]"]')
+      expect(page).to have_css('fieldset:has(> legend:contains("Access settings once embargo ends")) ' \
+                               '[data-apo-defaults-group="embargo_ends"] select[name="item[embargo_view]"]')
+      expect(page).to have_no_css('fieldset:has(> legend:contains("Access settings during embargo")) ' \
+                                  '[data-apo-defaults-group]')
+    end
+  end
+
+  context 'when not showing APO defaults' do
+    it 'does not render the apo-defaults targets' do
+      render_inline(component)
+
+      expect(page).to have_no_css('[data-apo-defaults-target]', visible: :all)
+    end
+  end
 end

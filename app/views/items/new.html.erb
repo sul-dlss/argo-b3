@@ -45,23 +45,28 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
                                                                           label: t('edit.items.tabs.rights.label'),
                                                                           mark_required: true)) do |pane| %>
-        <%= render Edit::ApoComponent.new(form:, options: @apo_options) %>
+        <%# Selecting an APO applies its object defaults to the rights fields. The defaults of the initially selected
+            APO are also applied to a new form, but not to a form redisplayed with errors, which keeps the user's values. %>
+        <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: @new_item_form.errors.empty? } do %>
+          <%= render Edit::ApoComponent.new(form:, options: @apo_options, apo_defaults: true) %>
 
-        <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
+          <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
 
-        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-        <%= render Edit::AccessAndEmbargoComponent.new(form:) %>
+          <%= render Edit::AccessAndEmbargoComponent.new(form:, apo_defaults: true) %>
 
-        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-        <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset') %>
+          <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset',
+                                                                    apo_defaults: true) %>
 
-        <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset') %>
+          <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
 
-        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-        <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+          <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
+        <% end %>
 
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>

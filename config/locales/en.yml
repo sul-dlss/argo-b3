@@ -251,6 +251,9 @@ en:
         tags:
           label: "Tags"
       fields:
+        apo_default:
+          text: "APO default = %{value}"
+          none: "none"
         apo_druid:
           label: "APO"
         barcode:
