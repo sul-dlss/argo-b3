@@ -48,6 +48,19 @@ RSpec.describe 'Republish object' do
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:toast]).to eq('Republishing started')
       end
+
+      context 'when a Turbo request' do
+        it 'publishes, shows the toast, and refreshes the page with a turbo stream' do
+          post republish_object_path(druid), headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+
+          expect(Sdr::Repository).to have_received(:publish).with(druid:, lane_id: 'low')
+          expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+          expect(response.body).to include('turbo-stream action="append" target="toast-container"')
+          expect(response.body).to include('Republishing started')
+          expect(response.body).to include('turbo-stream action="refresh"')
+          expect(flash[:toast]).to be_nil
+        end
+      end
     end
   end
 end

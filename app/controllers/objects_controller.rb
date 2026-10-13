@@ -9,6 +9,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                   show_structural_csv track]
 
   include TokenConcern
+  include ToastAndRefreshConcern
 
   # The strategy is to authorize on show, but not repeat authorization on other show endpoints.
   # This avoids having to make additional calls that would be required for the authorization, but not the showing.
@@ -158,13 +159,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(druid))
     authorize! @solr_doc, to: :update?, with: ObjectPolicy
 
-    if republishable?
-      Sdr::Repository.publish(druid:, lane_id: 'low')
-      flash[:toast] = t('show.toasts.republish_started')
-    else
+    unless republishable?
       flash[:warning] = t('show.warnings.republish_failed')
+      return redirect_to object_path(druid:)
     end
-    redirect_to object_path(druid:)
+
+    Sdr::Repository.publish(druid:, lane_id: 'low')
+    toast_and_refresh(t('show.toasts.republish_started'), fallback_location: object_path(druid:))
   end
 
   private
