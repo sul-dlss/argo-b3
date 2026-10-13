@@ -154,6 +154,31 @@ FactoryBot.define do
     end
   end
 
+  factory :solr_admin_policy, class: 'Hash' do
+    transient do
+      druid { generate(:unique_druid) }
+      sequence(:title) { |n| "Test APO #{n}" }
+      apo_druid { generate(:unique_druid) }
+    end
+
+    initialize_with do
+      {
+        Search::Fields::ID => druid,
+        Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
+        Search::Fields::TITLE => title,
+        Search::Fields::OBJECT_TYPES => ['APO'],
+        Search::Fields::APO_DRUID => [apo_druid],
+        FULL_TITLE_UNSTEMMED => title,
+        FULL_TITLE => title
+      }
+    end
+
+    to_create do |solr_doc|
+      Search::SolrFactory.call.add(solr_doc)
+      Search::SolrFactory.call.commit
+    end
+  end
+
   trait :with_projects do
     transient do
       projects { ['Project 1', 'Project 2 : Project 2a'] }

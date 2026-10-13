@@ -1,0 +1,85 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.items.edit.title')) %>
+
+  <p class="mb-4"><%= @title %></p>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%# enctype is necessary to support file upload. %>
+  <%# Rails normally handles magically, but doesn't because the file input isn't nested in the form. %>
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @edit_item_form, id: form_id, url: item_path(@edit_item_form.druid),
+                                                                       hidden_fields: [:lock], html_options: { enctype: 'multipart/form-data' }) %>
+
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.details.label'), tab_name: :details) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.description.label'), tab_name: :description) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.rights.label'), tab_name: :rights) %>
+    <% tab_list.with_tab(label: t('edit.items.edit.tabs.deposit.label'), tab_name: :deposit) %>
+
+    <% form_with(model: @edit_item_form, url: item_path(@edit_item_form.druid), html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
+                                                                          label: t('edit.items.tabs.details.label'))) do |pane| %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+              form:,
+              field_name: :source_id,
+              label_text: t('edit.items.fields.source_id.label')
+            ) %>
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, show_previous: false) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
+                                                                          label: t('edit.items.tabs.description.label'))) do |pane| %>
+
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, show_previous: true) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
+                                                                          label: t('edit.items.tabs.rights.label'))) do |pane| %>
+        <%= render Edit::ApoComponent.new(form:, options: @apo_options) %>
+
+        <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
+
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render Edit::AccessAndEmbargoComponent.new(form:) %>
+
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+        <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.items.edit.tabs.deposit.label'))) do |pane| %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+              form:,
+              field_name: :version_description,
+              label_text: t('edit.items.fields.version_description.label'),
+              label_mark_required: true,
+              container_classes: 'mb-3'
+            ) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, show_next: false, show_deposit: true) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+</div>

@@ -86,6 +86,10 @@ en:
         body_html: "Files could not be staged. Contact SDR support at %{email} for assistance."
       actions:
         edit_item: "Edit item"
+        edit_agreement: "Edit agreement"
+        edit_collection: "Edit collection"
+        edit_admin_policy: "Edit APO"
+        edit_virtual_object: "Edit virtual object"
         manage_files: "Manage files"
         deposit: "Deposit"
     released_to:
@@ -219,6 +223,20 @@ en:
         deleted: 'Resource deleted'
         updated: 'Resource updated'
     items:
+      edit:
+        title: "Edit item"
+        buttons:
+          deposit: "Deposit"
+          draft: "Save as draft"
+        warnings:
+          not_editable: "Item is not editable."
+          stale: "This item was changed since you opened it. Review the current values and make your changes again."
+        tabs:
+          deposit:
+            label: "Deposit"
+        toasts:
+          deposited: "Item updated and deposit started."
+          updated: "Item updated."
       new:
         title: "Register an item"
         buttons:
@@ -346,6 +364,8 @@ en:
           label: "Use and reproduction"
           help_text_html: >-
             See <a href="%{url}" target="_blank" rel="noopener">sample statements</a>.
+        version_description:
+          label: "Version description"
         viewing_direction:
           label: "Viewing direction"
     multiple_items:

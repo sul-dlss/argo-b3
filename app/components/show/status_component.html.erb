@@ -2,12 +2,19 @@
   <% case status %>
   <% when :deposited, :draft %>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.edit_item'),
-                                                                  variant: :'outline-primary', size: :sm,
-                                                                  disabled: true) %>
-      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.manage_files'),
-                                                                  variant: :'outline-primary', size: :sm,
-                                                                  disabled: true) %>
+      <% if edit? %>
+        <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
+                                                                        variant: :'outline-primary', size: :sm) %>
+      <% else %>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: edit_label,
+                                                                    variant: :'outline-primary', size: :sm,
+                                                                    disabled: true) %>
+      <% end %>
+      <% if item? %>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.manage_files'),
+                                                                    variant: :'outline-primary', size: :sm,
+                                                                    disabled: true) %>
+      <% end %>
       <% if status == :draft %>
         <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
                                                                     variant: :primary, size: :sm, disabled: true) %>
