@@ -42,7 +42,7 @@ module Show
     # expanded / collapsed state of the rows during the morph (see cocina_model_show_controller.js) would keep the
     # attributes of a different event's rows.
     def row_id
-      "event-#{Digest::MD5.hexdigest([event.event_type, event.timestamp, event.data].to_json)}"
+      "event-#{event.event_type}-#{event.timestamp}".parameterize
     end
 
     def data_id

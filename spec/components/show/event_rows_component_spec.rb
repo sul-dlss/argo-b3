@@ -36,19 +36,15 @@ RSpec.describe Show::EventRowsComponent, type: :component do
     end
   end
 
-  context 'with events that differ' do
+  context 'with an event' do
     let(:event) do
-      Dor::Services::Client::Events::Event.new(event_type: 'version_open', data: { 'description' => 'Fix title' },
-                                               timestamp: '2026-04-16T10:00:00Z')
-    end
-    let(:other_event) do
-      Dor::Services::Client::Events::Event.new(event_type: 'version_open', data: { 'description' => 'Fix title' },
-                                               timestamp: '2026-04-17T10:00:00Z')
+      Dor::Services::Client::Events::Event.new(event_type: 'druid_version_replicated', data: {},
+                                               timestamp: '2026-04-16T10:00:00.123Z')
     end
 
-    it 'identifies the rows by the event' do
-      expect(component.row_id).to eq(described_class.new(event: event.dup).row_id)
-      expect(component.row_id).not_to eq(described_class.new(event: other_event).row_id)
+    it 'identifies the rows by the event type and timestamp' do
+      expect(component.row_id).to eq('event-druid_version_replicated-2026-04-16t10-00-00-123z')
+      expect(component.data_id).to eq('event-druid_version_replicated-2026-04-16t10-00-00-123z-data')
     end
   end
 
