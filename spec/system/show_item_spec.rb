@@ -420,8 +420,9 @@ RSpec.describe 'Show item' do
 
     expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
     expect(page).to have_css('#events-table td', text: 'Version open')
+    # The filtered events frame is also reloaded on each page refresh, so may have been requested more than once.
     expect(events_client).to have_received(:list)
-      .with(event_types: ['version_open'], from: Time.utc(2021, 3, 31, 20, 0, 0), to: nil)
+      .with(event_types: ['version_open'], from: Time.utc(2021, 3, 31, 20, 0, 0), to: nil).at_least(:once)
 
     # Files tab
     click_button 'Files'

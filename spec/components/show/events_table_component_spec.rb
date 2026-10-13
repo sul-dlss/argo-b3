@@ -36,8 +36,7 @@ RSpec.describe Show::EventsTableComponent, type: :component do
 
   it 'renders the rows for each event' do
     expect(page).to have_css('tbody tr', count: 6)
-    expect(page).to have_css('tr#event-0-data')
-    expect(page).to have_css('tr#event-1-data')
+    expect(page).to have_css('tr.toggle-row-data', count: 2)
     expect(page).to have_css('tbody th', text: '2026-04-14 03:00:00 PT')
     expect(page).to have_css('tbody th', text: '2026-04-13 03:00:00 PT')
   end

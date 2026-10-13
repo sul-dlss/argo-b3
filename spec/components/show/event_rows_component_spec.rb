@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::EventRowsComponent, type: :component do
-  let(:component) { described_class.new(event:, index: 0) }
+  let(:component) { described_class.new(event:) }
   # Rendered within a table, since table rows are dropped when rendered as a standalone fragment.
   let(:table) do
     Capybara.string("<table><tbody>#{component.render_in(vc_test_view_context)}</tbody></table>")
@@ -18,7 +18,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
     end
 
     it 'renders a toggleable row and a row with the data' do
-      row = table.find('tr[data-bs-target="#event-0-data"]')
+      row = table.find("tr##{component.row_id}[data-bs-target='##{component.data_id}']")
       expect(row['data-bs-toggle']).to eq('collapse')
       expect(row[:class]).to include('collapsed')
       expect(row).to have_css('td .toggle-row-indicator')
@@ -28,11 +28,27 @@ RSpec.describe Show::EventRowsComponent, type: :component do
       expect(cells[1]).to have_text('jdoe')
       expect(cells[2]).to have_text('2')
 
-      data_row = table.find('tr#event-0-data.collapse')
+      data_row = table.find("tr##{component.data_id}.collapse")
       expect(data_row).to have_css('dt', text: 'Description')
       expect(data_row).to have_css('dd', text: 'Fix title')
       expect(data_row).to have_no_css('dt', text: 'Who')
       expect(data_row).to have_no_css('dt', text: 'Version')
+    end
+  end
+
+  context 'with events that differ' do
+    let(:event) do
+      Dor::Services::Client::Events::Event.new(event_type: 'version_open', data: { 'description' => 'Fix title' },
+                                               timestamp: '2026-04-16T10:00:00Z')
+    end
+    let(:other_event) do
+      Dor::Services::Client::Events::Event.new(event_type: 'version_open', data: { 'description' => 'Fix title' },
+                                               timestamp: '2026-04-17T10:00:00Z')
+    end
+
+    it 'identifies the rows by the event' do
+      expect(component.row_id).to eq(described_class.new(event: event.dup).row_id)
+      expect(component.row_id).not_to eq(described_class.new(event: other_event).row_id)
     end
   end
 
@@ -44,7 +60,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
     end
 
     it 'renders the value with the JSON viewer' do
-      data_row = table.find('tr#event-0-data')
+      data_row = table.find("tr##{component.data_id}")
       expect(data_row).to have_css('dt', text: 'Request')
       expect(data_row).to have_css('dd andypf-json-viewer')
     end
@@ -64,7 +80,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
       expect(cells[1]).to have_text('asmith')
       expect(cells[2]).to have_text('3')
       expect(row).to have_no_css('.toggle-row-indicator')
-      expect(table).to have_no_css('tr#event-0-data')
+      expect(table).to have_no_css("tr##{component.data_id}")
     end
   end
 
@@ -78,7 +94,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
       row = table.find('tr', text: 'Publishing complete')
       expect(row['data-bs-toggle']).to be_nil
       expect(row).to have_no_css('.toggle-row-indicator')
-      expect(table).to have_no_css('tr#event-0-data')
+      expect(table).to have_no_css("tr##{component.data_id}")
     end
   end
 end

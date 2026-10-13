@@ -5,10 +5,8 @@ module Show
   # For an event with data, the event row can be clicked to show / hide a row with the data.
   class EventRowsComponent < ApplicationComponent
     # @param event [Dor::Services::Client::Events::Event]
-    # @param index [Integer] the index of the event in the table, used to identify the data row
-    def initialize(event:, index:)
+    def initialize(event:)
       @event = event
-      @index = index
       super()
     end
 
@@ -39,8 +37,16 @@ module Show
       display_data.present?
     end
 
+    # Identifies the rows by the event rather than its position in the table, so that a morph refresh (e.g., after
+    # filtering or when new events arrive) only morphs a row into the same event's row. Otherwise, preserving the
+    # expanded / collapsed state of the rows during the morph (see cocina_model_show_controller.js) would keep the
+    # attributes of a different event's rows.
+    def row_id
+      "event-#{Digest::MD5.hexdigest([event.event_type, event.timestamp, event.data].to_json)}"
+    end
+
     def data_id
-      "event-#{@index}-data"
+      "#{row_id}-data"
     end
 
     def key_label(key)
@@ -59,9 +65,10 @@ module Show
     end
 
     def toggle_row_options
-      return {} unless data?
+      return { id: row_id } unless data?
 
       {
+        id: row_id,
         data: { bs_toggle: 'collapse', bs_target: "##{data_id}" },
         aria: { expanded: false, controls: data_id },
         class: 'toggle-row collapsed'
