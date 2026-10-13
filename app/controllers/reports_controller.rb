@@ -2,6 +2,9 @@
 
 # Controller for reports
 class ReportsController < ApplicationController
+  # Sends report chunks to the client as they are received from Solr, rather than buffering the whole report.
+  include ActionController::Live
+
   before_action :set_report_form, only: %i[download preview]
 
   # Reports don't require authorization.
