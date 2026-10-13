@@ -94,7 +94,9 @@ RSpec.describe 'Content file sets' do
                   '0' => { id: content_file.id, corrected_for_accessibility: submitted_value }
                 } } }
 
-          expect(response).to redirect_to(content_content_file_set_path(content_token, content_file_set, counter: 0))
+          expect(response).to redirect_to(
+            content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
+          )
           expect(content_file.reload.corrected_for_accessibility).to be expected_value
         end
       end
