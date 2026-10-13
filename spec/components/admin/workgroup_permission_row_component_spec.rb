@@ -24,7 +24,7 @@ RSpec.describe Admin::WorkgroupPermissionRowComponent, type: :component do
       expect(table).to have_css('tbody > tr', count: 1)
       expect(table).to have_link('Restricted collection', href: object_path('druid:bc123df4567'))
       expect(table.all('td').first(4).map { |cell| cell.text.strip }).to eq(
-        ['Restricted collection', 'druid:bc123df4567', 'Collection', 'Read restricted']
+        ['Restricted collection', 'bc123df4567', 'Collection', 'Read restricted']
       )
       delete_form = table.find("form[action='#{admin_permission_path(permission)}']")
       expect(delete_form).to have_css("input[name='_method'][value='delete']", visible: :all)
@@ -32,12 +32,28 @@ RSpec.describe Admin::WorkgroupPermissionRowComponent, type: :component do
     end
   end
 
+  [nil, ''].each do |title|
+    context "when the target object's title is #{title.inspect}" do
+      let(:object_doc) do
+        SolrDocPresenter.new(solr_doc: {
+                               Search::Fields::ID => 'druid:bc123df4567',
+                               Search::Fields::TITLE => title,
+                               Search::Fields::OBJECT_TYPES => ['collection']
+                             })
+      end
+
+      it 'uses the bare druid as the object link text' do
+        expect(table).to have_link('bc123df4567', href: object_path('druid:bc123df4567'))
+      end
+    end
+  end
+
   context 'when the target object is unavailable' do
     let(:object_doc) { nil }
 
-    it 'renders the target druid as the title without an object link' do
+    it 'renders the bare target druid as the title without an object link' do
       expect(table.all('td').first(4).map { |cell| cell.text.strip }).to eq(
-        ['druid:bc123df4567', 'druid:bc123df4567', '', 'Read restricted']
+        ['bc123df4567', 'bc123df4567', '', 'Read restricted']
       )
       expect(table).to have_no_css('a')
     end

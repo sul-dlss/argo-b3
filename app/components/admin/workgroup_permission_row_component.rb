@@ -12,9 +12,9 @@ module Admin
     attr_reader :permission, :object_doc
 
     def title_link
-      return permission.target_druid unless object_doc
+      return DruidSupport.bare_druid_from(permission.target_druid) unless object_doc
 
-      helpers.link_to_object(object_doc.title, object_doc.druid)
+      helpers.link_to_object(object_doc.title.presence || object_doc.bare_druid, object_doc.druid)
     end
 
     def permission_label

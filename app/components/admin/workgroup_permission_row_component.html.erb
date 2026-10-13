@@ -1,6 +1,6 @@
 <%= render SdrViewComponents::Tables::RowComponent.new(id: dom_id(permission)) do |row| %>
   <% row.with_cell do %><%= title_link %><% end %>
-  <% row.with_cell do %><%= permission.target_druid %><% end %>
+  <% row.with_cell do %><%= DruidSupport.bare_druid_from(permission.target_druid) %><% end %>
   <% row.with_cell do %><%= object_doc&.object_type_label %><% end %>
   <% row.with_cell do %><%= permission_label %><% end %>
   <% row.with_cell do %>

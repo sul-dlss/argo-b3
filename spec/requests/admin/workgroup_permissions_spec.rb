@@ -78,7 +78,7 @@ RSpec.describe 'Admin workgroup permissions' do
 
         rows = rendered_page.all('#additional-permissions-table tbody tr')
         expect(rows.map { |row| row.all('td')[0..3].map { |cell| cell.text.strip } }).to eq(
-          [['Restricted collection', 'druid:bc123df4567', 'Collection', 'Read restricted']]
+          [['Restricted collection', 'bc123df4567', 'Collection', 'Read restricted']]
         )
       end
     end
