@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::CopyrightComponent, type: :component do
   let(:component) { described_class.new(form:, container_classes: 'my-fieldset') }
-  let(:form) { ActionView::Helpers::FormBuilder.new(:item, item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new(copyright: 'Copyright © Stanford University.') }
+  let(:form) { ActionView::Helpers::FormBuilder.new(:item, new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new(copyright: 'Copyright © Stanford University.') }
 
   it 'renders the copyright text area' do
     render_inline(component)

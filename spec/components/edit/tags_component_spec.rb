@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Edit::TagsComponent, type: :component do
   let(:component) { described_class.new(form:) }
-  let(:form) { ActionView::Helpers::FormBuilder.new('item', item_form, vc_test_view_context, {}) }
-  let(:item_form) { ItemForm.new(other_tags_attributes: [{ tag: 'Registered By : mjgiarlo' }]) }
+  let(:form) { ActionView::Helpers::FormBuilder.new('item', new_item_form, vc_test_view_context, {}) }
+  let(:new_item_form) { NewItemForm.new(other_tags_attributes: [{ tag: 'Registered By : mjgiarlo' }]) }
 
   it 'renders a fieldset for each type of tag' do
     render_inline(component)
