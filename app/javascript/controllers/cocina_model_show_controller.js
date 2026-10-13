@@ -21,6 +21,8 @@ export default class extends Controller {
     document.addEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.addEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
+    document.addEventListener('turbo:submit-start', this.handleSubmitStart)
+    document.addEventListener('turbo:submit-end', this.handleSubmitEnd)
 
     this.href = window.location.href
     if (this.reloadTimeout) return
@@ -39,6 +41,8 @@ export default class extends Controller {
     document.removeEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.removeEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.removeEventListener('turbo:frame-missing', this.handleMissingFrame)
+    document.removeEventListener('turbo:submit-start', this.handleSubmitStart)
+    document.removeEventListener('turbo:submit-end', this.handleSubmitEnd)
   }
 
   // This preserves the active tab when the page is refreshed
@@ -83,12 +87,23 @@ export default class extends Controller {
   // stagger the frame reloads to avoid bursts of requests.
   scheduleReload = () => {
     this.reloadTimeout = setTimeout(() => {
-      if (this.href === window.location.href && document.visibilityState === 'visible') {
+      if (this.href === window.location.href && document.visibilityState === 'visible' && !this.submitting) {
         Turbo.session.refresh(this.href)
       }
 
       this.scheduleReload()
     }, this.intervalValue)
+  }
+
+  // A page refresh starts a Turbo visit, which aborts any in-flight form submission (e.g., pinning or
+  // republishing) so that its response (e.g., a toast) is never rendered. So the refresh is skipped while a
+  // submission is in flight.
+  handleSubmitStart = () => {
+    this.submitting = true
+  }
+
+  handleSubmitEnd = () => {
+    this.submitting = false
   }
 
   // handleFrameResponse, preventFailedFrameRender, and handleMissingFrame work together to prevent

@@ -6,6 +6,8 @@ RSpec.describe 'PinnedTags' do
   let(:user) { create(:user) }
   let(:tag) { 'Project : Foo' }
 
+  let(:turbo_stream_headers) { { 'Accept' => 'text/vnd.turbo-stream.html, text/html' } }
+
   before do
     sign_in(user)
   end
@@ -21,6 +23,19 @@ RSpec.describe 'PinnedTags' do
       expect(flash[:toast]).to eq('Pin added')
       expect(PinnedTag.last.user).to eq(user)
       expect(PinnedTag.last.tag).to eq(tag)
+    end
+
+    context 'when a Turbo request' do
+      it 'shows the toast and refreshes the page with a turbo stream' do
+        post pinned_tags_path, params: { tag: }, headers: turbo_stream_headers
+
+        expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+        expect(response.body).to include('turbo-stream action="append" target="toast-container"')
+        expect(response.body).to include('Pin added')
+        expect(response.body).to include('turbo-stream action="refresh"')
+        expect(response.body).not_to include('request-id')
+        expect(flash[:toast]).to be_nil
+      end
     end
 
     it 'is idempotent when the tag is already pinned' do
@@ -44,6 +59,19 @@ RSpec.describe 'PinnedTags' do
       expect(response).to redirect_to(root_path)
       expect(response).to have_http_status(:see_other)
       expect(flash[:toast]).to eq('Pin removed')
+    end
+
+    context 'when a Turbo request' do
+      it 'shows the toast and refreshes the page with a turbo stream' do
+        delete pinned_tag_path(tag), headers: turbo_stream_headers
+
+        expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+        expect(response.body).to include('turbo-stream action="append" target="toast-container"')
+        expect(response.body).to include('Pin removed')
+        expect(response.body).to include('turbo-stream action="refresh"')
+        expect(response.body).not_to include('request-id')
+        expect(flash[:toast]).to be_nil
+      end
     end
   end
 end

@@ -2,11 +2,7 @@
 
 # Controller for managing pinned objects
 class PinnedObjectsController < ApplicationController
-  # Any caller of create or destroy will want to include:
-  # <% content_for :head do %>
-  #   <meta name="turbo-refresh-method" content="morph">
-  #   <meta name="turbo-refresh-scroll" content="preserve">
-  # <% end %>
+  include ToastAndRefreshConcern
 
   # No reason to authorize since the user can only be the user.
   skip_verify_authorized
@@ -14,17 +10,13 @@ class PinnedObjectsController < ApplicationController
   def create
     PinnedObject.find_or_create_by!(user: current_user, druid: params[:druid])
 
-    flash[:toast] = t('pinned.pin_added')
-
-    redirect_to request.referer || root_path, status: :see_other
+    toast_and_refresh(t('pinned.pin_added'))
   end
 
   def destroy
     pinned_object = PinnedObject.find_by!(druid: params.expect(:id), user: current_user)
     pinned_object.destroy!
 
-    flash[:toast] = t('pinned.pin_removed')
-
-    redirect_to request.referer || root_path, status: :see_other
+    toast_and_refresh(t('pinned.pin_removed'))
   end
 end

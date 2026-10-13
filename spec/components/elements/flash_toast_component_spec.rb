@@ -16,6 +16,20 @@ RSpec.describe Elements::FlashToastComponent, type: :component do
     end
   end
 
+  context 'when a title is provided' do
+    before do
+      vc_test_controller.flash[:toast] = 'Saved'
+    end
+
+    it 'renders a turbo stream that appends a toast for the title instead of the flash' do
+      render_inline(described_class.new(title: 'Pin added'))
+
+      expect(page).to have_css('turbo-stream[action="append"][target="toast-container"]')
+      expect(rendered_content).to include('Pin added')
+      expect(rendered_content).not_to include('Saved')
+    end
+  end
+
   context 'when there is no toast flash' do
     it 'does not render' do
       render_inline(described_class.new)
