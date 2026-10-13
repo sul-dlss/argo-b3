@@ -55,7 +55,7 @@ RSpec.describe 'Create a new text extraction bulk action' do
       select_multi_option_with_key 'Danis', from: 'Search for a language', key: :enter
       select_multi_option_with_key 'Engl', from: 'Search for a language', key: :tab
 
-      items = find_multi_select_items(from: 'Search for a language')
+      items = find_multi_select_items(from: 'Search for a language', count: 2)
       expect(items.map(&:text)).to contain_exactly(a_string_starting_with('Danish'),
                                                    a_string_starting_with('English'))
     end
@@ -74,12 +74,12 @@ RSpec.describe 'Create a new text extraction bulk action' do
 
       languages.each { |language| select_multi_option language, from: 'Search for a language' }
 
-      expect(find_multi_select_items(from: 'Search for a language').size).to eq(9)
+      expect(find_multi_select('Search for a language')).to have_css('.item', count: 9)
       expect(page).to have_text('Selecting more than eight text-extraction languages')
 
       remove_first_multi_option from: 'Search for a language'
 
-      expect(find_multi_select_items(from: 'Search for a language').size).to eq(8)
+      expect(find_multi_select('Search for a language')).to have_css('.item', count: 8)
       expect(page).to have_no_text('Selecting more than eight text-extraction languages')
     end
   end
