@@ -221,37 +221,15 @@ RSpec.describe Sdr::Repository do
       instance_double(Dor::Services::Client::Object, version: version_client, workflow: workflow_client)
     end
     let(:type) { Cocina::Models::ObjectType.image }
-    let(:cocina_object) { build(:dro, id: druid, type:, version: 2).new(structural:) }
-    let(:structural) do
-      {
-        contains: [
-          {
-            type: Cocina::Models::FileSetType.file,
-            externalIdentifier: 'bc123df4567_1',
-            label: 'Fileset 1',
-            version: 2,
-            structural: { contains: files }
-          }
-        ]
-      }
-    end
-    let(:files) do
-      [
-        {
-          type: Cocina::Models::ObjectType.file,
-          externalIdentifier: 'https://cocina.sul.stanford.edu/file/bc123df4567-1/image1.tif',
-          label: 'image1.tif',
-          filename: 'image1.tif',
-          version: 2
-        }
-      ]
-    end
+    let(:cocina_object) { build(:dro, id: druid, type:, version: 2) }
+    let(:staged_files) { true }
 
     before do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
+      allow(StagingSupport).to receive(:staged_files?).with(druid:).and_return(staged_files)
     end
 
-    context 'when the object has files' do
+    context 'when there are files in staging' do
       it 'creates an assemblyWF' do
         described_class.accession(cocina_object:, user_name:)
 
@@ -261,7 +239,15 @@ RSpec.describe Sdr::Repository do
       end
     end
 
-    context 'when the object is geo and has files' do
+    context 'when there are files in staging and a context is given' do
+      it 'creates an assemblyWF with the context' do
+        described_class.accession(cocina_object:, user_name:, context: { runOcr: true })
+
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: { runOcr: true })
+      end
+    end
+
+    context 'when the object is geo and there are files in staging' do
       let(:type) { Cocina::Models::ObjectType.geo }
 
       it 'creates a gisAssemblyWF' do
@@ -272,35 +258,26 @@ RSpec.describe Sdr::Repository do
       end
     end
 
-    context 'when the object has file sets without files' do
-      let(:files) { [] }
+    context 'when there are no files in staging' do
+      let(:staged_files) { false }
 
       it 'closes the version to initiate accessioning' do
         described_class.accession(cocina_object:, user_name:)
 
         expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
         expect(object_client).not_to have_received(:workflow)
-      end
-    end
-
-    context 'when the object has no file sets' do
-      let(:structural) { {} }
-
-      it 'closes the version to initiate accessioning' do
-        described_class.accession(cocina_object:, user_name:)
-
-        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
       end
     end
 
     context 'when the object is an APO' do
       let(:cocina_object) { build(:admin_policy, id: druid, version: 2) }
 
-      it 'closes the version to initiate accessioning' do
+      it 'closes the version to initiate accessioning without checking staging' do
         described_class.accession(cocina_object:, user_name:)
 
         expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
         expect(object_client).not_to have_received(:workflow)
+        expect(StagingSupport).not_to have_received(:staged_files?)
       end
     end
 
