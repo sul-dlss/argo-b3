@@ -1,0 +1,15 @@
+<%= render SdrViewComponents::Tables::RowComponent.new(id: dom_id(permission)) do |row| %>
+  <% row.with_cell do %><%= title_link %><% end %>
+  <% row.with_cell do %><%= permission.target_druid %><% end %>
+  <% row.with_cell do %><%= object_doc&.object_type_label %><% end %>
+  <% row.with_cell do %><%= permission_label %><% end %>
+  <% row.with_cell do %>
+    <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(
+          link: admin_permission_path(permission),
+          icon: :delete,
+          label: delete_label,
+          method: :delete,
+          top: false
+        ) %>
+  <% end %>
+<% end %>

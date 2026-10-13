@@ -55,6 +55,7 @@ RSpec.describe 'Admin workgroup permissions' do
       before do
         create(:permission, :read_unrestricted, workgroup: 'sdr:alpha')
         create(:permission, :read_restricted, workgroup: 'sdr:alpha', target_druid: 'druid:bc123df4567')
+        create(:permission, :edit, workgroup: 'sdr:beta', target_druid: 'druid:df456gh7890')
 
         allow(Searchers::ItemByDruid).to receive(:call).and_return(
           [
@@ -133,19 +134,43 @@ RSpec.describe 'Admin workgroup permissions' do
         end
       end
 
-      context 'when the form cannot be saved' do
+      context 'when setting read unrestricted to yes and a permission already exists' do
         before do
-          allow(Admin::WorkgroupPermissionForm).to receive(:for_workgroup).and_wrap_original do |original, workgroup|
-            original.call(workgroup).tap { |form| allow(form).to receive(:save).and_return(false) }
-          end
+          create(:permission, :read_unrestricted, workgroup: 'sdr:alpha')
         end
 
-        it 're-renders the edit page with an unprocessable content status' do
-          patch admin_workgroup_permission_path('sdr:alpha'),
-                params: { admin_workgroup_permission: { read_unrestricted: true } }
+        it 'keeps the existing permission and shows a toast' do
+          expect do
+            patch admin_workgroup_permission_path('sdr:alpha'),
+                  params: { admin_workgroup_permission: { read_unrestricted: true } }
+          end.not_to change(Permission, :count)
 
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(response.body).to include('Return to all workgroups')
+          expect(response).to redirect_to(admin_workgroup_permissions_path)
+          expect(flash[:toast]).to eq('Permission updated')
+        end
+      end
+
+      context 'when setting read unrestricted to no and no permission exists' do
+        let!(:edit_permission) { create(:permission, :edit, workgroup: 'sdr:alpha', target_druid: 'druid:bc123df4567') }
+
+        it 'preserves the edit permission and shows a toast' do
+          expect do
+            patch admin_workgroup_permission_path('sdr:alpha'),
+                  params: { admin_workgroup_permission: { read_unrestricted: false } }
+          end.not_to change(Permission, :count)
+
+          expect(Permission.exists?(edit_permission.id)).to be true
+          expect(response).to redirect_to(admin_workgroup_permissions_path)
+          expect(flash[:toast]).to eq('Permission updated')
+        end
+      end
+
+      context 'when a different workgroup is submitted in the form' do
+        it 'creates the permission only for the workgroup in the URL' do
+          patch admin_workgroup_permission_path('sdr:alpha'),
+                params: { admin_workgroup_permission: { read_unrestricted: true, workgroup: 'sdr:beta' } }
+
+          expect(Permission.permission_type_read_unrestricted.pluck(:workgroup)).to eq(['sdr:alpha'])
         end
       end
     end
@@ -184,7 +209,7 @@ RSpec.describe 'Admin workgroup permissions' do
         expect(response).to have_http_status(:ok)
         expect(response.media_type).to eq('text/vnd.turbo-stream.html')
         expect(response.body).to include('Permission deleted')
-        expect(response.body).to include("turbo-stream action=\"remove\" target=\"#{ActionView::RecordIdentifier.dom_id(permission)}\"")
+        expect(response.body).to include('<turbo-stream action="refresh"')
         expect(Permission.exists?(permission.id)).to be false
       end
     end
