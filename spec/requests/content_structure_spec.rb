@@ -31,6 +31,81 @@ RSpec.describe 'Content structure' do
     end
   end
 
+  describe 'edit with a structure' do
+    before do
+      create(:content_file, content_file_set: create(:content_file_set, content:))
+    end
+
+    it 'renders the structure validation frame for the selected content type' do
+      get edit_content_structure_path(content_id: content_token, content_type: Cocina::Models::ObjectType.book)
+
+      frame = response.parsed_body.at_css("turbo-frame#structure-validation_content_#{content.id}")
+      expect(frame['refresh']).to eq('morph')
+      expect(frame['src']).to eq(validation_content_structure_path(
+                                   content_id: content_token, content_type: 'https://cocina.sul.stanford.edu/models/book'
+                                 ))
+    end
+  end
+
+  describe 'validation' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book).new(access:)
+    end
+    let(:access) { { view: 'world', download: 'world' } }
+    let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
+
+    before do
+      create(:content_file, content_file_set:, position: 1,
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.jp2',
+                                                                              mime_type: 'image/jp2'))
+      create(:content_file, content_file_set:, position: 2,
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.pdf',
+                                                                              mime_type: 'application/pdf'))
+    end
+
+    it 'renders the errors' do
+      get validation_content_structure_path(content_id: content_token)
+
+      expect(response.body).to include(%(<turbo-frame id="structure-validation_content_#{content.id}"))
+      expect(response.body).to include('Content errors')
+      expect(response.body).not_to include('Content warnings')
+      expect(response.body).to include('Resource 1 (Page 1) has published files that are not JP2, XML, TXT, or HTML: ' \
+                                       'page_0001.pdf.')
+    end
+
+    context 'when dark' do
+      let(:access) { { view: 'dark', download: 'none' } }
+
+      it 'renders the violations as warnings' do
+        get validation_content_structure_path(content_id: content_token)
+
+        expect(response.body).not_to include('Content errors')
+        expect(response.body).to include('Content warnings')
+        expect(response.body).to include('Resource 1 (Page 1) has published files')
+      end
+    end
+
+    context 'when citation-only' do
+      let(:access) { { view: 'citation-only', download: 'none' } }
+
+      it 'renders the violations as warnings' do
+        get validation_content_structure_path(content_id: content_token)
+
+        expect(response.body).not_to include('Content errors')
+        expect(response.body).to include('Content warnings')
+      end
+    end
+
+    context 'when a content type without a validator is selected' do
+      it 'renders no alerts' do
+        get validation_content_structure_path(content_id: content_token, content_type: Cocina::Models::ObjectType.image)
+
+        expect(response.body).not_to include('Content errors')
+        expect(response.body).not_to include('Content warnings')
+      end
+    end
+  end
+
   describe 'csv' do
     let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
     let(:content_file_binary) { create(:content_file_binary, content:, filepath: 'page_0001.tif') }

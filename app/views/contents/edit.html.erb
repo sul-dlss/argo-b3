@@ -13,7 +13,7 @@
 
   <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: item_form_id) %>
 
-  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: @contents_item_form.errors.any? ? :details : :add_files) do |tab_list| %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :add_files) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.details.label'), tab_name: :details) %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.add_files.label'), tab_name: :add_files) %>
     <% tab_list.with_tab(label: t('edit.contents.tabs.structural.label'), tab_name: :structural) %>
@@ -109,6 +109,10 @@
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
                                                                           label: t('edit.contents.tabs.structural.label'))) do %>
+        <%# This pane is in the content form, so a builder for the item form is needed for its content error. %>
+        <%= fields_for(@contents_item_form) do |item_form| %>
+          <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
+        <% end %>
         <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
           <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <%# Until the structure section has loaded, assume there are unassociated files. %>

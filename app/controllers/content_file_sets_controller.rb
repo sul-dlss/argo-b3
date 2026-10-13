@@ -9,6 +9,7 @@ class ContentFileSetsController < ContentsApplicationController
 
   def show
     @files_deleted = params[:files_deleted] == 'true' # Triggers a reload of files sections.
+    @structure_changed = params[:structure_changed] == 'true' # Triggers a reload of the structure validation.
   end
 
   def edit
@@ -44,7 +45,8 @@ class ContentFileSetsController < ContentsApplicationController
     flash[:toast] = t('edit.content_file_sets.toasts.updated')
     # Deleted binaries are no longer in the files sections, so tell show to reload the files section.
     files_deleted = @content_file_set_form.content_file_binaries_destroyed?.presence
-    redirect_to content_content_file_set_path(@content_token, @content_file_set, counter: @counter, files_deleted:)
+    redirect_to content_content_file_set_path(@content_token, @content_file_set, counter: @counter, files_deleted:,
+                                                                                 structure_changed: true)
   end
 
   def set_content_file_set

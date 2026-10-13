@@ -1,0 +1,19 @@
+<% if errors.present? %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(title: 'Content errors', variant: :danger, classes: 'my-3') do %>
+    <ul>
+      <% errors.each do |error| %>
+        <li><%= error %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+
+<% if warnings.present? %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(title: 'Content warnings', variant: :warning, classes: 'my-3') do %>
+    <ul>
+      <% warnings.each do |warning| %>
+        <li><%= warning %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
