@@ -1,0 +1,7 @@
+<%= turbo_frame_tag(turbo_frame_request_id) do %>
+  <% if @technical_metadata %>
+    <%= render Show::TechnicalMetadataComponent.new(technical_metadata: @technical_metadata) %>
+  <% else %>
+    <p>No technical metadata</p>
+  <% end %>
+<% end %>

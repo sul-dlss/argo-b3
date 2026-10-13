@@ -14,7 +14,9 @@ def secrets = [
     [path: 'application/argo-b3/stage/rabbitmq-password', secretValues: [
         [envVar: 'SETTINGS__RABBITMQ__PASSWORD', vaultKey: 'content']]],
     [path: 'application/folio/app_sdr_password', secretValues: [
-        [envVar: 'SETTINGS__FOLIO__OKAPI__PASSWORD', vaultKey: 'content']]]
+        [envVar: 'SETTINGS__FOLIO__OKAPI__PASSWORD', vaultKey: 'content']]],
+    [path: 'application/argo-b3/stage/tech-md-service-token', secretValues: [
+        [envVar: 'SETTINGS__TECH_MD_SERVICE__TOKEN', vaultKey: 'content']]]
 ]
 
 pipeline {

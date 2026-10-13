@@ -120,6 +120,7 @@ env:
     - SETTINGS__FOLIO__OKAPI__PASSWORD
     - SETTINGS__RABBITMQ__USERNAME
     - SETTINGS__RABBITMQ__PASSWORD
+    - SETTINGS__TECH_MD_SERVICE__TOKEN
     - DATABASE_PASSWORD
 
 # Destination-specific configuration (hosts and the env vars

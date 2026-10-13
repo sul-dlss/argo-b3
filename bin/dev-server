@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 #
 # Opens an SSH tunnel to server Solr and starts bin/setup pointed at it, along
-# with DSA, PresCat, stacks, and purl-fetcher pointed at the same environment.
+# with DSA, PresCat, techmd, stacks, and purl-fetcher pointed at the same environment.
 #
 # Usage: bin/dev-server [qa|stage|prod]
 # Defaults to qa.
 #
-# DSA and PresCat require tokens that this script does not hardcode. Put them
-# in an .env-server file in the project root (SETTINGS__DOR_SERVICES__TOKEN
-# and/or SETTINGS__PRESERVATION_CATALOG__TOKEN) and they'll be picked up
+# DSA, PresCat, and techmd require tokens that this script does not hardcode. Put them
+# in an .env-server file in the project root (SETTINGS__DOR_SERVICES__TOKEN,
+# SETTINGS__PRESERVATION_CATALOG__TOKEN, and SETTINGS__TECH_MD_SERVICE__TOKEN) and they'll be picked up
 # automatically, or export them yourself before running. The same .env-server file
 # can also override any of the SETTINGS__*__URL vars below, in case you need
 # a URL that doesn't match the qa/stage/prod pattern for a given service.
@@ -23,13 +23,13 @@ fi
 
 SERVER_ENV="${1:-qa}" # default to qa
 
-if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATALOG__TOKEN" ]; then
-  echo "SETTINGS__DOR_SERVICES__TOKEN and SETTINGS__PRESERVATION_CATALOG__TOKEN must be set (e.g. in .env-server)." >&2
+if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATALOG__TOKEN" ] || [ -z "$SETTINGS__TECH_MD_SERVICE__TOKEN" ]; then
+  echo "SETTINGS__DOR_SERVICES__TOKEN, SETTINGS__PRESERVATION_CATALOG__TOKEN, and SETTINGS__TECH_MD_SERVICE__TOKEN must be set (e.g. in .env-server)." >&2
   exit 1
 fi
 
 # db and redis are the only local containers this script needs; Solr, DSA,
-# and PresCat are tunneled to the remote server environment instead.
+# PresCat, and techmd are tunneled to the remote server environment instead.
 if ! docker info >/dev/null 2>&1; then
   echo "Docker does not appear to be running. Please start Docker and try again." >&2
   exit 1
@@ -75,6 +75,7 @@ fi
 export SETTINGS__SOLR__URL="${SETTINGS__SOLR__URL:-http://localhost:8990/solr/argo_${SERVER_ENV}}"
 export SETTINGS__DOR_SERVICES__URL="${SETTINGS__DOR_SERVICES__URL:-https://dor-services-${SERVER_ENV}-lb.stanford.edu}"
 export SETTINGS__PRESERVATION_CATALOG__URL="${SETTINGS__PRESERVATION_CATALOG__URL:-https://preservation-catalog-${SERVER_ENV}.stanford.edu}"
+export SETTINGS__TECH_MD_SERVICE__URL="${SETTINGS__TECH_MD_SERVICE__URL:-https://dor-techmd-${SERVER_ENV}-a.stanford.edu}"
 export SETTINGS__STACKS__URL="${SETTINGS__STACKS__URL:-https://stacks-${PURL_ENV}.stanford.edu/image}"
 export SETTINGS__PURL_FETCHER__URL="${SETTINGS__PURL_FETCHER__URL:-https://purl-fetcher-${PURL_ENV}.stanford.edu}"
 export SETTINGS__PURL__URL="${SETTINGS__PURL__URL:-https://sul-purl-${PURL_ENV}.stanford.edu}"

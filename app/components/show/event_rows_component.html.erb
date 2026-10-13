@@ -1,6 +1,6 @@
 <%= render SdrViewComponents::Tables::RowComponent.new(label: when_label, values: [event_type_label, who, version, toggle_indicator], **toggle_row_options) %>
 <% if data? %>
-  <%= render SdrViewComponents::Tables::RowComponent.new(id: data_id, class: 'event-data collapse') do |row_component| %>
+  <%= render SdrViewComponents::Tables::RowComponent.new(id: data_id, class: 'toggle-row-data collapse') do |row_component| %>
     <% row_component.with_cell(colspan: 5) do %>
       <dl class="row mb-0">
         <% display_data.each do |key, value| %>

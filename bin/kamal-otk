@@ -31,7 +31,8 @@ REQUIRED_DEPLOY_SECRETS = [
   'DATABASE_PASSWORD',
   'SETTINGS__FOLIO__OKAPI__PASSWORD',
   'SETTINGS__RABBITMQ__USERNAME',
-  'SETTINGS__RABBITMQ__PASSWORD'
+  'SETTINGS__RABBITMQ__PASSWORD',
+  'SETTINGS__TECH_MD_SERVICE__TOKEN'
 ].freeze
 
 def vault_secret_path(key, destination)
@@ -44,6 +45,7 @@ def vault_secret_path(key, destination)
   when 'SETTINGS__FOLIO__OKAPI__PASSWORD' then 'puppet/application/folio/app_sdr_password'
   when 'SETTINGS__RABBITMQ__USERNAME' then "puppet/application/argo-b3/#{destination}/rabbitmq-username"
   when 'SETTINGS__RABBITMQ__PASSWORD' then "puppet/application/argo-b3/#{destination}/rabbitmq-password"
+  when 'SETTINGS__TECH_MD_SERVICE__TOKEN' then "puppet/application/argo-b3/#{destination}/tech-md-service-token"
   else
     raise "Unknown secret key: #{key}"
   end

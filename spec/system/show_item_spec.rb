@@ -238,13 +238,9 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('.nav-link', text: 'Events')
     expect(page).to have_css('.nav-link', text: 'Files')
     expect(page).to have_css('.nav-link', text: 'Structure')
-    expect(page).to have_css('.nav-link', text: 'Technical metadata')
     expect(page).to have_css('.nav-link', text: 'Description preview')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
-    # Tabs that do not fit are moved into the "More" menu.
-    click_button 'More'
-    expect(page).to have_css('.dropdown-item', text: 'SOLR doc')
-    click_button 'More'
+    expect(page).to have_css('.nav-link', text: 'SOLR doc')
 
     # Overview table
     expect(page).to have_table_caption('overview-table', 'Overview')
@@ -404,9 +400,9 @@ RSpec.describe 'Show item' do
 
     # Toggle the event data
     expect(page).to have_no_css('#events-table dt', text: 'Description')
-    expect(page).to have_css('#events-table tr.event-toggle.collapsed .event-toggle-indicator')
+    expect(page).to have_css('#events-table tr.toggle-row.collapsed .toggle-row-indicator')
     row.click
-    expect(page).to have_css('#events-table tr.event-toggle:not(.collapsed) .event-toggle-indicator')
+    expect(page).to have_css('#events-table tr.toggle-row:not(.collapsed) .toggle-row-indicator')
     within('#events-table tr.collapse.show') do
       expect(page).to have_css('dt', text: 'Description')
       expect(page).to have_css('dd', text: 'Fix title')
@@ -452,7 +448,7 @@ RSpec.describe 'Show item' do
     # Expand the event data, to check that it remains expanded after the page refreshes.
     click_button 'Events'
     find_table_row('events-table', '2021-03-31 13:23:30 PT').click
-    expect(page).to have_css('#events-table tr.event-data.show dt', text: 'Description')
+    expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
 
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr)
@@ -474,7 +470,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('h1', text: updated_title, wait: 15)
 
     click_button 'Events'
-    expect(page).to have_css('#events-table tr.event-data.show dt', text: 'Description')
+    expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
     # The filter is retained after the page refreshes.
     expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
     expect(page).to have_css('#events-filter .ts-count', text: '1 selected')

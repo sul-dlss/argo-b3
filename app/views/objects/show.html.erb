@@ -102,7 +102,6 @@
         <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') if @solr_doc.dro? %>
         <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') if @solr_doc.dro? %>
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
-        <% component.with_tab(id: 'technical-metadata-tab', pane_id: 'technical-metadata-pane', label: 'Technical metadata') if @solr_doc.dro? %>
         <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
 
@@ -158,10 +157,6 @@
           <%= turbo_frame_tag(@solr_doc.druid, 'events', src: events_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
-        <% end %>
-
-        <%= component.with_pane(id: 'technical-metadata-pane', tab_id: 'technical-metadata-tab') do %>
-          <p>Not implemented yet</p>
         <% end %>
 
         <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
