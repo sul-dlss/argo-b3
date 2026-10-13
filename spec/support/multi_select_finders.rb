@@ -25,6 +25,7 @@ def remove_first_multi_option(from:)
   find_multi_select(from).first('.item .remove').click
 end
 
-def find_multi_select_items(from:)
-  find_multi_select(from).all('.item')
+# Provide the expected count to wait for it, since all does not otherwise wait for items to be added or removed.
+def find_multi_select_items(from:, count: nil)
+  find_multi_select(from).all('.item', **{ count: }.compact)
 end
