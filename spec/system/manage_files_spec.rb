@@ -15,6 +15,7 @@ RSpec.describe 'Manage files' do
 
   before do
     create(:permission, :read_unrestricted, workgroup: user.groups.first)
+    create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
 
     sign_in(user)
 
