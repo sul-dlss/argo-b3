@@ -105,8 +105,8 @@ RSpec.describe 'Create an item' do
 
       click_button 'Next'
       expect(page).to have_css('#release-tab.active')
-      choose 'Release to:'
-      check 'SearchWorks'
+      select 'Release', from: 'SearchWorks'
+      select 'Do not release', from: 'EarthWorks'
 
       click_button 'Next'
       expect(page).to have_css('#deposit-tab.active')
@@ -144,6 +144,10 @@ RSpec.describe 'Create an item' do
 
       expect(Sdr::Repository).to have_received(:create_release_tag)
         .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true)
+      expect(Sdr::Repository).to have_received(:create_release_tag)
+        .with(druid:, user_name: user.sunetid, release_target: 'Earthworks', release: false)
+      expect(Sdr::Repository).not_to have_received(:create_release_tag)
+        .with(druid:, user_name: user.sunetid, release_target: 'PURL sitemap', release: true)
     end
 
     it 'registers a valid cocina object without a license or rights statements' do
@@ -510,17 +514,11 @@ RSpec.describe 'Create an item' do
       fill_in 'Source ID', with: 'new:source-id'
       # Leaving Title blank.
 
-      find_by_id('release-tab').click
-      choose 'Release to:'
-
       find_by_id('deposit-tab').click
       click_button('Register only')
 
       find_by_id('description-tab').click
       expect(page).to have_invalid_feedback('Title', "can't be blank")
-
-      find_by_id('release-tab').click
-      expect(page).to have_css('.invalid-feedback', text: 'At least one target must be selected')
 
       expect(Sdr::Repository).not_to have_received(:register)
       expect(Sdr::Repository).not_to have_received(:accession)
