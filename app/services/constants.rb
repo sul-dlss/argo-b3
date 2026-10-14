@@ -131,9 +131,6 @@ module Constants # rubocop:disable Metrics/ModuleLength
 
   CONTENT_TYPES = Cocina::Models::DRO::TYPES.index_by { |uri| UriSupport.last(uri:) }.freeze
 
-  # Prefix of Cocina FileSet types; ContentFileSet#file_set_type is stored without it.
-  FILE_SET_TYPE_PREFIX = 'https://cocina.sul.stanford.edu/models/resources/'
-
   # content types selectable by the user on a registration form
   REGISTRATION_CONTENT_TYPES = {
     'book' => Cocina::Models::ObjectType.book,
@@ -147,6 +144,4 @@ module Constants # rubocop:disable Metrics/ModuleLength
     'webarchive-binary' => Cocina::Models::ObjectType.webarchive_binary,
     'webarchive-seed' => Cocina::Models::ObjectType.webarchive_seed
   }.freeze
-
-  RESOURCE_TYPES = Cocina::Models::FileSet::TYPES.index_by { |uri| UriSupport.last(uri:) }.freeze
 end

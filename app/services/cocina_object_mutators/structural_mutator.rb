@@ -49,7 +49,7 @@ module CocinaObjectMutators
 
     def build_file_set(content_file_set)
       {
-        type: "#{Constants::FILE_SET_TYPE_PREFIX}#{content_file_set.file_set_type}",
+        type: "#{FileSetTypes::PREFIX}#{content_file_set.file_set_type}",
         externalIdentifier: content_file_set.external_identifier,
         label: content_file_set.label,
         version: cocina_object.version,

@@ -8,11 +8,8 @@ module Contents
     # e.g., the master, the deliverable, and the OCR for an image, are grouped into a single file set.
     # Ported from pre-assembly's simple book content metadata creation style.
     class Image < Base
-      IMAGE_MIME_TYPE_PREFIX = 'image/'
       # The mime types of the files that, when accompanying an image, indicate that a file set contains OCR.
-      OCR_MIME_TYPES = ['application/xml', 'application/pdf', 'text/plain'].freeze
-      IMAGE_FILE_SET_TYPE = 'image'
-      OBJECT_FILE_SET_TYPE = 'object'
+      OCR_MIME_TYPES = [MimeTypes::XML, MimeTypes::PDF, MimeTypes::PLAIN_TEXT].freeze
       DARK_VIEW = 'dark'
 
       # Grouping the files of a image by filename only works when the files are not organized into folders,
@@ -29,7 +26,7 @@ module Contents
       end
 
       def self.image?(mime_type)
-        mime_type&.start_with?(IMAGE_MIME_TYPE_PREFIX) || false
+        mime_type&.start_with?(MimeTypes::IMAGE_PREFIX) || false
       end
 
       delegate :image?, to: :class
@@ -37,7 +34,7 @@ module Contents
       # @param [Content] content
       # @param [Cocina::Models::DROWithMetadata] cocina_object
       # @param [String] image_file_set_type type to use for a set of grouped files that include an image
-      def initialize(content:, cocina_object:, image_file_set_type: IMAGE_FILE_SET_TYPE)
+      def initialize(content:, cocina_object:, image_file_set_type: FileSetTypes::IMAGE)
         @image_file_set_type = image_file_set_type
         super(content:, cocina_object:)
       end
@@ -132,7 +129,7 @@ module Contents
       def file_set_type_for(content_file_binaries)
         return image_file_set_type if content_file_binaries.any? { |binary| image?(binary.mime_type) }
 
-        OBJECT_FILE_SET_TYPE
+        FileSetTypes::OBJECT
       end
 
       # Whereas pre-assembly asks the user whether a batch has OCR, here it is inferred from the files

@@ -26,8 +26,7 @@ module Edit
     end
 
     def file_set_type_options
-      # All types allowing in Cocina.
-      Cocina::Models::FileSet::TYPES.map { |type| type.delete_prefix(Constants::FILE_SET_TYPE_PREFIX) }
+      FileSetTypes::ALL
     end
   end
 end

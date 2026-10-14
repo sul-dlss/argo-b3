@@ -7,10 +7,6 @@ module Contents
     # It uses a strategy for creating a 3d object: the first model file is placed in a 3d file set and
     # each other file is placed in its own file file set.
     class ThreeDimensional < Base
-      MODEL_MIME_TYPE = 'model/gltf-binary'
-      THREE_DIMENSIONAL_FILE_SET_TYPE = '3d'
-      FILE_FILE_SET_TYPE = 'file'
-
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a 3d object.
       def self.disqualifying_reasons(content:, **)
         [].tap do |reasons|
@@ -19,7 +15,7 @@ module Contents
       end
 
       def self.model?(mime_type)
-        mime_type == MODEL_MIME_TYPE
+        mime_type == MimeTypes::GLTF_BINARY
       end
 
       delegate :model?, to: :class
@@ -32,7 +28,7 @@ module Contents
 
         if model_content_file_binary
           create_content_file_set(content_file_binary: model_content_file_binary,
-                                  file_set_type: THREE_DIMENSIONAL_FILE_SET_TYPE, label: '')
+                                  file_set_type: FileSetTypes::THREE_DIMENSIONAL, label: '')
         end
         create_file_content_file_sets(content_file_binaries: content_file_binaries - [model_content_file_binary])
       end
@@ -48,8 +44,8 @@ module Contents
       # New file sets are positioned at the end of the existing file sets by the positioning gem.
       def create_file_content_file_sets(content_file_binaries:)
         content_file_binaries.each do |content_file_binary|
-          create_content_file_set(content_file_binary:, file_set_type: FILE_FILE_SET_TYPE,
-                                  label: label_for(FILE_FILE_SET_TYPE))
+          create_content_file_set(content_file_binary:, file_set_type: FileSetTypes::FILE,
+                                  label: label_for(FileSetTypes::FILE))
         end
       end
 

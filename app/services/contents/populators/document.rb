@@ -7,10 +7,6 @@ module Contents
     # It uses a strategy for creating a document: each PDF is placed in its own document file set and
     # each other file is placed in its own file file set.
     class Document < Base
-      PDF_MIME_TYPE = 'application/pdf'
-      DOCUMENT_FILE_SET_TYPE = 'document'
-      FILE_FILE_SET_TYPE = 'file'
-
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a document.
       def self.disqualifying_reasons(content:, **)
         [].tap do |reasons|
@@ -19,7 +15,7 @@ module Contents
       end
 
       def self.pdf?(mime_type)
-        mime_type == PDF_MIME_TYPE
+        mime_type == MimeTypes::PDF
       end
 
       delegate :pdf?, to: :class
@@ -43,10 +39,10 @@ module Contents
           unassociated_content_file_binaries.path_order.partition { |binary| pdf?(binary.mime_type) }
 
         pdf_content_file_binaries.each do |content_file_binary|
-          create_content_file_set(content_file_binary:, file_set_type: DOCUMENT_FILE_SET_TYPE)
+          create_content_file_set(content_file_binary:, file_set_type: FileSetTypes::DOCUMENT)
         end
         other_content_file_binaries.each do |content_file_binary|
-          create_content_file_set(content_file_binary:, file_set_type: FILE_FILE_SET_TYPE)
+          create_content_file_set(content_file_binary:, file_set_type: FileSetTypes::FILE)
         end
       end
 

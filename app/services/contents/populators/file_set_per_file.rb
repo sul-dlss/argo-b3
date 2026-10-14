@@ -6,12 +6,10 @@ module Contents
     # that are not yet part of its structure.
     # It uses a one FileSet per file strategy.
     class FileSetPerFile < Base
-      OBJECT_FILE_SET_TYPE = 'object'
-
       # @param [Content] content
       # @param [Cocina::Models::DROWithMetadata] cocina_object
       # @param [String] file_set_type type to use for each file set
-      def initialize(content:, cocina_object:, file_set_type: OBJECT_FILE_SET_TYPE)
+      def initialize(content:, cocina_object:, file_set_type: FileSetTypes::OBJECT)
         @file_set_type = file_set_type
         super(content:, cocina_object:)
       end

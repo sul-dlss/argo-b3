@@ -99,7 +99,7 @@ module Contents
     def content_file_set_attrs(cocina_file_set:, position:)
       {
         position:,
-        file_set_type: cocina_file_set.type.delete_prefix(Constants::FILE_SET_TYPE_PREFIX),
+        file_set_type: cocina_file_set.type.delete_prefix(FileSetTypes::PREFIX),
         label: cocina_file_set.label,
         external_identifier: cocina_file_set.externalIdentifier
       }

@@ -10,7 +10,7 @@ module StructuralCsv
   # 3 existing file sets and sequences 1, 2, 5, the result is existing file set 1, existing file set 2, and a new
   # file set.
   class ContentFileSetsBuilder
-    DEFAULT_FILE_SET_TYPE = 'object'
+    DEFAULT_FILE_SET_TYPE = FileSetTypes::OBJECT
 
     # A built ContentFileSet, with the rows it was built from and its built ContentFiles (in the same order as the rows)
     BuiltContentFileSet = Struct.new(:rows, :content_file_set, :content_files)

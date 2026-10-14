@@ -7,13 +7,10 @@ module Contents
     # Violations of the rules for a Resource (ContentFileSet) are errors, except for a dark object, for
     # which they are only warnings since none of its files are expected to be published.
     class Book < Default
-      PAGE_FILE_SET_TYPE = 'page'
-      OBJECT_FILE_SET_TYPE = 'object'
-      JP2_MIME_TYPE = 'image/jp2'
-      IMAGE_MIME_TYPES = ['image/tiff', 'image/png', 'image/jpeg'].freeze
+      IMAGE_MIME_TYPES = [MimeTypes::TIFF, MimeTypes::PNG, MimeTypes::JPEG].freeze
       # JP2, XML (ALTO), TXT, and HTML (hOCR)
       PUBLISHABLE_PAGE_MIME_TYPES = [
-        JP2_MIME_TYPE, 'application/xml', 'text/xml', 'text/plain', 'text/html', 'application/xhtml+xml'
+        MimeTypes::JP2, MimeTypes::XML, MimeTypes::TEXT_XML, MimeTypes::PLAIN_TEXT, MimeTypes::HTML, MimeTypes::XHTML
       ].freeze
 
       # @return [Contents::Validators::Result]
@@ -39,9 +36,9 @@ module Contents
       def validate_content_file_set(content_file_set:, index:)
         name = resource_name_for(content_file_set:, index:)
         case content_file_set.file_set_type
-        when PAGE_FILE_SET_TYPE
+        when FileSetTypes::PAGE
           validate_page(content_file_set:, name:)
-        when OBJECT_FILE_SET_TYPE
+        when FileSetTypes::OBJECT
           # Object resources are not validated.
         else
           validate_other(content_file_set:, name:)
@@ -91,7 +88,7 @@ module Contents
 
       def any_page_with_image?
         content_file_sets.any? do |content_file_set|
-          content_file_set.file_set_type == PAGE_FILE_SET_TYPE &&
+          content_file_set.file_set_type == FileSetTypes::PAGE &&
             content_file_set.content_files.any? do |content_file|
               (content_file.publish && jp2?(content_file)) || image?(content_file)
             end
@@ -99,7 +96,7 @@ module Contents
       end
 
       def jp2?(content_file)
-        content_file.mime_type == JP2_MIME_TYPE
+        content_file.mime_type == MimeTypes::JP2
       end
 
       def image?(content_file)
