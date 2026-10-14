@@ -3,6 +3,19 @@
 module DescriptiveCsv
   # This exports the cocina description to a rectangularized data structure
   class Export
+    # Builds a CSV (as a string) from descriptions.
+    # @param descriptions [Hash<String, Hash>] descriptions mapped to a csv row
+    def self.as_csv(descriptions:)
+      grouped_descriptions = DescriptionsGrouper.group(descriptions:)
+      ordered_headers = Headers.create(headers: grouped_descriptions.values.flat_map(&:keys).uniq)
+
+      CSV.generate(write_headers: true, headers: %w[druid] + ordered_headers) do |csv|
+        grouped_descriptions.each do |druid, description|
+          csv << ([DruidSupport.bare_druid_from(druid)] + description.values_at(*ordered_headers))
+        end
+      end
+    end
+
     def self.export(source_id:, description:)
       new(source_id:, description:).export
     end

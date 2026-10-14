@@ -38,7 +38,9 @@
       <% end %>
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
         <% component.with_button(link: '/', label: 'Use as template', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '/', label: 'Download description', variant: 'outline-primary', disabled: true) %>
+        <% if @solr_doc.publishable_type? %>
+          <% component.with_button(link: description_csv_object_path(druid: @druid_token), label: 'Download description', variant: 'outline-primary', data: { turbo: false }) %>
+        <% end %>
         <% if @solr_doc.object_type?('item', 'agreement') %>
           <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>

@@ -6,7 +6,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
-                                  show_structural_csv track]
+                                  show_structural_csv show_description_csv track]
 
   include TokenConcern
   include ToastAndRefreshConcern
@@ -143,6 +143,17 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     # The immutable Content reflects the structural of the cocina object.
     send_data StructuralCsv::Export.as_csv(content: fetch_content),
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_structural.csv"
+  end
+
+  def show_description_csv
+    # Items, virtual objects and collections only.
+    return head :not_found if cocina_object.admin_policy?
+
+    description = DescriptiveCsv::Export.export(source_id: cocina_object.identification.sourceId,
+                                                description: cocina_object.description)
+    descriptions = { verified_druid => description }
+    send_data DescriptiveCsv::Export.as_csv(descriptions:),
+              type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_description.csv"
   end
 
   # Records the search_position (used for previous/next navigation between search results) for this
