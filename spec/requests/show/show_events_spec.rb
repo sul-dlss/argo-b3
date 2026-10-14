@@ -12,7 +12,8 @@ RSpec.describe 'Show events' do
   let(:events_client) { instance_double(Dor::Services::Client::Events, list: events) }
   let(:event_types_client) do
     instance_double(Dor::Services::Client::EventTypes,
-                    list: %w[argo_permission_created publishing_complete version_close version_open])
+                    list: %w[argo_permission_created publishing_complete version_close
+                             version_description_update version_open])
   end
   let(:events) do
     [Dor::Services::Client::Events::Event.new(event_type: 'version_open', data: {},
@@ -38,13 +39,15 @@ RSpec.describe 'Show events' do
 
         expect(response).to have_http_status(:ok)
         expect(events_client).to have_received(:list)
-          .with(event_types: %w[publishing_complete version_close version_open], from: nil, to: nil)
+          .with(event_types: %w[publishing_complete version_close version_description_update version_open],
+                from: nil, to: nil)
         expect(response.body).to include('Version open')
         page = Capybara.string(response.body)
         expect(page).to have_select('Event types',
                                     options: ['Argo permission created', 'Publishing complete', 'Version close',
-                                              'Version open'],
-                                    selected: ['Publishing complete', 'Version close', 'Version open'])
+                                              'Version description update', 'Version open'],
+                                    selected: ['Publishing complete', 'Version close', 'Version description update',
+                                               'Version open'])
         expect(page).to have_button('Filter')
       end
     end
@@ -68,7 +71,8 @@ RSpec.describe 'Show events' do
       it 'does not filter by event type' do
         get "/objects/#{token}/events", params: {
           events_filter: { from: '', to: '', event_types: ['', 'argo_permission_created', 'publishing_complete',
-                                                           'version_close', 'version_open'] }
+                                                           'version_close', 'version_description_update',
+                                                           'version_open'] }
         }
 
         expect(events_client).to have_received(:list).with(event_types: nil, from: nil, to: nil)

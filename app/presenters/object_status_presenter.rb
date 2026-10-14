@@ -22,6 +22,11 @@ class ObjectStatusPresenter
     version_status
   end
 
+  # @return [Boolean] true if the object's version can be opened or closed
+  def version_editable?
+    version_service.editable?
+  end
+
   def workflow_error_messages
     workflow_errors.map { |workflow_error| format_workflow_error(workflow_error) }
   end
