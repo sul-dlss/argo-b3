@@ -361,6 +361,101 @@ ALTER SEQUENCE public.form_validation_actions_id_seq OWNED BY public.form_valida
 
 
 --
+-- Name: item_deposit_actions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.item_deposit_actions (
+    id bigint NOT NULL,
+    multi_item_deposit_action_id bigint NOT NULL,
+    content_id bigint,
+    druid character varying NOT NULL,
+    path character varying NOT NULL,
+    manifest_line_number integer NOT NULL,
+    discovery_errors jsonb DEFAULT '[]'::jsonb NOT NULL,
+    discovery_warnings jsonb DEFAULT '[]'::jsonb NOT NULL,
+    structural_csv_errors jsonb DEFAULT '[]'::jsonb NOT NULL,
+    content_type_structure_errors jsonb DEFAULT '[]'::jsonb NOT NULL,
+    content_type_structure_warnings jsonb DEFAULT '[]'::jsonb NOT NULL,
+    deposit_errors jsonb DEFAULT '[]'::jsonb NOT NULL,
+    file_changes jsonb DEFAULT '{}'::jsonb NOT NULL,
+    initial_version boolean,
+    content_type character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: item_deposit_actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.item_deposit_actions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: item_deposit_actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.item_deposit_actions_id_seq OWNED BY public.item_deposit_actions.id;
+
+
+--
+-- Name: multi_item_deposit_actions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.multi_item_deposit_actions (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    description character varying,
+    file_location character varying DEFAULT 'mount'::character varying NOT NULL,
+    mount_path character varying,
+    step character varying DEFAULT 'discovery'::character varying NOT NULL,
+    discovery_state character varying DEFAULT 'discovery_not_in_progress'::character varying NOT NULL,
+    structuring_state character varying DEFAULT 'structuring_not_in_progress'::character varying NOT NULL,
+    initiating_deposit_state character varying DEFAULT 'initiating_deposit_not_in_progress'::character varying NOT NULL,
+    structural_metadata_csv text,
+    structural_metadata_csv_source character varying,
+    publish_preserve_all boolean DEFAULT false NOT NULL,
+    size bigint,
+    version_description character varying,
+    perform_ocr boolean DEFAULT false NOT NULL,
+    ocr_languages jsonb DEFAULT '[]'::jsonb NOT NULL,
+    discovery_started_at timestamp(6) without time zone,
+    discovery_completed_at timestamp(6) without time zone,
+    structuring_started_at timestamp(6) without time zone,
+    structuring_completed_at timestamp(6) without time zone,
+    initiating_deposit_started_at timestamp(6) without time zone,
+    initiating_deposit_completed_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: multi_item_deposit_actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.multi_item_deposit_actions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: multi_item_deposit_actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.multi_item_deposit_actions_id_seq OWNED BY public.multi_item_deposit_actions.id;
+
+
+--
 -- Name: permissions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -596,6 +691,20 @@ ALTER TABLE ONLY public.form_validation_actions ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: item_deposit_actions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_deposit_actions ALTER COLUMN id SET DEFAULT nextval('public.item_deposit_actions_id_seq'::regclass);
+
+
+--
+-- Name: multi_item_deposit_actions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.multi_item_deposit_actions ALTER COLUMN id SET DEFAULT nextval('public.multi_item_deposit_actions_id_seq'::regclass);
+
+
+--
 -- Name: permissions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -708,6 +817,22 @@ ALTER TABLE ONLY public.contents
 
 ALTER TABLE ONLY public.form_validation_actions
     ADD CONSTRAINT form_validation_actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: item_deposit_actions item_deposit_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_deposit_actions
+    ADD CONSTRAINT item_deposit_actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: multi_item_deposit_actions multi_item_deposit_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.multi_item_deposit_actions
+    ADD CONSTRAINT multi_item_deposit_actions_pkey PRIMARY KEY (id);
 
 
 --
@@ -864,6 +989,34 @@ CREATE INDEX index_form_validation_actions_on_user_id ON public.form_validation_
 
 
 --
+-- Name: index_item_deposit_actions_on_content_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_item_deposit_actions_on_content_id ON public.item_deposit_actions USING btree (content_id);
+
+
+--
+-- Name: index_item_deposit_actions_on_druid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_item_deposit_actions_on_druid ON public.item_deposit_actions USING btree (druid);
+
+
+--
+-- Name: index_item_deposit_actions_on_multi_item_deposit_and_druid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_item_deposit_actions_on_multi_item_deposit_and_druid ON public.item_deposit_actions USING btree (multi_item_deposit_action_id, druid);
+
+
+--
+-- Name: index_multi_item_deposit_actions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_multi_item_deposit_actions_on_user_id ON public.multi_item_deposit_actions USING btree (user_id);
+
+
+--
 -- Name: index_permissions_on_target_druid; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -944,6 +1097,14 @@ ALTER TABLE ONLY public.pinned_objects
 
 
 --
+-- Name: item_deposit_actions fk_rails_52fa2012d3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_deposit_actions
+    ADD CONSTRAINT fk_rails_52fa2012d3 FOREIGN KEY (multi_item_deposit_action_id) REFERENCES public.multi_item_deposit_actions(id);
+
+
+--
 -- Name: pinned_tags fk_rails_7ee08fc325; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -976,11 +1137,27 @@ ALTER TABLE ONLY public.content_files
 
 
 --
+-- Name: item_deposit_actions fk_rails_abf691f7d0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_deposit_actions
+    ADD CONSTRAINT fk_rails_abf691f7d0 FOREIGN KEY (content_id) REFERENCES public.contents(id) ON DELETE SET NULL;
+
+
+--
 -- Name: form_validation_actions fk_rails_b84cab4fe2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.form_validation_actions
     ADD CONSTRAINT fk_rails_b84cab4fe2 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: multi_item_deposit_actions fk_rails_bdbe999ffc; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.multi_item_deposit_actions
+    ADD CONSTRAINT fk_rails_bdbe999ffc FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -1014,6 +1191,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261014120000'),
 ('20260925120000'),
 ('20260924170659'),
 ('20260924132418'),

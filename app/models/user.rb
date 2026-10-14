@@ -3,6 +3,7 @@
 # Model for an Argo user.
 class User < ApplicationRecord
   has_many :bulk_actions, dependent: :destroy
+  has_many :multi_item_deposit_actions, dependent: :destroy
   has_many :pinned_objects, dependent: :destroy
   has_many :pinned_searches, dependent: :destroy
   has_many :pinned_tags, dependent: :destroy
