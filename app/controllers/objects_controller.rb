@@ -6,7 +6,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
-                                  show_structural_csv show_description_csv track]
+                                  show_structural_csv show_descriptive_csv track]
 
   include TokenConcern
   include ToastAndRefreshConcern
@@ -145,7 +145,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_structural.csv"
   end
 
-  def show_description_csv
+  def show_descriptive_csv
     # Items, virtual objects and collections only.
     return head :not_found if cocina_object.admin_policy?
 

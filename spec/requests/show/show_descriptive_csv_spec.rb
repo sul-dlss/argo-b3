@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Show description CSV' do
+RSpec.describe 'Show descriptive CSV' do
   let(:druid) { 'druid:bc123df4567' }
   let(:token) do
     Rails.application.message_verifier(:argo).generate(druid, purpose: 'show', expires_at: 1.week.from_now.end_of_day)
@@ -78,9 +78,9 @@ RSpec.describe 'Show description CSV' do
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
   end
 
-  describe 'GET /objects/:druid/description_csv' do
+  describe 'GET /objects/:druid/descriptive_csv' do
     it 'sends the description as a CSV' do
-      get "/objects/#{token}/description_csv"
+      get "/objects/#{token}/descriptive_csv"
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq('text/csv')
@@ -95,7 +95,7 @@ RSpec.describe 'Show description CSV' do
       let(:cocina_object) { build(:collection_with_metadata, id: druid, source_id: 'foo:130') }
 
       it 'sends the description as a CSV' do
-        get "/objects/#{token}/description_csv"
+        get "/objects/#{token}/descriptive_csv"
 
         expect(response).to have_http_status(:ok)
         expect(CSV.parse(response.body, headers: true).first.to_h).to include('druid' => 'bc123df4567')
@@ -106,14 +106,14 @@ RSpec.describe 'Show description CSV' do
       let(:cocina_object) { build(:admin_policy_with_metadata, id: druid) }
 
       it 'returns not found' do
-        get "/objects/#{token}/description_csv"
+        get "/objects/#{token}/descriptive_csv"
 
         expect(response).to have_http_status(:not_found)
       end
     end
 
     it 'raises when token verification fails' do
-      get "/objects/#{invalid_token}/description_csv"
+      get "/objects/#{invalid_token}/descriptive_csv"
 
       expect(response).to have_http_status(:forbidden)
     end

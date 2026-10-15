@@ -1,10 +1,21 @@
 # frozen_string_literal: true
 
 module DescriptiveCsv
-  # This exports the cocina description to a rectangularized data structure
+  # This class faciliates the export of cocina descriptive metadata to a hash and to CSV
+  #
+  # Exporting is two steps:
+  # 1. `.export` flattens the description of ONE object into a single row (a hash of column name => value).
+  # 2. `.as_csv` combines the rows of ONE OR MORE objects (keyed by druid) into a CSV string. Since objects
+  #    can have different columns (e.g., one has two titles, another has one), it unions and orders the columns.
+  #
+  # For example:
+  #   rows = { druid => DescriptiveCsv::Export.export(source_id:, description:) }
+  #   DescriptiveCsv::Export.as_csv(descriptions: rows)
   class Export
-    # Builds a CSV (as a string) from descriptions.
-    # @param descriptions [Hash<String, Hash>] descriptions mapped to a csv row
+    # Builds CSV (as a string) using the hashes of descriptions first produced by `.export`.
+    # This can then be written to disk or streamed as needed by the consumer.
+    # @param descriptions [Hash<String, Hash>] druids mapped to the row from `.export`
+    # @return [String] CSV text with a header row (`druid` plus the combined columns) and one row per druid
     def self.as_csv(descriptions:)
       grouped_descriptions = DescriptionsGrouper.group(descriptions:)
       ordered_headers = Headers.create(headers: grouped_descriptions.values.flat_map(&:keys).uniq)
@@ -16,6 +27,8 @@ module DescriptiveCsv
       end
     end
 
+    # Flattens the description of a single object to a hash.
+    # @return [Hash<String, String>] column name => value
     def self.export(source_id:, description:)
       new(source_id:, description:).export
     end
