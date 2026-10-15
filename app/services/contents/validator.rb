@@ -13,7 +13,9 @@ module Contents
     VALIDATORS_FOR_CONTENT_TYPES = {
       Cocina::Models::ObjectType.book => Contents::Validators::Book,
       Cocina::Models::ObjectType.image => Contents::Validators::Image,
-      Cocina::Models::ObjectType.map => Contents::Validators::Image
+      Cocina::Models::ObjectType.map => Contents::Validators::Image,
+      Cocina::Models::ObjectType.object => Contents::Validators::ObjectType,
+      Cocina::Models::ObjectType.webarchive_binary => Contents::Validators::ObjectType
     }.freeze
 
     def self.call(...)

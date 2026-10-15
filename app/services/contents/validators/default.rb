@@ -34,6 +34,23 @@ module Contents
       end
 
       delegate :errors, :warnings, to: :result
+
+      def content_file_sets
+        @content_file_sets ||= content.content_file_sets.includes(content_files: :content_file_binary).to_a
+      end
+
+      # Violations are only warnings for a dark object, since none of its files are expected to be published.
+      def add_warning_or_error(message)
+        (dark? ? warnings : errors) << message
+      end
+
+      # @param [Integer] index the 1-based position of the Resource among all of the Resources
+      # @return [String] the name of the Resource for messages, e.g., Resource 3 (Page 3)
+      def resource_name_for(content_file_set:, index:)
+        return "Resource #{index}" if content_file_set.label.blank?
+
+        "Resource #{index} (#{content_file_set.label})"
+      end
     end
   end
 end

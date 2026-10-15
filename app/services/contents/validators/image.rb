@@ -38,14 +38,6 @@ module Contents
 
       attr_reader :file_set_type
 
-      def content_file_sets
-        @content_file_sets ||= content.content_file_sets.includes(content_files: :content_file_binary).to_a
-      end
-
-      def add_warning_or_error(message)
-        (dark? ? warnings : errors) << message
-      end
-
       def validate_content_file_set(content_file_set:, index:)
         name = resource_name_for(content_file_set:, index:)
         case content_file_set.file_set_type
@@ -119,14 +111,6 @@ module Contents
 
       def image?(content_file)
         IMAGE_MIME_TYPES.include?(content_file.mime_type)
-      end
-
-      # @param [Integer] index the 1-based position of the Resource among all of the Resources
-      # @return [String] the name of the Resource for messages, e.g., Resource 3 (Page 3)
-      def resource_name_for(content_file_set:, index:)
-        return "Resource #{index}" if content_file_set.label.blank?
-
-        "Resource #{index} (#{content_file_set.label})"
       end
     end
   end
