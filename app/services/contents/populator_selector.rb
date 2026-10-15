@@ -31,8 +31,8 @@ module Contents
       Cocina::Models::ObjectType.map => Contents::Populators::Image,
       Cocina::Models::ObjectType.geo => Contents::Populators::Geo,
       Cocina::Models::ObjectType.three_dimensional => Contents::Populators::ThreeDimensional,
-      Cocina::Models::ObjectType.file => Contents::Populators::FileType,
-      Cocina::Models::ObjectType.webarchive_binary => Contents::Populators::FileType
+      Cocina::Models::ObjectType.object => Contents::Populators::ObjectType,
+      Cocina::Models::ObjectType.webarchive_binary => Contents::Populators::ObjectType
     }.freeze
 
     # The populators that can be selected, keyed by their demodulized name (e.g., FileSetPerFile).
