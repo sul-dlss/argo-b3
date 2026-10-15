@@ -23,6 +23,12 @@ Governs the administrative/access rules applied to the objects under it. "APO" a
 ### Governing APO
 The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has exactly one governing APO. The relationship means the same thing regardless of the subject's type — including when the subject is itself an APO (an APO can be governed by another APO).
 
+### Multi-Item Deposit
+A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit.
+
+### Item Deposit
+One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount.
+
 ## Structural Metadata Terms
 Structural metadata (file sets and files) is held in Active Record models rather than cocina models. See README "Structural metadata" for the full model and flows.
 
