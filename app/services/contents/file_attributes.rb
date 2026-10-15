@@ -12,29 +12,29 @@ module Contents
 
     # Attributes for a file that is not accompanied by OCR.
     ATTRIBUTES_FOR_MIME_TYPE = {
-      'image/tiff' => { preserve: true, shelve: false, publish: false },
-      'image/jp2' => { preserve: false, shelve: true, publish: true },
-      'image/jpeg' => { preserve: true, shelve: false, publish: false },
-      'image/png' => { preserve: true, shelve: false, publish: false },
-      'audio/wav' => { preserve: true, shelve: false, publish: false },
-      'audio/x-wav' => { preserve: true, shelve: false, publish: false },
-      'application/pdf' => { preserve: true, shelve: true, publish: true },
-      'text/plain' => { preserve: true, shelve: true, publish: true },
-      'application/zip' => { preserve: true, shelve: false, publish: false },
-      'application/json' => { preserve: true, shelve: true, publish: true },
-      'model/gltf-binary' => { preserve: true, shelve: true, publish: true }
+      MimeTypes::TIFF => { preserve: true, shelve: false, publish: false },
+      MimeTypes::JP2 => { preserve: false, shelve: true, publish: true },
+      MimeTypes::JPEG => { preserve: true, shelve: false, publish: false },
+      MimeTypes::PNG => { preserve: true, shelve: false, publish: false },
+      MimeTypes::WAV => { preserve: true, shelve: false, publish: false },
+      MimeTypes::X_WAV => { preserve: true, shelve: false, publish: false },
+      MimeTypes::PDF => { preserve: true, shelve: true, publish: true },
+      MimeTypes::PLAIN_TEXT => { preserve: true, shelve: true, publish: true },
+      MimeTypes::ZIP => { preserve: true, shelve: false, publish: false },
+      MimeTypes::JSON => { preserve: true, shelve: true, publish: true },
+      MimeTypes::GLTF_BINARY => { preserve: true, shelve: true, publish: true }
     }.freeze
 
     # Attributes for a file that is accompanied by OCR. Note that application/xml is only present here,
     # since an XML file that does not accompany an image is some other sort of metadata.
     ATTRIBUTES_FOR_MIME_TYPE_WITH_OCR = {
-      'image/tiff' => { preserve: true, shelve: false, publish: false },
-      'image/jp2' => { preserve: true, shelve: true, publish: true },
-      'image/jpeg' => { preserve: true, shelve: false, publish: false },
-      'image/png' => { preserve: true, shelve: false, publish: false },
-      'application/pdf' => { preserve: true, shelve: true, publish: true, use: 'transcription' },
-      'text/plain' => { preserve: true, shelve: true, publish: true },
-      'application/xml' => { preserve: true, shelve: true, publish: true, use: 'transcription' }
+      MimeTypes::TIFF => { preserve: true, shelve: false, publish: false },
+      MimeTypes::JP2 => { preserve: true, shelve: true, publish: true },
+      MimeTypes::JPEG => { preserve: true, shelve: false, publish: false },
+      MimeTypes::PNG => { preserve: true, shelve: false, publish: false },
+      MimeTypes::PDF => { preserve: true, shelve: true, publish: true, use: 'transcription' },
+      MimeTypes::PLAIN_TEXT => { preserve: true, shelve: true, publish: true },
+      MimeTypes::XML => { preserve: true, shelve: true, publish: true, use: 'transcription' }
     }.freeze
 
     def self.call(...)

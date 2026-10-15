@@ -11,7 +11,7 @@ RSpec.describe Edit::MimeTypeComponent, type: :component do
   it 'renders the MIME type select' do
     render_inline(component)
 
-    expect(page).to have_select('MIME type', selected: 'image/jp2', options: described_class::MIME_TYPES)
+    expect(page).to have_select('MIME type', selected: 'image/jp2', options: MimeTypes::COMMON)
     expect(page).to have_css('select[data-controller="creatable-select"]')
   end
 
