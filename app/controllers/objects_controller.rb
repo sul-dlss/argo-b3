@@ -299,7 +299,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def cocina_object
-    CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
+    @cocina_object ||= CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
   end
 
   def fetch_content
