@@ -149,7 +149,7 @@ RSpec.describe 'Manage files' do
       click_on 'Structure'
 
       expect(page).to have_css('p', text: 'There is 1 file that has not been added to the structure.')
-      expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
+      expect(page).to have_css('p', text: 'Strategy for structuring: File (resource per file)')
       expect(page).to have_no_text('Reasons for not using')
 
       click_button('Structure files')
@@ -158,7 +158,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('h3', text: 'Structural metadata')
 
       content_file_set = content.content_file_sets.sole
-      expect(content_file_set).to have_attributes(file_set_type: 'object')
+      expect(content_file_set).to have_attributes(file_set_type: 'file')
       expect(content_file_set.content_files.sole.content_file_binary).to eq(content_file_binary)
 
       click_on 'Deposit'
@@ -231,7 +231,7 @@ RSpec.describe 'Manage files' do
 
       click_on 'Structure'
 
-      expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
+      expect(page).to have_css('p', text: 'Strategy for structuring: File (resource per file)')
 
       click_on 'Item details'
       select 'book', from: 'Content type'

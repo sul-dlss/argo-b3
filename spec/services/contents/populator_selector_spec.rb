@@ -17,7 +17,7 @@ RSpec.describe Contents::PopulatorSelector do
   end
 
   context 'when the content type has no populator of its own' do
-    let(:cocina_type) { Cocina::Models::ObjectType.object }
+    let(:cocina_type) { Cocina::Models::ObjectType.media }
 
     it 'selects the fallback populator without reasons' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileSetPerFile,
@@ -75,12 +75,12 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
-  context 'when the content type is file' do
-    let(:cocina_type) { Cocina::Models::ObjectType.file }
+  context 'when the content type is object' do
+    let(:cocina_type) { Cocina::Models::ObjectType.object }
 
-    it 'selects the file type populator without reasons' do
-      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileType,
-                                        actual_populator: Contents::Populators::FileType,
+    it 'selects the object type populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::ObjectType,
+                                        actual_populator: Contents::Populators::ObjectType,
                                         reasons: [])
     end
   end
@@ -88,9 +88,9 @@ RSpec.describe Contents::PopulatorSelector do
   context 'when the content type is webarchive-binary' do
     let(:cocina_type) { Cocina::Models::ObjectType.webarchive_binary }
 
-    it 'selects the file type populator without reasons' do
-      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileType,
-                                        actual_populator: Contents::Populators::FileType,
+    it 'selects the object type populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::ObjectType,
+                                        actual_populator: Contents::Populators::ObjectType,
                                         reasons: [])
     end
   end

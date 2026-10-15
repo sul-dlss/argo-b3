@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Contents::Populators::FileType do
+RSpec.describe Contents::Populators::ObjectType do
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
   let(:cocina_object) do
     build(:dro_with_metadata, id: content.druid).new(access: { view: 'world', download: 'world' })
