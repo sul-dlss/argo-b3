@@ -71,7 +71,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_json
-    @cocina_hash = fetch_cocina_hash(verified_druid)
+    @cocina_hash = cocina_hash
 
     render layout: false
   end
@@ -111,7 +111,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_purl_preview
-    @cocina_hash = fetch_cocina_hash(verified_druid)
+    @cocina_hash = cocina_hash
     @preview = fetch_purl_preview(@cocina_hash)
     render layout: false
   end
@@ -125,7 +125,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_structure
     @content = fetch_content
-    @content_validation_result = fetch_content_validation_result(content: @content, cocina_object:)
+    @content_validation_result = fetch_content_validation_result(content: @content)
 
     render layout: false
   end
@@ -138,7 +138,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_structural_csv
-    return head :not_found unless cocina_object.dro?
+    return head :not_found unless Cocina::Models::DRO::TYPES.include?(cocina_hash[:type])
 
     # The immutable Content reflects the structural of the cocina object.
     send_data StructuralCsv::Export.as_csv(content: fetch_content),
@@ -298,17 +298,24 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     nil
   end
 
-  def cocina_object
-    @cocina_object ||= CocinaSupport.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
+  def cocina_hash
+    @cocina_hash ||= fetch_cocina_hash(verified_druid)
   end
 
+  def cocina_object
+    # dup since build_from_cocina_hash deletes keys from the hash it is given.
+    @cocina_object ||= CocinaSupport.build_from_cocina_hash(cocina_hash.dup)
+  end
+
+  # The immutable Content usually exists for the lock, so the cocina object is only built when it doesn't.
   def fetch_content
-    Contents::Builder.find_or_create(cocina_object:)
+    Content.find_by(druid: verified_druid, lock: cocina_hash[:lock], immutable: true) ||
+      Contents::Builder.find_or_create(cocina_object:)
   end
 
   # The immutable Content is fixed for a lock, so its validation result for a content type is too.
-  def fetch_content_validation_result(content:, cocina_object:)
-    cache_key = "objects/content-validation/#{content.druid}/#{content.lock}/#{cocina_object.type}"
+  def fetch_content_validation_result(content:)
+    cache_key = "objects/content-validation/#{content.druid}/#{content.lock}/#{cocina_hash[:type]}"
     result_hash = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
       Contents::Validator.call(content:, cocina_object:).to_h
     end
