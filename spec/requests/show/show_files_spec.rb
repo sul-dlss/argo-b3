@@ -86,6 +86,21 @@ RSpec.describe 'Show files' do
       expect(response.body).to include('folder1/bc123df4567_0001.tiff')
     end
 
+    context 'when the immutable Content already exists for the lock' do
+      before do
+        Contents::Builder.call(cocina_object:)
+        allow(Contents::Builder).to receive(:find_or_create)
+      end
+
+      it 'renders the existing Content without building one' do
+        get "/objects/#{token}/files"
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('folder1/bc123df4567_0001.tiff')
+        expect(Contents::Builder).not_to have_received(:find_or_create)
+      end
+    end
+
     it 'raises when token verification fails' do
       get "/objects/#{invalid_token}/files"
 
