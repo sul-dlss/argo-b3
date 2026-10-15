@@ -86,4 +86,30 @@ RSpec.describe Edit::AccessRightsComponent, type: :component do
       expect(page).to have_select('View access', options: ['World', 'Dark', 'Stanford', 'Location Based'])
     end
   end
+
+  context 'when showing APO defaults' do
+    let(:component) { described_class.new(form:, apo_defaults_group: 'embargo_ends') }
+    let(:manage_rights_form) { BulkActions::ManageRightsForm.new }
+
+    it 'renders the group and help text targets that the apo-defaults Stimulus controller expects' do
+      render_inline(component)
+
+      expect(page).to have_css('[data-controller="access-rights"][data-apo-defaults-target="accessGroup"]' \
+                               '[data-apo-defaults-group="embargo_ends"]')
+      %w[view download location].each do |field|
+        expect(page).to have_css(".form-text span[data-apo-defaults-field=\"#{field}\"]", visible: :all)
+      end
+    end
+  end
+
+  context 'when not showing APO defaults' do
+    let(:manage_rights_form) { BulkActions::ManageRightsForm.new }
+
+    it 'does not render the apo-defaults targets' do
+      render_inline(component)
+
+      expect(page).to have_no_css('[data-apo-defaults-target]', visible: :all)
+      expect(page).to have_no_css('[data-apo-defaults-field]', visible: :all)
+    end
+  end
 end

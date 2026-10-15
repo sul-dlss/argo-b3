@@ -35,4 +35,23 @@ RSpec.describe Edit::CopyrightComponent, type: :component do
       expect(page).to have_field('Default copyright', type: 'textarea')
     end
   end
+
+  context 'when showing APO defaults' do
+    let(:component) { described_class.new(form:, apo_defaults: true) }
+
+    it 'renders the targets that the apo-defaults Stimulus controller expects' do
+      render_inline(component)
+
+      expect(page).to have_css('textarea[name="item[copyright]"][data-apo-defaults-target="copyright"]')
+      expect(page).to have_css('.form-text span[data-apo-defaults-target="copyrightText"]', visible: :all)
+    end
+  end
+
+  context 'when not showing APO defaults' do
+    it 'does not render the apo-defaults targets' do
+      render_inline(component)
+
+      expect(page).to have_no_css('[data-apo-defaults-target]', visible: :all)
+    end
+  end
 end

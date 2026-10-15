@@ -53,4 +53,36 @@ RSpec.describe Edit::LicenseComponent, type: :component do
       expect(page).to have_no_text('Assigning a license may improve discovery of your work in web searches.')
     end
   end
+
+  context 'when showing APO defaults' do
+    let(:component) { described_class.new(form:, apo_defaults: true) }
+
+    it 'renders the targets that the apo-defaults Stimulus controller expects, keeping the help text' do
+      render_inline(component)
+
+      expect(page).to have_select('License') { |select| select['data-apo-defaults-target'] == 'license' }
+      expect(page).to have_css('.form-text',
+                               text: 'Assigning a license may improve discovery of your work in web searches.')
+      expect(page).to have_css('.form-text span[data-apo-defaults-target="licenseText"]', visible: :all)
+    end
+  end
+
+  context 'when showing APO defaults and hiding the help text' do
+    let(:component) { described_class.new(form:, apo_defaults: true, hide_help_text: true) }
+
+    it 'renders the APO default help text target without the help text' do
+      render_inline(component)
+
+      expect(page).to have_no_text('Assigning a license may improve discovery of your work in web searches.')
+      expect(page).to have_css('.form-text span[data-apo-defaults-target="licenseText"]', visible: :all)
+    end
+  end
+
+  context 'when not showing APO defaults' do
+    it 'does not render the apo-defaults targets' do
+      render_inline(component)
+
+      expect(page).to have_no_css('[data-apo-defaults-target]', visible: :all)
+    end
+  end
 end

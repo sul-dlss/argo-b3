@@ -14,7 +14,8 @@
   <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings without embargo', hidden_label: true,
                                                              data: { toggle_target: 'section',
                                                                      toggle_section: 'without-embargo' }) do %>
-    <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+    <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field',
+                                               apo_defaults_group: apo_defaults_group('without_embargo')) %>
   <% end %>
 
   <div data-toggle-target="section" data-toggle-section="with-embargo">
@@ -37,7 +38,8 @@
 
     <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings once embargo ends',
                                                                classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field') %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field',
+                                                 apo_defaults_group: apo_defaults_group('embargo_ends')) %>
     <% end %>
   </div>
 </div>

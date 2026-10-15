@@ -15,6 +15,8 @@ RSpec.describe 'Create an item' do
     create(:permission, :edit, workgroup:, target_druid: apo_druid)
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
+    # For applying the APO defaults when the APO is selected.
+    allow(Sdr::Repository).to receive(:find).and_return(build(:admin_policy_with_metadata, id: apo_druid))
     allow(Searchers::CollectionList).to receive(:call).and_return(
       [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
     )

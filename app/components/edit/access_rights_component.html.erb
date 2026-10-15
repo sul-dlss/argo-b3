@@ -1,4 +1,4 @@
-<div data-controller="access-rights">
+<%= tag.div data: { controller: 'access-rights', **container_data } do %>
   <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
         form:,
         field_name: field_name_for(:view),
@@ -6,6 +6,7 @@
         label_text: 'View access',
         label_classes:,
         label_mark_required: true,
+        help_text: apo_default_help_text('view'),
         input_data: { access_rights_target: 'view', action: 'access-rights#toggle' },
         container_classes:
       ) %>
@@ -17,6 +18,7 @@
         label_text: 'Download access',
         label_classes:,
         label_mark_required: true,
+        help_text: apo_default_help_text('download'),
         input_data: { access_rights_target: 'download', action: 'access-rights#toggle' },
         container_classes:
       ) %>
@@ -28,7 +30,8 @@
         label_text: 'Location',
         label_classes:,
         label_mark_required: false,
+        help_text: apo_default_help_text('location'),
         input_data: { access_rights_target: 'location' },
         container_classes:
       ) %>
-</div>
+<% end %>
