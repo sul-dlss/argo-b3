@@ -462,6 +462,10 @@ RSpec.describe 'Create an item' do
     end
 
     it 'registers and redirects to add files' do
+      version_service = instance_double(Sdr::VersionService, open?: true, editable?: true, version: 1,
+                                                             version_description: 'Initial version')
+      allow(Sdr::VersionService).to receive(:new).and_return(version_service)
+
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'

@@ -22,7 +22,8 @@ class ItemsController < ApplicationController
     return redirect_not_editable unless version_service.editable?
 
     @edit_item_form = EditItemForm.build_from_cocina_object(@cocina_object)
-    @edit_item_form.version_description = version_service.version_description if version_service.open?
+    @edit_item_form.version_service = version_service
+    @edit_item_form.prefill_version_description
     set_edit_view
   end
 
@@ -61,7 +62,10 @@ class ItemsController < ApplicationController
   end
 
   def build_submitted_edit_item_form
-    EditItemForm.build_from_cocina_object(@cocina_object).tap { |form| form.update(edit_item_form_params) }
+    EditItemForm.build_from_cocina_object(@cocina_object).tap do |form|
+      form.version_service = version_service
+      form.update(edit_item_form_params)
+    end
   end
 
   def edit_item_form_params

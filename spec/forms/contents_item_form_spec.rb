@@ -9,11 +9,19 @@ RSpec.describe ContentsItemForm do
     build(:dro_with_metadata, type: Cocina::Models::ObjectType.book)
       .then { |dro| dro.new(structural: dro.structural.new(hasMemberOrders: [{ viewingDirection: 'right-to-left' }])) }
   end
+  # Defaults to the initial version, for which a version description is not required.
+  let(:version_service) do
+    instance_double(Sdr::VersionService, open?: true, version: 1, version_description: 'Initial version')
+  end
+
+  before do
+    allow(Sdr::VersionService).to receive(:new).and_return(version_service)
+  end
 
   describe '.permitted_params' do
-    it 'permits the content type, viewing direction, and OCR settings' do
+    it 'permits the content type, viewing direction, OCR settings, and version description' do
       expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :run_ocr,
-                                                      { text_extraction_languages: [] }])
+                                                      :version_description, { text_extraction_languages: [] }])
     end
   end
 
@@ -136,6 +144,158 @@ RSpec.describe ContentsItemForm do
 
     it 'is not changed by setting the content' do
       expect(contents_item_form).not_to be_changed
+    end
+  end
+
+  describe 'version description' do
+    context 'when the initial version' do
+      it 'is not required' do
+        expect(contents_item_form).to be_initial_version
+        expect(contents_item_form).to be_valid
+      end
+    end
+
+    context 'when not the initial version' do
+      let(:version_service) do
+        instance_double(Sdr::VersionService, open?: false, version: 1, version_description: 'Initial version')
+      end
+
+      it 'is required' do
+        expect(contents_item_form).not_to be_initial_version
+        expect(contents_item_form).not_to be_valid
+        expect(contents_item_form.errors[:version_description]).to include("can't be blank")
+      end
+    end
+
+    it 'does not change the form' do
+      contents_item_form.update(version_description: 'Added files')
+
+      expect(contents_item_form).not_to be_changed
+    end
+  end
+
+  describe '#prefill_version_description' do
+    context 'when the version is open' do
+      it 'prefills the description of the open version' do
+        contents_item_form.prefill_version_description
+
+        expect(contents_item_form.version_description).to eq('Initial version')
+      end
+    end
+
+    context 'when the version is closed' do
+      let(:version_service) do
+        instance_double(Sdr::VersionService, open?: false, version: 1, version_description: 'Initial version')
+      end
+
+      it 'leaves the description blank' do
+        contents_item_form.prefill_version_description
+
+        expect(contents_item_form.version_description).to be_nil
+      end
+    end
+  end
+
+  describe '#save!' do
+    let(:user_name) { 'jlittman' }
+    let(:version_service) do
+      instance_double(Sdr::VersionService, open?: open, version:, version_description: 'Added files',
+                                           update_description: nil)
+    end
+    let(:version) { 2 }
+    let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
+
+    before do
+      allow(Sdr::VersionService).to receive(:open).and_return(opened_cocina_object)
+      allow(Sdr::Repository).to receive(:update)
+    end
+
+    context 'when the version is closed and there are no changes' do
+      let(:open) { false }
+      let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+      before do
+        contents_item_form.update(version_description: 'Added more files')
+        contents_item_form.content = content
+      end
+
+      it 'opens a new version without saving and rebases the content onto it' do
+        contents_item_form.save!(user_name:)
+
+        expect(Sdr::VersionService).to have_received(:open)
+          .with(druid: cocina_object.externalIdentifier, description: 'Added more files', opening_user_name: user_name)
+        expect(contents_item_form.previous_cocina_object).to eq(opened_cocina_object)
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.lock).to eq('opened-lock')
+      end
+    end
+
+    context 'when saving fails after opening a version' do
+      let(:open) { false }
+      let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+      before do
+        allow(Sdr::Repository).to receive(:update).and_raise(Sdr::Repository::Error, 'Update failed')
+        contents_item_form.update(version_description: 'Changed type', content_type: Cocina::Models::ObjectType.image)
+        contents_item_form.content = content
+      end
+
+      it 'rebases the content onto the opened version' do
+        expect { contents_item_form.save!(user_name:) }.to raise_error(Sdr::Repository::Error)
+        expect(content.reload.lock).to eq('opened-lock')
+      end
+    end
+
+    context 'when the version is open and the version description changed' do
+      let(:open) { true }
+
+      before { contents_item_form.update(version_description: 'Added more files') }
+
+      it 'updates the version description without opening a version' do
+        contents_item_form.save!(user_name:)
+
+        expect(version_service).to have_received(:update_description)
+          .with(description: 'Added more files', user_name:)
+        expect(Sdr::VersionService).not_to have_received(:open)
+      end
+    end
+
+    context 'when the version is open and the version description did not change' do
+      let(:open) { true }
+
+      before { contents_item_form.update(version_description: 'Added files') }
+
+      it 'does not update the version description' do
+        contents_item_form.save!(user_name:)
+
+        expect(version_service).not_to have_received(:update_description)
+        expect(Sdr::VersionService).not_to have_received(:open)
+      end
+    end
+
+    context 'when the initial version' do
+      let(:open) { true }
+      let(:version) { 1 }
+
+      it 'does not update the version description' do
+        contents_item_form.save!(user_name:)
+
+        expect(version_service).not_to have_received(:update_description)
+        expect(Sdr::VersionService).not_to have_received(:open)
+      end
+    end
+
+    context 'when the version description is missing' do
+      let(:open) { false }
+      let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+      before { contents_item_form.content = content }
+
+      it 'raises without opening a version or changing the content lock' do
+        expect { contents_item_form.save!(user_name:) }.to raise_error(ActiveModel::ValidationError)
+        expect(Sdr::VersionService).not_to have_received(:open)
+        expect(content.reload.lock).to eq(cocina_object.lock)
+      end
     end
   end
 end

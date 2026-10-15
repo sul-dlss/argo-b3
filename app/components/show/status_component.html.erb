@@ -10,11 +10,7 @@
                                                                     variant: :'outline-primary', size: :sm,
                                                                     disabled: true) %>
       <% end %>
-      <% if item? %>
-        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.manage_files'),
-                                                                    variant: :'outline-primary', size: :sm,
-                                                                    disabled: true) %>
-      <% end %>
+      <%= render manage_files_button if item? %>
       <% if status == :draft %>
         <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
                                                                     variant: :primary, size: :sm, disabled: true) %>
@@ -24,6 +20,10 @@
     <p><%= I18n.t('show.status.depositing.body') %></p>
   <% when :staging_failed %>
     <p><%= staging_failed_body %></p>
+    <%# Managing files again retries staging. %>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+      <%= render manage_files_button %>
+    </div>
   <% when :error %>
     <% workflow_error_messages.each do |workflow_error_message| %>
       <p><%= workflow_error_message %></p>

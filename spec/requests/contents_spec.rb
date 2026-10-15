@@ -8,16 +8,67 @@ RSpec.describe 'Contents' do
   let(:updated_cocina_object) { cocina_object.new(lock: 'updated-lock') }
   let!(:content) { create(:content, druid:, lock: cocina_object.lock, immutable: false) }
   let(:user) { create(:user) }
+  # Defaults to the initial version, for which a version description is not entered.
+  let(:version_service) do
+    instance_double(Sdr::VersionService, open?: open, editable?: editable, version:,
+                                         version_description: 'Initial version', update_description: nil)
+  end
+  let(:editable) { true }
+  let(:open) { true }
+  let(:version) { 1 }
+  let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
 
   before do
     allow(Sdr::Repository).to receive_messages(find: cocina_object, update: updated_cocina_object,
                                                find_solr: build(:solr_item, druid:))
+    allow(Sdr::VersionService).to receive_messages(new: version_service, open: opened_cocina_object)
     allow(StageFilesJob).to receive(:perform_later)
     create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
     sign_in(user)
   end
 
   describe 'edit' do
+    context 'when the version is not editable' do
+      let(:editable) { false }
+
+      it 'redirects to the object page' do
+        get edit_content_path(druid)
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(flash[:warning]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
+      end
+    end
+
+    context 'when the initial version' do
+      it 'does not render the version description' do
+        get edit_content_path(druid)
+
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_no_field('Version description')
+      end
+    end
+
+    context 'when the version is open' do
+      let(:version) { 2 }
+
+      it 'prefills the version description from the open version' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_field('Version description', with: 'Initial version')
+        expect(Sdr::VersionService).to have_received(:new).with(druid:).once
+      end
+    end
+
+    context 'when the version is closed' do
+      let(:open) { false }
+
+      it 'renders an empty version description' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body).find_field('Version description').value).to be_blank
+      end
+    end
+
     context 'when the user cannot edit the object' do
       before { Permission.permission_type_edit.destroy_all }
 
@@ -189,6 +240,106 @@ RSpec.describe 'Contents' do
           expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
                                                                       workflow_context: {})
         end
+      end
+    end
+
+    context 'when saving fails after opening a version' do
+      let(:open) { false }
+
+      before do
+        allow(Sdr::Repository).to receive(:update).and_raise(Sdr::Repository::Error, 'Updating failed')
+      end
+
+      it 'renders the edit page with the content rebased onto the opened version' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { version_description: 'Added files',
+                                                              content_type: Cocina::Models::ObjectType.image } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include(I18n.t('edit.contents.edit.errors.save_failed'))
+        expect(Sdr::VersionService).to have_received(:open)
+        expect(content.reload.lock).to eq('opened-lock')
+        expect(content.reload).to be_staging_not_in_progress
+        expect(StageFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when opening a version fails' do
+      let(:open) { false }
+
+      before do
+        allow(Sdr::VersionService).to receive(:open).and_raise(Dor::Services::Client::Error, 'Opening failed')
+      end
+
+      it 'renders the edit page without changing the content lock' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { version_description: 'Added files' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include(I18n.t('edit.contents.edit.errors.save_failed'))
+        expect(content.reload.lock).to eq(cocina_object.lock)
+        expect(StageFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when the version is closed' do
+      let(:open) { false }
+
+      it 'opens a new version and stages against it' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { version_description: 'Added files' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::VersionService).to have_received(:open)
+          .with(druid:, description: 'Added files', opening_user_name: user.sunetid)
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.lock).to eq('opened-lock')
+        expect(Sdr::VersionService).to have_received(:new).with(druid:).once
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
+                                                                    workflow_context: {})
+      end
+    end
+
+    context 'when the version is closed and the version description is missing' do
+      let(:open) { false }
+
+      it 'renders the edit page' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { version_description: '' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Sdr::VersionService).not_to have_received(:open)
+        expect(StageFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when the version is open and the version description changed' do
+      let(:version) { 2 }
+
+      it 'updates the version description' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { version_description: 'Added files' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(version_service).to have_received(:update_description)
+          .with(description: 'Added files', user_name: user.sunetid)
+        expect(Sdr::VersionService).not_to have_received(:open)
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
+                                                                    workflow_context: {})
+      end
+    end
+
+    context 'when the version is not editable' do
+      let(:editable) { false }
+
+      it 'redirects to the object page without updating' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(flash[:warning]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(StageFilesJob).not_to have_received(:perform_later)
       end
     end
 

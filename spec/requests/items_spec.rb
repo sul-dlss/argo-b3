@@ -52,7 +52,7 @@ RSpec.describe 'Items' do
 
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_field('Version description', with: 'Fixing the title')
-        expect(Sdr::VersionService).to have_received(:new).with(druid:)
+        expect(Sdr::VersionService).to have_received(:new).with(druid:).once
       end
 
       it 'renders the save as draft and deposit buttons' do
@@ -165,7 +165,7 @@ RSpec.describe 'Items' do
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:toast]).to eq('Item updated.')
-        expect(Sdr::VersionService).to have_received(:new).with(druid:).at_least(:once)
+        expect(Sdr::VersionService).to have_received(:new).with(druid:).once
         expect(Sdr::VersionService).not_to have_received(:open)
         expect(Sdr::Repository).to have_received(:update)
           .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.image, lock: cocina_object.lock),

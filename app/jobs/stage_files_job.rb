@@ -21,7 +21,7 @@ class StageFilesJob < ApplicationJob
       user_name: user.sunetid
     )
 
-    content.update!(lock: updated_cocina_object.lock, immutable: true)
+    make_immutable!(content:, lock: updated_cocina_object.lock)
 
     # Optionally start accessioning.
     if accession
@@ -59,6 +59,14 @@ class StageFilesJob < ApplicationJob
     raise "Lock mismatch for #{druid}. Content: #{content.lock}. Cocina object: #{cocina_object.lock}"
   end
 
+  # An unchanged structure leaves the lock unchanged, so this Content supersedes the existing immutable Content.
+  def make_immutable!(content:, lock:)
+    Content.transaction do
+      Content.where(druid:, lock:, immutable: true).where.not(id: content.id).find_each(&:destroy!)
+      content.update!(lock:, immutable: true)
+    end
+  end
+
   def analyze!
     stageable_content_file_binaries.find_each do |content_file_binary|
       Contents::Analyzer.call(content_file_binary:)
@@ -90,6 +98,8 @@ class StageFilesJob < ApplicationJob
     Rails.logger.error(error.full_message)
     Honeybadger.notify(error)
 
+    # Discards any unsaved changes from the failure, so that recording it does not fail again.
+    content.reload
     content.staging_errored! if content.staging?
     Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'),

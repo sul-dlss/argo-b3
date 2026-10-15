@@ -48,6 +48,13 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
       expect(page).to have_no_css('a.disabled', text: 'Edit item')
     end
+
+    it 'renders an enabled manage files link' do
+      render_inline(component)
+
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+      expect(page).to have_no_button('Manage files')
+    end
   end
 
   context 'when the item version is not editable' do
@@ -226,6 +233,24 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2 i.bi-exclamation-triangle-fill')
       expect(page).to have_text("Files could not be staged. Contact SDR support at #{Settings.support_email}")
       expect(page).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
+      expect(page).to have_button('Manage files', class: 'disabled')
+    end
+
+    context 'when the item version is editable and the user can edit' do
+      let(:editable) { true }
+
+      before do
+        user = create(:user)
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+        allow(Current).to receive(:user).and_return(user)
+      end
+
+      it 'renders an enabled manage files link' do
+        render_inline(component)
+
+        expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+        expect(page).to have_no_button('Manage files')
+      end
     end
   end
 end
