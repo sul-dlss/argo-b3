@@ -11,11 +11,9 @@ class ContentsItemForm < CocinaModels::Dro
   validates :version_description, presence: true, unless: :initial_version?
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description].freeze
+  FORM_ONLY_ATTRIBUTES = %w[version_description run_ocr text_extraction_languages].freeze
 
-  # The OCR settings are not part of the Cocina object; they are form-only attributes that
-  # #workflow_context hands to the assembly workflow instead. A consequence is that changing only
-  # these still issues a Cocina update that is a no-op.
+  # The OCR settings are not part of the Cocina object; #workflow_context hands them to the assembly workflow.
   attribute :run_ocr, :boolean, default: false
 
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
