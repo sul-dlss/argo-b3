@@ -8,16 +8,12 @@ module Contents
   # are wanted, since they tell the user that the content does not suit the content type.
   class Validator
     # The validator for content types without a validator of their own.
-    DEFAULT_VALIDATOR = [Contents::Validators::Default, {}].freeze
+    DEFAULT_VALIDATOR = Contents::Validators::Default
 
-    # The validator and its options for each content type.
     VALIDATORS_FOR_CONTENT_TYPES = {
-      Cocina::Models::ObjectType.book => [Contents::Validators::ImageResources,
-                                          { resource_file_set_type: FileSetTypes::PAGE }],
-      Cocina::Models::ObjectType.image => [Contents::Validators::ImageResources,
-                                           { resource_file_set_type: FileSetTypes::IMAGE }],
-      Cocina::Models::ObjectType.map => [Contents::Validators::ImageResources,
-                                         { resource_file_set_type: FileSetTypes::IMAGE }]
+      Cocina::Models::ObjectType.book => Contents::Validators::Book,
+      Cocina::Models::ObjectType.image => Contents::Validators::Image,
+      Cocina::Models::ObjectType.map => Contents::Validators::Image
     }.freeze
 
     def self.call(...)
@@ -36,13 +32,16 @@ module Contents
 
     # @return [Contents::Validators::Result]
     def call
-      validator, options = VALIDATORS_FOR_CONTENT_TYPES.fetch(content_type, DEFAULT_VALIDATOR)
-      validator.call(content:, dark: dark?, **options)
+      validator.call(content:, dark: dark?)
     end
 
     private
 
     attr_reader :content, :cocina_object, :content_type
+
+    def validator
+      VALIDATORS_FOR_CONTENT_TYPES.fetch(content_type, DEFAULT_VALIDATOR)
+    end
 
     # Validates based on what the file access will be after any embargo is lifted.
     def dark?

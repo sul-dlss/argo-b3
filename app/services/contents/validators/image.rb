@@ -2,12 +2,12 @@
 
 module Contents
   module Validators
-    # Validates that the structure of a Content is suitable for a content type whose images are in
-    # Resources (ContentFileSets) of a single file set type, e.g., page resources for a book.
+    # Validates that the structure of a Content is suitable for an image (or map), whose images are in
+    # image Resources (ContentFileSets). Subclasses may validate Resources of another file set type.
     #
     # Violations of the rules for a Resource are errors, except for a dark object, for
     # which they are only warnings since none of its files are expected to be published.
-    class ImageResources < Default
+    class Image < Default
       IMAGE_MIME_TYPES = [MimeTypes::TIFF, MimeTypes::PNG, MimeTypes::JPEG].freeze
       # JP2, XML (ALTO), TXT, and HTML (hOCR)
       PUBLISHABLE_RESOURCE_MIME_TYPES = [
@@ -16,10 +16,10 @@ module Contents
 
       # @param [Content] content
       # @param [Boolean] dark true if the object is dark
-      # @param [String] resource_file_set_type the file set type of the Resources holding the images, e.g., page
-      def initialize(content:, dark:, resource_file_set_type:)
+      # @param [String] file_set_type the file set type of the Resources holding the images
+      def initialize(content:, dark:, file_set_type: FileSetTypes::IMAGE)
         super(content:, dark:)
-        @resource_file_set_type = resource_file_set_type
+        @file_set_type = file_set_type
       end
 
       # @return [Contents::Validators::Result]
@@ -28,7 +28,7 @@ module Contents
           validate_content_file_set(content_file_set:, index:)
         end
         unless any_resource_with_image?
-          warnings << "No #{resource_file_set_type} resource has a published JP2 or a TIFF, PNG, or JPEG file."
+          warnings << "No #{file_set_type} resource has a published JP2 or a TIFF, PNG, or JPEG file."
         end
 
         result
@@ -36,7 +36,7 @@ module Contents
 
       private
 
-      attr_reader :resource_file_set_type
+      attr_reader :file_set_type
 
       def content_file_sets
         @content_file_sets ||= content.content_file_sets.includes(content_files: :content_file_binary).to_a
@@ -49,7 +49,7 @@ module Contents
       def validate_content_file_set(content_file_set:, index:)
         name = resource_name_for(content_file_set:, index:)
         case content_file_set.file_set_type
-        when resource_file_set_type
+        when file_set_type
           validate_resource(content_file_set:, name:)
         when FileSetTypes::OBJECT
           # Object resources are not validated.
@@ -96,13 +96,13 @@ module Contents
       def validate_other(content_file_set:, name:)
         return if content_file_set.content_files.none?(&:publish)
 
-        add_warning_or_error("#{name} has published files but is not #{article} #{resource_file_set_type} " \
+        add_warning_or_error("#{name} has published files but is not #{article} #{file_set_type} " \
                              'or object resource.')
       end
 
       def any_resource_with_image?
         content_file_sets.any? do |content_file_set|
-          content_file_set.file_set_type == resource_file_set_type &&
+          content_file_set.file_set_type == file_set_type &&
             content_file_set.content_files.any? do |content_file|
               (content_file.publish && jp2?(content_file)) || image?(content_file)
             end
@@ -110,7 +110,7 @@ module Contents
       end
 
       def article
-        resource_file_set_type.match?(/\A[aeiou]/) ? 'an' : 'a'
+        file_set_type.match?(/\A[aeiou]/) ? 'an' : 'a'
       end
 
       def jp2?(content_file)
