@@ -11,7 +11,9 @@ module Contents
     DEFAULT_VALIDATOR = Contents::Validators::Default
 
     VALIDATORS_FOR_CONTENT_TYPES = {
-      Cocina::Models::ObjectType.book => Contents::Validators::Book
+      Cocina::Models::ObjectType.book => Contents::Validators::Book,
+      Cocina::Models::ObjectType.image => Contents::Validators::Image,
+      Cocina::Models::ObjectType.map => Contents::Validators::Image
     }.freeze
 
     def self.call(...)
