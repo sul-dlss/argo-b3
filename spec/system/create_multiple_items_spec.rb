@@ -15,6 +15,7 @@ RSpec.describe 'Create multiple items' do
     create(:permission, :edit, workgroup:, target_druid: apo_druid)
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
+    allow(Searchers::TagSuggestions).to receive(:call).and_return([])
     allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
     allow(CatalogRepository).to receive(:exists?).and_return(true)
 
@@ -80,11 +81,11 @@ RSpec.describe 'Create multiple items' do
   end
 
   def fill_in_tags
-    fill_in 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+    fill_in_tag 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
     click_button 'Add another tag'
-    fill_in 'items_registration[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
-    fill_in 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
-    fill_in 'items_registration[ticket_tags_attributes][0][tag]', with: 'ABC-123'
+    fill_in_tag 'items_registration[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
+    fill_in_tag 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
+    fill_in_tag 'items_registration[ticket_tags_attributes][0][tag]', with: 'ABC-123'
   end
 
   # Fills in the registration form with a valid item and an item missing a title, then submits it.
@@ -446,7 +447,7 @@ RSpec.describe 'Create multiple items' do
 
       # A project name is already filled in, so the pasted project tag has to be appended below it
       # rather than overwrite it.
-      fill_in 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
+      fill_in_tag 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
       # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
       # the tabs as real keystrokes, which blur the text area. It also sends the first four and
       # last three characters as keystrokes, so keep the delimiters away from both ends.
@@ -454,12 +455,13 @@ RSpec.describe 'Create multiple items' do
               with: "Registered By : mjgiarlo\tProject : Google Books\nTicket : ABC-123\tRemediated By : 5.0.0"
       click_button 'Add tags'
 
-      expect(page).to have_field('items_registration[other_tags_attributes][0][tag]',
-                                 with: 'Registered By : mjgiarlo')
-      expect(page).to have_field('items_registration[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0')
-      expect(page).to have_field('items_registration[project_tags_attributes][0][tag]', with: 'Argo')
-      expect(page).to have_field('items_registration[project_tags_attributes][1][tag]', with: 'Google Books')
-      expect(page).to have_field('items_registration[ticket_tags_attributes][0][tag]', with: 'ABC-123')
+      expect(find_tag_select_item('items_registration[other_tags_attributes][0][tag]'))
+        .to have_text('Registered By : mjgiarlo')
+      expect(find_tag_select_item('items_registration[other_tags_attributes][1][tag]'))
+        .to have_text('Remediated By : 5.0.0')
+      expect(find_tag_select_item('items_registration[project_tags_attributes][0][tag]')).to have_text('Argo')
+      expect(find_tag_select_item('items_registration[project_tags_attributes][1][tag]')).to have_text('Google Books')
+      expect(find_tag_select_item('items_registration[ticket_tags_attributes][0][tag]')).to have_text('ABC-123')
       expect(page).to have_field('Enter multiple tags', with: '')
 
       fill_in_two_items
@@ -489,7 +491,7 @@ RSpec.describe 'Create multiple items' do
       expect(page).to have_css('h1', text: 'Register items')
 
       fill_in_registration_settings
-      fill_in 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By'
+      fill_in_tag 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By'
       fill_in_two_items
 
       click_button 'Register items'
