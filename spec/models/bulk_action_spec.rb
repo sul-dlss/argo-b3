@@ -11,6 +11,15 @@ RSpec.describe BulkAction do
     it 'returns the correct config for the action type' do
       expect(bulk_action.bulk_action_config).to eq(BulkActions::REINDEX)
     end
+
+    context 'when the action type is no longer configured' do
+      subject(:bulk_action) { described_class.new(action_type: 'OPEN_VERSION') }
+
+      it 'returns a config with a label derived from the action type' do
+        expect(bulk_action.label).to eq('Open version')
+        expect(bulk_action.exports).to eq([])
+      end
+    end
   end
 
   describe '.enqueue_job' do

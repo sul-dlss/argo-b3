@@ -3,7 +3,11 @@
 # Configurations for bulk actions.
 module BulkActions # rubocop:disable Metrics/ModuleLength
   def self.find_config(bulk_action_type)
-    "#{name}::#{bulk_action_type.to_s.upcase}".constantize
+    constant_name = bulk_action_type.to_s.upcase
+    return const_get(constant_name, false) if const_defined?(constant_name, false)
+
+    # Bulk actions of a removed or renamed type remain in the history.
+    Config.new(label: constant_name.humanize)
   end
 
   def self.to_path_helper(path_name)
