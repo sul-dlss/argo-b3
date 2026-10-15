@@ -205,6 +205,7 @@ Rails.application.routes.draw do
       get 'constituents', to: 'objects#show_constituents'
       post 'republish', to: 'objects#republish'
       get 'structural_csv', to: 'objects#show_structural_csv'
+      get 'descriptive_csv', to: 'objects#show_descriptive_csv'
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end

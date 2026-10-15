@@ -4,17 +4,11 @@ module BulkActions
   # Export a spreadsheet of descriptive metadata
   class ExportDescriptiveMetadataJob < DruidsJob
     def perform_bulk_action
-      grouped_descriptions = DescriptiveCsv::DescriptionsGrouper.group(descriptions:)
-      ordered_headers = DescriptiveCsv::Headers.create(headers: grouped_descriptions.values.flat_map(&:keys).uniq)
+      csv = DescriptiveCsv::Export.as_csv(descriptions:)
 
       log('Writing to file')
 
-      CSV.open(bulk_action.export_filepath(:descriptive_metadata), 'w',
-               write_headers: true, headers: %w[druid] + ordered_headers) do |csv|
-        grouped_descriptions.each do |druid, description|
-          csv << ([DruidSupport.bare_druid_from(druid)] + description.values_at(*ordered_headers))
-        end
-      end
+      File.write(bulk_action.export_filepath(:descriptive_metadata), csv)
     end
 
     private
