@@ -68,7 +68,7 @@
     <% layout.with_main_content do %>
       <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
         <div class="show-box flex-fill">
-          <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter) %>
+          <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter, solr_doc: @solr_doc) %>
         </div>
         <% if @solr_doc.releasable_type? %>
           <div class="show-box flex-fill">

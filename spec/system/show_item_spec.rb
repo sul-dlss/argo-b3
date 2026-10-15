@@ -23,7 +23,8 @@ RSpec.describe 'Show item' do
 
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
-                                                                         closed?: true, version: 2)
+                                                                         closed?: true, version: 2,
+                                                                         openable?: true, closeable?: false)
   end
   let(:milestone_date) { true }
   let(:event_types) { %w[publishing_complete version_open] }
@@ -223,6 +224,7 @@ RSpec.describe 'Show item' do
     # Status box
     expect(page).to have_css('h2', text: 'Deposited')
     expect(page).to have_css('h2 i.bi-check-circle-fill')
+    expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
 
     # Released to box
     expect(page).to have_css('h2', text: 'Released to')

@@ -1,0 +1,18 @@
+<div class="d-flex">
+  <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:) %>
+  <%= render SdrViewComponents::Forms::SubmitComponent.new(
+        label: t('edit.items.edit.buttons.draft'),
+        form_id:,
+        value: ItemsController::DRAFT_VALUE,
+        variant: 'outline-primary',
+        classes: 'ms-auto'
+      ) %>
+  <% if show_deposit %>
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(
+          label: t('edit.items.edit.buttons.deposit'),
+          form_id:,
+          value: ItemsController::DEPOSIT_VALUE,
+          classes: 'ms-2'
+        ) %>
+  <% end %>
+</div>
