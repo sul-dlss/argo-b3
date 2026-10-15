@@ -3,6 +3,9 @@
 module Sdr
   # Encapsulates all version-related functionality
   class VersionService
+    # A subclass of Sdr::Repository::Error, so callers can handle any SDR update failure together.
+    class Error < Sdr::Repository::Error; end
+
     class << self
       # @returns [Cocina::Models::DROWithMetadata|CollectionWithMetadata|AdminPolicyWithMetadata] cocina object with updated version # rubocop:disable Layout/LineLength
       def open(druid:, **)
@@ -52,12 +55,32 @@ module Sdr
 
     attr_reader :druid
 
-    delegate :close, :open, :update_description, to: :version_client
     delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :version, :version_description,
              to: :status
 
     def initialize(druid:)
       @druid = druid
+    end
+
+    # @raise [Error] if opening the version fails
+    def open(...)
+      version_client.open(...)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Opening version failed: #{e.message}"
+    end
+
+    # @raise [Error] if closing the version fails
+    def close(...)
+      version_client.close(...)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Closing version failed: #{e.message}"
+    end
+
+    # @raise [Error] if updating the version description fails
+    def update_description(...)
+      version_client.update_description(...)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Updating version description failed: #{e.message}"
     end
 
     def open_and_not_assembling?
