@@ -14,7 +14,7 @@ module BulkActions
       end
 
       def not_publishable?
-        cocina_object.admin_policy? || cocina_object.type == Cocina::Models::ObjectType.agreement
+        cocina_object.admin_policy? || CocinaSupport.agreement?(cocina_object)
       end
     end
   end

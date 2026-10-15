@@ -19,3 +19,5 @@ ignore_unused:
   - 'time.formats.*'
   # Called as helpers.t(...) in ApplicationController, which i18n-tasks does not scan.
   - 'errors.not_authorized'
+  # Built from symbol keys in MultiItemDeposit::DiscoverFilesJob#message.
+  - 'multi_item_deposit.discover_files.*'

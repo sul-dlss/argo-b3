@@ -394,6 +394,23 @@ en:
       art: "Art"
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
+  multi_item_deposit:
+    discover_files:
+      errors:
+        object_not_found: 'Object not found'
+        not_item: 'Not an Item'
+        not_authorized: 'Not authorized to update'
+        content_in_progress: 'Files are being staged or discovered for this object'
+        folder_not_found: 'Folder not found: %{path}'
+        no_files: 'No files found in folder: %{path}'
+        files_too_large: 'Files larger than 4 TB: %{filepaths}'
+        unexpected: 'An unexpected error occurred during discovery. Contact SDR support for assistance.'
+      warnings:
+        not_openable: 'A new version cannot be opened for this object'
+        not_closeable: 'The open version cannot be closed for this object'
+        empty_files: 'Empty files: %{filepaths}'
+        empty_folders: 'Empty folders: %{paths}'
+        discarded_content: 'Discarded in-progress file edits'
   bulk_actions:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
