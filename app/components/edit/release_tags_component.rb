@@ -9,5 +9,13 @@ module Edit
     end
 
     attr_reader :form
+
+    def options
+      [
+        ['Follow collection settings', ReleaseTagsForm::RELEASE_TO_COLLECTION],
+        ['Release', ReleaseTagsForm::RELEASE_TO_TARGETS],
+        ['Do not release', ReleaseTagsForm::NO_RELEASE]
+      ]
+    end
   end
 end

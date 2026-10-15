@@ -35,7 +35,7 @@ en:
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
   release_tags:
-    earthworks: "EarthWorks"
+    earthworks: "EarthWorks (requires geo coordinates or release will not be successful)"
     purl_sitemap: "Search engines"
     searchworks: "SearchWorks"
   banner:
@@ -262,8 +262,9 @@ en:
           label: "Release"
           pane: "Manage release"
           help_text: >-
-            Content will be released as soon as you deposit this item. If you want to add descriptive metadata after deposit
-            but before release, you should choose 'Do not release.'
+            If the item is not already in a collection, "Follow collection settings" will not have any effect until the item
+            is added to a collection. Choosing "Release" or "Do not release" will override any collection-level release
+            settings for this item.
         rights:
           label: "APO, collection, rights"
         tags:
