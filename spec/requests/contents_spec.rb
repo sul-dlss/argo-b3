@@ -268,7 +268,7 @@ RSpec.describe 'Contents' do
       let(:open) { false }
 
       before do
-        allow(Sdr::VersionService).to receive(:open).and_raise(Dor::Services::Client::Error, 'Opening failed')
+        allow(Sdr::VersionService).to receive(:open).and_raise(Sdr::VersionService::Error, 'Opening version failed')
       end
 
       it 'renders the edit page without changing the content lock' do

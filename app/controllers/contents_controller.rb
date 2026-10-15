@@ -90,7 +90,7 @@ class ContentsController < ContentsApplicationController
     StageFilesJob.perform_later(content:, accession: params[:commit] == ContentsController::DEPOSIT_VALUE,
                                 user: current_user, workflow_context: @contents_item_form.workflow_context)
     true
-  rescue Sdr::Repository::Error, Dor::Services::Client::Error => e
+  rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e)
     false
