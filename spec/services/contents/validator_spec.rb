@@ -33,6 +33,19 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'with the webarchive-binary content type' do
+    let(:content_type) { Cocina::Models::ObjectType.webarchive_binary }
+
+    before do
+      content_file_binary = create(:content_file_binary, content:, filepath: 'data.zip')
+      create(:content_file, content_file_set: content.content_file_sets.first, content_file_binary:, publish: true)
+    end
+
+    it 'validates file resources' do
+      expect(result.errors).to eq(['Resource 1 (File 1) has more than one published file.'])
+    end
+  end
+
   context 'with the image content type' do
     let(:content_type) { Cocina::Models::ObjectType.image }
 
