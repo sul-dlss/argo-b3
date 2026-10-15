@@ -2,11 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe Contents::Validators::Book do
-  subject(:result) { described_class.call(content:, dark:) }
+RSpec.describe Contents::Validators::ImageResources do
+  subject(:result) { described_class.call(content:, dark:, resource_file_set_type:) }
 
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
   let(:dark) { false }
+  let(:resource_file_set_type) { 'page' }
 
   # @param [Array<Array>] files the filepath, mime type, and publish flag of each file
   def create_resource(file_set_type:, files:, label: '')
@@ -152,6 +153,55 @@ RSpec.describe Contents::Validators::Book do
   context 'when there are no resources' do
     it 'has a warning' do
       expect(result.warnings).to eq(['No page resource has a published JP2 or a TIFF, PNG, or JPEG file.'])
+    end
+  end
+
+  context 'when validating image resources' do
+    let(:resource_file_set_type) { 'image' }
+
+    context 'when the images are valid' do
+      before do
+        create_resource(file_set_type: 'image', label: 'Image 1',
+                        files: [['image1.tif', 'image/tiff', false],
+                                ['image1.jp2', 'image/jp2', true],
+                                ['image1.xml', 'application/xml', true],
+                                ['image1.txt', 'text/plain', true],
+                                ['image1.html', 'text/html', true]])
+        create_resource(file_set_type: 'object', label: 'Object 1', files: [['notes.pdf', 'application/pdf', true]])
+      end
+
+      it 'has no errors or warnings' do
+        expect(result).to have_attributes(errors: [], warnings: [])
+      end
+    end
+
+    context 'when an image has more than one published JP2' do
+      before do
+        create_resource(file_set_type: 'image', label: 'Image 1',
+                        files: [['image1.jp2', 'image/jp2', true], ['image1a.jp2', 'image/jp2', true]])
+      end
+
+      it 'has an error' do
+        expect(result.errors).to eq(['Resource 1 (Image 1) has more than one published JP2 file.'])
+      end
+    end
+
+    context 'when a page resource has published files' do
+      before do
+        create_resource(file_set_type: 'image', label: 'Image 1', files: [['image1.jp2', 'image/jp2', true]])
+        create_resource(file_set_type: 'page', label: 'Page 1', files: [['page_0001.jp2', 'image/jp2', true]])
+      end
+
+      it 'has an error' do
+        expect(result.errors).to eq(['Resource 2 (Page 1) has published files but is not an image or object ' \
+                                     'resource.'])
+      end
+    end
+
+    context 'when there are no resources' do
+      it 'has a warning' do
+        expect(result.warnings).to eq(['No image resource has a published JP2 or a TIFF, PNG, or JPEG file.'])
+      end
     end
   end
 end

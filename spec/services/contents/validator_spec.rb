@@ -33,8 +33,24 @@ RSpec.describe Contents::Validator do
     end
   end
 
-  context 'with a content type without a validator of its own' do
+  context 'with the image content type' do
     let(:content_type) { Cocina::Models::ObjectType.image }
+
+    it 'validates image resources' do
+      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.'])
+    end
+  end
+
+  context 'with the map content type' do
+    let(:content_type) { Cocina::Models::ObjectType.map }
+
+    it 'validates image resources' do
+      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.'])
+    end
+  end
+
+  context 'with a content type without a validator of its own' do
+    let(:content_type) { Cocina::Models::ObjectType.media }
 
     it 'validates nothing' do
       expect(result).to have_attributes(errors: [], warnings: [])
