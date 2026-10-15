@@ -61,6 +61,10 @@ RSpec.describe ContentsItemForm do
     it 'requests OCR in the workflow context' do
       expect(contents_item_form.workflow_context).to eq({ runOcr: true, ocrLanguages: ['English'] })
     end
+
+    it 'does not change the form' do
+      expect(contents_item_form).not_to be_changed
+    end
   end
 
   context 'when not running OCR' do
@@ -282,6 +286,20 @@ RSpec.describe ContentsItemForm do
 
         expect(version_service).not_to have_received(:update_description)
         expect(Sdr::VersionService).not_to have_received(:open)
+      end
+    end
+
+    context 'when only the OCR settings changed' do
+      let(:open) { true }
+      let(:version) { 1 }
+
+      before { contents_item_form.update(run_ocr: true, text_extraction_languages: ['English']) }
+
+      it 'does not update the cocina object' do
+        contents_item_form.save!(user_name:)
+
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(contents_item_form.workflow_context).to eq({ runOcr: true, ocrLanguages: ['English'] })
       end
     end
 

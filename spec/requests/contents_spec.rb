@@ -162,9 +162,9 @@ RSpec.describe 'Contents' do
                                                               text_extraction_languages: ['', 'English'] } }
 
         expect(response).to redirect_to(object_path(druid))
-        # The OCR settings are not written to Cocina, but they do make the form dirty, so the
-        # object is updated with an unchanged payload.
-        expect(Sdr::Repository).to have_received(:update)
+        # The OCR settings are not written to Cocina, so the object is not updated.
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.lock).to eq(cocina_object.lock)
         expect(StageFilesJob).to have_received(:perform_later)
           .with(content:, accession: true, user:,
                 workflow_context: { runOcr: true, ocrLanguages: ['English'] })
