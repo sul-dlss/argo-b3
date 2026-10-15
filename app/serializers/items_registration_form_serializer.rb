@@ -13,8 +13,12 @@ class ItemsRegistrationFormSerializer < FormSerializer
 
   def serializable_attributes(form)
     form.attributes.except('csv_file').tap do |attributes|
-      # When reserializing an already serialized form, csv_file is nil and csv is retained.
-      attributes['csv'] = CsvUpload::Normalizer.read(form.csv_file.path) if form.csv_file.present?
+      next if form.csv_file.blank?
+
+      # When reserializing an already serialized form, csv_file is nil and csv / csv_error are retained.
+      attributes['csv'] = CsvUpload::Normalizer.read(form.csv_file.path)
+    rescue CsvUpload::Normalizer::Error => e
+      attributes['csv_error'] = e.message
     end
   end
 end

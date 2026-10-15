@@ -6,13 +6,9 @@ module BulkActions
     REQUIRED_HEADERS = %w[druid release_date view download].freeze
     LOCATION_BASED = 'location-based'
 
-    validate :csv_file_must_be_valid
-
     private
 
-    def csv_file_must_be_valid
-      return if csv_file.blank?
-
+    def validate_csv_file
       validator = CsvUpload::Validator.new(csv: normalized_csv_file, required_headers: REQUIRED_HEADERS)
       valid = validator.valid? { |csv| missing_location_header_message(csv) }
       return if valid

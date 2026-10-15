@@ -20,5 +20,18 @@ RSpec.describe BulkActions::ImportDescriptiveMetadataForm do
                   'Expected title2.structuredValue2.value.', 'Column header invalid: xsource_id'])
       end
     end
+
+    context 'when the csv_file cannot be read' do
+      let(:params) do
+        {
+          csv_file: fixture_file_upload('catalog_record_id_and_barcode.xls')
+        }
+      end
+
+      it 'is invalid' do
+        expect(form.valid?).to be false
+        expect(form.errors[:csv_file]).to eq(['Unsupported upload file type'])
+      end
+    end
   end
 end

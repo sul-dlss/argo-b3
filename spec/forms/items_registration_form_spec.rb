@@ -330,10 +330,24 @@ RSpec.describe ItemsRegistrationForm do
       end
     end
 
+    context 'when the csv could not be read' do
+      let(:form) { described_class.new(items_choice:, csv_error: 'Unsupported upload file type') }
+
+      it 'reports the error for csv_file and does not build any item registrations' do
+        expect(form.valid?).to be false
+        expect(form.errors[:csv_file]).to eq(['Unsupported upload file type'])
+        expect(form.errors[:csv_error]).to be_empty
+        expect(form.errors[:item_registrations]).to be_empty
+        expect(form.item_registrations.to_a).to be_empty
+        expect(form.invalid_item_registrations).to be_empty
+      end
+    end
+
     context 'when the items choice is not the upload csv choice' do
       let(:csv) { "source_id,title\nsul:ignored,Ignored title\n" }
       let(:form) do
         described_class.new(items_choice: described_class::ENTER_EACH_CHOICE, csv:,
+                            csv_error: 'Unsupported upload file type',
                             item_registrations_attributes: [{ source_id: 'sul:kept', title: 'Kept title' }])
       end
 
@@ -399,8 +413,8 @@ RSpec.describe ItemsRegistrationForm do
       )
     end
 
-    it 'does not permit the derived tags' do
-      expect(described_class.permitted_params).not_to include(:tags)
+    it 'does not permit the derived attributes' do
+      expect(described_class.permitted_params).not_to include(:csv, :csv_error, :tags)
     end
   end
 end

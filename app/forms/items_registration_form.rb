@@ -42,8 +42,9 @@ class ItemsRegistrationForm < ApplicationForm
 
   attribute :csv_file, :uploaded_file
   attribute :csv, :string # csv_file normalized and converted to a string by ItemsRegistrationFormSerializer
+  attribute :csv_error, :string # error raised when normalizing csv_file in ItemsRegistrationFormSerializer
   before_validation :build_item_registrations_from_csv
-  validate :csv_must_be_valid
+  validate :csv_must_be_valid, if: -> { items_choice == UPLOAD_CSV_CHOICE }
 
   has_many :item_registrations, class_name: 'ItemRegistrationForm'
   before_validation :remove_blank_item_registrations
@@ -51,10 +52,10 @@ class ItemsRegistrationForm < ApplicationForm
 
   attribute :tags, default: -> { [] }
 
-  # csv is derived from csv_file rather than submitted by the user.
+  # csv and csv_error are derived from csv_file rather than submitted by the user.
   # tags are derived from various tag fields.
   def self.immutable_attributes
-    %i[csv tags]
+    %i[csv csv_error tags]
   end
 
   def initialize(attributes = {})
@@ -123,9 +124,8 @@ class ItemsRegistrationForm < ApplicationForm
 
   # Errors are reported for csv_file rather than csv since csv_file is the field the user provides.
   def csv_must_be_valid
-    return unless items_choice == UPLOAD_CSV_CHOICE
+    return errors.add(:csv_file, :invalid, message: csv_error) if csv_error.present?
     return errors.add(:csv_file, :blank) if csv.blank?
-
     return if csv_valid?
 
     csv_validator.errors.each do |message|
