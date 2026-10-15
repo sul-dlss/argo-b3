@@ -8,13 +8,15 @@ module Elements
     class HasManyRowComponent < ApplicationComponent
       # @param form [ActionView::Helpers::FormBuilder] a nested form builder from fields_for
       # @param form_component [Class] the component rendering the fields for the row
-      def initialize(form:, form_component:)
+      # @param form_component_args [Hash] additional keyword arguments for the form component
+      def initialize(form:, form_component:, form_component_args: {})
         @form = form
         @form_component = form_component
+        @form_component_args = form_component_args
         super()
       end
 
-      attr_reader :form, :form_component
+      attr_reader :form, :form_component, :form_component_args
     end
   end
 end

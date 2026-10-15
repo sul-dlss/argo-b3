@@ -57,6 +57,33 @@ RSpec.describe Elements::Forms::HasManyRowComponent, type: :component do
     expect(page).to have_button('Remove')
   end
 
+  context 'with arguments for the nested form component' do
+    let(:widget_component_class) do
+      Class.new(ApplicationComponent) do
+        def initialize(form:, placeholder:)
+          @form = form
+          @placeholder = placeholder
+          super()
+        end
+
+        attr_reader :form
+
+        def call
+          form.text_field :name, placeholder: @placeholder
+        end
+      end
+    end
+    let(:component) do
+      described_class.new(form:, form_component: WidgetComponent, form_component_args: { placeholder: 'Widget name' })
+    end
+
+    it 'passes the arguments to the nested form component' do
+      render_inline(component)
+
+      expect(page).to have_field('widgets_form[widgets_attributes][0][name]', placeholder: 'Widget name')
+    end
+  end
+
   context 'when the nested form builder is for a client-side template row' do
     let(:form) do
       ActionView::Helpers::FormBuilder.new('widgets_form[widgets_attributes][NEW_RECORD]', widget,

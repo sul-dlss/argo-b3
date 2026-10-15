@@ -234,6 +234,8 @@ Rails.application.routes.draw do
 
   resources :apo_defaults, only: %i[show], param: :druid, defaults: { format: :json }
 
+  resources :tag_suggestions, only: %i[index], defaults: { format: :json }
+
   resources :pinned_objects, only: %i[create destroy]
 
   resources :pinned_searches, only: %i[create destroy]

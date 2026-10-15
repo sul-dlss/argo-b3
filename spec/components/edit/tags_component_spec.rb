@@ -39,6 +39,37 @@ RSpec.describe Edit::TagsComponent, type: :component do
     expect(page).to have_css('div[role="status"]')
   end
 
+  it 'does not suggest tags' do
+    # Checks the raw HTML, since the template rows for added tags are not part of the rendered page.
+    expect(component.render_in(vc_test_view_context)).not_to include('tag-select')
+  end
+
+  context 'when suggesting tags' do
+    let(:component) { described_class.new(form:, suggest_tags: true) }
+
+    it 'wires the tag fields to suggest tags of their type' do
+      render_inline(component)
+
+      expect(page).to have_field('item[other_tags_attributes][0][tag]') do |field|
+        field['data-controller'] == 'tag-select' &&
+          field['data-tag-select-url-path-value'] == '/tag_suggestions?type=other'
+      end
+      expect(page).to have_field('item[project_tags_attributes][0][tag]') do |field|
+        field['data-tag-select-url-path-value'] == '/tag_suggestions?type=project'
+      end
+      expect(page).to have_field('item[ticket_tags_attributes][0][tag]') do |field|
+        field['data-tag-select-url-path-value'] == '/tag_suggestions?type=ticket'
+      end
+    end
+
+    it 'wires the template rows for added tags to suggest tags' do
+      html = component.render_in(vc_test_view_context)
+
+      expect(html).to include('name="item[other_tags_attributes][NEW_RECORD][tag]"')
+      expect(html.scan('data-tag-select-url-path-value').size).to eq(6)
+    end
+  end
+
   it 'wires the multiple tags controller to each tag section' do
     render_inline(component)
 

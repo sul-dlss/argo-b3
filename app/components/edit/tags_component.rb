@@ -8,12 +8,18 @@ module Edit
     # sections from the same page (occurs in multiple item registration) out of the outlet set.
     TAG_FIELDS_CLASS = 'tag-fields'
 
-    def initialize(form:)
+    # @param suggest_tags [Boolean] whether the tag fields suggest existing tags as the user types
+    def initialize(form:, suggest_tags: false)
       @form = form
+      @suggest_tags = suggest_tags
       super()
     end
 
     attr_reader :form
+
+    def tag_component_args
+      { suggest: @suggest_tags }
+    end
 
     def tag_fields_classes
       ['my-fieldset', TAG_FIELDS_CLASS]
