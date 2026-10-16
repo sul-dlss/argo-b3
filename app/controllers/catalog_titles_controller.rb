@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Controller for looking up the title of a catalog record, e.g., for the "Retrieve title" button
+# Controller for looking up the title of a catalog record, e.g., for the "Preview FOLIO record" button
 # on the description tab of the item form.
 class CatalogTitlesController < ApplicationController
   # Catalog records are not access controlled, so any authenticated user may look up a title.

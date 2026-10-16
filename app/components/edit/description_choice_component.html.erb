@@ -29,19 +29,15 @@
         container_classes: 'my-fieldset'
       ) do |component| %>
     <% component.with_additional_container_content do %>
-      <%# The radio inputs are siblings of this element, so their events are only observable on document. %>
       <%= tag.div data: { controller: 'catalog-title',
-                          action: 'input@document->catalog-title#syncDisabled ' \
-                                  'change@document->catalog-title#syncDisabled',
                           catalog_title_url_value: catalog_titles_path,
                           catalog_title_error_message_value: t('edit.items.fields.catalog_record_id.errors.catalog_error') } do %>
-        <div class="my-field">
+        <div class="row my-field">
           <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :catalog_record_id,
                                                                   text: t('edit.items.fields.catalog_record_id.label'),
+                                                                  default_class: 'col-sm-3 col-form-label',
                                                                   mark_required: true) %>
-          <%# The button is a standalone button beside the input rather than part of an input group.
-              Aligning to the start keeps it level with the input as feedback appears below the input. %>
-          <div class="d-flex align-items-start gap-2">
+          <div class="col-sm-9 d-flex align-items-start gap-2">
             <div class="flex-grow-1">
               <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(
                     form:, field_name: :catalog_record_id, aria: catalog_record_id_aria,
@@ -64,16 +60,14 @@
           </div>
         </div>
 
-        <%# The retrieved title confirms that the catalog record id is the intended one. It is read only
-            because it comes from the catalog rather than from the user. %>
-        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
-              form:, field_name: :retrieved_title,
-              label_text: t('edit.items.fields.retrieved_title.label'),
-              container_classes: 'my-field',
-              input_readonly: true,
-              input_disabled: retrieved_title_disabled?,
-              input_data: { catalog_title_target: 'title' }
-            ) %>
+        <%# The retrieved title confirms that the catalog record id is the intended one. It is shown as text
+            because it comes from the catalog rather than from the user, and is hidden until retrieved.
+            The hidden field carries it through a submission so that title data is always passed with the form. %>
+        <%= tag.div class: 'row my-field', hidden: retrieved_title_hidden?, data: { catalog_title_target: 'titleRow' } do %>
+          <div class="col-sm-3"><%= t('edit.items.fields.retrieved_title.label') %></div>
+          <%= tag.div form.object.retrieved_title, class: 'col-sm-9', data: { catalog_title_target: 'titleText' } %>
+        <% end %>
+        <%= form.hidden_field :retrieved_title, data: { catalog_title_target: 'title' } %>
       <% end %>
 
       <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
