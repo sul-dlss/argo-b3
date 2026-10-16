@@ -61,6 +61,14 @@ RSpec.describe HeaderComponent, type: :component do
         expect(page).to have_link('Register multiple items', href: '/multiple_items/new')
         expect(page).to have_no_css('a.dropdown-item.disabled', exact_text: 'Register multiple items')
       end
+
+      it 'renders an enabled link for multi-item deposit' do
+        render_inline(component)
+
+        expect(page).to have_css("a.dropdown-item[href='/multi_item_deposit_actions'][data-turbo-method='post']",
+                                 exact_text: 'Deposit multiple items')
+        expect(page).to have_no_css('a.dropdown-item.disabled', exact_text: 'Deposit multiple items')
+      end
     end
 
     context 'when the user is an admin' do
@@ -86,13 +94,18 @@ RSpec.describe HeaderComponent, type: :component do
 
         expect(page).to have_css('a.dropdown-item.disabled', exact_text: 'Register multiple items')
       end
+
+      it 'renders a disabled link for multi-item deposit' do
+        render_inline(component)
+
+        expect(page).to have_css('a.dropdown-item.disabled', exact_text: 'Deposit multiple items')
+      end
     end
 
     it 'renders disabled links for the other multiple item options' do
       render_inline(component)
 
       expect(page).to have_css('a.dropdown-item.disabled', text: 'Register multiple items for Goobi')
-      expect(page).to have_css('a.dropdown-item.disabled', text: 'Deposit multiple items')
     end
   end
 

@@ -374,6 +374,9 @@ en:
           label: "Version description"
         viewing_direction:
           label: "Viewing direction"
+    multi_item_deposits:
+      edit:
+        title: "Multi-item deposit"
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."
