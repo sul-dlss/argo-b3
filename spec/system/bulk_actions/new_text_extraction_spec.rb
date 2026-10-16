@@ -47,17 +47,15 @@ RSpec.describe 'Create a new text extraction bulk action' do
   end
 
   context 'when selecting languages with the keyboard' do
-    it 'commits the highlighted language on either Enter or Tab' do
+    it 'commits the highlighted language on Enter' do
       visit new_bulk_actions_text_extraction_path
 
       expect(page).to have_css('h1', text: bulk_action_label)
 
       select_multi_option_with_key 'Danis', from: 'Search for a language', key: :enter
-      select_multi_option_with_key 'Engl', from: 'Search for a language', key: :tab
 
-      items = find_multi_select_items(from: 'Search for a language', count: 2)
-      expect(items.map(&:text)).to contain_exactly(a_string_starting_with('Danish'),
-                                                   a_string_starting_with('English'))
+      items = find_multi_select_items(from: 'Search for a language', count: 1)
+      expect(items.map(&:text)).to contain_exactly(a_string_starting_with('Danish'))
     end
   end
 

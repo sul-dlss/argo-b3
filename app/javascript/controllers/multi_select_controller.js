@@ -14,8 +14,6 @@ export default class extends Controller {
       plugins: ['remove_button'],
       // Show every matching option rather than tom-select's default of 50.
       maxOptions: null,
-      // Enter already commits the highlighted option; this makes Tab do the same.
-      selectOnTab: true,
       // Without this the committed query stays in the search box, so the next one appends to it.
       clearAfterSelect: true,
       onChange: () => this.toggleWarning()
