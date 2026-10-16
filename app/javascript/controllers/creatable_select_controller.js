@@ -9,9 +9,7 @@ export default class extends Controller {
       // Keeps a created value as an option, so that it can be reselected after selecting another value.
       persist: true,
       // Show every matching option rather than tom-select's default of 50.
-      maxOptions: null,
-      // Enter already commits the highlighted option; this makes Tab do the same.
-      selectOnTab: true
+      maxOptions: null
     })
   }
 
