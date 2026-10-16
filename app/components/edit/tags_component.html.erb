@@ -21,6 +21,7 @@
   <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: other_tag_label) do %>
     <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :other_tags,
                                                      form_component: Edit::OtherTagComponent,
+                                                     form_component_args: tag_component_args,
                                                      container_classes: tag_fields_classes,
                                                      add_button_label: 'Add another tag') %>
   <% end %>
@@ -28,6 +29,7 @@
   <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: project_tag_label) do %>
     <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :project_tags,
                                                      form_component: Edit::ProjectTagComponent,
+                                                     form_component_args: tag_component_args,
                                                      container_classes: tag_fields_classes,
                                                      add_button_label: 'Add another project') %>
   <% end %>
@@ -35,6 +37,7 @@
   <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: ticket_tag_label) do %>
     <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :ticket_tags,
                                                      form_component: Edit::TicketTagComponent,
+                                                     form_component_args: tag_component_args,
                                                      container_classes: tag_fields_classes,
                                                      add_button_label: 'Add another ticket') %>
   <% end %>

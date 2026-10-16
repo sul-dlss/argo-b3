@@ -2,12 +2,12 @@
   <div data-has-many-target="container">
     <template data-has-many-target="template">
       <%= form.fields_for field_name, template_record, child_index: 'NEW_RECORD' do |nested_form| %>
-        <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:) %>
+        <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:, form_component_args:) %>
       <% end %>
     </template>
 
     <%= form.fields_for field_name do |nested_form| %>
-      <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:) %>
+      <%= render Elements::Forms::HasManyRowComponent.new(form: nested_form, form_component:, form_component_args:) %>
     <% end %>
   </div>
 

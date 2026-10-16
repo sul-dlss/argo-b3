@@ -75,7 +75,7 @@
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :tags,
                                                                           label: t('edit.items.tabs.tags.label'))) do |pane| %>
-        <%= render Edit::TagsComponent.new(form:) %>
+        <%= render Edit::TagsComponent.new(form:, suggest_tags: true) %>
 
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
