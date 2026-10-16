@@ -15,7 +15,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       expect(page).to have_field('Enter title myself', type: 'radio', checked: true)
       expect(page).to have_field('Title', type: 'text', with: 'The Title')
 
-      expect(page).to have_field('Use FOLIO Instance HRID to retrieve title', type: 'radio', checked: false)
+      expect(page).to have_field('Retrieve description from FOLIO', type: 'radio', checked: false)
       expect(page).to have_field('Upload description spreadsheet', type: 'radio', checked: false)
     end
   end
@@ -23,15 +23,14 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   context 'when the title is retrieved from the catalog' do
     let(:new_item_form) do
       NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
-                      barcode: '36105010362304', catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
+                      catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
     end
 
     it 'renders the catalog id state' do
       render_inline(component)
 
-      expect(page).to have_field('Use FOLIO Instance HRID to retrieve title', type: 'radio', checked: true)
+      expect(page).to have_field('Retrieve description from FOLIO', type: 'radio', checked: true)
       expect(page).to have_field('FOLIO Instance HRID', type: 'text', with: 'in11403803')
-      expect(page).to have_field('Barcode', type: 'text', with: '36105010362304')
       expect(page).to have_field('Part label', type: 'text', with: 'v. 1')
       expect(page).to have_field('Sort key', type: 'text', with: '1')
 
@@ -44,31 +43,28 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
                         retrieved_title: 'Pride and prejudice')
       end
 
-      it 'renders the retrieved title in an enabled field' do
+      it 'renders the retrieved title as text' do
         render_inline(component)
 
-        expect(page).to have_field('Title', type: 'text', with: 'Pride and prejudice', readonly: true)
-        expect(page.find('input[data-catalog-title-target="title"]')[:disabled]).to be_blank
+        expect(page).to have_text('Pride and prejudice')
       end
     end
 
-    it 'renders the retrieve title button beside the HRID input and a disabled title field' do
+    it 'renders the preview folio record button beside the HRID input and a hidden title' do
       render_inline(component)
 
       expect(page).to have_css('[data-controller="catalog-title"][data-catalog-title-url-value="/catalog_titles"]')
 
       field_row = page.find('input[data-catalog-title-target="hrid"]').ancestor('.d-flex')
-      expect(field_row).to have_button('Retrieve title', type: 'button')
+      expect(field_row).to have_button('Preview FOLIO record', type: 'button')
       expect(field_row).to have_no_css('.input-group')
       # Bootstrap reveals the message when the input is marked invalid, so it carries no d-block/d-none.
       expect(field_row).to have_css('div.invalid-feedback[data-catalog-title-target="error"]', visible: :all)
       expect(field_row).to have_no_css('[data-catalog-title-target="error"].d-block', visible: :all)
 
-      # Disabled until a title is retrieved, rather than hidden.
-      title_field = page.find('input[data-catalog-title-target="title"]')
-      expect(title_field[:disabled]).to be_present
-      expect(title_field[:readonly]).to be_present
-      expect(page).to have_css("label.form-label[for='#{title_field[:id]}']", text: 'Title')
+      # Hidden until a title is retrieved.
+      expect(page).to have_css('.row[data-catalog-title-target="titleRow"][hidden]', visible: :all)
+      expect(page.find('input[data-catalog-title-target="title"]', visible: :hidden)[:value]).to be_blank
     end
   end
 
