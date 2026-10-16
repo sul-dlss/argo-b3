@@ -54,6 +54,14 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'with the geo content type' do
+    let(:content_type) { Cocina::Models::ObjectType.geo }
+
+    it 'validates object resources' do
+      expect(result.errors).to eq(['There are no object resources.'])
+    end
+  end
+
   context 'with the image content type' do
     let(:content_type) { Cocina::Models::ObjectType.image }
 
