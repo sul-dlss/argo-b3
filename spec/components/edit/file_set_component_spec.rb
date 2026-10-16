@@ -21,8 +21,7 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_css('label', text: 'Resource type') { |label| label.has_css?('span.required') }
     expect(page).to have_select('content_file_set[file_set_type]',
                                 selected: 'page',
-                                options: %w[audio attachment document file image media object page preview 3d thumb
-                                            video])
+                                options: %w[audio document file image media object page preview 3d video])
   end
 
   it 'renders each file with a role field and a remove button' do

@@ -63,6 +63,8 @@ RSpec.describe 'Create a new manage content type bulk action' do
 
       select 'book', from: 'New content type'
       select 'left-to-right', from: 'Viewing direction'
+      expect(page).to have_select('New resource type',
+                                  options: %w[audio document file image object page 3d video])
       select 'page', from: 'Current resource type'
       select 'page', from: 'New resource type'
 
