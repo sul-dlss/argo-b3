@@ -52,4 +52,42 @@ RSpec.describe CocinaSupport do
       expect(cocina_hash).not_to have_key(:modified)
     end
   end
+
+  describe '.agreement?, .virtual_object?, and .item?' do
+    let(:item) { build(:dro, type: Cocina::Models::ObjectType.book) }
+    let(:agreement) { build(:dro, type: Cocina::Models::ObjectType.agreement) }
+    let(:virtual_object) do
+      build(:dro, type: Cocina::Models::ObjectType.image)
+        .new(structural: { hasMemberOrders: [{ members: ['druid:bc123df4567'] }] })
+    end
+    let(:empty_member_orders) do
+      build(:dro, type: Cocina::Models::ObjectType.book)
+        .new(structural: { hasMemberOrders: [{ viewingDirection: 'left-to-right' }] })
+    end
+    let(:collection) { build(:collection) }
+    let(:admin_policy) { build(:admin_policy) }
+
+    it 'identifies an Item' do
+      expect(described_class.item?(item)).to be true
+      expect(described_class.item?(empty_member_orders)).to be true
+      expect(described_class.agreement?(item)).to be false
+      expect(described_class.virtual_object?(item)).to be false
+    end
+
+    it 'identifies an Agreement' do
+      expect(described_class.agreement?(agreement)).to be true
+      expect(described_class.item?(agreement)).to be false
+    end
+
+    it 'identifies a Virtual Object' do
+      expect(described_class.virtual_object?(virtual_object)).to be true
+      expect(described_class.item?(virtual_object)).to be false
+    end
+
+    it 'does not identify a Collection or APO as an Item' do
+      expect(described_class.item?(collection)).to be false
+      expect(described_class.item?(admin_policy)).to be false
+      expect(described_class.virtual_object?(collection)).to be false
+    end
+  end
 end
