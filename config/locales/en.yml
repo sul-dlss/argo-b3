@@ -234,6 +234,7 @@ en:
           deposit: "Deposit"
           draft: "Save as draft"
         warnings:
+          content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
           not_editable: "Item is not editable."
           stale: "This item was changed since you opened it. Review the current values and make your changes again."
         tabs:

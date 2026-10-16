@@ -170,7 +170,16 @@ RSpec.describe CocinaModels::Dro do
 
           expect(Sdr::Repository).to have_received(:update).ordered
           expect(Sdr::Repository).to have_received(:accession)
-            .with(cocina_object: updated_cocina_object, user_name:).ordered
+            .with(cocina_object: updated_cocina_object, user_name:, context: {}).ordered
+        end
+      end
+
+      context 'with a workflow context' do
+        it 'starts accessioning with the context' do
+          dro.save!(user_name:, description:, accession: true, workflow_context: { runOcr: true })
+
+          expect(Sdr::Repository).to have_received(:accession)
+            .with(cocina_object:, user_name:, context: { runOcr: true })
         end
       end
 
@@ -179,7 +188,7 @@ RSpec.describe CocinaModels::Dro do
           dro.save!(user_name:, description:, accession: true)
 
           expect(Sdr::Repository).not_to have_received(:update)
-          expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name:)
+          expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name:, context: {})
         end
       end
     end

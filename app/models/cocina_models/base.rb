@@ -23,13 +23,16 @@ module CocinaModels
     # @param [String] description the description of the update for DSA Event
     # @param [String] user_name the sunetid of the user performing the action
     # @param [Boolean] accession whether to start accessioning after saving (even if nothing changed)
+    # @param [Hash] workflow_context the context for the assembly workflow started by accessioning
     # @raise [Sdr::Repository::Error] if there is an error updating or accessioning the object
     # @raise [ActiveModel::ValidationError] if the model is invalid
-    def save!(user_name:, description: nil, accession: false)
+    def save!(user_name:, description: nil, accession: false, workflow_context: {})
       raise 'Cannot save an object that has not been persisted; call #create! instead' unless persisted?
 
       update_cocina_object!(user_name:, description:) if changed?
-      Sdr::Repository.accession(cocina_object: previous_cocina_object, user_name:) if accession
+      return unless accession
+
+      Sdr::Repository.accession(cocina_object: previous_cocina_object, user_name:, context: workflow_context)
     end
 
     # @param [String] user_name the sunetid of the user performing the action

@@ -69,6 +69,18 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when OCR settings were saved with the content' do
+      before { content.update!(perform_ocr: true, ocr_languages: ['English']) }
+
+      it 'prefills them' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_field('Yes', type: 'radio', checked: true)
+        expect(page).to have_css('select option[value="English"][selected]', visible: :all)
+      end
+    end
+
     context 'when the user cannot edit the object' do
       before { Permission.permission_type_edit.destroy_all }
 
@@ -94,8 +106,7 @@ RSpec.describe 'Contents' do
             description: cocina_object.description
           ), user_name: user.sunetid, description: nil)
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
       end
     end
 
@@ -110,8 +121,7 @@ RSpec.describe 'Contents' do
 
         expect(response).to redirect_to(object_path(druid))
         expect(content.reload.staging_state).to eq('staging')
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
       end
     end
 
@@ -137,8 +147,7 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
       end
     end
 
@@ -150,24 +159,22 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq(cocina_object.lock)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
       end
     end
 
     context 'when requesting OCR' do
-      it 'stages the object' do
-        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+      it 'saves the OCR settings with the content and stages the object' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
                                              contents_item: { run_ocr: 'true',
                                                               text_extraction_languages: ['', 'English'] } }
 
         expect(response).to redirect_to(object_path(druid))
         # The OCR settings are not written to Cocina, so the object is not updated.
         expect(Sdr::Repository).not_to have_received(:update)
-        expect(content.reload.lock).to eq(cocina_object.lock)
-        expect(StageFilesJob).to have_received(:perform_later)
-          .with(content:, accession: true, user:,
-                workflow_context: { runOcr: true, ocrLanguages: ['English'] })
+        expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_ocr: true,
+                                                  ocr_languages: ['English'])
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
       end
     end
 
@@ -178,6 +185,7 @@ RSpec.describe 'Contents' do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.perform_ocr).to be false
         expect(StageFilesJob).not_to have_received(:perform_later)
       end
     end
@@ -226,8 +234,7 @@ RSpec.describe 'Contents' do
                                                contents_item: { content_type: Cocina::Models::ObjectType.book } }
 
           expect(response).to redirect_to(object_path(druid))
-          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
-                                                                      workflow_context: {})
+          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
         end
       end
 
@@ -237,8 +244,7 @@ RSpec.describe 'Contents' do
                                                contents_item: { content_type: Cocina::Models::ObjectType.object } }
 
           expect(response).to redirect_to(object_path(druid))
-          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                      workflow_context: {})
+          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
         end
       end
     end
@@ -295,8 +301,7 @@ RSpec.describe 'Contents' do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq('opened-lock')
         expect(Sdr::VersionService).to have_received(:new).with(druid:).once
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
       end
     end
 
@@ -324,8 +329,7 @@ RSpec.describe 'Contents' do
         expect(version_service).to have_received(:update_description)
           .with(description: 'Added files', user_name: user.sunetid)
         expect(Sdr::VersionService).not_to have_received(:open)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                    workflow_context: {})
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
       end
     end
 

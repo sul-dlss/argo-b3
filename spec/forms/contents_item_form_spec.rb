@@ -58,10 +58,6 @@ RSpec.describe ContentsItemForm do
       expect(contents_item_form.text_extraction_languages).to eq(['English'])
     end
 
-    it 'requests OCR in the workflow context' do
-      expect(contents_item_form.workflow_context).to eq({ runOcr: true, ocrLanguages: ['English'] })
-    end
-
     it 'does not change the form' do
       expect(contents_item_form).not_to be_changed
     end
@@ -75,10 +71,6 @@ RSpec.describe ContentsItemForm do
     it 'clears the languages' do
       expect(contents_item_form).to be_valid
       expect(contents_item_form.text_extraction_languages).to eq([])
-    end
-
-    it 'has an empty workflow context' do
-      expect(contents_item_form.workflow_context).to eq({})
     end
   end
 
@@ -200,6 +192,18 @@ RSpec.describe ContentsItemForm do
     end
   end
 
+  describe '#prefill_ocr_settings' do
+    before do
+      contents_item_form.content = create(:content, perform_ocr: true, ocr_languages: ['English'])
+      contents_item_form.prefill_ocr_settings
+    end
+
+    it 'prefills the OCR settings saved with the content without changing the form' do
+      expect(contents_item_form).to have_attributes(run_ocr: true, text_extraction_languages: ['English'])
+      expect(contents_item_form).not_to be_changed
+    end
+  end
+
   describe '#save!' do
     let(:user_name) { 'jlittman' }
     let(:version_service) do
@@ -292,14 +296,38 @@ RSpec.describe ContentsItemForm do
     context 'when only the OCR settings changed' do
       let(:open) { true }
       let(:version) { 1 }
+      let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
 
-      before { contents_item_form.update(run_ocr: true, text_extraction_languages: ['English']) }
+      before do
+        contents_item_form.update(run_ocr: true, text_extraction_languages: ['English'])
+        contents_item_form.content = content
+      end
 
-      it 'does not update the cocina object' do
+      it 'saves the OCR settings with the content without updating the cocina object' do
         contents_item_form.save!(user_name:)
 
         expect(Sdr::Repository).not_to have_received(:update)
-        expect(contents_item_form.workflow_context).to eq({ runOcr: true, ocrLanguages: ['English'] })
+        expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+      end
+    end
+
+    context 'when OCR is no longer requested' do
+      let(:open) { true }
+      let(:version) { 1 }
+      let(:content) do
+        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, perform_ocr: true,
+                         ocr_languages: ['English'])
+      end
+
+      before do
+        contents_item_form.update(run_ocr: false, text_extraction_languages: ['English'])
+        contents_item_form.content = content
+      end
+
+      it 'clears the OCR settings saved with the content' do
+        contents_item_form.save!(user_name:)
+
+        expect(content.reload).to have_attributes(perform_ocr: false, ocr_languages: [])
       end
     end
 
@@ -307,12 +335,15 @@ RSpec.describe ContentsItemForm do
       let(:open) { false }
       let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
 
-      before { contents_item_form.content = content }
+      before do
+        contents_item_form.update(run_ocr: true, text_extraction_languages: ['English'])
+        contents_item_form.content = content
+      end
 
-      it 'raises without opening a version or changing the content lock' do
+      it 'raises without opening a version or changing the content' do
         expect { contents_item_form.save!(user_name:) }.to raise_error(ActiveModel::ValidationError)
         expect(Sdr::VersionService).not_to have_received(:open)
-        expect(content.reload.lock).to eq(cocina_object.lock)
+        expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_ocr: false)
       end
     end
   end

@@ -244,7 +244,8 @@ RSpec.describe 'Items' do
         expect(Sdr::VersionService).not_to have_received(:open)
         expect(Sdr::Repository).to have_received(:update).ordered
         expect(Sdr::Repository).to have_received(:accession)
-          .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.image), user_name: user.sunetid)
+          .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.image), user_name: user.sunetid,
+                context: {})
           .ordered
       end
     end
@@ -262,7 +263,7 @@ RSpec.describe 'Items' do
           .with(druid:, description: 'Redeposit', opening_user_name: user.sunetid)
         expect(Sdr::Repository).not_to have_received(:update)
         expect(Sdr::Repository).to have_received(:accession)
-          .with(cocina_object: opened_cocina_object, user_name: user.sunetid)
+          .with(cocina_object: opened_cocina_object, user_name: user.sunetid, context: {})
       end
     end
 
@@ -331,6 +332,50 @@ RSpec.describe 'Items' do
         expect(flash[:warning]).to eq('This item was changed since you opened it. ' \
                                       'Review the current values and make your changes again.')
         expect(Sdr::VersionService).not_to have_received(:open)
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when the item has a mutable content' do
+      let!(:content) do
+        create(:content, druid:, lock: cocina_object.lock, immutable: false, perform_ocr: true,
+                         ocr_languages: ['English'])
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
+      end
+
+      it 'rebases the content onto the saved object' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(content.reload.lock).to eq('updated-lock')
+      end
+
+      context 'when depositing' do
+        let(:commit) { ItemsController::DEPOSIT_VALUE }
+
+        it 'starts accessioning with the OCR settings of the content and destroys the content' do
+          patch "/items/#{druid}", params: { item: item_params, commit: }
+
+          expect(Sdr::Repository).to have_received(:accession)
+            .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name: user.sunetid,
+                  context: { runOcr: true, ocrLanguages: ['English'] })
+          expect(Content.exists?(content.id)).to be false
+        end
+      end
+    end
+
+    context 'when the mutable content is staging' do
+      before { create(:content, druid:, lock: cocina_object.lock, immutable: false, staging_state: 'staging') }
+
+      it 'redirects to the edit page with a warning without saving' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(edit_item_path(druid))
+        expect(flash[:warning]).to eq('Files for this item are being staged or discovered. ' \
+                                      'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
