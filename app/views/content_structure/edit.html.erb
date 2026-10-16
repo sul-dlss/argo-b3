@@ -15,29 +15,13 @@
     <%= render Edit::StructurePopulatorDescriptionComponent.new(populator_selection: @populator_selection) %>
     <% populator = @populator_selection.actual_populator.name.demodulize %>
     <% if @content.content_file_sets.none? %>
-      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
-                                                                      label: 'Structure files',
-                                                                      params: { commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_type: @content_type },
-                                                                      top: false,
-                                                                      method: :patch,
-                                                                      variant: :'outline-primary') %>
+      <%= render Edit::StructureButtonComponent.new(label: 'Structure files', commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_token: @content_token, content_type: @content_type) %>
     <% else %>
-      <div class="d-flex">
-        <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
-                                                                        label: 'Clear and structure files again',
-                                                                        params: { commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_type: @content_type },
-                                                                        top: false,
-                                                                        method: :patch,
-                                                                        variant: :'outline-primary') %>
+      <div class="d-flex align-items-start">
+        <%= render Edit::StructureButtonComponent.new(label: 'Clear and structure files again', commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_token: @content_token, content_type: @content_type) %>
 
         <% if unassociated_count.positive? %>
-          <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
-                                                                          label: 'Append files to structure',
-                                                                          params: { commit: ContentStructureController::APPEND_VALUE, populator:, content_type: @content_type },
-                                                                          classes: 'ms-3',
-                                                                          top: false,
-                                                                          method: :patch,
-                                                                          variant: :'outline-primary') %>
+          <%= render Edit::StructureButtonComponent.new(label: 'Append files to structure', commit: ContentStructureController::APPEND_VALUE, populator:, content_token: @content_token, content_type: @content_type, classes: 'ms-3') %>
         <% end %>
       </div>
       <%# Reloaded when a resource changes (see content_file_sets/show). %>

@@ -12,10 +12,6 @@
   <%= tag.div data: { controller: 'frame-reload',
                       frame_reload_interval_value: Settings.reload_intervals.mount_discovery,
                       frame_reload_url_value: content_mount_path(@content_token) } do %>
-    <%= render SdrViewComponents::Elements::SpinnerComponent.new(
-          message: 'Discovering files...',
-          image_path: "#{SdrViewComponents.configuration.component_library_url}/styles/Rosette.svg",
-          speed: Settings.rosette_spinner_speed
-        ) %>
+    <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: 'Discovering files...') %>
   <% end %>
 <% end %>
