@@ -84,9 +84,9 @@ RSpec.describe 'Manage files' do
                                                hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]
                                              )),
             user_name: user.sunetid, description: nil)
-    expect(StageFilesJob).to have_received(:perform_later)
-      .with(content: Content.find_by!(druid:, immutable: false), accession: true, user:,
-            workflow_context: { runOcr: true, ocrLanguages: ['English'] })
+    content = Content.find_by!(druid:, immutable: false)
+    expect(content).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+    expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
   end
 
   it 'warns about embedded text when running OCR on a document' do
@@ -174,8 +174,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_current_path("/objects/#{druid}")
 
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:,
-                                                                  workflow_context: {})
+      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
     end
   end
 

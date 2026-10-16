@@ -16,6 +16,9 @@ class EditItemForm < CocinaModels::Dro
   # was changed by someone else in the meantime. It is not part of the Cocina object.
   attribute :lock, :string
 
+  # The object's mutable Content, if any; not an attribute so that setting it does not make the form dirty.
+  attr_accessor :content
+
   include EmbargoFormConcern
   include CollectionFormConcern
 
@@ -24,15 +27,19 @@ class EditItemForm < CocinaModels::Dro
   # attributes.
   FORM_ONLY_ATTRIBUTES = %w[version_description lock with_embargo limit_collection_by_apo].freeze
 
-  # Before saving (and optionally accessioning), opens a new version if the version is closed and there is
-  # something to save or deposit; otherwise updates the description of the open version if it changed.
+  # Before saving, opens a new version if the version
+  # is closed and there is something to save or deposit; otherwise updates the open version's description if changed.
   # @param [String] user_name the sunetid of the user performing the action
   # @param [Boolean] accession whether to start accessioning after saving
   # @raise [ActiveModel::ValidationError] if the form is invalid
   def save!(user_name:, accession: false)
     validate!
     prepare_version!(user_name:, open_version: changed? || accession)
-    super
+    super(user_name:, accession:, workflow_context: content&.workflow_context || {})
+    # Depositing deposits the cocina structure, so changes to the content that were not staged are discarded.
+    content&.destroy! if accession
+  ensure
+    rebase_content_lock
   end
 
   def changed?
@@ -40,6 +47,11 @@ class EditItemForm < CocinaModels::Dro
   end
 
   private
+
+  # Keeps the content on the object's current lock, so that editing continues on it.
+  def rebase_content_lock
+    content.update!(lock: previous_cocina_object.lock) if content&.persisted?
+  end
 
   def model_attrs_for(cocina_object)
     super.then { |attrs| attrs.merge(lock: cocina_object.lock, with_embargo: attrs[:embargo_release_date].present?) }

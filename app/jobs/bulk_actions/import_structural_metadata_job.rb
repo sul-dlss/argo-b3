@@ -112,7 +112,7 @@ module BulkActions
       # by this job (since there is a unique index on druid, lock, and immutable). It is destroyed, since the import
       # will make it stale anyway, unless files are being staged or discovered.
       def check_existing_content?
-        existing_content = Content.find_by(druid:, lock: cocina_object.lock, immutable: false)
+        existing_content = Content.mutable_for(cocina_object)
         return true if existing_content.nil?
 
         if existing_content.staging? || existing_content.discovering?

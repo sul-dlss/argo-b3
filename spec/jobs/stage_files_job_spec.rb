@@ -7,7 +7,7 @@ RSpec.describe StageFilesJob do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:user) { create(:user) }
-  let(:content) { create(:content, druid:, lock: 'druid-version-1', staging_state: 'staging') }
+  let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
   let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
   let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
@@ -118,10 +118,10 @@ RSpec.describe StageFilesJob do
         .with(cocina_object: mutated_cocina_object, user_name: user.sunetid)
     end
 
-    it "updates the content's lock and marks it immutable" do
+    it "updates the content's lock and keeps it mutable" do
       job.perform(content:, user:)
 
-      expect(content.reload).to have_attributes(lock: 'druid-version-2', immutable: true)
+      expect(content.reload).to have_attributes(lock: 'druid-version-2', immutable: false)
     end
 
     it 'transitions the content out of the staging state' do
@@ -157,10 +157,20 @@ RSpec.describe StageFilesJob do
                                                                   user_name: user.sunetid, context: {})
       end
 
-      context 'with a workflow context' do
-        it 'passes the context on to accessioning' do
-          job.perform(content:, user:, accession: true,
-                      workflow_context: { runOcr: true, ocrLanguages: ['English'] })
+      it "updates the content's lock and marks it immutable" do
+        job.perform(content:, user:, accession: true)
+
+        expect(content.reload).to have_attributes(lock: 'druid-version-2', immutable: true)
+      end
+
+      context 'with OCR settings' do
+        let(:content) do
+          create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging',
+                           perform_ocr: true, ocr_languages: ['English'])
+        end
+
+        it 'passes them on to accessioning' do
+          job.perform(content:, user:, accession: true)
 
           expect(Sdr::Repository).to have_received(:accession)
             .with(cocina_object: updated_cocina_object, user_name: user.sunetid,
@@ -170,7 +180,7 @@ RSpec.describe StageFilesJob do
     end
 
     context "when the content's lock does not match the current cocina object's lock" do
-      let(:content) { create(:content, druid:, lock: 'stale-lock', staging_state: 'staging') }
+      let(:content) { create(:content, druid:, lock: 'stale-lock', immutable: false, staging_state: 'staging') }
 
       it 'does not mint identifiers, analyze, stage, or update SDR' do
         job.perform(content:, user:)
@@ -185,7 +195,6 @@ RSpec.describe StageFilesJob do
 
     context 'when updating SDR does not change the lock' do
       # The structure is unchanged, so an immutable Content for the lock may already exist.
-      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
       let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
       let!(:existing_content) { create(:content, druid:, lock: 'druid-version-1', immutable: true) }
 
@@ -199,8 +208,7 @@ RSpec.describe StageFilesJob do
       end
     end
 
-    context 'when making the content immutable fails' do
-      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+    context "when updating the content's lock fails" do
       let(:error) { ActiveRecord::RecordInvalid.new(content) }
 
       before do
@@ -211,12 +219,35 @@ RSpec.describe StageFilesJob do
         allow(Honeybadger).to receive(:notify)
       end
 
-      it 'marks the content as failed staging without the unsaved changes' do
+      it 'marks the content as failed staging without the unsaved changes or accessioning' do
         job.perform(content:, user:, accession: true)
 
         expect(content.reload).to have_attributes(staging_state: 'staging_failed', lock: 'druid-version-1',
                                                   immutable: false)
+        expect(Sdr::Repository).not_to have_received(:accession)
         expect(Honeybadger).to have_received(:notify).with(error)
+      end
+    end
+
+    context 'when making the content immutable fails' do
+      let(:error) { ActiveRecord::RecordInvalid.new(content) }
+
+      before do
+        allow(content).to receive(:update!).and_wrap_original do |original, attributes|
+          next original.call(attributes) unless attributes[:immutable]
+
+          content.assign_attributes(attributes)
+          raise error
+        end
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'marks the content as failed staging, keeping it mutable on the new lock' do
+        job.perform(content:, user:, accession: true)
+
+        expect(Sdr::Repository).to have_received(:accession)
+        expect(content.reload).to have_attributes(staging_state: 'staging_failed', lock: 'druid-version-2',
+                                                  immutable: false)
       end
     end
 
@@ -228,11 +259,11 @@ RSpec.describe StageFilesJob do
         allow(Honeybadger).to receive(:notify)
       end
 
-      it 'marks the content as failed staging' do
+      it 'marks the content as failed staging, keeping it mutable on the new lock' do
         job.perform(content:, user:, accession: true)
 
         expect(content.reload).to have_attributes(staging_state: 'staging_failed', lock: 'druid-version-2',
-                                                  immutable: true)
+                                                  immutable: false)
       end
 
       it 'notifies Honeybadger' do
