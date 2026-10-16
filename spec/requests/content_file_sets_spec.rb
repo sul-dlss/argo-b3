@@ -204,4 +204,57 @@ RSpec.describe 'Content file sets' do
       end
     end
   end
+
+  describe 'move' do
+    let!(:first_content_file_set) { create(:content_file_set, content:, position: 1, label: 'First') }
+    let!(:second_content_file_set) { create(:content_file_set, content:, position: 2, label: 'Second') }
+    let!(:third_content_file_set) { create(:content_file_set, content:, position: 3, label: 'Third') }
+
+    def move(content_file_set, direction:)
+      patch move_content_content_file_set_path(content_token, content_file_set, direction:),
+            headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+    end
+
+    it 'moves the resource up and reloads the files sections' do
+      move(second_content_file_set, direction: 'up')
+
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('data-controller="frame-reloader"')
+      expect(response.body).to include('Resource moved')
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[Second First Third])
+    end
+
+    it 'moves the resource down' do
+      move(second_content_file_set, direction: 'down')
+
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[First Third Second])
+    end
+
+    it 'does not move the first resource up or the last resource down' do
+      move(first_content_file_set, direction: 'up')
+      move(third_content_file_set, direction: 'down')
+
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[First Second Third])
+      expect(content.content_file_sets.pluck(:position)).to eq([1, 2, 3])
+    end
+
+    it 'rejects an unknown direction' do
+      move(second_content_file_set, direction: 'sideways')
+
+      expect(response).to have_http_status(:bad_request)
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[First Second Third])
+    end
+
+    context 'when the file set belongs to a different content' do
+      let(:other_content) { create(:content, druid: 'druid:df456gh7890') }
+      let(:content_token) { Rails.application.message_verifier(:argo).generate(other_content.id, purpose: 'contents') }
+
+      it 'returns forbidden' do
+        move(second_content_file_set, direction: 'up')
+
+        expect(response).to have_http_status(:forbidden)
+        expect(content.content_file_sets.pluck(:label)).to eq(%w[First Second Third])
+      end
+    end
+  end
 end

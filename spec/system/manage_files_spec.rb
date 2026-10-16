@@ -421,6 +421,28 @@ RSpec.describe 'Manage files' do
       expect(content.content_file_binaries).to be_empty
     end
 
+    it 'moves a resource' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+      upload_file('dropzone_upload2.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+      expect(page).to have_no_button('Move resource 1 up')
+      expect(page).to have_no_button('Move resource 2 down')
+
+      click_button 'Move resource 2 up'
+
+      expect(page).to have_toast('Resource moved')
+      # The structure is reloaded with the resources in their new order.
+      expect(first('.file-set-card')).to have_css('td', text: 'dropzone_upload2.txt')
+      expect(content.content_file_sets.map { |content_file_set| content_file_set.content_files.sole.filepath })
+        .to eq(['dropzone_upload2.txt', 'dropzone_upload.txt'])
+    end
+
     it 'deletes the resource when every file is removed' do
       build_structure_then_edit_resource
 

@@ -1,5 +1,6 @@
 <%= turbo_frame_tag(@content.druid, 'structure') do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Structural metadata', classes: 'mb-3') %>
   <%= render Item::ContentValidationAlertsComponent.new(content_validation_result: @content_validation_result) %>
-  <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, classes: 'mb-2') %>
+  <%= render Show::FileSetComponent.with_collection(@content.content_file_sets, content_file_set_total: @content.content_file_sets.size,
+                                                                                classes: 'mb-2') %>
 <% end %>

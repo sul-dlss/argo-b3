@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::FileSetComponent, type: :component do
-  let(:component) { described_class.new(content_file_set:, content_file_set_counter: 1) }
+  let(:component) { described_class.new(content_file_set:, content_file_set_counter: 1, content_file_set_total: 2) }
 
   let(:content_file_set) do
     instance_double(ContentFileSet, file_set_type: 'file', label: 'Resource 2', content_files: [content_file])
@@ -90,10 +90,15 @@ RSpec.describe Show::FileSetComponent, type: :component do
 
     expect(page).to have_no_link('Edit resource 2')
     expect(page).to have_no_button('Delete resource 2')
+    expect(page).to have_no_button('Move resource 2 up')
+    expect(page).to have_no_button('Move resource 2 down')
   end
 
   context 'when a content token is provided' do
-    let(:component) { described_class.new(content_file_set:, content_file_set_counter: 1, content_token: 'abc123') }
+    let(:component) do
+      described_class.new(content_file_set:, content_file_set_counter: 1, content_file_set_total: 2,
+                          content_token: 'abc123')
+    end
     let(:content_file_set) { create(:content_file_set) }
 
     it 'renders a delete button that confirms' do
@@ -104,6 +109,41 @@ RSpec.describe Show::FileSetComponent, type: :component do
       expect(page).to have_css('input[name="_method"][value="delete"]', visible: :hidden)
       expect(page).to have_button('Delete resource 2')
       expect(page).to have_no_css('form[data-turbo-frame="_top"]')
+    end
+
+    it 'renders move buttons between the label and the delete button' do
+      render_inline(described_class.new(content_file_set:, content_file_set_counter: 1, content_token: 'abc123',
+                                        content_file_set_total: 3))
+
+      expect(page).to have_css("form[action='/contents/abc123/content_file_sets/#{content_file_set.id}/move" \
+                               "?direction=up']")
+      expect(page).to have_css('input[name="_method"][value="patch"]', visible: :hidden, count: 2)
+      buttons = page.all('.card-title button').map { |button| button.text.strip }
+      expect(buttons).to eq(['Move resource 2 up', 'Move resource 2 down', 'Delete resource 2'])
+    end
+
+    it 'does not render a move up button for the first resource' do
+      render_inline(described_class.new(content_file_set:, content_file_set_counter: 0, content_token: 'abc123',
+                                        content_file_set_total: 3))
+
+      expect(page).to have_no_button('Move resource 1 up')
+      expect(page).to have_button('Move resource 1 down')
+    end
+
+    it 'does not render a move down button for the last resource' do
+      render_inline(described_class.new(content_file_set:, content_file_set_counter: 2, content_token: 'abc123',
+                                        content_file_set_total: 3))
+
+      expect(page).to have_button('Move resource 3 up')
+      expect(page).to have_no_button('Move resource 3 down')
+    end
+
+    it 'does not render move buttons for the only resource' do
+      render_inline(described_class.new(content_file_set:, content_file_set_counter: 0, content_token: 'abc123',
+                                        content_file_set_total: 1))
+
+      expect(page).to have_no_button('Move resource 1 up')
+      expect(page).to have_no_button('Move resource 1 down')
     end
   end
 end
