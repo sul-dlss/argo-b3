@@ -41,11 +41,11 @@
           </ul>
 
           <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :current_resource_type,
-                                                                        options: FileSetTypes::URIS,
+                                                                        options: FileSetTypes::BULK_ACTION_URIS,
                                                                         label_text: 'Current resource type') %>
 
           <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :new_resource_type,
-                                                                        options: FileSetTypes::URIS,
+                                                                        options: FileSetTypes::BULK_ACTION_URIS,
                                                                         label_text: 'New resource type',
                                                                         container_classes: 'mt-2') %>
         <% end %>
