@@ -33,6 +33,18 @@ RSpec.describe 'Import read unrestricted workgroups bulk action' do
       expect(BulkAction.last.action_type)
         .to eq(BulkActions::IMPORT_READ_UNRESTRICTED_WORKGROUPS.action_type.to_s)
     end
+
+    context 'when the csv_file cannot be read' do
+      let(:csv_file) { fixture_file_upload('catalog_record_id_and_barcode.xls') }
+
+      it 'renders the form with the error and does not create the bulk action' do
+        post bulk_actions_import_read_unrestricted_workgroups_path, params: form_params
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Unsupported upload file type')
+        expect(BulkAction.count).to eq(0)
+      end
+    end
   end
 
   context 'when signed in as a non-admin user' do

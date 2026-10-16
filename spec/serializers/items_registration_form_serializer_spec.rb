@@ -43,6 +43,17 @@ RSpec.describe ItemsRegistrationFormSerializer do
     end
   end
 
+  context 'when the uploaded file cannot be read' do
+    let(:csv_file) { fixture_file_upload('catalog_record_id_and_barcode.xls') }
+
+    it 'serializes the error message in csv_error' do
+      serialized = described_class.serialize(form)
+
+      expect(serialized[:attributes]['csv']).to be_nil
+      expect(serialized[:attributes]['csv_error']).to eq('Unsupported upload file type')
+    end
+  end
+
   context 'when the form has already been serialized' do
     let(:form) do
       ItemsRegistrationForm.new(items_choice: ItemsRegistrationForm::UPLOAD_CSV_CHOICE, csv: expected_csv)

@@ -52,6 +52,28 @@ RSpec.describe 'Multiple items' do
     end
   end
 
+  describe 'uploading a csv_file that cannot be read' do
+    before do
+      create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+    end
+
+    it 'renders the form with the error once the form has been validated' do
+      post multiple_items_path, params: {
+        items_registration: { items_choice: ItemsRegistrationForm::UPLOAD_CSV_CHOICE,
+                              csv_file: fixture_file_upload('catalog_record_id_and_barcode.xls') }
+      }
+      form_validation_action = FormValidationAction.last
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      get multiple_item_path(form_validation_action)
+
+      expect(form_validation_action.reload).to be_status_invalid
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('Unsupported upload file type')
+    end
+  end
+
   describe 'showing a form validation action' do
     let(:form_validation_action) do
       FormValidationAction.create!(user: form_validation_action_user, form: ItemsRegistrationForm.new,

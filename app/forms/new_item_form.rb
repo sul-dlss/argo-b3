@@ -87,6 +87,8 @@ class NewItemForm < CocinaModels::Dro
     return unless description_csv_row_count_valid?(description_csv)
 
     populate_description_hash_from_csv_row(description_csv.first)
+  rescue CsvUpload::Normalizer::Error => e
+    errors.add(:description_csv_file, :invalid, message: e.message)
   end
 
   # A single item is described by a single row.

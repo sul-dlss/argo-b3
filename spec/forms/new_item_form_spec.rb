@@ -160,6 +160,15 @@ RSpec.describe NewItemForm do
         expect(new_item_form.errors[:description_csv_file]).to eq(['Nope.'])
       end
     end
+
+    context 'when the spreadsheet cannot be read' do
+      let(:description_csv_file) { fixture_file_upload('catalog_record_id_and_barcode.xls') }
+
+      it 'is not valid' do
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:description_csv_file]).to eq(['Unsupported upload file type'])
+      end
+    end
   end
 
   describe 'catalog_record_id' do
