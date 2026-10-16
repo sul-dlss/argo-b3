@@ -46,6 +46,14 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'with the document content type' do
+    let(:content_type) { Cocina::Models::ObjectType.document }
+
+    it 'validates document resources' do
+      expect(result).to have_attributes(errors: [], warnings: ['No document resource has exactly one PDF file.'])
+    end
+  end
+
   context 'with the image content type' do
     let(:content_type) { Cocina::Models::ObjectType.image }
 
