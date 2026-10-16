@@ -508,6 +508,22 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  it 'disables the dropzone when using files from a mount' do
+    visit "/contents/#{druid}/edit"
+
+    expect(page).to have_css('#file-dropzone.dz-clickable:not(.opacity-50)')
+
+    choose 'Use files from mount'
+
+    expect(page).to have_css('#file-dropzone.opacity-50:not(.dz-clickable)')
+    expect(page).to have_button('Select files to upload', disabled: true)
+
+    choose 'Upload files from computer'
+
+    expect(page).to have_css('#file-dropzone.dz-clickable:not(.opacity-50)')
+    expect(page).to have_button('Select files to upload', disabled: false)
+  end
+
   context 'when discovering files on a mount' do
     let(:mount_path) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
 

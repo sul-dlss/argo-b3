@@ -60,8 +60,9 @@
                               data: {
                                 controller: 'dropzone',
                                 dropzone_max_filesize_value: Settings.file_upload.max_filesize,
-                                dropzone_reloadable_frame_outlet: '.content-files-frame'
-                              }, id: 'file-dropzone', class: 'dropzone my-fieldset' do %>
+                                dropzone_reloadable_frame_outlet: '.content-files-frame',
+                                action: 'radio:disable->dropzone#disable radio:enable->dropzone#enable'
+                              }, id: 'file-dropzone', class: 'dropzone radio-disableable my-fieldset' do %>
                   <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
                     <span data-dropzone-target="folderAlertText"></span>
                     <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
