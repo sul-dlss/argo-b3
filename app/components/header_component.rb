@@ -25,4 +25,8 @@ class HeaderComponent < ApplicationComponent
   def can_register_apo?
     helpers.allowed_to?(:new?, nil, with: ApoPolicy)
   end
+
+  def can_register_agreement?
+    helpers.allowed_to?(:new?, nil, with: AgreementPolicy)
+  end
 end

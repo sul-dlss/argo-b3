@@ -1,0 +1,71 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.agreements.new.title'), classes: 'mb-3') %>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @new_agreement_form, id: form_id, url: agreements_path) %>
+
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.agreements.tabs.details.label'), tab_name: :details, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.agreements.tabs.tags.label'), tab_name: :tags) %>
+    <% tab_list.with_tab(label: t('edit.agreements.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
+
+    <% form_with(model: @new_agreement_form, url: agreements_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
+                                                                          label: t('edit.agreements.tabs.details.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                                    label_text: t('edit.agreements.fields.title.label'),
+                                                                    label_classes: 'fw-bold',
+                                                                    label_mark_required: true,
+                                                                    container_classes: 'mb-3') %>
+
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :source_id,
+                                                                    label_text: t('edit.agreements.fields.source_id.label'),
+                                                                    label_classes: 'fw-bold',
+                                                                    label_mark_required: true,
+                                                                    container_classes: 'mb-3') %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :tags,
+                                                                          label: t('edit.agreements.tabs.tags.label'))) do |pane| %>
+        <%= render Edit::TagsComponent.new(form:) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.agreements.tabs.deposit.label'),
+                                                                          help_text: t('edit.agreements.tabs.deposit.help_text'),
+                                                                          mark_required: true)) do |pane| %>
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render Item::TabNavigationComponent.new(pane:, show_next: false, cancel_path: @cancel_path) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.agreements.new.buttons.register_add_files'),
+                  form_id: form.id,
+                  value: AgreementsController::DRAFT_TO_ADD_FILES_VALUE,
+                  classes: 'ms-auto'
+                ) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.agreements.new.buttons.register'),
+                  form_id: form.id,
+                  value: AgreementsController::DRAFT_VALUE,
+                  variant: 'outline-primary',
+                  classes: 'ms-2'
+                ) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

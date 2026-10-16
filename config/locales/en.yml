@@ -104,6 +104,29 @@ en:
   workflow_grid:
     label: "Workflow status"
   edit:
+    agreements:
+      new:
+        title: "Register an agreement"
+        buttons:
+          register: "Register only"
+          register_add_files: "Register and add files"
+        toasts:
+          register: "Agreement registered."
+      fields:
+        title:
+          label: "Title"
+        source_id:
+          label: "Source ID"
+      tabs:
+        deposit:
+          label: "Register"
+          help_text: >-
+            Complete registration of your agreement. Choose 'Register and add files' to proceed with your deposit. If
+            you're not ready to deposit your agreement, choose 'Register only' to return to it later.
+        details:
+          label: "Agreement details"
+        tags:
+          label: "Tags"
     apos:
       new:
         title: "Register and deposit APO"
@@ -156,6 +179,7 @@ en:
           append: "Files appended to structure"
           csv: "Structure updated from CSV"
         populators:
+          agreement: 'Agreement (resource per file)'
           book: "Book (resource per page)"
           document: "Document (resource per PDF)"
           object_type: "File (resource per file)"

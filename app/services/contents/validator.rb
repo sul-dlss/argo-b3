@@ -12,6 +12,7 @@ module Contents
 
     VALIDATORS_FOR_CONTENT_TYPES = {
       Cocina::Models::ObjectType.three_dimensional => Contents::Validators::ThreeDimensional,
+      Cocina::Models::ObjectType.agreement => Contents::Validators::Agreement,
       Cocina::Models::ObjectType.book => Contents::Validators::Book,
       Cocina::Models::ObjectType.document => Contents::Validators::Document,
       Cocina::Models::ObjectType.geo => Contents::Validators::Geo,
