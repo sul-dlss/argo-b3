@@ -417,6 +417,8 @@ en:
         empty_files: 'Empty files: %{filepaths}'
         empty_folders: 'Empty folders: %{paths}'
         discarded_content: 'Discarded in-progress file edits'
+      toasts:
+        completed: 'Completed discovering files'
   bulk_actions:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
