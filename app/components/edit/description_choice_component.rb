@@ -10,10 +10,11 @@ module Edit
 
     attr_reader :form
 
-    # FieldComponent performs this wiring for the fields it renders, but the Folio Instance HRID input is
-    # rendered on its own so that the "Preview FOLIO record" button can sit beside it in an input group.
-    def catalog_record_id_aria
-      SdrViewComponents::Forms::InvalidFeedbackSupport.arias_for(field_name: :catalog_record_id, form:)
+    # FieldComponent performs this wiring for the fields it renders, but the FOLIO fields are rendered on
+    # their own so that each label can sit to the left of its input (and the "Preview FOLIO record" button
+    # beside the Folio Instance HRID input).
+    def field_aria(field_name)
+      SdrViewComponents::Forms::InvalidFeedbackSupport.arias_for(field_name:, form:)
     end
 
     # The retrieved title is hidden until a title has been retrieved, whether by the
