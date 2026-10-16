@@ -1,0 +1,9 @@
+<%= tag.div class: classes do %>
+  <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: content_token),
+                                                                  label:,
+                                                                  params: { commit:, populator:, content_type: },
+                                                                  top: false,
+                                                                  method: :patch,
+                                                                  variant: :'outline-primary') %>
+  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: 'Structuring files...', classes: 'structure-spinner mt-2') %>
+<% end %>

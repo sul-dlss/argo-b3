@@ -74,8 +74,6 @@ folio:
     password: "supersecret"
   tenant_id: "sul"
 
-rosette_spinner_speed: 2.0
-
 mount_locations:
   - /ars
   - /datasets
