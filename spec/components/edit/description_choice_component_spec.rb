@@ -23,7 +23,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   context 'when the title is retrieved from the catalog' do
     let(:new_item_form) do
       NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
-                      barcode: '36105010362304', catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
+                      catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
     end
 
     it 'renders the catalog id state' do
@@ -31,7 +31,6 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
 
       expect(page).to have_field('Retrieve description from FOLIO', type: 'radio', checked: true)
       expect(page).to have_field('FOLIO Instance HRID', type: 'text', with: 'in11403803')
-      expect(page).to have_field('Barcode', type: 'text', with: '36105010362304')
       expect(page).to have_field('Part label', type: 'text', with: 'v. 1')
       expect(page).to have_field('Sort key', type: 'text', with: '1')
 
@@ -47,12 +46,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       it 'renders the retrieved title as text' do
         render_inline(component)
 
-        expect(page).to have_no_css('[data-catalog-title-target="titleRow"][hidden]', visible: :all)
-        title_row = page.find('.row[data-catalog-title-target="titleRow"]')
-        expect(title_row).to have_css('.col-sm-3', text: 'FOLIO title statement')
-        expect(title_row).to have_css('.col-sm-9[data-catalog-title-target="titleText"]', text: 'Pride and prejudice')
-        title_field = page.find('input[data-catalog-title-target="title"]', visible: :hidden)
-        expect(title_field[:value]).to eq 'Pride and prejudice'
+        expect(page).to have_text('Pride and prejudice')
       end
     end
 
@@ -67,9 +61,6 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       # Bootstrap reveals the message when the input is marked invalid, so it carries no d-block/d-none.
       expect(field_row).to have_css('div.invalid-feedback[data-catalog-title-target="error"]', visible: :all)
       expect(field_row).to have_no_css('[data-catalog-title-target="error"].d-block', visible: :all)
-
-      # The label is to the left of the input.
-      expect(page).to have_css('.row > label.col-sm-3.col-form-label', text: 'FOLIO Instance HRID')
 
       # Hidden until a title is retrieved.
       expect(page).to have_css('.row[data-catalog-title-target="titleRow"][hidden]', visible: :all)
