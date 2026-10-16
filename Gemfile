@@ -9,7 +9,7 @@ gem 'propshaft'
 # Use postgresql as the database for Active Record
 gem 'pg'
 # Use the Puma web server [https://github.com/puma/puma]
-gem 'puma', '>= 5.0'
+gem 'puma'
 # HTTP/2 proxy for Puma, for X-Sendfile asset serving and HTTP caching [https://github.com/basecamp/thruster]
 gem 'thruster', require: false
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -55,8 +55,8 @@ gem 'marcel' # For MIME type detection
 gem 'mission_control-jobs'
 gem 'okcomputer'
 gem 'positioning' # For ordering ContentFileSets and ContentFiles
-gem 'prawn', '~> 2'  # PDF generation; used in TracksheetService
-gem 'prawn-table'    # table support for Prawn PDFs
+gem 'prawn' # PDF generation; used in TracksheetService
+gem 'prawn-table' # table support for Prawn PDFs
 gem 'preservation-client'
 gem 'purl_fetcher-client'
 gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
