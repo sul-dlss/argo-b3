@@ -224,7 +224,9 @@ Rails.application.routes.draw do
       get 'validation'
     end
 
-    resources :content_file_sets, only: %i[edit update show destroy]
+    resources :content_file_sets, only: %i[edit update show destroy] do
+      patch :move, on: :member
+    end
     resources :content_file_binaries, only: %i[destroy]
   end
 

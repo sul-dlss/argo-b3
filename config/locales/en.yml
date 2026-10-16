@@ -191,6 +191,8 @@ en:
       buttons:
         delete: 'Delete resource %{index}'
         delete_confirm: 'Delete resource %{index} and its files?'
+        move_down: 'Move resource %{index} down'
+        move_up: 'Move resource %{index} up'
         remove_file: 'Remove %{filepath}'
       fields:
         content_files:
@@ -223,6 +225,7 @@ en:
           label: 'Label'
       toasts:
         deleted: 'Resource deleted'
+        moved: 'Resource moved'
         updated: 'Resource updated'
     items:
       edit:

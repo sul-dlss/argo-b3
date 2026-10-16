@@ -68,7 +68,8 @@
       <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
         <div class='mb-2'>
           <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>
-            <%= render Show::FileSetComponent.new(content_file_set:, content_token: @content_token, content_file_set_counter: index) %>
+            <%= render Show::FileSetComponent.new(content_file_set:, content_token: @content_token, content_file_set_counter: index,
+                                                  content_file_set_total: @content.content_file_sets.size) %>
           <% end %>
         </div>
       <% end %>

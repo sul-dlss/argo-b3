@@ -3,9 +3,9 @@
 # Controller for showing and editing a file set (resource) of a content
 class ContentFileSetsController < ContentsApplicationController
   # Authorization is coming from the verified content_id token.
-  skip_verify_authorized only: %i[update edit show destroy]
+  skip_verify_authorized only: %i[update edit show destroy move]
   before_action :set_content_file_set
-  before_action :set_counter, except: :destroy
+  before_action :set_counter, except: %i[destroy move]
 
   def show
     @files_deleted = params[:files_deleted] == 'true' # Triggers a reload of files sections.
@@ -31,6 +31,16 @@ class ContentFileSetsController < ContentsApplicationController
   def destroy
     ContentFileSetForm.from_model(@content_file_set).destroy
     render_destroyed
+  end
+
+  def move
+    direction = params.expect(:direction)
+    return head :bad_request unless ContentFileSet::MOVE_DIRECTIONS.include?(direction)
+
+    @content_file_set.move(direction)
+    # Every resource's index (and arrows) may change, so the files sections (including the structure) are reloaded.
+    flash.now[:toast] = t('edit.content_file_sets.toasts.moved')
+    render :moved, formats: :turbo_stream
   end
 
   private

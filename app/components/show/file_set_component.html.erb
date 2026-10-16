@@ -17,6 +17,26 @@
             <span class="fw-bold">Label:</span> <%= label %>
           </div>
         <% end %>
+        <% if move_up? || move_down? %>
+          <div class="d-flex ms-2">
+            <% if move_up? %>
+              <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:up),
+                                                                                  icon: :move_up,
+                                                                                  label: t('edit.content_file_sets.buttons.move_up', index:),
+                                                                                  method: :patch,
+                                                                                  top: false,
+                                                                                  classes: 'px-1') %>
+            <% end %>
+            <% if move_down? %>
+              <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:down),
+                                                                                  icon: :move_down,
+                                                                                  label: t('edit.content_file_sets.buttons.move_down', index:),
+                                                                                  method: :patch,
+                                                                                  top: false,
+                                                                                  classes: 'px-1') %>
+            <% end %>
+          </div>
+        <% end %>
         <% if editable? %>
           <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path,
                                                                               icon: :delete,

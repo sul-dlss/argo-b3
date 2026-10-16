@@ -29,4 +29,33 @@ RSpec.describe ContentFileSet do
       expect(content_file_set.errors[:external_identifier]).to include("can't be blank")
     end
   end
+
+  describe '#move' do
+    let(:content) { create(:content) }
+    let!(:first_content_file_set) { create(:content_file_set, content:, position: 1, label: 'First') }
+    let!(:second_content_file_set) { create(:content_file_set, content:, position: 2, label: 'Second') }
+
+    it 'moves the file set up' do
+      second_content_file_set.move('up')
+
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[Second First])
+    end
+
+    it 'moves the file set down' do
+      first_content_file_set.move('down')
+
+      expect(content.content_file_sets.pluck(:label)).to eq(%w[Second First])
+    end
+
+    it 'does not move the first file set up or the last file set down' do
+      first_content_file_set.move('up')
+      second_content_file_set.move('down')
+
+      expect(content.content_file_sets.pluck(:label, :position)).to eq([['First', 1], ['Second', 2]])
+    end
+
+    it 'raises for an unknown direction' do
+      expect { first_content_file_set.move('sideways') }.to raise_error(KeyError)
+    end
+  end
 end
