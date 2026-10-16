@@ -62,6 +62,16 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'with the 3d content type' do
+    let(:content_type) { Cocina::Models::ObjectType.three_dimensional }
+
+    it 'validates 3d resources' do
+      expect(result).to have_attributes(
+        errors: [], warnings: ['There is not exactly one 3D resource containing exactly one GLB file.']
+      )
+    end
+  end
+
   context 'with the image content type' do
     let(:content_type) { Cocina::Models::ObjectType.image }
 
