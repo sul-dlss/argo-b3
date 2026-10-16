@@ -5,7 +5,7 @@ module BulkActions
   class ImportDescriptiveMetadataForm < BasicCsvForm
     private
 
-    def validate_csv_file
+    def validate_normalized_csv
       csv = CSV.parse(normalized_csv_file, headers: true)
       validator = DescriptiveCsv::Validator.new(csv, bulk_job: true)
       return if validator.valid?

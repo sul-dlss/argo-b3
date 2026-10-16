@@ -23,13 +23,15 @@ module BulkActions
     def csv_file_must_be_valid
       return if csv_file.blank?
 
+      # Read the file now so unreadable files are reported here; it is then memoized for future callers.
       normalized_csv_file
-      validate_csv_file
+      validate_normalized_csv
     rescue CsvUpload::Normalizer::Error => e
       errors.add(:csv_file, :invalid, message: e.message)
     end
 
     # Subclasses may override to perform additional validations on the CSV file.
-    def validate_csv_file; end
+    # Only called once the CSV file has been successfully normalized.
+    def validate_normalized_csv; end
   end
 end

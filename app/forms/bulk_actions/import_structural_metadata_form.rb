@@ -6,7 +6,7 @@ module BulkActions
   class ImportStructuralMetadataForm < BasicCsvForm
     private
 
-    def validate_csv_file
+    def validate_normalized_csv
       validator = CsvUpload::Validator.new(csv: normalized_csv_file,
                                            required_headers: StructuralCsv::Validator::REQUIRED_COLUMNS)
       return if validator.valid?

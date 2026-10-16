@@ -8,7 +8,7 @@ module BulkActions
 
     private
 
-    def validate_csv_file
+    def validate_normalized_csv
       validator = CsvUpload::Validator.new(csv: normalized_csv_file, required_headers: REQUIRED_HEADERS)
       valid = validator.valid? { |csv| missing_location_header_message(csv) }
       return if valid
