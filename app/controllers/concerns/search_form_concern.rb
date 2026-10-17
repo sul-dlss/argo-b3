@@ -21,10 +21,8 @@ module SearchFormConcern
   class UnknownViewFormError < StandardError; end
 
   # Builds a search form permitting parameters appropriately.
-  # Search forms submit unscoped (scope: '') so their params match those of generated links.
   def set_search_form
-    permitted_params = params.permit(search_form_class.permitted_params)
-    @search_form = search_form_class.new(**permitted_params, debug: params[:debug])
+    @search_form = search_form_class.new(**search_form_class.params_from(params), debug: params[:debug])
   end
 
   # The search form class for this request, determined by the route's view_form default.

@@ -71,6 +71,6 @@ class ContentFileSetsController < ContentsApplicationController
   end
 
   def content_file_set_params
-    params.permit(content_file_set: ContentFileSetForm.permitted_params)[:content_file_set]
+    ContentFileSetForm.params_from(params)
   end
 end

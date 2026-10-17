@@ -1,5 +1,8 @@
 inherit_from: .rubocop_todo.yml
 
+require:
+  - ./lib/rubocop/cop/argo_b3/form_params_from
+
 plugins:
   - rubocop-capybara
   - rubocop-factory_bot
@@ -667,3 +670,7 @@ RSpecRails/HttpStatusNameConsistency: # new in 2.32
   Enabled: true
 RSpecRails/ReceivePerformLater: # new in 2.33
   Enabled: false
+
+ArgoB3/FormParamsFrom:
+  Include:
+    - 'app/controllers/**/*.rb'

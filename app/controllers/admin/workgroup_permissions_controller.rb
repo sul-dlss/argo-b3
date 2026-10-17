@@ -51,7 +51,7 @@ module Admin
     end
 
     def workgroup_permission_params
-      params.permit(admin_workgroup_permission: WorkgroupPermissionForm.permitted_params)[:admin_workgroup_permission]
+      WorkgroupPermissionForm.params_from(params)
     end
 
     def read_unrestricted_permission

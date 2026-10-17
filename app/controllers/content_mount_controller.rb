@@ -36,7 +36,7 @@ class ContentMountController < ContentsApplicationController
   private
 
   def mount_form_params
-    params.expect(mount: MountForm.permitted_params)
+    MountForm.params_from(params)
   end
 
   def set_content

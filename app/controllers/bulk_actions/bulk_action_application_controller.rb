@@ -49,7 +49,7 @@ module BulkActions
     end
 
     def expected_params
-      params.expect(bulk_action_config.form.model_name.param_key => form_class.permitted_params)
+      form_class.params_from(params)
     end
 
     # Gets the druids to process for the bulk action based on the form input.

@@ -112,7 +112,7 @@ class ContentsController < ContentsApplicationController
   end
 
   def contents_item_form_params
-    params.permit(contents_item: ContentsItemForm.permitted_params)[:contents_item] || {}
+    ContentsItemForm.params_from(params)
   end
 
   def find_content(cocina_object:)
