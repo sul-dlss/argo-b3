@@ -13,6 +13,14 @@ RSpec.describe SearchForm do
     end
   end
 
+  describe '.params_from' do
+    it 'returns the permitted params unscoped' do
+      params = ActionController::Parameters.new(query: 'twain', not_an_attribute: 'dropped')
+
+      expect(ResultsSearchForm.params_from(params).to_h).to eq('query' => 'twain')
+    end
+  end
+
   describe '#with' do
     let(:form) { ResultsSearchForm.new(query: 'twain', tags: ['Registered By : jdoe'], page: 4) }
 

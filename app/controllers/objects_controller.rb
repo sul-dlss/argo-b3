@@ -183,8 +183,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   private
 
   def events_filter_params
-    param_key = EventsFilterForm.model_name.param_key
-    params.permit(param_key => EventsFilterForm.permitted_params)[param_key]
+    EventsFilterForm.params_from(params)
   end
 
   def fetch_events
