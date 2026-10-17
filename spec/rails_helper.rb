@@ -46,6 +46,9 @@ end
 WebMock.disable_net_connect!(allow_localhost: true, allow: 'solr:8983')
 
 RSpec.configure do |config|
+  # Bulk action output directories are keyed by id, so files left from earlier runs would collide.
+  config.before(:suite) { FileUtils.rm_rf(Settings.bulk_actions.directory) }
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
