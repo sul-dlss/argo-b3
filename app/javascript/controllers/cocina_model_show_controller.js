@@ -23,6 +23,7 @@ export default class extends Controller {
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
     document.addEventListener('turbo:submit-start', this.handleSubmitStart)
     document.addEventListener('turbo:submit-end', this.handleSubmitEnd)
+    document.addEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
 
     this.href = window.location.href
     if (this.reloadTimeout) return
@@ -43,6 +44,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-missing', this.handleMissingFrame)
     document.removeEventListener('turbo:submit-start', this.handleSubmitStart)
     document.removeEventListener('turbo:submit-end', this.handleSubmitEnd)
+    document.removeEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
   }
 
   // This preserves the active tab when the page is refreshed
@@ -87,7 +89,7 @@ export default class extends Controller {
   // stagger the frame reloads to avoid bursts of requests.
   scheduleReload = () => {
     this.reloadTimeout = setTimeout(() => {
-      if (this.href === window.location.href && document.visibilityState === 'visible' && !this.submitting) {
+      if (this.href === window.location.href && document.visibilityState === 'visible') {
         Turbo.session.refresh(this.href)
       }
 
@@ -98,6 +100,11 @@ export default class extends Controller {
   // A page refresh starts a Turbo visit, which aborts any in-flight form submission (e.g., pinning or
   // republishing) so that its response (e.g., a toast) is never rendered. So the refresh is skipped while a
   // submission is in flight.
+  // This is checked when the visit starts, since Turbo debounces session.refresh (by 150ms).
+  preventRefreshWhileSubmitting = (event) => {
+    if (this.submitting && event.detail.url === window.location.href) event.preventDefault()
+  }
+
   handleSubmitStart = () => {
     this.submitting = true
   }
