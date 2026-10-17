@@ -46,6 +46,8 @@ end
 WebMock.disable_net_connect!(allow_localhost: true, allow: 'solr:8983')
 
 RSpec.configure do |config|
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
