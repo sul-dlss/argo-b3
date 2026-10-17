@@ -35,7 +35,6 @@ RSpec.describe 'Create an item' do
                                                  lock: registered_cocina_object.lock,
                                                  source_id_exists?: false)
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
-      allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
     end
 
     it 'registers a valid cocina object' do
@@ -462,8 +461,8 @@ RSpec.describe 'Create an item' do
     end
 
     it 'registers and redirects to add files' do
-      version_service = instance_double(Sdr::VersionService, open?: true, editable?: true, version: 1,
-                                                             version_description: 'Initial version')
+      version_service = version_service_double(open?: true, editable?: true, version: 1,
+                                               version_description: 'Initial version')
       allow(Sdr::VersionService).to receive(:new).and_return(version_service)
 
       visit new_item_path

@@ -18,7 +18,7 @@ RSpec.describe BulkActions::TextExtractionJob do
 
   let(:cocina_object) { instance_double(Cocina::Models::DRO) }
   let(:text_extraction) { instance_double(Sdr::TextExtraction, call: true, ocr_able?: true) }
-  let(:version_service) { instance_double(Sdr::VersionService, open?: false, assembling?: false) }
+  let(:version_service) { version_service_double(open?: false, assembling?: false) }
 
   before do
     allow(described_class::JobItem).to receive(:new).and_return(job_item)

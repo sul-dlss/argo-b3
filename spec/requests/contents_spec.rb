@@ -10,8 +10,7 @@ RSpec.describe 'Contents' do
   let(:user) { create(:user) }
   # Defaults to the initial version, for which a version description is not entered.
   let(:version_service) do
-    instance_double(Sdr::VersionService, open?: open, editable?: editable, version:,
-                                         version_description: 'Initial version', update_description: nil)
+    version_service_double(open?: open, editable?: editable, version:, version_description: 'Initial version')
   end
   let(:editable) { true }
   let(:open) { true }
