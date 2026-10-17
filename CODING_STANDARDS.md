@@ -11,6 +11,7 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 ### What to test
 - Unless specifically asked, do not write tests for memoization, caching, getters, or default values. These restate the implementation and break on refactors without catching regressions. Security-relevant behavior is not a "default" and should be tested (e.g., an attribute excluded from `permitted_params`, a field that cannot be changed).
 - Every `describe` / `context` / `it` description is backed by an assertion. For example, a "with errors" context asserts the error message (e.g., `have_invalid_feedback`), not just the absence of success.
+- Every change to a component's rendered output adds or updates its component spec (`spec/components/...`), even when a system spec also covers it.
 
 ### Expected values
 - Expected values are independent of the implementation. Do not compute them with the code under test or the helpers, constants, or expressions it uses (e.g., `DruidSupport.bare_druid_from`, `Form.permitted_params`, `File.size(filepath_on_disk)`); use literals instead (e.g., `'bc123df4567'`, `[:tag]`, `52`).
@@ -26,6 +27,7 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 
 ## Ruby / Rails
 
+- Controllers stay thin: they authorize, build the form, save, and redirect or render. Domain steps (e.g., opening a version, updating the version description, starting accessioning) belong in the form's `save!`, `CocinaModels::Base#save!`, or `Sdr::Repository`. When `Metrics/AbcSize` fires on a controller action, move logic down a layer rather than extracting private controller helpers.
 - In an `ActiveSupport::Concern`, define instance methods in the module body, not inside `included do`.
 - Every `rescue StandardError` in a job logs the error (`Rails.logger.error(e.full_message)`) and notifies Honeybadger (`Honeybadger.notify(e)`), as in `BulkActions::BaseRegisterJob`.
 - Read form params with the form's param key (`Form.model_name.param_key`); Voids drops the `Form` suffix (`EventsFilterForm` submits as `events_filter`).
