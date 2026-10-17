@@ -34,8 +34,17 @@ begin
     sh('bin/herb analyze app --no-timing')
   end
 
-  desc 'Run all configured linters'
-  task lint: %i[rubocop erblint eslint stylelint herb]
+  desc 'Run all configured linters, reporting every failing linter'
+  task lint: :environment do
+    # sh raises RuntimeError and RuboCop aborts (SystemExit) on failure; keep going so every linter reports.
+    failed_linters = %w[rubocop erblint eslint stylelint herb].filter_map do |linter|
+      Rake::Task[linter].invoke
+      nil
+    rescue RuntimeError, SystemExit
+      linter
+    end
+    abort("Linters failed: #{failed_linters.join(', ')}") if failed_linters.any?
+  end
 
   # clear the default task injected by rspec
   task(:default).clear
