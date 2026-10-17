@@ -2,7 +2,8 @@ solr:
   url: http://localhost:<%= 8983 + (ENV['TEST_ENV_NUMBER'].presence || 1).to_i %>/solr/argo
 
 bulk_actions:
-  directory: "tmp/bulk_jobs_test"
+  # Per parallel_rspec process, since each process's test DB reuses the same bulk action ids.
+  directory: "tmp/bulk_jobs_test<%= ENV['TEST_ENV_NUMBER'] %>"
 
 # Tests should never publish events to a RabbitMQ instance.
 rabbitmq:
