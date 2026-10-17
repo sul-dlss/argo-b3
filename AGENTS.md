@@ -39,7 +39,7 @@ If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update th
 
 ## Checks
 
-- Before reporting work done, run `bin/rake lint` (rubocop, erb_lint, herb, JS and SCSS linters); fix offenses before committing.
+- Before reporting work done, run `bin/rake lint` (rubocop, erb_lint, herb, JS and SCSS linters, i18n-tasks); fix offenses before committing.
 
 ## References
 For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.

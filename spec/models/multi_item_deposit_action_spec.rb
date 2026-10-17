@@ -99,7 +99,7 @@ RSpec.describe MultiItemDepositAction do
   end
 
   describe '#destroy' do
-    let(:content) { create(:content, immutable: false) }
+    let(:content) { create(:content, :mutable) }
 
     before do
       create(:item_deposit_action, multi_item_deposit_action:, content:)

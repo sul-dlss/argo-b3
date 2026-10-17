@@ -6,7 +6,7 @@ RSpec.describe 'Contents' do
   let(:druid) { 'druid:bc123df4567' }
   let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
   let(:updated_cocina_object) { cocina_object.new(lock: 'updated-lock') }
-  let!(:content) { create(:content, druid:, lock: cocina_object.lock, immutable: false) }
+  let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
   let(:user) { create(:user) }
   # Defaults to the initial version, for which a version description is not entered.
   let(:version_service) do
@@ -111,7 +111,7 @@ RSpec.describe 'Contents' do
 
     context 'when the content previously failed staging' do
       let!(:content) do
-        create(:content, druid:, lock: cocina_object.lock, immutable: false, staging_state: 'staging_failed')
+        create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging_failed')
       end
 
       it 'stages again' do
@@ -360,7 +360,7 @@ RSpec.describe 'Contents' do
     end
 
     context 'when the object has changed since the edit page was loaded' do
-      let!(:content) { create(:content, druid:, lock: 'stale-lock', immutable: false) }
+      let!(:content) { create(:content, :mutable, druid:, lock: 'stale-lock') }
 
       it 'redirects to the edit page' do
         patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
