@@ -55,8 +55,8 @@ RSpec.describe Content do
 
     context 'when multiple contents for the druid are staging or failed staging' do
       let!(:latest_content) do
-        create(:content, druid:, lock: 'lock-3', immutable: false, staging_state: 'staging_failed',
-                         updated_at: 1.minute.ago)
+        create(:content, :mutable, druid:, lock: 'lock-3', staging_state: 'staging_failed',
+                                   updated_at: 1.minute.ago)
       end
 
       before do

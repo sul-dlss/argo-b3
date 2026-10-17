@@ -185,7 +185,7 @@ RSpec.describe StageFilesJob do
 
     context 'when updating SDR does not change the lock' do
       # The structure is unchanged, so an immutable Content for the lock may already exist.
-      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+      let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
       let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
       let!(:existing_content) { create(:content, druid:, lock: 'druid-version-1', immutable: true) }
 
@@ -200,7 +200,7 @@ RSpec.describe StageFilesJob do
     end
 
     context 'when making the content immutable fails' do
-      let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+      let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
       let(:error) { ActiveRecord::RecordInvalid.new(content) }
 
       before do

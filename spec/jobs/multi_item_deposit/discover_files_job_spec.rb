@@ -197,7 +197,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
 
   context 'when there is an existing mutable Content that is staging' do
     let!(:existing_content) do
-      create(:content, druid:, lock: 'abc123', immutable: false, staging_state: 'staging')
+      create(:content, :mutable, druid:, lock: 'abc123', staging_state: 'staging')
     end
 
     it 'records an error and keeps the existing Content' do
@@ -209,7 +209,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when there is an existing mutable Content that is not in progress' do
-    let!(:existing_content) { create(:content, druid:, lock: 'abc123', immutable: false) }
+    let!(:existing_content) { create(:content, :mutable, druid:, lock: 'abc123') }
 
     it 'discards it, records a warning, and creates a new Content' do
       perform
@@ -221,7 +221,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when there is an existing mutable Content and other errors' do
-    let!(:existing_content) { create(:content, druid:, lock: 'abc123', immutable: false) }
+    let!(:existing_content) { create(:content, :mutable, druid:, lock: 'abc123') }
     let(:folder_path) { File.join(mount_path, 'other') }
 
     it 'keeps the existing Content' do

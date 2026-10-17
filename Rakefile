@@ -34,10 +34,17 @@ begin
     sh('bin/herb analyze app --no-timing')
   end
 
+  desc 'Check for missing and unused i18n keys'
+  task i18n: :environment do
+    puts 'Running i18n-tasks...'
+    sh('bundle exec i18n-tasks missing')
+    sh('bundle exec i18n-tasks unused')
+  end
+
   desc 'Run all configured linters, reporting every failing linter'
   task lint: :environment do
     # sh raises RuntimeError and RuboCop aborts (SystemExit) on failure; keep going so every linter reports.
-    failed_linters = %w[rubocop erblint eslint stylelint herb].filter_map do |linter|
+    failed_linters = %w[rubocop erblint eslint stylelint herb i18n].filter_map do |linter|
       Rake::Task[linter].invoke
       nil
     rescue RuntimeError, SystemExit
