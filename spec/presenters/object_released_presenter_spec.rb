@@ -11,7 +11,7 @@ RSpec.describe ObjectReleasedPresenter do
                                      Search::Fields::CATALOG_RECORD_ID => catalog_record_id })
   end
   let(:catalog_record_id) { [] }
-  let(:version_service) { instance_double(Sdr::VersionService, version: 2, open?: false, accessioning?: false) }
+  let(:version_service) { version_service_double(version: 2, open?: false, accessioning?: false) }
 
   describe '#heading' do
     context 'when there are no release tags' do
@@ -32,7 +32,7 @@ RSpec.describe ObjectReleasedPresenter do
       end
 
       context 'when the object is still undeposited' do
-        let(:version_service) { instance_double(Sdr::VersionService, version: 1, open?: true, accessioning?: false) }
+        let(:version_service) { version_service_double(version: 1, open?: true, accessioning?: false) }
 
         it 'returns the unreleased heading' do
           expect(presenter.heading).to eq(I18n.t('show.released_to.unreleased.heading'))

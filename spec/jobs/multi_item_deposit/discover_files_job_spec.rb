@@ -19,7 +19,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
     build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book, admin_policy_id: apo_druid)
   end
   let(:version_service) do
-    instance_double(Sdr::VersionService, open?: false, openable?: true, closeable?: true, version: 2)
+    version_service_double(open?: false, openable?: true, closeable?: true, version: 2)
   end
 
   before do
@@ -59,7 +59,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when the object is an initial version' do
-    let(:version_service) { instance_double(Sdr::VersionService, open?: true, closeable?: true, version: 1) }
+    let(:version_service) { version_service_double(open?: true, closeable?: true, version: 1) }
 
     it 'sets initial_version' do
       expect(perform.initial_version).to be true
@@ -180,7 +180,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when the object is closed and not openable' do
-    let(:version_service) { instance_double(Sdr::VersionService, open?: false, openable?: false, version: 2) }
+    let(:version_service) { version_service_double(open?: false, openable?: false, version: 2) }
 
     it 'records a warning' do
       expect(perform.discovery_warnings).to eq(['A new version cannot be opened for this object'])
@@ -188,7 +188,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when the object is open and not closeable' do
-    let(:version_service) { instance_double(Sdr::VersionService, open?: true, closeable?: false, version: 2) }
+    let(:version_service) { version_service_double(open?: true, closeable?: false, version: 2) }
 
     it 'records a warning' do
       expect(perform.discovery_warnings).to eq(['The open version cannot be closed for this object'])

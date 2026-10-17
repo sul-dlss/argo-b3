@@ -125,8 +125,7 @@ RSpec.describe EditItemForm do
   describe '#save!' do
     let(:user_name) { 'jlittman' }
     let(:version_service) do
-      instance_double(Sdr::VersionService, open?: open, version_description: 'Fixed the content type',
-                                           update_description: nil)
+      version_service_double(open?: open, version_description: 'Fixed the content type')
     end
     let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
 
