@@ -28,6 +28,11 @@ class SearchForm < ApplicationForm
     super
   end
 
+  # Search forms submit unscoped (scope: '') so their params match those of generated links.
+  def self.params_from(params)
+    params.permit(permitted_params)
+  end
+
   delegate :route_scope, to: :class
 
   # @return [Boolean] whether this search can be pinned

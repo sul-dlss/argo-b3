@@ -15,6 +15,12 @@ module PermittedParamsConcern
       user_editable_attributes + nested_association_attributes
     end
 
+    # Use in controllers to read the form's submitted params ({} if absent).
+    # permit rather than expect, since expect drops fields_for nested attributes.
+    def params_from(params)
+      params.fetch(model_name.param_key, {}).permit(permitted_params)
+    end
+
     private
 
     def user_editable_attributes

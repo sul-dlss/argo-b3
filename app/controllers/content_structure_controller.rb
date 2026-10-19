@@ -78,7 +78,7 @@ class ContentStructureController < ContentsApplicationController
   end
 
   def structural_csv_params
-    params.permit(structural_csv: StructuralCsvForm.permitted_params)[:structural_csv]
+    StructuralCsvForm.params_from(params)
   end
 
   # Since the CSV is for this object only, every row must have its druid (rather than being grouped by druid, as by

@@ -29,7 +29,7 @@ class AposController < ApplicationController
   private
 
   def apo_form_params
-    params.permit(apo: ApoForm.permitted_params)[:apo]
+    ApoForm.params_from(params)
   end
 
   def set_agreement_options

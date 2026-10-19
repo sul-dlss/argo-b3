@@ -34,7 +34,7 @@ class DashboardController < ApplicationController
   end
 
   def go_to_druid
-    @go_to_druid_form = GoToDruidForm.new(params.expect(go_to_druid: [:druid]))
+    @go_to_druid_form = GoToDruidForm.new(GoToDruidForm.params_from(params))
 
     if @go_to_druid_form.valid?
       redirect_to object_path(@go_to_druid_form.druid)

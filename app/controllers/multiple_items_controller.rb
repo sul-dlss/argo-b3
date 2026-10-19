@@ -68,7 +68,7 @@ class MultipleItemsController < ApplicationController
   end
 
   def items_registration_form_params
-    params.permit(items_registration: ItemsRegistrationForm.permitted_params)[:items_registration]
+    ItemsRegistrationForm.params_from(params)
   end
 
   def bulk_action_config

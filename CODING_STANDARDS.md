@@ -30,4 +30,3 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 - Controllers stay thin: they authorize, build the form, save, and redirect or render. Domain steps (e.g., opening a version, updating the version description, starting accessioning) belong in the form's `save!`, `CocinaModels::Base#save!`, `Sdr::Repository`, or a service class. When `Metrics/AbcSize` fires on a controller action, move logic down a layer rather than extracting private controller helpers.
 - In an `ActiveSupport::Concern`, define instance methods in the module body, not inside `included do`.
 - Every `rescue StandardError` in a job logs the error (`Rails.logger.error(e.full_message)`) and notifies Honeybadger (`Honeybadger.notify(e)`), as in `BulkActions::BaseRegisterJob`.
-- Read form params with the form's param key (`Form.model_name.param_key`); Voids drops the `Form` suffix (`EventsFilterForm` submits as `events_filter`).

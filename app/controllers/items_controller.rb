@@ -61,8 +61,7 @@ class ItemsController < ApplicationController
   private
 
   def new_item_form_params
-    param_key = NewItemForm.model_name.param_key
-    params.permit(param_key => NewItemForm.permitted_params)[param_key]
+    NewItemForm.params_from(params)
   end
 
   def build_submitted_edit_item_form
@@ -74,8 +73,7 @@ class ItemsController < ApplicationController
   end
 
   def edit_item_form_params
-    param_key = EditItemForm.model_name.param_key
-    params.permit(param_key => EditItemForm.permitted_params)[param_key] || {}
+    EditItemForm.params_from(params)
   end
 
   def version_service
