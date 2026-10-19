@@ -1,0 +1,81 @@
+<%= render SdrViewComponents::Structure::HeaderComponent.new(title: 'Argo: Build Back Better', variant: :dark, background_color: '84, 73, 72') do |header| %>
+  <%= header.with_primary_navigation_link do %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: "mailto:#{Settings.support_email}") %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: logged_in_text) %>
+  <% end %>
+  <%= header.with_secondary_navigation_link do %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Recent bulk actions', link: bulk_actions_path) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Register and deposit') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Single object', classes: 'h4') %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Item', link: new_item_path, disabled: !can_register_item?) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'APO', link: new_apo_path, disabled: !can_register_apo?) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Agreement', link: '#', disabled: true) %>
+      <% end %>
+
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: 'Multiple items', classes: 'h4') %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items', link: new_multiple_item_path, disabled: !can_register_item?) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items for Goobi', link: '#', disabled: true) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items (via CSV)', link: new_bulk_actions_register_csv_path, disabled: !can_register_item?) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Deposit multiple items', link: multi_item_deposit_actions_path, disabled: !can_register_item?, data: { turbo_method: :post }) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Reports') do |dropdown| %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Custom report', link: report_path) %>
+      <% end %>
+      <% dropdown.with_item do %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Aggregate report', link: '#', disabled: true) %>
+      <% end %>
+    <% end %>
+
+    <% if admin? || impersonating? %>
+      <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Admin') do |dropdown| %>
+        <% if admin? %>
+          <% dropdown.with_item do %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Manage permissions', link: admin_workgroup_permissions_path) %>
+          <% end %>
+        <% end %>
+
+        <% if show_impersonation_link? %>
+          <% dropdown.with_item do %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Impersonate', link: admin_impersonate_path, disabled: impersonating?) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if impersonating? %>
+      <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Stop impersonating', path: admin_stop_impersonate_path, data: { turbo_method: :delete, turbo_confirm: 'Stop impersonating?' }) %>
+    <% end %>
+
+  <% end %>
+<% end %>

@@ -12,3 +12,6 @@ config/credentials.yml.enc diff=rails_credentials
 Gemfile.lock linguist-generated
 yarn.lock linguist-generated
 .rubocop_todo.yml linguist-generated
+
+# Specify linguist language mapping
+app/components/**/*.html.erb linguist-language=HTML+ERB diff=erb
