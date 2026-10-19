@@ -5,6 +5,21 @@ require 'rails_helper'
 RSpec.describe Content do
   let(:druid) { 'druid:bc123df4567' }
 
+  describe '.mutable_for' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid).new(lock: 'current-lock') }
+    let!(:mutable_content) { create(:content, druid:, lock: 'current-lock', immutable: false) }
+
+    before do
+      create(:content, druid:, lock: 'current-lock', immutable: true)
+      create(:content, druid:, lock: 'old-lock', immutable: false)
+      create(:content, druid: 'druid:dj123df4598', lock: 'current-lock', immutable: false)
+    end
+
+    it 'returns the mutable Content for the lock of the object' do
+      expect(described_class.mutable_for(cocina_object)).to eq(mutable_content)
+    end
+  end
+
   describe 'staging state' do
     it 'can start staging again after failing staging' do
       content = create(:content, staging_state: 'staging_failed')
@@ -66,6 +81,32 @@ RSpec.describe Content do
       it 'returns the most recently updated' do
         expect(described_class.latest_staging_activity(druid:)).to eq(latest_content)
       end
+    end
+  end
+
+  describe '#workflow_context' do
+    context 'when performing OCR' do
+      subject(:content) { build(:content, perform_ocr: true, ocr_languages: %w[English Spanish]) }
+
+      it 'requests OCR in the languages' do
+        expect(content.workflow_context).to eq({ runOcr: true, ocrLanguages: %w[English Spanish] })
+      end
+    end
+
+    context 'when not performing OCR' do
+      subject(:content) { build(:content, perform_ocr: false) }
+
+      it 'is empty' do
+        expect(content.workflow_context).to eq({})
+      end
+    end
+  end
+
+  describe '#staging_or_discovering?' do
+    it 'is true only while staging or discovering' do
+      expect(build(:content, staging_state: 'staging')).to be_staging_or_discovering
+      expect(build(:content, mount_state: 'discovering')).to be_staging_or_discovering
+      expect(build(:content, staging_state: 'staging_failed')).not_to be_staging_or_discovering
     end
   end
 

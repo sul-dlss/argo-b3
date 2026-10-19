@@ -42,10 +42,14 @@ class ItemsController < ApplicationController
     end
   end
 
-  def update
+  def update # rubocop:disable Metrics/AbcSize
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.editable?
     return redirect_stale if stale?
+
+    # The mutable Content holds the OCR settings and must follow the object to its new lock.
+    @content = Content.mutable_for(@cocina_object)
+    return redirect_content_busy if @content&.staging_or_discovering?
 
     @edit_item_form = build_submitted_edit_item_form
     return render_invalid_edit unless @edit_item_form.valid?
@@ -65,6 +69,7 @@ class ItemsController < ApplicationController
     EditItemForm.build_from_cocina_object(@cocina_object).tap do |form|
       form.version_service = version_service
       form.update(edit_item_form_params)
+      form.content = @content
     end
   end
 
@@ -98,6 +103,10 @@ class ItemsController < ApplicationController
 
   def redirect_stale
     redirect_to edit_item_path(@druid), flash: { warning: t('edit.items.edit.warnings.stale') }
+  end
+
+  def redirect_content_busy
+    redirect_to edit_item_path(@druid), flash: { warning: t('edit.items.edit.warnings.content_busy') }
   end
 
   def set_edit_view

@@ -211,7 +211,69 @@ RSpec.describe EditItemForm do
         expect(Sdr::VersionService).to have_received(:open)
           .with(druid: cocina_object.externalIdentifier, description: 'Redeposit', opening_user_name: user_name)
         expect(Sdr::Repository).not_to have_received(:update)
-        expect(Sdr::Repository).to have_received(:accession).with(cocina_object: opened_cocina_object, user_name:)
+        expect(Sdr::Repository).to have_received(:accession)
+          .with(cocina_object: opened_cocina_object, user_name:, context: {})
+      end
+    end
+
+    context 'when accessioning with a content that has OCR settings' do
+      let(:open) { true }
+      let(:content) do
+        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false,
+                         perform_ocr: true, ocr_languages: ['English'])
+      end
+
+      before do
+        edit_item_form.update(version_description: 'Fixed the content type',
+                              content_type: Cocina::Models::ObjectType.image)
+        edit_item_form.content = content
+        allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
+      end
+
+      it 'starts accessioning with the OCR settings and destroys the content' do
+        edit_item_form.save!(user_name:, accession: true)
+
+        expect(Sdr::Repository).to have_received(:accession)
+          .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name:,
+                context: { runOcr: true, ocrLanguages: ['English'] })
+        expect(Content.exists?(content.id)).to be false
+      end
+    end
+
+    context 'when accessioning fails with a content' do
+      let(:open) { true }
+      let(:content) do
+        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false,
+                         perform_ocr: true, ocr_languages: ['English'])
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:accession).and_raise(Sdr::Repository::Error, 'Accession failed')
+        edit_item_form.update(version_description: 'Redeposit')
+        edit_item_form.content = content
+      end
+
+      it 'keeps the content with its OCR settings' do
+        expect { edit_item_form.save!(user_name:, accession: true) }.to raise_error(Sdr::Repository::Error)
+        expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_ocr: true)
+      end
+    end
+
+    context 'when saving fails with a content' do
+      let(:open) { false }
+      let(:content) do
+        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false)
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:update).and_raise(Sdr::Repository::Error, 'Update failed')
+        edit_item_form.update(version_description: 'Changed type', content_type: Cocina::Models::ObjectType.image)
+        edit_item_form.content = content
+      end
+
+      it 'rebases the content onto the opened version' do
+        expect { edit_item_form.save!(user_name:) }.to raise_error(Sdr::Repository::Error)
+        expect(content.reload.lock).to eq('opened-lock')
       end
     end
 

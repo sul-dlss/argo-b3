@@ -14,6 +14,12 @@ class Content < ApplicationRecord
 
   scope :with_structural_associations, -> { includes(content_file_sets: { content_files: :content_file_binary }) }
 
+  # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object
+  # @return [Content, nil] the mutable Content for the object's current lock
+  def self.mutable_for(cocina_object)
+    find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false)
+  end
+
   # Staging changes the lock and immutability of the Content being staged, so this is not scoped by either.
   # @param druid [String] the druid of the object
   # @return [Content, nil] the most recently updated Content for the druid that is staging or failed staging
@@ -25,6 +31,19 @@ class Content < ApplicationRecord
   # when this Content is staged.
   def clear_other_staging_failures!
     Content.where(druid:).where.not(id:).with_staging_state(:staging_failed).find_each(&:staging_failure_cleared!)
+  end
+
+  # The assembly workflow reads these from its context to decide whether to run OCR.
+  # @return [Hash] the workflow context to start accessioning with
+  def workflow_context
+    return {} unless perform_ocr
+
+    { runOcr: true, ocrLanguages: ocr_languages }
+  end
+
+  # A background job may change the lock of a Content that is staging or discovering.
+  def staging_or_discovering?
+    staging? || discovering?
   end
 
   # Staging is retried by starting staging again from staging_failed.

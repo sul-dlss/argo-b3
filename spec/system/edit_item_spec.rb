@@ -80,6 +80,6 @@ RSpec.describe 'Edit an item' do
       ),
             user_name: user.sunetid, description: nil)
     expect(Sdr::Repository).to have_received(:accession)
-      .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name: user.sunetid)
+      .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name: user.sunetid, context: {})
   end
 end

@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 # Job that copies files to staging, generates fixities, determines mimetype,
-# updates the object, and optionally closes version.
+# updates the object, and optionally accessions.
 class StageFilesJob < ApplicationJob
   # @param [Content] content the content whose files should be staged
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging
-  # @param [Hash] workflow_context the context for the assembly workflow started by accessioning
-  def perform(content:, user:, accession: false, workflow_context: {}) # rubocop:disable Metrics/AbcSize
+  def perform(content:, user:, accession: false)
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
 
@@ -15,19 +14,8 @@ class StageFilesJob < ApplicationJob
     Contents::ExternalIdentifierMinter.call(content:) # Mint external identifiers for new files/filesets
     analyze! # Generate digests, size, and mimetypes
     stage! # Copy to staging
-    # Update SDR
-    updated_cocina_object = Sdr::Repository.update(
-      cocina_object: CocinaObjectMutators::StructuralMutator.call(cocina_object:, content:),
-      user_name: user.sunetid
-    )
-
-    make_immutable!(content:, lock: updated_cocina_object.lock)
-
-    # Optionally start accessioning.
-    if accession
-      Sdr::Repository.accession(cocina_object: updated_cocina_object, user_name: user.sunetid,
-                                context: workflow_context)
-    end
+    updated_cocina_object = update_sdr!(content:)
+    accession!(content:, cocina_object: updated_cocina_object) if accession
     content.staging_completed!
 
     perform_broadcast
@@ -57,6 +45,21 @@ class StageFilesJob < ApplicationJob
     return if content.lock == cocina_object.lock
 
     raise "Lock mismatch for #{druid}. Content: #{content.lock}. Cocina object: #{cocina_object.lock}"
+  end
+
+  # The Content follows the object to its new lock right away, so that a later failure leaves a mutable Content
+  # to retry with.
+  def update_sdr!(content:)
+    Sdr::Repository.update(
+      cocina_object: CocinaObjectMutators::StructuralMutator.call(cocina_object:, content:),
+      user_name: user.sunetid
+    ).tap { |updated_cocina_object| content.update!(lock: updated_cocina_object.lock) }
+  end
+
+  # The Content becomes immutable only once accessioning has started, so that it stays mutable if accessioning fails.
+  def accession!(content:, cocina_object:)
+    Sdr::Repository.accession(cocina_object:, user_name: user.sunetid, context: content.workflow_context)
+    make_immutable!(content:, lock: cocina_object.lock)
   end
 
   # An unchanged structure leaves the lock unchanged, so this Content supersedes the existing immutable Content.
