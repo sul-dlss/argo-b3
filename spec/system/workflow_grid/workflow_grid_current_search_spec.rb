@@ -35,19 +35,19 @@ RSpec.describe 'Workflow grid as a view of the current search', :solr do
     # Pinning is not offered on the grid.
     expect(page).to have_no_button('Pin search')
 
-    # The search can be refined from the grid, just as it can from the results. Object types is a
+    # The search can be refined from the grid, just as it can from the results. Object type is a
     # non-lazy facet, whose counts the grid gets from the secondary facets request.
-    find_facet_section('Object types').click
-    expect(page).to have_facet_value('item', facet: 'Object types')
+    find_facet_section('Object type').click
+    expect(page).to have_facet_value('item', facet: 'Object type')
 
-    within(find_facet_section('Object types')) do
+    within(find_facet_section('Object type')) do
       check('item')
       click_button('Filter')
     end
 
     # Refining keeps the user on the grid.
     expect(page).to have_link('Workflow status view', class: 'active')
-    expect(page).to have_current_filter('Object types', 'item')
+    expect(page).to have_current_filter('Object type', 'item')
     expect(page).to have_css('.selected-item-label', text: 'twain')
 
     # Toggling back returns to the results for the same, refined search.
@@ -55,7 +55,7 @@ RSpec.describe 'Workflow grid as a view of the current search', :solr do
 
     expect(page).to have_link('Search results view', class: 'active')
     expect(page).to have_result_count(2)
-    expect(page).to have_current_filter('Object types', 'item')
+    expect(page).to have_current_filter('Object type', 'item')
     expect(page).to have_css('.selected-item-label', text: 'twain')
   end
 

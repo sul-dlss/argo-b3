@@ -26,13 +26,13 @@ RSpec.describe Search::Serializer do
     expect(serialized_query)
       .to eq('"test query" AND ' \
              'Access rights: NOT "dark" AND ' \
-             'Content types: "image" AND ' \
-             'Earliest accessioned: "Last week" AND ' \
+             'Content type: "image" AND ' \
+             'First deposited date: "Last week" AND ' \
              'Embargo release date: ("Last day" AND "All") AND ' \
-             'Last accessioned date: 2024-01-01 TO 2024-12-31 AND ' \
-             'Last opened date: 2024-02-01 TO * AND ' \
+             'Last deposited date: 2024-01-01 TO 2024-12-31 AND ' \
+             'Last draft opened date: 2024-02-01 TO * AND ' \
              'Last published date: * TO 2024-11-30 AND ' \
-             'Object types: ("item" OR "collection") AND ' \
+             'Object type: ("item" OR "collection") AND ' \
              'Registered date: ("Last month" AND 2021-02-01 TO 2022-02-01)')
   end
 end

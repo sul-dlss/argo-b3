@@ -14,62 +14,62 @@ RSpec.describe 'Hierarchical facets', :solr do
 
     expect(page).to have_result_count(2)
 
-    find_facet_section('Projects').click
-    expect(page).to have_facet_value('Project 1', count: 2, facet: 'Projects')
-    expect(page).to have_facet_value('Project 2', count: 1, facet: 'Projects')
+    find_facet_section('Project').click
+    expect(page).to have_facet_value('Project 1', count: 2, facet: 'Project')
+    expect(page).to have_facet_value('Project 2', count: 1, facet: 'Project')
 
-    within(find_facet_section('Projects')) do
+    within(find_facet_section('Project')) do
       click_link('Project 1')
     end
 
     expect(page).to have_result_count(2)
-    expect(page).to have_current_filter('Projects', 'Project 1')
+    expect(page).to have_current_filter('Project', 'Project 1')
 
-    within(find_facet_section('Projects')) do
+    within(find_facet_section('Project')) do
       click_link('Remove', title: 'Remove Project 1')
     end
 
     expect(page).to have_result_count(2)
-    expect(page).not_to have_current_filter('Projects', 'Project 1', wait: 0)
+    expect(page).not_to have_current_filter('Project', 'Project 1', wait: 0)
 
-    find_facet_section('Projects').click
-    within(find_facet_section('Projects')) do
+    find_facet_section('Project').click
+    within(find_facet_section('Project')) do
       click_link('Project 2')
     end
 
     expect(page).to have_result_count(1)
-    expect(page).to have_current_filter('Projects', 'Project 2')
+    expect(page).to have_current_filter('Project', 'Project 2')
 
-    expect(page).to have_facet_value('Project 1', count: 1, facet: 'Projects')
-    expect(page).to have_facet_value('Project 2a', count: 1, facet: 'Projects')
+    expect(page).to have_facet_value('Project 1', count: 1, facet: 'Project')
+    expect(page).to have_facet_value('Project 2a', count: 1, facet: 'Project')
 
-    within(find_facet_section('Projects')) do
+    within(find_facet_section('Project')) do
       expect(page).to have_text('Project 2')
       expect(page).to have_no_link('Project 2', exact: true)
       click_link('Remove')
     end
 
     expect(page).to have_result_count(2)
-    expect(page).not_to have_current_filter('Projects', 'Project 2', wait: 0)
+    expect(page).not_to have_current_filter('Project', 'Project 2', wait: 0)
 
-    find_facet_section('Projects').click
-    find_facet_toggle('Project 2', facet_label: 'Projects').click
-    expect(page).to have_facet_value('Project 2a', count: 1, facet: 'Projects')
+    find_facet_section('Project').click
+    find_facet_toggle('Project 2', facet_label: 'Project').click
+    expect(page).to have_facet_value('Project 2a', count: 1, facet: 'Project')
 
-    within(find_facet_section('Projects')) do
+    within(find_facet_section('Project')) do
       click_link('Project 2a')
     end
 
     expect(page).to have_result_count(1)
-    expect(page).to have_current_filter('Projects', 'Project 2 : Project 2a')
+    expect(page).to have_current_filter('Project', 'Project 2 : Project 2a')
 
-    within(find_facet_section('Projects')) do
+    within(find_facet_section('Project')) do
       expect(page).to have_text('Project 2a')
       expect(page).to have_no_link('Project 2a', exact: true)
       click_link('Remove', title: 'Remove Project 2a')
     end
 
     expect(page).to have_result_count(2)
-    expect(page).not_to have_current_filter('Projects', 'Project 2 : Project 2a', wait: 0)
+    expect(page).not_to have_current_filter('Project', 'Project 2 : Project 2a', wait: 0)
   end
 end

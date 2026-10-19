@@ -14,11 +14,11 @@ RSpec.describe 'Facet search', :solr do
 
     expect(page).to have_result_count(2)
 
-    find_facet_section('Tags').click
-    expect(page).to have_facet_value('Tag 1', count: 2, facet: 'Tags')
-    expect(page).to have_facet_value('Tag 2', count: 1, facet: 'Tags')
+    find_facet_section('Tag').click
+    expect(page).to have_facet_value('Tag 1', count: 2, facet: 'Tag')
+    expect(page).to have_facet_value('Tag 2', count: 1, facet: 'Tag')
 
-    fill_in('Search these tags', with: 'Tag 2')
+    fill_in('Search tag', with: 'Tag 2')
 
     within(first('.list-group-item')) do
       expect(page).to have_css('.facet-label', text: 'Tag 2')
@@ -29,6 +29,6 @@ RSpec.describe 'Facet search', :solr do
     find('.list-group-item', text: 'Tag 2 : Tag 2a').click
 
     expect(page).to have_result_count(1)
-    expect(page).to have_current_filter('Tags', 'Tag 2 : Tag 2a')
+    expect(page).to have_current_filter('Tag', 'Tag 2 : Tag 2a')
   end
 end

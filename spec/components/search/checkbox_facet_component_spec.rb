@@ -17,7 +17,7 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
   it 'renders the facet' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Object types"] h3', text: 'Object types')
+    expect(page).to have_css('section[aria-label="Object type"] h3', text: 'Object type')
 
     expect(page).to have_css('form[action="/search"][method="get"]')
     expect(page).to have_field('query', with: 'test', type: 'hidden')

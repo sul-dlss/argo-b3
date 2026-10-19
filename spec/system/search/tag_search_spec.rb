@@ -23,6 +23,6 @@ RSpec.describe 'Tag search', :solr do
       expect(page).to have_result_count(5)
     end
 
-    expect(page).to have_selected_facet_value('Tag 2a', facet: 'Tags')
+    expect(page).to have_selected_facet_value('Tag 2a', facet: 'Tag')
   end
 end

@@ -48,17 +48,19 @@ en:
   search:
     # If not provided, will use humanized field name
     facets:
-      admin_policy_druids: "APOs"
-      collection_druids: "Collections"
-      earliest_accessioned_date: "Earliest accessioned"
-      earliest_accessioned_date_from: 'Earliest accessioned from'
-      earliest_accessioned_date_to: 'Earliest accessioned to'
-      formats: "Formats"
-      mimetypes: "MIME types"
-      mods_resource_types: "MODS resource types"
-      released_to_earthworks: "Released to Earthworks"
-      released_to_purl_sitemap: "Released to Search engines"
-      released_to_searchworks: "Released to Searchworks"
+      admin_policy_druids: "APO"
+      collection_druids: "Collection"
+      earliest_accessioned_date: "First deposited date"
+      last_accessioned_date: "Last deposited date"
+      last_opened_date: "Last draft opened date"
+      formats: "Format"
+      mimetypes: "MIME type"
+      dates: "Year"
+      access_rights: "Access rights"
+      mods_resource_types: "MODS resource type"
+      released_to_earthworks: "Released to EarthWorks"
+      released_to_purl_sitemap: "Released to search engines"
+      released_to_searchworks: "Released to SearchWorks"
       wps_workflows: "Workflow > Process > Status"
     facet_values:
       ever: "Currently released"

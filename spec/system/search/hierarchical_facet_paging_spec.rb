@@ -11,16 +11,16 @@ RSpec.describe 'Hierarchical facet paging', :solr do
   it 'returns facets' do
     visit search_path(query: 'test')
 
-    find_facet_section('Projects').click
+    find_facet_section('Project').click
 
-    expect(page).to have_facet_value('project 01', count: 1, facet: 'Projects')
-    expect(page).to have_facet_value('project 10', count: 1, facet: 'Projects')
-    expect(page).not_to have_facet_value('project 26', facet: 'Projects', wait: 0)
+    expect(page).to have_facet_value('project 01', count: 1, facet: 'Project')
+    expect(page).to have_facet_value('project 10', count: 1, facet: 'Project')
+    expect(page).not_to have_facet_value('project 26', facet: 'Project', wait: 0)
 
-    find_facet_more_link('Projects').click
+    find_facet_more_link('Project').click
 
-    expect(page).to have_facet_value('project 26', count: 1, facet: 'Projects')
-    expect(page).to have_facet_value('project 30', count: 1, facet: 'Projects')
+    expect(page).to have_facet_value('project 26', count: 1, facet: 'Project')
+    expect(page).to have_facet_value('project 30', count: 1, facet: 'Project')
 
     expect(page).to have_no_link('More', wait: 0)
   end

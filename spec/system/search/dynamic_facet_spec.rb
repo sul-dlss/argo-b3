@@ -17,30 +17,30 @@ RSpec.describe 'Dynamic facets', :solr do
 
     expect(page).to have_result_count(9)
 
-    # Released to Earthworks is a dynamic facet.
-    find_facet_section('Released to Earthworks').click
-    expect(page).to have_facet_value('Last week', count: 5, facet: 'Released to Earthworks')
-    expect(page).to have_facet_value('Last month', count: 5, facet: 'Released to Earthworks')
-    expect(page).to have_facet_value('Last year', count: 5, facet: 'Released to Earthworks')
-    expect(page).to have_facet_value('Currently released', count: 5, facet: 'Released to Earthworks')
-    expect(page).to have_facet_value('Not released', count: 4, facet: 'Released to Earthworks')
+    # Released to EarthWorks is a dynamic facet.
+    find_facet_section('Released to EarthWorks').click
+    expect(page).to have_facet_value('Last week', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Last month', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Last year', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Currently released', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Not released', count: 4, facet: 'Released to EarthWorks')
 
-    within(find_facet_section('Released to Earthworks')) do
+    within(find_facet_section('Released to EarthWorks')) do
       click_link('Currently released')
     end
 
     expect(page).to have_result_count(5)
     expect(page).to have_item_result(released_item_doc)
     expect(page).not_to have_item_result(not_released_item_doc, wait: 0)
-    expect(page).to have_current_filter('Released to Earthworks', 'Currently released')
-    expect(page).to have_facet('Released to Earthworks', expanded: true)
+    expect(page).to have_current_filter('Released to EarthWorks', 'Currently released')
+    expect(page).to have_facet('Released to EarthWorks', expanded: true)
 
-    within(find_facet_section('Released to Earthworks')) do
+    within(find_facet_section('Released to EarthWorks')) do
       click_link('Remove')
     end
 
     expect(page).to have_result_count(9)
-    expect(page).to have_facet('Released to Earthworks', expanded: false)
-    expect(page).not_to have_current_filter('Released to Earthworks', 'Currently released', wait: 0)
+    expect(page).to have_facet('Released to EarthWorks', expanded: false)
+    expect(page).not_to have_current_filter('Released to EarthWorks', 'Currently released', wait: 0)
   end
 end

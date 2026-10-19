@@ -23,7 +23,7 @@ RSpec.describe 'Project search', :solr do
       expect(page).to have_result_count(5)
     end
 
-    expect(page).to have_selected_facet_value('Project 2a', facet: 'Projects')
+    expect(page).to have_selected_facet_value('Project 2a', facet: 'Project')
   end
 
   context 'when there are more results than are initially displayed' do

@@ -24,8 +24,8 @@ RSpec.describe 'Current filters', :solr do
     expect(page).to have_current_filter('test')
 
     # Select a facet.
-    find_facet_section('Object types').click
-    within(find_facet_section('Object types')) do
+    find_facet_section('Object type').click
+    within(find_facet_section('Object type')) do
       check('item')
       check('agreement')
       click_button('Filter')
@@ -35,14 +35,14 @@ RSpec.describe 'Current filters', :solr do
     expect(page).to have_result_count(2)
     expect(page).to have_item_result(item_doc)
     expect(page).to have_current_filter('test')
-    expect(page).to have_current_filter('Object types', 'agreement OR item')
+    expect(page).to have_current_filter('Object type', 'agreement OR item')
 
     within(find_current_filters_section) do
-      click_link('Remove Object types > agreement OR item')
+      click_link('Remove Object type > agreement OR item')
     end
 
     expect(page).to have_result_count(3)
     expect(page).to have_current_filter('test')
-    expect(page).not_to have_current_filter('Object types', 'agreement OR item', wait: 0)
+    expect(page).not_to have_current_filter('Object type', 'agreement OR item', wait: 0)
   end
 end

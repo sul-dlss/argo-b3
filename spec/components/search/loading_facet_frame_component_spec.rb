@@ -8,6 +8,6 @@ RSpec.describe Search::LoadingFacetFrameComponent, type: :component do
   it 'renders the loading facet frame component' do
     render_inline(component)
 
-    expect(page).to have_css("turbo-frame#projects-facet[src='/search/project_facets'] h3", text: 'Projects')
+    expect(page).to have_css("turbo-frame#projects-facet[src='/search/project_facets'] h3", text: 'Project')
   end
 end
