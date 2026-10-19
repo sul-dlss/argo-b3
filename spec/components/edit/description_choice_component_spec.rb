@@ -23,7 +23,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
   context 'when the title is retrieved from the catalog' do
     let(:new_item_form) do
       NewItemForm.new(description_choice: NewItemForm::DESCRIPTION_CATALOG_ID_CHOICE, catalog_record_id: 'in11403803',
-                      catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
+                      barcode: '36105010362304', catalog_link_part_label: 'v. 1', catalog_link_sort_key: '1')
     end
 
     it 'renders the catalog id state' do
@@ -31,6 +31,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
 
       expect(page).to have_field('Retrieve description from FOLIO', type: 'radio', checked: true)
       expect(page).to have_field('FOLIO Instance HRID', type: 'text', with: 'in11403803')
+      expect(page).to have_field('Barcode', type: 'text', with: '36105010362304')
       expect(page).to have_field('Part label', type: 'text', with: 'v. 1')
       expect(page).to have_field('Sort key', type: 'text', with: '1')
 
@@ -63,7 +64,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       expect(field_row).to have_no_css('[data-catalog-title-target="error"].d-block', visible: :all)
 
       # Hidden until a title is retrieved.
-      expect(page).to have_css('.row[data-catalog-title-target="titleRow"][hidden]', visible: :all)
+      expect(page).to have_css('[data-catalog-title-target="titleRow"][hidden]', visible: :all)
       expect(page.find('input[data-catalog-title-target="title"]', visible: :hidden)[:value]).to be_blank
     end
   end

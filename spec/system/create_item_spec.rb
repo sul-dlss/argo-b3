@@ -682,7 +682,7 @@ RSpec.describe 'Create an item' do
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
         click_button 'Preview FOLIO record'
 
-        expect(page).to have_text("FOLIO title statement\n#{title}")
+        expect(page).to have_text("FOLIO title statement: #{title}")
         expect(CatalogRepository).to have_received(:title).with(catalog_record_id:)
       end
 
@@ -699,7 +699,7 @@ RSpec.describe 'Create an item' do
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
         click_button 'Preview FOLIO record'
 
-        expect(page).to have_text("FOLIO title statement\n#{title}")
+        expect(page).to have_text("FOLIO title statement: #{title}")
         expect(page).to have_no_css('.invalid-feedback', text: "can't be blank")
         expect(page).to have_no_css('#item_catalog_record_id.is-invalid')
       end
@@ -710,21 +710,21 @@ RSpec.describe 'Create an item' do
         choose 'Retrieve description from FOLIO'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
         click_button 'Preview FOLIO record'
-        expect(page).to have_text("FOLIO title statement\n#{title}")
+        expect(page).to have_text("FOLIO title statement: #{title}")
 
         # Leaving the APO blank so that the form is redisplayed with an error.
         find_by_id('deposit-tab').click
         click_button('Register only')
 
         find_by_id('description-tab').click
-        expect(page).to have_text("FOLIO title statement\n#{title}")
+        expect(page).to have_text("FOLIO title statement: #{title}")
       end
 
       it 'clears the title when the FOLIO Instance HRID is changed' do
         choose 'Retrieve description from FOLIO'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
         click_button 'Preview FOLIO record'
-        expect(page).to have_text("FOLIO title statement\n#{title}")
+        expect(page).to have_text("FOLIO title statement: #{title}")
 
         fill_in 'FOLIO Instance HRID', with: 'in999'
 
