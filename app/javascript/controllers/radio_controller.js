@@ -46,6 +46,13 @@ export default class extends Controller {
     buttons.forEach((button) => {
       button.disabled = disable
     })
+    // Elements that have radio-disableable class are sent a radio:disable or radio:enable event
+    // so that elements that aren't form inputs (e.g., a dropzone) can disable / enable themselves.
+    // For example: data-action="radio:disable->dropzone#disable radio:enable->dropzone#enable"
+    const disableableEls = containerElem.querySelectorAll('.radio-disableable')
+    disableableEls.forEach((el) => {
+      this.dispatch(disable ? 'disable' : 'enable', { target: el, bubbles: false })
+    })
     // Elements that have radio-hide class will be hidden when the radio is not selected.
     const hideEls = containerElem.querySelectorAll('.radio-hide')
     hideEls.forEach((el) => {
