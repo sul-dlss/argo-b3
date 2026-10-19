@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Prepares a git worktree of this repo for running specs and linters.
+# Usage (from the new worktree): bin/setup-worktree [SOURCE_CHECKOUT]
+# SOURCE_CHECKOUT defaults to the main worktree. The database is shared, so it is not touched.
+require 'fileutils'
+
+APP_ROOT = File.expand_path('..', __dir__)
+
+# Gitignored files that specs and the app need.
+LOCAL_FILES = %w[.ruby-version .env-server config/master.key config/settings.local.yml
+                 config/settings/*.local.yml].freeze
+
+def system!(*)
+  system(*, exception: true)
+end
+
+FileUtils.chdir APP_ROOT do
+  source = ARGV.first || `git worktree list --porcelain`[/\Aworktree (.+)$/, 1]
+  abort 'Run this from a worktree, not the source checkout.' if File.realpath(source) == File.realpath(APP_ROOT)
+
+  puts "== Copying local files from #{source} =="
+  LOCAL_FILES.flat_map { |pattern| Dir.glob(pattern, base: source) }.each do |path|
+    next if File.exist?(path)
+
+    FileUtils.mkdir_p(File.dirname(path))
+    FileUtils.cp(File.join(source, path), path)
+    puts "  #{path}"
+  end
+
+  puts "\n== Installing dependencies =="
+  system('bundle check') || system!('bundle install')
+  system!('yarn install --check-files')
+
+  puts "\n== Building assets =="
+  system!('yarn build:css')
+end
