@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# Stubs the DSA object client (Dor::Services::Client.object(druid)) with everything the object show page calls.
-# When a new DSA client call is added to the show page, add it here so every spec that lands on the show page
-# picks it up.
+# Stubs the DSA object client (Dor::Services::Client.object(druid)) and the PURL preview with everything the object
+# show page calls. When a new DSA client or external call is added to the show page, add it here so every spec that
+# lands on the show page picks it up.
 #
 # Requires `druid`. Override the value lets (e.g., `version_inventory`, `milestones`, `release_tags`, `events`,
 # `event_types`) or the `version_status` double for the data a spec cares about.
@@ -44,6 +44,8 @@ RSpec.shared_context 'with show page object client' do
   before do
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Dor::Services::Client).to receive(:event_types).and_return(event_types_client)
+    # The Description tab loads a PURL preview.
+    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
     # Filters by event type when given, as DSA does.
     allow(events_client).to receive(:list) do |event_types:, **|
       event_types ? events.select { |event| event_types.include?(event.event_type) } : events

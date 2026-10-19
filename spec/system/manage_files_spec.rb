@@ -32,7 +32,6 @@ RSpec.describe 'Manage files' do
     allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
     allow(StageFilesJob).to receive(:perform_later)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
-    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
   end
 
   def upload_file(filename)

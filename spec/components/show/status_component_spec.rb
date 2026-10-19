@@ -12,8 +12,7 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:object_type) { 'item' }
 
   let(:version_service) do
-    instance_double(Sdr::VersionService, assembling?: assembling, accessioning?: accessioning, closed?: closed,
-                                         editable?: editable)
+    version_service_double(assembling?: assembling, accessioning?: accessioning, closed?: closed, editable?: editable)
   end
   let(:closed) { false }
   let(:editable) { false }

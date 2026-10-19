@@ -32,7 +32,6 @@ RSpec.describe 'Edit an item' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
     allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
-    allow(PurlPreviewService).to receive(:call).and_return('<html><body><main></main></body></html>')
   end
 
   it 'edits the item and deposits' do

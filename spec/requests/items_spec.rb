@@ -31,7 +31,7 @@ RSpec.describe 'Items' do
     let(:druid) { 'druid:bc123df4567' }
     let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
     let(:version_service) do
-      instance_double(Sdr::VersionService, open?: open, editable?: true, version_description: 'Fixing the title')
+      version_service_double(open?: open, editable?: true, version_description: 'Fixing the title')
     end
 
     before do
@@ -140,8 +140,7 @@ RSpec.describe 'Items' do
     let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
     let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
     let(:version_service) do
-      instance_double(Sdr::VersionService, open?: open, editable?: editable, version_description: 'Changed type',
-                                           update_description: nil)
+      version_service_double(open?: open, editable?: editable, version_description: 'Changed type')
     end
     let(:open) { true }
     let(:editable) { true }

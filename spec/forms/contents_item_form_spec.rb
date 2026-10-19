@@ -11,7 +11,7 @@ RSpec.describe ContentsItemForm do
   end
   # Defaults to the initial version, for which a version description is not required.
   let(:version_service) do
-    instance_double(Sdr::VersionService, open?: true, version: 1, version_description: 'Initial version')
+    version_service_double(open?: true, version: 1, version_description: 'Initial version')
   end
 
   before do
@@ -153,7 +153,7 @@ RSpec.describe ContentsItemForm do
 
     context 'when not the initial version' do
       let(:version_service) do
-        instance_double(Sdr::VersionService, open?: false, version: 1, version_description: 'Initial version')
+        version_service_double(open?: false, version: 1, version_description: 'Initial version')
       end
 
       it 'is required' do
@@ -181,7 +181,7 @@ RSpec.describe ContentsItemForm do
 
     context 'when the version is closed' do
       let(:version_service) do
-        instance_double(Sdr::VersionService, open?: false, version: 1, version_description: 'Initial version')
+        version_service_double(open?: false, version: 1, version_description: 'Initial version')
       end
 
       it 'leaves the description blank' do
@@ -207,8 +207,7 @@ RSpec.describe ContentsItemForm do
   describe '#save!' do
     let(:user_name) { 'jlittman' }
     let(:version_service) do
-      instance_double(Sdr::VersionService, open?: open, version:, version_description: 'Added files',
-                                           update_description: nil)
+      version_service_double(open?: open, version:, version_description: 'Added files')
     end
     let(:version) { 2 }
     let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
