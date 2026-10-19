@@ -216,7 +216,7 @@ Rails.application.routes.draw do
 
   resources :multiple_items, only: %i[new create show]
 
-  resources :multi_item_deposit_actions, only: %i[create edit]
+  resources :multi_item_deposit_actions, only: %i[create edit update]
 
   resources :contents, only: %i[edit show update] do
     resource :dropzone, only: %i[update], controller: 'content_dropzone'

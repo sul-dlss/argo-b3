@@ -34,6 +34,9 @@ en:
       date_time: "%Y-%m-%d %H:%M:%S PT"
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
+    mount_path:
+      not_found: "does not exist"
+      not_in_mount_location: "must be within a mount location"
   release_tags:
     earthworks: "EarthWorks (requires geo coordinates or release will not be successful)"
     purl_sitemap: "Search engines"
@@ -331,9 +334,6 @@ en:
           help_text: "Assigning a license may improve discovery of your work in web searches."
         mount_path:
           label: "Mount path"
-          validations:
-            not_found: "does not exist"
-            not_in_mount_location: "must be within a mount location"
         multiple_tags:
           label: 'Enter multiple tags'
           button: 'Add tags'
@@ -381,6 +381,47 @@ en:
     multi_item_deposits:
       edit:
         title: "Multi-item deposit"
+        buttons:
+          cancel: "Cancel"
+          discover: "Discover files and check manifest"
+          next: "Next"
+        discovery_results:
+          heading: "Results of checking manifest"
+        discovery_errors_alert:
+          title: "We found errors with the manifest."
+          body: 'Please fix your manifest and / or files and click "%{discover_label}" again.'
+        no_discovery_errors_alert:
+          title: "No errors with manifest"
+          body: 'Click "%{next_label}" to proceed.'
+      fields:
+        description:
+          label: "Describe this deposit"
+        discovery:
+          label: "Discover files and check manifest"
+          help_text: >-
+            Upload your manifest and files, and we will check for errors.
+            You can include structural metadata when adding your files or upload it by itself on the next page.
+        file_location:
+          label: "Select how to upload files"
+          globus:
+            label: "Globus"
+          mount:
+            label: "Use files from mount"
+        mount_path:
+          label: "Mount path"
+        manifest_file:
+          label: "Upload manifest file"
+          retained: "A manifest has been uploaded. Choose a file to replace it."
+        manifest_source:
+          label: "Upload manifest"
+          mount:
+            label: "Include with your files below"
+          upload:
+            label: "Upload from a computer"
+          validations:
+            manifest_not_found: "%{filename} not found in the mount path"
+      wait:
+        message: "Processing..."
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."
@@ -402,6 +443,13 @@ en:
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
   multi_item_deposit:
+    error_details:
+      label: 'Error details'
+      headers:
+        druid: 'Druid'
+        error: 'Error'
+        folder: 'Folder'
+        manifest_line_number: 'Manifest line number'
     discover_files:
       errors:
         object_not_found: 'Object not found'

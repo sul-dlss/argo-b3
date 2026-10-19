@@ -1,0 +1,10 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multiple_items %>">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
+
+  <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: t('edit.multi_item_deposits.wait.message'), message_position: :bottom, classes: 'align-items-center') %>
+</div>

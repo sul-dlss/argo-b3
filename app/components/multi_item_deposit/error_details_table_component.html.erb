@@ -1,0 +1,37 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(label:, responsive: true) do |component| %>
+  <% component.with_caption do %>
+    <%= label %>
+  <% end %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.manifest_line_number')) %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.druid')) %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.folder')) %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.error')) %>
+  <% item_deposit_actions.each do |item_deposit_action| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= item_deposit_action.manifest_line_number %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= bare_druid(item_deposit_action) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= item_deposit_action.path %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
+          <%# Errors are styled like validation errors; warnings are not. %>
+          <% item_deposit_action.discovery_errors.each do |error| %>
+            <% list_component.with_item do %>
+              <%= tag.span(error, class: 'text-danger') %>
+            <% end %>
+          <% end %>
+          <% item_deposit_action.discovery_warnings.each do |warning| %>
+            <% list_component.with_item do %>
+              <%= tag.span(warning) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

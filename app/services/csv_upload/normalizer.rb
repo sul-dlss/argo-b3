@@ -21,7 +21,8 @@ module CsvUpload
     # Reads uploaded file (could be csv or Excel) and normalizes to CSV.
     # This includes handling BOM and druids without prefixes.
     # @return [String] csv
-    # @raise [Error] if unsupported file type or the file cannot be read, e.g., invalid byte sequence or malformed CSV
+    # @raise [Error] if unsupported file type or the file cannot be read, e.g., invalid byte sequence, malformed CSV,
+    #   or permission denied
     def read # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/MethodLength
       raise Error, 'Unsupported upload file type' unless normalized_file_extension.in?(SUPPORTED_FILE_EXTENSIONS)
 
@@ -54,6 +55,8 @@ module CsvUpload
       raise Error, e.message
     rescue Zip::Error => e
       raise Error, "Spreadsheet could not be opened: #{e.message}"
+    rescue SystemCallError => e
+      raise Error, "File could not be read: #{e.message}"
     end
 
     private
