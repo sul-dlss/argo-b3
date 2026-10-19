@@ -21,3 +21,5 @@ ignore_unused:
   - 'errors.not_authorized'
   # Built from symbol keys in MultiItemDeposit::DiscoverFilesJob#message.
   - 'multi_item_deposit.discover_files.*'
+  # Built from symbol keys in MultiItemDeposit::StructureJob#message.
+  - 'multi_item_deposit.structure.*'
