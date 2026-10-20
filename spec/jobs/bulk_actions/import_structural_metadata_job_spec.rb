@@ -192,7 +192,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
   end
 
   context 'when there is an existing mutable content' do
-    let!(:existing_content) { create(:content, druid:, lock: cocina_object.lock, immutable: false) }
+    let!(:existing_content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
 
     it 'destroys it and imports' do
       job.perform_now
@@ -204,7 +204,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
 
   context 'when files are being staged for the object' do
     before do
-      create(:content, druid:, lock: cocina_object.lock, immutable: false, staging_state: 'staging')
+      create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging')
     end
 
     it 'does not import' do

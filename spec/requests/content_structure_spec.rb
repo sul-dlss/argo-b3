@@ -173,7 +173,7 @@ RSpec.describe 'Content structure' do
   end
 
   describe 'uploading a structural CSV' do
-    let(:content) { create(:content, druid:, lock: cocina_object.lock, immutable: false) }
+    let(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
     let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
     let(:content_file_binary) do
       create(:content_file_binary, content:, filepath: 'page_0001.tif', mime_type: 'image/tiff')

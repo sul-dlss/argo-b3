@@ -7,7 +7,7 @@ RSpec.describe StageFilesJob do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:user) { create(:user) }
-  let(:content) { create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging') }
+  let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
   let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
   let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
@@ -165,8 +165,8 @@ RSpec.describe StageFilesJob do
 
       context 'with OCR settings' do
         let(:content) do
-          create(:content, druid:, lock: 'druid-version-1', immutable: false, staging_state: 'staging',
-                           perform_ocr: true, ocr_languages: ['English'])
+          create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging',
+                                     perform_ocr: true, ocr_languages: ['English'])
         end
 
         it 'passes them on to accessioning' do
@@ -180,7 +180,7 @@ RSpec.describe StageFilesJob do
     end
 
     context "when the content's lock does not match the current cocina object's lock" do
-      let(:content) { create(:content, druid:, lock: 'stale-lock', immutable: false, staging_state: 'staging') }
+      let(:content) { create(:content, :mutable, druid:, lock: 'stale-lock', staging_state: 'staging') }
 
       it 'does not mint identifiers, analyze, stage, or update SDR' do
         job.perform(content:, user:)

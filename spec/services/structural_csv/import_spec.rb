@@ -12,7 +12,7 @@ RSpec.describe StructuralCsv::Import do
       'rights_download,rights_location,mimetype,role,file_language,sdr_generated_text,corrected_for_accessibility'
   end
 
-  let(:content) { create(:content, druid: 'druid:bc123df4567', immutable: false) }
+  let(:content) { create(:content, :mutable, druid: 'druid:bc123df4567') }
 
   let(:image1_binary) { create_binary('image1.tif') }
   let(:image2_binary) { create_binary('image2.tif') }
