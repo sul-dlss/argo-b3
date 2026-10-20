@@ -495,6 +495,10 @@ en:
       toasts:
         completed: 'Completed discovering files'
     structure:
+      errors:
+        no_rows: 'No rows for this object in the structural metadata CSV'
+        files_not_in_csv: 'Files not in structural metadata CSV: %{filepaths}'
+        unexpected: 'An unexpected error occurred while building the structure. Contact SDR support for assistance.'
       toasts:
         completed: 'Completed building structure'
   bulk_actions:
