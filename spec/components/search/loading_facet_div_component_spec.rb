@@ -8,6 +8,6 @@ RSpec.describe Search::LoadingFacetDivComponent, type: :component do
   it 'renders the loading facet div component' do
     render_inline(component)
 
-    expect(page).to have_css('div#object-types-facet h3', text: 'Object types')
+    expect(page).to have_css('div#object-types-facet h3', text: 'Object type')
   end
 end

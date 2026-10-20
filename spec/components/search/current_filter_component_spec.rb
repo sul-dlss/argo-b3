@@ -19,10 +19,10 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: /Projects\s+❯\s+Project 1/)
+      expect(page).to have_css('li', text: /Project\s+❯\s+Project 1/)
       expect(page).to have_link('', href: '/search?object_types%5B%5D=item&object_types%5B%5D=collection' \
                                           '&projects%5B%5D=Project+2',
-                                    title: 'Remove Projects > Project 1')
+                                    title: 'Remove Project > Project 1')
     end
   end
 
@@ -39,10 +39,10 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the values in a single current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: /Object types\s+❯\s+item OR collection/)
+      expect(page).to have_css('li', text: /Object type\s+❯\s+item OR collection/)
       expect(page).to have_link('',
                                 href: '/search?projects%5B%5D=Project+1',
-                                title: 'Remove Object types > item OR collection')
+                                title: 'Remove Object type > item OR collection')
     end
   end
 
@@ -58,7 +58,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: /Released to Earthworks\s+❯\s+Last year/)
+      expect(page).to have_css('li', text: /Released to EarthWorks\s+❯\s+Last year/)
     end
   end
 
@@ -71,7 +71,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     it 'renders the resolved label instead of the raw druid' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: /APOs\s+❯\s+University Archives/)
+      expect(page).to have_css('li', text: /APO\s+❯\s+University Archives/)
     end
 
     context 'when the druid has no resolved label' do
@@ -80,7 +80,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       it 'falls back to the raw druid' do
         render_inline(component)
 
-        expect(page).to have_css('li', text: /APOs\s+❯\s+druid:bc123df4567/)
+        expect(page).to have_css('li', text: /APO\s+❯\s+druid:bc123df4567/)
       end
     end
   end

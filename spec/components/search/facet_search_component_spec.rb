@@ -12,7 +12,7 @@ RSpec.describe Search::FacetSearchComponent, type: :component do
 
     expect(page).to have_css('div[data-controller="autocomplete form-submit"][data-autocomplete-url-value=' \
                              '"/search/tag_facets/search?query=test&tags%5B%5D=test+%3A+tag"]')
-    expect(page).to have_field('Search these tags', type: 'text')
+    expect(page).to have_field('Search tag', type: 'text')
     expect(page).to have_css("form[action='/search'][method='get']")
     expect(page).to have_field('query', with: 'test', type: 'hidden')
     expect(page).to have_field('tags[]', with: 'test : tag', type: 'hidden')

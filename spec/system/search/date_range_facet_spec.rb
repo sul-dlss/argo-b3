@@ -18,15 +18,15 @@ RSpec.describe 'Date range dynamic facets', :solr do
 
     expect(page).to have_result_count(2)
 
-    # Earliest accessioned is a dynamic facet.
-    find_facet_section('Earliest accessioned').click
-    expect(page).to have_facet_value('Last day', count: 1, facet: 'Earliest accessioned')
-    expect(page).to have_facet_value('Last week', count: 1, facet: 'Earliest accessioned')
-    expect(page).to have_facet_value('Last month', count: 1, facet: 'Earliest accessioned')
-    expect(page).to have_facet_value('Last year', count: 2, facet: 'Earliest accessioned')
-    expect(page).to have_facet_value('All', count: 2, facet: 'Earliest accessioned')
+    # First deposited date is a dynamic facet.
+    find_facet_section('First deposited date').click
+    expect(page).to have_facet_value('Last day', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Last week', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Last month', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Last year', count: 2, facet: 'First deposited date')
+    expect(page).to have_facet_value('All', count: 2, facet: 'First deposited date')
 
-    within(find_facet_section('Earliest accessioned')) do
+    within(find_facet_section('First deposited date')) do
       fill_in 'From', with: from.strftime('%m-%d-%Y')
       fill_in 'To', with: to.strftime('%m-%d-%Y')
       click_button 'Filter'
@@ -36,13 +36,13 @@ RSpec.describe 'Date range dynamic facets', :solr do
     expect(page).to have_item_result(year_ago_item_doc)
     expect(page).not_to have_item_result(now_item_doc, wait: 0)
 
-    expect(page).to have_current_filter('Earliest accessioned from', from.strftime('%Y-%m-%d'))
-    expect(page).to have_current_filter('Earliest accessioned to', to.strftime('%Y-%m-%d'))
-    expect(page).to have_facet('Earliest accessioned', expanded: true)
+    expect(page).to have_current_filter('Earliest accessioned date from', from.strftime('%Y-%m-%d'))
+    expect(page).to have_current_filter('Earliest accessioned date to', to.strftime('%Y-%m-%d'))
+    expect(page).to have_facet('First deposited date', expanded: true)
 
-    find_current_filter('Earliest accessioned from', from.strftime('%Y-%m-%d')).click
+    find_current_filter('Earliest accessioned date from', from.strftime('%Y-%m-%d')).click
     within(find_current_filters_section) do
-      click_link('Remove Earliest accessioned to')
+      click_link('Remove Earliest accessioned date to')
     end
     expect(page).to have_result_count(2)
   end

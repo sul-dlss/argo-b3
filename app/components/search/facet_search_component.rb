@@ -30,7 +30,7 @@ module Search
     end
 
     def label
-      "Search these #{helpers.facet_label(form_field).downcase}"
+      "Search #{helpers.facet_label(form_field).downcase}"
     end
 
     def id

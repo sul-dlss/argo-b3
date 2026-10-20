@@ -13,10 +13,10 @@ RSpec.describe 'Show search page', :solr do
     visit search_path
 
     # Shows home page facets
-    expect(page).to have_facet('Object types', expanded: false)
-    find_facet_section('Object types').click
-    expect(page).to have_facet_value('item', facet: 'Object types', count: 4)
-    expect(page).to have_facet_value('collection', facet: 'Object types', count: 3)
+    expect(page).to have_facet('Object type', expanded: false)
+    find_facet_section('Object type').click
+    expect(page).to have_facet_value('item', facet: 'Object type', count: 4)
+    expect(page).to have_facet_value('collection', facet: 'Object type', count: 3)
 
     # Does not show non-home page facets
     expect(page).not_to have_facet('Project Tags', wait: 0)

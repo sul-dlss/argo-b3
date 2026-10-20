@@ -83,7 +83,8 @@ module Search
       limit: 25,
       facet_resource: :admin_policy_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      alpha_sort: true
     )
 
     # Facets and filters on the druid (a title is not a unique identifier), but displays the title
@@ -96,7 +97,8 @@ module Search
       limit: 25,
       facet_resource: :collection_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      alpha_sort: true
     )
 
     DATES = Config.with_defaults(
@@ -185,7 +187,8 @@ module Search
       form_field: :licenses,
       field: Search::Fields::LICENSE_URI,
       composite_facet_field: Search::Fields::LICENSE_LABEL_URI,
-      limit: 50
+      limit: 50,
+      alpha_sort: true
     )
 
     MIMETYPES = Config.with_defaults(
@@ -214,7 +217,8 @@ module Search
     FORMATS = Config.with_defaults(
       form_field: :formats,
       field: Search::Fields::FORMATS,
-      limit: 100
+      limit: 100,
+      alpha_sort: true
     )
 
     GENRES = Config.with_defaults(
@@ -360,7 +364,8 @@ module Search
     VERSIONS = Config.with_defaults(
       form_field: :versions,
       field: Search::Fields::VERSION,
-      limit: 100
+      limit: 100,
+      alpha_sort: true
     )
 
     WORKFLOWS = Config.with_defaults(

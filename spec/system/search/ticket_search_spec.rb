@@ -28,19 +28,19 @@ RSpec.describe 'Project search', :solr do
       expect(page).to have_item_result(solr_item)
     end
 
-    expect(page).to have_selected_facet_value('TESTREQ-0', facet: 'Tickets')
+    expect(page).to have_selected_facet_value('TESTREQ-0', facet: 'Ticket')
 
-    find_current_filter('Tickets', 'TESTREQ-0').click_link('Remove')
+    find_current_filter('Ticket', 'TESTREQ-0').click_link('Remove')
 
     find_search_field.fill_in(with: 'test')
     click_button('Search')
 
-    find_facet_section('Tickets').click
-    expect(page).to have_facet_value('TESTREQ-0', count: 1, facet: 'Tickets')
-    expect(page).not_to have_facet_value('TESTREQ-Z9', count: 1, facet: 'Tickets', wait: 0)
+    find_facet_section('Ticket').click
+    expect(page).to have_facet_value('TESTREQ-0', count: 1, facet: 'Ticket')
+    expect(page).not_to have_facet_value('TESTREQ-Z9', count: 1, facet: 'Ticket', wait: 0)
 
-    find_facet_more_link('Tickets').click
+    find_facet_more_link('Ticket').click
 
-    expect(page).to have_facet_value('TESTREQ-Z9', count: 1, facet: 'Tickets')
+    expect(page).to have_facet_value('TESTREQ-Z9', count: 1, facet: 'Ticket')
   end
 end

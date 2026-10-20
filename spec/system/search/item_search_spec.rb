@@ -146,7 +146,7 @@ RSpec.describe 'Item search', :solr do
         find_object_type_field.select('Collection')
         click_button('Search')
 
-        expect(page).to have_current_filter('Object types', 'collection')
+        expect(page).to have_current_filter('Object type', 'collection')
         within(find_item_results_section) do
           expect(page).to have_result_count(5)
           expect(page).to have_item_result(collection_doc)
@@ -159,13 +159,13 @@ RSpec.describe 'Item search', :solr do
         visit search_path('object_types[]': 'collection')
 
         expect(page).to have_result_count(5)
-        expect(page).to have_current_filter('Object types', 'collection')
+        expect(page).to have_current_filter('Object type', 'collection')
 
         find_search_field.fill_in(with: collection_doc[Search::Fields::TITLE])
         click_button('Search')
 
         expect(page).to have_result_count(1)
-        expect(page).to have_current_filter('Object types', 'collection')
+        expect(page).to have_current_filter('Object type', 'collection')
       end
     end
   end

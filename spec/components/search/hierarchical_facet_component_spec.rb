@@ -29,7 +29,7 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
   it 'renders the hierarchical facet' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Tags"] h3', text: 'Tags')
+    expect(page).to have_css('section[aria-label="Tag"] h3', text: 'Tag')
     # There is a turbo-frame around the facet values
     expect(page).to have_css('turbo-frame#tags-facet-page1 ul')
 
@@ -43,7 +43,7 @@ RSpec.describe Search::HierarchicalFacetComponent, type: :component do
     it 'renders the facet search input' do
       render_inline(component)
 
-      expect(page).to have_field('Search these tags', type: 'text')
+      expect(page).to have_field('Search tag', type: 'text')
     end
   end
 

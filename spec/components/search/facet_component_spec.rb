@@ -22,7 +22,7 @@ RSpec.describe Search::FacetComponent, type: :component do
   it 'renders the facet' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Object types"] h3 button[aria-expanded="true"]', text: 'Object types')
+    expect(page).to have_css('section[aria-label="Object type"] h3 button[aria-expanded="true"]', text: 'Object type')
     # There is a turbo-frame around the facet values
     expect(page).to have_css('turbo-frame#object-types-facet-page1 ul')
 
@@ -37,7 +37,7 @@ RSpec.describe Search::FacetComponent, type: :component do
   end
 
   context 'when paging is enabled' do
-    # Object types doesn't have facet_path_helper, so borrowing from projects facet for test.
+    # Object type doesn't have facet_path_helper, so borrowing from projects facet for test.
     let(:facet_page_path_helper) { Search::FacetPathResolver.index_path_helper(facet_config: Search::Facets::PROJECTS, search_form:) }
 
     before do
@@ -59,7 +59,7 @@ RSpec.describe Search::FacetComponent, type: :component do
     it 'renders the facet search input' do
       render_inline(component)
 
-      expect(page).to have_field('Search these object types', type: 'text')
+      expect(page).to have_field('Search object type', type: 'text')
     end
   end
 

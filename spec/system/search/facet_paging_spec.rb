@@ -11,15 +11,15 @@ RSpec.describe 'Facet paging', :solr do
   it 'returns facets' do
     visit search_path(query: 'test')
 
-    find_facet_section('MIME types').click
+    find_facet_section('MIME type').click
 
-    expect(page).to have_facet_value('application/test01', count: 1, facet: 'MIME types')
-    expect(page).to have_facet_value('application/test10', count: 1, facet: 'MIME types')
-    expect(page).not_to have_facet_value('application/test11', facet: 'MIME types', wait: 0)
+    expect(page).to have_facet_value('application/test01', count: 1, facet: 'MIME type')
+    expect(page).to have_facet_value('application/test10', count: 1, facet: 'MIME type')
+    expect(page).not_to have_facet_value('application/test11', facet: 'MIME type', wait: 0)
 
-    find_facet_more_link('MIME types').click
-    expect(page).to have_facet_value('application/test11', count: 1, facet: 'MIME types')
-    expect(page).to have_facet_value('application/test15', count: 1, facet: 'MIME types')
+    find_facet_more_link('MIME type').click
+    expect(page).to have_facet_value('application/test11', count: 1, facet: 'MIME type')
+    expect(page).to have_facet_value('application/test15', count: 1, facet: 'MIME type')
 
     expect(page).to have_no_link('More', wait: 0)
   end

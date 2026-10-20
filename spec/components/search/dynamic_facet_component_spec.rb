@@ -19,7 +19,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
   it 'renders the facet' do
     render_inline(component)
 
-    expect(page).to have_css('section[aria-label="Released to Earthworks"] h3', text: 'Released to Earthworks')
+    expect(page).to have_css('section[aria-label="Released to EarthWorks"] h3', text: 'Released to EarthWorks')
 
     # Add a new facet value
     item = page.find('li', text: 'Last month')
@@ -52,7 +52,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
     it 'renders the date range inputs' do
       render_inline(component)
 
-      expect(page).to have_css('section[aria-label="Earliest accessioned"]')
+      expect(page).to have_css('section[aria-label="First deposited date"]')
 
       expect(page).to have_field('From', type: 'date')
       expect(page).to have_field('To', type: 'date')
