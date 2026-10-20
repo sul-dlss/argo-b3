@@ -299,6 +299,9 @@ module Search
 
     RELEASED_TO_EARTHWORKS = Config.with_defaults(
       form_field: :released_to_earthworks,
+      date_from_form_field: :released_to_earthworks_date_from,
+      date_to_form_field: :released_to_earthworks_date_to,
+      field: Search::Fields::RELEASED_TO_EARTHWORKS,
       dynamic_facet: {
         last_week: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_WEEK}",
         last_month: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_MONTH}",
@@ -310,6 +313,9 @@ module Search
 
     RELEASED_TO_PURL_SITEMAP = Config.with_defaults(
       form_field: :released_to_purl_sitemap,
+      date_from_form_field: :released_to_purl_sitemap_date_from,
+      date_to_form_field: :released_to_purl_sitemap_date_to,
+      field: Search::Fields::RELEASED_TO_PURL_SITEMAP,
       dynamic_facet: {
         last_week: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_WEEK}",
         last_month: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_MONTH}",
@@ -321,6 +327,9 @@ module Search
 
     RELEASED_TO_SEARCHWORKS = Config.with_defaults(
       form_field: :released_to_searchworks,
+      date_from_form_field: :released_to_searchworks_date_from,
+      date_to_form_field: :released_to_searchworks_date_to,
+      field: Search::Fields::RELEASED_TO_SEARCHWORKS,
       dynamic_facet: {
         last_week: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_WEEK}",
         last_month: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_MONTH}",
