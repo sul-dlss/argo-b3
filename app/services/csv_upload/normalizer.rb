@@ -74,11 +74,20 @@ module CsvUpload
     # 3. Removes line feeds at the end of lines (`CSV#parse` wants newlines)
     def normalized_csv_string
       csv = File.read(path, encoding: 'bom|utf-8')
+      validate_encoding!(csv)
       lines = csv.split(/\r?\n/)
       lines.shift until lines.first&.match?(/\Adruid,/i) || lines.empty?
       return csv if lines.empty?
 
       lines.join("\n")
+    end
+
+    def validate_encoding!(csv)
+      return if csv.valid_encoding?
+
+      # Check physical lines before normalization changes their numbers or CSV parsing touches the invalid bytes.
+      line_number = csv.each_line.with_index(1).find { |line, _number| !line.valid_encoding? }.last
+      raise Error, "CSV contains invalid UTF-8 bytes on line #{line_number}."
     end
 
     def whitespace_only_nullifier

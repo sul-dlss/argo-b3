@@ -50,5 +50,58 @@ RSpec.describe Contents::MountDiscoverer do
                                                               md5_digest: nil, sha1_digest: nil)
       end
     end
+
+    context 'when a filename contains invalid UTF-8 bytes' do
+      let(:invalid_filepath) { "bad\xFF.txt" }
+      let(:expected_error) { 'Filepaths contain invalid UTF-8 bytes: "bad\\xFF.txt"' }
+
+      before do
+        # Some filesystems (including macOS) cannot create filenames containing invalid UTF-8 bytes.
+        allow(Dir).to receive(:glob).and_call_original
+        allow(Dir).to receive(:glob).with('**/*', File::FNM_DOTMATCH, base: mount_path)
+                                    .and_return(['file1.txt', invalid_filepath])
+        allow(File).to receive(:file?).and_call_original
+        allow(File).to receive(:file?).with(File.join(mount_path, invalid_filepath)).and_return(true)
+      end
+
+      it 'reports the escaped filepath without creating any binaries' do
+        expect { described_class.call(content:, mount_path:) }
+          .to raise_error(described_class::InvalidFilepathsError, expected_error)
+        expect(content.content_file_binaries).to be_empty
+      end
+
+      context 'when the filepath has a binary encoding' do
+        let(:invalid_filepath) { "bad\xFF.txt".b }
+
+        it 'validates the bytes as UTF-8 without changing the input encoding' do
+          expect { described_class.call(content:, mount_path:) }
+            .to raise_error(described_class::InvalidFilepathsError, expected_error)
+          expect(invalid_filepath.encoding).to eq(Encoding::BINARY)
+        end
+      end
+
+      context 'when the invalid bytes are in a parent directory name' do
+        let(:invalid_filepath) { "folder\xFF/file.txt" }
+        let(:expected_error) { 'Filepaths contain invalid UTF-8 bytes: "folder\\xFF/file.txt"' }
+
+        it 'reports the escaped directory in the filepath' do
+          expect { described_class.call(content:, mount_path:) }
+            .to raise_error(described_class::InvalidFilepathsError, expected_error)
+        end
+      end
+    end
+
+    context 'when a filename contains valid Unicode' do
+      before do
+        File.write(File.join(mount_path, 'café.txt'), 'file three')
+      end
+
+      it 'preserves the filename' do
+        described_class.call(content:, mount_path:)
+
+        expect(content.content_file_binaries.pluck(:filepath))
+          .to contain_exactly('file1.txt', 'folder/file2.txt', 'café.txt')
+      end
+    end
   end
 end

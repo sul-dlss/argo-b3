@@ -31,10 +31,17 @@ module MultiItemDeposit
 
     def check_folder
       return add_error(:folder_not_found, path: item_deposit_action.path) unless File.directory?(folder_path)
+
+      check_folder_contents
+    end
+
+    def check_folder_contents
       return add_error(:no_files, path: item_deposit_action.path) if filepaths.empty?
 
       check_file_sizes
       add_warning(:empty_folders, paths: join(empty_folder_paths)) if empty_folder_paths.any?
+    rescue Contents::MountDiscoverer::InvalidFilepathsError => e
+      item_deposit_action.discovery_errors << e.message
     end
 
     def check_file_sizes

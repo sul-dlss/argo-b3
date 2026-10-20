@@ -83,7 +83,17 @@ RSpec.describe CsvUpload::Normalizer do
       let(:filepath) { file_fixture('invalid_bulk_upload_nonutf8.csv') }
 
       it 'raises an exception describing the encoding error' do
-        expect { csv }.to raise_error(described_class::Error, /CSV could not be opened due to an encoding error: /)
+        expect { csv }.to raise_error(described_class::Error, 'CSV contains invalid UTF-8 bytes on line 2.')
+      end
+    end
+
+    context 'with a valid Unicode filename' do
+      let(:filepath) do
+        tempfile_with(extension: '.csv', content: "druid,filename\nbc123df4567,café.tif\n").path
+      end
+
+      it 'preserves the filename' do
+        expect(csv).to eq("druid,filename\ndruid:bc123df4567,café.tif\n")
       end
     end
 

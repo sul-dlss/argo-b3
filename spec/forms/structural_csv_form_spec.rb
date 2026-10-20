@@ -34,6 +34,15 @@ RSpec.describe StructuralCsvForm do
     end
   end
 
+  context 'when a filename contains invalid UTF-8 bytes' do
+    let(:csv_string) { "druid,sequence,filename\nbc123df4567,1,bad\xFF.tif\n" }
+
+    it 'adds the encoding error to the upload field' do
+      expect(form).not_to be_valid
+      expect(form.errors[:csv_file]).to eq(['CSV contains invalid UTF-8 bytes on line 2.'])
+    end
+  end
+
   describe '#add_validation_errors' do
     it 'adds the errors with their row numbers' do
       form.add_validation_errors([StructuralCsv::ValidationError.new(3, 'Bad value')])
