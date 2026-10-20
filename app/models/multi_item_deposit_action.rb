@@ -9,9 +9,21 @@ class MultiItemDepositAction < ApplicationRecord
 
   enum :file_location, { globus: 'globus', mount: 'mount' }, prefix: true, validate: true
   enum :step, { discovery: 'discovery', structure: 'structure', deposit: 'deposit', submitted: 'submitted' },
-       prefix: true, validate: true
+       suffix: true, validate: true
+  enum :manifest_source, { mount: 'mount', upload: 'upload' }, prefix: true, validate: true
   enum :structural_metadata_csv_source, { mount: 'mount', upload: 'upload' }, prefix: true,
                                                                               validate: { allow_nil: true }
+
+  # @return [ActiveRecord::Relation<ItemDepositAction>] the Item Deposits with discovery errors or warnings
+  def item_deposit_actions_with_discovery_errors_or_warnings
+    item_deposit_actions.merge(ItemDepositAction.with_discovery_errors.or(ItemDepositAction.with_discovery_warnings))
+                        .order(:manifest_line_number)
+  end
+
+  # Discovery has completed and found no errors, so the deposit can proceed to the structure step.
+  def discovery_succeeded?
+    discovery_completed_at.present? && item_deposit_actions.with_discovery_errors.none?
+  end
 
   state_machine :discovery_state, initial: :discovery_not_in_progress do
     event :discovery_started do

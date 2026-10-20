@@ -55,6 +55,14 @@ RSpec.describe CsvUpload::Normalizer do
       end
     end
 
+    context 'with a file that cannot be read' do
+      let(:filepath) { Rails.root.join('tmp/missing.csv') }
+
+      it 'raises an exception describing the error' do
+        expect { csv }.to raise_error(described_class::Error, /File could not be read: No such file or directory/)
+      end
+    end
+
     context 'with plain-old CSV' do
       let(:filepath) { file_fixture('catalog_record_id_and_barcode.csv') }
 
