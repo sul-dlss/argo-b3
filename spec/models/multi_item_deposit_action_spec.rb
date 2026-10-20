@@ -98,6 +98,90 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '#structuring_succeeded?' do
+    it 'is false before structuring has completed' do
+      expect(multi_item_deposit_action).not_to be_structuring_succeeded
+    end
+
+    context 'when structuring has completed' do
+      before { multi_item_deposit_action.update!(structuring_completed_at: Time.current) }
+
+      it 'is true with only structure warnings' do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_warnings: ['No images'])
+
+        expect(multi_item_deposit_action).to be_structuring_succeeded
+      end
+
+      it 'is false with structural CSV errors' do
+        create(:item_deposit_action, multi_item_deposit_action:, structural_csv_errors: ['Row 2: Missing filename'])
+
+        expect(multi_item_deposit_action).not_to be_structuring_succeeded
+      end
+
+      it 'is false with content type structure errors' do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_errors: ['Too many images'])
+
+        expect(multi_item_deposit_action).not_to be_structuring_succeeded
+      end
+    end
+  end
+
+  describe '#ocr_applicable?' do
+    it 'is true when an Item Deposit has a content type that can be OCRed' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'map')
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+
+      expect(multi_item_deposit_action).to be_ocr_applicable
+    end
+
+    it 'is false when no Item Deposit has a content type that can be OCRed' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'map')
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: nil)
+
+      expect(multi_item_deposit_action).not_to be_ocr_applicable
+    end
+  end
+
+  describe '#structural_metadata_csv_required?' do
+    it 'is true when an Item Deposit is media' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media')
+
+      expect(multi_item_deposit_action).to be_structural_metadata_csv_required
+    end
+
+    it 'is false when no Item Deposit is media' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+
+      expect(multi_item_deposit_action).not_to be_structural_metadata_csv_required
+    end
+  end
+
+  describe '#mount_structural_metadata_csv_path' do
+    let(:mount_directory) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
+
+    before { multi_item_deposit_action.mount_path = mount_directory }
+
+    after { FileUtils.rm_rf(mount_directory) }
+
+    it 'returns the path when the CSV is at the root of the mount path' do
+      File.write(File.join(mount_directory, 'structural_metadata.csv'), 'druid')
+
+      expect(multi_item_deposit_action.mount_structural_metadata_csv_path)
+        .to eq(File.join(mount_directory, 'structural_metadata.csv'))
+    end
+
+    it 'returns nil when the CSV is not found' do
+      expect(multi_item_deposit_action.mount_structural_metadata_csv_path).to be_nil
+    end
+
+    it 'returns nil without a mount path' do
+      multi_item_deposit_action.mount_path = nil
+
+      expect(multi_item_deposit_action.mount_structural_metadata_csv_path).to be_nil
+    end
+  end
+
   describe '#destroy' do
     let(:content) { create(:content, :mutable) }
 

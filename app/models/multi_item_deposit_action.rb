@@ -7,6 +7,11 @@ class MultiItemDepositAction < ApplicationRecord
   belongs_to :user
   has_many :item_deposit_actions, dependent: :destroy
 
+  # Item Deposit content types are stored as the last segment of the cocina type URI.
+  OCR_CONTENT_TYPES = Sdr::TextExtraction::SUPPORTED_TYPES.map { |type| UriSupport.last(uri: type) }.freeze
+  STRUCTURAL_METADATA_CSV_REQUIRED_CONTENT_TYPES = [UriSupport.last(uri: Cocina::Models::ObjectType.media)].freeze
+  STRUCTURAL_METADATA_CSV_FILENAME = 'structural_metadata.csv'
+
   enum :file_location, { globus: 'globus', mount: 'mount' }, prefix: true, validate: true
   enum :step, { discovery: 'discovery', structure: 'structure', deposit: 'deposit', submitted: 'submitted' },
        suffix: true, validate: true
@@ -23,6 +28,29 @@ class MultiItemDepositAction < ApplicationRecord
   # Discovery has completed and found no errors, so the deposit can proceed to the structure step.
   def discovery_succeeded?
     discovery_completed_at.present? && item_deposit_actions.with_discovery_errors.none?
+  end
+
+  # Structuring has completed and found no errors, so the deposit can proceed to the deposit step.
+  def structuring_succeeded?
+    structuring_completed_at.present? && item_deposit_actions.with_structure_errors.none?
+  end
+
+  # @return [Boolean] whether any Item Deposit has a content type that can be OCRed
+  def ocr_applicable?
+    item_deposit_actions.exists?(content_type: OCR_CONTENT_TYPES)
+  end
+
+  # @return [Boolean] whether any Item Deposit has a content type that can only be structured from a CSV
+  def structural_metadata_csv_required?
+    item_deposit_actions.exists?(content_type: STRUCTURAL_METADATA_CSV_REQUIRED_CONTENT_TYPES)
+  end
+
+  # @return [String, nil] the path of the structural metadata CSV at the root of the mount path, if it exists
+  def mount_structural_metadata_csv_path
+    return if mount_path.blank?
+
+    path = File.join(mount_path, STRUCTURAL_METADATA_CSV_FILENAME)
+    path if File.file?(path)
   end
 
   state_machine :discovery_state, initial: :discovery_not_in_progress do

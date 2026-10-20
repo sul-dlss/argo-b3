@@ -106,7 +106,7 @@ class ContentsController < ContentsApplicationController
       form.version_service = version_service
       form.prefill_version_description
       form.content = find_or_create_content(cocina_object:)
-      form.prefill_ocr_settings
+      form.prefill_ocr_settings(form.content)
     end
   end
 

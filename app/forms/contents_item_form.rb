@@ -13,9 +13,6 @@ class ContentsItemForm < CocinaModels::Dro
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
   FORM_ONLY_ATTRIBUTES = %w[version_description run_ocr text_extraction_languages].freeze
 
-  # The OCR settings are not part of the Cocina object; they are saved with the content.
-  attribute :run_ocr, :boolean, default: false
-
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
 
@@ -31,7 +28,6 @@ class ContentsItemForm < CocinaModels::Dro
   }
   before_validation :clear_text_extraction_languages, unless: :run_ocr
 
-  validates :text_extraction_languages, presence: true, if: :run_ocr
   # Only depositing requires the structure (content) to be valid for the content type.
   # The content errors themselves are shown by the structure validation frame.
   validate :content_valid_for_content_type, on: :deposit
@@ -40,19 +36,13 @@ class ContentsItemForm < CocinaModels::Dro
     [:content_type, :viewing_direction, :run_ocr, :version_description, { text_extraction_languages: [] }]
   end
 
-  # Prefills the OCR settings saved with the content.
-  def prefill_ocr_settings
-    self.run_ocr = content.perform_ocr
-    self.text_extraction_languages = content.ocr_languages
-  end
-
   # Saves the OCR settings with the content. Then opens a new version if the version is closed (since staging
   # always updates the structure); otherwise updates the description of the open version if it changed.
   # @param [String] user_name the sunetid of the user performing the action
   # @raise [ActiveModel::ValidationError] if the form is invalid
   def save!(user_name:)
     validate!
-    content&.update!(perform_ocr: run_ocr, ocr_languages: text_extraction_languages)
+    content&.update!(ocr_settings_attributes)
     prepare_version!(user_name:, open_version: true)
     super
   ensure

@@ -1,0 +1,12 @@
+<%= content_for :title, t('edit.multi_item_deposits.edit.title') %>
+
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
+
+  <% if @multi_item_deposit_action.description? %>
+    <p><%= @multi_item_deposit_action.description %></p>
+  <% end %>
+
+  <%# Stub until the deposit step is implemented. %>
+  <p>The deposit step is not yet implemented.</p>
+</div>

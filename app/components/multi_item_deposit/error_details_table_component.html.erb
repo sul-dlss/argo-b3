@@ -1,7 +1,4 @@
 <%= render SdrViewComponents::Tables::TableComponent.new(label:, responsive: true) do |component| %>
-  <% component.with_caption do %>
-    <%= label %>
-  <% end %>
   <% component.with_header(label: t('multi_item_deposit.error_details.headers.manifest_line_number')) %>
   <% component.with_header(label: t('multi_item_deposit.error_details.headers.druid')) %>
   <% component.with_header(label: t('multi_item_deposit.error_details.headers.folder')) %>

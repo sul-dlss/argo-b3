@@ -194,8 +194,7 @@ RSpec.describe ContentsItemForm do
 
   describe '#prefill_ocr_settings' do
     before do
-      contents_item_form.content = create(:content, perform_ocr: true, ocr_languages: ['English'])
-      contents_item_form.prefill_ocr_settings
+      contents_item_form.prefill_ocr_settings(create(:content, perform_ocr: true, ocr_languages: ['English']))
     end
 
     it 'prefills the OCR settings saved with the content without changing the form' do
