@@ -1,0 +1,33 @@
+<%= render SdrViewComponents::Tables::RowComponent.new do |row_component| %>
+  <% row_component.with_cell do %>
+    <%= bare_druid %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= file_count %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= content_type %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= deposit_type %>
+  <% end %>
+<% end %>
+<% if structure_errors_or_warnings? %>
+  <%= render SdrViewComponents::Tables::RowComponent.new do |row_component| %>
+    <% row_component.with_cell(colspan: 4) do %>
+      <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
+        <%# Errors are styled like validation errors; warnings are not. %>
+        <% structure_errors.each do |error| %>
+          <% list_component.with_item do %>
+            <%= tag.span(error, class: 'text-danger') %>
+          <% end %>
+        <% end %>
+        <% content_type_structure_warnings.each do |warning| %>
+          <% list_component.with_item do %>
+            <%= tag.span(warning) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

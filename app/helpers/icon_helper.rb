@@ -30,6 +30,10 @@ module IconHelper
     icon(icon_classes: %w[bi bi-dash collapse-icon], **)
   end
 
+  def left_arrow_icon(**)
+    icon(icon_classes: %w[bi bi-arrow-left], **)
+  end
+
   def cloud_upload_icon(**)
     icon(icon_classes: %w[bi bi-cloud-arrow-up-fill], **)
   end

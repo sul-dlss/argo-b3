@@ -43,7 +43,14 @@ RSpec.describe 'Multi-item deposit' do
     File.join(manifest_directory, filename).tap { |manifest_path| File.write(manifest_path, csv) }
   end
 
-  it 'checks the manifest, discovers files, and proceeds to structure' do
+  def run_structure_jobs(multi_item_deposit_action)
+    multi_item_deposit_action.item_deposit_actions.each do |item_deposit_action|
+      MultiItemDeposit::StructureJob.perform_now(item_deposit_action:)
+    end
+    MultiItemDeposit::StructureFinishJob.perform_now(multi_item_deposit_action:)
+  end
+
+  it 'checks the manifest, discovers files, structures, and proceeds to deposit' do
     visit root_path
     click_on 'Deposit multiple items'
 
@@ -99,5 +106,53 @@ RSpec.describe 'Multi-item deposit' do
     expect(page).to have_css('h1', text: 'Multi-item deposit')
     expect(page).to have_no_field('Mount path')
     expect(multi_item_deposit_action.reload).to be_structure_step
+
+    # No CSV is on the mount and the items cannot be OCRed.
+    expect(page).to have_no_field('Yes, use structural metadata CSV found in file location')
+    expect(page).to have_no_css('legend', text: 'Run OCR?')
+    expect(page).to have_field('No', checked: true)
+    expect(page).to have_field('Upload structural metadata CSV', disabled: true)
+    expect(page).to have_button('Next', disabled: true)
+
+    choose 'Yes, upload a structural metadata CSV'
+    expect(page).to have_field('Default by file type', disabled: true)
+    attach_file 'Upload structural metadata CSV', write_manifest('structural.csv', "druid,sequence\nbc123df4567,1\n")
+    click_on 'Check files'
+
+    # The CSV fails validation, so structuring does not start.
+    expect(page).to have_text('missing headers: filename')
+    expect(multi_item_deposit_action.reload).not_to be_structuring
+
+    choose 'No'
+    choose 'Publish and preserve all files'
+    click_on 'Check files'
+
+    expect(page).to have_text('Processing...')
+    expect(multi_item_deposit_action.reload).to be_structuring
+    expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: nil, publish_preserve_all: true)
+
+    run_structure_jobs(multi_item_deposit_action)
+
+    # The wait page refreshes to show the results.
+    expect(page).to have_css('h2', text: 'Results of checking files')
+    summary_rows = page.find('table[aria-label="Summary"]').all('tbody tr')
+    expect(summary_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
+      .to eq([%w[bc123df4567 1 object redeposit], %w[cd234fg5678 1 object redeposit]])
+    expect(page).to have_field('Publish and preserve all files', checked: true)
+
+    # Returning to discovery discards nothing.
+    click_on 'Previous'
+
+    expect(page).to have_css('h2', text: 'Results of checking manifest')
+    expect(multi_item_deposit_action.reload).to be_discovery_step
+
+    click_on 'Next'
+
+    expect(page).to have_css('h2', text: 'Results of checking files')
+
+    click_on 'Next'
+
+    expect(page).to have_text('The deposit step is not yet implemented.')
+    expect(multi_item_deposit_action.reload).to be_deposit_step
   end
 end

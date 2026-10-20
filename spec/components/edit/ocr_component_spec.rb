@@ -16,6 +16,7 @@ RSpec.describe Edit::OcrComponent, type: :component do
     expect(page).to have_css('legend', text: 'Run OCR?')
     expect(page).to have_field('Yes', type: 'radio', checked: false)
     expect(page).to have_field('No', type: 'radio', checked: true)
+    expect(page.all('input[type="radio"]').map(&:value)).to eq(%w[false true])
   end
 
   it 'wires the radios up to the ocr-options controller' do
@@ -25,18 +26,20 @@ RSpec.describe Edit::OcrComponent, type: :component do
                              count: 2)
   end
 
-  it 'renders the language selector as the ocr-options dependent' do
+  it 'renders the language selector as the ocr-options dependent within the Yes option' do
     render_inline(component)
 
     expect(page).to have_css('label', text: 'Search for a language')
-    expect(page).to have_css('div[data-controller="multi-select"][data-ocr-options-target="languages"]')
+    expect(page).to have_css('.form-check:has(input[value="true"]) ' \
+                             'div[data-controller="multi-select"][data-ocr-options-target="languages"]')
   end
 
-  it 'renders the embedded text info alert hidden, scoped to documents' do
+  it 'renders the embedded text info alert hidden, scoped to documents, within the Yes option' do
     render_inline(component)
 
     warn_for = [Cocina::Models::ObjectType.document].to_json
-    expect(page).to have_css(".alert-info.d-none[data-ocr-options-target='warning']" \
+    expect(page).to have_css(".form-check:has(input[value='true']) .alert-info.d-none" \
+                             "[data-ocr-options-target='warning']" \
                              "[data-ocr-options-warn-content-types='#{warn_for}']",
                              text: 'Do not run OCR for files that already have embedded text.')
   end

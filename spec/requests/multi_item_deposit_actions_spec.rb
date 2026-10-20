@@ -56,7 +56,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_field('Describe this deposit', with: 'My deposit')
-        expect(rendered_page).to have_button('Discover files and check manifest')
+        expect(rendered_page).to have_button('Discover files and check manifest', class: 'btn-primary')
         expect(rendered_page).to have_link('Cancel', href: root_path)
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
         expect(rendered_page).to have_field('Include with your files below', type: 'radio')
@@ -112,6 +112,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('.alert-success', text: 'No errors with manifest')
         expect(rendered_page).to have_css('.alert-success', text: 'Click "Next" to proceed.')
         expect(rendered_page).to have_button('Next', disabled: false)
+        expect(rendered_page).to have_button('Discover files and check manifest', class: 'btn-outline-primary')
       end
     end
 
@@ -158,6 +159,101 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_no_field('Mount path')
+      end
+
+      it 'renders the OCR inputs when an Item Deposit can be OCRed' do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type: 'image')
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_css('legend', text: 'Run OCR?')
+      end
+
+      it 'does not render the OCR inputs when no Item Deposit can be OCRed' do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type: 'map')
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_no_css('legend', text: 'Run OCR?')
+      end
+
+      it 'renders the summary of the Item Deposits once structuring has completed' do
+        multi_item_deposit_action.update!(structuring_completed_at: Time.current)
+        create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567')
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_css('table[aria-label="Summary"] td', text: 'bc123df4567')
+      end
+
+      it 'renders Previous and a disabled Next until structuring succeeds' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_button('Previous')
+        expect(rendered_page).to have_button('Next', disabled: true)
+        expect(rendered_page).to have_button('Check files', class: 'btn-primary')
+      end
+
+      it 'renders an enabled Next and an outlined Check files once structuring succeeds' do
+        multi_item_deposit_action.update!(structuring_completed_at: Time.current)
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_button('Next', disabled: false)
+        expect(rendered_page).to have_button('Check files', class: 'btn-outline-primary')
+      end
+
+      it 'renders the structural metadata CSV choice without the mount option' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_field('Yes, upload a structural metadata CSV', type: 'radio', checked: false)
+        expect(rendered_page).to have_field('Upload structural metadata CSV', type: 'file')
+        expect(rendered_page).to have_no_field('Yes, use structural metadata CSV found in file location')
+        expect(rendered_page).to have_field('No', type: 'radio', checked: true)
+        expect(rendered_page).to have_field('Default by file type', type: 'radio', checked: true)
+        expect(rendered_page).to have_field('Publish and preserve all files', type: 'radio', checked: false)
+      end
+
+      context 'when a structural metadata CSV is on the mount' do
+        let(:mount_directory) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
+        let(:multi_item_deposit_action) do
+          create(:multi_item_deposit_action, user: owner, step: 'structure', mount_path: mount_directory)
+        end
+
+        before { File.write(File.join(mount_directory, 'structural_metadata.csv'), 'druid') }
+
+        after { FileUtils.rm_rf(mount_directory) }
+
+        it 'renders the mount option selected' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(rendered_page).to have_field('Yes, use structural metadata CSV found in file location',
+                                              type: 'radio', checked: true)
+        end
+      end
+
+      context 'when an Item Deposit is media' do
+        before { create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media') }
+
+        it 'requires a structural metadata CSV' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(rendered_page).to have_field('Yes, upload a structural metadata CSV', type: 'radio', checked: true)
+          expect(rendered_page).to have_no_field('No', type: 'radio')
+          expect(rendered_page).to have_no_field('Default by file type')
+        end
+      end
+    end
+
+    context 'when the multi-item deposit action is in the deposit step' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
+
+      it 'renders the deposit page' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_text('The deposit step is not yet implemented.')
       end
     end
 
@@ -392,6 +488,205 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(multi_item_deposit_action.reload).to be_discovery_step
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when building the structure' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+      let!(:item_deposit_action) { create(:item_deposit_action, multi_item_deposit_action:) }
+      let(:params) do
+        { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: ['', 'English'] } }
+      end
+
+      it 'saves the OCR settings, starts structuring, and redirects to the edit page' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to be_structuring
+        expect(multi_item_deposit_action).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+        expect(MultiItemDeposit::StructureJob).to have_been_enqueued.with(item_deposit_action:)
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when building the structure from an uploaded structural metadata CSV' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+      let(:csv_header) { 'druid,sequence,filename,publish,preserve,rights_view,rights_download,rights_location' }
+      let(:csv_tempfile) do
+        Tempfile.new(['structural', '.csv']).tap do |file|
+          file.write("#{csv_header}\nbc123df4567,1,file1.tif,yes,yes,world,world,\n") && file.flush
+        end
+      end
+      let(:params) do
+        { multi_item_deposit_structure: {
+          structural_metadata_csv_choice: 'upload',
+          structural_metadata_csv_file: Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv')
+        } }
+      end
+
+      it 'saves the CSV and starts structuring' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to be_structuring
+        expect(multi_item_deposit_action).to have_attributes(
+          structural_metadata_csv: "#{csv_header}\ndruid:bc123df4567,1,file1.tif,yes,yes,world,world,\n",
+          structural_metadata_csv_source: 'upload', publish_preserve_all: false
+        )
+      end
+
+      context 'when the form has other errors' do
+        let(:params) do
+          { multi_item_deposit_structure: {
+            structural_metadata_csv_choice: 'upload', run_ocr: 'true', text_extraction_languages: [''],
+            structural_metadata_csv_file: Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv')
+          } }
+        end
+
+        it 'retains the uploaded CSV in the re-rendered form' do
+          patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(rendered_page).to have_text('A structural metadata CSV has been uploaded.')
+          expect(rendered_page).to have_field('multi_item_deposit_structure[structural_metadata_csv]', type: :hidden)
+        end
+      end
+    end
+
+    context 'when building the structure from the structural metadata CSV on the mount' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', mount_path: mount_directory)
+      end
+      let(:csv_string) do
+        "druid,sequence,filename,publish,preserve,rights_view,rights_download,rights_location\n" \
+          "druid:bc123df4567,1,a.tif,yes,yes,world,world,\n"
+      end
+      let(:params) { { multi_item_deposit_structure: { structural_metadata_csv_choice: 'mount' } } }
+
+      before { File.write(File.join(mount_directory, 'structural_metadata.csv'), csv_string) }
+
+      it 'saves the CSV read from the mount and starts structuring' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to be_structuring
+        expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: csv_string,
+                                                             structural_metadata_csv_source: 'mount')
+      end
+    end
+
+    context 'when building the structure without a structural metadata CSV' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structural_metadata_csv: 'druid',
+                                           structural_metadata_csv_source: 'upload')
+      end
+      let(:params) do
+        { multi_item_deposit_structure: { structural_metadata_csv_choice: 'none', publish_preserve_all: 'true' } }
+      end
+
+      it 'clears the CSV, saves the publish / preserve setting, and starts structuring' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to be_structuring
+        expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: nil,
+                                                             structural_metadata_csv_source: nil,
+                                                             publish_preserve_all: true)
+      end
+    end
+
+    context 'when returning to discovery from the structure step' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_completed_at: Time.current,
+                                           structural_metadata_csv: 'druid', structural_metadata_csv_source: 'upload')
+      end
+
+      before { create(:item_deposit_action, multi_item_deposit_action:) }
+
+      it 'moves to the discovery step without discarding anything' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params: { commit: 'previous' })
+
+        expect(multi_item_deposit_action.reload).to be_discovery_step
+        expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: 'druid',
+                                                             structuring_completed_at: be_present)
+        expect(multi_item_deposit_action.item_deposit_actions.count).to eq(1)
+        expect(batch_class).not_to have_received(:enqueue)
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when proceeding after structuring succeeded' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_completed_at: Time.current)
+      end
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_warnings: ['No images'])
+      end
+
+      it 'moves to the deposit step without restarting structuring' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params: { commit: 'next' })
+
+        expect(multi_item_deposit_action.reload).to be_deposit_step
+        expect(batch_class).not_to have_received(:enqueue)
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when proceeding after structuring found errors' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_completed_at: Time.current)
+      end
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, structural_csv_errors: ['Row 2: Missing filename'])
+      end
+
+      it 'stays in the structure step' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params: { commit: 'next' })
+
+        expect(multi_item_deposit_action.reload).to be_structure_step
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when building the structure with OCR but no languages' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+      let(:params) { { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: [''] } } }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type: 'image')
+      end
+
+      it 'renders the structure page with errors' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('#multi_item_deposit_structure_text_extraction_languages_error',
+                                          text: "can't be blank")
+        expect(multi_item_deposit_action.reload).not_to be_structuring
+        expect(multi_item_deposit_action.perform_ocr).to be false
+        expect(batch_class).not_to have_received(:enqueue)
+      end
+    end
+
+    context 'when structuring is in progress' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_state: 'structuring')
+      end
+      let(:params) { { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: ['English'] } } }
+
+      it 'does not restart structuring and redirects to the edit page' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+        expect(multi_item_deposit_action.reload.perform_ocr).to be false
+        expect(batch_class).not_to have_received(:enqueue)
       end
     end
 

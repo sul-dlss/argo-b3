@@ -408,11 +408,15 @@ en:
       edit:
         title: "Multi-item deposit"
         buttons:
+          build_structure: "Check files"
           cancel: "Cancel"
           discover: "Discover files and check manifest"
           next: "Next"
+          previous: "Previous"
         discovery_results:
           heading: "Results of checking manifest"
+        structure_results:
+          heading: "Results of checking files"
         discovery_errors_alert:
           title: "We found errors with the manifest."
           body: 'Please fix your manifest and / or files and click "%{discover_label}" again.'
@@ -446,6 +450,26 @@ en:
             label: "Upload from a computer"
           validations:
             manifest_not_found: "%{filename} not found in the mount path"
+        publish_preserve_all:
+          label: "Select publish / preserve settings"
+          default:
+            label: "Default by file type"
+          all:
+            label: "Publish and preserve all files"
+        structural_metadata_csv_choice:
+          label: "Do you want to configure file-specific settings using a structural metadata CSV?"
+          upload:
+            label: "Yes, upload a structural metadata CSV"
+          mount:
+            label: "Yes, use structural metadata CSV found in file location"
+          none:
+            label: "No"
+          validations:
+            not_found: "%{filename} not found in the mount path"
+            required: "A structural metadata CSV is required for media items"
+        structural_metadata_csv_file:
+          label: "Upload structural metadata CSV"
+          retained: "A structural metadata CSV has been uploaded. Choose a file to replace it."
       wait:
         message: "Processing..."
     multiple_items:
@@ -476,6 +500,16 @@ en:
         error: 'Error'
         folder: 'Folder'
         manifest_line_number: 'Manifest line number'
+    summary:
+      label: 'Summary'
+      headers:
+        druid: 'Druid'
+        file_count: 'Number of files'
+        content_type: 'Content type'
+        deposit_type: 'Deposit type'
+      deposit_types:
+        new_item: 'new item'
+        redeposit: 'redeposit'
     discover_files:
       errors:
         object_not_found: 'Object not found'

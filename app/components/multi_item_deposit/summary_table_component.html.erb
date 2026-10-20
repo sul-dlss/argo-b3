@@ -1,0 +1,12 @@
+<%= render SdrViewComponents::Tables::RawTableComponent.new(label:, responsive: true) do |component| %>
+  <% component.with_header(label: t('multi_item_deposit.summary.headers.druid')) %>
+  <% component.with_header(label: t('multi_item_deposit.summary.headers.file_count')) %>
+  <% component.with_header(label: t('multi_item_deposit.summary.headers.content_type')) %>
+  <% component.with_header(label: t('multi_item_deposit.summary.headers.deposit_type')) %>
+  <% item_deposit_actions.each do |item_deposit_action| %>
+    <% component.with_row do %>
+      <%= render MultiItemDeposit::SummaryRowsComponent.new(item_deposit_action:,
+                                                            file_count: file_count(item_deposit_action)) %>
+    <% end %>
+  <% end %>
+<% end %>

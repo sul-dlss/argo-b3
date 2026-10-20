@@ -2,4 +2,115 @@
 
 <div class="container py-2">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
+
+  <% if @multi_item_deposit_action.description? %>
+    <p><%= @multi_item_deposit_action.description %></p>
+  <% end %>
+
+  <%= form_with model: @structure_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
+    <% if @multi_item_deposit_action.ocr_applicable? %>
+      <div data-controller="ocr-options">
+        <%= render Edit::OcrComponent.new(form:) %>
+      </div>
+
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+    <% end %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+          label: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.label'),
+          classes: 'my-fieldset',
+          mark_required: true,
+          data: { controller: 'radio' }
+        ) do %>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+            form:,
+            field_name: :structural_metadata_csv_choice,
+            label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.upload.label'),
+            input_value: MultiItemDeposit::StructureForm::UPLOAD_CHOICE,
+            input_data: { radio_target: 'radio', action: 'radio#toggle' },
+            container_classes: 'my-fieldset'
+          ) do |component| %>
+        <% component.with_additional_container_content do %>
+          <% if @structure_form.unsaved_structural_metadata_csv? %>
+            <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
+          <% end %>
+          <% if @structure_form.retainable_structural_metadata_csv.present? %>
+            <p class="mb-1"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
+          <% end %>
+          <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                 field_name: :structural_metadata_csv_file,
+                                                                 container_classes: 'my-field',
+                                                                 label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_file.label')) %>
+          <% if @multi_item_deposit_action.structural_metadata_csv_required? %>
+            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :structural_metadata_csv_choice) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if @multi_item_deposit_action.mount_structural_metadata_csv_path %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+              form:,
+              field_name: :structural_metadata_csv_choice,
+              label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.mount.label'),
+              input_value: MultiItemDeposit::StructureForm::MOUNT_CHOICE,
+              input_data: { radio_target: 'radio', action: 'radio#toggle' },
+              container_classes: 'my-fieldset'
+            ) do |component| %>
+          <% component.with_additional_container_content do %>
+            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :structural_metadata_csv_choice) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% unless @multi_item_deposit_action.structural_metadata_csv_required? %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+              form:,
+              field_name: :structural_metadata_csv_choice,
+              label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.none.label'),
+              input_value: MultiItemDeposit::StructureForm::NONE_CHOICE,
+              input_data: { radio_target: 'radio', action: 'radio#toggle' },
+              container_classes: 'my-fieldset'
+            ) do |component| %>
+          <% component.with_additional_container_content do %>
+            <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+                  label: t('edit.multi_item_deposits.fields.publish_preserve_all.label'),
+                  classes: 'my-fieldset'
+                ) do %>
+              <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+                    form:,
+                    field_name: :publish_preserve_all,
+                    label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.default.label'),
+                    input_value: 'false'
+                  ) %>
+              <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+                    form:,
+                    field_name: :publish_preserve_all,
+                    label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.all.label'),
+                    input_value: 'true'
+                  ) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if @multi_item_deposit_action.structuring_completed_at.present? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.structure_results.heading'), classes: 'mb-3') %>
+
+      <%= render MultiItemDeposit::SummaryTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+    <% end %>
+
+    <div class="mt-3">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.multi_item_deposits.edit.buttons.cancel'), link: root_path, variant: :link, classes: 'me-3') %>
+      <% next_enabled = @multi_item_deposit_action.structuring_succeeded? %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.build_structure'), variant: next_enabled ? :'outline-primary' : :primary, classes: 'me-3') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::PREVIOUS_VALUE, variant: :'outline-primary', classes: 'me-2') do %>
+        <%= left_arrow_icon %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
+      <% end %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, disabled: !next_enabled) do %>
+        <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon %>
+      <% end %>
+    </div>
+  <% end %>
+
 </div>
