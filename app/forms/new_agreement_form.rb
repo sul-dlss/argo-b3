@@ -10,15 +10,19 @@ class NewAgreementForm < CocinaModels::Dro
   include TitleFormConcern
   include TagsFormConcern
 
-  # All agreements are dark and governed by the ur APO (Internal System Objects).
-  attribute :content_type, :string, default: Cocina::Models::ObjectType.agreement
-  attribute :apo_druid, :string, default: -> { Settings.ur_apo_druid }
-  attribute :access_view, :string, default: 'dark'
-  attribute :access_download, :string, default: 'none'
-
+  # Not permitted as params, since they are fixed (see below).
   def self.immutable_attributes
     %i[content_type apo_druid access_view access_download access_location]
   end
+
+  # All agreements are dark and governed by the ur APO (Internal System Objects). These readers override the
+  # inherited attribute readers so that the values cannot be changed by assigning them: an assigned value is
+  # stored but never read.
+  def content_type = Cocina::Models::ObjectType.agreement
+  def apo_druid = Settings.ur_apo_druid
+  def access_view = 'dark'
+  def access_download = 'none'
+  def access_location = nil
 
   validates :title, presence: true
   before_validation :populate_description_hash_from_title, if: -> { title.present? }

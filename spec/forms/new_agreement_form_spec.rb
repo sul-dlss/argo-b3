@@ -18,6 +18,18 @@ RSpec.describe NewAgreementForm do
     end
   end
 
+  describe 'fixed values' do
+    it 'ignores assigned values for the content type, governing APO, and access' do
+      new_agreement_form.assign_attributes(content_type: Cocina::Models::ObjectType.book,
+                                           apo_druid: 'druid:dd111dd1111', access_view: 'world',
+                                           access_download: 'world', access_location: 'spec')
+
+      expect(new_agreement_form).to have_attributes(content_type: Cocina::Models::ObjectType.agreement,
+                                                    apo_druid: Settings.ur_apo_druid, access_view: 'dark',
+                                                    access_download: 'none', access_location: nil)
+    end
+  end
+
   describe 'validation' do
     context 'when the title is blank' do
       let(:title) { '' }
