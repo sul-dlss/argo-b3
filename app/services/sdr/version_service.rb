@@ -6,6 +6,8 @@ module Sdr
     # A subclass of Sdr::Repository::Error, so callers can handle any SDR update failure together.
     class Error < Sdr::Repository::Error; end
 
+    STATUSES_SLICE_SIZE = 25
+
     class << self
       # @returns [Cocina::Models::DROWithMetadata|CollectionWithMetadata|AdminPolicyWithMetadata] cocina object with updated version # rubocop:disable Layout/LineLength
       def open(druid:, **)
@@ -50,6 +52,19 @@ module Sdr
 
       def version(...)
         new(...).version
+      end
+
+      # Objects that are not found are omitted.
+      # @param druids [Array<String>]
+      # @param slice_size [Integer] the number of druids per request
+      # @return [Hash<String, Dor::Services::Client::ObjectVersion::VersionStatus>] the version statuses, keyed by druid
+      # @raise [Error] if retrieving the statuses fails
+      def statuses(druids:, slice_size: STATUSES_SLICE_SIZE)
+        druids.each_slice(slice_size).with_object({}) do |slice_druids, statuses|
+          statuses.merge!(Dor::Services::Client.objects.statuses(object_ids: slice_druids))
+        end
+      rescue Dor::Services::Client::Error => e
+        raise Error, "Retrieving version statuses failed: #{e.message}"
       end
     end
 

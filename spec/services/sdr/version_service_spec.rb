@@ -142,6 +142,38 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '.statuses' do
+    let(:druids) { ['druid:bc123df4567', 'druid:cd234fg5678', 'druid:df345gh6789'] }
+    let(:objects_client) { instance_double(Dor::Services::Client::Objects) }
+    let(:first_status) { instance_double(Dor::Services::Client::ObjectVersion::VersionStatus) }
+    let(:last_status) { instance_double(Dor::Services::Client::ObjectVersion::VersionStatus) }
+
+    before do
+      allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
+      allow(objects_client).to receive(:statuses).and_return({ 'druid:bc123df4567' => first_status },
+                                                             { 'druid:df345gh6789' => last_status })
+    end
+
+    it 'retrieves the statuses in slices' do
+      expect(described_class.statuses(druids:, slice_size: 2))
+        .to eq('druid:bc123df4567' => first_status, 'druid:df345gh6789' => last_status)
+      expect(objects_client).to have_received(:statuses)
+        .with(object_ids: ['druid:bc123df4567', 'druid:cd234fg5678'])
+      expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:df345gh6789'])
+    end
+
+    context 'when the objects client fails' do
+      before do
+        allow(objects_client).to receive(:statuses).and_raise(Dor::Services::Client::Error, 'Oops')
+      end
+
+      it 'raises a version service error' do
+        expect { described_class.statuses(druids:) }
+          .to raise_error(Sdr::VersionService::Error, 'Retrieving version statuses failed: Oops')
+      end
+    end
+  end
+
   describe 'status methods' do
     it 'delegates to the version client' do
       %i[open? openable? assembling? accessioning? closed? closeable? version].each do |method|

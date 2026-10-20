@@ -535,6 +535,16 @@ en:
         unexpected: 'An unexpected error occurred while building the structure. Contact SDR support for assistance.'
       toasts:
         completed: 'Completed building structure'
+    deposit_check:
+      errors:
+        object_not_found: 'Object not found'
+        not_authorized: 'Not authorized to update'
+        object_changed: 'Object changed since discovery; re-run Discover'
+        not_openable: 'A new version cannot be opened for this object'
+        not_closeable: 'The open version cannot be closed for this object'
+        unexpected: 'An unexpected error occurred while checking the deposit. Contact SDR support for assistance.'
+      toasts:
+        errors: 'Deposit check found errors'
   bulk_actions:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
