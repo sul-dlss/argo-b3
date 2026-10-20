@@ -337,8 +337,8 @@ RSpec.describe 'Items' do
 
     context 'when the item has a mutable content' do
       let!(:content) do
-        create(:content, druid:, lock: cocina_object.lock, immutable: false, perform_ocr: true,
-                         ocr_languages: ['English'])
+        create(:content, :mutable, druid:, lock: cocina_object.lock, perform_ocr: true,
+                                   ocr_languages: ['English'])
       end
 
       before do
@@ -367,7 +367,7 @@ RSpec.describe 'Items' do
     end
 
     context 'when the mutable content is staging' do
-      before { create(:content, druid:, lock: cocina_object.lock, immutable: false, staging_state: 'staging') }
+      before { create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging') }
 
       it 'redirects to the edit page with a warning without saving' do
         patch "/items/#{druid}", params: { item: item_params, commit: }

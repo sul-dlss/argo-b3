@@ -7,12 +7,12 @@ RSpec.describe Content do
 
   describe '.mutable_for' do
     let(:cocina_object) { build(:dro_with_metadata, id: druid).new(lock: 'current-lock') }
-    let!(:mutable_content) { create(:content, druid:, lock: 'current-lock', immutable: false) }
+    let!(:mutable_content) { create(:content, :mutable, druid:, lock: 'current-lock') }
 
     before do
       create(:content, druid:, lock: 'current-lock', immutable: true)
-      create(:content, druid:, lock: 'old-lock', immutable: false)
-      create(:content, druid: 'druid:dj123df4598', lock: 'current-lock', immutable: false)
+      create(:content, :mutable, druid:, lock: 'old-lock')
+      create(:content, :mutable, druid: 'druid:dj123df4598', lock: 'current-lock')
     end
 
     it 'returns the mutable Content for the lock of the object' do

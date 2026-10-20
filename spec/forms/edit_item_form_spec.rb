@@ -218,8 +218,8 @@ RSpec.describe EditItemForm do
     context 'when accessioning with a content that has OCR settings' do
       let(:open) { true }
       let(:content) do
-        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false,
-                         perform_ocr: true, ocr_languages: ['English'])
+        create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock,
+                                   perform_ocr: true, ocr_languages: ['English'])
       end
 
       before do
@@ -242,8 +242,8 @@ RSpec.describe EditItemForm do
     context 'when accessioning fails with a content' do
       let(:open) { true }
       let(:content) do
-        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false,
-                         perform_ocr: true, ocr_languages: ['English'])
+        create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock,
+                                   perform_ocr: true, ocr_languages: ['English'])
       end
 
       before do
@@ -261,7 +261,7 @@ RSpec.describe EditItemForm do
     context 'when saving fails with a content' do
       let(:open) { false }
       let(:content) do
-        create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false)
+        create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock)
       end
 
       before do
