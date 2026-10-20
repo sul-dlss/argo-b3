@@ -4,6 +4,7 @@
                                                                   params: { commit:, populator:, content_type: },
                                                                   top: false,
                                                                   method: :patch,
-                                                                  variant: :'outline-primary') %>
+                                                                  variant: :'outline-primary',
+                                                                  data:) %>
   <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: 'Structuring files...', classes: 'structure-spinner mt-2') %>
 <% end %>

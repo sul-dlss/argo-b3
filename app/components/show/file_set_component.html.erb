@@ -7,7 +7,8 @@
                       render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :edit,
                                                                                       label: "Edit resource #{index}",
                                                                                       link: edit_path,
-                                                                                      classes: 'ms-2')
+                                                                                      classes: 'ms-2',
+                                                                                      data: { structure_actions_target: 'disableable' })
                     end %>
 
       </div>
@@ -17,34 +18,37 @@
             <span class="fw-bold">Label:</span> <%= label %>
           </div>
         <% end %>
-        <% if move_up? || move_down? %>
-          <div class="d-flex ms-2">
-            <% if move_up? %>
-              <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:up),
-                                                                                  icon: :move_up,
-                                                                                  label: t('edit.content_file_sets.buttons.move_up', index:),
-                                                                                  method: :patch,
-                                                                                  top: false,
-                                                                                  classes: 'px-1') %>
-            <% end %>
-            <% if move_down? %>
-              <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:down),
-                                                                                  icon: :move_down,
-                                                                                  label: t('edit.content_file_sets.buttons.move_down', index:),
-                                                                                  method: :patch,
-                                                                                  top: false,
-                                                                                  classes: 'px-1') %>
-            <% end %>
-          </div>
-        <% end %>
         <% if editable? %>
-          <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path,
-                                                                              icon: :delete,
-                                                                              label: t('edit.content_file_sets.buttons.delete', index:),
-                                                                              method: :delete,
-                                                                              confirm: t('edit.content_file_sets.buttons.delete_confirm', index:),
-                                                                              top: false,
-                                                                              classes: 'ms-2') %>
+          <%# A fieldset so that the move and delete buttons can be disabled together (e.g., while structuring). %>
+          <fieldset class="d-flex align-items-center" data-structure-actions-target="disableable">
+            <% if move_up? || move_down? %>
+              <div class="d-flex ms-2">
+                <% if move_up? %>
+                  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:up),
+                                                                                      icon: :move_up,
+                                                                                      label: t('edit.content_file_sets.buttons.move_up', index:),
+                                                                                      method: :patch,
+                                                                                      top: false,
+                                                                                      classes: 'px-1') %>
+                <% end %>
+                <% if move_down? %>
+                  <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: move_path(:down),
+                                                                                      icon: :move_down,
+                                                                                      label: t('edit.content_file_sets.buttons.move_down', index:),
+                                                                                      method: :patch,
+                                                                                      top: false,
+                                                                                      classes: 'px-1') %>
+                <% end %>
+              </div>
+            <% end %>
+            <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path,
+                                                                                icon: :delete,
+                                                                                label: t('edit.content_file_sets.buttons.delete', index:),
+                                                                                method: :delete,
+                                                                                confirm: t('edit.content_file_sets.buttons.delete_confirm', index:),
+                                                                                top: false,
+                                                                                classes: 'ms-2') %>
+          </fieldset>
         <% end %>
       </div>
     </div>

@@ -3,7 +3,7 @@ import Dropzone from 'dropzone'
 
 // Copied from H3
 export default class extends Controller {
-  static outlets = ['reloadable-frame', 'sdr-tab-error', 'form-error', 'disableable']
+  static outlets = ['reloadable-frame', 'sdr-tab-error', 'form-error']
   static targets = ['progress', 'error', 'folderAlert', 'folderAlertText']
   static values = {
     maxFilesize: Number,
@@ -33,7 +33,6 @@ export default class extends Controller {
       // Using processingmultiple instead of addedfiles for showing the progress bar
       // since addedfiles is triggered by dropping an empty directory.
       // This is not.
-      this.disableableOutlets.forEach(disableable => disableable.disable())
       this.progressTarget.classList.remove('d-none')
       // This shows the user that something is going on since there may be a paused before first progress.
       this.updateProgress(2)
@@ -58,7 +57,6 @@ export default class extends Controller {
       this.reloadableFrameOutlets.forEach(reloadableFrame => reloadableFrame.reload())
       if (this.hasSdrTabErrorOutlet) this.sdrTabErrorOutlet.clearInvalidStatus('files')
       if (this.hasFormErrorOutlet) this.formErrorOutlet.changedFiles()
-      this.disableableOutlets.forEach(disableable => disableable.enable())
       this.element.dataset.dropzoneReady = true
     })
     this.dropzone.on('sendingmultiple', (files, xhr, data) => {
