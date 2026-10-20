@@ -10,7 +10,7 @@
                                                                     variant: :'outline-primary', size: :sm,
                                                                     disabled: true) %>
       <% end %>
-      <%= render manage_files_button if item? %>
+      <%= render manage_files_button if manage_files? %>
       <% if status == :draft %>
         <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
                                                                     variant: :primary, size: :sm, disabled: true) %>

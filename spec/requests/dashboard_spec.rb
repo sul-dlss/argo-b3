@@ -101,6 +101,7 @@ RSpec.describe 'Dashboard' do
         expect(rendered_page).to have_css('h2', text: 'Register & deposit single object')
         expect(rendered_page).to have_button('Item', class: 'disabled')
         expect(rendered_page).to have_button('APO', class: 'disabled')
+        expect(rendered_page).to have_button('Agreement', class: 'disabled')
 
         expect(rendered_page).to have_css('h2', text: 'Register or deposit multiple items')
         expect(rendered_page).to have_button('Register multiple items')
@@ -135,6 +136,23 @@ RSpec.describe 'Dashboard' do
         expect(rendered_page).to have_css("form[action='#{multi_item_deposit_actions_path}'][method='post']",
                                           text: 'Deposit multiple items')
         expect(rendered_page).to have_no_css('.disabled', exact_text: 'Deposit multiple items')
+
+        expect(rendered_page).to have_button('Agreement', class: 'disabled')
+      end
+    end
+
+    context 'when signed in as a user with edit permission for the ur APO' do
+      let(:workgroup) { 'sdr:test-workgroup' }
+
+      before do
+        create(:permission, :edit, workgroup:, target_druid: Settings.ur_apo_druid)
+        sign_in(create(:user, groups: [workgroup]))
+        get root_path
+      end
+
+      it 'enables the Agreement button' do
+        expect(rendered_page).to have_link('Agreement', href: new_agreement_path)
+        expect(rendered_page).to have_no_css('a.disabled', text: 'Agreement')
       end
     end
 

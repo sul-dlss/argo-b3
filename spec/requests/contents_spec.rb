@@ -47,6 +47,33 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when an item' do
+      it 'renders the item details tab' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('[role="tab"]', text: 'Item details')
+        expect(page).to have_select('Content type', visible: :all)
+      end
+    end
+
+    context 'when an agreement' do
+      let(:cocina_object) { build(:agreement_with_metadata, id: druid) }
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, :agreement, druid:))
+      end
+
+      it 'does not render the item details tab' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('[role="tab"]', text: 'Add files')
+        expect(page).to have_no_css('[role="tab"]', text: 'Item details')
+        expect(page).to have_no_select('Content type', visible: :all)
+      end
+    end
+
     context 'when the version is open' do
       let(:version) { 2 }
 
@@ -106,6 +133,19 @@ RSpec.describe 'Contents' do
           ), user_name: user.sunetid, description: nil)
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
+      end
+    end
+
+    context 'when depositing an agreement' do
+      let(:cocina_object) { build(:agreement_with_metadata, id: druid) }
+
+      it 'stages with accessioning' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
       end
     end
 

@@ -25,6 +25,7 @@ module Contents
     FALLBACK_POPULATOR = Contents::Populators::FileSetPerFile
 
     POPULATORS_FOR_CONTENT_TYPES = {
+      Cocina::Models::ObjectType.agreement => Contents::Populators::Agreement,
       Cocina::Models::ObjectType.book => Contents::Populators::Book,
       Cocina::Models::ObjectType.document => Contents::Populators::Document,
       Cocina::Models::ObjectType.image => Contents::Populators::Image,

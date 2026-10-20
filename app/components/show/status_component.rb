@@ -27,15 +27,20 @@ module Show
     end
 
     def edit?
-      item? && version_editable? && helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)
+      item? && editable?
     end
 
     def edit_path
       edit_item_path(druid)
     end
 
+    # Files are managed for items and agreements.
+    def manage_files?
+      item? || agreement?
+    end
+
     def manage_files_button
-      Show::ManageFilesButtonComponent.new(druid:, enabled: edit?)
+      Show::ManageFilesButtonComponent.new(druid:, enabled: manage_files? && editable?)
     end
 
     def staging_failed_body
@@ -43,6 +48,10 @@ module Show
     end
 
     private
+
+    def editable?
+      version_editable? && helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)
+    end
 
     def edit_action
       return :edit_agreement if agreement?

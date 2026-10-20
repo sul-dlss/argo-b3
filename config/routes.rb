@@ -213,6 +213,7 @@ Rails.application.routes.draw do
   resources :items, only: %i[new create edit update]
 
   resources :apos, only: %i[new create]
+  resources :agreements, only: %i[new create]
 
   resources :multiple_items, only: %i[new create show]
 

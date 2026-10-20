@@ -109,11 +109,30 @@ RSpec.describe Show::StatusComponent, type: :component do
   context 'when the object is an agreement' do
     let(:object_type) { 'agreement' }
 
-    it 'renders the edit agreement button without manage files' do
+    it 'renders disabled edit agreement and manage files buttons' do
       render_inline(component)
 
       expect(page).to have_button('Edit agreement', class: 'disabled')
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_button('Manage files', class: 'disabled')
+    end
+  end
+
+  context 'when the agreement version is editable and the user can edit' do
+    let(:object_type) { 'agreement' }
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders a disabled edit agreement button and an enabled manage files link' do
+      render_inline(component)
+
+      expect(page).to have_button('Edit agreement', class: 'disabled')
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
     end
   end
 

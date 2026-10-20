@@ -54,6 +54,14 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'with the agreement content type' do
+    let(:content_type) { Cocina::Models::ObjectType.agreement }
+
+    it 'validates agreement resources' do
+      expect(result.errors).to include(a_string_ending_with('must be preserved and not published.'))
+    end
+  end
+
   context 'with the geo content type' do
     let(:content_type) { Cocina::Models::ObjectType.geo }
 

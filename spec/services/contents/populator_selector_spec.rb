@@ -65,6 +65,16 @@ RSpec.describe Contents::PopulatorSelector do
     end
   end
 
+  context 'when the content type is agreement' do
+    let(:cocina_type) { Cocina::Models::ObjectType.agreement }
+
+    it 'selects the agreement populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Agreement,
+                                        actual_populator: Contents::Populators::Agreement,
+                                        reasons: [])
+    end
+  end
+
   context 'when the content type is geo' do
     let(:cocina_type) { Cocina::Models::ObjectType.geo }
 

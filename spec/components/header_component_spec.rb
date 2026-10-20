@@ -71,6 +71,22 @@ RSpec.describe HeaderComponent, type: :component do
       end
     end
 
+    context 'when the user belongs to a workgroup with edit permission for the ur APO' do
+      let(:user) { build_stubbed(:user, name: 'Test User', groups: [workgroup]) }
+      let(:workgroup) { 'sdr:test-workgroup' }
+
+      before do
+        create(:permission, :edit, workgroup:, target_druid: Settings.ur_apo_druid)
+      end
+
+      it 'renders an enabled link for agreement registration' do
+        render_inline(component)
+
+        expect(page).to have_link('Agreement', href: '/agreements/new')
+        expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Agreement')
+      end
+    end
+
     context 'when the user is an admin' do
       let(:user) { build_stubbed(:user, :admin, name: 'Admin User') }
 
