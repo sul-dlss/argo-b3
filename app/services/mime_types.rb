@@ -20,12 +20,16 @@ module MimeTypes
   HTML = 'text/html'
   PLAIN_TEXT = 'text/plain'
   TEXT_XML = 'text/xml'
+  VTT = 'text/vtt'
 
+  MP3 = 'audio/mpeg'
   MP4_AUDIO = 'audio/mp4'
   WAV = 'audio/wav'
   X_WAV = 'audio/x-wav'
 
   MP4_VIDEO = 'video/mp4'
+  MOV = 'video/quicktime'
+  MKV = 'video/x-matroska'
 
   GLTF_BINARY = 'model/gltf-binary'
 
@@ -48,17 +52,17 @@ module MimeTypes
     'application/vnd.shx',
     'application/vnd.pmtiles',
     'application/vnd.fgb',
-    'video/quicktime',
+    MOV,
     'image/tiff; application=geotiff',
     'image/tiff; application=geotiff; profile=cloud-optimized',
-    'audio/mpeg',
+    MP3,
     'image/x-nikon-nef',
     'image/x-raw',
     GIF,
     'video/mpeg',
     'application/msword',
-    'video/x-matroska',
-    'text/vtt',
+    MKV,
+    VTT,
     'application/mxf'
   ].freeze
 end

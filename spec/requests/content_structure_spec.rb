@@ -98,7 +98,8 @@ RSpec.describe 'Content structure' do
 
     context 'when a content type without a validator is selected' do
       it 'renders no alerts' do
-        get validation_content_structure_path(content_id: content_token, content_type: Cocina::Models::ObjectType.media)
+        get validation_content_structure_path(content_id: content_token,
+                                              content_type: Cocina::Models::ObjectType.webarchive_seed)
 
         expect(response.body).not_to include('Content errors')
         expect(response.body).not_to include('Content warnings')
