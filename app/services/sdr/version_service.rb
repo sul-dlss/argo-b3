@@ -73,8 +73,10 @@ module Sdr
     delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :version, :version_description,
              to: :status
 
-    def initialize(druid:)
+    # @param status [Dor::Services::Client::ObjectVersion::VersionStatus, nil] an already retrieved status
+    def initialize(druid:, status: nil)
       @druid = druid
+      @status = status
     end
 
     # @raise [Error] if opening the version fails

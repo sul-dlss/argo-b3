@@ -15,11 +15,7 @@ module Show
     delegate :item?, :agreement?, :collection?, :admin_policy?, :virtual_object?, to: :solr_doc
 
     def heading
-      label = I18n.t("show.status.#{status}.heading")
-      icon_tag = status_icon
-      return label if icon_tag.nil?
-
-      safe_join([icon_tag, label], ' ')
+      render(Show::StatusLabelComponent.new(status:))
     end
 
     def edit_label
@@ -60,15 +56,6 @@ module Show
       return :edit_virtual_object if virtual_object?
 
       :edit_item
-    end
-
-    def status_icon
-      case status
-      when :deposited
-        helpers.success_icon(classes: 'text-success me-2', aria: { hidden: true })
-      when :error, :staging_failed
-        helpers.danger_icon(classes: 'text-danger me-2', aria: { hidden: true })
-      end
     end
   end
 end

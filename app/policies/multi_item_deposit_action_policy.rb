@@ -2,9 +2,9 @@
 
 # Policy for Multi-Item Deposits.
 class MultiItemDepositActionPolicy < ApplicationPolicy
-  alias_rule :show?, :update?, to: :edit?
+  alias_rule :update?, :edit?, :show?, to: :manage?
 
-  def edit?
+  def manage?
     record.user_id == user.id
   end
 end

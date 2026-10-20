@@ -2,13 +2,15 @@
 
 # Presenter for determining the deposit status of an object.
 class ObjectStatusPresenter
-  def initialize(document:, version_service:, content:)
+  # @param initiating [Boolean] true if the object's deposit is being initiated but has not yet started staging
+  def initialize(document:, version_service:, content:, initiating: false)
     @document = document
     @version_service = version_service
     @content = content
+    @initiating = initiating
   end
 
-  delegate :workflow_errors, :druid, to: :document
+  delegate :workflow_errors, :druid, :bare_druid, to: :document
 
   def status
     # For the purposes of the status, treating these states as mutually exclusive.
@@ -17,6 +19,7 @@ class ObjectStatusPresenter
     # Thus, the order of these statements is potentially significant.
     return :staging if content&.staging?
     return :staging_failed if content&.staging_failed?
+    return :initiating if initiating
     return :error if workflow_errors.present?
 
     version_status
@@ -33,7 +36,7 @@ class ObjectStatusPresenter
 
   private
 
-  attr_reader :document, :version_service, :content
+  attr_reader :document, :version_service, :content, :initiating
 
   def version_status
     return :assembling if version_service.assembling?

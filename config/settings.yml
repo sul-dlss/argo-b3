@@ -8,6 +8,7 @@ reload_intervals:
   workflow_grid: 10000
   multiple_items: 2000
   mount_discovery: 2000
+  multi_item_deposit_show: 30000
 
 argo:
   url: https://argo.stanford.edu

@@ -5,11 +5,22 @@ class MultiItemDepositActionsController < ApplicationController
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
 
-  before_action :set_multi_item_deposit_action, only: %i[show edit update structural_metadata_csv_template]
+  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template]
 
-  # Stubbing this out for now.
   def show
+    @multi_item_deposit_action = MultiItemDepositAction.includes(item_deposit_actions: :content)
+                                                       .order(item_deposit_actions: { manifest_line_number: :asc })
+                                                       .find(params.expect(:id))
     authorize! @multi_item_deposit_action
+
+    unless @multi_item_deposit_action.submitted_step?
+      return redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    end
+
+    @object_status_presenters = MultiItemDeposit::ObjectStatusPresentersBuilder.call(
+      item_deposit_actions: @multi_item_deposit_action.item_deposit_actions,
+      initiating: @multi_item_deposit_action.initiating_depositing?
+    )
   end
 
   def edit

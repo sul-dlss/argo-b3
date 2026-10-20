@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ObjectStatusPresenter do
-  subject(:presenter) { described_class.new(document:, version_service:, content:) }
+  subject(:presenter) { described_class.new(document:, version_service:, content:, initiating:) }
 
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
   let(:druid) { 'druid:bc123df4567' }
@@ -17,6 +17,7 @@ RSpec.describe ObjectStatusPresenter do
   let(:assembling) { false }
   let(:accessioning) { false }
   let(:content) { nil }
+  let(:initiating) { false }
 
   describe '#status' do
     context 'when the version is open' do
@@ -26,6 +27,24 @@ RSpec.describe ObjectStatusPresenter do
     end
 
     context 'when the content is staging' do
+      let(:content) { build(:content, staging_state: 'staging') }
+
+      it 'returns staging' do
+        expect(presenter.status).to eq(:staging)
+      end
+    end
+
+    context 'when initiating' do
+      let(:initiating) { true }
+      let(:closed) { true }
+
+      it 'returns initiating' do
+        expect(presenter.status).to eq(:initiating)
+      end
+    end
+
+    context 'when initiating and the content is staging' do
+      let(:initiating) { true }
       let(:content) { build(:content, staging_state: 'staging') }
 
       it 'returns staging' do

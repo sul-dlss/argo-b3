@@ -85,6 +85,8 @@ en:
         heading: "Deposited"
       draft:
         heading: "Draft, not deposited"
+      initiating:
+        heading: "Initiating deposit..."
       depositing:
         heading: "Depositing..."
         body: "Actions unavailable until deposit is complete."
@@ -413,6 +415,7 @@ en:
     multi_item_deposits:
       show:
         title: "Multi-item deposit"
+        description: "Your deposit has been submitted and is in progress. If you have errors below, go to the items' pages to address."
       edit:
         title: "Multi-item deposit"
         buttons:
@@ -508,6 +511,11 @@ en:
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
   multi_item_deposit:
+    deposit_status:
+      label: 'Deposit status'
+      headers:
+        druid: 'Druid'
+        status: 'Status'
     error_details:
       label: 'Error details'
       headers:
