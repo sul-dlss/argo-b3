@@ -208,7 +208,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Source ID', with: 'new:source-id'
 
       find_by_id('description-tab').click
-      choose 'Use FOLIO Instance HRID to retrieve title'
+      choose 'Retrieve description from FOLIO'
       fill_in 'FOLIO Instance HRID', with: 'in11403803'
 
       find_by_id('rights-tab').click
@@ -535,7 +535,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Source ID', with: 'new:source-id'
 
       find_by_id('description-tab').click
-      choose 'Use FOLIO Instance HRID to retrieve title'
+      choose 'Retrieve description from FOLIO'
       # Leaving Title and FOLIO Instance HRID blank.
 
       find_by_id('deposit-tab').click
@@ -668,28 +668,28 @@ RSpec.describe 'Create an item' do
       let(:title) { nil }
 
       it 'does not allow retrieving the title' do
-        expect(page).to have_button('Retrieve title', disabled: true)
+        expect(page).to have_button('Preview FOLIO record', disabled: true)
       end
     end
 
     context 'when the catalog record has a title' do
       let(:title) { 'Pride and prejudice' }
 
-      it 'displays the title in a read-only field' do
-        choose 'Use FOLIO Instance HRID to retrieve title'
-        expect(page).to have_no_field('item_retrieved_title', with: title)
+      it 'displays the title as text' do
+        choose 'Retrieve description from FOLIO'
+        expect(page).to have_no_text(title)
 
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
-        click_button 'Retrieve title'
+        click_button 'Preview FOLIO record'
 
-        expect(page).to have_field('item_retrieved_title', with: title, readonly: true)
+        expect(page).to have_text("FOLIO title statement: #{title}")
         expect(CatalogRepository).to have_received(:title).with(catalog_record_id:)
       end
 
       it 'clears the error from a previous submission when the title is retrieved' do
         allow(Sdr::Repository).to receive_messages(register: nil, accession: nil, source_id_exists?: false)
 
-        choose 'Use FOLIO Instance HRID to retrieve title'
+        choose 'Retrieve description from FOLIO'
         # Leaving the HRID blank so that the form is redisplayed with an error for it.
         find_by_id('deposit-tab').click
         click_button('Register only')
@@ -697,9 +697,9 @@ RSpec.describe 'Create an item' do
         expect(page).to have_invalid_feedback('item_catalog_record_id', "can't be blank")
 
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
-        click_button 'Retrieve title'
+        click_button 'Preview FOLIO record'
 
-        expect(page).to have_field('item_retrieved_title', with: title, readonly: true)
+        expect(page).to have_text("FOLIO title statement: #{title}")
         expect(page).to have_no_css('.invalid-feedback', text: "can't be blank")
         expect(page).to have_no_css('#item_catalog_record_id.is-invalid')
       end
@@ -707,28 +707,28 @@ RSpec.describe 'Create an item' do
       it 'redisplays the title when the form is redisplayed with validation errors' do
         allow(Sdr::Repository).to receive_messages(register: nil, accession: nil, source_id_exists?: false)
 
-        choose 'Use FOLIO Instance HRID to retrieve title'
+        choose 'Retrieve description from FOLIO'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
-        click_button 'Retrieve title'
-        expect(page).to have_field('item_retrieved_title', with: title, readonly: true)
+        click_button 'Preview FOLIO record'
+        expect(page).to have_text("FOLIO title statement: #{title}")
 
         # Leaving the APO blank so that the form is redisplayed with an error.
         find_by_id('deposit-tab').click
         click_button('Register only')
 
         find_by_id('description-tab').click
-        expect(page).to have_field('item_retrieved_title', with: title, readonly: true)
+        expect(page).to have_text("FOLIO title statement: #{title}")
       end
 
       it 'clears the title when the FOLIO Instance HRID is changed' do
-        choose 'Use FOLIO Instance HRID to retrieve title'
+        choose 'Retrieve description from FOLIO'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
-        click_button 'Retrieve title'
-        expect(page).to have_field('item_retrieved_title', with: title, readonly: true)
+        click_button 'Preview FOLIO record'
+        expect(page).to have_text("FOLIO title statement: #{title}")
 
         fill_in 'FOLIO Instance HRID', with: 'in999'
 
-        expect(page).to have_no_field('item_retrieved_title', with: title)
+        expect(page).to have_no_text(title)
         expect(page).to have_no_css('#item_catalog_record_id.is-invalid')
       end
     end
@@ -739,27 +739,27 @@ RSpec.describe 'Create an item' do
       end
 
       it 'displays an error' do
-        choose 'Use FOLIO Instance HRID to retrieve title'
+        choose 'Retrieve description from FOLIO'
         fill_in 'FOLIO Instance HRID', with: catalog_record_id
-        click_button 'Retrieve title'
+        click_button 'Preview FOLIO record'
 
         # Marking the input is what reveals the message, and gives it the server-side red border.
         expect(page).to have_css('#item_catalog_record_id.is-invalid')
         expect(page).to have_invalid_feedback('item_catalog_record_id', 'FOLIO record not found')
-        expect(page).to have_no_field('item_retrieved_title')
+        expect(page).to have_no_text('FOLIO title statement')
       end
 
       it 'replaces the error from a previous submission rather than showing both' do
         allow(Sdr::Repository).to receive_messages(register: nil, accession: nil, source_id_exists?: false)
 
-        choose 'Use FOLIO Instance HRID to retrieve title'
+        choose 'Retrieve description from FOLIO'
         find_by_id('deposit-tab').click
         click_button('Register only')
         find_by_id('description-tab').click
         expect(page).to have_invalid_feedback('item_catalog_record_id', "can't be blank")
 
         # Retrieving without editing the field, so the field itself fires no change event.
-        click_button 'Retrieve title'
+        click_button 'Preview FOLIO record'
 
         expect(page).to have_invalid_feedback('item_catalog_record_id', 'Enter a FOLIO Instance HRID.')
         expect(page).to have_no_css('.invalid-feedback', text: "can't be blank")

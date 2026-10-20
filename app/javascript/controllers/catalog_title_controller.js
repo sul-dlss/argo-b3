@@ -1,28 +1,15 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Retrieves the title for a catalog record id (FOLIO instance HRID) and displays it in a read-only
-// field. The endpoint receives the catalog record id as the catalog_record_id param and returns
+// Retrieves the title for a catalog record id (FOLIO instance HRID) and displays it as text.
+// The endpoint receives the catalog record id as the catalog_record_id param and returns
 // either { "title": "..." } or { "error": "..." }.
-// The field is disabled until a title has been retrieved, so that an empty one is visibly inactive
-// rather than looking like a field waiting to be filled in.
+// The title is also kept in a hidden field (the title target) so that it survives a submission that
+// fails validation. The title's row is hidden until it is retrieved.
 export default class extends Controller {
-  static targets = ['hrid', 'button', 'title', 'error', 'submissionError']
+  static targets = ['hrid', 'button', 'title', 'titleText', 'titleRow', 'error', 'submissionError']
   static values = {
     url: String,
     errorMessage: String
-  }
-
-  connect () {
-    this.syncDisabled()
-  }
-
-  // radio_controller enables every input inside the selected radio's container, including this one, so
-  // the disabled state has to be re-asserted after it runs: on connect (Stimulus connects this
-  // controller after radio_controller, which is on an ancestor) and on the events it responds to.
-  // This only ever disables, so it never overrides radio_controller disabling an unselected radio's
-  // fields.
-  syncDisabled () {
-    if (this.titleTarget.value === '') this.titleTarget.disabled = true
   }
 
   async retrieve () {
@@ -36,7 +23,7 @@ export default class extends Controller {
       const response = await fetch(url, { headers: { Accept: 'application/json' } })
       const body = await response.json()
       if (response.ok) {
-        this.showTitle(body.title)
+        this.setTitle(body.title || '')
       } else {
         this.showError(body.error)
       }
@@ -51,8 +38,7 @@ export default class extends Controller {
   // Clears a previously retrieved title or error, e.g., when the catalog record id is changed,
   // so that a title is never shown for a catalog record id other than the one it was retrieved for.
   reset () {
-    this.titleTarget.value = ''
-    this.titleTarget.disabled = true
+    this.setTitle('')
     this.errorTarget.textContent = ''
     // Before un-marking the input: sdr-tab-error ignores a change event from a field that is not
     // currently marked invalid.
@@ -71,9 +57,10 @@ export default class extends Controller {
     this.hridTarget.dispatchEvent(new Event('change', { bubbles: true }))
   }
 
-  showTitle (title) {
+  setTitle (title) {
     this.titleTarget.value = title
-    this.titleTarget.disabled = false
+    this.titleTextTarget.textContent = title
+    this.titleRowTarget.hidden = title === ''
   }
 
   // Marking the input is what reveals the message, via Bootstrap's `.is-invalid ~ .invalid-feedback`,
