@@ -103,6 +103,34 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
     end
   end
 
+  context 'when filepaths contain invalid UTF-8 bytes' do
+    let!(:existing_content) { create(:content, :mutable, druid:, lock: 'abc123') }
+    let(:invalid_filepaths) { ["bad\xFF.txt", "folder\xFE/file.txt"] }
+
+    before do
+      create(:content_file_binary, content: existing_content, filepath: 'existing.txt')
+      allow(Dir).to receive(:glob).and_call_original
+      allow(Dir).to receive(:glob).with('**/*', File::FNM_DOTMATCH, base: folder_path)
+                                  .and_return(['file1.txt', *invalid_filepaths])
+      allow(File).to receive(:file?).and_call_original
+      invalid_filepaths.each do |filepath|
+        allow(File).to receive(:file?).with(File.join(folder_path, filepath)).and_return(true)
+      end
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'reports invalid filename bytes without replacing existing content' do
+      expect { perform }.not_to change(Content, :count)
+
+      expect(item_deposit_action.discovery_errors)
+        .to eq(['Filepaths contain invalid UTF-8 bytes: "bad\\xFF.txt", "folder\\xFE/file.txt"'])
+      expect(item_deposit_action.content).to be_nil
+      expect(Content.exists?(existing_content.id)).to be true
+      expect(existing_content.content_file_binaries.pluck(:filepath)).to eq(['existing.txt'])
+      expect(Honeybadger).not_to have_received(:notify)
+    end
+  end
+
   context 'when there are empty files and folders' do
     before do
       File.write(File.join(folder_path, 'zero2.txt'), '')

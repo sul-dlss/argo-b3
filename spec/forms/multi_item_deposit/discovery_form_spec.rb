@@ -75,6 +75,16 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     end
   end
 
+  context 'when the uploaded manifest contains invalid UTF-8 bytes' do
+    let(:csv_string) { "druid,folder_name\nbc123df4567,bad\xFF\n" }
+
+    it 'adds the encoding error to the upload field and does not retain the manifest' do
+      expect(form).not_to be_valid
+      expect(form.errors[:manifest_file]).to eq(['CSV contains invalid UTF-8 bytes on line 2.'])
+      expect(form.retainable_manifest_csv).to be_nil
+    end
+  end
+
   context 'when the uploaded file cannot be read' do
     let(:extension) { '.txt' }
 
@@ -131,6 +141,19 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     it 'is not valid' do
       expect(form).not_to be_valid
       expect(form.errors[:manifest_source]).to eq(['Unclosed quoted field in line 2.'])
+    end
+  end
+
+  context 'when the manifest included with the files contains invalid UTF-8 bytes' do
+    let(:manifest_source) { 'mount' }
+
+    before do
+      File.binwrite(File.join(mount_directory, 'manifest.csv'), "druid,folder_name\nbc123df4567,bad\xFF\n")
+    end
+
+    it 'adds the encoding error to the manifest source field' do
+      expect(form).not_to be_valid
+      expect(form.errors[:manifest_source]).to eq(['CSV contains invalid UTF-8 bytes on line 2.'])
     end
   end
 

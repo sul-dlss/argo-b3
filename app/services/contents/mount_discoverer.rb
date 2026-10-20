@@ -4,6 +4,9 @@ module Contents
   # Records the files in a directory on the mount as ContentFileBinaries for a Content.
   # Files that should be ignored are skipped and never become records.
   class MountDiscoverer
+    # Raised before any binaries are built when discovered filepaths contain invalid UTF-8 bytes.
+    class InvalidFilepathsError < StandardError; end
+
     def self.call(...)
       new(...).call
     end
@@ -12,9 +15,16 @@ module Contents
     # @return [Array<String>] the filepaths (relative to the mount path) of the files that are not ignored
     def self.filepaths(mount_path:)
       # File::FNM_DOTMATCH matches .<filename> files.
-      Dir.glob('**/*', File::FNM_DOTMATCH, base: mount_path)
-         .select { |filepath| File.file?(File.join(mount_path, filepath)) }
-         .reject { |filepath| IgnoreFileService.call(filepath:) }
+      filepaths = Dir.glob('**/*', File::FNM_DOTMATCH, base: mount_path)
+                     .select { |filepath| File.file?(File.join(mount_path, filepath)) }
+                     .reject { |filepath| IgnoreFileService.call(filepath:) }
+      invalid_filepaths = filepaths.reject { |filepath| filepath.dup.force_encoding(Encoding::UTF_8).valid_encoding? }
+      if invalid_filepaths.any?
+        raise InvalidFilepathsError,
+              "Filepaths contain invalid UTF-8 bytes: #{invalid_filepaths.map(&:inspect).join(', ')}"
+      end
+
+      filepaths
     end
 
     # @param content [Content]
