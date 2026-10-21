@@ -10,6 +10,14 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     Config.new(label: constant_name.humanize)
   end
 
+  # @return [Array<Config>] the configs for all bulk action types defined in this module
+  def self.all
+    @@all ||= constants.filter_map do |constant_name| # rubocop:disable Style/ClassVars
+      config = const_get(constant_name)
+      config if config.is_a?(Config)
+    end
+  end
+
   def self.to_path_helper(path_name)
     ->(*args) { Rails.application.routes.url_helpers.public_send(path_name, *args) }
   end

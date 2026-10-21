@@ -8,7 +8,10 @@ class BulkActionsController < ApplicationController
   skip_verify_authorized only: %i[index new]
 
   def index
-    @bulk_actions = Current.user.bulk_actions.order(created_at: :desc, id: :desc).page(params[:page]).per(PER_PAGE)
+    @filter_form = BulkActions::FilterForm.new(filter_form_params)
+    @bulk_actions = Current.user.bulk_actions.filtered(**@filter_form.filters)
+                           .order(created_at: :desc, id: :desc)
+                           .page(params[:page]).per(PER_PAGE)
   end
 
   def show
@@ -25,6 +28,10 @@ class BulkActionsController < ApplicationController
   end
 
   private
+
+  def filter_form_params
+    BulkActions::FilterForm.params_from(params)
+  end
 
   def set_bulk_action
     @bulk_action = BulkAction.find(params[:id])

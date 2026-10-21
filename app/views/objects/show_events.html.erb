@@ -1,7 +1,8 @@
 <%= turbo_frame_tag(@druid, 'events') do %>
-  <%# The form is permanent so that the filter values (and Tom Select) are retained when the frame reloads. %>
+  <%# The form is permanent so that the filter values (and Tom Select) are retained when the frame reloads.
+      The id is per object so another object's form isn't retained. %>
   <%= form_with model: @events_filter_form, url: events_object_path(druid: params[:druid]), method: :get,
-                id: 'events-filter', class: 'row g-3 align-items-end mb-4',
+                id: "events_filter_#{DruidSupport.bare_druid_from(@druid)}", class: 'row g-3 align-items-end mb-4',
                 data: { turbo_permanent: true, turbo_frame: "#{@druid}_events" } do |form| %>
     <div class="col-md-3">
       <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :from, text: 'From') %>

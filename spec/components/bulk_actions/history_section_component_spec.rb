@@ -7,9 +7,11 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
 
   let(:component) do
     described_class.new(bulk_actions: BulkAction.where(id: [bulk_action.id, bulk_action_with_files.id])
-                                                .page(1).per(20))
+                                                .page(1).per(20),
+                        filter_form:)
   end
 
+  let(:filter_form) { BulkActions::FilterForm.new }
   let(:bulk_action) do
     create(:bulk_action, action_type: :reindex, description: 'Test description',
                          created_at: Time.zone.parse('2026-04-16T10:00:00Z'))
@@ -25,6 +27,14 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('h1', text: 'Bulk actions')
+
+    form = page.find("form#bulk-actions-filter[action='/bulk_actions'][method='get']")
+    expect(form).to have_css("select[multiple][data-controller='checkbox-tom-select'] " \
+                             "option[value='REDEPOSIT'][selected]", text: 'Redeposit')
+    expect(form).to have_css("select[multiple][data-checkbox-tom-select-select-all-value='false'] " \
+                             "option[value='completed_with_errors'][selected]", text: 'Completed with errors')
+    expect(form).to have_select('Submitted date', selected: 'View all')
+    expect(form).to have_button('Filter', class: 'btn-outline-primary')
 
     table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions']")
     expect(table).to have_css('thead th', text: 'Submitted')
@@ -56,7 +66,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
 
   context 'when a bulk action has multiple export files' do
     let(:component) do
-      described_class.new(bulk_actions: BulkAction.where(id: bulk_action.id).page(1).per(20))
+      described_class.new(bulk_actions: BulkAction.where(id: bulk_action.id).page(1).per(20), filter_form:)
     end
 
     let(:bulk_action) { create(:bulk_action, :with_export, action_type: :register_csv, status: :completed) }
@@ -82,7 +92,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     before { create_list(:bulk_action, 5) }
 
     let(:component) do
-      described_class.new(bulk_actions: BulkAction.all.page(2).per(2))
+      described_class.new(bulk_actions: BulkAction.all.page(2).per(2), filter_form:)
     end
 
     it 'renders pagination controls' do
@@ -91,6 +101,26 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
       expect(page).to have_css('nav.paginate-section')
       expect(page).to have_css('.page-item.active', text: '2')
       expect(page).to have_link('Next »', href: '/bulk_actions?page=3')
+    end
+
+    context 'when filtered' do
+      let(:filter_form) do
+        BulkActions::FilterForm.new(action_types: %w[REDEPOSIT], statuses: %w[completed], submitted_date: 'last_7_days')
+      end
+
+      it 'renders the selected action types and retains the filter in pagination links' do
+        render_inline(component)
+
+        expect(page).to have_css("select option[value='REDEPOSIT'][selected]")
+        expect(page).to have_no_css("select option[value='REINDEX'][selected]")
+        expect(page).to have_css("select option[value='completed'][selected]")
+        expect(page).to have_no_css("select option[value='processing'][selected]")
+        expect(page).to have_select('Submitted date', selected: 'Last 7 days')
+        expect(page).to have_link('Next »',
+                                  href: '/bulk_actions?bulk_actions_filter%5Baction_types%5D%5B%5D=REDEPOSIT' \
+                                        '&bulk_actions_filter%5Bstatuses%5D%5B%5D=completed' \
+                                        '&bulk_actions_filter%5Bsubmitted_date%5D=last_7_days&page=3')
+      end
     end
   end
 end

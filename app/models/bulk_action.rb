@@ -9,7 +9,49 @@ class BulkAction < ApplicationRecord
   after_create :create_output_directory!
   before_destroy :remove_output_directory!
 
+  # Statuses as shown to users, which distinguish completed bulk actions with failed druids.
+  DISPLAY_STATUSES = {
+    'processing' => 'Processing',
+    'completed' => 'Completed',
+    'completed_with_errors' => 'Completed with errors'
+  }.freeze
+
   delegate :exports, :label, to: :bulk_action_config
+
+  # @param display_statuses [Array<String>] keys of DISPLAY_STATUSES (others are ignored)
+  # @return [ActiveRecord::Relation] the bulk actions with any of the display statuses
+  def self.with_display_statuses(display_statuses)
+    (display_statuses & DISPLAY_STATUSES.keys).map { |display_status| where_display_status(display_status) }
+                                              .reduce(:or) || none
+  end
+
+  # @param action_types [Array<String>, nil] nil for no limit
+  # @param statuses [Array<String>, nil] keys of DISPLAY_STATUSES; nil for no limit
+  # @param submitted_since [ActiveSupport::TimeWithZone, nil] nil for no limit
+  # @return [ActiveRecord::Relation] the bulk actions that match the filters
+  def self.filtered(action_types: nil, statuses: nil, submitted_since: nil)
+    relation = all
+    relation = relation.where(action_type: action_types) if action_types
+    relation = relation.with_display_statuses(statuses) if statuses
+    relation = relation.where(created_at: submitted_since..) if submitted_since
+    relation
+  end
+
+  def self.where_display_status(display_status)
+    case display_status
+    when 'processing' then where.not(status: 'completed')
+    when 'completed' then completed.where(druid_count_fail: 0)
+    when 'completed_with_errors' then completed.where(druid_count_fail: 1..)
+    end
+  end
+  private_class_method :where_display_status
+
+  # @return [String] the key of the bulk action's DISPLAY_STATUSES
+  def display_status
+    return 'processing' unless completed?
+
+    druid_count_fail.positive? ? 'completed_with_errors' : 'completed'
+  end
 
   def bulk_action_config
     @bulk_action_config ||= BulkActions.find_config(action_type)

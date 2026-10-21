@@ -3,17 +3,18 @@
 module BulkActions
   # Component for rendering the bulk actions history section
   class HistorySectionComponent < ApplicationComponent
-    def initialize(bulk_actions:)
+    def initialize(bulk_actions:, filter_form:)
       @bulk_actions = bulk_actions
+      @filter_form = filter_form
       super()
     end
 
-    attr_reader :bulk_actions
+    attr_reader :bulk_actions, :filter_form
 
     delegate :current_page, :total_pages, :limit_value, :total_count, to: :bulk_actions
 
     def path_func
-      ->(new_page) { bulk_actions_path(page: new_page) }
+      ->(new_page) { bulk_actions_path(page: new_page, **filter_params) }
     end
 
     def data
@@ -34,11 +35,19 @@ module BulkActions
       ]
     end
 
-    def label
+    def heading
       I18n.t('bulk_actions.history')
     end
 
     private
+
+    # Pagination links retain the filters that do not select all options.
+    def filter_params
+      params = filter_form.active_filter_params
+      return {} if params.empty?
+
+      { filter_form.model_name.param_key => params }
+    end
 
     def show_link_for(bulk_action)
       link_to(helpers.format_datetime(bulk_action.created_at), bulk_action_path(bulk_action))

@@ -69,4 +69,103 @@ RSpec.describe 'Show bulk actions history' do
     expect(page).to have_current_path(bulk_action_path(bulk_action))
     expect(page).to have_css('h1', text: BulkActions::EXPORT_COCINA_JSON.label)
   end
+
+  it 'filters the bulk actions by action type' do
+    redeposit_bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
+    reindex_bulk_action = create(:bulk_action, user:, action_type: 'REINDEX')
+
+    visit bulk_actions_path
+
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '31 selected')
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
+    click_button 'Select none'
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+    click_button 'Select all'
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '31 selected')
+    click_button 'Select none'
+    find('.ts-dropdown .option', text: 'Redeposit').click
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    click_button 'Filter'
+
+    expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
+    expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+
+    # The select (and the filter) are retained when the page reloads.
+    other_redeposit_bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
+    expect(page).to have_css("tr##{dom_id(other_redeposit_bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_no_css('#bulk-actions-filter select[multiple]:not(.tomselected)', visible: :all)
+  end
+
+  it 'resets the filter when navigating to the unfiltered bulk actions' do
+    redeposit_bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
+    reindex_bulk_action = create(:bulk_action, user:, action_type: 'REINDEX')
+
+    visit bulk_actions_path
+
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
+    click_button 'Select none'
+    find('.ts-dropdown .option', text: 'Redeposit').click
+    click_button 'Filter'
+    expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
+
+    click_button 'Bulk actions'
+    click_link 'Recent bulk actions'
+
+    expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
+    expect(page).to have_css("tr##{dom_id(reindex_bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '31 selected')
+
+    page.go_back
+
+    expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper', count: 1)
+  end
+
+  it 'filters the bulk actions by status' do
+    processing_bulk_action = create(:bulk_action, user:)
+    completed_bulk_action = create(:bulk_action, user:, status: :completed)
+
+    visit bulk_actions_path
+
+    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '3 selected')
+    find('#bulk_actions_filter_statuses + .ts-wrapper .ts-control').click
+    expect(page).to have_no_button('Select all')
+    find('.ts-dropdown .option', text: 'Processing').click
+    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '2 selected')
+    click_button 'Filter'
+
+    expect(page).to have_css("tr##{dom_id(completed_bulk_action, 'row')}")
+    expect(page).to have_no_css("tr##{dom_id(processing_bulk_action, 'row')}")
+  end
+
+  it 'filters the bulk actions by submitted date' do
+    recent_bulk_action = create(:bulk_action, user:, created_at: 3.days.ago)
+    older_bulk_action = create(:bulk_action, user:, created_at: 10.days.ago)
+
+    visit bulk_actions_path
+
+    expect(page).to have_select('Submitted date', selected: 'View all')
+    expect(page).to have_css("tr##{dom_id(older_bulk_action, 'row')}")
+    select 'Last 7 days', from: 'Submitted date'
+    click_button 'Filter'
+
+    expect(page).to have_css("tr##{dom_id(recent_bulk_action, 'row')}")
+    expect(page).to have_no_css("tr##{dom_id(older_bulk_action, 'row')}")
+    expect(page).to have_select('Submitted date', selected: 'Last 7 days')
+  end
+
+  it 'returns to the first page when the filter is submitted' do
+    create_list(:bulk_action, BulkActionsController::PER_PAGE + 1, user:, action_type: 'REDEPOSIT')
+
+    visit bulk_actions_path(page: 2)
+    expect(page).to have_css('.page-item.active', text: '2')
+
+    click_button 'Filter'
+
+    expect(page).to have_css('.page-item.active', text: '1')
+    expect(page).to have_no_current_path(/page=/)
+  end
 end

@@ -1,8 +1,38 @@
 <%= tag.div class: 'container mt-3', data: do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-4') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: heading, classes: 'mb-4') %>
+
+  <%# Morph refreshes skip the form, since morphing breaks Tom Select. %>
+  <%= form_with model: filter_form, url: bulk_actions_path, method: :get,
+                id: 'bulk-actions-filter', class: 'd-flex gap-3 mb-4 align-items-end',
+                data: { controller: 'skip-morph', action: 'turbo:before-morph-element->skip-morph#skip' } do |form| %>
+    <div>
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :action_types, text: 'Actions') %>
+      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :action_types,
+                                                                         options: filter_form.action_type_options,
+                                                                         multiple: true,
+                                                                         data: { controller: 'checkbox-tom-select' }) %>
+    </div>
+    <div>
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :statuses, text: 'Statuses') %>
+      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :statuses,
+                                                                         options: filter_form.status_options,
+                                                                         multiple: true,
+                                                                         data: { controller: 'checkbox-tom-select',
+                                                                                 checkbox_tom_select_select_all_value: false }) %>
+    </div>
+    <div>
+      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :submitted_date, text: 'Submitted date') %>
+      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :submitted_date,
+                                                                         options: filter_form.submitted_date_options) %>
+    </div>
+    <div>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter', variant: 'outline-primary') %>
+    </div>
+  <% end %>
+
   <%= render Elements::Pagination::BriefComponent.new(total_pages:, current_page:, path_func:, total_results: total_count, per_page: limit_value) %>
 
-  <%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(label: heading, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
     <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Action', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Description', style: 'width: 30%;') %>
