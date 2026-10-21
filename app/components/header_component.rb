@@ -22,6 +22,11 @@ class HeaderComponent < ApplicationComponent
     helpers.allowed_to?(:new?, nil, with: ItemPolicy)
   end
 
+  # @return [Boolean]
+  def can_register_collection?
+    helpers.allowed_to?(:new?, nil, with: CollectionPolicy)
+  end
+
   def can_register_apo?
     helpers.allowed_to?(:new?, nil, with: ApoPolicy)
   end

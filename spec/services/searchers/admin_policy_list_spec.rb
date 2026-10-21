@@ -53,4 +53,49 @@ RSpec.describe Searchers::AdminPolicyList do
       end
     end
   end
+
+  context 'when limited to editable APOs' do
+    let(:apo_options) { described_class.call(user_scope:, editable: true) }
+
+    context 'with an admin user' do
+      it 'does not restrict the APOs' do
+        apo_options
+
+        expect(Search::SolrService).to have_received(:post) do |args|
+          expect(args[:request][:fq]).to eq(["#{Search::Fields::OBJECT_TYPES}:APO"])
+        end
+      end
+    end
+
+    context 'with a non-admin user' do
+      let(:user) { create(:user) }
+
+      before do
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
+        create(:permission, :read_restricted, workgroup: user.groups.first, target_druid: 'druid:xz987wv6543')
+      end
+
+      it 'restricts the APOs to those the user can edit' do
+        apo_options
+
+        expect(Search::SolrService).to have_received(:post) do |args|
+          expect(args[:request][:fq]).to eq(
+            ["#{Search::Fields::OBJECT_TYPES}:APO", "#{Search::Fields::ID}:(\"druid\\:bc123df4567\")"]
+          )
+        end
+      end
+    end
+
+    context 'with a non-admin user without edit permissions' do
+      let(:user) { create(:user) }
+
+      it 'matches no APOs' do
+        apo_options
+
+        expect(Search::SolrService).to have_received(:post) do |args|
+          expect(args[:request][:fq]).to eq(["#{Search::Fields::OBJECT_TYPES}:APO", '(*:* AND NOT *:*)'])
+        end
+      end
+    end
+  end
 end

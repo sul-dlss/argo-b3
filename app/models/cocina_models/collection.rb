@@ -4,7 +4,10 @@ module CocinaModels
   # Model for a Cocina Collection object.
   class Collection < Base
     include CatalogLinksConcern
-    include SourceIdConcern
+
+    # Not SourceIdConcern, which requires a source id: Cocina does not require one for a collection,
+    # and collection forms do not edit it, so it is only carried through saves.
+    attribute :source_id, :string
 
     # @param cocina_object [Cocina::Models::CollectionWithMetadata] the Cocina object to build this model from
     def self.build_from_cocina_object(cocina_object)

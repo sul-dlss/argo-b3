@@ -161,6 +161,35 @@ en:
           help_text: "The following defaults will apply to all newly registered objects."
         use_and_reproduction_statement:
           label: "Default use and reproduction"
+    collections:
+      new:
+        title: "Register and deposit collection"
+        buttons:
+          register: "Register and deposit collection"
+        toasts:
+          register: "Collection registered and deposit started."
+      fields:
+        access_view:
+          label: "View access"
+        apo_druid:
+          validations:
+            not_selectable: "must be an APO you can edit"
+      tabs:
+        deposit:
+          label: "Register and deposit"
+          help_text: "Complete registration and deposit your collection."
+        description:
+          label: "Description"
+        release:
+          label: "Release"
+          help_text: >-
+            If you choose to release the collection and its member items, this will affect all current and future member
+            items. You can override the collection-level release settings for a specific member item by editing its
+            item-level release settings.
+        rights:
+          label: "APO and rights"
+        tags:
+          label: "Tags"
     contents:
       fields:
         content:

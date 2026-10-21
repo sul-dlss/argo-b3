@@ -22,7 +22,7 @@
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Item', link: new_item_path, disabled: !can_register_item?) %>
       <% end %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: '#', disabled: true) %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Collection', link: new_collection_path, disabled: !can_register_collection?) %>
       <% end %>
       <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'APO', link: new_apo_path, disabled: !can_register_apo?) %>

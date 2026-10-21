@@ -100,6 +100,7 @@ RSpec.describe 'Dashboard' do
 
         expect(rendered_page).to have_css('h2', text: 'Register & deposit single object')
         expect(rendered_page).to have_button('Item', class: 'disabled')
+        expect(rendered_page).to have_button('Collection', class: 'disabled')
         expect(rendered_page).to have_button('APO', class: 'disabled')
         expect(rendered_page).to have_button('Agreement', class: 'disabled')
 
@@ -126,9 +127,12 @@ RSpec.describe 'Dashboard' do
         get root_path
       end
 
-      it 'enables the Item, Register multiple items, and Deposit multiple items buttons' do
+      it 'enables the Item, Collection, Register multiple items, and Deposit multiple items buttons' do
         expect(rendered_page).to have_link('Item', href: new_item_path)
         expect(rendered_page).to have_no_css('a.disabled', text: 'Item')
+
+        expect(rendered_page).to have_link('Collection', href: new_collection_path)
+        expect(rendered_page).to have_no_css('a.disabled', text: 'Collection')
 
         expect(rendered_page).to have_link('Register multiple items', href: new_multiple_item_path)
         expect(rendered_page).to have_no_css('a.disabled', exact_text: 'Register multiple items')

@@ -31,6 +31,7 @@ module CocinaObjectMutators
       cocina_object.is_a?(Cocina::Models::RequestDRO) || cocina_object.is_a?(Cocina::Models::RequestCollection)
     end
 
+    # @return [Hash] the props of the cocina object, updated from the cocina model
     def build_new_cocina_props # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       source_props.tap do |new_cocina_props|
         new_cocina_props[:description] = cocina_model.description_hash
@@ -39,7 +40,9 @@ module CocinaObjectMutators
             Cocina::Models::Mapping::Purl.for(druid: cocina_model.druid)
         end
         new_cocina_props[:identification] ||= {}
-        new_cocina_props[:identification][:sourceId] = cocina_model.source_id
+        # Omitted when blank (permitted for collections), since Cocina rejects a null sourceId.
+        new_cocina_props[:identification][:sourceId] = cocina_model.source_id.presence
+        new_cocina_props[:identification].compact!
         new_cocina_props[:administrative] ||= {}
         new_cocina_props[:administrative][:hasAdminPolicy] = cocina_model.apo_druid
         new_cocina_props[:access] ||= {}

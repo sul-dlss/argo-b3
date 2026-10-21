@@ -105,6 +105,36 @@ RSpec.describe CocinaModels::Collection do
         expect(new_collection.external_identifier).to eq(registered_cocina_object.externalIdentifier)
       end
     end
+
+    context 'without a source id' do
+      let(:new_collection) do
+        described_class.new(access_view: 'world', apo_druid: 'druid:hv992ry2431',
+                            description_hash: { title: [{ value: 'My collection' }] })
+      end
+      let(:registered_cocina_object) { build(:collection_with_metadata) }
+
+      before do
+        allow(Sdr::Repository).to receive(:register).and_return(registered_cocina_object)
+      end
+
+      it 'registers a collection without a source id' do
+        new_collection.create!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:request_cocina_object].identification.sourceId).to be_nil
+        end
+      end
+    end
+  end
+
+  describe 'validate source id' do
+    context 'without a source id' do
+      before { collection.source_id = nil }
+
+      it 'is valid' do
+        expect(collection).to be_valid
+      end
+    end
   end
 
   describe 'type predicates' do
