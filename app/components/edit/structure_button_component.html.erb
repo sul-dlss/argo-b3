@@ -1,9 +1,11 @@
 <%= tag.div class: classes do %>
+  <%# While structuring, the resources' actions are disabled. %>
   <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: content_token),
                                                                   label:,
                                                                   params: { commit:, populator:, content_type: },
                                                                   top: false,
                                                                   method: :patch,
-                                                                  variant: :'outline-primary') %>
+                                                                  variant: :'outline-primary',
+                                                                  data: helpers.disable_actions_form_data) %>
   <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: 'Structuring files...', classes: 'structure-spinner mt-2') %>
 <% end %>
