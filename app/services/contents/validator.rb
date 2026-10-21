@@ -18,6 +18,7 @@ module Contents
       Cocina::Models::ObjectType.geo => Contents::Validators::Geo,
       Cocina::Models::ObjectType.image => Contents::Validators::Image,
       Cocina::Models::ObjectType.map => Contents::Validators::Image,
+      Cocina::Models::ObjectType.media => Contents::Validators::Media,
       Cocina::Models::ObjectType.object => Contents::Validators::ObjectType,
       Cocina::Models::ObjectType.webarchive_binary => Contents::Validators::ObjectType
     }.freeze

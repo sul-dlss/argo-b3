@@ -97,7 +97,7 @@ RSpec.describe Contents::Validator do
   end
 
   context 'with a content type without a validator of its own' do
-    let(:content_type) { Cocina::Models::ObjectType.media }
+    let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
 
     it 'validates nothing' do
       expect(result).to have_attributes(errors: [], warnings: [])
