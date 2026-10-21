@@ -5,7 +5,7 @@ class MultiItemDepositActionsController < ApplicationController
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
 
-  before_action :set_multi_item_deposit_action, only: %i[edit update]
+  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template]
 
   def edit
     authorize! @multi_item_deposit_action
@@ -45,6 +45,13 @@ class MultiItemDepositActionsController < ApplicationController
 
     # Can be removed once all of the edit views are implemented.
     raise NotImplementedError, "Editing #{@multi_item_deposit_action.step} step is not yet implemented"
+  end
+
+  def structural_metadata_csv_template
+    authorize! @multi_item_deposit_action, to: :edit?
+
+    send_data StructuralCsv::Template.as_csv(multi_item_deposit_action: @multi_item_deposit_action),
+              type: 'text/csv', filename: MultiItemDepositAction::STRUCTURAL_METADATA_CSV_FILENAME
   end
 
   private
