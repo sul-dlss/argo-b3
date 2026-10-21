@@ -20,6 +20,7 @@ RSpec.describe 'Create an item' do
     allow(Searchers::CollectionList).to receive(:call).and_return(
       [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
     )
+    allow(Searchers::TagSuggestions).to receive(:call).and_return([])
   end
 
   context 'when valid' do
@@ -94,15 +95,15 @@ RSpec.describe 'Create an item' do
 
       click_button 'Next'
       expect(page).to have_css('#tags-tab.active')
-      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+      fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
       click_button 'Add another tag'
-      fill_in 'item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
-      fill_in 'item[project_tags_attributes][0][tag]', with: 'Argo'
+      fill_in_tag 'item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
+      fill_in_tag 'item[project_tags_attributes][0][tag]', with: 'Argo'
       click_button 'Add another project'
-      fill_in 'item[project_tags_attributes][1][tag]', with: 'Google Books'
-      fill_in 'item[ticket_tags_attributes][0][tag]', with: 'ABC-123'
+      fill_in_tag 'item[project_tags_attributes][1][tag]', with: 'Google Books'
+      fill_in_tag 'item[ticket_tags_attributes][0][tag]', with: 'ABC-123'
       click_button 'Add another ticket'
-      fill_in 'item[ticket_tags_attributes][1][tag]', with: 'ABC-456'
+      fill_in_tag 'item[ticket_tags_attributes][1][tag]', with: 'ABC-456'
 
       click_button 'Next'
       expect(page).to have_css('#release-tab.active')
@@ -376,9 +377,9 @@ RSpec.describe 'Create an item' do
       select apo_title, from: 'APO'
 
       find_by_id('tags-tab').click
-      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+      fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
       click_button 'Add another tag'
-      fill_in 'item[other_tags_attributes][1][tag]', with: 'Project : Argo'
+      fill_in_tag 'item[other_tags_attributes][1][tag]', with: 'Project : Argo'
 
       within 'fieldset', text: 'Tags' do
         within first('.form-instance') do
@@ -409,8 +410,8 @@ RSpec.describe 'Create an item' do
       select apo_title, from: 'APO'
 
       find_by_id('tags-tab').click
-      fill_in 'item[project_tags_attributes][0][tag]', with: 'Project : Argo'
-      fill_in 'item[ticket_tags_attributes][0][tag]', with: 'Ticket : ABC-123'
+      fill_in_tag 'item[project_tags_attributes][0][tag]', with: 'Project : Argo'
+      fill_in_tag 'item[ticket_tags_attributes][0][tag]', with: 'Ticket : ABC-123'
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -442,11 +443,11 @@ RSpec.describe 'Create an item' do
       click_button 'Add tags'
 
       # The first tag fills the blank row that is already there; the second is appended.
-      expect(page).to have_field('item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo')
-      expect(page).to have_field('item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0')
+      expect(find_tag_select_item('item[other_tags_attributes][0][tag]')).to have_text('Registered By : mjgiarlo')
+      expect(find_tag_select_item('item[other_tags_attributes][1][tag]')).to have_text('Remediated By : 5.0.0')
       # Project and ticket tags are filed under their own sections with the prefix removed.
-      expect(page).to have_field('item[project_tags_attributes][0][tag]', with: 'Argo')
-      expect(page).to have_field('item[ticket_tags_attributes][0][tag]', with: 'ABC-123')
+      expect(find_tag_select_item('item[project_tags_attributes][0][tag]')).to have_text('Argo')
+      expect(find_tag_select_item('item[ticket_tags_attributes][0][tag]')).to have_text('ABC-123')
       expect(page).to have_field('Enter multiple tags', with: '')
 
       find_by_id('deposit-tab').click
@@ -458,6 +459,61 @@ RSpec.describe 'Create an item' do
         expect(args[:tags]).to eq(['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
                                    'Project : Argo', 'Ticket : ABC-123'])
       end
+    end
+
+    it 'registers a valid cocina object with suggested tags' do
+      allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'other'))
+                                                        .and_return(['Remediated By : 5.0.0'])
+      allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'project'))
+                                                        .and_return(['Argo : Phase 1', 'Argo : Phase 2'])
+      allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'ticket'))
+                                                        .and_return(['ARGO-123'])
+
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      select_tag_suggestion('Remediated By : 5.0.0', query: 'remed', field_name: 'item[other_tags_attributes][0][tag]')
+      select_tag_suggestion('Argo : Phase 2', query: 'argo', field_name: 'item[project_tags_attributes][0][tag]')
+      click_button 'Add another ticket'
+      select_tag_suggestion('ARGO-123', query: 'argo', field_name: 'item[ticket_tags_attributes][1][tag]')
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq(['Remediated By : 5.0.0', 'Project : Argo : Phase 2', 'Ticket : ARGO-123'])
+      end
+      expect(Searchers::TagSuggestions).to have_received(:call)
+        .with(query: 'remed', tag_type: 'other', user_scope: an_instance_of(Permissions::UserScope))
+    end
+
+    it 'does not suggest tags until 3 characters have been entered' do
+      allow(Searchers::TagSuggestions).to receive(:call).and_return(['Argo : Phase 1'])
+
+      visit new_item_path
+
+      find_by_id('tags-tab').click
+      input = find_tag_select_input('item[project_tags_attributes][0][tag]')
+      input.send_keys('ar')
+      # Only the option for entering the typed text is shown.
+      expect(page).to have_css('.ts-dropdown .create', text: 'ar')
+      expect(page).to have_no_css('.ts-dropdown .option:not(.create)')
+
+      input.send_keys('g')
+      expect(page).to have_css('.ts-dropdown .option', text: 'Argo : Phase 1')
+      expect(Searchers::TagSuggestions).to have_received(:call).once
+      expect(Searchers::TagSuggestions).to have_received(:call)
+        .with(query: 'arg', tag_type: 'project', user_scope: an_instance_of(Permissions::UserScope))
     end
 
     it 'registers and redirects to add files' do
@@ -618,7 +674,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('tags-tab').click
-      fill_in 'item[other_tags_attributes][0][tag]', with: 'Registered By'
+      fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By'
 
       find_by_id('deposit-tab').click
       click_button('Register only')
