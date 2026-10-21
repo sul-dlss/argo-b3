@@ -19,8 +19,8 @@ RSpec.describe Edit::StructureButtonComponent, type: :component do
     expect(form).to have_field('populator', with: 'Book', type: :hidden)
     expect(form).to have_field('content_type', with: 'https://cocina.sul.stanford.edu/models/book', type: :hidden)
     expect(form).to have_button('Append files to structure')
-    expect(form['data-action']).to eq('turbo:submit-start->structure-actions#disable ' \
-                                      'turbo:submit-end->structure-actions#enable')
+    expect(form['data-action']).to eq('turbo:submit-start->disable-actions#disable ' \
+                                      'turbo:submit-end->disable-actions#enable')
     expect(action).to have_css('.structure-spinner img[src$="/styles/Rosette.svg"]')
     expect(action).to have_text('Structuring files...')
   end

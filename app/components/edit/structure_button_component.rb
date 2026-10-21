@@ -21,10 +21,5 @@ module Edit
     def classes
       merge_classes('structure-action', @classes)
     end
-
-    # While structuring, the resources' actions are disabled (see structure_actions_controller.js).
-    def data
-      { action: 'turbo:submit-start->structure-actions#disable turbo:submit-end->structure-actions#enable' }
-    end
   end
 end

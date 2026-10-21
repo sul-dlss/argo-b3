@@ -8,7 +8,7 @@
                                                                                       label: "Edit resource #{index}",
                                                                                       link: edit_path,
                                                                                       classes: 'ms-2',
-                                                                                      data: { structure_actions_target: 'disableable' })
+                                                                                      data: { disable_actions_target: 'disableable' })
                     end %>
 
       </div>
@@ -20,7 +20,7 @@
         <% end %>
         <% if editable? %>
           <%# A fieldset so that the move and delete buttons can be disabled together (e.g., while structuring). %>
-          <fieldset class="d-flex align-items-center" data-structure-actions-target="disableable">
+          <fieldset class="d-flex align-items-center" data-disable-actions-target="disableable">
             <% if move_up? || move_down? %>
               <div class="d-flex ms-2">
                 <% if move_up? %>

@@ -27,9 +27,9 @@
       <%# Reloaded when a resource changes (see content_file_sets/show). %>
       <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token, content_type: @content_type), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
 
-      <%# While uploading, the resources' actions are disabled (see structure_actions_controller.js). %>
+      <%# While uploading, the resources' actions are disabled. %>
       <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3',
-                    data: { action: 'turbo:submit-start->structure-actions#disable turbo:submit-end->structure-actions#enable' } do |form| %>
+                    data: disable_actions_form_data do |form| %>
         <%= hidden_field_tag :content_type, @content_type %>
         <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
         <%= render SdrViewComponents::Forms::FileComponent.new(form:,

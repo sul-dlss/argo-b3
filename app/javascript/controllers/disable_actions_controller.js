@@ -1,7 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Disables the resources' actions (e.g., while structuring files).
-// Targets are fieldsets of buttons or links.
+// Disables the disableable targets while a form declaring the disable-actions actions is submitting
+// (see DisableActionsHelper). Attach to a container that holds both the forms and the targets.
+// Targets are buttons, fieldsets of buttons, or links.
 export default class extends Controller {
   static targets = ['disableable']
 

@@ -92,7 +92,7 @@ RSpec.describe Show::FileSetComponent, type: :component do
     expect(page).to have_no_button('Delete resource 2')
     expect(page).to have_no_button('Move resource 2 up')
     expect(page).to have_no_button('Move resource 2 down')
-    expect(page).to have_no_css('[data-structure-actions-target]')
+    expect(page).to have_no_css('[data-disable-actions-target]')
   end
 
   context 'when a content token is provided' do
@@ -115,8 +115,8 @@ RSpec.describe Show::FileSetComponent, type: :component do
     it 'renders disableable edit, move, and delete buttons' do
       render_inline(component)
 
-      expect(page).to have_css('a[data-structure-actions-target="disableable"]', text: 'Edit resource 2')
-      fieldset = page.find('.card-title fieldset[data-structure-actions-target="disableable"]')
+      expect(page).to have_css('a[data-disable-actions-target="disableable"]', text: 'Edit resource 2')
+      fieldset = page.find('.card-title fieldset[data-disable-actions-target="disableable"]')
       expect(fieldset).to have_button('Move resource 2 up')
       expect(fieldset).to have_button('Delete resource 2')
     end
