@@ -10,6 +10,7 @@ class ItemDepositAction < ApplicationRecord
   # where.not(discovery_errors: []) would be NOT IN (), so the jsonb arrays are compared directly.
   scope :with_discovery_errors, -> { where("discovery_errors <> '[]'::jsonb") }
   scope :with_discovery_warnings, -> { where("discovery_warnings <> '[]'::jsonb") }
+  scope :with_deposit_errors, -> { where("deposit_errors <> '[]'::jsonb") }
   scope :with_structure_errors, lambda {
     where("structural_csv_errors <> '[]'::jsonb").or(where("content_type_structure_errors <> '[]'::jsonb"))
   }

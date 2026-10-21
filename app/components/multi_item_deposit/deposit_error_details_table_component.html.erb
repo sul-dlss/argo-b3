@@ -1,0 +1,20 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(label:, responsive: true) do |component| %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.druid')) %>
+  <% component.with_header(label: t('multi_item_deposit.error_details.headers.error')) %>
+  <% item_deposit_actions_with_deposit_errors.each do |item_deposit_action| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %>
+        <%= bare_druid(item_deposit_action) %>
+      <% end %>
+      <% row_component.with_cell do %>
+        <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
+          <% item_deposit_action.deposit_errors.each do |error| %>
+            <% list_component.with_item do %>
+              <%= tag.span(error, class: 'text-danger') %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -411,14 +411,19 @@ en:
         viewing_direction:
           label: "Viewing direction"
     multi_item_deposits:
+      show:
+        title: "Multi-item deposit"
       edit:
         title: "Multi-item deposit"
         buttons:
           build_structure: "Check files"
           cancel: "Cancel"
+          deposit: "Check version status and deposit"
           discover: "Discover files and check manifest"
           next: "Next"
           previous: "Previous"
+        deposit_results:
+          heading: "Results of checking version status"
         discovery_results:
           heading: "Results of checking manifest"
         structure_results:
@@ -477,6 +482,9 @@ en:
           label: "Upload structural metadata CSV"
           retained: "A structural metadata CSV has been uploaded. Choose a file to replace it."
           template: "Download structural metadata template CSV"
+        version_description:
+          help_text: "The version description will only be applied to items that do not already have one."
+          initial_version_help_text: "Version description is automatically set for initial deposits."
       wait:
         message: "Processing..."
     multiple_items:
@@ -546,7 +554,7 @@ en:
       errors:
         object_not_found: 'Object not found'
         not_authorized: 'Not authorized to update'
-        object_changed: 'Object changed since discovery; re-run Discover'
+        object_changed: 'Object changed since discovery; re-run Discover files'
         not_openable: 'A new version cannot be opened for this object'
         not_closeable: 'The open version cannot be closed for this object'
         unexpected: 'An unexpected error occurred while checking the deposit. Contact SDR support for assistance.'

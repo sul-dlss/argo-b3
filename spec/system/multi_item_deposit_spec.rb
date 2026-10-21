@@ -11,6 +11,9 @@ RSpec.describe 'Multi-item deposit' do
   let(:version_service) do
     instance_double(Sdr::VersionService, open?: false, openable?: true, closeable?: true, version: 2)
   end
+  let(:status) do
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, open?: false, openable?: true)
+  end
   # The test database has no queue tables, so a verifying double (which loads the schema) cannot be used.
   # The block enqueues to the test adapter.
   let(:batch_class) { double('SolidQueue::Batch') } # rubocop:disable RSpec/VerifiedDoubles
@@ -27,6 +30,8 @@ RSpec.describe 'Multi-item deposit' do
       build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
     end
     allow(Sdr::VersionService).to receive(:new).and_return(version_service)
+    allow(version_service).to receive(:open) { build(:dro_with_metadata).new(lock: 'opened-lock') }
+    allow(Sdr::VersionService).to receive(:statuses) { |druids:| druids.index_with { status } }
     stub_const('SolidQueue::Batch', batch_class)
     allow(batch_class).to receive(:enqueue).and_yield
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
@@ -50,7 +55,19 @@ RSpec.describe 'Multi-item deposit' do
     MultiItemDeposit::StructureFinishJob.perform_now(multi_item_deposit_action:)
   end
 
-  it 'checks the manifest, discovers files, structures, and proceeds to deposit' do
+  # The objects' locks are those found at discovery, except for any changed since.
+  def run_deposit_job(multi_item_deposit_action, changed_druids: [])
+    allow(Sdr::Repository).to receive(:find_all) do |druids:|
+      druids.index_with do |druid|
+        cocina_object = build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
+        changed_druids.include?(druid) ? cocina_object.new(lock: 'changed-lock') : cocina_object
+      end
+    end
+    MultiItemDeposit::DepositJob.perform_now(multi_item_deposit_action: multi_item_deposit_action.reload,
+                                             effective_groups: user.groups)
+  end
+
+  it 'checks the manifest, discovers files, structures, and deposits' do
     visit root_path
     click_on 'Deposit multiple items'
 
@@ -152,7 +169,52 @@ RSpec.describe 'Multi-item deposit' do
 
     click_on 'Next'
 
-    expect(page).to have_text('The deposit step is not yet implemented.')
+    expect(page).to have_css('h1', text: 'Multi-item deposit')
     expect(multi_item_deposit_action.reload).to be_deposit_step
+
+    # The items are redeposits, so a version description is required.
+    expect(page).to have_field('Version description', disabled: false)
+    click_on 'Check version status and deposit'
+
+    expect(page).to have_css('#multi_item_deposit_deposit_version_description_error', text: "can't be blank")
+    expect(multi_item_deposit_action.reload).not_to be_initiating_depositing
+
+    # Returning to structure keeps the structure results.
+    click_on 'Previous'
+
+    expect(page).to have_css('h2', text: 'Results of checking files')
+    expect(multi_item_deposit_action.reload).to be_structure_step
+
+    click_on 'Next'
+
+    fill_in 'Version description', with: 'Adding files'
+    click_on 'Check version status and deposit'
+
+    expect(page).to have_text('Processing...')
+    expect(multi_item_deposit_action.reload).to be_initiating_depositing
+    expect(multi_item_deposit_action.version_description).to eq('Adding files')
+    expect(MultiItemDeposit::DepositJob).to have_been_enqueued
+
+    run_deposit_job(multi_item_deposit_action, changed_druids: ['druid:cd234fg5678'])
+
+    # The wait page refreshes to show the errors, and nothing is deposited.
+    expect(page).to have_css('h2', text: 'Results of checking version status')
+    error_rows = page.find('table[aria-label="Error details"]').all('tbody tr')
+    expect(error_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
+      .to eq([['cd234fg5678', 'Object changed since discovery; re-run Discover files']])
+    expect(page).to have_field('Version description', with: 'Adding files')
+    expect(version_service).not_to have_received(:open)
+
+    click_on 'Check version status and deposit'
+
+    expect(page).to have_text('Processing...')
+
+    run_deposit_job(multi_item_deposit_action)
+
+    # The wait page refreshes to the show page once the deposit is submitted.
+    expect(page).to have_text('The show page is not yet implemented.')
+    expect(multi_item_deposit_action.reload).to be_submitted_step
+    expect(version_service).to have_received(:open).twice
+    expect(StageFilesJob).to have_been_enqueued.twice
   end
 end

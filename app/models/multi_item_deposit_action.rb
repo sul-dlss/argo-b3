@@ -45,6 +45,11 @@ class MultiItemDepositAction < ApplicationRecord
     item_deposit_actions.exists?(content_type: STRUCTURAL_METADATA_CSV_REQUIRED_CONTENT_TYPES)
   end
 
+  # @return [Boolean] whether every Item Deposit is an initial version
+  def all_initial_versions?
+    !item_deposit_actions.exists?(initial_version: [false, nil])
+  end
+
   # @return [String, nil] the path of the structural metadata CSV at the root of the mount path, if it exists
   def mount_structural_metadata_csv_path
     return if mount_path.blank?

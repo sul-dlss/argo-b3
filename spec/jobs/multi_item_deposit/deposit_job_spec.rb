@@ -14,8 +14,9 @@ RSpec.describe MultiItemDeposit::DepositJob do
                                        version_description: 'Adding files', perform_ocr: true,
                                        ocr_languages: ['English'])
   end
-  let(:content) { create(:content, :mutable, druid:, lock: 'abc123') }
-  let(:other_content) { create(:content, :mutable, druid: other_druid, lock: 'abc123') }
+  # Content locks come from find as ETags, while find_all returns bare locks ('abc123').
+  let(:content) { create(:content, :mutable, druid:, lock: 'W/"abc123-gzip"') }
+  let(:other_content) { create(:content, :mutable, druid: other_druid, lock: 'W/"abc123-gzip"') }
   let!(:item_deposit_action) do
     create(:item_deposit_action, multi_item_deposit_action:, druid:, deposit_errors: ['Old error'], content:,
                                  content_type: 'book')
@@ -93,7 +94,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
       perform
 
       expect(Sdr::VersionService).not_to have_received(:open).with(hash_including(druid: other_druid))
-      expect(other_content.reload.lock).to eq('abc123')
+      expect(other_content.reload.lock).to eq('W/"abc123-gzip"')
     end
 
     it 'sets the OCR settings only for content types that can be OCRed' do
@@ -137,7 +138,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
 
         expect(item_deposit_action.reload.deposit_errors)
           .to eq(['An unexpected error occurred while depositing. Contact SDR support for assistance.'])
-        expect(content.reload).to have_attributes(lock: 'abc123', staging_state: 'staging_not_in_progress')
+        expect(content.reload).to have_attributes(lock: 'W/"abc123-gzip"', staging_state: 'staging_not_in_progress')
         expect(Honeybadger).to have_received(:notify).with(error)
         expect(StageFilesJob).to have_been_enqueued.with(content: other_content, user:, accession: true,
                                                          notify: false, staging_location: Settings.assembly_location)
@@ -175,7 +176,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
       item_deposit_action.content.update!(lock: 'def456')
     end
 
-    it_behaves_like 'completes with an error', 'Object changed since discovery; re-run Discover'
+    it_behaves_like 'completes with an error', 'Object changed since discovery; re-run Discover files'
   end
 
   context 'when the Content no longer exists' do
@@ -183,7 +184,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
       item_deposit_action.update!(content: nil)
     end
 
-    it_behaves_like 'completes with an error', 'Object changed since discovery; re-run Discover'
+    it_behaves_like 'completes with an error', 'Object changed since discovery; re-run Discover files'
   end
 
   context 'when the object is closed and cannot be opened' do

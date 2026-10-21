@@ -157,6 +157,27 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '#all_initial_versions?' do
+    it 'is true when every Item Deposit is an initial version' do
+      create_list(:item_deposit_action, 2, multi_item_deposit_action:, initial_version: true)
+
+      expect(multi_item_deposit_action).to be_all_initial_versions
+    end
+
+    it 'is false when an Item Deposit is not an initial version' do
+      create(:item_deposit_action, multi_item_deposit_action:, initial_version: true)
+      create(:item_deposit_action, multi_item_deposit_action:, initial_version: false)
+
+      expect(multi_item_deposit_action).not_to be_all_initial_versions
+    end
+
+    it 'is false when whether an Item Deposit is an initial version is unknown' do
+      create(:item_deposit_action, multi_item_deposit_action:, initial_version: nil)
+
+      expect(multi_item_deposit_action).not_to be_all_initial_versions
+    end
+  end
+
   describe '#mount_structural_metadata_csv_path' do
     let(:mount_directory) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
 
