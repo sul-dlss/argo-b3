@@ -35,7 +35,7 @@ RSpec.describe 'Create an agreement' do
 
     click_button 'Next'
     expect(page).to have_css('#tags-tab.active')
-    fill_in 'agreement[other_tags_attributes][0][tag]', with: 'Some : Tag'
+    fill_in_tag 'agreement[other_tags_attributes][0][tag]', with: 'Some : Tag'
 
     click_button 'Next'
     expect(page).to have_css('#deposit-tab.active')
