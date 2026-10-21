@@ -6,9 +6,14 @@ class StageFilesJob < ApplicationJob
   # @param [Content] content the content whose files should be staged
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging
-  def perform(content:, user:, accession: false)
+  # @param [Boolean] notify whether to notify the user (with toasts) when staging completes or fails
+  # @param [String] staging_location where to stage, unless files are already staged elsewhere
+  def perform(content:, user:, accession: false, notify: true, staging_location: Settings.staging_location)
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
+    @notify = notify
+    # Already staged files win, since assembly reads only the first location with the druid's files.
+    @staging_location = StagingSupport.staged_location(druid:) || staging_location
 
     check_lock! # Check cocina lock version and raise if optimistic lock problem
     Contents::ExternalIdentifierMinter.call(content:) # Mint external identifiers for new files/filesets
@@ -20,10 +25,10 @@ class StageFilesJob < ApplicationJob
 
     perform_broadcast
   rescue StandardError => e
-    handle_failure(error: e, content:, user:)
+    handle_failure(error: e, content:, user:, notify:)
   end
 
-  attr_reader :content, :user
+  attr_reader :content, :user, :notify, :staging_location
 
   delegate :druid, to: :content
 
@@ -79,7 +84,8 @@ class StageFilesJob < ApplicationJob
   def stage!
     stageable_content_file_binaries.find_each do |content_file_binary|
       filepath = content_file_binary.filepath_on_disk
-      staging_filepath = StagingSupport.staging_filepath(druid:, filepath: content_file_binary.filepath)
+      staging_filepath = StagingSupport.staging_filepath(druid:, filepath: content_file_binary.filepath,
+                                                         staging_location:)
       create_directory(staging_filepath)
       FileUtils.cp filepath, staging_filepath
       content_file_binary.file_location_stage!
@@ -92,12 +98,13 @@ class StageFilesJob < ApplicationJob
 
   def perform_broadcast
     Turbo::StreamsChannel.broadcast_refresh_to('objects', druid)
+    return unless notify
 
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_completed'), user:, disappearing: true)
   end
 
   # Uses the arguments passed to #perform, since the failure may have happened before they were assigned.
-  def handle_failure(error:, content:, user:)
+  def handle_failure(error:, content:, user:, notify:)
     Rails.logger.error(error.full_message)
     Honeybadger.notify(error)
 
@@ -105,6 +112,8 @@ class StageFilesJob < ApplicationJob
     content.reload
     content.staging_errored! if content.staging?
     Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
+    return unless notify
+
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'),
                     text: I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email),
                     user:, disappearing: false, variant: :red)

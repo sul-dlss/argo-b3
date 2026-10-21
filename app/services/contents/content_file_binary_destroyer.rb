@@ -31,11 +31,13 @@ module Contents
 
     attr_reader :content_file_binaries
 
-    # @return [Array<String>] the staging filepaths of the binaries that had been staged
+    # @return [Array<String>] the staging filepaths (in every staging location) of the binaries that had been staged
     def staging_filepaths
-      content_file_binaries.select(&:file_location_stage?).map do |content_file_binary|
-        StagingSupport.staging_filepath(druid: content_file_binary.content.druid,
-                                        filepath: content_file_binary.filepath)
+      content_file_binaries.select(&:file_location_stage?).flat_map do |content_file_binary|
+        StagingSupport.locations.map do |staging_location|
+          StagingSupport.staging_filepath(druid: content_file_binary.content.druid,
+                                          filepath: content_file_binary.filepath, staging_location:)
+        end
       end
     end
   end

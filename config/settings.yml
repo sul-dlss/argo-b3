@@ -61,6 +61,8 @@ file_upload:
   directory: "tmp/argo-files"
 
 staging_location: 'tmp/sdr-deposit-staging'
+# Multi-Item Deposit stages here, where assembly reads it.
+assembly_location: 'tmp/dor-assembly'
 
 links:
   license: 'https://sdr.library.stanford.edu/documentation/license-options'

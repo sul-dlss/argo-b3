@@ -27,10 +27,12 @@ class Content < ApplicationRecord
     where(druid:).with_staging_states(:staging, :staging_failed).order(updated_at: :desc).first
   end
 
-  # A staging failure for another Content for the druid (e.g., one for an earlier lock) is superseded
-  # when this Content is staged.
-  def clear_other_staging_failures!
-    Content.where(druid:).where.not(id:).with_staging_state(:staging_failed).find_each(&:staging_failure_cleared!)
+  # Staging supersedes staging failures for other Contents for the druid (e.g., one for an earlier lock).
+  # @param stage_files_options [Hash] additional keyword arguments for StageFilesJob#perform
+  def start_staging!(user:, **stage_files_options)
+    clear_other_staging_failures!
+    staging_started!
+    StageFilesJob.perform_later(content: self, user:, **stage_files_options)
   end
 
   # The assembly workflow reads these from its context to decide whether to run OCR.
@@ -73,5 +75,11 @@ class Content < ApplicationRecord
     event :discovery_completed do
       transition discovering: :discovery_not_in_progress
     end
+  end
+
+  private
+
+  def clear_other_staging_failures!
+    Content.where(druid:).where.not(id:).with_staging_state(:staging_failed).find_each(&:staging_failure_cleared!)
   end
 end

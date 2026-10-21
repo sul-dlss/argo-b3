@@ -83,10 +83,7 @@ class ContentsController < ContentsApplicationController
     # Saving also saves the OCR settings with the content and rebases it onto the saved object's lock.
     @contents_item_form.save!(user_name: current_user.sunetid)
 
-    content.clear_other_staging_failures!
-    content.staging_started!
-    StageFilesJob.perform_later(content:, accession: params[:commit] == ContentsController::DEPOSIT_VALUE,
-                                user: current_user)
+    content.start_staging!(user: current_user, accession: params[:commit] == ContentsController::DEPOSIT_VALUE)
     true
   rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)

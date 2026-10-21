@@ -110,18 +110,29 @@ RSpec.describe Content do
     end
   end
 
-  describe '#clear_other_staging_failures!' do
+  describe '#start_staging!' do
     subject(:content) { create(:content, druid:, lock: 'lock-2', staging_state: 'staging_failed') }
 
+    let(:user) { create(:user) }
     let!(:other_failed_content) { create(:content, druid:, lock: 'lock-1', staging_state: 'staging_failed') }
     let!(:other_object_failed_content) do
       create(:content, druid: 'druid:df123bc4589', lock: 'lock-1', staging_state: 'staging_failed')
     end
 
-    it 'clears staging failures for other contents for the druid only' do
-      content.clear_other_staging_failures!
+    before do
+      allow(StageFilesJob).to receive(:perform_later)
+    end
 
-      expect(content.reload.staging_state).to eq('staging_failed')
+    it 'starts staging the content with the options' do
+      content.start_staging!(user:, accession: true)
+
+      expect(content.reload.staging_state).to eq('staging')
+      expect(StageFilesJob).to have_received(:perform_later).with(content:, user:, accession: true)
+    end
+
+    it 'clears staging failures for other contents for the druid only' do
+      content.start_staging!(user:)
+
       expect(other_failed_content.reload.staging_state).to eq('staging_not_in_progress')
       expect(other_object_failed_content.reload.staging_state).to eq('staging_failed')
     end
