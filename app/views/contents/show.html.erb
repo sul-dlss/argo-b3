@@ -1,6 +1,9 @@
 <%= turbo_frame_tag @content, 'show' do %>
   <%# Deleting is disabled during discovery, since discovery may be adding files. %>
-  <%= render Edit::ContentFileBinariesComponent.new(content_record: @content,
-                                                    content_token: @content_token,
-                                                    disabled: @content.discovering?) %>
+  <%# The fieldset is disabled while uploading and structuring (see disable-actions in contents/edit). %>
+  <fieldset data-disable-actions-target="disableable">
+    <%= render Edit::ContentFileBinariesComponent.new(content_record: @content,
+                                                      content_token: @content_token,
+                                                      disabled: @content.discovering?) %>
+  </fieldset>
 <% end %>

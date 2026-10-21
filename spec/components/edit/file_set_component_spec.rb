@@ -47,6 +47,12 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_button('Remove image1.tif')
   end
 
+  it 'renders a save button that is disabled while other actions are in progress' do
+    render_inline(component)
+
+    expect(page).to have_css('button[data-disable-actions-target="disableable"]', text: 'Save')
+  end
+
   it 'renders a hidden note for when every file is removed' do
     render_inline(component)
 

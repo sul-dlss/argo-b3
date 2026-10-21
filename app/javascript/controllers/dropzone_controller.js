@@ -26,6 +26,8 @@ export default class extends Controller {
       hiddenInputContainer: this.hiddenInputContainerSelectorValue
     })
     this.progress = 0
+    this.disablers = new Set()
+    this.disabled = false
     this.shouldClearErrors = false
     this.basePath = null
     this.dropzone.on('processingmultiple', () => {
@@ -41,6 +43,9 @@ export default class extends Controller {
       this.element.dispatchEvent(new Event('change'))
 
       this.clearErrors()
+
+      // This notifies listeners (e.g., disable-actions) that an upload has started.
+      this.dispatch('upload-start')
     })
     this.dropzone.on('totaluploadprogress', (totalUploadProgress) => {
       const uploadProgress = Math.trunc(totalUploadProgress)
@@ -58,6 +63,7 @@ export default class extends Controller {
       if (this.hasSdrTabErrorOutlet) this.sdrTabErrorOutlet.clearInvalidStatus('files')
       if (this.hasFormErrorOutlet) this.formErrorOutlet.changedFiles()
       this.element.dataset.dropzoneReady = true
+      this.dispatch('upload-end')
     })
     this.dropzone.on('sendingmultiple', (files, xhr, data) => {
       // Add the full path of each file to the form data
@@ -111,15 +117,41 @@ export default class extends Controller {
     this.folderAlertTarget.classList.add('d-none')
   }
 
-  disable () {
-    this.element.classList.add('opacity-50')
-    this.dropzone.disable()
-    this.element.dataset.dropzoneReady = false
+  // The dropzone is disabled by its radio button not being selected (radio:disable) and by other actions
+  // being in progress (disable-actions:disable). Each disabler is tracked separately, so that the dropzone
+  // is enabled only once none apply.
+  disable (event) {
+    // Disabling cancels uploads, so the dropzone isn't disabled while uploading (e.g., by disable-actions
+    // disabling actions because of this upload).
+    if (this.dropzone.getUploadingFiles().length > 0) return
+
+    this.disablers.add(this.disablerFor(event))
+    this.updateDisabled()
   }
 
-  enable () {
-    this.element.classList.remove('opacity-50')
-    this.dropzone.enable()
-    this.element.dataset.dropzoneReady = true
+  enable (event) {
+    this.disablers.delete(this.disablerFor(event))
+    this.updateDisabled()
+  }
+
+  // The identifier of the controller that dispatched the event (e.g., 'radio' for radio:disable), since
+  // Stimulus prefixes dispatched events with the dispatching controller's identifier.
+  disablerFor (event) {
+    return event.type.split(':')[0]
+  }
+
+  updateDisabled () {
+    const disabled = this.disablers.size > 0
+    // Enabling an enabled dropzone would add its event listeners again.
+    if (disabled === this.disabled) return
+
+    this.disabled = disabled
+    this.element.classList.toggle('opacity-50', disabled)
+    if (disabled) {
+      this.dropzone.disable()
+    } else {
+      this.dropzone.enable()
+    }
+    this.element.dataset.dropzoneReady = !disabled
   }
 }

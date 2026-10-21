@@ -14,38 +14,44 @@
     <% end %>
     <%= render Edit::StructurePopulatorDescriptionComponent.new(populator_selection: @populator_selection) %>
     <% populator = @populator_selection.actual_populator.name.demodulize %>
+    <%# The structure buttons and the CSV upload are in fieldsets so that they are disabled while uploading. %>
     <% if @content.content_file_sets.none? %>
-      <%= render Edit::StructureButtonComponent.new(label: 'Structure files', commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_token: @content_token, content_type: @content_type) %>
+      <fieldset data-disable-actions-target="disableable">
+        <%= render Edit::StructureButtonComponent.new(label: 'Structure files', commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_token: @content_token, content_type: @content_type) %>
+      </fieldset>
     <% else %>
-      <div class="d-flex align-items-start">
+      <fieldset class="d-flex align-items-start" data-disable-actions-target="disableable">
         <%= render Edit::StructureButtonComponent.new(label: 'Clear and structure files again', commit: ContentStructureController::STRUCTURE_VALUE, populator:, content_token: @content_token, content_type: @content_type) %>
 
         <% if unassociated_count.positive? %>
           <%= render Edit::StructureButtonComponent.new(label: 'Append files to structure', commit: ContentStructureController::APPEND_VALUE, populator:, content_token: @content_token, content_type: @content_type, classes: 'ms-3') %>
         <% end %>
-      </div>
+      </fieldset>
       <%# Reloaded when a resource changes (see content_file_sets/show). %>
       <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token, content_type: @content_type), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
 
-      <%# While uploading, the resources' actions are disabled. %>
-      <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3',
-                    data: disable_actions_form_data do |form| %>
-        <%= hidden_field_tag :content_type, @content_type %>
-        <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
-        <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                               field_name: :csv_file,
-                                                               label_text: 'Upload structural CSV:',
-                                                               label_classes: 'fw-bold',
-                                                               label_default_class: 'col-form-label text-nowrap',
-                                                               container_classes: 'inline-upload-field',
-                                                               input_classes: 'form-control-sm',
-                                                               input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(','),
-                                                               error_classes: 'order-last') do |component| %>
-          <% component.with_additional_container_content do %>
-            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload', variant: :'outline-primary', classes: 'btn-sm', value: ContentStructureController::CSV_VALUE) %>
+      <%# While uploading a CSV, actions (e.g., the resources' actions) are disabled. While uploading files or structuring,
+          the CSV upload is disabled. %>
+      <fieldset data-disable-actions-target="disableable">
+        <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3',
+                      data: disable_actions_form_data do |form| %>
+          <%= hidden_field_tag :content_type, @content_type %>
+          <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
+          <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                 field_name: :csv_file,
+                                                                 label_text: 'Upload structural CSV:',
+                                                                 label_classes: 'fw-bold',
+                                                                 label_default_class: 'col-form-label text-nowrap',
+                                                                 container_classes: 'inline-upload-field',
+                                                                 input_classes: 'form-control-sm',
+                                                                 input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(','),
+                                                                 error_classes: 'order-last') do |component| %>
+            <% component.with_additional_container_content do %>
+              <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload', variant: :'outline-primary', classes: 'btn-sm', value: ContentStructureController::CSV_VALUE) %>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
+      </fieldset>
 
       <div class="text-end">
         <span class="fw-bold">Download:</span> <%= link_to 'structural metadata', csv_content_structure_path(content_id: @content_token), data: { turbo: false } %>

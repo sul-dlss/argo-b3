@@ -200,6 +200,130 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when a file is uploading' do
+    def dispatch_dropzone_event(name)
+      page.execute_script("document.getElementById('file-dropzone')" \
+                          ".dispatchEvent(new CustomEvent('dropzone:#{name}', { bubbles: true }))")
+    end
+
+    it 'disables actions until the upload finishes' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+      expect(page).to have_toast('Structure built from files')
+
+      click_on 'Add files'
+
+      # Simulating the upload, since an actual upload finishes too quickly to observe.
+      dispatch_dropzone_event('upload-start')
+
+      expect(page).to have_button('Delete dropzone_upload.txt', disabled: true)
+      expect(page).to have_field('Use files from mount', type: 'radio', disabled: true)
+      click_on 'Structure'
+      expect(page).to have_button('Clear and structure files again', disabled: true)
+      expect(page).to have_button('Upload', disabled: true)
+      expect(page).to have_button('Delete resource 1', disabled: true)
+      expect(page).to have_link('Edit resource 1', class: 'disabled')
+      click_on 'Deposit'
+      expect(page).to have_button('Deposit', disabled: true)
+      expect(page).to have_button('Save as draft', disabled: true)
+
+      dispatch_dropzone_event('upload-end')
+
+      expect(page).to have_button('Deposit', disabled: false)
+      expect(page).to have_button('Save as draft', disabled: false)
+      click_on 'Structure'
+      expect(page).to have_button('Clear and structure files again', disabled: false)
+      expect(page).to have_button('Upload', disabled: false)
+      expect(page).to have_button('Delete resource 1', disabled: false)
+      expect(page).to have_no_css('a.disabled', text: 'Edit resource 1')
+      click_on 'Add files'
+      expect(page).to have_button('Delete dropzone_upload.txt', disabled: false)
+      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+    end
+
+    it 'disables actions rendered while uploading' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+      expect(page).to have_toast('Structure built from files')
+
+      dispatch_dropzone_event('upload-start')
+      expect(page).to have_button('Delete resource 1', disabled: true)
+
+      # For example, changing the content type reloads the structure section.
+      page.execute_script("document.querySelector('turbo-frame[id^=\"edit-structure\"]').reload()")
+
+      expect(page).to have_button('Clear and structure files again', disabled: true)
+      expect(page).to have_button('Delete resource 1', disabled: true)
+    end
+  end
+
+  context 'when structuring' do
+    def dispatch_structure_event(name)
+      page.execute_script("[...document.querySelectorAll('.structure-action form')]" \
+                          ".find(form => form.textContent.includes('Clear and structure files again'))" \
+                          ".dispatchEvent(new CustomEvent('turbo:#{name}', { bubbles: true }))")
+    end
+
+    it 'disables actions until structuring finishes' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+      expect(page).to have_toast('Structure built from files')
+
+      # Simulating the submission, since structuring finishes too quickly to observe.
+      dispatch_structure_event('submit-start')
+
+      expect(page).to have_button('Delete resource 1', disabled: true)
+      click_on 'Add files'
+      expect(page).to have_css('#file-dropzone.opacity-50')
+      expect(page).to have_button('Delete dropzone_upload.txt', disabled: true)
+      expect(page).to have_field('Use files from mount', type: 'radio', disabled: true)
+      click_on 'Deposit'
+      expect(page).to have_button('Deposit', disabled: true)
+      expect(page).to have_button('Save as draft', disabled: true)
+
+      dispatch_structure_event('submit-end')
+
+      expect(page).to have_button('Deposit', disabled: false)
+      expect(page).to have_button('Save as draft', disabled: false)
+      click_on 'Add files'
+      expect(page).to have_no_css('#file-dropzone.opacity-50')
+      expect(page).to have_button('Delete dropzone_upload.txt', disabled: false)
+      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+    end
+
+    it 'keeps the dropzone disabled when using files from the mount' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Structure'
+      click_button('Structure files')
+      expect(page).to have_toast('Structure built from files')
+
+      click_on 'Add files'
+      choose 'Use files from mount'
+      expect(page).to have_css('#file-dropzone.opacity-50')
+
+      dispatch_structure_event('submit-start')
+      dispatch_structure_event('submit-end')
+
+      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+      expect(page).to have_css('#file-dropzone.opacity-50')
+    end
+  end
+
   context 'when the object is a book with images' do
     let(:cocina_object) do
       build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
