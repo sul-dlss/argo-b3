@@ -58,6 +58,23 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '.find_all' do
+    let(:druids) { ['druid:bc123df4567', 'druid:cd234fg5678', 'druid:df345gh6789'] }
+    let(:objects_client) { instance_double(Dor::Services::Client::Objects) }
+    let(:cocina_objects) { druids.map { |id| build(:dro_with_metadata, id:) } }
+
+    before do
+      allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
+      allow(objects_client).to receive(:find_all).and_return(cocina_objects.first(2), cocina_objects.last(1))
+    end
+
+    it 'finds the objects in slices, keyed by druid' do
+      expect(described_class.find_all(druids:, slice_size: 2)).to eq(druids.zip(cocina_objects).to_h)
+      expect(objects_client).to have_received(:find_all).with(druids: ['druid:bc123df4567', 'druid:cd234fg5678'])
+      expect(objects_client).to have_received(:find_all).with(druids: ['druid:df345gh6789'])
+    end
+  end
+
   describe '#find_solr' do
     context 'when the object is found' do
       let(:solr_doc) { { 'id' => druid } }

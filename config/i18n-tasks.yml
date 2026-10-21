@@ -23,3 +23,5 @@ ignore_unused:
   - 'multi_item_deposit.discover_files.*'
   # Built from symbol keys in MultiItemDeposit::StructureJob#message.
   - 'multi_item_deposit.structure.*'
+  # Built from symbol keys in MultiItemDeposit::DepositCheckJob#message.
+  - 'multi_item_deposit.deposit_check.*'

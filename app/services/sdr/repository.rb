@@ -7,6 +7,7 @@ module Sdr
     class NotFoundResponse < Error; end
 
     REGISTERED_BY_TAG_PREFIX = 'Registered By : '
+    FIND_ALL_SLICE_SIZE = 25
 
     # @param [String] druid the druid of the object
     # @return [Cocina::Models::DROWithMetadata] the returned model
@@ -16,6 +17,16 @@ module Sdr
       Dor::Services::Client.object(druid).find
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
+    # Objects that are not found are omitted.
+    # @param [Array<String>] druids the druids of the objects
+    # @param [Integer] slice_size the number of druids per request
+    # @return [Hash<String, Cocina::Models::DROWithMetadata>] the returned models, keyed by druid
+    def self.find_all(druids:, slice_size: FIND_ALL_SLICE_SIZE)
+      druids.each_slice(slice_size).flat_map do |slice_druids|
+        Dor::Services::Client.objects.find_all(druids: slice_druids)
+      end.index_by(&:externalIdentifier)
     end
 
     # Retrieve the current lock (optimistic concurrency token) for the object.
