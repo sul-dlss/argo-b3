@@ -72,6 +72,7 @@ volumes:
   - "/workspace/bulk:/workspace/bulk"
   - "/var/log/argo:/var/log/argo"
   - "/sdr-deposit-staging:/sdr-deposit-staging"
+  - "/dor/assembly:/dor/assembly"
   - "/data/argo-files:/data/argo-files"
   # File locations in all environments
   - "/globus:/globus"

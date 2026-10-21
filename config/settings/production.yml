@@ -5,3 +5,4 @@ file_upload:
   directory: "/data/argo-files"
 
 staging_location: '/sdr-deposit-staging'
+assembly_location: '/dor/assembly'

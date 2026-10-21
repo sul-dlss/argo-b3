@@ -2,19 +2,31 @@
 
 # Methods for staging support, such as constructing file paths.
 class StagingSupport
-  def self.staging_filepath(druid:, filepath:)
-    File.join(staging_content_path(druid:), filepath)
+  # @return [Array<String>] the staging locations, in the order searched
+  def self.locations
+    [Settings.staging_location, Settings.assembly_location]
   end
 
-  def self.staging_content_path(druid:)
-    druid_tree_folder = DruidTools::Druid.new(druid, Settings.staging_location).path
+  def self.staging_filepath(druid:, filepath:, staging_location: Settings.staging_location)
+    File.join(staging_content_path(druid:, staging_location:), filepath)
+  end
+
+  def self.staging_content_path(druid:, staging_location: Settings.staging_location)
+    druid_tree_folder = DruidTools::Druid.new(druid, staging_location).path
     File.join(druid_tree_folder, 'content')
   end
 
-  # @return [Boolean] true if the staging content directory for the druid exists and contains files
+  # @return [Boolean] true if the staging content directory for the druid in any staging location contains files
   #   (including in subdirectories)
   def self.staged_files?(druid:)
-    content_path = staging_content_path(druid:)
-    Dir.glob('**/*', base: content_path).any? { |path| File.file?(File.join(content_path, path)) }
+    staged_location(druid:).present?
+  end
+
+  # @return [String, nil] the first staging location with staged files for the druid
+  def self.staged_location(druid:)
+    locations.find do |staging_location|
+      content_path = staging_content_path(druid:, staging_location:)
+      Dir.glob('**/*', base: content_path).any? { |path| File.file?(File.join(content_path, path)) }
+    end
   end
 end

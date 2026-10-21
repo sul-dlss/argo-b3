@@ -57,7 +57,7 @@ RSpec.describe Contents::ContentFileBinaryDestroyer do
 
   context 'when the binary has been staged' do
     let(:staging_filepath) do
-      StagingSupport.staging_filepath(druid: content.druid, filepath: content_file_binary.filepath)
+      File.join(Settings.staging_location, 'bc/123/df/4567/bc123df4567/content/image1.tif')
     end
 
     before do
@@ -74,6 +74,18 @@ RSpec.describe Contents::ContentFileBinaryDestroyer do
       call
 
       expect(File.exist?(staging_filepath)).to be false
+    end
+
+    context 'when the binary was staged to the assembly location' do
+      let(:staging_filepath) do
+        File.join(Settings.assembly_location, 'bc/123/df/4567/bc123df4567/content/image1.tif')
+      end
+
+      it 'deletes the staged file from that location' do
+        call
+
+        expect(File.exist?(staging_filepath)).to be false
+      end
     end
 
     context 'when the enclosing transaction is rolled back' do

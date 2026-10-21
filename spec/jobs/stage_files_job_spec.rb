@@ -25,7 +25,11 @@ RSpec.describe StageFilesJob do
 
   let(:content_file_set) { create(:content_file_set, content:) }
 
-  let(:staging_filepath) { StagingSupport.staging_filepath(druid:, filepath: 'image1.tif') }
+  let(:staging_filepath) { staged_filepath('image1.tif') }
+
+  def staged_filepath(filepath, staging_location: Settings.staging_location)
+    File.join(staging_location, 'bc/123/df/4567/bc123df4567/content', filepath)
+  end
 
   before do
     attached_content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
@@ -46,7 +50,9 @@ RSpec.describe StageFilesJob do
   end
 
   after do
-    FileUtils.rm_rf(StagingSupport.staging_content_path(druid:))
+    StagingSupport.locations.each do |staging_location|
+      FileUtils.rm_rf(StagingSupport.staging_content_path(druid:, staging_location:))
+    end
   end
 
   describe '#perform' do
@@ -68,9 +74,9 @@ RSpec.describe StageFilesJob do
       job.perform(content:, user:)
 
       expect(File.binread(staging_filepath)).to eq(attached_content_file_binary.file.download)
-      expect(File.binread(StagingSupport.staging_filepath(druid:, filepath: 'catalog_record_id_and_barcode.xlsx')))
+      expect(File.binread(staged_filepath('catalog_record_id_and_barcode.xlsx')))
         .to eq(file_fixture('catalog_record_id_and_barcode.xlsx').binread)
-      expect(File.exist?(StagingSupport.staging_filepath(druid:, filepath: 'image2.tif'))).to be false
+      expect(File.exist?(staged_filepath('image2.tif'))).to be false
     end
 
     it 'updates the file location of staged content file binaries to stage' do
@@ -91,7 +97,7 @@ RSpec.describe StageFilesJob do
 
         expect(Contents::Analyzer).not_to have_received(:call)
           .with(content_file_binary: unassociated_content_file_binary)
-        expect(File.exist?(StagingSupport.staging_filepath(druid:, filepath: 'image3.tif'))).to be false
+        expect(File.exist?(staged_filepath('image3.tif'))).to be false
         expect(unassociated_content_file_binary.reload.file_location).to eq('attached')
       end
     end
@@ -141,6 +147,41 @@ RSpec.describe StageFilesJob do
       job.perform(content:, user:)
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('objects', druid)
+    end
+
+    context 'when notifying is not requested' do
+      it 'broadcasts a refresh to the object without a toast notification' do
+        job.perform(content:, user:, notify: false)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('objects', druid)
+        expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
+      end
+    end
+
+    context 'when another staging location is requested' do
+      it 'stages to that location' do
+        job.perform(content:, user:, staging_location: Settings.assembly_location)
+
+        expect(File.binread(staged_filepath('image1.tif', staging_location: Settings.assembly_location)))
+          .to eq(attached_content_file_binary.file.download)
+        expect(File.exist?(staging_filepath)).to be false
+      end
+    end
+
+    context 'when files are already staged in another staging location' do
+      let(:previously_staged_filepath) { staged_filepath('previous.tif') }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(previously_staged_filepath))
+        FileUtils.touch(previously_staged_filepath)
+      end
+
+      it 'stages to the location with the staged files, so that the files are not split' do
+        job.perform(content:, user:, staging_location: Settings.assembly_location)
+
+        expect(File.binread(staging_filepath)).to eq(attached_content_file_binary.file.download)
+        expect(File.exist?(staged_filepath('image1.tif', staging_location: Settings.assembly_location))).to be false
+      end
     end
 
     it 'does not accession the object' do
@@ -285,6 +326,15 @@ RSpec.describe StageFilesJob do
           .with('notifications', user, target: 'toast-container',
                                        html: a_string_including('Staging failed', Settings.support_email,
                                                                 'bg-stanford-digital-red'))
+      end
+
+      context 'when notifying is not requested' do
+        it 'does not broadcast an error toast' do
+          job.perform(content:, user:, accession: true, notify: false)
+
+          expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('objects', druid)
+          expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
+        end
       end
     end
   end
