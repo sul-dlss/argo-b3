@@ -21,6 +21,7 @@ env:
     SETTINGS__FEATURE_FLAGS__BULK_ACTIONS: true
     SETTINGS__FOLIO__OKAPI__URL: https://folio-stage-api.stanford.edu
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-stage.stanford.edu
+    SETTINGS__TECH_MD_SERVICE__URL: https://techmd-stage.stanford.edu
 
     DATABASE_HOSTNAME: argo-b3-db-stage-a
 
