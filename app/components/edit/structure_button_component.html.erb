@@ -1,5 +1,5 @@
 <%= tag.div class: classes do %>
-  <%# While structuring, the resources' actions are disabled. %>
+  <%# While structuring, actions (e.g., the resources' actions, depositing, uploading) are disabled. %>
   <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: content_token),
                                                                   label:,
                                                                   params: { commit:, populator:, content_type: },

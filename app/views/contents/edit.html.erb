@@ -1,5 +1,9 @@
 
-<div class="container py-2" data-controller="unassociated-files structure-content-type">
+<%# disable-actions disables actions (e.g., deleting files, changing the structure, depositing) while files are
+    uploading and while the structure is changing (forms with DisableActionsHelper#disable_actions_form_data, e.g.,
+    structuring files). %>
+<div class="container py-2" data-controller="unassociated-files structure-content-type disable-actions"
+     data-action="dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.contents.edit.title')) %>
 
   <p class="mb-4"><%= @solr_doc.title %></p>
@@ -66,7 +70,9 @@
                                 controller: 'dropzone',
                                 dropzone_max_filesize_value: Settings.file_upload.max_filesize,
                                 dropzone_reloadable_frame_outlet: '.content-files-frame',
-                                action: 'radio:disable->dropzone#disable radio:enable->dropzone#enable'
+                                action: 'radio:disable->dropzone#disable radio:enable->dropzone#enable ' \
+                                        'disable-actions:disable->dropzone#disable disable-actions:enable->dropzone#enable',
+                                disable_actions_target: 'disableable'
                               }, id: 'file-dropzone', class: 'dropzone radio-disableable my-fieldset' do %>
                   <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
                     <span data-dropzone-target="folderAlertText"></span>
@@ -90,7 +96,7 @@
                   field_name: :file_location_choice,
                   label_text: t('edit.items.fields.file_choice.mount.label'),
                   input_value: ContentForm::MOUNT_FILE_LOCATION_CHOICE,
-                  input_data: { radio_target: 'radio', action: 'radio#toggle' },
+                  input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
                   container_classes: 'my-fieldset'
                 ) do |component| %>
               <% component.with_additional_container_content do %>
@@ -115,7 +121,7 @@
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
                                                                             label: t('edit.contents.tabs.structural.label'))) do %>
           <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
-          <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame disable-actions', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
+          <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <%# Until the structure section has loaded, assume there are unassociated files. %>
             <span hidden data-unassociated-files-target="unassociated"></span>
@@ -135,10 +141,11 @@
                 container_classes: 'mb-3'
               ) %>
         <% end %>
-        <div class="d-flex justify-content-end">
+        <%# A fieldset so that disabling while uploading doesn't conflict with the unassociated-files disabling of the buttons. %>
+        <fieldset class="d-flex justify-content-end" data-disable-actions-target="disableable">
           <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ContentsController::DRAFT_VALUE, form_id: item_form_id, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
           <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ContentsController::DEPOSIT_VALUE, form_id: item_form_id, data: { unassociated_files_target: 'submit' }) %>
-        </div>
+        </fieldset>
       <% end %>
     <% end %>
   <% end %>
