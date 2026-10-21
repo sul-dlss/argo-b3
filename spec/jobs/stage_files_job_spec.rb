@@ -174,7 +174,7 @@ RSpec.describe StageFilesJob do
 
           expect(Sdr::Repository).to have_received(:accession)
             .with(cocina_object: updated_cocina_object, user_name: user.sunetid,
-                  context: { runOcr: true, ocrLanguages: ['English'] })
+                  context: { runOCR: true, ocrLanguages: ['English'] })
         end
       end
     end

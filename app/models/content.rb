@@ -38,7 +38,7 @@ class Content < ApplicationRecord
   def workflow_context
     return {} unless perform_ocr
 
-    { runOcr: true, ocrLanguages: ocr_languages }
+    { runOCR: true, ocrLanguages: ocr_languages }
   end
 
   # A background job may change the lock of a Content that is staging or discovering.

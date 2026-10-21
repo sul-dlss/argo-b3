@@ -176,10 +176,10 @@ RSpec.describe CocinaModels::Dro do
 
       context 'with a workflow context' do
         it 'starts accessioning with the context' do
-          dro.save!(user_name:, description:, accession: true, workflow_context: { runOcr: true })
+          dro.save!(user_name:, description:, accession: true, workflow_context: { runOCR: true })
 
           expect(Sdr::Repository).to have_received(:accession)
-            .with(cocina_object:, user_name:, context: { runOcr: true })
+            .with(cocina_object:, user_name:, context: { runOCR: true })
         end
       end
 
