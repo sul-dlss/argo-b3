@@ -44,7 +44,7 @@ RSpec.describe Contents::Populators::ThreeDimensional do
       it 'creates a 3d file set with a file for the model' do
         structure
 
-        expect(content.content_file_sets.sole).to have_attributes(file_set_type: '3d', label: '')
+        expect(content.content_file_sets.sole).to have_attributes(file_set_type: '3d', label: 'Model file')
         content_file = content.content_files.sole
         expect(content_file.content_file_binary).to eq(model_binary)
         expect(content_file).to have_attributes(label: 'model.glb', preserve: true, shelve: true, publish: true,
@@ -68,7 +68,7 @@ RSpec.describe Contents::Populators::ThreeDimensional do
         structure
 
         expect(content.content_file_sets.map { |file_set| [file_set.file_set_type, file_set.label] })
-          .to eq([['3d', ''], ['file', 'File 1'], ['file', 'File 2'], ['file', 'File 3']])
+          .to eq([['3d', 'Model file'], ['file', 'File 1'], ['file', 'File 2'], ['file', 'File 3']])
         expect(content.content_file_sets.pluck(:position)).to eq([1, 2, 3, 4])
         expect(content.content_files.map(&:filepath)).to eq(%w[model2.glb aaa_notes.txt image.tif model10.glb])
       end
