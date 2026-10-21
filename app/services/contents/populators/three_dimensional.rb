@@ -28,7 +28,7 @@ module Contents
 
         if model_content_file_binary
           create_content_file_set(content_file_binary: model_content_file_binary,
-                                  file_set_type: FileSetTypes::THREE_DIMENSIONAL, label: '')
+                                  file_set_type: FileSetTypes::THREE_DIMENSIONAL, label: 'Model file')
         end
         create_file_content_file_sets(content_file_binaries: content_file_binaries - [model_content_file_binary])
       end
