@@ -35,15 +35,15 @@
 
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_EARTHWORKS,
                                                           facet_counts: @results.released_to_earthworks_facet,
-                                                          search_form: @search_form, facet_component: :dynamic) %>
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
 
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_PURL_SITEMAP,
                                                           facet_counts: @results.released_to_purl_sitemap_facet,
-                                                          search_form: @search_form, facet_component: :dynamic) %>
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
 
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::RELEASED_TO_SEARCHWORKS,
                                                           facet_counts: @results.released_to_searchworks_facet,
-                                                          search_form: @search_form, facet_component: :dynamic) %>
+                                                          search_form: @search_form, facet_component: :dynamic_with_date_range) %>
 
   <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::METADATA_SOURCES,
                                                           facet_counts: @results.metadata_sources_facet,

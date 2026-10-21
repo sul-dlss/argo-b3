@@ -7,6 +7,7 @@
 #
 # Attributes declared here determine *which objects match*. Attributes that only affect how matching
 # objects are presented (e.g., page, sort) belong on a subclass.
+# rubocop:disable-next Metrics/ClassLength
 class SearchForm < ApplicationForm
   include NormalizationConcern
 
@@ -97,8 +98,14 @@ class SearchForm < ApplicationForm
   attribute :registered_date_from, :date, default: nil
   attribute :registered_date_to, :date, default: nil
   attribute :released_to_earthworks, array: true, default: -> { [] }
+  attribute :released_to_earthworks_date_from, :date, default: nil
+  attribute :released_to_earthworks_date_to, :date, default: nil
   attribute :released_to_purl_sitemap, array: true, default: -> { [] }
+  attribute :released_to_purl_sitemap_date_from, :date, default: nil
+  attribute :released_to_purl_sitemap_date_to, :date, default: nil
   attribute :released_to_searchworks, array: true, default: -> { [] }
+  attribute :released_to_searchworks_date_from, :date, default: nil
+  attribute :released_to_searchworks_date_to, :date, default: nil
   attribute :tags, array: true, default: -> { [] }
   attribute :tickets, array: true, default: -> { [] }
   attribute :topics, array: true, default: -> { [] }
