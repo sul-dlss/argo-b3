@@ -159,6 +159,10 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_no_field('Mount path')
+        expect(rendered_page).to have_link(
+          'Download structural metadata template CSV',
+          href: structural_metadata_csv_template_multi_item_deposit_action_path(multi_item_deposit_action)
+        )
       end
 
       it 'renders the OCR inputs when an Item Deposit can be OCRed' do
@@ -697,6 +701,39 @@ RSpec.describe 'Multi-item deposit actions' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(multi_item_deposit_action.reload.description).to eq('My deposit')
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
+  describe 'structural_metadata_csv_template' do
+    let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+    let(:content) { create(:content, :mutable, druid: 'druid:bc123df4567') }
+
+    before do
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567', content:)
+      create(:content_file_binary, content:, filepath: 'image1.tif', mime_type: 'image/tiff')
+    end
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:owner) { user }
+
+      it 'downloads the structural metadata CSV template' do
+        get structural_metadata_csv_template_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq('text/csv')
+        expect(response.headers['Content-Disposition']).to include('attachment; filename="structural_metadata.csv"')
+        expect(response.body.lines.second).to eq("bc123df4567,,,,image1.tif,,,,,,,,image/tiff,,,,\n")
+      end
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:owner) { create(:user) }
+
+      it 'denies access' do
+        get structural_metadata_csv_template_multi_item_deposit_action_path(multi_item_deposit_action)
+
         expect(response).to redirect_to(root_path)
       end
     end

@@ -35,8 +35,13 @@
             <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
           <% end %>
           <% if @structure_form.retainable_structural_metadata_csv.present? %>
-            <p class="mb-1"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
+            <p class="mb-2"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
           <% end %>
+          <div class="my-2">
+            <%= link_to structural_metadata_csv_template_multi_item_deposit_action_path(@multi_item_deposit_action), download: true do %>
+              <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.template') %>
+            <% end %>
+          </div>
           <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                                  field_name: :structural_metadata_csv_file,
                                                                  container_classes: 'my-field',

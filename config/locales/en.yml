@@ -476,6 +476,7 @@ en:
         structural_metadata_csv_file:
           label: "Upload structural metadata CSV"
           retained: "A structural metadata CSV has been uploaded. Choose a file to replace it."
+          template: "Download structural metadata template CSV"
       wait:
         message: "Processing..."
     multiple_items:
