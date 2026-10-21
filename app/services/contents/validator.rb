@@ -20,7 +20,8 @@ module Contents
       Cocina::Models::ObjectType.map => Contents::Validators::Image,
       Cocina::Models::ObjectType.media => Contents::Validators::Media,
       Cocina::Models::ObjectType.object => Contents::Validators::ObjectType,
-      Cocina::Models::ObjectType.webarchive_binary => Contents::Validators::ObjectType
+      Cocina::Models::ObjectType.webarchive_binary => Contents::Validators::ObjectType,
+      Cocina::Models::ObjectType.webarchive_seed => Contents::Validators::WebarchiveSeed
     }.freeze
 
     def self.call(...)

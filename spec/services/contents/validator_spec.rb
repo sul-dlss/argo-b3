@@ -96,11 +96,25 @@ RSpec.describe Contents::Validator do
     end
   end
 
-  context 'with a content type without a validator of its own' do
+  context 'with the media content type' do
+    let(:content_type) { Cocina::Models::ObjectType.media }
+
+    it 'provides a warning instead of an error' do
+      expect(result).to have_attributes(
+        errors: [],
+        warnings: [
+          'No video or audio resource has exactly one MP4 (video) or M4A (audio) file, ' \
+          'or an MP3, MOV, MKV, or WAV file.'
+        ]
+      )
+    end
+  end
+
+  context 'with the webarchive-seed content type' do
     let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
 
-    it 'validates nothing' do
-      expect(result).to have_attributes(errors: [], warnings: [])
+    it 'validates published files' do
+      expect(result.errors).to eq(['Resource 1 (File 1) has published files that are not JP2: image1.tif.'])
     end
   end
 
