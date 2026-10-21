@@ -89,7 +89,7 @@ RSpec.describe Content do
       subject(:content) { build(:content, perform_ocr: true, ocr_languages: %w[English Spanish]) }
 
       it 'requests OCR in the languages' do
-        expect(content.workflow_context).to eq({ runOcr: true, ocrLanguages: %w[English Spanish] })
+        expect(content.workflow_context).to eq({ runOCR: true, ocrLanguages: %w[English Spanish] })
       end
     end
 

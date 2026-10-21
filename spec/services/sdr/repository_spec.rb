@@ -241,9 +241,9 @@ RSpec.describe Sdr::Repository do
 
     context 'when there are files in staging and a context is given' do
       it 'creates an assemblyWF with the context' do
-        described_class.accession(cocina_object:, user_name:, context: { runOcr: true })
+        described_class.accession(cocina_object:, user_name:, context: { runOCR: true })
 
-        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: { runOcr: true })
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: { runOCR: true })
       end
     end
 

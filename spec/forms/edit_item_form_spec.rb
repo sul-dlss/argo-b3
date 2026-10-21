@@ -234,7 +234,7 @@ RSpec.describe EditItemForm do
 
         expect(Sdr::Repository).to have_received(:accession)
           .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name:,
-                context: { runOcr: true, ocrLanguages: ['English'] })
+                context: { runOCR: true, ocrLanguages: ['English'] })
         expect(Content.exists?(content.id)).to be false
       end
     end
