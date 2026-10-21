@@ -11,9 +11,7 @@ module BulkActions
     attr_reader :bulk_action
 
     def label
-      return 'Processing' unless bulk_action.completed?
-
-      bulk_action.druid_count_fail.positive? ? 'Completed with errors' : 'Completed'
+      BulkAction::DISPLAY_STATUSES.fetch(bulk_action.display_status)
     end
 
     def icon

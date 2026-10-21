@@ -22,6 +22,66 @@ RSpec.describe BulkAction do
     end
   end
 
+  describe '.filtered' do
+    let!(:redeposit_processing_bulk_action) { create(:bulk_action, action_type: 'REDEPOSIT', created_at: 3.days.ago) }
+    let!(:redeposit_completed_bulk_action) do
+      create(:bulk_action, action_type: 'REDEPOSIT', status: :completed, created_at: 10.days.ago)
+    end
+    let!(:reindex_completed_bulk_action) { create(:bulk_action, action_type: 'REINDEX', status: :completed) }
+
+    it 'returns all bulk actions when there are no filters' do
+      expect(described_class.filtered).to contain_exactly(redeposit_processing_bulk_action,
+                                                          redeposit_completed_bulk_action,
+                                                          reindex_completed_bulk_action)
+    end
+
+    it 'returns the bulk actions with the action types and statuses' do
+      expect(described_class.filtered(action_types: ['REDEPOSIT'], statuses: ['completed']))
+        .to contain_exactly(redeposit_completed_bulk_action)
+    end
+
+    it 'returns the bulk actions submitted since the time' do
+      expect(described_class.filtered(action_types: ['REDEPOSIT'], submitted_since: 7.days.ago))
+        .to contain_exactly(redeposit_processing_bulk_action)
+    end
+  end
+
+  describe '.with_display_statuses' do
+    let!(:created_bulk_action) { create(:bulk_action, status: :created) }
+    let!(:started_bulk_action) { create(:bulk_action, status: :started) }
+    let!(:completed_bulk_action) { create(:bulk_action, status: :completed, druid_count_fail: 0) }
+    let!(:completed_with_errors_bulk_action) { create(:bulk_action, status: :completed, druid_count_fail: 2) }
+
+    it 'returns the bulk actions that are processing' do
+      expect(described_class.with_display_statuses(['processing']))
+        .to contain_exactly(created_bulk_action, started_bulk_action)
+    end
+
+    it 'returns the bulk actions that completed with and without errors' do
+      expect(described_class.with_display_statuses(['completed'])).to contain_exactly(completed_bulk_action)
+      expect(described_class.with_display_statuses(['completed_with_errors']))
+        .to contain_exactly(completed_with_errors_bulk_action)
+    end
+
+    it 'returns the bulk actions with any of the display statuses' do
+      expect(described_class.with_display_statuses(%w[processing completed_with_errors]))
+        .to contain_exactly(created_bulk_action, started_bulk_action, completed_with_errors_bulk_action)
+    end
+
+    it 'returns no bulk actions when there are no known display statuses' do
+      expect(described_class.with_display_statuses(['unknown'])).to be_empty
+    end
+  end
+
+  describe '.display_status' do
+    it 'returns the display status' do
+      expect(described_class.new(status: :queued).display_status).to eq('processing')
+      expect(described_class.new(status: :completed, druid_count_fail: 0).display_status).to eq('completed')
+      expect(described_class.new(status: :completed, druid_count_fail: 1).display_status)
+        .to eq('completed_with_errors')
+    end
+  end
+
   describe '.enqueue_job' do
     subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 

@@ -1,7 +1,9 @@
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
   <meta name="turbo-refresh-scroll" content="preserve">
+  <%# Not cached, so that Back renders the filter form for the URL rather than a snapshot of it. %>
+  <meta name="turbo-cache-control" content="no-cache">
 <% end %>
 
 <%= turbo_stream_from 'bulk_actions_history', current_user %>
-<%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions) %>
+<%= render BulkActions::HistorySectionComponent.new(bulk_actions: @bulk_actions, filter_form: @filter_form) %>

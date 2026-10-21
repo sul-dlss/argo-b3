@@ -413,10 +413,14 @@ RSpec.describe 'Show item' do
     expect(page).to have_no_css('#events-table dt', text: 'Description')
 
     # Filter the events
-    expect(page).to have_css('#events-filter .ts-count', text: '2 selected')
-    find('#events-filter .ts-control').click
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '2 selected')
+    find('form[id^=events_filter_] .ts-control').click
+    click_button 'Select none'
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '0 selected')
+    click_button 'Select all'
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '2 selected')
     find('.ts-dropdown .option', text: 'Publishing complete').click
-    expect(page).to have_css('#events-filter .ts-count', text: '1 selected')
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '1 selected')
     fill_in 'From', with: Time.zone.local(2021, 3, 31, 13, 0, 0)
     click_button 'Filter'
 
@@ -476,7 +480,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
     # The filter is retained after the page refreshes.
     expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
-    expect(page).to have_css('#events-filter .ts-count', text: '1 selected')
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '1 selected')
 
     click_button 'Overview'
     expect(find_table('overview-table')).to have_no_css('th', text: 'Last deposited')

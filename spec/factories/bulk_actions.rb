@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :bulk_action do
-    action_type { 'reindex' }
+    action_type { 'REINDEX' }
     user
 
     trait :with_log do

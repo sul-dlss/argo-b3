@@ -3,7 +3,10 @@ import TomSelect from 'tom-select'
 
 // Connects a multiple select to Tom Select, with a checkbox for each option.
 // Rather than listing the selected options, the control shows the number of selected options.
+// Set the selectAll value to false to omit the Select all / Select none buttons.
 export default class extends Controller {
+  static values = { selectAll: { type: Boolean, default: true } }
+
   connect () {
     this.tomSelect = new TomSelect(this.element, {
       plugins: ['checkbox_options', 'no_backspace_delete'],
@@ -22,6 +25,28 @@ export default class extends Controller {
     this.tomSelect.control.prepend(this.count)
     this.tomSelect.on('change', this.updateCount)
     this.updateCount()
+    if (this.selectAllValue) this.addSelectAllButtons()
+  }
+
+  addSelectAllButtons () {
+    const header = document.createElement('div')
+    header.classList.add('ts-select-all', 'd-flex', 'gap-2', 'px-2', 'border-bottom')
+    header.append(
+      this.createButton('Select all', () => this.tomSelect.setValue(Object.keys(this.tomSelect.options))),
+      this.createButton('Select none', () => this.tomSelect.clear())
+    )
+    this.tomSelect.dropdown.prepend(header)
+  }
+
+  createButton (text, onClick) {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.classList.add('btn', 'btn-link', 'btn-sm', 'px-0')
+    button.textContent = text
+    // Prevents the control from losing focus, which would close the dropdown.
+    button.addEventListener('mousedown', (event) => event.preventDefault())
+    button.addEventListener('click', onClick)
+    return button
   }
 
   // Destroying Tom Select restores the select's original options, so the selected values are reapplied.
