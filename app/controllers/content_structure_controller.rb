@@ -6,7 +6,7 @@ class ContentStructureController < ContentsApplicationController
   APPEND_VALUE = 'append'
   CSV_VALUE = 'csv'
 
-  skip_verify_authorized only: %i[edit update csv validation]
+  skip_verify_authorized only: %i[edit update destroy csv validation]
   before_action :set_content_and_cocina_object
 
   def edit
@@ -30,6 +30,21 @@ class ContentStructureController < ContentsApplicationController
     end
 
     redirect_to_edit_with_structure_changed
+  end
+
+  # Deletes all of the files and resources, then reloads the page, which opens on the Add files tab.
+  def destroy
+    # Deleting is disabled during discovery, since discovery may be adding files.
+    if @content.discovering?
+      return redirect_to edit_content_path(@content.druid),
+                         flash: { warning: t('edit.contents.structure.warnings.discovering') }
+    end
+
+    ActiveRecord::Base.transaction do
+      ContentFileSet.where(content: @content).destroy_all
+      Contents::ContentFileBinaryDestroyer.call(content_file_binaries: ContentFileBinary.where(content: @content).to_a)
+    end
+    redirect_to edit_content_path(@content.druid), flash: { toast: t('edit.contents.structure.toasts.delete_all') }
   end
 
   # Exports the current (possibly in-progress) structure, not necessarily what has been saved to SDR.

@@ -56,6 +56,16 @@
       <div class="text-end">
         <span class="fw-bold">Download:</span> <%= link_to 'structural metadata', csv_content_structure_path(content_id: @content_token), data: { turbo: false } %>
       </div>
+      <%# Reloads the whole page (rather than this frame) so that the page opens on the Add files tab. %>
+      <fieldset class="text-end" data-disable-actions-target="disableable">
+        <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                        method: :delete,
+                                                                        variant: :link,
+                                                                        classes: 'text-danger p-0',
+                                                                        confirm: t('edit.contents.structure.buttons.delete_all_confirm')) do %>
+          <%= delete_icon(classes: 'me-2') %><%= t('edit.contents.structure.buttons.delete_all') %>
+        <% end %>
+      </fieldset>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
       <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
         <div class='mb-2'>
