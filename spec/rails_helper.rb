@@ -92,6 +92,9 @@ RSpec.configure do |config|
     if ApplicationPolicy.class_variable_defined?(:@@admin_workgroups)
       ApplicationPolicy.remove_class_variable(:@@admin_workgroups)
     end
+
+    # Jobs left by earlier examples can reference rolled-back records, breaking have_been_enqueued.
+    ActiveJob::Base.queue_adapter.enqueued_jobs.clear
   end
 
   config.after do
