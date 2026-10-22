@@ -81,10 +81,13 @@ RSpec.describe ContentFileBinary do
     end
 
     context 'when the file is on globus' do
-      subject(:content_file_binary) { build(:content_file_binary, file_location: 'globus') }
+      subject(:content_file_binary) do
+        build(:content_file_binary, file_location: 'globus', mount_path: '/globus/uploads',
+                                    filepath: 'folder1/image1.tif')
+      end
 
-      it 'raises NotImplementedError' do
-        expect { content_file_binary.filepath_on_disk }.to raise_error(NotImplementedError)
+      it 'returns the filepath joined to the mount path' do
+        expect(content_file_binary.filepath_on_disk).to eq('/globus/uploads/folder1/image1.tif')
       end
     end
 
@@ -107,6 +110,13 @@ RSpec.describe ContentFileBinary do
 
     it 'is valid with a mount_path when the file is on a mount' do
       expect(build(:content_file_binary, file_location: 'mount', mount_path: '/mnt/sdr')).to be_valid
+    end
+
+    it 'is invalid without a mount_path when the file is on globus' do
+      content_file_binary = build(:content_file_binary, file_location: 'globus', mount_path: nil)
+
+      expect(content_file_binary).not_to be_valid
+      expect(content_file_binary.errors[:mount_path]).to include("can't be blank")
     end
 
     it 'is valid without a mount_path when the file is not on a mount' do

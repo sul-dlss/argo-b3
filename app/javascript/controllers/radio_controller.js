@@ -46,6 +46,26 @@ export default class extends Controller {
     buttons.forEach((button) => {
       button.disabled = disable
     })
+    // Links styled as buttons (e.g., ButtonLinkComponent) can't be disabled with the disabled attribute,
+    // so they get Bootstrap's disabled class, which prevents clicking.
+    const buttonLinks = containerElem.querySelectorAll('a.btn')
+    buttonLinks.forEach((link) => {
+      link.classList.toggle('disabled', disable)
+      link.setAttribute('aria-disabled', disable)
+      if (disable) {
+        link.setAttribute('tabindex', '-1')
+      } else {
+        link.removeAttribute('tabindex')
+      }
+    })
+    // Turbo frames with data-radio-src are loaded from that url the first time the radio is selected,
+    // so that they aren't loaded (e.g., calling an external API) unless needed.
+    if (!disable) {
+      const lazyFrames = containerElem.querySelectorAll('turbo-frame[data-radio-src]:not([src])')
+      lazyFrames.forEach((frame) => {
+        frame.src = frame.dataset.radioSrc
+      })
+    }
     // Elements that have radio-disableable class are sent a radio:disable or radio:enable event
     // so that elements that aren't form inputs (e.g., a dropzone) can disable / enable themselves.
     // For example: data-action="radio:disable->dropzone#disable radio:enable->dropzone#enable"

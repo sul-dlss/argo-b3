@@ -22,6 +22,10 @@ RSpec.describe StageFilesJob do
     create(:content_file_binary, content:, file_location: 'mount', mount_path: file_fixture_path,
                                  filepath: 'catalog_record_id_and_barcode.xlsx')
   end
+  let(:globus_content_file_binary) do
+    create(:content_file_binary, content:, file_location: 'globus', mount_path: file_fixture_path,
+                                 filepath: 'dropzone_upload2.txt')
+  end
 
   let(:content_file_set) { create(:content_file_set, content:) }
 
@@ -36,6 +40,7 @@ RSpec.describe StageFilesJob do
     create(:content_file, content_file_set:, content_file_binary: attached_content_file_binary, position: 1)
     create(:content_file, content_file_set:, content_file_binary: deposited_content_file_binary, position: 2)
     create(:content_file, content_file_set:, content_file_binary: mount_content_file_binary, position: 3)
+    create(:content_file, content_file_set:, content_file_binary: globus_content_file_binary, position: 4)
 
     allow(Contents::ExternalIdentifierMinter).to receive(:call)
     allow(Contents::Analyzer).to receive(:call)
@@ -71,20 +76,22 @@ RSpec.describe StageFilesJob do
         .with(content: content.id, druid:, staging_location: Settings.staging_location)
     end
 
-    it 'analyzes only the attached and mount content file binaries' do
+    it 'analyzes only the attached, mount, and globus content file binaries' do
       job.perform(content:, user:)
 
       expect(Contents::Analyzer).to have_received(:call).with(content_file_binary: attached_content_file_binary)
       expect(Contents::Analyzer).to have_received(:call).with(content_file_binary: mount_content_file_binary)
+      expect(Contents::Analyzer).to have_received(:call).with(content_file_binary: globus_content_file_binary)
       expect(Contents::Analyzer).not_to have_received(:call).with(content_file_binary: deposited_content_file_binary)
     end
 
-    it 'stages only the attached and mount content file binaries' do
+    it 'stages only the attached, mount, and globus content file binaries' do
       job.perform(content:, user:)
 
       expect(File.binread(staging_filepath)).to eq(attached_content_file_binary.file.download)
       expect(File.binread(staged_filepath('catalog_record_id_and_barcode.xlsx')))
         .to eq(file_fixture('catalog_record_id_and_barcode.xlsx').binread)
+      expect(File.binread(staged_filepath('dropzone_upload2.txt'))).to eq(file_fixture('dropzone_upload2.txt').binread)
       expect(File.exist?(staged_filepath('image2.tif'))).to be false
     end
 
@@ -93,6 +100,7 @@ RSpec.describe StageFilesJob do
 
       expect(attached_content_file_binary.reload.file_location).to eq('stage')
       expect(mount_content_file_binary.reload.file_location).to eq('stage')
+      expect(globus_content_file_binary.reload.file_location).to eq('stage')
       expect(deposited_content_file_binary.reload.file_location).to eq('deposited')
     end
 

@@ -269,6 +269,11 @@ GEM
     geo_coord (0.2.0)
     globalid (1.4.0)
       activesupport (>= 6.1)
+    globus_client (0.19.1)
+      activesupport (>= 4.2)
+      faraday
+      faraday-retry
+      zeitwerk
     hashdiff (1.2.1)
     hashie (5.2.0)
       logger
@@ -777,6 +782,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   folio_client
+  globus_client
   herb
   honeybadger
   i18n-tasks

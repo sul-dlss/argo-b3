@@ -706,4 +706,53 @@ RSpec.describe 'Manage files' do
       expect(page).to have_no_button(class: 'disabled')
     end
   end
+
+  context 'when discovering files on Globus' do
+    let(:globus_path) { File.join(Settings.globus.directory, "uploads/#{user.sunetid}/objects/bc123df4567") }
+
+    before do
+      allow(GlobusClient).to receive(:mkdir) { FileUtils.mkdir_p(globus_path) }
+      allow(GlobusClient).to receive(:writable?) { File.directory?(globus_path) }
+      allow(Settings.reload_intervals).to receive(:mount_discovery).and_return(100)
+    end
+
+    after do
+      FileUtils.rm_rf(Settings.globus.directory)
+    end
+
+    it 'creates the Globus link and discovers the files' do
+      visit "/contents/#{druid}/edit"
+
+      # Globus isn't called until the Globus radio is selected.
+      expect(page).to have_field('Use files from mount')
+      expect(page).to have_no_button('Create Globus link')
+      expect(GlobusClient).not_to have_received(:writable?)
+
+      choose 'Select files from Globus'
+      click_button 'Create Globus link'
+
+      expect(page).to have_link('Open Globus')
+      expect(page).to have_no_css('a.disabled', text: 'Open Globus')
+      expect(GlobusClient).to have_received(:mkdir)
+
+      choose 'Use files from mount'
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Open Globus')
+
+      choose 'Select files from Globus'
+      expect(page).to have_no_css('a.disabled', text: 'Open Globus')
+
+      FileUtils.cp(file_fixture('dropzone_upload.txt'), File.join(globus_path, 'dropzone_upload.txt'))
+      within('turbo-frame', id: /globus/) { click_button 'Discover files' }
+
+      expect(page).to have_text('Discovering files...')
+
+      content = Content.find_by!(druid:)
+      DiscoverFilesJob.perform_now(content:, mount_path: globus_path, file_location: :globus)
+
+      expect(page).to have_toast('Completed discovering files')
+      expect(page).to have_css('tbody th', text: 'dropzone_upload.txt')
+      expect(content.content_file_binaries.sole)
+        .to have_attributes(filepath: 'dropzone_upload.txt', file_location: 'globus', mount_path: globus_path)
+    end
+  end
 end

@@ -22,6 +22,7 @@ env:
     SETTINGS__FOLIO__OKAPI__URL: https://folio-stage-api.stanford.edu
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-stage.stanford.edu
     SETTINGS__TECH_MD_SERVICE__URL: https://techmd-stage.stanford.edu
+    SETTINGS__GLOBUS__DIRECTORY: /globus/argo_ingest/stage
 
     DATABASE_HOSTNAME: argo-b3-db-stage-a
 

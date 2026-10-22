@@ -29,9 +29,11 @@ module Contents
 
     # @param content [Content]
     # @param mount_path [String] the directory on the mount to discover files in (recursively)
-    def initialize(content:, mount_path:)
+    # @param file_location [Symbol] the file location of the binaries (:mount or :globus)
+    def initialize(content:, mount_path:, file_location: :mount)
       @content = content
       @mount_path = mount_path
+      @file_location = file_location
     end
 
     def call
@@ -40,12 +42,12 @@ module Contents
 
     private
 
-    attr_reader :content, :mount_path
+    attr_reader :content, :mount_path, :file_location
 
     def build_content_file_binary(filepath:) # rubocop:disable Metrics/AbcSize
       content_file_binary = content.content_file_binaries.find_or_initialize_by(filepath:)
       full_filepath = File.join(mount_path, filepath)
-      content_file_binary.file_location = :mount
+      content_file_binary.file_location = file_location
       content_file_binary.mount_path = mount_path
       content_file_binary.size = File.size(full_filepath)
       content_file_binary.mime_type = Marcel::MimeType.for(Pathname.new(full_filepath), name: filepath)

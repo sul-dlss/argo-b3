@@ -24,6 +24,13 @@ RSpec.describe DiscoverFilesJob do
         .to have_attributes(file_location: 'mount', mount_path:, size: 8, mime_type: 'text/plain')
     end
 
+    it 'creates binaries with the given file location' do
+      job.perform(content:, mount_path:, file_location: :globus)
+
+      expect(content.content_file_binaries.find_by(filepath: 'file1.txt'))
+        .to have_attributes(file_location: 'globus', mount_path:)
+    end
+
     it 'transitions the content out of the discovering state' do
       job.perform(content:, mount_path:)
 

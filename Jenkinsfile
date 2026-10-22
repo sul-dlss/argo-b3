@@ -16,7 +16,13 @@ def secrets = [
     [path: 'application/folio/app_sdr_password', secretValues: [
         [envVar: 'SETTINGS__FOLIO__OKAPI__PASSWORD', vaultKey: 'content']]],
     [path: 'application/argo-b3/stage/tech-md-service-token', secretValues: [
-        [envVar: 'SETTINGS__TECH_MD_SERVICE__TOKEN', vaultKey: 'content']]]
+        [envVar: 'SETTINGS__TECH_MD_SERVICE__TOKEN', vaultKey: 'content']]],
+    [path: 'application/argo-b3/stage/globus-client-id', secretValues: [
+        [envVar: 'SETTINGS__GLOBUS__CLIENT_ID', vaultKey: 'content']]],
+    [path: 'application/argo-b3/stage/globus-client-secret', secretValues: [
+        [envVar: 'SETTINGS__GLOBUS__CLIENT_SECRET', vaultKey: 'content']]],
+    [path: 'application/argo-b3/stage/globus-endpoint-id', secretValues: [
+        [envVar: 'SETTINGS__GLOBUS__ENDPOINT_ID', vaultKey: 'content']]]
 ]
 
 pipeline {

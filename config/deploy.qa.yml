@@ -22,6 +22,7 @@ env:
     SETTINGS__FOLIO__OKAPI__URL: https://folio-test-api.stanford.edu
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-qa.stanford.edu
     SETTINGS__TECH_MD_SERVICE__URL: https://dor-techmd-qa-a.stanford.edu
+    SETTINGS__GLOBUS__DIRECTORY: /globus/argo_ingest/qa
 
     DATABASE_HOSTNAME: argo-b3-db-qa-a
 

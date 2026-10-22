@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Edit
-  # Button that structures the files of a content, with a spinner shown while structuring (see .structure-action).
+  # Button that structures the files of a content, with a spinner shown while structuring (see .spinner-on-submit).
   class StructureButtonComponent < ApplicationComponent
     # @param commit [String] ContentStructureController::STRUCTURE_VALUE or APPEND_VALUE
     # @param populator [String] the name of the populator
@@ -19,7 +19,7 @@ module Edit
     attr_reader :label, :commit, :populator, :content_token, :content_type
 
     def classes
-      merge_classes('structure-action', @classes)
+      merge_classes('structure-action spinner-on-submit', @classes)
     end
   end
 end
