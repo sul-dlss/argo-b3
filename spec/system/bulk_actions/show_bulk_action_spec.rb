@@ -17,11 +17,11 @@ RSpec.describe 'Show a bulk action' do
   it 'shows the bulk action details, refreshing until it is completed' do
     visit bulk_action_path(bulk_action)
 
-    expect(page).to have_css('h1', text: BulkActions::EXPORT_COCINA_JSON.label)
+    expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: My bulk action")
     expect(page).to have_css('.object-type-bulk-action span.object-type-bg', text: /bulk action/i)
 
     expect(page).to have_css('h2', text: 'Processing')
-    expect(page).to have_text('My bulk action')
+    expect(page).to have_css('.show-box p', text: "#{BulkActions::EXPORT_COCINA_JSON.label} bulk action updated at")
     expect(page).to have_css('h2', text: 'Total / Success / Failed')
     expect(page).to have_css('.show-box', text: '0 / 0 / 0')
     expect(page).to have_no_css('h2', text: 'Downloads')

@@ -8,9 +8,7 @@
 <div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multi_item_deposit_show %>">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.show.title'), classes: 'mb-3') %>
 
-  <% if @multi_item_deposit_action.description? %>
-    <p><%= @multi_item_deposit_action.description %></p>
-  <% end %>
+  <p><%= @multi_item_deposit_action.name %></p>
 
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('multi_item_deposit.deposit_status.label'), classes: 'mb-2') %>
 

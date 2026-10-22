@@ -76,7 +76,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
-        expect(rendered_page).to have_text('My deposit')
+        expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
         expect(rendered_page).to have_css('div[data-controller="scheduled-refresh"]')
 
         rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
@@ -136,6 +136,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
+        expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
         expect(rendered_page).to have_field('Describe this deposit', with: 'My deposit')
         expect(rendered_page).to have_button('Discover files and check manifest', class: 'btn-primary')
         expect(rendered_page).to have_link('Cancel', href: root_path)
@@ -239,6 +240,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
+        expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
         expect(rendered_page).to have_no_field('Mount path')
         expect(rendered_page).to have_link(
           'Download structural metadata template CSV',
@@ -343,6 +345,7 @@ RSpec.describe 'Multi-item deposit actions' do
           get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
           expect(response).to have_http_status(:ok)
+          expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
           expect(rendered_page).to have_field('Version description', with: 'Initial version', disabled: true)
           expect(rendered_page).to have_text('Version description is automatically set for initial deposits.')
           expect(rendered_page).to have_link('Cancel', href: root_path)
@@ -385,6 +388,22 @@ RSpec.describe 'Multi-item deposit actions' do
           expect(rendered_page).to have_field('Version description', disabled: false)
           expect(rendered_page).to have_no_text('Version description is automatically set for initial deposits.')
         end
+      end
+    end
+
+    context 'when discovery is in progress' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, description: 'My deposit', discovery_state: 'discovering')
+      end
+
+      it 'renders the wait page' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page)
+          .to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My deposit...")
+        expect(rendered_page).to have_no_field('Describe this deposit')
       end
     end
 

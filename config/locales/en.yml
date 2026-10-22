@@ -518,7 +518,7 @@ en:
           help_text: "The version description will only be applied to items that do not already have one."
           initial_version_help_text: "Version description is automatically set for initial deposits."
       wait:
-        message: "Processing..."
+        message: "Processing %{name}..."
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."

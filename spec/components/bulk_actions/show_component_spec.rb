@@ -15,7 +15,7 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('← Bulk action', href: '/bulk_actions')
-      expect(page).to have_css('h1', text: BulkActions::REINDEX.label)
+      expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: Test description")
       expect(page).to have_css('.object-type-bulk-action span.object-type-bg', text: 'Bulk action')
       expect(page).to have_css('div[data-controller="scheduled-refresh"]' \
                                '[data-scheduled-refresh-interval-value="500"]')
@@ -23,8 +23,7 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       status_box = page.first('.show-box')
       expect(status_box).to have_css('h2', text: 'Processing')
       expect(status_box).to have_no_css('i.bi')
-      expect(status_box).to have_css('p', text: '2026-04-16 03:00:00 PT')
-      expect(status_box).to have_css('p', text: 'Test description')
+      expect(status_box).to have_css('p', text: 'Reindex bulk action updated at 2026-04-16 03:00:00 PT')
 
       expect(page).to have_css('h2', text: 'Total / Success / Failed')
       expect(page).to have_css('.show-box', text: '0 / 0 / 0')
@@ -46,6 +45,8 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_no_css('div[data-controller="scheduled-refresh"]')
+
+      expect(page).to have_css('h1', exact_text: "Bulk action #{bulk_action.id}")
 
       expect(page).to have_css('h2 i.bi-check-circle-fill.text-success')
       expect(page).to have_css('h2', text: 'Completed')

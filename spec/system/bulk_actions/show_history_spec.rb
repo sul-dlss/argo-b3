@@ -30,8 +30,8 @@ RSpec.describe 'Show bulk actions history' do
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
     expect(row).to have_css("td:nth-of-type(1) a[href='#{bulk_action_path(bulk_action)}']",
-                            text: format_datetime(bulk_action.created_at))
-    expect(row).to have_css('td:nth-of-type(3)', text: 'First bulk action')
+                            text: "Bulk action #{bulk_action.id}: First bulk action")
+    expect(row).to have_css('td:nth-of-type(3)', text: format_datetime(bulk_action.created_at))
     expect(row).to have_css('td:nth-of-type(4)', text: 'Processing')
     expect(row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
     expect(page).to have_css("tr##{dom_id(bulk_action, 'row')}", text: 'First bulk action')
@@ -64,10 +64,10 @@ RSpec.describe 'Show bulk actions history' do
     visit bulk_actions_path
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
-    row.click_link(format_datetime(bulk_action.created_at))
+    row.click_link("Bulk action #{bulk_action.id}: First bulk action")
 
     expect(page).to have_current_path(bulk_action_path(bulk_action))
-    expect(page).to have_css('h1', text: BulkActions::EXPORT_COCINA_JSON.label)
+    expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: First bulk action")
   end
 
   it 'filters the bulk actions by action type' do

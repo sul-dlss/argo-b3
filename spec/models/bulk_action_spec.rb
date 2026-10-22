@@ -224,6 +224,18 @@ RSpec.describe BulkAction do
     end
   end
 
+  describe '#name' do
+    it 'returns the name with the description' do
+      expect(described_class.new(id: 5, description: 'Reindex books').name).to eq('Bulk action 5: Reindex books')
+    end
+
+    context 'when there is no description' do
+      it 'returns the name without the description' do
+        expect(described_class.new(id: 5, description: '').name).to eq('Bulk action 5')
+      end
+    end
+  end
+
   describe 'creating and removing output directory' do
     subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 

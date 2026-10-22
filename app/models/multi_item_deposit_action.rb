@@ -112,4 +112,11 @@ class MultiItemDepositAction < ApplicationRecord
       multi_item_deposit_action.initiating_deposit_completed_at = Time.current
     end
   end
+
+  def name
+    name = "Multi-item deposit #{id}"
+    return name if description.blank?
+
+    "#{name}: #{description}"
+  end
 end

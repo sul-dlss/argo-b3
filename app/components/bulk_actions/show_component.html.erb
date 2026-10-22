@@ -5,7 +5,7 @@
                                                                       variant: :link, link: bulk_actions_path) %>
 
       <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
-        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-0') %>
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: name, classes: 'mb-0') %>
         <span class="object-type-bg text-white fw-bold text-uppercase rounded-pill fs-4 px-3 py-1"><%= t('bulk_actions.label') %></span>
       </div>
     <% end %>
@@ -21,10 +21,7 @@
       <div class="d-flex flex-column flex-xl-row gap-4 mt-4 mb-4">
         <div class="show-box flex-fill">
           <%= render Show::BoxComponent.new(heading: status_heading) do %>
-            <p class="mb-1"><%= helpers.format_datetime(bulk_action.updated_at) %></p>
-            <% if bulk_action.description.present? %>
-              <p class="mb-0"><%= bulk_action.description %></p>
-            <% end %>
+            <p><%= action_label %> updated at <%= helpers.format_datetime(bulk_action.updated_at) %></p>
           <% end %>
         </div>
 
