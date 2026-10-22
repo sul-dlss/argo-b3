@@ -220,6 +220,12 @@ en:
           structure: "Structure built from files"
           append: "Files appended to structure"
           csv: "Structure updated from CSV"
+          delete_all: "All files and resources deleted"
+        buttons:
+          delete_all: "Delete all files and resources"
+          delete_all_confirm: "Are you sure you want to delete all files and resources?"
+        warnings:
+          discovering: "Files are being discovered. Try again when discovery has finished."
         populators:
           agreement: 'Agreement (resource per file)'
           book: "Book (resource per page)"

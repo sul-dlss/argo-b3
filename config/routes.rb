@@ -225,7 +225,7 @@ Rails.application.routes.draw do
   resources :contents, only: %i[edit show update] do
     resource :dropzone, only: %i[update], controller: 'content_dropzone'
     resource :mount, only: %i[new create show], controller: 'content_mount'
-    resource :structure, only: %i[edit update], controller: 'content_structure' do
+    resource :structure, only: %i[edit update destroy], controller: 'content_structure' do
       get 'csv'
       get 'validation'
     end

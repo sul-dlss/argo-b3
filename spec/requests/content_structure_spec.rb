@@ -45,6 +45,55 @@ RSpec.describe 'Content structure' do
                                    content_id: content_token, content_type: 'https://cocina.sul.stanford.edu/models/book'
                                  ))
     end
+
+    it 'renders the delete all button, which confirms and reloads the page' do
+      get edit_content_structure_path(content_id: content_token)
+
+      form = response.parsed_body.css(%(form[action="#{content_structure_path(content_id: content_token)}"]))
+                     .find { |candidate| candidate.at_css('input[name="_method"][value="delete"]') }
+      expect(form['data-turbo-frame']).to eq('_top')
+      expect(form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
+      button = form.at_css('button.btn-link.text-danger')
+      expect(button.text.strip).to eq('Delete all files and resources')
+      expect(button.at_css('i.bi.bi-trash')).to be_present
+    end
+  end
+
+  describe 'destroy' do
+    let(:other_binary) { create(:content_file_binary, content: create(:content, druid: 'druid:df456gh7890')) }
+
+    before do
+      structured_binary = create(:content_file_binary, content:, filepath: 'structured.txt')
+      create(:content_file, content_file_set: create(:content_file_set, content:),
+                            content_file_binary: structured_binary)
+      create(:content_file_binary, content:, filepath: 'unassociated.txt') # Not in a resource
+      create(:content_file_set, content:) # A resource without files
+      other_binary
+    end
+
+    it 'deletes all of the files and resources and returns to the edit page with a toast' do
+      delete content_structure_path(content_id: content_token)
+
+      expect(response).to redirect_to(edit_content_path(druid))
+      expect(flash[:toast]).to eq('All files and resources deleted')
+      expect(content.content_file_binaries.reload).to be_empty
+      expect(content.content_file_sets.reload).to be_empty
+      expect(ContentFile.count).to eq(0)
+      expect(ContentFileBinary.exists?(other_binary.id)).to be true
+    end
+
+    context 'when discovering files' do
+      let(:content) { create(:content, druid:, lock: cocina_object.lock, mount_state: 'discovering') }
+
+      it 'does not delete and returns to the edit page with a warning' do
+        delete content_structure_path(content_id: content_token)
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(flash[:warning]).to eq('Files are being discovered. Try again when discovery has finished.')
+        expect(content.content_file_binaries.count).to eq(2)
+        expect(content.content_file_sets.count).to eq(2)
+      end
+    end
   end
 
   describe 'validation' do
