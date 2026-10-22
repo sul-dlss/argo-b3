@@ -1,0 +1,6 @@
+<%= turbo_stream.update 'object-permission-form' do %>
+  <%= render 'form', object_permission_form: @object_permission_form, druid: @druid, workgroups: @workgroups %>
+<% end %>
+<%= render Elements::FlashToastComponent.new(title: t('admin.object_permissions.toasts.added')) %>
+<%# Omit the request ID so Turbo refreshes the browser that submitted the addition. %>
+<%= turbo_stream.refresh(request_id: nil) %>

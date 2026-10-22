@@ -47,6 +47,69 @@ RSpec.describe 'Show object' do
     end
   end
 
+  describe 'Admin permissions navigation' do
+    include_context 'with show page object client'
+
+    let(:user) { create(:user, groups: [AuthenticationHelpers::ADMIN_GROUP]) }
+    let(:object_type) { 'collection' }
+    let(:cocina_object) { build(:collection_with_metadata, id: druid) }
+    let(:rendered_page) { Capybara.string(response.body).find('.object-show') }
+
+    before do
+      create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+      allow(Sdr::Repository).to receive_messages(
+        find: cocina_object,
+        find_solr: {
+          Search::Fields::ID => druid, Search::Fields::OBJECT_TYPES => [object_type],
+          Search::Fields::TITLE => 'My object',
+          Search::Fields::AGREEMENT_DRUID => 'druid:df456gh7890', Search::Fields::AGREEMENT_TITLE => 'Agreement'
+        }
+      )
+      allow(Sdr::WorkflowService).to receive(:published?).and_return(false)
+      sign_in(user)
+    end
+
+    it 'offers Manage permissions in the Admin button list for a collection' do
+      get object_path(druid)
+      expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_css('h2', text: 'Admin')
+      expect(rendered_page).to have_button('Manage permissions')
+      expect(rendered_page).to have_css("form[action='#{admin_object_permissions_path(druid)}'][method='get']")
+    end
+
+    context 'when the object is an APO' do
+      let(:object_type) { 'APO' }
+      let(:cocina_object) { build(:admin_policy_with_metadata, id: druid) }
+
+      it 'offers Manage permissions' do
+        get object_path(druid)
+        expect(rendered_page).to have_button('Manage permissions')
+        expect(rendered_page).to have_css("form[action='#{admin_object_permissions_path(druid)}'][method='get']")
+      end
+    end
+
+    context 'when the object is an item' do
+      let(:object_type) { 'item' }
+      let(:cocina_object) { build(:dro_with_metadata, id: druid) }
+
+      it 'omits the Admin button list' do
+        get object_path(druid)
+        expect(rendered_page).to have_no_css('h2', text: 'Admin')
+        expect(rendered_page).to have_no_button('Manage permissions')
+      end
+    end
+
+    context 'when the user is not an admin' do
+      let(:user) { create(:user) }
+
+      it 'omits the Admin button list' do
+        get object_path(druid)
+        expect(rendered_page).to have_no_css('h2', text: 'Admin')
+        expect(rendered_page).to have_no_button('Manage permissions')
+      end
+    end
+  end
+
   describe 'GET /objects/:druid/track' do
     it 'redirects to the clean object show page' do
       get "/objects/#{druid}/track", params: { search_position: 3 }
