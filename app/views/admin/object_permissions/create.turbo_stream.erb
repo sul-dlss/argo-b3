@@ -1,0 +1,5 @@
+<%= render Elements::FlashToastComponent.new %>
+<%= turbo_stream.replace 'object-permission-form', partial: 'form', locals: { object_permission_form: @object_permission_form } %>
+<% if @permissions %>
+  <%= turbo_stream.replace 'object-permissions', partial: 'permissions_table', locals: { permissions: @permissions } %>
+<% end %>

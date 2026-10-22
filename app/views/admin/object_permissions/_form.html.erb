@@ -1,0 +1,22 @@
+<%= tag.div id: 'object-permission-form' do %>
+  <%= form_with model: object_permission_form, url: admin_object_permissions_path(object_permission_form.target_druid) do |form| %>
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+          form:,
+          field_name: :workgroup,
+          options: object_permission_form.workgroup_options,
+          prompt: t('admin.object_permissions.fields.workgroup.prompt'),
+          label_text: t('admin.object_permissions.fields.workgroup.label'),
+          container_classes: 'mb-3',
+          input_data: { controller: 'creatable-select' }
+        ) %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('admin.object_permissions.fields.permission_type.label'), classes: 'mb-3') do %>
+      <% Admin::ObjectPermissionForm::PERMISSION_TYPES.each do |permission_type| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :permission_type, input_value: permission_type,
+                                                                      label_text: t("admin.object_permissions.fields.permission_type.#{permission_type}")) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('admin.object_permissions.buttons.add')) %>
+  <% end %>
+<% end %>
