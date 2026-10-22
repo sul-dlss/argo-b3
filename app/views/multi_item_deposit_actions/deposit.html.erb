@@ -7,6 +7,42 @@
     <p><%= @multi_item_deposit_action.description %></p>
   <% end %>
 
-  <%# Stub until the deposit step is implemented. %>
-  <p>The deposit step is not yet implemented.</p>
+  <%= form_with model: @deposit_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
+    <% if @multi_item_deposit_action.all_initial_versions? %>
+      <%# When all are initial versions, the version description is fixed, so rendering a disabled text input. %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+            form:,
+            field_name: :version_description,
+            label_text: t('edit.items.fields.version_description.label'),
+            input_disabled: true,
+            container_classes: 'mb-3',
+            label_classes: 'fw-bold',
+            help_text: t('edit.multi_item_deposits.fields.version_description.initial_version_help_text')
+          ) %>
+    <% else %>
+      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+            form:,
+            field_name: :version_description,
+            label_text: t('edit.items.fields.version_description.label'),
+            label_mark_required: true,
+            container_classes: 'mb-3',
+            label_classes: 'fw-bold',
+            help_text: t('edit.multi_item_deposits.fields.version_description.help_text')
+          ) %>
+    <% end %>
+
+    <% if @multi_item_deposit_action.initiating_deposit_completed_at.present? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.deposit_results.heading'), classes: 'mb-3') %>
+
+      <%= render MultiItemDeposit::DepositErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+    <% end %>
+
+    <div class="mt-5">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.multi_item_deposits.edit.buttons.cancel'), link: root_path, variant: :link, classes: 'me-3') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::PREVIOUS_VALUE, variant: :'outline-primary', classes: 'me-2') do %>
+        <%= left_arrow_icon %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
+      <% end %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.deposit')) %>
+    </div>
+  <% end %>
 </div>

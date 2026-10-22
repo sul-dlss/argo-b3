@@ -5,12 +5,17 @@ class MultiItemDepositActionsController < ApplicationController
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
 
-  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template]
+  before_action :set_multi_item_deposit_action, only: %i[show edit update structural_metadata_csv_template]
+
+  # Stubbing this out for now.
+  def show
+    authorize! @multi_item_deposit_action
+  end
 
   def edit
     authorize! @multi_item_deposit_action
 
-    return render :wait if @multi_item_deposit_action.discovering? || @multi_item_deposit_action.structuring?
+    return render :wait if wait?
 
     if @multi_item_deposit_action.discovery_step?
       @discovery_form = MultiItemDeposit::DiscoveryForm.from_model(@multi_item_deposit_action)
@@ -22,11 +27,13 @@ class MultiItemDepositActionsController < ApplicationController
       return render :structure
     end
 
-    # Stubbing this out for now.
-    return render :deposit if @multi_item_deposit_action.deposit_step?
+    if @multi_item_deposit_action.deposit_step?
+      @deposit_form = MultiItemDeposit::DepositForm.from_model(@multi_item_deposit_action)
+      return render :deposit
+    end
 
-    # Can be removed once all of the edit views are implemented.
-    raise NotImplementedError, "Editing #{@multi_item_deposit_action.step} step is not yet implemented"
+    # Otherwise, submitted so redirect to show page
+    redirect_to multi_item_deposit_action_path(@multi_item_deposit_action)
   end
 
   # Create is a POST (rather than a GET new) so that prefetching or reloading does not create a deposit.
@@ -43,8 +50,8 @@ class MultiItemDepositActionsController < ApplicationController
     return update_discovery if @multi_item_deposit_action.discovery_step?
     return update_structure if @multi_item_deposit_action.structure_step?
 
-    # Can be removed once all of the edit views are implemented.
-    raise NotImplementedError, "Editing #{@multi_item_deposit_action.step} step is not yet implemented"
+    # Otherwise, deposit step.
+    update_deposit
   end
 
   def structural_metadata_csv_template
@@ -88,6 +95,27 @@ class MultiItemDepositActionsController < ApplicationController
     redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
   end
 
+  def update_deposit
+    # Initiating the deposit cannot be restarted while in progress, e.g., after a double submit.
+    if @multi_item_deposit_action.initiating_depositing?
+      return redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    end
+    return return_to_structure if params[:commit] == PREVIOUS_VALUE
+
+    @deposit_form = build_submitted_deposit_form
+    return render :deposit, status: :unprocessable_content unless @deposit_form.valid?
+
+    MultiItemDeposit::DepositStarter.call(multi_item_deposit_action: @multi_item_deposit_action,
+                                          deposit_form: @deposit_form,
+                                          effective_groups: current_effective_groups)
+    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+  end
+
+  def build_submitted_deposit_form
+    MultiItemDeposit::DepositForm.new(deposit_form_params)
+                                 .tap { |form| form.multi_item_deposit_action = @multi_item_deposit_action }
+  end
+
   def proceed_to_structure
     @multi_item_deposit_action.update!(step: :structure) if @multi_item_deposit_action.discovery_succeeded?
     redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
@@ -100,6 +128,12 @@ class MultiItemDepositActionsController < ApplicationController
 
   def return_to_discovery
     @multi_item_deposit_action.update!(step: :discovery)
+    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+  end
+
+  # The deposit results are cleared, since they would be out of date when returning to the deposit step.
+  def return_to_structure
+    @multi_item_deposit_action.update!(step: :structure, initiating_deposit_completed_at: nil)
     redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
   end
 
@@ -132,5 +166,14 @@ class MultiItemDepositActionsController < ApplicationController
 
   def structure_form_params
     MultiItemDeposit::StructureForm.params_from(params)
+  end
+
+  def deposit_form_params
+    MultiItemDeposit::DepositForm.params_from(params)
+  end
+
+  def wait?
+    @multi_item_deposit_action.discovering? || @multi_item_deposit_action.structuring? ||
+      @multi_item_deposit_action.initiating_depositing?
   end
 end

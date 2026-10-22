@@ -2,7 +2,7 @@
 
 module MultiItemDeposit
   # Renders the discovery errors and warnings for a Multi-Item Deposit's Item Deposits.
-  class ErrorDetailsTableComponent < ApplicationComponent
+  class DiscoveryErrorDetailsTableComponent < ApplicationComponent
     def initialize(multi_item_deposit_action:)
       @multi_item_deposit_action = multi_item_deposit_action
       super()

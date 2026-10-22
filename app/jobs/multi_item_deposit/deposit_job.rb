@@ -53,7 +53,7 @@ module MultiItemDeposit
       status = statuses[item_deposit_action.druid]
       return :object_not_found if cocina_object.nil? || status.nil?
       return :not_authorized unless update_allowed?(cocina_object)
-      return :object_changed if item_deposit_action.content&.lock != cocina_object.lock
+      return :object_changed unless LockSupport.same?(item_deposit_action.content&.lock, cocina_object.lock)
 
       version_error_key(status)
     end

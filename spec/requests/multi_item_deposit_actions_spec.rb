@@ -44,6 +44,34 @@ RSpec.describe 'Multi-item deposit actions' do
     end
   end
 
+  describe 'show' do
+    let(:multi_item_deposit_action) do
+      create(:multi_item_deposit_action, user: owner, step: 'submitted', description: 'My deposit')
+    end
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:owner) { user }
+
+      it 'renders the show page' do
+        get multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
+        expect(rendered_page).to have_text('My deposit')
+      end
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:owner) { create(:user) }
+
+      it 'denies access' do
+        get multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
   describe 'edit' do
     let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, description: 'My deposit') }
 
@@ -253,11 +281,68 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
 
-      it 'renders the deposit page' do
+      context 'when every Item Deposit is an initial version' do
+        before do
+          create(:item_deposit_action, multi_item_deposit_action:, initial_version: true)
+        end
+
+        it 'renders the deposit page with the version description set' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(response).to have_http_status(:ok)
+          expect(rendered_page).to have_field('Version description', with: 'Initial version', disabled: true)
+          expect(rendered_page).to have_text('Version description is automatically set for initial deposits.')
+          expect(rendered_page).to have_link('Cancel', href: root_path)
+          expect(rendered_page).to have_button('Previous')
+          expect(rendered_page).to have_button('Check version status and deposit')
+        end
+      end
+
+      context 'when checking version status found deposit errors' do
+        let(:multi_item_deposit_action) do
+          create(:multi_item_deposit_action, user: owner, step: 'deposit',
+                                             initiating_deposit_completed_at: Time.current)
+        end
+
+        before do
+          create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567',
+                                       deposit_errors: ['Version cannot be opened'])
+        end
+
+        it 'renders the error details' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(rendered_page).to have_css('h2', text: 'Results of checking version status')
+          table = rendered_page.find('table[aria-label="Error details"]')
+          expect(table).to have_css('td', text: 'bc123df4567')
+          expect(table).to have_css('span.text-danger', text: 'Version cannot be opened')
+        end
+      end
+
+      context 'when an Item Deposit is not an initial version' do
+        before do
+          create(:item_deposit_action, multi_item_deposit_action:, initial_version: true)
+          create(:item_deposit_action, multi_item_deposit_action:, initial_version: false)
+        end
+
+        it 'renders the deposit page with the version description to enter' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(response).to have_http_status(:ok)
+          expect(rendered_page).to have_field('Version description', disabled: false)
+          expect(rendered_page).to have_no_text('Version description is automatically set for initial deposits.')
+        end
+      end
+    end
+
+    context 'when the multi-item deposit action has been submitted' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'submitted') }
+
+      it 'redirects to the show page' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
-        expect(response).to have_http_status(:ok)
-        expect(rendered_page).to have_text('The deposit step is not yet implemented.')
+        expect(response).to redirect_to(multi_item_deposit_action_path(multi_item_deposit_action))
       end
     end
 
@@ -691,6 +776,101 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
         expect(multi_item_deposit_action.reload.perform_ocr).to be false
         expect(batch_class).not_to have_received(:enqueue)
+      end
+    end
+
+    context 'when depositing with a version description' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
+      let(:params) { { multi_item_deposit_deposit: { version_description: 'Fixed typos' } } }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, initial_version: false)
+      end
+
+      it 'saves the version description, starts the deposit, and redirects to the edit page' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload.version_description).to eq('Fixed typos')
+        expect(multi_item_deposit_action).to be_initiating_depositing
+        expect(MultiItemDeposit::DepositJob).to have_been_enqueued
+          .with(multi_item_deposit_action:, effective_groups: [workgroup])
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when initiating the deposit is in progress' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'deposit',
+                                           initiating_deposit_state: 'initiating_depositing')
+      end
+      let(:params) { { multi_item_deposit_deposit: { version_description: 'Fixed typos' } } }
+
+      it 'does not restart the deposit and redirects to the edit page' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+        expect(multi_item_deposit_action.reload.version_description).to be_nil
+        expect(MultiItemDeposit::DepositJob).not_to have_been_enqueued
+      end
+    end
+
+    context 'when depositing without a version description' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
+      let(:params) { { multi_item_deposit_deposit: { version_description: '' } } }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, initial_version: false)
+      end
+
+      it 'renders the deposit page with errors' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('#multi_item_deposit_deposit_version_description_error',
+                                          text: "can't be blank")
+        expect(multi_item_deposit_action.reload.version_description).to be_nil
+        expect(MultiItemDeposit::DepositJob).not_to have_been_enqueued
+      end
+    end
+
+    context 'when returning to structure from the deposit step' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'deposit', initiating_deposit_completed_at: Time.current)
+      end
+      let(:params) { { commit: 'previous', multi_item_deposit_deposit: { version_description: '' } } }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, initial_version: false)
+      end
+
+      it 'moves to the structure step, clearing the deposit results, without saving the version description' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to be_structure_step
+        expect(multi_item_deposit_action.initiating_deposit_completed_at).to be_nil
+        expect(multi_item_deposit_action.version_description).to be_nil
+        expect(MultiItemDeposit::DepositJob).not_to have_been_enqueued
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when depositing initial versions' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, initial_version: true)
+      end
+
+      it 'saves the initial version description' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action))
+
+        expect(multi_item_deposit_action.reload.version_description).to eq('Initial version')
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
     end
 

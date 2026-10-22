@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe MultiItemDeposit::ErrorDetailsTableComponent, type: :component do
+RSpec.describe MultiItemDeposit::DiscoveryErrorDetailsTableComponent, type: :component do
   let(:component) { described_class.new(multi_item_deposit_action:) }
   let(:multi_item_deposit_action) { create(:multi_item_deposit_action) }
 
