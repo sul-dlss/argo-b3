@@ -1,0 +1,7 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label: false, responsive: true) do |component| %>
+  <% component.with_header(label: t('multi_item_deposit.deposit_status.headers.druid')) %>
+  <% component.with_header(label: t('multi_item_deposit.deposit_status.headers.status')) %>
+  <% object_status_presenters.each do |object_status_presenter| %>
+    <% component.with_row(values: values_for(object_status_presenter)) %>
+  <% end %>
+<% end %>

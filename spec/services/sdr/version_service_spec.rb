@@ -174,6 +174,17 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  context 'when a status is provided' do
+    subject(:service) { described_class.new(druid:, status: provided_status) }
+
+    let(:provided_status) { instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, open?: true) }
+
+    it 'uses the provided status' do
+      expect(service.open?).to be true
+      expect(Dor::Services::Client).not_to have_received(:object)
+    end
+  end
+
   describe 'status methods' do
     it 'delegates to the version client' do
       %i[open? openable? assembling? accessioning? closed? closeable? version].each do |method|

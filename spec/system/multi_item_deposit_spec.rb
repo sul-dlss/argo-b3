@@ -32,6 +32,9 @@ RSpec.describe 'Multi-item deposit' do
     allow(Sdr::VersionService).to receive(:new).and_return(version_service)
     allow(version_service).to receive(:open) { build(:dro_with_metadata).new(lock: 'opened-lock') }
     allow(Sdr::VersionService).to receive(:statuses) { |druids:| druids.index_with { status } }
+    allow(Searchers::ItemByDruid).to receive(:call) do |druids:, **|
+      druids.map { |druid| SearchResults::Item.new(solr_doc: build(:solr_item, druid:)) }
+    end
     stub_const('SolidQueue::Batch', batch_class)
     allow(batch_class).to receive(:enqueue).and_yield
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
@@ -212,7 +215,12 @@ RSpec.describe 'Multi-item deposit' do
     run_deposit_job(multi_item_deposit_action)
 
     # The wait page refreshes to the show page once the deposit is submitted.
-    expect(page).to have_text('The show page is not yet implemented.')
+    expect(page).to have_css('h2', text: 'Deposit status')
+    expect(page).to have_text('My multi-item deposit')
+    deposit_status_rows = page.find('table[aria-label="Deposit status"]').all('tbody tr')
+    expect(deposit_status_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
+      .to eq([['bc123df4567', 'Staging files'], ['cd234fg5678', 'Staging files']])
+    expect(deposit_status_rows[0]).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
     expect(multi_item_deposit_action.reload).to be_submitted_step
     expect(version_service).to have_received(:open).twice
     expect(StageFilesJob).to have_been_enqueued.twice

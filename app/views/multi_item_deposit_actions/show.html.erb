@@ -1,12 +1,20 @@
 <%= content_for :title, t('edit.multi_item_deposits.show.title') %>
 
-<div class="container py-2">
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multi_item_deposit_show %>">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.show.title'), classes: 'mb-3') %>
 
   <% if @multi_item_deposit_action.description? %>
     <p><%= @multi_item_deposit_action.description %></p>
   <% end %>
 
-  <%# Stub until the show page is implemented. %>
-  <p>The show page is not yet implemented.</p>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('multi_item_deposit.deposit_status.label'), classes: 'mb-2') %>
+
+  <p><%= t('edit.multi_item_deposits.show.description') %></p>
+
+  <%= render MultiItemDeposit::DepositStatusTableComponent.new(object_status_presenters: @object_status_presenters) %>
 </div>

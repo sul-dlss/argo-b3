@@ -51,13 +51,66 @@ RSpec.describe 'Multi-item deposit actions' do
 
     context 'when the multi-item deposit action belongs to the user' do
       let(:owner) { user }
+      let(:closed_status) do
+        Dor::Services::Client::ObjectVersion::VersionStatus.new(open: false, openable: true, assembling: false,
+                                                                accessioning: false, closeable: false)
+      end
+      let(:open_status) do
+        Dor::Services::Client::ObjectVersion::VersionStatus.new(open: true, openable: false, assembling: false,
+                                                                accessioning: false, closeable: true)
+      end
 
-      it 'renders the show page' do
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:cd234fg5678', manifest_line_number: 3)
+        create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567', manifest_line_number: 2)
+        allow(Searchers::ItemByDruid).to receive(:call).and_return(
+          [SearchResults::Item.new(solr_doc: build(:solr_item, druid: 'druid:cd234fg5678')),
+           SearchResults::Item.new(solr_doc: build(:solr_item, druid: 'druid:bc123df4567'))]
+        )
+        allow(Sdr::VersionService).to receive(:statuses)
+          .and_return({ 'druid:bc123df4567' => closed_status, 'druid:cd234fg5678' => open_status })
+      end
+
+      it 'renders the deposit status of each Item Deposit in manifest order' do
         get multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_text('My deposit')
+        expect(rendered_page).to have_css('div[data-controller="scheduled-refresh"]')
+
+        rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
+        expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
+          .to eq([%w[bc123df4567 Deposited], ['cd234fg5678', 'Draft, not deposited']])
+        expect(rows[0]).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
+
+        expect(Sdr::VersionService).to have_received(:statuses).with(druids: ['druid:bc123df4567', 'druid:cd234fg5678'])
+      end
+
+      context 'when the deposit is being initiated' do
+        let(:multi_item_deposit_action) do
+          create(:multi_item_deposit_action, user: owner, step: 'submitted',
+                                             initiating_deposit_state: 'initiating_depositing')
+        end
+
+        it 'renders the Item Deposits as initiating' do
+          get multi_item_deposit_action_path(multi_item_deposit_action)
+
+          rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
+          expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
+            .to eq([['bc123df4567', 'Initiating deposit...'], ['cd234fg5678', 'Initiating deposit...']])
+        end
+      end
+    end
+
+    context 'when the multi-item deposit action has not been submitted' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'deposit') }
+
+      it 'redirects to the edit page' do
+        get multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
     end
 
