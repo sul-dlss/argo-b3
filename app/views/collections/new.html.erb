@@ -1,0 +1,90 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.collections.new.title'), classes: 'mb-3') %>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @new_collection_form, id: form_id, url: collections_path) %>
+
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :description,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.description.label'), tab_name: :description, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.rights.label'), tab_name: :rights, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.tags.label'), tab_name: :tags) %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.release.label'), tab_name: :release) %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
+
+    <% form_with(model: @new_collection_form, url: collections_path, html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
+                                                                          label: t('edit.collections.tabs.description.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render Edit::DescriptionChoiceComponent.new(form:, item_fields: false) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
+                                                                          label: t('edit.collections.tabs.rights.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render Edit::ApoComponent.new(form:, options: @apo_options, container_classes: 'my-field') %>
+
+        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+              form:,
+              field_name: :access_view,
+              options: %w[world dark],
+              label_text: t('edit.collections.fields.access_view.label'),
+              label_mark_required: true,
+              label_classes: 'fw-bold',
+              input_classes: 'w-auto',
+              container_classes: 'my-field'
+            ) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :tags,
+                                                                          label: t('edit.collections.tabs.tags.label'))) do |pane| %>
+        <%= render Edit::TagsComponent.new(form:) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :release,
+                                                                          label: t('edit.collections.tabs.release.label'),
+                                                                          help_text: t('edit.collections.tabs.release.help_text'))) do |pane| %>
+        <%= render SdrViewComponents::Forms::HasOneComponent.new(form:,
+                                                                 field_name: :release_tags,
+                                                                 form_component: Edit::ReleaseTagsComponent,
+                                                                 form_options: Edit::ReleaseTagsComponent::COLLECTION_OPTIONS,
+                                                                 fieldset_label: t('edit.collections.tabs.release.label')) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.collections.tabs.deposit.label'),
+                                                                          help_text: t('edit.collections.tabs.deposit.help_text'),
+                                                                          mark_required: true)) do |pane| %>
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render Item::TabNavigationComponent.new(pane:, show_next: false, cancel_path: @cancel_path) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.collections.new.buttons.register'),
+                  form_id: form.id,
+                  classes: 'ms-auto'
+                ) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

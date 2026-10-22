@@ -55,6 +55,13 @@ RSpec.describe HeaderComponent, type: :component do
         expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Item')
       end
 
+      it 'renders an enabled link for collection registration' do
+        render_inline(component)
+
+        expect(page).to have_link('Collection', href: '/collections/new')
+        expect(page).to have_no_css('a.dropdown-item.disabled', text: 'Collection')
+      end
+
       it 'renders an enabled link for multiple item registration' do
         render_inline(component)
 

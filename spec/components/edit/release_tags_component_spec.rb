@@ -26,4 +26,22 @@ RSpec.describe Edit::ReleaseTagsComponent, type: :component do
       expect(page).to have_no_css('input[type="radio"], input[type="checkbox"]')
     end
   end
+
+  context 'with options for a collection' do
+    let(:component) do
+      described_class.new(form:, options: [['Do not release', 'no_release'], ['Release collection', 'self']])
+    end
+    let(:release_tags_form) { CollectionReleaseTagsForm.new(searchworks_target: 'self') }
+
+    it 'renders the dropdowns with the given options' do
+      render_inline(component)
+
+      expect(page).to have_select('SearchWorks', selected: 'Release collection',
+                                                 options: ['Do not release', 'Release collection'])
+      expect(page).to have_select('EarthWorks (requires geo coordinates or release will not be successful)',
+                                  selected: 'Do not release', options: ['Do not release', 'Release collection'])
+      expect(page).to have_select('Search engines', selected: 'Do not release',
+                                                    options: ['Do not release', 'Release collection'])
+    end
+  end
 end
