@@ -35,6 +35,8 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
                                                                           label: t('edit.items.tabs.description.label'))) do |pane| %>
 
+        <%= render Edit::ItemDescriptionComponent.new(form:, druid_token: @druid_token) %>
+
         <% pane.with_footer do %>
           <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, show_previous: true) %>
         <% end %>

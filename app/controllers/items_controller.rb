@@ -2,6 +2,11 @@
 
 # Controller for items (DRO)
 class ItemsController < ApplicationController
+  include TokenConcern
+
+  # Matches ObjectsController so its descriptive CSV download accepts the druid token.
+  self.token_purpose = 'show'
+
   before_action :set_druid_and_cocina_object, only: %i[edit update]
   # Values for submit buttons
   DRAFT_VALUE = 'draft'
@@ -110,6 +115,7 @@ class ItemsController < ApplicationController
   def set_edit_view
     @title = Cocina::Models::Builders::TitleBuilder.build(@cocina_object.description.title)
     @cancel_path = object_path(@druid)
+    @druid_token = generate_token(@druid)
     set_apo_and_collection_options(form: @edit_item_form)
   end
 

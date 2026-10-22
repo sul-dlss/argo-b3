@@ -8,6 +8,12 @@ class EditItemForm < CocinaModels::Dro
 
   include PermittedParamsConcern
   include VersionDescriptionConcern
+  include DescriptionCsvFormConcern
+  include EmbargoFormConcern
+  include CollectionFormConcern
+  include CatalogRecordIdFormConcern
+  include CatalogRecordIdExistsFormConcern
+  include FolioCatalogLinksFormConcern
 
   # Prefilled with the open version's description.
   validates :version_description, presence: true
@@ -16,16 +22,17 @@ class EditItemForm < CocinaModels::Dro
   # was changed by someone else in the meantime. It is not part of the Cocina object.
   attribute :lock, :string
 
+  # A refreshed description would replace the spreadsheet's description.
+  validate :description_csv_file_absent_when_refreshed
+  validate :description_csv_must_be_valid, if: -> { description_csv_file.present? && !catalog_link_refresh? }
+
   # The object's mutable Content, if any; not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
 
-  include EmbargoFormConcern
-  include CollectionFormConcern
-
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  # with_embargo and limit_collection_by_apo only control the form; a change to the embargo is in the embargo
-  # attributes.
-  FORM_ONLY_ATTRIBUTES = %w[version_description lock with_embargo limit_collection_by_apo].freeze
+  # catalog_record_id is not one, since changing it can move refresh and serials to another Folio catalog link.
+  FORM_ONLY_ATTRIBUTES = %w[version_description lock with_embargo limit_collection_by_apo
+                            description_csv_file].freeze
 
   # Before saving, opens a new version if the version
   # is closed and there is something to save or deposit; otherwise updates the open version's description if changed.
@@ -53,7 +60,15 @@ class EditItemForm < CocinaModels::Dro
     content.update!(lock: previous_cocina_object.lock) if content&.persisted?
   end
 
+  def description_csv_file_absent_when_refreshed
+    return unless description_csv_file.present? && catalog_link_refresh?
+
+    errors.add(:description_csv_file, I18n.t('edit.items.fields.description_csv_file.validations.refreshed'))
+  end
+
   def model_attrs_for(cocina_object)
-    super.then { |attrs| attrs.merge(lock: cocina_object.lock, with_embargo: attrs[:embargo_release_date].present?) }
+    super.then do |attrs|
+      attrs.merge(lock: cocina_object.lock, with_embargo: attrs[:embargo_release_date].present?)
+    end
   end
 end

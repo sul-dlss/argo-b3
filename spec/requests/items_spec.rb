@@ -67,6 +67,50 @@ RSpec.describe 'Items' do
 
         expect(Capybara.string(response.body)).to have_field('item[lock]', type: :hidden, with: cocina_object.lock)
       end
+
+      it 'renders a link to download the description spreadsheet' do
+        get "/items/#{druid}/edit"
+
+        link = Capybara.string(response.body).find_link('Download description spreadsheet')
+        druid_token = link[:href][%r{/objects/([^/]+)/descriptive_csv}, 1]
+        expect(Rails.application.message_verifier(:argo).verify(druid_token, purpose: 'show')).to eq(druid)
+      end
+
+      it 'renders the refresh checkbox with an explanation' do
+        get "/items/#{druid}/edit"
+
+        page = Capybara.string(response.body)
+        expect(page).to have_field('Refresh on deposit', type: 'checkbox', checked: false)
+        expect(page).to have_css('.alert-info', text: 'If checked, this item will be refreshed every time')
+      end
+    end
+
+    context 'when the item has a Folio catalog link' do
+      let(:open) { true }
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book).then do |dro|
+          dro.new(identification: dro.identification.to_h.merge(
+            catalogLinks: [{ catalog: 'folio', catalogRecordId: 'in11403803', refresh: true,
+                             partLabel: 'v. 1', sortKey: '1' },
+                           { catalog: 'folio', catalogRecordId: 'in222', refresh: false }],
+            barcode: '36105010362304'
+          ))
+        end
+      end
+
+      it 'prefills the catalog record ids, refresh setting, barcode, and serials' do
+        get "/items/#{druid}/edit"
+
+        page = Capybara.string(response.body)
+        expect(page).to have_field('FOLIO Instance HRID', with: 'in11403803')
+        expect(page).to have_field('Refresh on deposit', type: 'checkbox', checked: true)
+        expect(page).to have_field('item[additional_folio_catalog_links_attributes][0][catalog_record_id]',
+                                   with: 'in222')
+        expect(page).to have_button('Add another FOLIO Instance HRID')
+        expect(page).to have_field('Barcode', with: '36105010362304')
+        expect(page).to have_field('Part label', with: 'v. 1')
+        expect(page).to have_field('Sort key', with: '1')
+      end
     end
 
     context 'when rendering the rights' do
@@ -174,6 +218,28 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when a catalog record id is provided' do
+      let(:item_params) do
+        { version_description: 'Changed type', lock: cocina_object.lock, catalog_record_id: 'in11403803',
+          catalog_link_refresh: '1', barcode: '36105010362304', catalog_link_part_label: 'v. 1',
+          catalog_link_sort_key: '1' }
+      end
+
+      before { allow(CatalogRepository).to receive(:exists?).and_return(true) }
+
+      it 'saves the Folio catalog link with the serials and the barcode' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update) do |cocina_object:, **|
+          expect(cocina_object.identification.barcode).to eq('36105010362304')
+          expect(cocina_object.identification.catalogLinks.map(&:to_h))
+            .to eq([{ catalog: 'folio', catalogRecordId: 'in11403803', refresh: true, partLabel: 'v. 1',
+                      sortKey: '1' }])
+        end
+      end
+    end
+
     context 'when saving as a draft with an open version and a changed version description' do
       let(:item_params) { { version_description: 'Changed type and title', lock: cocina_object.lock } }
 
@@ -215,6 +281,72 @@ RSpec.describe 'Items' do
           .with(cocina_object: having_attributes(access: having_attributes(
             license: Constants::LICENSE_OPTIONS.first[:uri], copyright: 'Copyright © Stanford University.'
           )), user_name: user.sunetid, description: nil)
+      end
+    end
+
+    context 'when a description spreadsheet is provided' do
+      let(:item_params) do
+        { description_csv_file: fixture_file_upload('item_description.csv', 'text/csv'),
+          version_description: 'Changed type', lock: cocina_object.lock }
+      end
+
+      it 'saves the description from the spreadsheet' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(description: having_attributes(
+            title: [having_attributes(value: 'A spreadsheet title')]
+          )), user_name: user.sunetid, description: nil)
+      end
+    end
+
+    context 'when additional catalog record ids are provided' do
+      let(:item_params) do
+        { version_description: 'Changed type', lock: cocina_object.lock, catalog_record_id: 'in11403803',
+          additional_folio_catalog_links_attributes: { '0' => { catalog_record_id: 'in222' },
+                                                       '3' => { catalog_record_id: 'in333' } } }
+      end
+
+      before { allow(CatalogRepository).to receive(:exists?).and_return(true) }
+
+      it 'saves the Folio catalog links' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update) do |cocina_object:, **|
+          expect(cocina_object.identification.catalogLinks.map(&:catalogRecordId)).to eq(%w[in11403803 in222 in333])
+        end
+      end
+
+      context 'when an additional catalog record id is not found in FOLIO' do
+        before do
+          allow(CatalogRepository).to receive(:exists?)
+            .with(catalog_record_id: 'in333', allow_catalog_errors: true).and_return(false)
+        end
+
+        it 'renders the errors without saving' do
+          patch "/items/#{druid}", params: { item: item_params, commit: }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include('was not found in FOLIO')
+          expect(Sdr::Repository).not_to have_received(:update)
+        end
+      end
+    end
+
+    context 'when an invalid description spreadsheet is provided' do
+      let(:item_params) do
+        { description_csv_file: fixture_file_upload('item_description_invalid.csv', 'text/csv'),
+          version_description: 'Changed type', lock: cocina_object.lock }
+      end
+
+      it 'renders the errors without saving' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Title column not found.')
+        expect(Sdr::Repository).not_to have_received(:update)
       end
     end
 

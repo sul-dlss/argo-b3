@@ -1,0 +1,7 @@
+<%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                       field_name: :description_csv_file,
+                                                       container_classes: 'my-field',
+                                                       label_text: t('edit.items.fields.description_csv_file.label'),
+                                                       label_classes: 'fw-bold',
+                                                       label_caption: download_link,
+                                                       input_data:) %>

@@ -12,6 +12,8 @@ module CocinaModels
       attribute :catalog_link_refresh, :boolean, default: false
       attribute :catalog_link_part_label, :string
       attribute :catalog_link_sort_key, :string
+      # A blank field is nil, as when mapped from a link without one, so that it is not a change.
+      normalizes_whitespace :catalog_link_part_label, :catalog_link_sort_key
       validate :sort_key_requires_part_label
 
       def find_folio_catalog_link(catalog_record_id:)
@@ -21,10 +23,13 @@ module CocinaModels
       def catalog_link_refresh? = catalog_link_refresh
 
       def folio_catalog_links_changed?
-        existing_catalog_record_ids = Array(previous_cocina_object.identification&.catalogLinks)
-                                      .filter_map { |link| link.catalogRecordId if link.catalog == 'folio' }
+        folio_catalog_links.map(&:catalog_record_id).sort != existing_folio_catalog_record_ids.sort
+      end
 
-        folio_catalog_links.map(&:catalog_record_id).sort != existing_catalog_record_ids.sort
+      # @return [Array<String>] the catalog record ids of the Folio catalog links of the previous Cocina object
+      def existing_folio_catalog_record_ids
+        Array(previous_cocina_object&.identification&.catalogLinks)
+          .filter_map { |link| link.catalogRecordId if link.catalog == 'folio' }
       end
 
       # This bubbles up changes to the parent objects.

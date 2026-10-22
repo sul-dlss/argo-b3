@@ -81,4 +81,75 @@ RSpec.describe 'Edit an item' do
     expect(Sdr::Repository).to have_received(:accession)
       .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name: user.sunetid, context: {})
   end
+
+  context 'when the item has Folio catalog links' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, source_id: 'sul:original').then do |dro|
+        dro.new(identification: dro.identification.to_h.merge(
+          catalogLinks: [{ catalog: 'folio', catalogRecordId: 'in111', refresh: true },
+                         { catalog: 'folio', catalogRecordId: 'in222', refresh: false }]
+        ))
+      end
+    end
+
+    before do
+      allow(CatalogRepository).to receive_messages(exists?: true, title: 'Pride and prejudice')
+    end
+
+    it 'previews the FOLIO record for an additional FOLIO Instance HRID' do
+      visit edit_item_path(druid)
+
+      click_button 'Description'
+      within('fieldset', text: 'Additional FOLIO Instance HRIDs') do
+        click_button 'Preview FOLIO record'
+
+        expect(page).to have_text('FOLIO title statement: Pride and prejudice')
+      end
+      expect(CatalogRepository).to have_received(:title).with(catalog_record_id: 'in222')
+    end
+
+    it 'disables uploading a description spreadsheet while refreshing on deposit' do
+      visit edit_item_path(druid)
+
+      click_button 'Description'
+      expect(page).to have_field('Refresh on deposit', checked: true)
+      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true)
+
+      uncheck 'Refresh on deposit'
+      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: false)
+
+      check 'Refresh on deposit'
+      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true)
+    end
+
+    it 'replaces the additional FOLIO Instance HRIDs' do
+      visit edit_item_path(druid)
+
+      click_button 'Description'
+      expect(page).to have_field('FOLIO Instance HRID', with: 'in111')
+      within('fieldset', text: 'Additional FOLIO Instance HRIDs') do
+        expect(page).to have_field('Additional FOLIO Instance HRID', with: 'in222')
+        click_button 'Remove'
+        # Removing the last row leaves a blank row.
+        fill_in 'Additional FOLIO Instance HRID', with: 'in333'
+        click_button 'Add another FOLIO Instance HRID'
+        all('input[type="text"]').last.fill_in(with: 'in444')
+      end
+
+      find_by_id('deposit-tab').click
+      fill_in 'Version description', with: 'Changed the HRIDs'
+      click_button 'Save as draft', match: :first
+
+      expect(page).to have_toast('Item updated.')
+      expect(CatalogRepository).to have_received(:exists?).twice
+      expect(Sdr::Repository).to have_received(:update) do |cocina_object:, **|
+        expect(cocina_object.identification.catalogLinks.map(&:to_h)).to contain_exactly(
+          { catalog: 'folio', catalogRecordId: 'in111', refresh: true },
+          { catalog: 'folio', catalogRecordId: 'in333', refresh: false },
+          { catalog: 'folio', catalogRecordId: 'in444', refresh: false },
+          { catalog: 'previous folio', catalogRecordId: 'in222', refresh: false }
+        )
+      end
+    end
+  end
 end
