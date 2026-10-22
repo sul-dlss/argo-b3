@@ -1,56 +1,75 @@
 <%= form_with model: @bulk_action_form, url: bulk_actions_manage_license_and_rights_statements_path do |form| %>
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
-  <fieldset>
-      <legend>Use and reproduction statement</legend>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Use and reproduction statement') do %>
       <p><%= link_to_new_tab 'Sample use and reproduction statements.', 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements' %></p>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
                                                                     label_text: 'Do not update use and reproduction statement',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'no_change') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
                                                                     label_text: 'Remove existing use and reproduction statement',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'remove') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,
                                                                     label_text: 'Update use and reproduction statement',
-                                                                    input_value: 'update') %>
-      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :use_and_reproduction_statement,
-                                                                 label_text: 'Use and reproduction statement', label_hidden: true,
-                                                                 rows: 5) %>
-    </fieldset>
+                                                                    container_classes: 'my-field',
+                                                                    input_value: 'update') do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :use_and_reproduction_statement,
+                                                                     label_text: 'Use and reproduction statement',
+                                                                     label_hidden: true,
+                                                                     container_classes: 'my-field',
+                                                                     rows: 5) %>
+        <% end %>
+      <% end %>
+    <% end %>
 
-    <fieldset class="my-fieldset">
-      <legend>Copyright statement</legend>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Copyright statement', classes: 'my-fieldset') do %>
       <p><%= link_to_new_tab 'Sample copyright statements.', 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements' %></p>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
                                                                     label_text: 'Do not update copyright statement',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'no_change') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
                                                                     label_text: 'Remove existing copyright statement',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'remove') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :copyright_action,
                                                                     label_text: 'Update copyright statement',
-                                                                    input_value: 'update') %>
-      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :copyright,
-                                                                 label_text: 'Copyright statement', label_hidden: true,
-                                                                 rows: 5) %>
-    </fieldset>
+                                                                    container_classes: 'my-field',
+                                                                    input_value: 'update') do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :copyright,
+                                                                     label_text: 'Copyright statement',
+                                                                     label_hidden: true,
+                                                                     container_classes: 'my-field',
+                                                                     rows: 5) %>
+        <% end %>
+      <% end %>
+    <% end %>
 
-    <fieldset class="my-fieldset">
-      <legend>License</legend>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'License', classes: 'my-fieldset') do %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
                                                                     label_text: 'Do not update license',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'no_change') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
                                                                     label_text: 'Remove existing license',
+                                                                    container_classes: 'my-field',
                                                                     input_value: 'remove') %>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :license_action,
                                                                     label_text: 'Update license',
-                                                                    input_value: 'update') %>
-      <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :license, text: 'License', hidden: true) %>
-      <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(
-            form:, field_name: :license,
-            options: Constants::LICENSE_OPTIONS.map { |option| [option[:label], option[:uri]] }
-          ) %>
-    </fieldset>
+                                                                    container_classes: 'my-field',
+                                                                    input_value: 'update') do |component| %>
+        <%= component.with_additional_container_content do %>
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+                form:, field_name: :license, label_text: 'License', label_hidden: true,
+                container_classes: 'my-field',
+                options: Constants::LICENSE_OPTIONS.map { |option| [option[:label], option[:uri]] }
+              ) %>
+        <% end %>
+      <% end %>
+    <% end %>
 
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
   <% end %>

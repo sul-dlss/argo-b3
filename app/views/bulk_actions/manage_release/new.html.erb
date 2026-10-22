@@ -2,16 +2,19 @@
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
     <p>For items, this overrides any collection release instructions; for a collection this releases the collection object itself, not its members.</p>
 
-    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
-                                                                  label_text: 'Release this object',
-                                                                  input_value: 'true') %>
-    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
-                                                                  label_text: 'Do not release this object',
-                                                                  input_value: 'false') %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Release') do %>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
+                                                                    label_text: 'Release this object',
+                                                                    container_classes: 'my-field',
+                                                                    input_value: 'true') %>
+      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :release,
+                                                                    label_text: 'Do not release this object',
+                                                                    container_classes: 'my-field',
+                                                                    input_value: 'false') %>
 
-    <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :to, text: 'to') %>
-    <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :to,
-                                                                       options: Constants::RELEASE_TARGETS) %>
+      <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :to, label_text: 'to',
+                                                                    options: Constants::RELEASE_TARGETS) %>
+    <% end %>
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
   <% end %>
 <% end %>

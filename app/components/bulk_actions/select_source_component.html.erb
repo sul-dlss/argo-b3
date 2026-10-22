@@ -1,8 +1,12 @@
-<fieldset data-controller="radio" class="my-fieldset">
-  <legend>Select source of items for bulk action</legend>
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      label: 'Select source of items for bulk action',
+      classes: 'my-fieldset',
+      data: { controller: 'radio' }
+    ) do %>
 
   <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :source,
                                                                 label_text: 'From last search',
+                                                                container_classes: 'my-field',
                                                                 input_value: 'results', input_disabled: !last_search?, input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
     <%= component.with_additional_container_content do %>
       <% if last_search? %>
@@ -13,9 +17,12 @@
 
   <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :source,
                                                                 label_text: 'From druid list',
+                                                                container_classes: 'my-field',
                                                                 input_value: 'druids', input_data: { radio_target: 'radio', action: 'radio#toggle' }) do |component| %>
     <%= component.with_additional_container_content do %>
-      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :druid_list, label_text: 'Enter druid list', label_hidden: true, input_rows: 5) %>
+      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :druid_list,
+                                                                 label_text: 'Enter druid list', label_hidden: true,
+                                                                 input_rows: 5, container_classes: 'my-field') %>
     <% end %>
   <% end %>
-</fieldset>
+<% end %>
