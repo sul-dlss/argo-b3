@@ -1,0 +1,14 @@
+<%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label:, id:, empty_message:) do |table| %>
+  <%= table.with_header(label: 'Multi-item deposit', style: "width: #{show_user? ? 30 : 40}%;") %>
+  <% if show_user? %>
+    <%= table.with_header(label: 'User', style: 'width: 10%;') %>
+  <% end %>
+  <%= table.with_header(label: 'Created', style: 'width: 15%;') %>
+  <%= table.with_header(label: 'Submitted', style: 'width: 15%;') %>
+  <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
+  <%= table.with_header(label: 'Workflow status', style: 'width: 15%;') %>
+  <% multi_item_deposit_actions.each do |multi_item_deposit_action| %>
+    <%= table.with_row(values: values_for(multi_item_deposit_action),
+                       id: dom_id(multi_item_deposit_action, 'row')) %>
+  <% end %>
+<% end %>

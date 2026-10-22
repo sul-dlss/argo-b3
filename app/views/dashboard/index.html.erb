@@ -60,6 +60,8 @@
         <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
       </div>
 
+      <%= render Dashboard::MultiItemDepositsTableComponent.new(multi_item_deposit_actions: @recent_multi_item_deposit_actions) %>
+
       <div class="mb-5">
         <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
       </div>

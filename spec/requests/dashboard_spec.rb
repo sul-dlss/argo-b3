@@ -26,6 +26,35 @@ RSpec.describe 'Dashboard' do
       expect(response).to have_http_status(:ok)
     end
 
+    context 'when the user has Multi-Item Deposits' do
+      let!(:multi_item_deposit_actions) do
+        Array.new(6) { |index| create(:multi_item_deposit_action, user:, updated_at: index.days.ago) }
+      end
+      let!(:other_user_multi_item_deposit_action) { create(:multi_item_deposit_action) }
+
+      it 'lists the 5 most recently updated Multi-Item Deposits of the user' do
+        get root_path
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page.all('#multi-item-deposits-table tbody tr').pluck(:id))
+          .to eq(multi_item_deposit_actions.take(5).map { |deposit| "row_multi_item_deposit_action_#{deposit.id}" })
+        expect(rendered_page)
+          .to have_no_css("tr#row_multi_item_deposit_action_#{other_user_multi_item_deposit_action.id}")
+        expect(rendered_page).to have_link('View all multi-item deposits', href: '/multi_item_deposit_actions')
+      end
+    end
+
+    context 'when the user has no Multi-Item Deposits' do
+      before { create(:multi_item_deposit_action) }
+
+      it 'does not render the Multi-Item Deposits table' do
+        get root_path
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_no_css('#multi-item-deposits-table')
+      end
+    end
+
     context 'when objects have recently been viewed' do
       let(:recent_object_druids) do
         %w[

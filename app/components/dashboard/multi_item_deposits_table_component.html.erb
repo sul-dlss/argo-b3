@@ -1,0 +1,5 @@
+<%# The wrapper is part of the component, so that no spacing remains when there are no Multi-Item Deposits. %>
+<div class="mb-5">
+  <%= render MultiItemDeposit::TableComponent.new(multi_item_deposit_actions:, label:, id: 'multi-item-deposits-table', show_label: true) %>
+  <%= link_to 'View all multi-item deposits', multi_item_deposit_actions_path %>
+</div>

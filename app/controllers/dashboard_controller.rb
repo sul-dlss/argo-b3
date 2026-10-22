@@ -25,9 +25,12 @@ class DashboardController < ApplicationController
     Search::Fields::ALL_TAGS
   ].freeze
 
+  RECENT_MULTI_ITEM_DEPOSITS_LIMIT = 5
+
   def index
     @go_to_druid_form = GoToDruidForm.new
     set_recent_object_docs
+    set_recent_multi_item_deposit_actions
     set_pinned_object_docs
     set_pinned_searches
     set_pinned_tags
@@ -40,6 +43,7 @@ class DashboardController < ApplicationController
       redirect_to object_path(@go_to_druid_form.druid)
     else
       set_recent_object_docs
+      set_recent_multi_item_deposit_actions
       set_pinned_object_docs
       set_pinned_searches
       set_pinned_tags
@@ -62,6 +66,12 @@ class DashboardController < ApplicationController
                           else
                             []
                           end
+  end
+
+  def set_recent_multi_item_deposit_actions
+    @recent_multi_item_deposit_actions = MultiItemDepositAction.where(user: current_user)
+                                                               .order(updated_at: :desc, id: :desc)
+                                                               .limit(RECENT_MULTI_ITEM_DEPOSITS_LIMIT)
   end
 
   def set_pinned_searches
