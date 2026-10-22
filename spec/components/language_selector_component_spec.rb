@@ -11,7 +11,7 @@ RSpec.describe LanguageSelectorComponent, type: :component do
   it 'renders a multiple select wired up to the multi-select controller' do
     render_inline(component)
 
-    expect(page).to have_css('div[data-controller="multi-select"][data-multi-select-max-recommended-value="8"]')
+    expect(page).to have_css('div[data-controller="multi-select"]')
     expect(page).to have_css('label', text: 'Search for a language')
     expect(page).to have_css('select[multiple][data-multi-select-target="select"]')
   end
@@ -24,11 +24,11 @@ RSpec.describe LanguageSelectorComponent, type: :component do
     expect(page).to have_css('select option[value="ArmenianEastern"]', text: 'Armenian (Eastern)')
   end
 
-  it 'renders the too-many-languages warning hidden' do
+  it 'renders help text about selecting many languages' do
     render_inline(component)
 
-    expect(page).to have_css('.d-none[data-multi-select-target="warning"]',
-                             text: 'Selecting more than eight text-extraction languages')
+    expect(page).to have_css('.form-text', text: 'Selecting many languages may have an adverse effect')
+    expect(page).to have_css('select[aria-describedby="text_extraction_languages_help"]')
   end
 
   context 'with container data from the caller' do

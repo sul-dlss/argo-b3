@@ -58,27 +58,4 @@ RSpec.describe 'Create a new text extraction bulk action' do
       expect(items.map(&:text)).to contain_exactly(a_string_starting_with('Danish'))
     end
   end
-
-  context 'when more than the recommended number of languages is selected' do
-    let(:languages) do
-      %w[Afrikaans Albanian Basque Danish English Finnish Hawaiian Icelandic Zulu]
-    end
-
-    it 'warns the user until a language is removed' do
-      visit new_bulk_actions_text_extraction_path
-
-      expect(page).to have_css('h1', text: bulk_action_label)
-      expect(page).to have_no_text('Selecting more than eight text-extraction languages')
-
-      languages.each { |language| select_multi_option language, from: 'Search for a language' }
-
-      expect(find_multi_select('Search for a language')).to have_css('.item', count: 9)
-      expect(page).to have_text('Selecting more than eight text-extraction languages')
-
-      remove_first_multi_option from: 'Search for a language'
-
-      expect(find_multi_select('Search for a language')).to have_css('.item', count: 8)
-      expect(page).to have_no_text('Selecting more than eight text-extraction languages')
-    end
-  end
 end
