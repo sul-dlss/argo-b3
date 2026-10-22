@@ -38,7 +38,6 @@
         <% component.with_button(link: new_multiple_item_path, label: 'Register multiple items', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
         <% component.with_button(link: new_bulk_actions_register_csv_path, label: 'Register multiple items (via CSV)', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
         <% component.with_button(link: multi_item_deposit_actions_path, method: :post, label: 'Deposit multiple items', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
-        <% component.with_button(link: '#', label: 'Register items for Goobi', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
       <% if allowed_to?(:admin?, nil, with: AdminPolicy) %>

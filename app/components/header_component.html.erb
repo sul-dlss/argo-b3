@@ -38,9 +38,6 @@
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items', link: new_multiple_item_path, disabled: !can_register_item?) %>
       <% end %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items for Goobi', link: '#', disabled: true) %>
-      <% end %>
-      <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Register multiple items (via CSV)', link: new_bulk_actions_register_csv_path, disabled: !can_register_item?) %>
       <% end %>
       <% dropdown.with_item do %>
