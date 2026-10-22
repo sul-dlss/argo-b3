@@ -24,6 +24,7 @@ export default class extends Controller {
       addPrecedence: true,
       persist: false,
       selectOnTab: true,
+      closeAfterSelect: true,
       // Tags may contain commas, so the value of the input is never split into multiple tags.
       delimiter: '\u0000',
       // The endpoint determines which options match and their order, so every loaded option is shown as is.
@@ -31,6 +32,16 @@ export default class extends Controller {
       shouldLoad: (query) => query.length >= MIN_QUERY_LENGTH,
       load: (query, callback) => this.load(query, callback)
     })
+    this.preventReopeningWhenFull()
+  }
+
+  // Throttled refreshes and slow loads would otherwise reopen the dropdown over the next field after a tag is entered.
+  preventReopeningWhenFull () {
+    const open = this.tomSelect.open.bind(this.tomSelect)
+    this.tomSelect.open = () => {
+      if (this.tomSelect.isFull() && this.tomSelect.inputValue() === '') return
+      open()
+    }
   }
 
   disconnect () {
