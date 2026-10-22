@@ -24,6 +24,7 @@ export default class extends Controller {
     document.addEventListener('turbo:submit-start', this.handleSubmitStart)
     document.addEventListener('turbo:submit-end', this.handleSubmitEnd)
     document.addEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
+    document.addEventListener('turbo:before-render', this.skipRefreshRenderWhileSubmitting)
 
     this.href = window.location.href
     if (this.reloadTimeout) return
@@ -45,6 +46,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:submit-start', this.handleSubmitStart)
     document.removeEventListener('turbo:submit-end', this.handleSubmitEnd)
     document.removeEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
+    document.removeEventListener('turbo:before-render', this.skipRefreshRenderWhileSubmitting)
   }
 
   // This preserves the active tab when the page is refreshed
@@ -103,6 +105,12 @@ export default class extends Controller {
   // This is checked when the visit starts, since Turbo debounces session.refresh (by 150ms).
   preventRefreshWhileSubmitting = (event) => {
     if (this.submitting && event.detail.url === window.location.href) event.preventDefault()
+  }
+
+  // A refresh that started before a submission can still render during it. Turbo would then reload a frame whose
+  // submission (e.g., the events filter) is in flight from its original src, so that render is skipped.
+  skipRefreshRenderWhileSubmitting = (event) => {
+    if (this.submitting && event.detail.renderMethod === 'morph') event.detail.render = () => {}
   }
 
   handleSubmitStart = () => {
