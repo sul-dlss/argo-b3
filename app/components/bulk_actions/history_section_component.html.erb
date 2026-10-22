@@ -5,6 +5,15 @@
   <%= form_with model: filter_form, url: bulk_actions_path, method: :get,
                 id: 'bulk-actions-filter', class: 'd-flex gap-3 mb-4 align-items-end',
                 data: { controller: 'skip-morph', action: 'turbo:before-morph-element->skip-morph#skip' } do |form| %>
+    <% if admin? %>
+      <div>
+        <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :user_ids, text: 'Users') %>
+        <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :user_ids,
+                                                                           options: filter_form.user_options,
+                                                                           multiple: true,
+                                                                           data: { controller: 'checkbox-tom-select' }) %>
+      </div>
+    <% end %>
     <div>
       <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :action_types, text: 'Actions') %>
       <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:, field_name: :action_types,
@@ -34,8 +43,11 @@
 
   <%= render SdrViewComponents::Tables::TableComponent.new(label: heading, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
     <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
+    <% if admin? %>
+      <%= table.with_header(label: 'User', style: 'width: 10%;') %>
+    <% end %>
     <%= table.with_header(label: 'Action', style: 'width: 15%;') %>
-    <%= table.with_header(label: 'Description', style: 'width: 30%;') %>
+    <%= table.with_header(label: 'Description', style: "width: #{admin? ? 20 : 30}%;") %>
     <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Downloads', style: 'width: 15%;') %>

@@ -28,9 +28,11 @@ class BulkAction < ApplicationRecord
   # @param action_types [Array<String>, nil] nil for no limit
   # @param statuses [Array<String>, nil] keys of DISPLAY_STATUSES; nil for no limit
   # @param submitted_since [ActiveSupport::TimeWithZone, nil] nil for no limit
+  # @param user_ids [Array<String>, nil] nil for no limit
   # @return [ActiveRecord::Relation] the bulk actions that match the filters
-  def self.filtered(action_types: nil, statuses: nil, submitted_since: nil)
+  def self.filtered(action_types: nil, statuses: nil, submitted_since: nil, user_ids: nil)
     relation = all
+    relation = relation.where(user_id: user_ids) if user_ids
     relation = relation.where(action_type: action_types) if action_types
     relation = relation.with_display_statuses(statuses) if statuses
     relation = relation.where(created_at: submitted_since..) if submitted_since

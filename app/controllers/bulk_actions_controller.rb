@@ -8,10 +8,12 @@ class BulkActionsController < ApplicationController
   skip_verify_authorized only: %i[index new]
 
   def index
-    @filter_form = BulkActions::FilterForm.new(filter_form_params)
-    @bulk_actions = Current.user.bulk_actions.filtered(**@filter_form.filters)
-                           .order(created_at: :desc, id: :desc)
-                           .page(params[:page]).per(PER_PAGE)
+    @filter_form = BulkActions::FilterForm.new(filter_form_params, user: Current.user,
+                                                                   admin: allowed_to?(:admin?, nil, with: AdminPolicy))
+    @bulk_actions = authorized_scope(BulkAction.all).filtered(**@filter_form.filters)
+                                                    .includes(:user)
+                                                    .order(created_at: :desc, id: :desc)
+                                                    .page(params[:page]).per(PER_PAGE)
   end
 
   def show

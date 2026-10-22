@@ -53,7 +53,46 @@ RSpec.describe BulkActions::FilterForm do
     it 'returns the filters for the bulk actions' do
       form = described_class.new(statuses: ['', 'completed'])
 
-      expect(form.filters).to eq(action_types: nil, statuses: ['completed'], submitted_since: nil)
+      expect(form.filters).to eq(action_types: nil, statuses: ['completed'], submitted_since: nil, user_ids: nil)
+    end
+  end
+
+  describe '#user_ids_filter' do
+    let(:user) { create(:user) }
+    let(:other_user) { create(:user) }
+
+    before { create(:bulk_action, user: other_user) }
+
+    it 'returns the current user when an admin provides no user ids' do
+      expect(described_class.new(user:, admin: true).user_ids_filter).to eq([user.id.to_s])
+    end
+
+    it 'returns no user ids when an admin provides only the blank value of the select' do
+      expect(described_class.new(user_ids: [''], user:, admin: true).user_ids_filter).to eq([])
+    end
+
+    it 'returns nil when an admin selects all users' do
+      form = described_class.new(user_ids: ['', user.id.to_s, other_user.id.to_s], user:, admin: true)
+
+      expect(form.user_ids_filter).to be_nil
+    end
+
+    it 'returns nil when not an admin, whatever user ids are provided' do
+      expect(described_class.new(user_ids: [other_user.id.to_s], user:).user_ids_filter).to be_nil
+    end
+  end
+
+  describe '#user_options' do
+    let(:user) { create(:user, email_address: 'mmouse@stanford.edu') }
+
+    before do
+      create(:bulk_action, user: create(:user, email_address: 'dduck@stanford.edu'))
+      create(:bulk_action, user: create(:user, email_address: 'bbunny@stanford.edu'))
+      create(:user, email_address: 'nobulkactions@stanford.edu')
+    end
+
+    it 'returns the current user followed by the other users with bulk actions, sorted by sunetid' do
+      expect(described_class.new(user:, admin: true).user_options.map(&:first)).to eq(%w[mmouse bbunny dduck])
     end
   end
 
@@ -73,6 +112,22 @@ RSpec.describe BulkActions::FilterForm do
       form = described_class.new(statuses: ['', 'completed'], submitted_date: 'last_year')
 
       expect(form.active_filter_params).to eq(statuses: ['', 'completed'], submitted_date: 'last_year')
+    end
+
+    context 'when an admin' do
+      let(:user) { create(:user) }
+
+      it 'returns no user ids param when only the current user is selected' do
+        form = described_class.new(user_ids: ['', user.id.to_s], user:, admin: true)
+
+        expect(form.active_filter_params).to eq({})
+      end
+
+      it 'returns the user ids param when no users are selected' do
+        form = described_class.new(user_ids: [''], user:, admin: true)
+
+        expect(form.active_filter_params).to eq(user_ids: [''])
+      end
     end
   end
 

@@ -40,6 +40,11 @@ RSpec.describe BulkAction do
         .to contain_exactly(redeposit_completed_bulk_action)
     end
 
+    it 'returns the bulk actions of the users' do
+      expect(described_class.filtered(user_ids: [reindex_completed_bulk_action.user_id.to_s]))
+        .to contain_exactly(reindex_completed_bulk_action)
+    end
+
     it 'returns the bulk actions submitted since the time' do
       expect(described_class.filtered(action_types: ['REDEPOSIT'], submitted_since: 7.days.ago))
         .to contain_exactly(redeposit_processing_bulk_action)
