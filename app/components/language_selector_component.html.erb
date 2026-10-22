@@ -3,15 +3,9 @@
                                                               options: available_ocr_languages,
                                                               label_text: 'Search for a language',
                                                               label_classes: 'fw-bold',
+                                                              help_text: 'Selecting many languages may have an adverse effect on the speed and quality of text extraction.',
                                                               container_classes: 'my-field',
                                                               container_data:,
                                                               input_multiple: true,
                                                               input_data: { 'multi-select-target': 'select' },
-                                                              **select_options) do |component| %>
-  <% component.with_additional_container_content do %>
-    <div class="d-none text-danger" data-multi-select-target="warning">
-      <b>Warning</b>: Selecting more than eight text-extraction languages may have an adverse effect on the
-      speed and quality of recognition. Please reduce the number of languages.
-    </div>
-  <% end %>
-<% end %>
+                                                              **select_options) %>

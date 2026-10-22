@@ -21,10 +21,6 @@ def select_multi_option_with_key(query, from:, key:)
   input.send_keys(key)
 end
 
-def remove_first_multi_option(from:)
-  find_multi_select(from).first('.item .remove').click
-end
-
 # Provide the expected count to wait for it, since all does not otherwise wait for items to be added or removed.
 def find_multi_select_items(from:, count: nil)
   find_multi_select(from).all('.item', **{ count: }.compact)

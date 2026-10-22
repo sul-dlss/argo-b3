@@ -2,8 +2,6 @@
 
 # Show the language selection controls for OCR text extraction workflows
 class LanguageSelectorComponent < ApplicationComponent
-  # Selecting more than this many languages degrades recognition, so warn the user.
-  MAX_RECOMMENDED_LANGUAGES = 8
   ABBYY_LANGUAGES = YAML.load_file(Rails.root.join('config/abbyy_languages.yml')).freeze
 
   def initialize(form:, container_data: {}, **select_options)
@@ -23,8 +21,7 @@ class LanguageSelectorComponent < ApplicationComponent
 
   # Merged rather than overridable so that a caller cannot detach the multi-select controller.
   def container_data
-    { controller: 'multi-select',
-      'multi-select-max-recommended-value': MAX_RECOMMENDED_LANGUAGES }.merge(@container_data)
+    { controller: 'multi-select' }.merge(@container_data)
   end
 
   attr_reader :form, :select_options
