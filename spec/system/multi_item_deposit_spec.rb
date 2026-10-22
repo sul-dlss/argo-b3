@@ -102,7 +102,7 @@ RSpec.describe 'Multi-item deposit' do
     fill_in 'Mount path', with: mount_path
     click_on 'Discover files and check manifest'
 
-    expect(page).to have_text('Processing...')
+    expect(page).to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My multi-item deposit...")
     expect(multi_item_deposit_action.reload).to be_discovering
     expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid, :path))
       .to contain_exactly(['druid:bc123df4567', 'folder1'], ['druid:cd234fg5678', 'folder2'])
@@ -147,7 +147,7 @@ RSpec.describe 'Multi-item deposit' do
     choose 'Publish and preserve all files'
     click_on 'Check files'
 
-    expect(page).to have_text('Processing...')
+    expect(page).to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My multi-item deposit...")
     expect(multi_item_deposit_action.reload).to be_structuring
     expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: nil, publish_preserve_all: true)
 
@@ -193,7 +193,7 @@ RSpec.describe 'Multi-item deposit' do
     fill_in 'Version description', with: 'Adding files'
     click_on 'Check version status and deposit'
 
-    expect(page).to have_text('Processing...')
+    expect(page).to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My multi-item deposit...")
     expect(multi_item_deposit_action.reload).to be_initiating_depositing
     expect(multi_item_deposit_action.version_description).to eq('Adding files')
     expect(MultiItemDeposit::DepositJob).to have_been_enqueued
@@ -210,7 +210,7 @@ RSpec.describe 'Multi-item deposit' do
 
     click_on 'Check version status and deposit'
 
-    expect(page).to have_text('Processing...')
+    expect(page).to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My multi-item deposit...")
 
     run_deposit_job(multi_item_deposit_action)
 

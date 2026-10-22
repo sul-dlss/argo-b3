@@ -37,7 +37,9 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(form).to have_button('Filter', class: 'btn-outline-primary')
 
     table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions']")
-    expect(table).to have_css('thead th', text: 'Submitted')
+    expect(table).to have_css('thead th:nth-of-type(1)', text: 'Bulk action')
+    expect(table).to have_css('thead th:nth-of-type(2)', text: 'Action')
+    expect(table).to have_css('thead th:nth-of-type(3)', text: 'Submitted')
     expect(table).to have_css('thead th', count: 6)
     expect(table).to have_no_css('thead th', text: 'User')
     expect(form).to have_no_select('Users')
@@ -45,9 +47,9 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
 
     bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
     expect(bulk_action_row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']",
-                                        text: '2026-04-16 03:00:00 PT')
+                                        text: "Bulk action #{bulk_action.id}: Test description")
     expect(bulk_action_row).to have_css('td:nth-of-type(2)', text: BulkActions::REINDEX.label)
-    expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: 'Test description')
+    expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: '2026-04-16 03:00:00 PT')
     expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Processing')
     expect(bulk_action_row).to have_no_css('td:nth-of-type(4) i.bi')
     expect(bulk_action_row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
@@ -55,9 +57,9 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
 
     bulk_action_with_files_row = table.find("tr##{dom_id(bulk_action_with_files, 'row')}")
     expect(bulk_action_with_files_row)
-      .to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action_with_files.id}']")
+      .to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action_with_files.id}']",
+                   exact_text: "Bulk action #{bulk_action_with_files.id}")
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(2)', text: BulkActions::EXPORT_COCINA_JSON.label)
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(3)', text: '')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4)', text: 'Completed')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4) i.bi-exclamation-triangle-fill.text-warning')
     expect(bulk_action_with_files_row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')

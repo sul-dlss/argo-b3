@@ -42,12 +42,12 @@
   <%= render Elements::Pagination::BriefComponent.new(total_pages:, current_page:, path_func:, total_results: total_count, per_page: limit_value) %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(label: heading, show_label: false, id: 'bulk-actions-history-table', empty_message: 'No bulk actions.') do |table| %>
-    <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
+    <%= table.with_header(label: 'Bulk action', style: "width: #{admin? ? 20 : 30}%;") %>
     <% if admin? %>
       <%= table.with_header(label: 'User', style: 'width: 10%;') %>
     <% end %>
     <%= table.with_header(label: 'Action', style: 'width: 15%;') %>
-    <%= table.with_header(label: 'Description', style: "width: #{admin? ? 20 : 30}%;") %>
+    <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Downloads', style: 'width: 15%;') %>

@@ -6,5 +6,5 @@
 <div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multiple_items %>">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
 
-  <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: t('edit.multi_item_deposits.wait.message'), message_position: :bottom, classes: 'align-items-center') %>
+  <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: t('edit.multi_item_deposits.wait.message', name: @multi_item_deposit_action.name), message_position: :bottom, classes: 'align-items-center') %>
 </div>

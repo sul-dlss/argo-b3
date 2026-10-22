@@ -3,9 +3,7 @@
 <div class="container py-2">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
 
-  <% if @multi_item_deposit_action.description? %>
-    <p><%= @multi_item_deposit_action.description %></p>
-  <% end %>
+  <p><%= @multi_item_deposit_action.name %></p>
 
   <%= form_with model: @structure_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
     <% if @multi_item_deposit_action.ocr_applicable? %>

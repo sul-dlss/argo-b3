@@ -12,7 +12,7 @@ module BulkActions
 
     attr_reader :bulk_action
 
-    delegate :completed?, :log_file?, to: :bulk_action
+    delegate :completed?, :log_file?, :name, to: :bulk_action
 
     def data
       return {} if completed?
@@ -23,8 +23,8 @@ module BulkActions
       }
     end
 
-    def label
-      bulk_action.bulk_action_config.label
+    def action_label
+      "#{bulk_action.bulk_action_config.label} bulk action"
     end
 
     delegate :existing_exports, to: :bulk_action

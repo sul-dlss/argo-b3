@@ -29,12 +29,12 @@ module BulkActions
       values = [
         show_link_for(bulk_action),
         bulk_action.bulk_action_config.label,
-        bulk_action.description,
+        helpers.format_datetime(bulk_action.created_at),
         render(StatusComponent.new(bulk_action:)),
         "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}",
         download_links_for(bulk_action)
       ]
-      # Admins see the bulk actions of other users, so the user follows the submitted date.
+      # Admins see the bulk actions of other users, so the user follows the bulk action name.
       values.insert(1, bulk_action.user.sunetid) if admin?
       values
     end
@@ -54,7 +54,7 @@ module BulkActions
     end
 
     def show_link_for(bulk_action)
-      link_to(helpers.format_datetime(bulk_action.created_at), bulk_action_path(bulk_action))
+      link_to(bulk_action.name, bulk_action_path(bulk_action))
     end
 
     def log_file_link_for(bulk_action)

@@ -109,6 +109,13 @@ class BulkAction < ApplicationRecord
     File.join(output_directory, filename)
   end
 
+  def name
+    name = "Bulk action #{id}"
+    return name if description.blank?
+
+    "#{name}: #{description}"
+  end
+
   private
 
   def create_output_directory!

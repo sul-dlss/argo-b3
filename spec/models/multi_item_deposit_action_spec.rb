@@ -203,6 +203,18 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '#name' do
+    it 'returns the name with the description' do
+      expect(described_class.new(id: 5, description: 'Maps').name).to eq('Multi-item deposit 5: Maps')
+    end
+
+    context 'when there is no description' do
+      it 'returns the name without the description' do
+        expect(described_class.new(id: 5, description: '').name).to eq('Multi-item deposit 5')
+      end
+    end
+  end
+
   describe '#destroy' do
     let(:content) { create(:content, :mutable) }
 
