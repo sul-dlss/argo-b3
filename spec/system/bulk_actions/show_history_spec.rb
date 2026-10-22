@@ -98,6 +98,30 @@ RSpec.describe 'Show bulk actions history' do
     expect(page).to have_no_css('#bulk-actions-filter select[multiple]:not(.tomselected)', visible: :all)
   end
 
+  context 'when an admin' do
+    let!(:bulk_action_other_user) { create(:bulk_action, user: create(:user, email_address: 'mmouse@stanford.edu')) }
+    let(:user) { create(:user, :admin) }
+
+    it 'filters the bulk actions by user' do
+      user_bulk_action = create(:bulk_action, user:)
+
+      visit bulk_actions_path
+
+      expect(page).to have_css("tr##{dom_id(user_bulk_action, 'row')}")
+      expect(page).to have_no_css("tr##{dom_id(bulk_action_other_user, 'row')}")
+      expect(page).to have_css('#bulk_actions_filter_user_ids + .ts-wrapper .ts-count', text: '1 selected')
+
+      find('#bulk_actions_filter_user_ids + .ts-wrapper .ts-control').click
+      click_button 'Select all'
+      expect(page).to have_css('#bulk_actions_filter_user_ids + .ts-wrapper .ts-count', text: '2 selected')
+      click_button 'Filter'
+
+      row = page.find("tr##{dom_id(bulk_action_other_user, 'row')}")
+      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
+      expect(page).to have_css("tr##{dom_id(user_bulk_action, 'row')}")
+    end
+  end
+
   it 'resets the filter when navigating to the unfiltered bulk actions' do
     redeposit_bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
     reindex_bulk_action = create(:bulk_action, user:, action_type: 'REINDEX')

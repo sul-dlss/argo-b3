@@ -39,6 +39,8 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions']")
     expect(table).to have_css('thead th', text: 'Submitted')
     expect(table).to have_css('thead th', count: 6)
+    expect(table).to have_no_css('thead th', text: 'User')
+    expect(form).to have_no_select('Users')
     expect(table).to have_css('tbody tr', count: 2)
 
     bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
@@ -121,6 +123,28 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
                                         '&bulk_actions_filter%5Bstatuses%5D%5B%5D=completed' \
                                         '&bulk_actions_filter%5Bsubmitted_date%5D=last_7_days&page=3')
       end
+    end
+  end
+
+  context 'when an admin' do
+    let(:filter_form) { BulkActions::FilterForm.new(user: admin_user, admin: true) }
+    let(:admin_user) { create(:user, email_address: 'admin@stanford.edu') }
+    let(:bulk_action) { create(:bulk_action, user: create(:user, email_address: 'mmouse@stanford.edu')) }
+
+    it 'renders the users filter and the user column' do
+      render_inline(component)
+
+      expect(page).to have_css("select[multiple][data-controller='checkbox-tom-select'] " \
+                               "option[value='#{admin_user.id}'][selected]", text: 'admin')
+      expect(page).to have_css("select option[value='#{bulk_action.user_id}']:not([selected])", text: 'mmouse')
+
+      table = page.find('table#bulk-actions-history-table')
+      expect(table).to have_css('thead th', count: 7)
+      expect(table).to have_css('thead th:nth-of-type(2)', text: 'User')
+
+      row = table.find("tr##{dom_id(bulk_action, 'row')}")
+      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
+      expect(row).to have_css('td:nth-of-type(3)', text: BulkActions::REINDEX.label)
     end
   end
 end

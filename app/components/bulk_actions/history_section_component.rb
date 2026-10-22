@@ -12,6 +12,7 @@ module BulkActions
     attr_reader :bulk_actions, :filter_form
 
     delegate :current_page, :total_pages, :limit_value, :total_count, to: :bulk_actions
+    delegate :admin?, to: :filter_form
 
     def path_func
       ->(new_page) { bulk_actions_path(page: new_page, **filter_params) }
@@ -25,7 +26,7 @@ module BulkActions
     end
 
     def values_for(bulk_action)
-      [
+      values = [
         show_link_for(bulk_action),
         bulk_action.bulk_action_config.label,
         bulk_action.description,
@@ -33,6 +34,9 @@ module BulkActions
         "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}",
         download_links_for(bulk_action)
       ]
+      # Admins see the bulk actions of other users, so the user follows the submitted date.
+      values.insert(1, bulk_action.user.sunetid) if admin?
+      values
     end
 
     def heading

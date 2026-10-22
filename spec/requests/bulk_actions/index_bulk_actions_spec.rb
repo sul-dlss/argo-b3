@@ -103,4 +103,47 @@ RSpec.describe 'Listing bulk actions history' do
       expect(response.body).to include(%(href="#{bulk_action_path(legacy_bulk_action)}"))
     end
   end
+
+  context 'when filtering by user' do
+    let!(:user_bulk_action) { create(:bulk_action, user:) }
+    let(:other_user) { create(:user) }
+    let!(:other_user_bulk_action) { create(:bulk_action, user: other_user) }
+
+    context 'when an admin' do
+      let(:user) { create(:user, :admin) }
+
+      it 'lists only the bulk actions of the admin by default' do
+        get bulk_actions_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(%(href="#{bulk_action_path(user_bulk_action)}"))
+        expect(response.body).not_to include(%(href="#{bulk_action_path(other_user_bulk_action)}"))
+      end
+
+      it 'lists the bulk actions of the selected users' do
+        get bulk_actions_path(bulk_actions_filter: { user_ids: ['', other_user.id.to_s] })
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include(%(href="#{bulk_action_path(user_bulk_action)}"))
+        expect(response.body).to include(%(href="#{bulk_action_path(other_user_bulk_action)}"))
+      end
+
+      it 'lists no bulk actions when no users are selected' do
+        get bulk_actions_path(bulk_actions_filter: { user_ids: [''] })
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('No bulk actions.')
+      end
+    end
+
+    context 'when not an admin' do
+      it 'lists only the bulk actions of the user, ignoring the selected users' do
+        get bulk_actions_path(bulk_actions_filter: { user_ids: ['', other_user.id.to_s] })
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(%(href="#{bulk_action_path(user_bulk_action)}"))
+        expect(response.body).not_to include(%(href="#{bulk_action_path(other_user_bulk_action)}"))
+      end
+    end
+  end
 end
