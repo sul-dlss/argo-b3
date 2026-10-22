@@ -3,7 +3,7 @@
 # Opens an SSH tunnel to server Solr and starts bin/setup pointed at it, along
 # with DSA, PresCat, techmd, stacks, and purl-fetcher pointed at the same environment.
 #
-# Usage: bin/dev-server [qa|stage|prod]
+# Usage: bin/dev-server [qa|stage|prod] [console]
 # Defaults to qa.
 #
 # DSA, PresCat, and techmd require tokens that this script does not hardcode. Put them
@@ -22,6 +22,12 @@ if [ -f .env-server ]; then
 fi
 
 SERVER_ENV="${1:-qa}" # default to qa
+RUN_CONSOLE="${2:-}"
+
+if [ "$SERVER_ENV" = "console" ]; then
+  SERVER_ENV="qa"
+  RUN_CONSOLE="console"
+fi
 
 if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATALOG__TOKEN" ] || [ -z "$SETTINGS__TECH_MD_SERVICE__TOKEN" ]; then
   echo "SETTINGS__DOR_SERVICES__TOKEN, SETTINGS__PRESERVATION_CATALOG__TOKEN, and SETTINGS__TECH_MD_SERVICE__TOKEN must be set (e.g. in .env-server)." >&2
@@ -82,4 +88,9 @@ export SETTINGS__PURL__URL="${SETTINGS__PURL__URL:-https://sul-purl-${PURL_ENV}.
 export SETTINGS__SEARCHWORKS__URL="${SETTINGS__SEARCHWORKS__URL:-https://searchworks${SEARCHWORKS_ENV}.stanford.edu}"
 export SETTINGS__EARTHWORKS__URL="${SETTINGS__EARTHWORKS__URL:-https://earthworks-${PURL_ENV}.stanford.edu}"
 
-bin/setup
+if [ "$RUN_CONSOLE" = "console" ]; then
+  bin/setup --skip-server
+  bin/rails console
+else
+  bin/setup
+fi
