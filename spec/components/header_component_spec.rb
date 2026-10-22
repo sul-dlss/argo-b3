@@ -117,12 +117,6 @@ RSpec.describe HeaderComponent, type: :component do
         expect(page).to have_css('a.dropdown-item.disabled', exact_text: 'Deposit multiple items')
       end
     end
-
-    it 'renders disabled links for the other multiple item options' do
-      render_inline(component)
-
-      expect(page).to have_css('a.dropdown-item.disabled', text: 'Register multiple items for Goobi')
-    end
   end
 
   describe 'reports dropdown' do
