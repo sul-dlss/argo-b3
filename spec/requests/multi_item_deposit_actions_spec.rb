@@ -11,6 +11,94 @@ RSpec.describe 'Multi-item deposit actions' do
     sign_in(user)
   end
 
+  describe 'index' do
+    let!(:user_multi_item_deposit_action) { create(:multi_item_deposit_action, user:, updated_at: 2.days.ago) }
+    let!(:recent_user_multi_item_deposit_action) do
+      create(:multi_item_deposit_action, user:, step: :submitted, initiating_deposit_completed_at: 1.day.ago)
+    end
+    let(:other_user) { create(:user) }
+    let!(:other_user_multi_item_deposit_action) { create(:multi_item_deposit_action, user: other_user) }
+
+    it 'lists the Multi-Item Deposits of the user, most recently updated first' do
+      get multi_item_deposit_actions_path
+
+      expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_css('h1', text: 'Multi-item deposits')
+      expect(rendered_page.all('#multi-item-deposits-history-table tbody tr').pluck(:id))
+        .to eq(["row_multi_item_deposit_action_#{recent_user_multi_item_deposit_action.id}",
+                "row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}"])
+    end
+
+    it 'lists only the Multi-Item Deposits with the selected statuses' do
+      get multi_item_deposit_actions_path(multi_item_deposit_filter: { statuses: ['', 'submitted'] })
+
+      expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_css("tr#row_multi_item_deposit_action_#{recent_user_multi_item_deposit_action.id}")
+      expect(rendered_page).to have_no_css("tr#row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}")
+    end
+
+    it 'lists only the Multi-Item Deposits submitted within the range' do
+      get multi_item_deposit_actions_path(multi_item_deposit_filter: { submitted_date: 'last_7_days' })
+
+      expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_css("tr#row_multi_item_deposit_action_#{recent_user_multi_item_deposit_action.id}")
+      expect(rendered_page).to have_no_css("tr#row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}")
+    end
+
+    it 'ignores the selected users' do
+      get multi_item_deposit_actions_path(multi_item_deposit_filter: { user_ids: ['', other_user.id.to_s] })
+
+      expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_css("tr#row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}")
+      expect(rendered_page)
+        .to have_no_css("tr#row_multi_item_deposit_action_#{other_user_multi_item_deposit_action.id}")
+    end
+
+    context 'when there are more Multi-Item Deposits than fit on one page' do
+      before { create_list(:multi_item_deposit_action, MultiItemDepositActionsController::PER_PAGE, user:) }
+
+      it 'paginates' do
+        get multi_item_deposit_actions_path(page: 2)
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_css('#multi-item-deposits-history-table tbody tr', count: 2)
+      end
+    end
+
+    context 'when there are no Multi-Item Deposits' do
+      let(:user_multi_item_deposit_action) { nil }
+      let(:recent_user_multi_item_deposit_action) { nil }
+
+      it 'renders the empty message' do
+        get multi_item_deposit_actions_path
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_css('p', text: 'No multi-item deposits yet')
+      end
+    end
+
+    context 'when an admin' do
+      let(:user) { create(:user, :admin) }
+
+      it 'lists only the Multi-Item Deposits of the admin by default' do
+        get multi_item_deposit_actions_path
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_css("tr#row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}")
+        expect(rendered_page)
+          .to have_no_css("tr#row_multi_item_deposit_action_#{other_user_multi_item_deposit_action.id}")
+      end
+
+      it 'lists the Multi-Item Deposits of the selected users' do
+        get multi_item_deposit_actions_path(multi_item_deposit_filter: { user_ids: ['', other_user.id.to_s] })
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_no_css("tr#row_multi_item_deposit_action_#{user_multi_item_deposit_action.id}")
+        expect(rendered_page).to have_css("tr#row_multi_item_deposit_action_#{other_user_multi_item_deposit_action.id}")
+      end
+    end
+  end
+
   describe 'create' do
     context 'when the user belongs to a workgroup with edit permission' do
       before do

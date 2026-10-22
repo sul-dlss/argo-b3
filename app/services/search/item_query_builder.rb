@@ -73,7 +73,7 @@ module Search
     end
 
     def filter_queries
-      [].tap do |queries|
+      [multi_item_deposit_filter_query].tap do |queries|
         FACETS.each do |facet_config|
           if facet_config.dynamic_facet.present?
             queries << dynamic_facet_filter_query(facet_config:)
@@ -83,6 +83,17 @@ module Search
           end
         end
       end.compact
+    end
+
+    # The terms parser is not subject to the boolean clause limit, so it handles large Multi-Item Deposits.
+    def multi_item_deposit_filter_query
+      return if search_form.multi_item_deposit_action_ids.blank?
+
+      druids = ItemDepositAction.where(multi_item_deposit_action_id: search_form.multi_item_deposit_action_ids)
+                                .distinct.pluck(:druid)
+      return "-#{ID}:[* TO *]" if druids.empty?
+
+      "{!terms f=#{ID}}#{druids.join(',')}"
     end
 
     # Construct a facet filter query for the given form field and Solr field for value facets.

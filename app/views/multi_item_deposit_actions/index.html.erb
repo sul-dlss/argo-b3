@@ -1,0 +1,10 @@
+<%= content_for :title, t('multi_item_deposit_actions.history.heading') %>
+
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+  <%# Not cached, so that Back renders the filter form for the URL rather than a snapshot of it. %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
+<%= render MultiItemDeposit::HistorySectionComponent.new(multi_item_deposit_actions: @multi_item_deposit_actions, filter_form: @filter_form) %>

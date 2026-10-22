@@ -15,7 +15,7 @@ module Search
     attr_reader :form_field, :values, :search_form, :facet_labels
 
     def label
-      return values_label if query?
+      return values_label unless field_label?
 
       "#{field_label} > #{values_label}"
     end
@@ -30,6 +30,15 @@ module Search
       form_field == 'query'
     end
 
+    # Multi-Item Deposit names already say what they are, so the field label would repeat it.
+    def field_label?
+      !query? && !multi_item_deposit?
+    end
+
+    def multi_item_deposit?
+      form_field == 'multi_item_deposit_action_ids'
+    end
+
     private
 
     def values_label
@@ -41,6 +50,8 @@ module Search
     end
 
     def value_label(value)
+      return multi_item_deposit_name(value) if multi_item_deposit?
+
       facet_config = Search::Facets.find_config_by_form_field(form_field)
       # Values for dynamic facets may need to be mapped to user-friendly labels.
       return helpers.facet_value_label(value) if facet_config&.dynamic_facet
@@ -48,6 +59,10 @@ module Search
       return facet_labels.fetch(value, value) if facet_config&.composite_facet_field
 
       value
+    end
+
+    def multi_item_deposit_name(id)
+      MultiItemDepositAction.find(id).name
     end
   end
 end

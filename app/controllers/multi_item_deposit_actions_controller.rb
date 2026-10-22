@@ -4,8 +4,21 @@
 class MultiItemDepositActionsController < ApplicationController
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
+  PER_PAGE = 20
 
   before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template]
+  skip_verify_authorized only: %i[index]
+
+  def index
+    @filter_form = MultiItemDeposit::FilterForm.new(filter_form_params,
+                                                    user: Current.user,
+                                                    admin: allowed_to?(:admin?, nil, with: AdminPolicy))
+    @multi_item_deposit_actions = authorized_scope(MultiItemDepositAction.all)
+                                  .filtered(**@filter_form.filters)
+                                  .includes(:user)
+                                  .order(updated_at: :desc, id: :desc)
+                                  .page(params[:page]).per(PER_PAGE)
+  end
 
   def show
     @multi_item_deposit_action = MultiItemDepositAction.includes(item_deposit_actions: :content)
@@ -162,6 +175,10 @@ class MultiItemDepositActionsController < ApplicationController
     return {} unless @multi_item_deposit_action.manifest_source_upload?
 
     { manifest_csv: @multi_item_deposit_action.manifest_csv }
+  end
+
+  def filter_form_params
+    MultiItemDeposit::FilterForm.params_from(params)
   end
 
   def discovery_form_params

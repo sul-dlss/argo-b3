@@ -37,6 +37,33 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with Multi-Item Deposits' do
+    let(:search_form) { WorkflowGridSearchForm.new(multi_item_deposit_action_ids: [multi_item_deposit_action.id.to_s]) }
+    let(:multi_item_deposit_action) { create(:multi_item_deposit_action) }
+
+    before do
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567')
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:cd234fg5678')
+      create(:item_deposit_action, druid: 'druid:df345gh6789')
+    end
+
+    it 'filters by the druids of the Multi-Item Deposits' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq]).first).to start_with('{!terms f=id}')
+      expect(Array(result[:fq]).first.delete_prefix('{!terms f=id}').split(','))
+        .to contain_exactly('druid:bc123df4567', 'druid:cd234fg5678')
+    end
+
+    context 'when the Multi-Item Deposits have no Item Deposits' do
+      let(:search_form) { WorkflowGridSearchForm.new(multi_item_deposit_action_ids: ['0']) }
+
+      it 'filters out all objects' do
+        result = described_class.call(search_form:, user_scope:)
+        expect(Array(result[:fq])).to include('-id:[* TO *]')
+      end
+    end
+  end
+
   context 'with object types (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(object_types: %w[dro collection]) }
 
