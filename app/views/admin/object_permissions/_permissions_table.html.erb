@@ -1,0 +1,13 @@
+<%= tag.div id: 'object-permissions' do %>
+  <%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('admin.object_permissions.table_label'), variant: :h3,
+                                                              empty_message: t('admin.object_permissions.empty')) do |table| %>
+    <%= table.with_header(label: t('admin.object_permissions.fields.workgroup.label')) %>
+    <%= table.with_header(label: t('admin.object_permissions.fields.permission_type.label')) %>
+    <%= table.with_header(label: '') %>
+    <% permissions.each do |permission| %>
+      <% table.with_row do %>
+        <%= render Admin::ObjectPermissionRowComponent.new(permission:) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

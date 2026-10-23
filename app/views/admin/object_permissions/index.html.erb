@@ -1,0 +1,15 @@
+<div class="container pb-3">
+  <p>
+    <%= link_to object_path(@druid) do %><%= previous_icon %> <%= t('admin.object_permissions.back', object_type: @solr_doc.object_type) %><% end %>
+  </p>
+
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('admin.object_permissions.heading', object_type: @solr_doc.object_type),
+                                                               classes: 'mb-2') %>
+  <p class="mb-4"><%= @solr_doc.title %> (<%= @solr_doc.bare_druid %>)</p>
+
+  <%= render 'form', object_permission_form: @object_permission_form %>
+
+  <hr class="my-4">
+
+  <%= render 'permissions_table', permissions: @permissions %>
+</div>

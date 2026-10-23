@@ -60,6 +60,12 @@
         <% component.with_button(link: '/', label: 'Refresh from FOLIO', variant: 'outline-primary', disabled: true) %>
       <% end %>
 
+      <% if @solr_doc.object_type?('APO', 'collection') && allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+        <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
+          <% component.with_button(link: admin_object_permissions_path(@solr_doc.druid), label: 'Manage permissions', variant: 'outline-primary') %>
+        <% end %>
+      <% end %>
+
       <%= render Elements::ButtonListComponent.new(title: 'Discard', classes: 'mt-4') do |component| %>
         <% component.with_button(link: '/', label: 'Purge item', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary', disabled: true) %>
