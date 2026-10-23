@@ -29,61 +29,12 @@
         container_classes: 'my-fieldset'
       ) do |component| %>
     <% component.with_additional_container_content do %>
-      <%= tag.div data: { controller: 'catalog-title',
-                          catalog_title_url_value: catalog_titles_path,
-                          catalog_title_error_message_value: t('edit.items.fields.catalog_record_id.errors.catalog_error') } do %>
-        <div class="my-field">
-          <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :catalog_record_id,
-                                                                  text: t('edit.items.fields.catalog_record_id.label'),
-                                                                  mark_required: true) %>
-          <div class="d-flex align-items-start gap-2">
-            <div class="flex-grow-1">
-              <%= render SdrViewComponents::Forms::BasicTextFieldComponent.new(
-                    form:, field_name: :catalog_record_id, aria: catalog_record_id_aria,
-                    data: { catalog_title_target: 'hrid', action: 'input->catalog-title#reset' }
-                  ) %>
-              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(
-                    form:, field_name: :catalog_record_id,
-                    data: { catalog_title_target: 'submissionError' }
-                  ) %>
-              <%# Populated by the catalog-title Stimulus controller when the title cannot be retrieved.
-                  Bootstrap reveals it via `.is-invalid ~ .invalid-feedback`, so the controller marks the
-                  input rather than this element. %>
-              <%= tag.div class: 'invalid-feedback', data: { catalog_title_target: 'error' } %>
-            </div>
-            <%= render SdrViewComponents::Elements::ButtonComponent.new(
-                  label: t('edit.items.fields.catalog_record_id.retrieve_title'),
-                  variant: :'outline-primary',
-                  data: { catalog_title_target: 'button', action: 'catalog-title#retrieve' }
-                ) %>
-          </div>
-        </div>
-
-        <%# The retrieved title confirms that the catalog record id is the intended one. It is shown as text
-            because it comes from the catalog rather than from the user, and is hidden until retrieved.
-            The hidden field carries it through a submission so that title data is always passed with the form. %>
-        <%= tag.div class: 'my-field', hidden: retrieved_title_hidden?, data: { catalog_title_target: 'titleRow' } do %>
-          <span class="form-label"><%= t('edit.items.fields.retrieved_title.label') %>: </span>
-          <%= tag.span form.object.retrieved_title, data: { catalog_title_target: 'titleText' } %>
-        <% end %>
-        <%= form.hidden_field :retrieved_title, data: { catalog_title_target: 'title' } %>
-      <% end %>
+      <%= render Edit::CatalogRecordIdComponent.new(form:) %>
 
       <% if item_fields? %>
-        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
-                                                                    label_text: t('edit.items.fields.barcode.label'),
-                                                                    container_classes: 'my-field') %>
+        <%= render Edit::BarcodeComponent.new(form:) %>
 
-        <%= render SdrViewComponents::Forms::FieldsetComponent.new(classes: 'my-fieldset', legend_classes: 'fw-bold') do |component| %>
-          <% component.with_legend do %><%= t('edit.items.fields.serials.label') %><% end %>
-          <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_link_part_label,
-                                                                      label_text: t('edit.items.fields.part_label.label'),
-                                                                      container_classes: 'my-field') %>
-
-          <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :catalog_link_sort_key,
-                                                                      label_text: t('edit.items.fields.sort_key.label'),
-                                                                      container_classes: 'my-field') %>
-        <% end %>
+        <%= render Edit::SerialsComponent.new(form:) %>
       <% end %>
     <% end %>
   <% end %>

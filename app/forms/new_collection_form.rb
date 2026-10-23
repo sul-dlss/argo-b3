@@ -9,7 +9,7 @@ class NewCollectionForm < CocinaModels::Collection
   include PermittedParamsConcern
   include TitleFormConcern
   include TagsFormConcern
-  include CocinaModels::CatalogRecordIdConcern
+  include CatalogRecordIdFormConcern
   include DescriptionChoiceFormConcern
 
   # Not permitted as params, since the collection form has no fields for them.

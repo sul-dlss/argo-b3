@@ -2,7 +2,7 @@
 
 # Concern for registration forms in which the user chooses to enter a title or to retrieve the
 # description from FOLIO (see Edit::DescriptionChoiceComponent).
-# Requires TitleFormConcern, CocinaModels::CatalogLinksConcern, and CocinaModels::CatalogRecordIdConcern.
+# Requires TitleFormConcern, CocinaModels::CatalogLinksConcern, and CatalogRecordIdFormConcern.
 module DescriptionChoiceFormConcern
   extend ActiveSupport::Concern
 
@@ -14,11 +14,6 @@ module DescriptionChoiceFormConcern
 
     validates :title, presence: true, if: -> { description_choice == DESCRIPTION_TITLE_CHOICE }
     validates :catalog_record_id, presence: true, if: -> { description_choice == DESCRIPTION_CATALOG_ID_CHOICE }
-
-    # The title retrieved from the catalog, shown read only to confirm that the catalog record id is the
-    # intended one. The description is refreshed from the catalog, so this is never written to the Cocina
-    # object; it is an attribute of the form so that it survives a submission that fails validation.
-    attribute :retrieved_title, :string
 
     before_validation :populate_description_hash_from_title, if: lambda {
       description_choice == DESCRIPTION_TITLE_CHOICE && title.present?
