@@ -25,6 +25,7 @@ module BulkActions
       }
     end
 
+    # rubocop:disable-next Metrics/AbcSize
     def values_for(bulk_action)
       values = [
         show_link_for(bulk_action),
@@ -32,7 +33,8 @@ module BulkActions
         helpers.format_datetime(bulk_action.created_at),
         render(StatusComponent.new(bulk_action:)),
         "#{bulk_action.druid_count_total} / #{bulk_action.druid_count_success} / #{bulk_action.druid_count_fail}",
-        download_links_for(bulk_action)
+        download_links_for(bulk_action),
+        delete_link_for(bulk_action)
       ]
       # Admins see the bulk actions of other users, so the user follows the bulk action name.
       values.insert(1, bulk_action.user.sunetid) if admin?
@@ -76,6 +78,17 @@ module BulkActions
       return if links.blank?
 
       tag.ul { safe_join(links.map { |link| tag.li(link) }) }
+    end
+
+    def delete_link_for(bulk_action)
+      return unless bulk_action.completed?
+
+      render SdrViewComponents::Elements::IconButtonFormComponent.new(link: bulk_action_path(bulk_action),
+                                                                      icon: :delete,
+                                                                      label: I18n.t('bulk_actions.delete'),
+                                                                      method: :delete,
+                                                                      confirm: I18n.t('bulk_actions.delete_confirm'),
+                                                                      top: false)
     end
   end
 end

@@ -145,7 +145,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :bulk_actions, only: %i[new index show] do
+  resources :bulk_actions, only: %i[new index show destroy] do
     member do
       get 'file'
     end

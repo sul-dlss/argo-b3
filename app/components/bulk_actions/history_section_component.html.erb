@@ -27,11 +27,12 @@
     <% if admin? %>
       <%= table.with_header(label: 'User', style: 'width: 10%;') %>
     <% end %>
-    <%= table.with_header(label: 'Action', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Action', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Submitted', style: 'width: 10%;') %>
-    <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Status', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Downloads', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Clear from history', style: 'width: 10%;') %>
     <%= bulk_actions.each do |bulk_action| %>
       <%= table.with_row(values: values_for(bulk_action),
                          id: dom_id(bulk_action, 'row')) %>
