@@ -349,6 +349,10 @@ en:
         tags:
           label: "Tags"
       fields:
+        additional_catalog_record_ids:
+          label: "Additional FOLIO Instance HRIDs"
+          row_label: "Additional FOLIO Instance HRID"
+          add_button: "Add another FOLIO Instance HRID"
         apo_default:
           text: "APO default = %{value}"
           none: "none"
@@ -356,6 +360,11 @@ en:
           label: "APO"
         barcode:
           label: "Barcode"
+        catalog_link_refresh:
+          label: "Refresh on deposit"
+          help_text: >-
+            If checked, this item will be refreshed every time a new version is saved or deposited.
+            If unchecked, it will not be refreshed.
         catalog_record_id:
           label: "FOLIO Instance HRID"
           retrieve_title: "Preview FOLIO record"
@@ -385,10 +394,12 @@ en:
             label: 'Enter title myself'
         description_csv_file:
           label: "Upload a CSV file"
+          download: "Download description spreadsheet"
           validations:
             extra_rows: "Only one row of description is allowed."
             missing_title: "Title value not found."
             no_rows: "Description row not found."
+            refreshed: "A spreadsheet cannot be uploaded while Refresh on deposit is checked."
         file_choice:
           label: 'Select how to upload files'
           upload:

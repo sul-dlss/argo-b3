@@ -1,0 +1,32 @@
+<%= render Edit::CatalogRecordIdComponent.new(form:, label_classes: 'fw-bold') %>
+
+<%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info) do %>
+  <p class="mb-0"><%= t('edit.items.fields.catalog_link_refresh.help_text') %></p>
+<% end %>
+
+<%# A description spreadsheet cannot be uploaded while the description is refreshed from FOLIO. %>
+<div data-controller="disable-when-checked">
+  <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+        form:,
+        field_name: :catalog_link_refresh,
+        label_text: t('edit.items.fields.catalog_link_refresh.label'),
+        container_classes: 'my-field',
+        input_data: { disable_when_checked_target: 'checkbox', action: 'disable-when-checked#toggle' }
+      ) %>
+
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.items.fields.additional_catalog_record_ids.label')) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :additional_folio_catalog_links,
+                                                     form_component: Edit::AdditionalCatalogRecordIdComponent,
+                                                     container_classes: 'my-fieldset',
+                                                     add_button_label: t('edit.items.fields.additional_catalog_record_ids.add_button')) %>
+  <% end %>
+
+  <%= render Edit::BarcodeComponent.new(form:, label_classes: 'fw-bold') %>
+
+  <%= render Edit::SerialsComponent.new(form:) %>
+
+  <%= render Edit::DescriptionCsvFileComponent.new(form:, druid_token:,
+                                                   input_data: { disable_when_checked_target: 'input' }) %>
+</div>
+
+<p class="mt-4 mb-5">You can view a preview of your changes on the item page once you click "Save as draft."</p>
