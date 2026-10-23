@@ -82,6 +82,24 @@ RSpec.describe 'Edit an item' do
       .with(cocina_object: having_attributes(lock: 'updated-lock'), user_name: user.sunetid, context: {})
   end
 
+  it 'edits the item and redirects to edit files' do
+    visit edit_item_path(druid)
+
+    fill_in 'Source ID', with: 'sul:changed'
+
+    find_by_id('deposit-tab').click
+    fill_in 'Version description', with: 'Changed the source ID'
+    click_button 'Save draft and edit files'
+
+    expect(page).to have_current_path(edit_content_path(druid))
+    expect(page).to have_toast('Item updated.')
+
+    expect(Sdr::Repository).to have_received(:update)
+      .with(cocina_object: having_attributes(identification: having_attributes(sourceId: 'sul:changed')),
+            user_name: user.sunetid, description: nil)
+    expect(Sdr::Repository).not_to have_received(:accession)
+  end
+
   context 'when the item has Folio catalog links' do
     let(:cocina_object) do
       build(:dro_with_metadata, id: druid, source_id: 'sul:original').then do |dro|

@@ -308,6 +308,7 @@ en:
           discard_draft: "Discard draft"
           discard_draft_confirm: "Discard this draft? All changes since the last version, including added files, will be deleted. This cannot be undone."
           draft: "Save as draft"
+          draft_edit_files: "Save draft and edit files"
         errors:
           discard_failed: "Discarding the draft failed."
         warnings:

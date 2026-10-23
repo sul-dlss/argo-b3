@@ -218,6 +218,19 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when saving as a draft and editing files' do
+      let(:commit) { ItemsController::DRAFT_TO_ADD_FILES_VALUE }
+
+      it 'saves and redirects to the content edit page' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(flash[:toast]).to eq('Item updated.')
+        expect(Sdr::Repository).to have_received(:update)
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
     context 'when a catalog record id is provided' do
       let(:item_params) do
         { version_description: 'Changed type', lock: cocina_object.lock, catalog_record_id: 'in11403803',

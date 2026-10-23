@@ -1,11 +1,20 @@
 <div class="d-flex">
   <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:) %>
+  <% if show_edit_files %>
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(
+          label: t('edit.items.edit.buttons.draft_edit_files'),
+          form_id:,
+          value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
+          variant: 'outline-primary',
+          classes: 'ms-auto'
+        ) %>
+  <% end %>
   <%= render SdrViewComponents::Forms::SubmitComponent.new(
         label: t('edit.items.edit.buttons.draft'),
         form_id:,
         value: ItemsController::DRAFT_VALUE,
         variant: 'outline-primary',
-        classes: 'ms-auto'
+        classes: show_edit_files ? 'ms-2' : 'ms-auto'
       ) %>
   <%# A link rather than a form, since the footer is inside the edit form. %>
   <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
