@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for barcode
+  # The form's object must include CocinaModels::BarcodeConcern.
   class BarcodeComponent < ApplicationComponent
     def initialize(form:, container_classes: 'my-field', label_classes: [])
       @form = form

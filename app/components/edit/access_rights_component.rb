@@ -2,6 +2,8 @@
 
 module Edit
   # Component for rendering edit form for access rights
+  # The form's object must include CocinaModels::AccessConcern for the access_ prefix or CocinaModels::EmbargoConcern
+  # for the embargo_ prefix; without a prefix, it must provide view, download, and location.
   class AccessRightsComponent < ApplicationComponent
     VIEW_RIGHTS = %w[world dark citation-only stanford location-based].freeze
     DOWNLOAD_RIGHTS = %w[world stanford location-based none].freeze

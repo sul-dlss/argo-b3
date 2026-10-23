@@ -2,6 +2,7 @@
 
 module Edit
   # Component for editing a file set (resource)
+  # The content file set form must provide file_set_type, label, and content_files (with allow_destroy).
   class FileSetComponent < ApplicationComponent
     def initialize(content_file_set_form:, counter:, content_token:, classes: [])
       @content_file_set_form = content_file_set_form

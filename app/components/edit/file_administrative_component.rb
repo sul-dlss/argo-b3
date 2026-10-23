@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering the administrative (publish / preserve) radio buttons for a file.
+  # The form's object must provide administrative (errors are shown for administrative_options).
   class FileAdministrativeComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder] a form builder for a ContentFileForm
     def initialize(form:, container_classes: [])

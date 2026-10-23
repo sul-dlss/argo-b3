@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for content type
+  # The form's object must include CocinaModels::ContentTypeConcern.
   class ContentTypeComponent < ApplicationComponent
     def initialize(form:, container_classes: [], input_data: {})
       @form = form

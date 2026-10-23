@@ -3,6 +3,8 @@
 module Edit
   # Component for rendering edit form for the collections that an item is a member of.
   # Collections are selected by title or druid, with options loaded as the user types.
+  # The form's object must include CocinaModels::CollectionConcern and, with show_limit_by_apo, also
+  # CollectionFormConcern and CocinaModels::ApoConcern.
   class CollectionsComponent < ApplicationComponent
     # @param options [Array<Array(String, String)>] [label, druid] pairs for the selected collections
     # @param show_limit_by_apo [Boolean] show the "limit collections by APO" checkbox (default = true)

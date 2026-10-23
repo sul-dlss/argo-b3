@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for OCR text extraction settings
+  # The form's object must include TextExtractionConcern.
   class OcrComponent < ApplicationComponent
     # Content types whose files commonly already contain text, so OCR would be redundant.
     EMBEDDED_TEXT_CONTENT_TYPES = [Cocina::Models::ObjectType.document].freeze

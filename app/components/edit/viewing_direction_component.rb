@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for viewing direction
+  # The form's object must include CocinaModels::ContentTypeConcern.
   class ViewingDirectionComponent < ApplicationComponent
     def initialize(form:, **select_options)
       @form = form

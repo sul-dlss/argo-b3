@@ -2,7 +2,8 @@
 
 module Edit
   # Component for rendering edit form for description choice
-  # The form's object must include DescriptionChoiceFormConcern.
+  # The form's object must include DescriptionChoiceFormConcern and, with item_fields, also CocinaModels::BarcodeConcern
+  # and DescriptionCsvFormConcern.
   class DescriptionChoiceComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder]
     # @param item_fields [Boolean] whether to render the fields that only apply to items: barcode and serials
