@@ -104,7 +104,11 @@ class ItemsController < ApplicationController
 
   def redirect_updated
     toast_key = deposit? ? 'deposited' : 'updated'
-    redirect_to object_path(@druid), flash: { toast: t("edit.items.edit.toasts.#{toast_key}") }
+    redirect_to update_redirect_path, flash: { toast: t("edit.items.edit.toasts.#{toast_key}") }
+  end
+
+  def update_redirect_path
+    params[:commit] == DRAFT_TO_ADD_FILES_VALUE ? edit_content_path(@druid) : object_path(@druid)
   end
 
   # A purged object no longer has an object page.

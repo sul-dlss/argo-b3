@@ -78,7 +78,7 @@
             ) %>
 
         <% pane.with_footer do %>
-          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, discard_path: @discard_path, show_next: false, show_deposit: true) %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: @cancel_path, discard_path: @discard_path, show_next: false, show_edit_files: true, show_deposit: true) %>
         <% end %>
       <% end %>
     <% end %>
