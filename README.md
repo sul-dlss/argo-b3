@@ -19,66 +19,13 @@ Note that `bin/setup` will create the database, run yarn, and perform other setu
 
 The roles, email address, and name of the test user can be provided in environment variables. Defaults are set in `bin/dev`.
 
-### Using resources from deployed environments
-
-To avoid having to bootstrap local resources or to test with real objects, sometimes it is useful to point the local development environment at deployed resources (e.g., Solr, DSA). Note that these connections are read/write, so be cautious with interactions with deployed environments, especially prod.
-
-Any of the below approaches can be combined (and usually will be).
-
-#### Solr
-
-To connect to production Solr (there is only a production environment for Solr):
-
-```
-ssh -L 8990:sul-solr-prod-a.stanford.edu:80 lyberadmin@argo-b3-prod-a.stanford.edu
-```
-
-In a separate terminal window:
-```
-SETTINGS__SOLR__URL=http://localhost:8990/solr/argo_qa bin/setup
-```
-to connect to the Argo QA Solr index. (Alternatively, you can connect to the stage Solr index with `argo_stage` or production with `argo_prod`.)
-
-#### DSA
-[Obtain a token for the DSA instance](https://github.com/sul-dlss/dor-services-app#authentication) and then:
-```
-SETTINGS__DOR_SERVICES__URL='https://dor-services-qa-lb.stanford.edu' SETTINGS__DOR_SERVICES__TOKEN=hbGcifaketokenOiJIUzI1NiJ9.jbvl5uai9y2MF7_nFqYrcewO4uKJ8tLY2A69b bin/setup
-```
-
-#### SDR Event / RabbitMQ
-Argo publishes events (e.g., permission changes) to RabbitMQ, where they are consumed by DSA. Publishing is
-disabled by default (`Settings.rabbitmq.enabled`) so that a local RabbitMQ is not required. To publish events
-to a RabbitMQ instance:
-```
-SETTINGS__RABBITMQ__ENABLED=true SETTINGS__RABBITMQ__HOSTNAME='sul-rabbitmq-qa-a.stanford.edu' bin/setup
-```
-
-#### PresCat
-[Obtain a token for the PresCat instance](https://github.com/sul-dlss/preservation_catalog#authn) and then:
-
-```
-SETTINGS__PRESERVATION_CATALOG__URL='https://preservation-catalog-qa.stanford.edu' SETTINGS__PRESERVATION_CATALOG__TOKEN='fgJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.FhjtP5vOd1xIX7h6oRBNZrf' bin/setup
-```
-
-#### Technical Metadata Service
-Obtain a token for the techmd instance (generated on the server with `bundle exec rake generate_token`; see the [techmd README](https://github.com/sul-dlss/technical-metadata-service#integration)) and then:
-
-```
-SETTINGS__TECH_MD_SERVICE__URL='https://dor-techmd-qa-a.stanford.edu' SETTINGS__TECH_MD_SERVICE__TOKEN='eyJhbGcfaketokenJ9.eyJzdWJhcmdvIn0.Kd8aPq2mXvR7tLw3NcZbHfe' bin/setup
-```
-
-#### Other
-```
-SETTINGS__PURL_FETCHER__URL='https://purl-fetcher-stage.stanford.edu' SETTINGS__STACKS__URL='https://stacks-stage.stanford.edu/image' bin/setup
-```
-
 ### Development script for running locally connecting to remote services
 
 For running code in localhost pointing to real data on a server environment but talking to your local database, `bin/dev-server` will facilitate the setup described above.
 
 1. Ensure you are on VPN, have a valid kerberos ticket, and docker desktop client is running.
-2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, ensures required docker containers are up, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server. The script can be passed a parameter of "stage", "qa" or "prod" and will auto-configure the service URLs (e.g. `bin/dev-server stage`). It defaults to "qa" if no environment is passed.
-3. In order to authenticate with DSA, Prescat, and techmd (to display and edit objects), you will need valid DSA, Prescat, and techmd tokens for the remote environments you are connected to.  While you can pass these into the bin script via env variables as described in the sections above, it is easier to setup a `.env-server` file in the root of the app, and put the tokens in there as env variables.  The `.env-server` file will be gitignored and automatically picked up by the `bin/dev-server` script. The `.env-server` file can also contain the service URLs as env variables if you do not want them automatically configured by the script.  If the tokens are different per environment (e.g. stage vs qa vs prod), you will need to change them in the `.env-server` file (e.g. comment/uncomment out as needed) before starting `bin/dev-server`.
+2. Running `bin/dev-server` sets up the jumphost (if needed), opens a solr tunnel in the background, ensures required docker containers are up, configures the environment variables for connection to qa/stage/prod services, and starts the localhost server. The script can be passed a parameter of "stage", "qa" or "prod" (e.g. `bin/dev-server stage`). It defaults to "qa" if no environment is passed. Running against prod also requires `ALLOW_PROD=true`.
+3. Service settings (e.g., URLs) come from `config/deploy.<env>.yml` and the secrets for them (e.g., DSA, PresCat, and techmd tokens and the Folio password) come from Vault, so the `vault` CLI is required; the script launches `vault login -method oidc` if needed. Any `SETTINGS__*` variable already exported in your shell takes precedence. RabbitMQ is configured for the environment but event publishing stays disabled unless you run with `SETTINGS__RABBITMQ__ENABLED=true`.
 
 You can also start a local rails console that connects to the remote services but local database in the same way by appending `console` to the script, e.g. `bin/dev-server stage console` or just `bin/dev-server console` for the default QA environment).
 
@@ -129,7 +76,7 @@ Note:
 * Honeybadger deploy notifications are performed in `.kamal/hooks/post-deploy`.
 * Kamal deploy secrets are resolved from environment variables via `.kamal/secrets-common`.
   * In CI, Jenkins injects those variables from Vault and runs `bin/kamal` directly.
-  * For local deploys, `bin/kamal-otk` loads any missing required deploy secrets from Vault before invoking Kamal.
+  * For local deploys, `bin/kamal-otk` invokes Kamal via `bin/with-deploy-env`, which loads any missing deploy secrets from Vault.
 * The Dockerfile configures the lyberadmin (50:503) user to match the host server.
 * `/workspace/bulk` and `/var/log/argo` are shared with the containers.
 * The docker image is built on the stage server (AMD64) for all environments to avoid emulation on the developer Mac. Sharing one builder keeps its layer cache warm across environments.
@@ -145,7 +92,7 @@ To add a secret:
    * For a secret shared by all environments, add it at `puppet/application/argo-b3/<secret-name>`.
 2. Add the environment variable to `env.secret` in `config/deploy.yml`.
 3. Add `NAME=${NAME}` to `.kamal/secrets-common`.
-4. Add the environment variable to `REQUIRED_DEPLOY_SECRETS` and its Vault path to `vault_secret_path` in `bin/kamal-otk` (for local deploys).
+4. Add its Vault path to `vault_secret_path` in `bin/with-deploy-env` (for local deploys and, for `SETTINGS__*` secrets, `bin/dev-server`).
 5. Add the environment variable to `secrets` in `Jenkinsfile` (for continuous deployment to stage). Use the stage path, omitting the `puppet/` prefix (e.g., `application/argo-b3/stage/<secret-name>`).
 
 ### Deploy
@@ -156,7 +103,7 @@ To build and deploy the local, committed code:
 bin/kamal-otk qa deploy
 ```
 
-For local deploys, `bin/kamal-otk` loads required deploy secrets from Vault only when they are missing from the current environment, then runs Kamal.
+For local deploys, `bin/kamal-otk` loads deploy secrets from Vault (via `bin/with-deploy-env`) only when they are missing from the current environment, then runs Kamal.
 
 #### Deploying faster when deploying to all environments
 
