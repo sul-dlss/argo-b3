@@ -42,7 +42,7 @@ RSpec.describe 'Create a new text extraction bulk action' do
       expect(bulk_action.queued?).to be true
 
       expect(BulkActions::TextExtractionJob)
-        .to have_been_enqueued.with(druids:, bulk_action:, text_extraction_languages: ['English'])
+        .to have_been_enqueued.with(druids:, bulk_action:, ocr_languages: ['English'])
     end
   end
 

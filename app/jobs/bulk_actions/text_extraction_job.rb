@@ -3,16 +3,16 @@
 module BulkActions
   # Job to start text extraction workflow for objects
   class TextExtractionJob < DruidsJob
-    def perform(bulk_action:, druids:, text_extraction_languages: [])
-      @text_extraction_languages = text_extraction_languages
+    def perform(bulk_action:, druids:, ocr_languages: [])
+      @ocr_languages = ocr_languages
       super
     end
 
-    attr_reader :text_extraction_languages
+    attr_reader :ocr_languages
 
     # Start text extraction for a single object
     class JobItem < BaseJobItem
-      delegate :text_extraction_languages, to: :job
+      delegate :ocr_languages, to: :job
 
       def perform
         return unless check_update_ability?
@@ -33,7 +33,7 @@ module BulkActions
       end
 
       def text_extraction
-        @text_extraction ||= Sdr::TextExtraction.new(cocina_object, languages: text_extraction_languages,
+        @text_extraction ||= Sdr::TextExtraction.new(cocina_object, languages: ocr_languages,
                                                                     already_opened: version_service.open?)
       end
     end

@@ -10,13 +10,13 @@ import { Controller } from '@hotwired/stimulus'
 // disables the radios:
 //   <fieldset data-ocr-options-target="section"></fieldset>
 // Mark each Run OCR? radio with:
-//   <input type="radio" data-ocr-options-target="runOcr" data-action="ocr-options#toggle">
+//   <input type="radio" data-ocr-options-target="performOcr" data-action="ocr-options#toggle">
 // Mark the language selector's multi-select container with:
 //   <div data-ocr-options-target="languages"></div>
 // Mark any warning with the content types it applies to; it is shown only while OCR is requested:
 //   <div data-ocr-options-target="warning" data-ocr-options-warn-content-types='["..."]'></div>
 export default class extends Controller {
-  static targets = ['contentType', 'section', 'runOcr', 'languages', 'warning']
+  static targets = ['contentType', 'section', 'performOcr', 'languages', 'warning']
   static values = { allowedContentTypes: Array }
 
   connect () {
@@ -28,7 +28,7 @@ export default class extends Controller {
     const ocrAllowed = !this.hasContentTypeTarget || this.allowedContentTypesValue.includes(contentType)
     this.sectionTarget.disabled = !ocrAllowed
 
-    const ocrRequested = this.runOcrTargets.some((radio) => radio.checked && radio.value === 'true')
+    const ocrRequested = this.performOcrTargets.some((radio) => radio.checked && radio.value === 'true')
     // The multi-select controller owns the tom-select widget, so ask it to disable itself rather
     // than relying on the disabled fieldset, which leaves the widget interactive.
     this.languagesTarget.dataset.multiSelectDisabledValue = String(!(ocrAllowed && ocrRequested))

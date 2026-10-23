@@ -745,7 +745,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
       let!(:item_deposit_action) { create(:item_deposit_action, multi_item_deposit_action:) }
       let(:params) do
-        { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: ['', 'English'] } }
+        { multi_item_deposit_structure: { perform_ocr: 'true', ocr_languages: ['', 'English'] } }
       end
 
       it 'saves the OCR settings, starts structuring, and redirects to the edit page' do
@@ -787,7 +787,7 @@ RSpec.describe 'Multi-item deposit actions' do
       context 'when the form has other errors' do
         let(:params) do
           { multi_item_deposit_structure: {
-            structural_metadata_csv_choice: 'upload', run_ocr: 'true', text_extraction_languages: [''],
+            structural_metadata_csv_choice: 'upload', perform_ocr: 'true', ocr_languages: [''],
             structural_metadata_csv_file: Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv')
           } }
         end
@@ -905,7 +905,7 @@ RSpec.describe 'Multi-item deposit actions' do
     context 'when building the structure with OCR but no languages' do
       let(:owner) { user }
       let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
-      let(:params) { { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: [''] } } }
+      let(:params) { { multi_item_deposit_structure: { perform_ocr: 'true', ocr_languages: [''] } } }
 
       before do
         create(:item_deposit_action, multi_item_deposit_action:, content_type: 'image')
@@ -915,7 +915,7 @@ RSpec.describe 'Multi-item deposit actions' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(rendered_page).to have_css('#multi_item_deposit_structure_text_extraction_languages_error',
+        expect(rendered_page).to have_css('#multi_item_deposit_structure_ocr_languages_error',
                                           text: "can't be blank")
         expect(multi_item_deposit_action.reload).not_to be_structuring
         expect(multi_item_deposit_action.perform_ocr).to be false
@@ -928,7 +928,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:multi_item_deposit_action) do
         create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_state: 'structuring')
       end
-      let(:params) { { multi_item_deposit_structure: { run_ocr: 'true', text_extraction_languages: ['English'] } } }
+      let(:params) { { multi_item_deposit_structure: { perform_ocr: 'true', ocr_languages: ['English'] } } }
 
       it 'does not restart structuring and redirects to the edit page' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)

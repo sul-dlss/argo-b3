@@ -205,8 +205,8 @@ RSpec.describe 'Contents' do
     context 'when requesting OCR' do
       it 'saves the OCR settings with the content and stages the object' do
         patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
-                                             contents_item: { run_ocr: 'true',
-                                                              text_extraction_languages: ['', 'English'] } }
+                                             contents_item: { perform_ocr: 'true',
+                                                              ocr_languages: ['', 'English'] } }
 
         expect(response).to redirect_to(object_path(druid))
         # The OCR settings are not written to Cocina, so the object is not updated.
@@ -220,7 +220,7 @@ RSpec.describe 'Contents' do
     context 'when requesting OCR without a language' do
       it 'renders the edit page' do
         patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
-                                             contents_item: { run_ocr: 'true' } }
+                                             contents_item: { perform_ocr: 'true' } }
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(Sdr::Repository).not_to have_received(:update)

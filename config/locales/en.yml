@@ -413,12 +413,12 @@ en:
           label: 'Tag'
         part_label:
           label: 'Part label'
+        perform_ocr:
+          label: 'Run OCR?'
         project_tag:
           label: 'Project name'
         retrieved_title:
           label: 'FOLIO title statement'
-        run_ocr:
-          label: 'Run OCR?'
         serials:
           label: 'Serials metadata'
         sort_key:

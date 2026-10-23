@@ -22,8 +22,9 @@ RSpec.describe Edit::OcrComponent, type: :component do
   it 'wires the radios up to the ocr-options controller' do
     render_inline(component)
 
-    expect(page).to have_css('input[type="radio"][data-ocr-options-target="runOcr"][data-action="ocr-options#toggle"]',
-                             count: 2)
+    expect(page).to have_css(
+      'input[type="radio"][data-ocr-options-target="performOcr"][data-action="ocr-options#toggle"]', count: 2
+    )
   end
 
   it 'renders the language selector as the ocr-options dependent within the Yes option' do
@@ -46,7 +47,7 @@ RSpec.describe Edit::OcrComponent, type: :component do
 
   context 'when OCR has been requested' do
     let(:contents_item_form) do
-      super().tap { |form| form.update(run_ocr: true, text_extraction_languages: ['English']) }
+      super().tap { |form| form.update(perform_ocr: true, ocr_languages: ['English']) }
     end
 
     it 'selects Yes and the chosen languages' do

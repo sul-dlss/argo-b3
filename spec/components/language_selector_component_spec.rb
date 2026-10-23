@@ -28,7 +28,7 @@ RSpec.describe LanguageSelectorComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('.form-text', text: 'Selecting many languages may have an adverse effect')
-    expect(page).to have_css('select[aria-describedby="text_extraction_languages_help"]')
+    expect(page).to have_css('select[aria-describedby="ocr_languages_help"]')
   end
 
   context 'with container data from the caller' do
@@ -42,7 +42,7 @@ RSpec.describe LanguageSelectorComponent, type: :component do
   end
 
   context 'when languages are already selected' do
-    let(:bulk_action_form) { BulkActions::TextExtractionForm.new(text_extraction_languages: %w[English Danish]) }
+    let(:bulk_action_form) { BulkActions::TextExtractionForm.new(ocr_languages: %w[English Danish]) }
 
     it 'marks those options as selected' do
       render_inline(component)

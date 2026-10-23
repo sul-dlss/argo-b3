@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe BulkActions::TextExtractionJob do
-  subject(:job) { described_class.new(bulk_action:, druids: [druid], text_extraction_languages: languages) }
+  subject(:job) { described_class.new(bulk_action:, druids: [druid], ocr_languages: languages) }
 
   let(:druid) { 'druid:bb111cc2222' }
   let(:languages) { ['English'] }
