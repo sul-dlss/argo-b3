@@ -50,7 +50,7 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
     row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
     expect(row).to have_css("td:nth-of-type(1) a[href='/multi_item_deposit_actions/#{multi_item_deposit_action.id}']",
                             exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
-    expect(row).to have_css('td:nth-of-type(2)', text: '2026-04-16 03:00:00 PT')
+    expect(row).to have_css('td:nth-of-type(2)', exact_text: '2026-04-16')
     expect(row).to have_css('td:nth-of-type(3)', exact_text: '')
     expect(row).to have_css('td:nth-of-type(4)', text: 'Discovering files')
     expect(row).to have_no_css('td:nth-of-type(5) a')
@@ -58,7 +58,7 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
     submitted_row = table.find("tr##{dom_id(submitted_multi_item_deposit_action, 'row')}")
     expect(submitted_row).to have_css('td:nth-of-type(1) a',
                                       text: "Multi-item deposit #{submitted_multi_item_deposit_action.id}: Maps")
-    expect(submitted_row).to have_css('td:nth-of-type(3)', text: '2026-04-17 03:00:00 PT')
+    expect(submitted_row).to have_css('td:nth-of-type(3)', exact_text: '2026-04-17')
     expect(submitted_row).to have_css('td:nth-of-type(4)', text: 'Submitted')
     expect(submitted_row).to have_link('Workflow status',
                                        href: '/workflow_grid?multi_item_deposit_action_ids%5B%5D=' \

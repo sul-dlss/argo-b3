@@ -20,20 +20,8 @@
 
   <%= render Elements::Pagination::BriefComponent.new(total_pages:, current_page:, path_func:, total_results: total_count, per_page: limit_value) %>
 
-  <%= render SdrViewComponents::Tables::TableComponent.new(label: heading, show_label: false, id: 'multi-item-deposits-history-table', empty_message:) do |table| %>
-    <%= table.with_header(label: 'Multi-item deposit', style: "width: #{admin? ? 30 : 40}%;") %>
-    <% if admin? %>
-      <%= table.with_header(label: 'User', style: 'width: 10%;') %>
-    <% end %>
-    <%= table.with_header(label: 'Created', style: 'width: 15%;') %>
-    <%= table.with_header(label: 'Submitted', style: 'width: 15%;') %>
-    <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
-    <%= table.with_header(label: 'Workflow status', style: 'width: 15%;') %>
-    <% multi_item_deposit_actions.each do |multi_item_deposit_action| %>
-      <%= table.with_row(values: values_for(multi_item_deposit_action),
-                         id: dom_id(multi_item_deposit_action, 'row')) %>
-    <% end %>
-  <% end %>
+  <%= render MultiItemDeposit::TableComponent.new(multi_item_deposit_actions:, label: heading, id: 'multi-item-deposits-history-table',
+                                                  show_user: admin?) %>
 
   <%= render Elements::Pagination::FullComponent.new(total_pages:, current_page:, path_func:) %>
 <% end %>

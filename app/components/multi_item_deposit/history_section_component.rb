@@ -25,25 +25,8 @@ module MultiItemDeposit
       }
     end
 
-    def values_for(multi_item_deposit_action)
-      values = [
-        link_to(multi_item_deposit_action.name, multi_item_deposit_action_path(multi_item_deposit_action)),
-        helpers.format_datetime(multi_item_deposit_action.created_at),
-        helpers.format_datetime(multi_item_deposit_action.initiating_deposit_completed_at),
-        MultiItemDepositAction::DISPLAY_STATUSES.fetch(multi_item_deposit_action.display_status),
-        workflow_status_link_for(multi_item_deposit_action)
-      ]
-      # Admins see the Multi-Item Deposits of other users, so the user follows the name.
-      values.insert(1, multi_item_deposit_action.user.sunetid) if admin?
-      values
-    end
-
     def heading
       I18n.t('multi_item_deposit_actions.history.heading')
-    end
-
-    def empty_message
-      I18n.t('multi_item_deposit_actions.history.empty')
     end
 
     private
@@ -54,13 +37,6 @@ module MultiItemDeposit
       return {} if params.empty?
 
       { filter_form.model_name.param_key => params }
-    end
-
-    # Without Item Deposits, the workflow grid would not be limited to any objects.
-    def workflow_status_link_for(multi_item_deposit_action)
-      return unless multi_item_deposit_action.item_deposit_actions.exists?
-
-      link_to('Workflow status', workflow_grid_path(multi_item_deposit_action_ids: [multi_item_deposit_action.id]))
     end
   end
 end
