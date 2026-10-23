@@ -615,6 +615,12 @@ en:
       heading: 'Multi-item deposits'
       empty: 'No multi-item deposits yet'
   admin:
+    object_permissions:
+      toasts:
+        added: 'Permission added'
+        deleted: 'Permission deleted'
+      errors:
+        duplicate_permission: 'already has this permission'
     impersonation:
       start: "You are now impersonating the selected workgroups."
       stop: "You have stopped impersonating."

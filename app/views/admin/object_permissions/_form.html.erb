@@ -1,0 +1,14 @@
+<%= form_with model: object_permission_form, url: admin_object_permissions_path(druid) do |form| %>
+  <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :workgroup,
+                                                                options: workgroups | [object_permission_form.workgroup].compact,
+                                                                prompt: 'Select or enter a workgroup',
+                                                                label_text: 'Workgroup', label_classes: 'fw-bold',
+                                                                input_data: { controller: 'creatable-select' }) %>
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Permission') do %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :permission_type,
+                                                                  label_text: 'Read', input_value: 'read_restricted') %>
+    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :permission_type,
+                                                                  label_text: 'Edit', input_value: 'edit') %>
+  <% end %>
+  <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Add permission') %>
+<% end %>

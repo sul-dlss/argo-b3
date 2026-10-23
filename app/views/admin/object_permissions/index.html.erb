@@ -1,0 +1,31 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<div class="container pb-3">
+  <p>
+    <%= link_to object_path(@druid) do %><%= previous_icon %> Return to object<% end %>
+  </p>
+
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Manage permissions', classes: 'mb-4') %>
+
+  <%# Keep the widget across table morphs; form responses replace the contents to clear validation state. %>
+  <%= turbo_frame_tag 'object-permission-form', data: { turbo_permanent: true } do %>
+    <%= render 'form', object_permission_form: @object_permission_form, druid: @druid, workgroups: @workgroups %>
+  <% end %>
+
+  <hr class="my-4">
+
+  <%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Permissions', show_label: false,
+                                                              id: 'object-permissions-table', empty_message: 'No permissions.') do |table| %>
+    <%= table.with_header(label: 'Workgroup') %>
+    <%= table.with_header(label: 'Permission') %>
+    <%= table.with_header(label: '') %>
+    <% @permissions.each do |permission| %>
+      <% table.with_row do %>
+        <%= render Admin::ObjectPermissionRowComponent.new(permission:) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
