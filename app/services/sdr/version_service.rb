@@ -70,8 +70,8 @@ module Sdr
 
     attr_reader :druid
 
-    delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :version, :version_description,
-             to: :status
+    delegate :open?, :openable?, :assembling?, :accessioning?, :closed?, :closeable?, :discardable?, :version,
+             :version_description, to: :status
 
     # @param status [Dor::Services::Client::ObjectVersion::VersionStatus, nil] an already retrieved status
     def initialize(druid:, status: nil)
@@ -98,6 +98,13 @@ module Sdr
       version_client.update_description(...)
     rescue Dor::Services::Client::Error => e
       raise Error, "Updating version description failed: #{e.message}"
+    end
+
+    # @raise [Error] if discarding the version fails
+    def discard
+      version_client.discard
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Discarding version failed: #{e.message}"
     end
 
     def open_and_not_assembling?

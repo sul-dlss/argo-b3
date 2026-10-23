@@ -7,7 +7,7 @@ class ItemsController < ApplicationController
   # Matches ObjectsController so its descriptive CSV download accepts the druid token.
   self.token_purpose = 'show'
 
-  before_action :set_druid_and_cocina_object, only: %i[edit update]
+  before_action :set_druid_and_cocina_object, only: %i[edit update discard_draft]
   # Values for submit buttons
   DRAFT_VALUE = 'draft'
   DRAFT_TO_ADD_FILES_VALUE = 'add_files'
@@ -63,6 +63,19 @@ class ItemsController < ApplicationController
     redirect_updated
   end
 
+  def discard_draft
+    authorize! @cocina_object, to: :update?, with: ObjectPolicy
+
+    purged = Sdr::DraftDiscarder.call(cocina_object: @cocina_object, user_name: current_user.sunetid)
+    redirect_draft_discarded(purged:)
+  rescue Sdr::DraftDiscarder::ContentBusyError
+    redirect_content_busy
+  rescue Sdr::DraftDiscarder::NotDiscardableError
+    redirect_not_discardable
+  rescue Sdr::Repository::Error => e
+    redirect_discard_failed(e)
+  end
+
   private
 
   def new_item_form_params
@@ -94,6 +107,21 @@ class ItemsController < ApplicationController
     redirect_to object_path(@druid), flash: { toast: t("edit.items.edit.toasts.#{toast_key}") }
   end
 
+  # A purged object no longer has an object page.
+  def redirect_draft_discarded(purged:)
+    redirect_to purged ? root_path : object_path(@druid), flash: { toast: t('edit.items.edit.toasts.draft_discarded') }
+  end
+
+  def redirect_discard_failed(error)
+    Rails.logger.error(error.full_message)
+    Honeybadger.notify(error, context: { druid: @druid })
+    redirect_to edit_item_path(@druid), flash: { danger: t('edit.items.edit.errors.discard_failed') }
+  end
+
+  def redirect_not_discardable
+    redirect_to object_path(@druid), flash: { warning: t('edit.items.edit.warnings.not_discardable') }
+  end
+
   def redirect_not_editable
     redirect_to object_path(@druid), flash: { warning: t('edit.items.edit.warnings.not_editable') }
   end
@@ -115,6 +143,7 @@ class ItemsController < ApplicationController
   def set_edit_view
     @title = Cocina::Models::Builders::TitleBuilder.build(@cocina_object.description.title)
     @cancel_path = object_path(@druid)
+    @discard_path = discard_draft_item_path(@druid)
     @druid_token = generate_token(@druid)
     set_apo_and_collection_options(form: @edit_item_form)
   end

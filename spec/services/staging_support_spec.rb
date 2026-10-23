@@ -32,6 +32,19 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.delete_staged_files' do
+    before do
+      described_class.locations.each { |staging_location| stage_file(staging_location:) }
+    end
+
+    it 'deletes the staged files in every staging location' do
+      described_class.delete_staged_files(druid:)
+
+      expect(Dir.glob('**/*', base: File.join(Settings.staging_location, 'bc/123/df/4567/bc123df4567'))).to eq []
+      expect(Dir.glob('**/*', base: File.join(Settings.assembly_location, 'bc/123/df/4567/bc123df4567'))).to eq []
+    end
+  end
+
   describe '.staged_files?' do
     context 'when the staging content directory does not exist' do
       it 'returns false' do

@@ -44,6 +44,19 @@ RSpec.describe Sdr::PurgeService do
       end
     end
 
+    context 'when the object client fails' do
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+        allow(Sdr::WorkflowService).to receive(:submitted?).and_return(false)
+        allow(object_client).to receive(:destroy).and_raise(Dor::Services::Client::Error, 'Oops')
+      end
+
+      it 'raises a purge service error' do
+        expect { described_class.purge(druid:, user_name:) }
+          .to raise_error(Sdr::PurgeService::Error, 'Purging failed: Oops')
+      end
+    end
+
     context 'when the object cannot be purged' do
       before do
         allow(Sdr::WorkflowService).to receive(:submitted?).with(druid:).and_return(true)

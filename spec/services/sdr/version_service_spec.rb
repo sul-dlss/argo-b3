@@ -98,6 +98,27 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '#discard' do
+    before do
+      allow(version_client).to receive(:discard)
+    end
+
+    it 'delegates to the version client' do
+      service.discard
+      expect(version_client).to have_received(:discard).once
+    end
+
+    context 'when the version client fails' do
+      before do
+        allow(version_client).to receive(:discard).and_raise(Dor::Services::Client::Error, 'Oops')
+      end
+
+      it 'raises a version service error' do
+        expect { service.discard }.to raise_error(Sdr::VersionService::Error, 'Discarding version failed: Oops')
+      end
+    end
+  end
+
   describe '#editable?' do
     before do
       allow(status).to receive_messages(openable?: openable, closeable?: closeable)
@@ -187,7 +208,7 @@ RSpec.describe Sdr::VersionService do
 
   describe 'status methods' do
     it 'delegates to the version client' do
-      %i[open? openable? assembling? accessioning? closed? closeable? version].each do |method|
+      %i[open? openable? assembling? accessioning? closed? closeable? discardable? version].each do |method|
         allow(status).to receive(method)
         service.send(method)
         expect(status).to have_received(method).once

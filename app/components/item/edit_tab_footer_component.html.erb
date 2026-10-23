@@ -7,6 +7,15 @@
         variant: 'outline-primary',
         classes: 'ms-auto'
       ) %>
+  <%# A link rather than a form, since the footer is inside the edit form. %>
+  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
+        link: discard_path,
+        variant: :'outline-primary',
+        classes: 'ms-2',
+        data: { turbo_method: :delete, turbo_confirm: t('edit.items.edit.buttons.discard_draft_confirm') }
+      ) do %>
+    <%= helpers.delete_icon(classes: 'me-1') %><%= t('edit.items.edit.buttons.discard_draft') %>
+  <% end %>
   <% if show_deposit %>
     <%= render SdrViewComponents::Forms::SubmitComponent.new(
           label: t('edit.items.edit.buttons.deposit'),
