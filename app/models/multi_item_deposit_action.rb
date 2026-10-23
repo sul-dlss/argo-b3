@@ -12,12 +12,64 @@ class MultiItemDepositAction < ApplicationRecord
   STRUCTURAL_METADATA_CSV_REQUIRED_CONTENT_TYPES = [UriSupport.last(uri: Cocina::Models::ObjectType.media)].freeze
   STRUCTURAL_METADATA_CSV_FILENAME = 'structural_metadata.csv'
 
+  DISPLAY_STATUSES = {
+    'submitted' => 'Submitted',
+    'initiating_deposit' => 'Initiating deposit',
+    'discovering' => 'Discovering files',
+    'structuring' => 'Checking files',
+    'not_submitted' => 'Not submitted'
+  }.freeze
+
+  # The conditions of the display statuses in order of precedence; a display status applies only when
+  # none of the preceding ones do. Not submitted (nil) applies when none of the others do.
+  DISPLAY_STATUS_CONDITIONS = {
+    'submitted' => { step: 'submitted' },
+    'initiating_deposit' => { initiating_deposit_state: 'initiating_depositing' },
+    'discovering' => { discovery_state: 'discovering' },
+    'structuring' => { structuring_state: 'structuring' },
+    'not_submitted' => nil
+  }.freeze
+
   enum :file_location, { globus: 'globus', mount: 'mount' }, prefix: true, validate: true
   enum :step, { discovery: 'discovery', structure: 'structure', deposit: 'deposit', submitted: 'submitted' },
        suffix: true, validate: true
   enum :manifest_source, { mount: 'mount', upload: 'upload' }, prefix: true, validate: true
   enum :structural_metadata_csv_source, { mount: 'mount', upload: 'upload' }, prefix: true,
                                                                               validate: { allow_nil: true }
+
+  # @param display_statuses [Array<String>] keys of DISPLAY_STATUSES (others are ignored)
+  # @return [ActiveRecord::Relation] the Multi-Item Deposits with any of the display statuses
+  def self.with_display_statuses(display_statuses)
+    (display_statuses & DISPLAY_STATUSES.keys).map { |display_status| where_display_status(display_status) }
+                                              .reduce(:or) || none
+  end
+
+  # @param statuses [Array<String>, nil] keys of DISPLAY_STATUSES; nil for no limit
+  # @param submitted_since [ActiveSupport::TimeWithZone, nil] nil for no limit
+  # @param user_ids [Array<String>, nil] nil for no limit
+  # @return [ActiveRecord::Relation] the Multi-Item Deposits that match the filters
+  def self.filtered(statuses: nil, submitted_since: nil, user_ids: nil)
+    relation = all
+    relation = relation.where(user_id: user_ids) if user_ids
+    relation = relation.with_display_statuses(statuses) if statuses
+    relation = relation.where(initiating_deposit_completed_at: submitted_since..) if submitted_since
+    relation
+  end
+
+  def self.where_display_status(display_status)
+    preceding_conditions = DISPLAY_STATUS_CONDITIONS.values.take(DISPLAY_STATUS_CONDITIONS.keys.index(display_status))
+    relation = preceding_conditions.reduce(all) { |partial_relation, condition| partial_relation.where.not(condition) }
+    condition = DISPLAY_STATUS_CONDITIONS[display_status]
+    condition ? relation.where(condition) : relation
+  end
+  private_class_method :where_display_status
+
+  # @return [String] the key of the Multi-Item Deposit's DISPLAY_STATUSES
+  def display_status
+    DISPLAY_STATUS_CONDITIONS.find do |_display_status, condition|
+      condition.nil? || condition.all? { |attribute, value| public_send(attribute) == value }
+    end.first
+  end
 
   # @return [ActiveRecord::Relation<ItemDepositAction>] the Item Deposits with discovery errors or warnings
   def item_deposit_actions_with_discovery_errors_or_warnings

@@ -1,10 +1,10 @@
 <%= render Elements::SelectedItemComponent.new(path: remove_path, label:) do |component| %>
   <%= component.with_label_content do %>
-    <% if query? %>
-      <%= values_label %>
-    <% else %>
+    <% if field_label? %>
       <%= field_label %>
       <span class="selected-item-separator">❯</span>
+      <%= values_label %>
+    <% else %>
       <%= values_label %>
     <% end %>
   <% end %>

@@ -84,4 +84,19 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       end
     end
   end
+
+  context 'when a filter for a Multi-Item Deposit' do
+    let(:form_field) { 'multi_item_deposit_action_ids' }
+    let(:values) { [multi_item_deposit_action.id.to_s] }
+    let(:search_form) { WorkflowGridSearchForm.new(multi_item_deposit_action_ids: values) }
+    let(:multi_item_deposit_action) { create(:multi_item_deposit_action, description: 'Maps') }
+
+    it 'renders the name of the Multi-Item Deposit without the field label' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: "Multi-item deposit #{multi_item_deposit_action.id}: Maps")
+      expect(page).to have_no_css('li', text: '❯')
+      expect(page).to have_link('', href: '/workflow_grid')
+    end
+  end
 end

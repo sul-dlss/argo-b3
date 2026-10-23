@@ -215,6 +215,88 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '.filtered' do
+    let(:other_user) { create(:user) }
+    let!(:submitted_multi_item_deposit_action) do
+      create(:multi_item_deposit_action, step: :submitted, initiating_deposit_completed_at: 3.days.ago)
+    end
+    let!(:older_submitted_multi_item_deposit_action) do
+      create(:multi_item_deposit_action, step: :submitted, initiating_deposit_completed_at: 10.days.ago)
+    end
+    let!(:other_user_multi_item_deposit_action) { create(:multi_item_deposit_action, user: other_user) }
+
+    it 'returns all Multi-Item Deposits when there are no filters' do
+      expect(described_class.filtered).to contain_exactly(submitted_multi_item_deposit_action,
+                                                          older_submitted_multi_item_deposit_action,
+                                                          other_user_multi_item_deposit_action)
+    end
+
+    it 'returns the Multi-Item Deposits with the statuses' do
+      expect(described_class.filtered(statuses: ['not_submitted']))
+        .to contain_exactly(other_user_multi_item_deposit_action)
+    end
+
+    it 'returns the Multi-Item Deposits of the users' do
+      expect(described_class.filtered(user_ids: [other_user.id.to_s]))
+        .to contain_exactly(other_user_multi_item_deposit_action)
+    end
+
+    it 'returns the Multi-Item Deposits submitted since the time' do
+      expect(described_class.filtered(submitted_since: 7.days.ago))
+        .to contain_exactly(submitted_multi_item_deposit_action)
+    end
+  end
+
+  describe '.with_display_statuses' do
+    let!(:submitted_multi_item_deposit_action) do
+      # Submitted takes precedence over initiating the deposit, which completes just after the step is submitted.
+      create(:multi_item_deposit_action, step: :submitted, initiating_deposit_state: 'initiating_depositing')
+    end
+    let!(:initiating_deposit_multi_item_deposit_action) do
+      create(:multi_item_deposit_action, step: :deposit, initiating_deposit_state: 'initiating_depositing')
+    end
+    let!(:discovering_multi_item_deposit_action) { create(:multi_item_deposit_action, discovery_state: 'discovering') }
+    let!(:structuring_multi_item_deposit_action) do
+      create(:multi_item_deposit_action, step: :structure, structuring_state: 'structuring')
+    end
+    let!(:not_submitted_multi_item_deposit_action) { create(:multi_item_deposit_action, step: :deposit) }
+
+    it 'returns the Multi-Item Deposits with each display status' do
+      expect(described_class.with_display_statuses(['submitted']))
+        .to contain_exactly(submitted_multi_item_deposit_action)
+      expect(described_class.with_display_statuses(['initiating_deposit']))
+        .to contain_exactly(initiating_deposit_multi_item_deposit_action)
+      expect(described_class.with_display_statuses(['discovering']))
+        .to contain_exactly(discovering_multi_item_deposit_action)
+      expect(described_class.with_display_statuses(['structuring']))
+        .to contain_exactly(structuring_multi_item_deposit_action)
+      expect(described_class.with_display_statuses(['not_submitted']))
+        .to contain_exactly(not_submitted_multi_item_deposit_action)
+    end
+
+    it 'returns the Multi-Item Deposits with any of the display statuses' do
+      expect(described_class.with_display_statuses(%w[submitted discovering]))
+        .to contain_exactly(submitted_multi_item_deposit_action, discovering_multi_item_deposit_action)
+    end
+
+    it 'returns no Multi-Item Deposits when there are no known display statuses' do
+      expect(described_class.with_display_statuses(['unknown'])).to be_empty
+    end
+  end
+
+  describe '#display_status' do
+    it 'returns the display status' do
+      expect(described_class.new(step: :submitted, initiating_deposit_state: 'initiating_depositing').display_status)
+        .to eq('submitted')
+      expect(described_class.new(step: :deposit, initiating_deposit_state: 'initiating_depositing').display_status)
+        .to eq('initiating_deposit')
+      expect(described_class.new(discovery_state: 'discovering').display_status).to eq('discovering')
+      expect(described_class.new(step: :structure, structuring_state: 'structuring').display_status)
+        .to eq('structuring')
+      expect(described_class.new(step: :deposit).display_status).to eq('not_submitted')
+    end
+  end
+
   describe '#destroy' do
     let(:content) { create(:content, :mutable) }
 

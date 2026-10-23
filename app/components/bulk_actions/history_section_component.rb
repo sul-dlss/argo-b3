@@ -20,8 +20,8 @@ module BulkActions
 
     def data
       {
-        controller: 'bulk-actions-history',
-        bulk_actions_history_interval_value: Settings.reload_intervals.bulk_actions_history.to_i
+        controller: 'reload-interval',
+        reload_interval_interval_value: Settings.reload_intervals.bulk_actions_history.to_i
       }
     end
 

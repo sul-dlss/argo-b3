@@ -14,7 +14,7 @@ module Search
     end
 
     def call
-      (query_parts + facet_parts).join(' AND ')
+      (query_parts + multi_item_deposit_parts + facet_parts).join(' AND ')
     end
 
     private
@@ -23,6 +23,10 @@ module Search
 
     def query_parts
       [quote(search_form.query)].compact_blank
+    end
+
+    def multi_item_deposit_parts
+      search_form.multi_item_deposit_action_ids.map { |id| "#{facet_label(:multi_item_deposit_action_ids)}: #{id}" }
     end
 
     def facet_parts

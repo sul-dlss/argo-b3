@@ -61,6 +61,7 @@ en:
       dates: "Year"
       access_rights: "Access rights"
       mods_resource_types: "MODS resource type"
+      multi_item_deposit_action_ids: "Multi-item deposit"
       released_to_earthworks: "Released to EarthWorks"
       released_to_earthworks_date_from: "Released to EarthWorks date from"
       released_to_earthworks_date_to: "Released to EarthWorks date to"
@@ -609,6 +610,10 @@ en:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
     history: 'Bulk actions'
+  multi_item_deposit_actions:
+    history:
+      heading: 'Multi-item deposits'
+      empty: 'No multi-item deposits yet'
   admin:
     impersonation:
       start: "You are now impersonating the selected workgroups."

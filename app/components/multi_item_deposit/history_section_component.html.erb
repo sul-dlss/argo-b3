@@ -1,0 +1,39 @@
+<%= tag.div class: 'container mt-3', data: do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: heading, classes: 'mb-4') %>
+
+  <%# Morph refreshes skip the form, since morphing breaks Tom Select. %>
+  <%= form_with model: filter_form, url: multi_item_deposit_actions_path, method: :get,
+                id: 'multi-item-deposits-filter', class: 'd-flex gap-3 mb-4 align-items-end',
+                data: { controller: 'skip-morph', action: 'turbo:before-morph-element->skip-morph#skip' } do |form| %>
+    <% if admin? %>
+      <%= render Elements::Forms::MultiSelectFilterComponent.new(form:, field_name: :user_ids, options: filter_form.user_options,
+                                                                 label_text: 'Users') %>
+    <% end %>
+    <%= render Elements::Forms::MultiSelectFilterComponent.new(form:, field_name: :statuses, options: filter_form.status_options,
+                                                               label_text: 'Statuses') %>
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :submitted_date, options: filter_form.submitted_date_options,
+                                                                  label_text: 'Submitted date') %>
+    <div>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter', variant: 'outline-primary') %>
+    </div>
+  <% end %>
+
+  <%= render Elements::Pagination::BriefComponent.new(total_pages:, current_page:, path_func:, total_results: total_count, per_page: limit_value) %>
+
+  <%= render SdrViewComponents::Tables::TableComponent.new(label: heading, show_label: false, id: 'multi-item-deposits-history-table', empty_message:) do |table| %>
+    <%= table.with_header(label: 'Multi-item deposit', style: "width: #{admin? ? 30 : 40}%;") %>
+    <% if admin? %>
+      <%= table.with_header(label: 'User', style: 'width: 10%;') %>
+    <% end %>
+    <%= table.with_header(label: 'Created', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Submitted', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Status', style: 'width: 15%;') %>
+    <%= table.with_header(label: 'Workflow status', style: 'width: 15%;') %>
+    <% multi_item_deposit_actions.each do |multi_item_deposit_action| %>
+      <%= table.with_row(values: values_for(multi_item_deposit_action),
+                         id: dom_id(multi_item_deposit_action, 'row')) %>
+    <% end %>
+  <% end %>
+
+  <%= render Elements::Pagination::FullComponent.new(total_pages:, current_page:, path_func:) %>
+<% end %>

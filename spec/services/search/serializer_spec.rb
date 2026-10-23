@@ -35,4 +35,12 @@ RSpec.describe Search::Serializer do
              'Object type: ("item" OR "collection") AND ' \
              'Registered date: ("Last month" AND 2021-02-01 TO 2022-02-01)')
   end
+
+  context 'with Multi-Item Deposits' do
+    let(:search_form) { WorkflowGridSearchForm.new(query: 'maps', multi_item_deposit_action_ids: %w[12 13]) }
+
+    it 'includes the Multi-Item Deposits' do
+      expect(serialized_query).to eq('"maps" AND Multi-item deposit: 12 AND Multi-item deposit: 13')
+    end
+  end
 end
