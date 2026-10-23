@@ -12,7 +12,7 @@ module BulkActions
     def job_params
       {
         druids: druids_from_form,
-        text_extraction_languages: @bulk_action_form.text_extraction_languages
+        ocr_languages: @bulk_action_form.ocr_languages
       }
     end
   end

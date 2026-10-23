@@ -20,8 +20,8 @@ RSpec.describe ContentsItemForm do
 
   describe '.permitted_params' do
     it 'permits the content type, viewing direction, OCR settings, and version description' do
-      expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :run_ocr,
-                                                      :version_description, { text_extraction_languages: [] }])
+      expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :perform_ocr,
+                                                      :version_description, { ocr_languages: [] }])
     end
   end
 
@@ -49,13 +49,13 @@ RSpec.describe ContentsItemForm do
 
   context 'when running OCR' do
     before do
-      contents_item_form.update(run_ocr: true, text_extraction_languages: ['', 'English'])
+      contents_item_form.update(perform_ocr: true, ocr_languages: ['', 'English'])
     end
 
     it 'retains the languages, less the blank value submitted by the select' do
       expect(contents_item_form).to be_valid
-      expect(contents_item_form.run_ocr).to be true
-      expect(contents_item_form.text_extraction_languages).to eq(['English'])
+      expect(contents_item_form.perform_ocr).to be true
+      expect(contents_item_form.ocr_languages).to eq(['English'])
     end
 
     it 'does not change the form' do
@@ -65,36 +65,36 @@ RSpec.describe ContentsItemForm do
 
   context 'when not running OCR' do
     before do
-      contents_item_form.update(run_ocr: false, text_extraction_languages: ['English'])
+      contents_item_form.update(perform_ocr: false, ocr_languages: ['English'])
     end
 
     it 'clears the languages' do
       expect(contents_item_form).to be_valid
-      expect(contents_item_form.text_extraction_languages).to eq([])
+      expect(contents_item_form.ocr_languages).to eq([])
     end
   end
 
   context 'when running OCR without a language' do
     before do
-      contents_item_form.update(run_ocr: true, text_extraction_languages: [])
+      contents_item_form.update(perform_ocr: true, ocr_languages: [])
     end
 
     it 'is not valid' do
       expect(contents_item_form).not_to be_valid
-      expect(contents_item_form.errors[:text_extraction_languages]).to be_present
+      expect(contents_item_form.errors[:ocr_languages]).to be_present
     end
   end
 
   context 'when changing to a content type that cannot be OCRed' do
     before do
-      contents_item_form.update(content_type: Cocina::Models::ObjectType.map, run_ocr: true,
-                                text_extraction_languages: ['English'])
+      contents_item_form.update(content_type: Cocina::Models::ObjectType.map, perform_ocr: true,
+                                ocr_languages: ['English'])
     end
 
     it 'clears the OCR settings' do
       expect(contents_item_form).to be_valid
-      expect(contents_item_form.run_ocr).to be false
-      expect(contents_item_form.text_extraction_languages).to eq([])
+      expect(contents_item_form.perform_ocr).to be false
+      expect(contents_item_form.ocr_languages).to eq([])
     end
   end
 
@@ -198,7 +198,7 @@ RSpec.describe ContentsItemForm do
     end
 
     it 'prefills the OCR settings saved with the content without changing the form' do
-      expect(contents_item_form).to have_attributes(run_ocr: true, text_extraction_languages: ['English'])
+      expect(contents_item_form).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
       expect(contents_item_form).not_to be_changed
     end
   end
@@ -297,7 +297,7 @@ RSpec.describe ContentsItemForm do
       let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
 
       before do
-        contents_item_form.update(run_ocr: true, text_extraction_languages: ['English'])
+        contents_item_form.update(perform_ocr: true, ocr_languages: ['English'])
         contents_item_form.content = content
       end
 
@@ -318,7 +318,7 @@ RSpec.describe ContentsItemForm do
       end
 
       before do
-        contents_item_form.update(run_ocr: false, text_extraction_languages: ['English'])
+        contents_item_form.update(perform_ocr: false, ocr_languages: ['English'])
         contents_item_form.content = content
       end
 
@@ -334,7 +334,7 @@ RSpec.describe ContentsItemForm do
       let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
 
       before do
-        contents_item_form.update(run_ocr: true, text_extraction_languages: ['English'])
+        contents_item_form.update(perform_ocr: true, ocr_languages: ['English'])
         contents_item_form.content = content
       end
 

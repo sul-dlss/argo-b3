@@ -1,24 +1,24 @@
 <%= render SdrViewComponents::Forms::FieldsetComponent.new(
-      label: t('edit.items.fields.run_ocr.label'),
+      label: t('edit.items.fields.perform_ocr.label'),
       classes: 'my-fieldset',
       data: { ocr_options_target: 'section' }
     ) do %>
 
   <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
         form:,
-        field_name: :run_ocr,
+        field_name: :perform_ocr,
         label_text: 'No',
         input_value: 'false',
-        input_data: { ocr_options_target: 'runOcr', action: 'ocr-options#toggle' },
+        input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
         container_classes: 'my-fieldset'
       ) %>
 
   <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
         form:,
-        field_name: :run_ocr,
+        field_name: :perform_ocr,
         label_text: 'Yes',
         input_value: 'true',
-        input_data: { ocr_options_target: 'runOcr', action: 'ocr-options#toggle' },
+        input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
         container_classes: 'my-fieldset'
       ) do |component| %>
     <% component.with_additional_container_content do %>

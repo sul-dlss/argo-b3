@@ -28,14 +28,14 @@ RSpec.describe MultiItemDeposit::StructureForm do
 
   describe 'OCR validations' do
     it 'requires OCR languages when running OCR' do
-      form = described_class.new(run_ocr: true, text_extraction_languages: [])
+      form = described_class.new(perform_ocr: true, ocr_languages: [])
 
       expect(form).not_to be_valid
-      expect(form.errors[:text_extraction_languages]).to be_present
+      expect(form.errors[:ocr_languages]).to be_present
     end
 
     it 'does not require OCR languages when not running OCR' do
-      expect(described_class.new(run_ocr: false, text_extraction_languages: [])).to be_valid
+      expect(described_class.new(perform_ocr: false, ocr_languages: [])).to be_valid
     end
   end
 
@@ -48,7 +48,7 @@ RSpec.describe MultiItemDeposit::StructureForm do
       end
 
       it 'prefills the OCR and publish / preserve settings' do
-        expect(form).to have_attributes(run_ocr: true, text_extraction_languages: ['English'],
+        expect(form).to have_attributes(perform_ocr: true, ocr_languages: ['English'],
                                         publish_preserve_all: true)
       end
     end
@@ -199,7 +199,7 @@ RSpec.describe MultiItemDeposit::StructureForm do
   describe '#multi_item_deposit_action_attributes' do
     context 'when uploading a CSV' do
       it 'includes the normalized CSV' do
-        form = build_form(run_ocr: true, text_extraction_languages: ['', 'English'], publish_preserve_all: true,
+        form = build_form(perform_ocr: true, ocr_languages: ['', 'English'], publish_preserve_all: true,
                           structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)
 
         expect(form.multi_item_deposit_action_attributes)

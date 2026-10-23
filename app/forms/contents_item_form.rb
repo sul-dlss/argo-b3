@@ -11,7 +11,7 @@ class ContentsItemForm < CocinaModels::Dro
   validates :version_description, presence: true, unless: :initial_version?
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description run_ocr text_extraction_languages].freeze
+  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages].freeze
 
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
@@ -23,17 +23,17 @@ class ContentsItemForm < CocinaModels::Dro
   }
 
   # Likewise, the OCR settings are retained when changing to a content type that cannot be OCRed.
-  before_validation :clear_run_ocr, unless: lambda {
+  before_validation :clear_perform_ocr, unless: lambda {
     Sdr::TextExtraction::SUPPORTED_TYPES.include?(content_type)
   }
-  before_validation :clear_text_extraction_languages, unless: :run_ocr
+  before_validation :clear_ocr_languages, unless: :perform_ocr
 
   # Only depositing requires the structure (content) to be valid for the content type.
   # The content errors themselves are shown by the structure validation frame.
   validate :content_valid_for_content_type, on: :deposit
 
   def self.permitted_params
-    [:content_type, :viewing_direction, :run_ocr, :version_description, { text_extraction_languages: [] }]
+    [:content_type, :viewing_direction, :perform_ocr, :version_description, { ocr_languages: [] }]
   end
 
   # Saves the OCR settings with the content. Then opens a new version if the version is closed (since staging
@@ -60,12 +60,12 @@ class ContentsItemForm < CocinaModels::Dro
     self.viewing_direction = nil
   end
 
-  def clear_run_ocr
-    self.run_ocr = false
+  def clear_perform_ocr
+    self.perform_ocr = false
   end
 
-  def clear_text_extraction_languages
-    self.text_extraction_languages = []
+  def clear_ocr_languages
+    self.ocr_languages = []
   end
 
   def content_valid_for_content_type
