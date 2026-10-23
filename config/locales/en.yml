@@ -364,6 +364,7 @@ en:
           none: "none"
         apo_druid:
           label: "APO"
+          apply_defaults: "Apply APO defaults"
         barcode:
           label: "Barcode"
         catalog_link_refresh:
