@@ -18,6 +18,10 @@ const ACCESS_FIELDS = ['view', 'download', 'location']
 //   <select data-apo-defaults-target="apo" data-action="apo-defaults#apply">
 //     <option value="druid:..." data-apo-defaults-url="/apo_defaults/druid:..."></option>
 //   </select>
+// To apply the defaults only when the user asks (e.g., when editing an existing item), have the select only
+// refresh the help texts and apply the defaults from a button:
+//   <select data-apo-defaults-target="apo" data-action="apo-defaults#refresh">...</select>
+//   <button type="button" data-action="apo-defaults#apply">Apply APO defaults</button>
 // Mark each field input and the help text element that shows its default with, e.g.:
 //   <textarea data-apo-defaults-target="copyright"></textarea> <span data-apo-defaults-target="copyrightText"></span>
 export default class extends Controller {
@@ -35,6 +39,11 @@ export default class extends Controller {
 
   apply () {
     this.update({ applyValues: true })
+  }
+
+  // Shows the selected APO's defaults in the help texts, without changing the field values.
+  refresh () {
+    this.update({ applyValues: false })
   }
 
   async update ({ applyValues }) {
