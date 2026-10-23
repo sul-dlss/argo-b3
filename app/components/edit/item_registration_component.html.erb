@@ -11,6 +11,4 @@
                                                             label_text: t('edit.items.fields.catalog_record_id.label'),
                                                             container_classes: 'my-field') %>
 
-<%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :barcode,
-                                                            label_text: t('edit.items.fields.barcode.label'),
-                                                            container_classes: 'my-field') %>
+<%= render Edit::BarcodeComponent.new(form:) %>

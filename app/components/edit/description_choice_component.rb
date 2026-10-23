@@ -19,19 +19,5 @@ module Edit
     def item_fields?
       @item_fields
     end
-
-    # FieldComponent performs this wiring for the fields it renders, but the Folio Instance HRID input is
-    # rendered on its own so that the "Preview FOLIO record" button can sit beside it.
-    # @return [Hash] the aria attributes for the Folio Instance HRID input
-    def catalog_record_id_aria
-      SdrViewComponents::Forms::InvalidFeedbackSupport.arias_for(field_name: :catalog_record_id, form:)
-    end
-
-    # The retrieved title is hidden until a title has been retrieved, whether by the
-    # catalog-title Stimulus controller or by a previous submission of the form.
-    # @return [Boolean]
-    def retrieved_title_hidden?
-      form.object.retrieved_title.blank?
-    end
   end
 end

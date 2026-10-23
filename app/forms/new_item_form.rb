@@ -11,7 +11,8 @@ class NewItemForm < CocinaModels::Dro
   include TitleFormConcern
   include TagsFormConcern
   include CollectionFormConcern
-  include CocinaModels::CatalogRecordIdConcern
+  include CatalogRecordIdFormConcern
+  include DescriptionCsvFormConcern
   # Provides the title and catalog id description choices; the spreadsheet choice is specific to items.
   include DescriptionChoiceFormConcern
 
@@ -28,8 +29,8 @@ class NewItemForm < CocinaModels::Dro
 
   has_one :release_tags
 
-  attribute :description_csv_file, :uploaded_file
-  validate :description_csv_must_be_valid, if: -> { description_choice == DESCRIPTION_SPREADSHEET_CHOICE }
+  validates :description_csv_file, presence: true, if: :description_spreadsheet_choice?
+  validate :description_csv_must_be_valid, if: -> { description_spreadsheet_choice? && description_csv_file.present? }
 
   before_validation :generate_source_id, if: lambda {
     source_id_choice == SOURCE_ID_GENERATE_CHOICE && source_id_prefix.present?
@@ -49,56 +50,8 @@ class NewItemForm < CocinaModels::Dro
 
   private
 
-  # Normalizes, validates, and imports the uploaded description spreadsheet. This is a validation rather
-  # than a before_validation callback because a callback cannot add errors and the description must only
-  # be imported when the spreadsheet has none.
-  # Errors are reported for description_csv_file since that is the field the user provides.
-  def description_csv_must_be_valid
-    return errors.add(:description_csv_file, :blank) if description_csv_file.blank?
-
-    description_csv = parsed_description_csv
-    validator = DescriptiveCsv::Validator.new(description_csv)
-    return add_description_csv_errors(validator.errors) unless validator.valid?
-
-    return unless description_csv_row_count_valid?(description_csv)
-
-    populate_description_hash_from_csv_row(description_csv.first)
-  rescue CsvUpload::Normalizer::Error => e
-    errors.add(:description_csv_file, :invalid, message: e.message)
-  end
-
-  # A single item is described by a single row.
-  def description_csv_row_count_valid?(description_csv)
-    return true if description_csv.size == 1
-
-    validation_key = description_csv.empty? ? 'no_rows' : 'extra_rows'
-    errors.add(:description_csv_file,
-               I18n.t("edit.items.fields.description_csv_file.validations.#{validation_key}"))
-    false
-  end
-
-  # @return [CSV::Table]
-  def parsed_description_csv
-    CSV.parse(CsvUpload::Normalizer.read(description_csv_file.path), headers: true)
-  end
-
-  def populate_description_hash_from_csv_row(csv_row)
-    import_result = DescriptiveCsv::Import.import(csv_row:, druid: nil)
-    return add_description_csv_errors(import_result.failure) if import_result.failure?
-
-    description = import_result.value!
-    # DescriptiveCsv::Validator only checks that the spreadsheet has a title column, not that the column
-    # has a value, and a RequestDescription (unlike a Description) allows an empty title.
-    if description.title.empty?
-      return errors.add(:description_csv_file,
-                        I18n.t('edit.items.fields.description_csv_file.validations.missing_title'))
-    end
-
-    self.description_hash = description.to_h
-  end
-
-  def add_description_csv_errors(messages)
-    messages.each { |message| errors.add(:description_csv_file, :invalid, message:) }
+  def description_spreadsheet_choice?
+    description_choice == DESCRIPTION_SPREADSHEET_CHOICE
   end
 
   def generate_source_id
