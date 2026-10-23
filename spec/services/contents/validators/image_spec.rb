@@ -26,7 +26,9 @@ RSpec.describe Contents::Validators::Image do
                               ['image1.jp2', 'image/jp2', true],
                               ['image1.xml', 'application/xml', true],
                               ['image1.txt', 'text/plain', true],
-                              ['image1.html', 'text/html', true]])
+                              ['image1.html', 'text/html', true],
+                              ['image1.pdf', 'application/pdf', true],
+                              ['image1.json', 'application/json', true]])
       create_resource(file_set_type: 'object', label: 'Object 1', files: [['notes.pdf', 'application/pdf', true]])
       create_resource(file_set_type: 'file', label: 'File 1', files: [['data.zip', 'application/zip', false]])
     end
@@ -69,18 +71,17 @@ RSpec.describe Contents::Validators::Image do
     end
   end
 
-  context 'when an image has published files that are not JP2, XML, TXT, or HTML' do
+  context 'when an image has published files that are not JP2, XML, TXT, HTML, PDF, or JSON' do
     before do
       create_resource(file_set_type: 'image', label: 'Image 1',
                       files: [['image1.jp2', 'image/jp2', true],
-                              ['image1.pdf', 'application/pdf', true],
                               ['image1.dat', nil, true],
                               ['image1.zip', 'application/zip', false]])
     end
 
     it 'has an error listing the files' do
-      expect(result.errors).to eq(['Resource 1 (Image 1) has published files that are not JP2, XML, TXT, or HTML: ' \
-                                   'image1.pdf, image1.dat.'])
+      expect(result.errors).to eq(['Resource 1 (Image 1) has published files that are not JP2, XML, TXT, HTML, ' \
+                                   'PDF, or JSON: image1.dat.'])
     end
   end
 

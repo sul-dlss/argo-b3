@@ -65,6 +65,49 @@ RSpec.describe Contents::Populators::Image do
       end
     end
 
+    context 'when an image also has TXT, HTML, PDF, and JSON files' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.tif', mime_type: 'image/tiff')
+        create(:content_file_binary, content:, filepath: 'image_0001.txt', mime_type: 'text/plain')
+        create(:content_file_binary, content:, filepath: 'image_0001.html', mime_type: 'text/html')
+        create(:content_file_binary, content:, filepath: 'image_0001.pdf', mime_type: 'application/pdf')
+        create(:content_file_binary, content:, filepath: 'image_0001.json', mime_type: 'application/json')
+      end
+
+      it 'groups the files into the same file set' do
+        structure
+
+        expect(content.content_file_sets.sole).to have_attributes(file_set_type: 'image', label: 'Image 1')
+        expect(content.content_files.map(&:filepath))
+          .to eq(%w[image_0001.html image_0001.json image_0001.pdf image_0001.tif image_0001.txt])
+      end
+
+      it 'preserves and publishes the extra files (other than the image)' do
+        structure
+
+        expect(content.content_files.find_by(label: 'image_0001.html')).to have_attributes(use: nil)
+
+        %w[image_0001.txt image_0001.html image_0001.pdf image_0001.json].each do |label|
+          expect(content.content_files.find_by(label:)).to have_attributes(preserve: true, shelve: true, publish: true)
+        end
+      end
+    end
+
+    context 'when an image has a TXT file and a JP2 file' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+        create(:content_file_binary, content:, filepath: 'image_0001.txt', mime_type: 'text/plain')
+      end
+
+      it 'publishes the TXT and preserves the deliverable JP2' do
+        structure
+
+        expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: true)
+        expect(content.content_files.find_by(label: 'image_0001.txt'))
+          .to have_attributes(preserve: true, shelve: true, publish: true, use: nil)
+      end
+    end
+
     context 'when there are multiple images' do
       before do
         create(:content_file_binary, content:, filepath: 'image_0002.tif', mime_type: 'image/tiff')
