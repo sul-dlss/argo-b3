@@ -1,25 +1,17 @@
 #!/usr/bin/env sh
 #
 # Opens an SSH tunnel to server Solr and starts bin/setup pointed at it, along
-# with DSA, PresCat, techmd, stacks, and purl-fetcher pointed at the same environment.
+# with DSA, PresCat, techmd, Folio, stacks, purl-fetcher, etc. for the same environment.
 #
 # Usage: bin/dev-server [qa|stage|prod] [console]
-# Defaults to qa.
+# Defaults to qa. prod additionally requires ALLOW_PROD=true.
 #
-# DSA, PresCat, and techmd require tokens that this script does not hardcode. Put them
-# in an .env-server file in the project root (SETTINGS__DOR_SERVICES__TOKEN,
-# SETTINGS__PRESERVATION_CATALOG__TOKEN, and SETTINGS__TECH_MD_SERVICE__TOKEN) and they'll be picked up
-# automatically, or export them yourself before running. The same .env-server file
-# can also override any of the SETTINGS__*__URL vars below, in case you need
-# a URL that doesn't match the qa/stage/prod pattern for a given service.
+# Service settings come from config/deploy.<env>.yml and their secrets (tokens, Folio
+# password) from Vault, via bin/with-deploy-env. Any SETTINGS__* var already exported
+# takes precedence. RabbitMQ is configured but disabled; export SETTINGS__RABBITMQ__ENABLED=true
+# to publish events to the environment's RabbitMQ.
 
 set -e
-
-if [ -f .env-server ]; then
-  set -a
-  . ./.env-server
-  set +a
-fi
 
 SERVER_ENV="${1:-qa}" # default to qa
 RUN_CONSOLE="${2:-}"
@@ -29,8 +21,16 @@ if [ "$SERVER_ENV" = "console" ]; then
   RUN_CONSOLE="console"
 fi
 
-if [ -z "$SETTINGS__DOR_SERVICES__TOKEN" ] || [ -z "$SETTINGS__PRESERVATION_CATALOG__TOKEN" ] || [ -z "$SETTINGS__TECH_MD_SERVICE__TOKEN" ]; then
-  echo "SETTINGS__DOR_SERVICES__TOKEN, SETTINGS__PRESERVATION_CATALOG__TOKEN, and SETTINGS__TECH_MD_SERVICE__TOKEN must be set (e.g. in .env-server)." >&2
+case "$SERVER_ENV" in
+  qa|stage|prod) ;;
+  *)
+    echo "Usage: bin/dev-server [qa|stage|prod] [console]" >&2
+    exit 1
+    ;;
+esac
+
+if [ "$SERVER_ENV" = "prod" ] && [ "$ALLOW_PROD" != "true" ]; then
+  echo "Refusing to run against prod. Rerun with ALLOW_PROD=true bin/dev-server prod if you really mean it." >&2
   exit 1
 fi
 
@@ -63,34 +63,10 @@ trap 'kill "$TUNNEL_PID" 2>/dev/null' EXIT
 # give the tunnel a moment to establish before hitting it
 sleep 2
 
-
-# stacks, earthworks, and purl-fetcher have no qa environment of their own; qa falls back to stage.
-if [ "$SERVER_ENV" = "qa" ]; then
-  PURL_ENV="stage"
-else
-  PURL_ENV="$SERVER_ENV"
-fi
-
-# searchworks has a shared preview instance for qa and stage; prod uses no env.
-if [ "$SERVER_ENV" = "qa" ] || [ "$SERVER_ENV" = "stage" ]; then
-  SEARCHWORKS_ENV="-preview-stage"
-else
-  SEARCHWORKS_ENV=""
-fi
-
 export SETTINGS__SOLR__URL="${SETTINGS__SOLR__URL:-http://localhost:8990/solr/argo_${SERVER_ENV}}"
-export SETTINGS__DOR_SERVICES__URL="${SETTINGS__DOR_SERVICES__URL:-https://dor-services-${SERVER_ENV}-lb.stanford.edu}"
-export SETTINGS__PRESERVATION_CATALOG__URL="${SETTINGS__PRESERVATION_CATALOG__URL:-https://preservation-catalog-${SERVER_ENV}.stanford.edu}"
-export SETTINGS__TECH_MD_SERVICE__URL="${SETTINGS__TECH_MD_SERVICE__URL:-https://dor-techmd-${SERVER_ENV}-a.stanford.edu}"
-export SETTINGS__STACKS__URL="${SETTINGS__STACKS__URL:-https://stacks-${PURL_ENV}.stanford.edu/image}"
-export SETTINGS__PURL_FETCHER__URL="${SETTINGS__PURL_FETCHER__URL:-https://purl-fetcher-${PURL_ENV}.stanford.edu}"
-export SETTINGS__PURL__URL="${SETTINGS__PURL__URL:-https://sul-purl-${PURL_ENV}.stanford.edu}"
-export SETTINGS__SEARCHWORKS__URL="${SETTINGS__SEARCHWORKS__URL:-https://searchworks${SEARCHWORKS_ENV}.stanford.edu}"
-export SETTINGS__EARTHWORKS__URL="${SETTINGS__EARTHWORKS__URL:-https://earthworks-${PURL_ENV}.stanford.edu}"
 
 if [ "$RUN_CONSOLE" = "console" ]; then
-  bin/setup --skip-server
-  bin/rails console
+  bin/with-deploy-env "$SERVER_ENV" --settings -- sh -c 'bin/setup --skip-server && bin/rails console'
 else
-  bin/setup
+  bin/with-deploy-env "$SERVER_ENV" --settings -- bin/setup
 fi

@@ -14,6 +14,10 @@ env:
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-prod.stanford.edu
     SETTINGS__STACKS__URL: https://stacks.stanford.edu/image
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
+    SETTINGS__PURL__URL: https://purl.stanford.edu
+    SETTINGS__ARGO__URL: https://argo.stanford.edu
+    SETTINGS__SEARCHWORKS__URL: https://searchworks.stanford.edu
+    SETTINGS__EARTHWORKS__URL: https://earthworks.stanford.edu
     SETTINGS__FOLIO__OKAPI__URL: https://folio-prod-api.stanford.edu
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-prod.stanford.edu
     SETTINGS__TECH_MD_SERVICE__URL: https://techmd-prod.stanford.edu
