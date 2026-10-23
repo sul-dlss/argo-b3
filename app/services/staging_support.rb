@@ -16,6 +16,11 @@ class StagingSupport
     File.join(druid_tree_folder, 'content')
   end
 
+  # Deletes the staging content directory for the druid in every staging location.
+  def self.delete_staged_files(druid:)
+    locations.each { |staging_location| FileUtils.rm_rf(staging_content_path(druid:, staging_location:)) }
+  end
+
   # @return [Boolean] true if the staging content directory for the druid in any staging location contains files
   #   (including in subdirectories)
   def self.staged_files?(druid:)

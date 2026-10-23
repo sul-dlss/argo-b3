@@ -7,13 +7,16 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
 
   context 'without deposit' do
     it 'renders the navigation and the save as draft button' do
-      render_inline(described_class.new(pane:, form_id: 'tabbed_form', cancel_path: '/objects/druid:bc123df4567'))
+      render_inline(described_class.new(pane:, form_id: 'tabbed_form', cancel_path: '/objects/druid:bc123df4567',
+                                        discard_path: '/items/druid:bc123df4567/discard_draft'))
 
       expect(page).to have_link('Cancel', href: '/objects/druid:bc123df4567')
       expect(page).to have_button('Previous')
       expect(page).to have_button('Next')
       expect(page).to have_css('button[type="submit"][form="tabbed_form"][name="commit"][value="draft"]',
                                text: 'Save as draft')
+      expect(page).to have_css('a[href="/items/druid:bc123df4567/discard_draft"][data-turbo-method="delete"]' \
+                               '[data-turbo-confirm^="Discard this draft?"]', text: 'Discard draft')
       expect(page).to have_no_button('Deposit')
     end
   end
@@ -21,6 +24,7 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
   context 'with deposit' do
     it 'renders the save as draft and deposit buttons' do
       render_inline(described_class.new(pane:, form_id: 'tabbed_form', cancel_path: '/objects/druid:bc123df4567',
+                                        discard_path: '/items/druid:bc123df4567/discard_draft',
                                         show_next: false, show_deposit: true))
 
       expect(page).to have_no_button('Next')

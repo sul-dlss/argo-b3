@@ -210,7 +210,9 @@ Rails.application.routes.draw do
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end
 
-  resources :items, only: %i[new create edit update]
+  resources :items, only: %i[new create edit update] do
+    delete :discard_draft, on: :member
+  end
 
   resources :apos, only: %i[new create]
   resources :agreements, only: %i[new create]

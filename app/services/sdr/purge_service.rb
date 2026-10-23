@@ -11,8 +11,10 @@ module Sdr
       new(druid:).purge(user_name:)
     end
 
+    # A subclass of Sdr::Repository::Error, so callers can handle any SDR update failure together.
+    class Error < Sdr::Repository::Error; end
     # Raised when an object cannot be purged.
-    class CannotPurgeError < StandardError; end
+    class CannotPurgeError < Error; end
 
     def initialize(druid:)
       @druid = druid
@@ -23,10 +25,14 @@ module Sdr
       !Sdr::WorkflowService.submitted?(druid:)
     end
 
+    # @raise [CannotPurgeError] if the object has been submitted
+    # @raise [Error] if purging fails
     def purge(user_name:)
       raise CannotPurgeError, 'Cannot purge an object after it is submitted' unless can_purge?
 
       Dor::Services::Client.object(druid).destroy(user_name:)
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Purging failed: #{e.message}"
     end
 
     private

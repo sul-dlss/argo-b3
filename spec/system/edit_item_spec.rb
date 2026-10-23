@@ -152,4 +152,32 @@ RSpec.describe 'Edit an item' do
       end
     end
   end
+
+  context 'when discarding the draft' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
+    let(:version_status) do
+      Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 2, open: true, openable: false,
+                                                              closeable: true, assembling: false,
+                                                              accessioning: false, discardable: true,
+                                                              versionDescription: 'Changed the title')
+    end
+    let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
+
+    before do
+      allow(version_client).to receive(:discard)
+    end
+
+    it 'confirms, discards the version and the mutable content, and returns to the object page' do
+      visit edit_item_path(druid)
+
+      accept_confirm(/\ADiscard this draft\?/) do
+        click_link 'Discard draft'
+      end
+
+      expect(page).to have_current_path(object_path(druid))
+      expect(page).to have_toast('Draft discarded.')
+      expect(version_client).to have_received(:discard)
+      expect(Content.exists?(content.id)).to be false
+    end
+  end
 end

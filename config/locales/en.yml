@@ -305,9 +305,14 @@ en:
         title: "Edit item"
         buttons:
           deposit: "Deposit"
+          discard_draft: "Discard draft"
+          discard_draft_confirm: "Discard this draft? All changes since the last version, including added files, will be deleted. This cannot be undone."
           draft: "Save as draft"
+        errors:
+          discard_failed: "Discarding the draft failed."
         warnings:
           content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
+          not_discardable: "This draft cannot be discarded."
           not_editable: "Item is not editable."
           stale: "This item was changed since you opened it. Review the current values and make your changes again."
         tabs:
@@ -315,6 +320,7 @@ en:
             label: "Deposit"
         toasts:
           deposited: "Item updated and deposit started."
+          draft_discarded: "Draft discarded."
           updated: "Item updated."
       new:
         title: "Register an item"

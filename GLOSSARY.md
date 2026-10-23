@@ -23,6 +23,9 @@ Governs the administrative/access rules applied to the objects under it. "APO" a
 ### Governing APO
 The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has exactly one governing APO. The relationship means the same thing regardless of the subject's type — including when the subject is itself an APO (an APO can be governed by another APO).
 
+### Draft
+The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version; if the open version is the first version, the object is purged instead. Either way, the draft's Mutable Content and staged files are deleted.
+
 ### Multi-Item Deposit
 A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit. The deposit step is initiated once a version is open and staging has started for every Item Deposit; staging and accessioning then proceed for each Item independently.
 
