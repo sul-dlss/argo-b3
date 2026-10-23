@@ -9,9 +9,10 @@ module Contents
     # which they are only warnings since none of its files are expected to be published.
     class Image < Default
       IMAGE_MIME_TYPES = [MimeTypes::TIFF, MimeTypes::PNG, MimeTypes::JPEG].freeze
-      # JP2, XML (ALTO), TXT, and HTML (hOCR)
+      # JP2, XML (ALTO), TXT, HTML (hOCR), PDF, and JSON
       PUBLISHABLE_RESOURCE_MIME_TYPES = [
-        MimeTypes::JP2, MimeTypes::XML, MimeTypes::TEXT_XML, MimeTypes::PLAIN_TEXT, MimeTypes::HTML, MimeTypes::XHTML
+        MimeTypes::JP2, MimeTypes::XML, MimeTypes::TEXT_XML, MimeTypes::PLAIN_TEXT, MimeTypes::HTML, MimeTypes::XHTML,
+        MimeTypes::PDF, MimeTypes::JSON
       ].freeze
 
       # @param [Content] content
@@ -73,14 +74,14 @@ module Contents
         add_warning_or_error("#{name} has more than one TIFF, PNG, or JPEG file.")
       end
 
-      # A resource may publish only its image (JP2) and OCR (XML, TXT, or HTML) files.
+      # A resource may publish only its image (JP2) and accompanying (XML, TXT, HTML, PDF, or JSON) files.
       def validate_unpublishable(published_content_files:, name:)
         unpublishable_content_files = published_content_files.reject do |content_file|
           PUBLISHABLE_RESOURCE_MIME_TYPES.include?(content_file.mime_type)
         end
         return if unpublishable_content_files.empty?
 
-        add_warning_or_error("#{name} has published files that are not JP2, XML, TXT, or HTML: " \
+        add_warning_or_error("#{name} has published files that are not JP2, XML, TXT, HTML, PDF, or JSON: " \
                              "#{unpublishable_content_files.map(&:filepath).join(', ')}.")
       end
 

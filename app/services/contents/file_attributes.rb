@@ -22,6 +22,7 @@ module Contents
       MimeTypes::PLAIN_TEXT => { preserve: true, shelve: true, publish: true },
       MimeTypes::ZIP => { preserve: true, shelve: false, publish: false },
       MimeTypes::JSON => { preserve: true, shelve: true, publish: true },
+      MimeTypes::HTML => { preserve: true, shelve: true, publish: true },
       MimeTypes::GLTF_BINARY => { preserve: true, shelve: true, publish: true }
     }.freeze
 
