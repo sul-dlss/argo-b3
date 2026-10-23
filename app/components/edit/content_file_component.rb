@@ -4,6 +4,8 @@ module Edit
   # Component for editing a file within a file set (resource).
   # The row markup is the contract with the content-files Stimulus controller
   # (see app/javascript/controllers/content_files_controller.js).
+  # The form's object must provide filepath, corrected_for_accessibility, and _destroy, plus the attributes required by
+  # the components it renders.
   class ContentFileComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder] a nested form builder for a ContentFileForm
     def initialize(form:)

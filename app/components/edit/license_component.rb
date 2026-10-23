@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for license
+  # The form's object must include CocinaModels::AccessConcern.
   class LicenseComponent < ApplicationComponent
     # @param apo_defaults [Boolean] true to show the selected APO's default license, using the apo-defaults
     #   Stimulus controller

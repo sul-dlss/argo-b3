@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for access settings, including embargo
+  # The form's object must include CocinaModels::AccessConcern, CocinaModels::EmbargoConcern, and EmbargoFormConcern.
   class AccessAndEmbargoComponent < ApplicationComponent
     # @param apo_defaults [Boolean] true to show (and apply) the selected APO's default access, using the
     #   apo-defaults Stimulus controller

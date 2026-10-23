@@ -3,6 +3,7 @@
 module Edit
   # Component for selecting the MIME type of a file.
   # The user can select a common MIME type or enter another one.
+  # The form's object must provide mime_type.
   class MimeTypeComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder] a nested form builder for a ContentFileForm
     def initialize(form:)

@@ -2,6 +2,8 @@
 
 module Edit
   # Component for rendering the description tab of the item edit form.
+  # The form's object must include FolioCatalogLinksFormConcern, CocinaModels::CatalogLinksConcern,
+  # CocinaModels::BarcodeConcern, and DescriptionCsvFormConcern.
   class ItemDescriptionComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder] for an EditItemForm
     # @param druid_token [String] the token for the item's druid

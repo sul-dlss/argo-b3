@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for other tags (not project or ticket)
+  # The form's object must provide tag.
   class OtherTagComponent < ApplicationComponent
     def initialize(form:, container_classes: [])
       @form = form

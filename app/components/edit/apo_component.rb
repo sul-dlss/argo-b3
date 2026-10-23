@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for the governing APO
+  # The form's object must include CocinaModels::ApoConcern.
   class ApoComponent < ApplicationComponent
     # @param options [Array<Array(String, String)>] the title and druid of each APO
     # @param apo_defaults [Boolean] true to apply the selected APO's defaults to the rights fields, using the

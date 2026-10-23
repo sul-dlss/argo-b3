@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for project tags
+  # The form's object must provide tag.
   class ProjectTagComponent < ApplicationComponent
     def initialize(form:, container_classes: [])
       @form = form

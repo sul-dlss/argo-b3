@@ -3,6 +3,7 @@
 module Edit
   # Component for selecting the use (role) of a file.
   # The user can select a common use or enter another one.
+  # The form's object must provide use.
   class UseComponent < ApplicationComponent
     # Ordered from most to least common in SDR.
     USES = %w[

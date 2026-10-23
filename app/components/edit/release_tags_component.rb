@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for release tags
+  # The form's object must provide searchworks_target, earthworks_target, and purl_sitemap_target.
   class ReleaseTagsComponent < ApplicationComponent
     ITEM_OPTIONS = [
       ['Follow collection settings', ReleaseTagsForm::RELEASE_TO_COLLECTION],

@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for serials (part label and sort key of the Folio catalog link)
+  # The form's object must include CocinaModels::CatalogLinksConcern.
   class SerialsComponent < ApplicationComponent
     def initialize(form:)
       @form = form

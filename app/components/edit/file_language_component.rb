@@ -3,6 +3,7 @@
 module Edit
   # Component for selecting the language of a file.
   # The user can select a common language tag or enter another one.
+  # The form's object must provide language_tag.
   class FileLanguageComponent < ApplicationComponent
     # Ordered from most to least common in SDR.
     LANGUAGE_TAGS = %w[

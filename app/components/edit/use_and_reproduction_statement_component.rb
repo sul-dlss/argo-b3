@@ -2,6 +2,7 @@
 
 module Edit
   # Component for rendering edit form for use and reproduction statement
+  # The form's object must include CocinaModels::AccessConcern.
   class UseAndReproductionStatementComponent < ApplicationComponent
     INPUT_ROWS = 3
 
