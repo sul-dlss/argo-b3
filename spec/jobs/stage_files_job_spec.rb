@@ -62,6 +62,15 @@ RSpec.describe StageFilesJob do
       expect(Contents::ExternalIdentifierMinter).to have_received(:call).with(content:)
     end
 
+    it 'sets the Honeybadger context' do
+      allow(Honeybadger).to receive(:context)
+
+      job.perform(content:, user:)
+
+      expect(Honeybadger).to have_received(:context)
+        .with(content: content.id, druid:, staging_location: Settings.staging_location)
+    end
+
     it 'analyzes only the attached and mount content file binaries' do
       job.perform(content:, user:)
 
