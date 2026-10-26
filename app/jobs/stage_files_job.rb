@@ -14,6 +14,7 @@ class StageFilesJob < ApplicationJob
     @notify = notify
     # Already staged files win, since assembly reads only the first location with the druid's files.
     @staging_location = StagingSupport.staged_location(druid:) || staging_location
+    set_hb_context
 
     check_lock! # Check cocina lock version and raise if optimistic lock problem
     Contents::ExternalIdentifierMinter.call(content:) # Mint external identifiers for new files/filesets
@@ -117,5 +118,9 @@ class StageFilesJob < ApplicationJob
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'),
                     text: I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email),
                     user:, disappearing: false, variant: :red)
+  end
+
+  def set_hb_context
+    Honeybadger.context(content: content.id, druid:, staging_location:)
   end
 end
