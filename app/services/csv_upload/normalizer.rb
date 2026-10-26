@@ -14,8 +14,11 @@ module CsvUpload
     end
 
     # @param path [String] path to uploaded file
-    def initialize(path)
+    # @param headers [Boolean] whether the first row is a header row. Without headers, rows are not aligned to
+    #   columns, so blank cells are removed (and druids are not normalized, since there is no druid column).
+    def initialize(path, headers: true)
       @path = path
+      @headers = headers
     end
 
     # Reads uploaded file (could be csv or Excel) and normalizes to CSV.
@@ -23,16 +26,33 @@ module CsvUpload
     # @return [String] csv
     # @raise [Error] if unsupported file type or the file cannot be read, e.g., invalid byte sequence, malformed CSV,
     #   or permission denied
-    def read # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/MethodLength
+    def read # rubocop:disable Metrics/AbcSize
       raise Error, 'Unsupported upload file type' unless normalized_file_extension.in?(SUPPORTED_FILE_EXTENSIONS)
 
       # If handed *anything but* a CSV file, first pre-process into a CSV string with Roo.
       csv_string = normalized_file_extension == '.csv' ? normalized_csv_string : Roo::Spreadsheet.open(path).to_csv
 
-      # Deal with both pre-processed CSV strings or files, using the built-in CSV
-      # library to parse either.
-      table = CSV.parse(csv_string, headers: true, skip_blanks: true, skip_lines: /^\s*$/,
-                                    converters: whitespace_only_nullifier).tap do |csv|
+      headers ? normalize_with_headers(csv_string) : normalize_without_headers(csv_string)
+    rescue CSV::MalformedCSVError => e
+      raise Error, e.message
+    rescue Zip::Error => e
+      raise Error, "Spreadsheet could not be opened: #{e.message}"
+    rescue SystemCallError => e
+      raise Error, "File could not be read: #{e.message}"
+    end
+
+    private
+
+    attr_reader :path, :headers
+
+    # Deal with both pre-processed CSV strings or files, using the built-in CSV
+    # library to parse either.
+    def parse(csv_string)
+      CSV.parse(csv_string, headers:, skip_blanks: true, skip_lines: /^\s*$/, converters: whitespace_only_nullifier)
+    end
+
+    def normalize_with_headers(csv_string) # rubocop:disable Metrics/AbcSize
+      parse(csv_string).tap do |csv|
         # Remove rows that are a bunch of nils
         csv.by_row!.delete_if { |row| row.fields.none? }
 
@@ -46,22 +66,12 @@ module CsvUpload
 
           csv[druid_column] = csv[druid_column].map { |druid| DruidSupport.prefixed_druid_from(druid) }
         end
-      end
-
-      table.to_csv
-    rescue ArgumentError => e
-      raise Error, "CSV could not be opened due to an encoding error: #{e.message}"
-    rescue CSV::MalformedCSVError => e
-      raise Error, e.message
-    rescue Zip::Error => e
-      raise Error, "Spreadsheet could not be opened: #{e.message}"
-    rescue SystemCallError => e
-      raise Error, "File could not be read: #{e.message}"
+      end.to_csv
     end
 
-    private
-
-    attr_reader :path
+    def normalize_without_headers(csv_string)
+      parse(csv_string).map(&:compact).reject(&:empty?).map(&:to_csv).join
+    end
 
     def normalized_file_extension
       @normalized_file_extension ||= File.extname(path).downcase
@@ -70,12 +80,14 @@ module CsvUpload
     # This method:
     #
     # 1. Removes the BOM if present (since CSV.parse will not)
-    # 2. Ignores any preamble lines before the legitimate header row
+    # 2. Ignores any preamble lines before the legitimate header row (if there are headers)
     # 3. Removes line feeds at the end of lines (`CSV#parse` wants newlines)
     def normalized_csv_string
       csv = File.read(path, encoding: 'bom|utf-8')
       validate_encoding!(csv)
       lines = csv.split(/\r?\n/)
+      return lines.join("\n") unless headers
+
       lines.shift until lines.first&.match?(/\Adruid,/i) || lines.empty?
       return csv if lines.empty?
 

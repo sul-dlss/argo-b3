@@ -1,0 +1,10 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_create_virtual_object_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do |component| %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file',
+                                                           label_classes: 'fw-bold',
+                                                           variant: :help_text_below,
+                                                           help_text: 'Do not include column headers. Each row has the virtual object druid in the first column, followed by the constituent druids in the order they should appear in the viewer. A new version of each virtual object is opened and deposited, so a virtual object cannot already have an open version.') %>
+  <% end %>
+<% end %>
