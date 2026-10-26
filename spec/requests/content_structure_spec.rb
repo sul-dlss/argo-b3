@@ -108,8 +108,8 @@ RSpec.describe 'Content structure' do
                             content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.jp2',
                                                                               mime_type: 'image/jp2'))
       create(:content_file, content_file_set:, position: 2,
-                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.pdf',
-                                                                              mime_type: 'application/pdf'))
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.zip',
+                                                                              mime_type: 'application/zip'))
     end
 
     it 'renders the errors' do
@@ -118,8 +118,8 @@ RSpec.describe 'Content structure' do
       expect(response.body).to include(%(<turbo-frame id="structure-validation_content_#{content.id}"))
       expect(response.body).to include('Content errors')
       expect(response.body).not_to include('Content warnings')
-      expect(response.body).to include('Resource 1 (Page 1) has published files that are not JP2, XML, TXT, or HTML: ' \
-                                       'page_0001.pdf.')
+      expect(response.body).to include('Resource 1 (Page 1) has published files that are not JP2, XML, TXT, HTML, ' \
+                                       'PDF, or JSON: page_0001.zip.')
     end
 
     context 'when dark' do

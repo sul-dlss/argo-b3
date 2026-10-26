@@ -69,18 +69,17 @@ RSpec.describe Contents::Validators::Book do
     end
   end
 
-  context 'when a page has published files that are not JP2, XML, TXT, or HTML' do
+  context 'when a page has published files that are not JP2, XML, TXT, HTML, PDF, or JSON' do
     before do
       create_resource(file_set_type: 'page', label: 'Page 1',
                       files: [['page_0001.jp2', 'image/jp2', true],
-                              ['page_0001.pdf', 'application/pdf', true],
                               ['page_0001.dat', nil, true],
                               ['page_0001.zip', 'application/zip', false]])
     end
 
     it 'has an error listing the files' do
-      expect(result.errors).to eq(['Resource 1 (Page 1) has published files that are not JP2, XML, TXT, or HTML: ' \
-                                   'page_0001.pdf, page_0001.dat.'])
+      expect(result.errors).to eq(['Resource 1 (Page 1) has published files that are not JP2, XML, TXT, HTML, ' \
+                                   'PDF, or JSON: page_0001.dat.'])
     end
   end
 
