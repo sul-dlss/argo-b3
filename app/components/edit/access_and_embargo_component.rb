@@ -19,5 +19,13 @@ module Edit
     def apo_defaults_group(group)
       group if @apo_defaults
     end
+
+    # A date input only accepts a date (YYYY-MM-DD), so it would otherwise discard the release date, which is a
+    # datetime. The date is in the application time zone (UTC), in which a submitted date is cast to a datetime,
+    # so that saving the form does not change the date.
+    # @return [String, nil]
+    def embargo_release_date_value
+      form.object.embargo_release_date&.to_date&.iso8601
+    end
   end
 end

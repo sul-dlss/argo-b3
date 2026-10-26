@@ -20,6 +20,16 @@ RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
     expect(page).to have_field('When will this embargo end?', type: 'date', name: 'item[embargo_release_date]')
   end
 
+  context 'with an embargo release date' do
+    let(:new_item_form) { NewItemForm.new(with_embargo: true, embargo_release_date: '2027-03-15') }
+
+    it 'renders the release date as a date' do
+      render_inline(component)
+
+      expect(page).to have_field('When will this embargo end?', type: 'date', with: '2027-03-15')
+    end
+  end
+
   it 'renders the access rights for each embargo state' do
     render_inline(component)
 

@@ -130,6 +130,23 @@ RSpec.describe 'Items' do
         expect(page).to have_field('Without embargo', type: 'radio', checked: true)
       end
 
+      context 'when the item is embargoed' do
+        let(:release_date) { (DateTime.now + 1.year).strftime('%Y-03-15') }
+        let(:cocina_object) do
+          build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+            .new(access: { view: 'stanford', download: 'stanford',
+                           embargo: { releaseDate: "#{release_date}T00:00:00Z", view: 'world', download: 'world' } })
+        end
+
+        it 'renders the embargo release date' do
+          get "/items/#{druid}/edit"
+
+          page = Capybara.string(response.body)
+          expect(page).to have_field('With embargo', type: 'radio', checked: true)
+          expect(page).to have_field('When will this embargo end?', type: 'date', with: release_date)
+        end
+      end
+
       context 'when the user can select the current APO' do
         before do
           allow(Searchers::AdminPolicyList).to receive(:call)
