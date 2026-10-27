@@ -38,12 +38,11 @@ class StageFilesJob < ApplicationJob
   end
 
   def stageable_content_file_binaries
-    # Globus to be added.
     content.content_file_binaries
            # Binaries that are not part of the structure are not deposited, so they are not staged.
            # This shouldn't happen, but just in case.
            .associated
-           .where(file_location: %w[attached mount])
+           .where(file_location: %w[attached mount globus])
            .includes(file_attachment: :blob)
   end
 

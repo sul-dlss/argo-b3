@@ -94,6 +94,27 @@
             <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
                   form:,
                   field_name: :file_location_choice,
+                  label_text: t('edit.items.fields.file_choice.globus.label'),
+                  input_value: ContentForm::GLOBUS_FILE_LOCATION_CHOICE,
+                  input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
+                  container_classes: 'my-fieldset'
+                ) do |component| %>
+              <% component.with_additional_container_content do %>
+                <div class="my-fieldset">
+                  <%# Loaded when the radio is selected (see radio controller), since it calls the Globus API.
+                      The spinner is hidden until then. %>
+                  <%= turbo_frame_tag @content, 'globus', data: { radio_src: new_content_globus_path(@content_token) } do %>
+                    <div class="radio-hide">
+                      <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+
+            <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
+                  form:,
+                  field_name: :file_location_choice,
                   label_text: t('edit.items.fields.file_choice.mount.label'),
                   input_value: ContentForm::MOUNT_FILE_LOCATION_CHOICE,
                   input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },

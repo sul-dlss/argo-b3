@@ -35,6 +35,15 @@ RSpec.describe Contents::MountDiscoverer do
         .to have_attributes(file_location: 'mount', mount_path:, size: 9, mime_type: 'text/plain')
     end
 
+    context 'with a globus file location' do
+      it 'creates globus binaries for the files' do
+        described_class.call(content:, mount_path:, file_location: :globus)
+
+        expect(content.content_file_binaries.pluck(:file_location)).to all(eq('globus'))
+        expect(content.content_file_binaries.pluck(:mount_path)).to all(eq(mount_path))
+      end
+    end
+
     context 'when a binary already exists for the filepath' do
       let!(:content_file_binary) do
         create(:content_file_binary, content:, filepath: 'file1.txt', file_location: 'deposited',

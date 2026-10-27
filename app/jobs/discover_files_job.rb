@@ -5,8 +5,9 @@
 class DiscoverFilesJob < ApplicationJob
   # @param [Content] content
   # @param [String] mount_path the directory on the mount to discover files in (recursively)
-  def perform(content:, mount_path:)
-    Contents::MountDiscoverer.call(content:, mount_path:)
+  # @param [Symbol] file_location the file location of the binaries (:mount or :globus, which is also mounted)
+  def perform(content:, mount_path:, file_location: :mount)
+    Contents::MountDiscoverer.call(content:, mount_path:, file_location:)
 
     content.discovery_completed!
   end

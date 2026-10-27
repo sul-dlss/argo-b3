@@ -49,6 +49,7 @@ gem 'dor-services-client'
 gem 'druid-tools'
 gem 'dry-monads'
 gem 'folio_client'
+gem 'globus_client'
 gem 'honeybadger'
 gem 'kaminari'
 gem 'marcel' # For MIME type detection

@@ -7,5 +7,5 @@
                                                                   method: :patch,
                                                                   variant: :'outline-primary',
                                                                   data: helpers.disable_actions_form_data) %>
-  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: 'Structuring files...', classes: 'structure-spinner mt-2') %>
+  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.structure.spinner'), classes: 'submit-spinner mt-2') %>
 <% end %>

@@ -21,6 +21,7 @@ env:
     SETTINGS__FOLIO__OKAPI__URL: https://folio-prod-api.stanford.edu
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-prod.stanford.edu
     SETTINGS__TECH_MD_SERVICE__URL: https://techmd-prod.stanford.edu
+    SETTINGS__GLOBUS__DIRECTORY: /globus/argo_ingest/prod
 
     DATABASE_HOSTNAME: argo-b3-db-prod-a
 

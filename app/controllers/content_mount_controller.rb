@@ -2,18 +2,9 @@
 
 # Controller for managing mounted content
 class ContentMountController < ContentsApplicationController
-  before_action :set_content
-  skip_verify_authorized only: %i[show new create]
+  include FileDiscoveryConcern
 
-  def show
-    if @content.discovery_not_in_progress?
-      flash[:toast] = t('edit.contents.mount.toasts.discovery_completed')
-      redirect_to new_content_mount_path(@content_token, files_discovered: true)
-    else
-      @discovery_started = params[:discovery_started] == 'true' # Triggers a reload of files section.
-      render layout: false
-    end
-  end
+  skip_verify_authorized only: %i[show new create]
 
   def new
     @mount_form = MountForm.new
@@ -39,9 +30,11 @@ class ContentMountController < ContentsApplicationController
     MountForm.params_from(params)
   end
 
-  def set_content
-    @content_token = params[:content_id]
-    verified_content_id = verify_token(@content_token)
-    @content = Content.find(verified_content_id)
+  def discovery_frame_name
+    'mount'
+  end
+
+  def new_discovery_path(...)
+    new_content_mount_path(@content_token, ...)
   end
 end

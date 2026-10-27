@@ -3,3 +3,7 @@ solr:
 
 mount_locations:
   - <%= Rails.root.join('tmp') %>
+
+globus:
+  test_mode: true
+  directory: <%= Rails.root.join('tmp', 'globus') %>

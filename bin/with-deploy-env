@@ -8,7 +8,7 @@
 # Modes:
 #   --secrets   every env.secret var (for Kamal deploys, which supply env.clear themselves).
 #   --settings  the SETTINGS__* env.clear and env.secret vars (for local dev), except
-#               SETTINGS__RABBITMQ__ENABLED so event publishing stays off unless exported.
+#               those in LOCAL_SETTING_EXCLUSIONS.
 #
 # Vars already set in the environment are left as-is.
 #
@@ -21,6 +21,10 @@ require 'pathname'
 
 USAGE = 'Usage: bin/with-deploy-env DESTINATION (--secrets|--settings) -- COMMAND [ARGS...]'
 
+# Not applied in --settings mode: event publishing stays off unless exported, and the
+# server's Globus mount isn't available locally (config/settings/development.yml is used instead).
+LOCAL_SETTING_EXCLUSIONS = %w[SETTINGS__RABBITMQ__ENABLED SETTINGS__GLOBUS__DIRECTORY].freeze
+
 def vault_secret_path(key, destination)
   case key
   when 'HONEYBADGER_API_KEY' then 'puppet/application/argo-b3/honeybadger-api-key'
@@ -32,6 +36,9 @@ def vault_secret_path(key, destination)
   when 'SETTINGS__RABBITMQ__USERNAME' then "puppet/application/argo-b3/#{destination}/rabbitmq-username"
   when 'SETTINGS__RABBITMQ__PASSWORD' then "puppet/application/argo-b3/#{destination}/rabbitmq-password"
   when 'SETTINGS__TECH_MD_SERVICE__TOKEN' then "puppet/application/argo-b3/#{destination}/tech-md-service-token"
+  when 'SETTINGS__GLOBUS__CLIENT_ID' then "puppet/application/argo-b3/#{destination}/globus-client-id"
+  when 'SETTINGS__GLOBUS__CLIENT_SECRET' then "puppet/application/argo-b3/#{destination}/globus-client-secret"
+  when 'SETTINGS__GLOBUS__ENDPOINT_ID' then "puppet/application/argo-b3/#{destination}/globus-endpoint-id"
   else
     raise "No Vault path for secret: #{key}"
   end
@@ -57,7 +64,7 @@ def fetch_secret_from_vault(path)
 end
 
 def local_setting?(key)
-  key.start_with?('SETTINGS__') && key != 'SETTINGS__RABBITMQ__ENABLED'
+  key.start_with?('SETTINGS__') && !LOCAL_SETTING_EXCLUSIONS.include?(key)
 end
 
 def populate_missing_secrets_from_vault!(keys, destination)

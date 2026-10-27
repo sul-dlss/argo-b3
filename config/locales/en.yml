@@ -199,6 +199,10 @@ en:
         content:
           validations:
             invalid: "Content errors must be fixed."
+      discovery:
+        spinner: "Discovering files..."
+        toasts:
+          completed: "Completed discovering files"
       edit:
         files_section:
           label: 'Files'
@@ -211,10 +215,17 @@ en:
           save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
         toasts:
           stale: "This item was changed since you opened it. Review your changes and resubmit."
-      mount:
-        toasts:
-          discovery_completed: "Completed discovering files"
+      globus:
+        buttons:
+          create: "Create Globus link"
+          open: "Open Globus"
+        checking: "Checking Globus..."
+        errors:
+          create_failed: "The Globus link could not be created. Try again, or contact SDR support if the problem continues."
+        instructions: 'Go to Globus and transfer your files. Once your files are transferred, click "Discover files".'
+        spinner: "Creating Globus link..."
       structure:
+        spinner: "Structuring files..."
         unassociated_files:
           one: "There is 1 file that has not been added to the structure."
           other: "There are %{count} files that have not been added to the structure."
@@ -415,6 +426,8 @@ en:
             label: 'Upload files from computer'
           mount:
             label: 'Use files from mount'
+          globus:
+            label: 'Select files from Globus'
         goobi:
           deposit: 'Deposit with Goobi'
         license:

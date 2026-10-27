@@ -78,6 +78,17 @@ folio:
     password: "supersecret"
   tenant_id: "sul"
 
+globus:
+  # Where the root of the Globus collection (endpoint) is on the local Globus mount; varies by deploy environment.
+  directory: '/globus/argo_ingest/development'
+  # Directory within the collection holding each user's upload directories.
+  uploads_path: '/uploads'
+  # Globus collection (endpoint), also the destination in links to the Globus file manager.
+  endpoint_id: endpoint_id
+  client_id: client_id
+  client_secret: client_secret
+  test_mode: false # if test_mode=true (development only), simulates the globus directory creation
+
 mount_locations:
   - /ars
   - /datasets
