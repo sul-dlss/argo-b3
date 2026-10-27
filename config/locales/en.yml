@@ -112,9 +112,17 @@ en:
         heading: "Released to"
       unreleased:
         heading: "Not released"
+    errors:
+      discard_failed: "Discarding the draft failed."
+      purge_failed: "Purging failed."
     toasts:
+      draft_discarded: "Draft discarded."
+      purged: "Object purged."
       republish_started: "Republishing started"
     warnings:
+      cannot_purge: "This object cannot be purged because it has been submitted."
+      content_busy: "Files for this object are being staged or discovered. Try again when that has finished."
+      not_discardable: "This draft cannot be discarded."
       republish_failed: "Republish is not possible"
   workflow_grid:
     label: "Workflow status"
@@ -310,11 +318,10 @@ en:
           discard_draft_confirm: "Discard this draft? All changes since the last version, including added files, will be deleted. This cannot be undone."
           draft: "Save as draft"
           draft_edit_files: "Save draft and edit files"
-        errors:
-          discard_failed: "Discarding the draft failed."
+          purge: "Purge"
+          purge_confirm: "Purge this item? It and all of its files will be permanently deleted. This cannot be undone."
         warnings:
           content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
-          not_discardable: "This draft cannot be discarded."
           not_editable: "Item is not editable."
           stale: "This item was changed since you opened it. Review the current values and make your changes again."
         tabs:
@@ -322,7 +329,6 @@ en:
             label: "Deposit"
         toasts:
           deposited: "Item updated and deposit started."
-          draft_discarded: "Draft discarded."
           updated: "Item updated."
       new:
         title: "Register an item"
