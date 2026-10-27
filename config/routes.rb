@@ -155,6 +155,7 @@ Rails.application.routes.draw do
     resource :add_workflow, only: %i[new create], controller: 'add_workflow'
     resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
     resource :redeposit, only: %i[new create], controller: 'redeposit'
+    resource :create_virtual_object, only: %i[new create], controller: 'create_virtual_object'
     resource :export_catalog_data, only: %i[new create], controller: 'export_catalog_data'
     resource :export_checksum_report, only: %i[new create], controller: 'export_checksum_report'
     resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'

@@ -130,6 +130,37 @@ RSpec.describe CsvUpload::Normalizer do
     end
   end
 
+  describe '#read without headers' do
+    let(:csv) { described_class.read(filepath.to_s, headers: false) }
+
+    context 'with a CSV' do
+      let(:filepath) do
+        tempfile_with(extension: '.csv',
+                      content: "﻿bc123df4567, druid:cd234fg5678,,\n,,\ndruid:df345gh6789,  ,fg456hj7890\n").path
+      end
+
+      it 'keeps the first row and removes blank cells and rows without normalizing druids' do
+        expect(csv).to eq("bc123df4567,druid:cd234fg5678\ndruid:df345gh6789,fg456hj7890\n")
+      end
+    end
+
+    context 'with a CSV that has a line starting with druid,' do
+      let(:filepath) { tempfile_with(extension: '.csv', content: "bc123df4567,cd234fg5678\ndruid,source_id\n").path }
+
+      it 'does not remove preceding lines as a preamble' do
+        expect(csv).to eq("bc123df4567,cd234fg5678\ndruid,source_id\n")
+      end
+    end
+
+    context 'with xlsx file' do
+      let(:filepath) { file_fixture('catalog_record_id_and_barcode.xlsx') }
+
+      it 'reads the header row as a row' do
+        expect(csv).to eq("Druid,Catkey,Barcode\ndruid:bb396kf5077,13157971\nbb631ry3167,13965062\n")
+      end
+    end
+  end
+
   def tempfile_with(extension:, content:)
     Tempfile.new(['upload', extension]).tap { |file| file.write(content) && file.flush }
   end

@@ -75,7 +75,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   CREATE_VIRTUAL_OBJECT = Config.new(
     label: 'Create virtual object',
-    help_text: 'Group druids into one or more virtual objects.'
+    help_text: 'Group druids into one or more virtual objects.',
+    job: BulkActions::CreateVirtualObjectJob,
+    path_helper: to_path_helper(:new_bulk_actions_create_virtual_object_path),
+    form: BulkActions::CreateVirtualObjectForm
   )
 
   EXPORT_CATALOG_DATA = Config.new(

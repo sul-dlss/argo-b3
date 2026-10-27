@@ -15,15 +15,8 @@ module BulkActions
     def perform_bulk_action
       return unless check_druid_column?
 
-      csv.each.with_index(2) do |row, index|
-        druid = row[DRUID_COLUMN]
-        perform_item_class.new(druid:, index:, job: self, row:).perform
-      rescue Sdr::Repository::NotFoundResponse
-        failure!(druid:, message: 'Error: Object not found', index:)
-      rescue StandardError => e
-        failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
-        Rails.logger.error(e.full_message)
-        Honeybadger.notify(e)
+      csv.each.with_index(first_row_number) do |row, index|
+        perform_row(row:, index:)
       end
     end
 
@@ -49,6 +42,28 @@ module BulkActions
     end
 
     private
+
+    def perform_row(row:, index:)
+      druid = druid_for(row)
+      perform_item_class.new(druid:, index:, job: self, row:).perform
+    rescue Sdr::Repository::NotFoundResponse
+      failure!(druid:, message: 'Error: Object not found', index:)
+    rescue StandardError => e
+      failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
+      Rails.logger.error(e.full_message)
+      Honeybadger.notify(e)
+    end
+
+    # The spreadsheet row number of the first row, for logging.
+    # Subclasses such as CreateVirtualObjectJob can override when there is not a header row.
+    def first_row_number
+      2
+    end
+
+    # Subclasses can override if the CSV does not have column headers
+    def druid_for(row)
+      row[DRUID_COLUMN]
+    end
 
     # Subclasses can override this and return true if the check is not needed.
     def check_druid_column?
