@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
+import MorphableTomSelect from 'controllers/morphable_tom_select'
 
 // Connects a (multiple) select to Tom Select, loading options from a JSON endpoint as the user types.
 // The endpoint receives the typed text as the q param and returns a list of options,
@@ -18,6 +19,14 @@ export default class extends Controller {
   }
 
   connect () {
+    this.morphable = new MorphableTomSelect(this.element, { build: () => this.build() })
+    this.morphable.connect()
+
+    this.formChangeHandler = (event) => this.formChanged(event)
+    this.element.form?.addEventListener('change', this.formChangeHandler)
+  }
+
+  build () {
     this.tomSelect = new TomSelect(this.element, {
       valueField: this.valueFieldValue,
       labelField: this.labelFieldValue,
@@ -33,14 +42,12 @@ export default class extends Controller {
       shouldLoad: (query) => query.length >= this.minQueryLengthValue,
       load: (query, callback) => this.load(query, callback)
     })
-
-    this.formChangeHandler = (event) => this.formChanged(event)
-    this.element.form?.addEventListener('change', this.formChangeHandler)
+    return this.tomSelect
   }
 
   disconnect () {
     this.element.form?.removeEventListener('change', this.formChangeHandler)
-    this.tomSelect?.destroy()
+    this.morphable.disconnect()
   }
 
   formChanged (event) {

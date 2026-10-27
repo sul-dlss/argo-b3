@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
+import MorphableTomSelect from 'controllers/morphable_tom_select'
 
 // Connects a multiple select to Tom Select, with a checkbox for each option.
 // Rather than listing the selected options, the control shows the number of selected options.
@@ -8,6 +9,14 @@ export default class extends Controller {
   static values = { selectAll: { type: Boolean, default: true } }
 
   connect () {
+    this.morphable = new MorphableTomSelect(this.element, {
+      build: () => this.build(),
+      destroy: (tomSelect) => this.destroyRetainingSelection(tomSelect)
+    })
+    this.morphable.connect()
+  }
+
+  build () {
     this.tomSelect = new TomSelect(this.element, {
       plugins: ['checkbox_options', 'no_backspace_delete'],
       create: false,
@@ -26,6 +35,7 @@ export default class extends Controller {
     this.tomSelect.on('change', this.updateCount)
     this.updateCount()
     if (this.selectAllValue) this.addSelectAllButtons()
+    return this.tomSelect
   }
 
   addSelectAllButtons () {
@@ -49,13 +59,15 @@ export default class extends Controller {
     return button
   }
 
+  disconnect () {
+    this.morphable.disconnect()
+  }
+
   // Destroying Tom Select restores the select's original options, so the selected values are reapplied.
   // This retains the selection when the select is moved, e.g., as a Turbo permanent element.
-  disconnect () {
-    if (!this.tomSelect) return
-
-    const values = this.tomSelect.getValue()
-    this.tomSelect.destroy()
+  destroyRetainingSelection (tomSelect) {
+    const values = tomSelect.getValue()
+    tomSelect.destroy()
     Array.from(this.element.options).forEach((option) => {
       option.selected = values.includes(option.value)
     })

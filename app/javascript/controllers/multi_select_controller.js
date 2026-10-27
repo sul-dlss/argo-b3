@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
+import MorphableTomSelect from 'controllers/morphable_tom_select'
 
 // Turns a <select multiple> into a searchable multi-select with removable pills.
 // Set the disabled value to disable the field; setting the select's own disabled attribute is not
@@ -9,6 +10,11 @@ export default class extends Controller {
   static values = { disabled: Boolean }
 
   connect () {
+    this.morphable = new MorphableTomSelect(this.selectTarget, { build: () => this.build() })
+    this.morphable.connect()
+  }
+
+  build () {
     this.tomSelect = new TomSelect(this.selectTarget, {
       plugins: ['remove_button'],
       // Show every matching option rather than tom-select's default of 50.
@@ -18,11 +24,12 @@ export default class extends Controller {
     })
     // Stimulus runs value callbacks before connect, when the widget does not exist yet.
     this.applyDisabled()
+    return this.tomSelect
   }
 
   disconnect () {
     // Turbo caches pages, so the widget must be torn down or it is duplicated on restore.
-    this.tomSelect?.destroy()
+    this.morphable.disconnect()
     this.tomSelect = null
   }
 

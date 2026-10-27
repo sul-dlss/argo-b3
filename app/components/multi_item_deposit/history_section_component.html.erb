@@ -1,10 +1,8 @@
 <%= tag.div class: 'container mt-3', data: do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: heading, classes: 'mb-4') %>
 
-  <%# Morph refreshes skip the form, since morphing breaks Tom Select. %>
   <%= form_with model: filter_form, url: multi_item_deposit_actions_path, method: :get,
-                id: 'multi-item-deposits-filter', class: 'd-flex gap-3 mb-4 align-items-end',
-                data: { controller: 'skip-morph', action: 'turbo:before-morph-element->skip-morph#skip' } do |form| %>
+                id: 'multi-item-deposits-filter', class: 'd-flex gap-3 mb-4 align-items-end' do |form| %>
     <% if admin? %>
       <%= render Elements::Forms::MultiSelectFilterComponent.new(form:, field_name: :user_ids, options: filter_form.user_options,
                                                                  label_text: 'Users') %>
