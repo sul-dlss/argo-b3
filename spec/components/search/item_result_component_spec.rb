@@ -27,8 +27,6 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       expect(page).to have_table_value('item-result-bb123cd4567', 'Content type', 'Book')
       expect(page).to have_table_value('item-result-bb123cd4567', 'Released to', 'Not released')
       expect(page).to have_table_value('item-result-bb123cd4567', 'Access rights', 'Dark, Stanford')
-      expect(find_table_value_cell('item-result-bb123cd4567', 'Old Argo'))
-        .to have_link('Test Title', href: "https://argo.stanford.edu/view/#{druid}")
     end
   end
 

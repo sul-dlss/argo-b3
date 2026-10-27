@@ -11,9 +11,6 @@ reload_intervals:
   mount_discovery: 2000
   multi_item_deposit_show: 30000
 
-argo:
-  url: https://argo.stanford.edu
-
 support_email: argo-feedback@lists.stanford.edu
 
 dor_services:

@@ -30,7 +30,6 @@
         <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
         <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
         <% component.with_row(label: 'Access rights', values: access_rights_values) if result.access_rights.present? %>
-        <% component.with_row(label: 'Old Argo', values: [helpers.link_to_old_argo(title, druid)]) %>
       <% end %>
     </div>
     <div class="col-md-2 mx-auto align-self-start pt-5 <%= result.object_type_class %>">

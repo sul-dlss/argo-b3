@@ -17,10 +17,6 @@ module LinkHelper
     link_to(*, target: '_blank', rel: 'noopener', data:, **, &)
   end
 
-  def link_to_old_argo(label, druid, *, data: {}, **, &)
-    link_to_new_tab(label, "#{Settings.argo.url}/view/#{druid}", *, data:, **, &)
-  end
-
   def link_to_purl(druid, *, data: {}, **, &)
     link_to_new_tab('View PURL page', Cocina::Models::Mapping::Purl.for(druid:), *, data:, **, &)
   end
