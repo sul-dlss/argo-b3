@@ -6,7 +6,7 @@ class BulkActionsController < ApplicationController
 
   PER_PAGE = 20
 
-  before_action :set_bulk_action, only: %i[file show destroy]
+  before_action :set_bulk_action, only: %i[file show destroy cancel]
   skip_verify_authorized only: %i[index new]
 
   def index
@@ -27,12 +27,22 @@ class BulkActionsController < ApplicationController
   def destroy
     authorize! @bulk_action
 
-    # NOTE: this delete action is not linked in the UI unless the bulk action is complete,
-    # so this is just an extra guard to be sure it can't be deleted unless complete
-    return head :conflict unless @bulk_action.completed?
+    unless @bulk_action.clearable?
+      return redirect_to bulk_actions_path, flash: { danger: t('bulk_actions.delete_failed') }
+    end
 
     @bulk_action.destroy!
     toast_and_refresh(t('bulk_actions.delete_success'), fallback_location: bulk_actions_path)
+  end
+
+  def cancel
+    authorize! @bulk_action
+    unless @bulk_action.cancellable?
+      return redirect_to bulk_actions_path, flash: { danger: t('bulk_actions.cancel_failed') }
+    end
+
+    @bulk_action.cancelling!
+    toast_and_refresh(t('bulk_actions.cancel_success'), fallback_location: bulk_actions_path)
   end
 
   def file

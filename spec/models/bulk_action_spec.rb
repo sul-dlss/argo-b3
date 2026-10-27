@@ -51,30 +51,30 @@ RSpec.describe BulkAction do
     end
   end
 
-  describe '.with_display_statuses' do
+  describe '.with_filter_statuses' do
     let!(:created_bulk_action) { create(:bulk_action, status: :created) }
     let!(:started_bulk_action) { create(:bulk_action, status: :started) }
     let!(:completed_bulk_action) { create(:bulk_action, status: :completed, druid_count_fail: 0) }
     let!(:completed_with_errors_bulk_action) { create(:bulk_action, status: :completed, druid_count_fail: 2) }
 
     it 'returns the bulk actions that are processing' do
-      expect(described_class.with_display_statuses(['processing']))
+      expect(described_class.with_filter_statuses(['processing']))
         .to contain_exactly(created_bulk_action, started_bulk_action)
     end
 
     it 'returns the bulk actions that completed with and without errors' do
-      expect(described_class.with_display_statuses(['completed'])).to contain_exactly(completed_bulk_action)
-      expect(described_class.with_display_statuses(['completed_with_errors']))
+      expect(described_class.with_filter_statuses(['completed'])).to contain_exactly(completed_bulk_action)
+      expect(described_class.with_filter_statuses(['completed_with_errors']))
         .to contain_exactly(completed_with_errors_bulk_action)
     end
 
     it 'returns the bulk actions with any of the display statuses' do
-      expect(described_class.with_display_statuses(%w[processing completed_with_errors]))
+      expect(described_class.with_filter_statuses(%w[processing completed_with_errors]))
         .to contain_exactly(created_bulk_action, started_bulk_action, completed_with_errors_bulk_action)
     end
 
     it 'returns no bulk actions when there are no known display statuses' do
-      expect(described_class.with_display_statuses(['unknown'])).to be_empty
+      expect(described_class.with_filter_statuses(['unknown'])).to be_empty
     end
   end
 
@@ -233,6 +233,48 @@ RSpec.describe BulkAction do
       it 'returns the name without the description' do
         expect(described_class.new(id: 5, description: '').name).to eq('Bulk action 5')
       end
+    end
+  end
+
+  describe '#cancellable?' do
+    let(:config) { BulkActions::Config.new }
+
+    before do
+      allow(BulkActions).to receive(:find_config).and_return(config)
+    end
+
+    it 'returns true when queued or started' do
+      expect(described_class.new(status: :queued).cancellable?).to be true
+      expect(described_class.new(status: :started).cancellable?).to be true
+    end
+
+    it 'returns false when not queued or started' do
+      expect(described_class.new(status: :created).cancellable?).to be false
+      expect(described_class.new(status: :completed).cancellable?).to be false
+      expect(described_class.new(status: :cancelling).cancellable?).to be false
+      expect(described_class.new(status: :cancelled).cancellable?).to be false
+    end
+
+    context 'when the config is not cancellable' do
+      let(:config) { BulkActions::Config.new(cancellable: false) }
+
+      it 'returns false' do
+        expect(described_class.new(status: :started).cancellable?).to be false
+      end
+    end
+  end
+
+  describe '#clearable?' do
+    it 'returns true when completed or cancelled' do
+      expect(described_class.new(status: :completed).clearable?).to be true
+      expect(described_class.new(status: :cancelled).clearable?).to be true
+    end
+
+    it 'returns false when not finished' do
+      expect(described_class.new(status: :created).clearable?).to be false
+      expect(described_class.new(status: :queued).clearable?).to be false
+      expect(described_class.new(status: :started).clearable?).to be false
+      expect(described_class.new(status: :cancelling).clearable?).to be false
     end
   end
 

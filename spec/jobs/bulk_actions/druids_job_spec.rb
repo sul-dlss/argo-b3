@@ -128,4 +128,58 @@ RSpec.describe BulkActions::DruidsJob do
       expect(bulk_action.druid_count_fail).to eq(1)
     end
   end
+
+  context 'when cancelled' do
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
+        def perform
+          success!(message: 'Testing successful')
+          # Cancelled from the UI while the job is running.
+          BulkAction.find(job.bulk_action.id).cancelling!
+        end
+      end
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
+
+      allow(TestBulkActionJob::JobItem).to receive(:new).and_call_original
+    end
+
+    it 'stops performing items and marks the bulk action as cancelled' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(TestBulkActionJob::JobItem).to have_received(:new).once
+      expect(log).to have_received(:puts).with(/\tCancelled$/)
+      expect(log).not_to have_received(:puts).with(/Finished TestBulkActionJob/)
+      expect(log).to have_received(:close)
+
+      expect(bulk_action.reload).to be_cancelled
+      expect(bulk_action.druid_count_success).to eq(1)
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('bulk_actions_history',
+                                                                                 bulk_action.user)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
+    end
+  end
+
+  context 'when cancelled while queued' do
+    let(:bulk_action) { create(:bulk_action, status: :cancelling) }
+
+    before do
+      stub_const('TestBulkActionJob::JobItem', Class.new(BulkActions::BaseJobItem))
+
+      allow(TestBulkActionJob::JobItem).to receive(:new).and_call_original
+    end
+
+    it 'does not perform items and marks the bulk action as cancelled' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(TestBulkActionJob::JobItem).not_to have_received(:new)
+      expect(log).to have_received(:puts).with(/\tCancelled$/)
+      expect(log).not_to have_received(:puts).with(/Starting TestBulkActionJob/)
+      expect(log).to have_received(:close)
+
+      expect(bulk_action.reload).to be_cancelled
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('bulk_actions_history',
+                                                                                 bulk_action.user)
+    end
+  end
 end

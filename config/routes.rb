@@ -148,6 +148,7 @@ Rails.application.routes.draw do
   resources :bulk_actions, only: %i[new index show destroy] do
     member do
       get 'file'
+      post 'cancel'
     end
   end
 

@@ -154,11 +154,11 @@ RSpec.describe 'Show bulk actions history' do
 
     visit bulk_actions_path
 
-    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '3 selected')
+    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '4 selected')
     find('#bulk_actions_filter_statuses + .ts-wrapper .ts-control').click
     expect(page).to have_no_button('Select all')
     find('.ts-dropdown .option', text: 'Processing').click
-    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '2 selected')
+    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '3 selected')
     click_button 'Filter'
 
     expect(page).to have_css("tr##{dom_id(completed_bulk_action, 'row')}")

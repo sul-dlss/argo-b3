@@ -16,6 +16,8 @@ module BulkActions
       return unless check_druid_column?
 
       csv.each.with_index(first_row_number) do |row, index|
+        break cancel! if cancelling?
+
         perform_row(row:, index:)
       end
     end

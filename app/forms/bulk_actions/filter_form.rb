@@ -25,7 +25,7 @@ module BulkActions
     end
 
     attribute :action_types, array: true, default: -> { all_action_types }
-    attribute :statuses, array: true, default: -> { BulkAction::DISPLAY_STATUSES.keys }
+    attribute :statuses, array: true, default: -> { BulkAction::FILTER_STATUSES.keys }
     attribute :submitted_date, :string, default: 'all'
     attribute :user_ids, array: true
 
@@ -86,7 +86,7 @@ module BulkActions
 
     # @return [Array<Array(String, String)>] label and display status pairs for the statuses select
     def status_options
-      BulkAction::DISPLAY_STATUSES.map { |status, label| [label, status] }
+      BulkAction::FILTER_STATUSES.map { |status, label| [label, status] }
     end
 
     # @return [Array<Array(String, String)>] label and key pairs for the submitted date select
@@ -116,7 +116,7 @@ module BulkActions
     end
 
     def all_statuses?
-      (BulkAction::DISPLAY_STATUSES.keys - selected_statuses).empty?
+      (BulkAction::FILTER_STATUSES.keys - selected_statuses).empty?
     end
 
     def other_users

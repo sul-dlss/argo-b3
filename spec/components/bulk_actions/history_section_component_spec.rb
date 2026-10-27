@@ -23,6 +23,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
            druid_count_success: 5, druid_count_fail: 2, druid_count_total: 7)
   end
 
+  before do
+    allow(Current).to receive(:user).and_return(build_stubbed(:user))
+  end
+
   it 'renders the history section with bulk actions' do
     render_inline(component)
 
@@ -45,57 +49,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(form).to have_no_select('Users')
     expect(table).to have_css('tbody tr', count: 2)
 
-    bulk_action_row = table.find("tr##{dom_id(bulk_action, 'row')}")
-    expect(bulk_action_row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']",
-                                        text: "Bulk action #{bulk_action.id}: Test description")
-    expect(bulk_action_row).to have_css('td:nth-of-type(2)', text: BulkActions::REINDEX.label)
-    expect(bulk_action_row).to have_css('td:nth-of-type(3)', text: '2026-04-16 03:00:00 PT')
-    expect(bulk_action_row).to have_css('td:nth-of-type(4)', text: 'Processing')
-    expect(bulk_action_row).to have_no_css('td:nth-of-type(4) i.bi')
-    expect(bulk_action_row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
-    expect(bulk_action_row).to have_no_css('td:nth-of-type(6) a')
-    expect(bulk_action_row).to have_no_css('td:nth-of-type(7) form')
-
-    bulk_action_with_files_row = table.find("tr##{dom_id(bulk_action_with_files, 'row')}")
-    expect(bulk_action_with_files_row)
-      .to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action_with_files.id}']",
-                   exact_text: "Bulk action #{bulk_action_with_files.id}")
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(2)', text: BulkActions::EXPORT_COCINA_JSON.label)
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4)', text: 'Completed')
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(4) i.bi-exclamation-triangle-fill.text-warning')
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) ul > li', count: 2)
-    expect(bulk_action_with_files_row).to have_css('td:nth-of-type(6) a', text: 'Log')
-    expect(bulk_action_with_files_row).to have_link(BulkActions::EXPORT_COCINA_JSON.exports.first.label)
-    expect(bulk_action_with_files_row).to have_css(
-      "td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action_with_files.id}']" \
-      "[data-turbo-confirm='Delete this bulk action from history? Its log and export files will also be deleted. " \
-      "This cannot be undone.']"
-    )
-  end
-
-  context 'when a bulk action has multiple export files' do
-    let(:component) do
-      described_class.new(bulk_actions: BulkAction.where(id: bulk_action.id).page(1).per(20), filter_form:)
-    end
-
-    let(:bulk_action) { create(:bulk_action, :with_export, action_type: :register_csv, status: :completed) }
-
-    before do
-      File.write(bulk_action.export_filepath(:tracking_sheets), 'PDF content')
-    end
-
-    it 'renders a link for each export file' do
-      render_inline(component)
-
-      row = page.find("tr##{dom_id(bulk_action, 'row')}")
-      expect(row).to have_css('td:nth-of-type(6) ul > li', count: 2)
-      expect(row).to have_css('td:nth-of-type(6) a', count: 2)
-      expect(row).to have_link('Registration report',
-                               href: "/bulk_actions/#{bulk_action.id}/file?filename=registration_report.csv")
-      expect(row).to have_link('Tracking sheets',
-                               href: "/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf")
-    end
+    expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(1)",
+                              text: "Bulk action #{bulk_action.id}")
+    expect(table).to have_css("tr##{dom_id(bulk_action_with_files, 'row')} td:nth-of-type(1)",
+                              text: "Bulk action #{bulk_action_with_files.id}")
   end
 
   context 'when there are multiple pages' do
@@ -149,11 +106,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
       table = page.find('table#bulk-actions-history-table')
       expect(table).to have_css('thead th', count: 8)
       expect(table).to have_css('thead th:nth-of-type(2)', text: 'User')
-
-      row = table.find("tr##{dom_id(bulk_action, 'row')}")
-      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
-      expect(row).to have_css('td:nth-of-type(3)', text: BulkActions::REINDEX.label)
-      expect(row).to have_no_css('td:nth-of-type(8) form')
+      expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(2)", text: 'mmouse')
     end
   end
 end

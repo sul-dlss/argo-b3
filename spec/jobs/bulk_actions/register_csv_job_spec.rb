@@ -113,6 +113,28 @@ RSpec.describe BulkActions::RegisterCsvJob do
     end
   end
 
+  context 'when cancelled' do
+    before do
+      # Cancelled from the UI while the first object is registered.
+      allow(Sdr::Repository).to receive(:register) do
+        BulkAction.find(bulk_action.id).cancelling!
+        cocina_object
+      end
+    end
+
+    it 'stops registering and writes tracking sheets for the registered objects' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:register).once
+      expect(log).to have_received(:puts).with(/\tCancelled$/)
+      expect(bulk_action.reload).to be_cancelled
+      expect(bulk_action.druid_count_success).to eq 1
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters.map(&:druid)).to eq ['druid:df123df4567']
+      end
+    end
+  end
+
   context 'when registration is successful with params' do
     # Params are provided from registration page (not bulk action page)
     let(:csv_string) do

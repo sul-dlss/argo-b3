@@ -29,7 +29,12 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :help_text,
                       :path_helper,
                       # Array of Export for the files created by this bulk action, if any.
-                      :exports) do
+                      :exports,
+                      :cancellable) do
+                        def initialize(cancellable: true, **)
+                          super
+                        end
+
                         # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
                         def action_type
                           job.to_s.demodulize.delete_suffix('Job').underscore.upcase
@@ -37,6 +42,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
                         def exports
                           self[:exports] || []
+                        end
+
+                        def cancellable?
+                          cancellable
                         end
 
                         def find_export(key)
@@ -117,6 +126,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
       Export.new(key: :descriptive_metadata, filename: 'descriptive.csv', label: 'Descriptive metadata spreadsheet')
     ],
     job: BulkActions::ExportDescriptiveMetadataJob,
+    cancellable: false,
     path_helper: to_path_helper(:new_bulk_actions_export_descriptive_metadata_path),
     form: BulkActions::BasicForm
   )
@@ -149,6 +159,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
       Export.new(key: :tracking_sheets, filename: 'tracking_sheets.pdf', label: 'Tracking sheets')
     ],
     job: BulkActions::ExportTrackingSheetsJob,
+    cancellable: false,
     path_helper: to_path_helper(:new_bulk_actions_export_tracking_sheets_path),
     form: BulkActions::BasicForm
   )

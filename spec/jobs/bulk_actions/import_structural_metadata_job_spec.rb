@@ -179,6 +179,30 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
     end
   end
 
+  context 'when cancelled' do
+    let(:other_druid) { 'druid:fg123hj4589' }
+    let(:csv_file) do
+      header, *rows = exported_csv.lines
+      [header, *rows, *rows.map { |row| row.sub('bc123df4567', 'fg123hj4589') }].join
+    end
+
+    before do
+      # Cancelled from the UI while the first object is imported.
+      allow(Sdr::Repository).to receive(:find).with(druid:) do
+        BulkAction.find(bulk_action.id).cancelling!
+        cocina_object
+      end
+    end
+
+    it 'stops importing' do
+      job.perform_now
+
+      expect(described_class::JobItem).to have_received(:new).once
+      expect(log.string).to include("\tCancelled\n")
+      expect(bulk_action.reload).to be_cancelled
+    end
+  end
+
   context 'when a required column is missing' do
     let(:csv_file) { exported_csv.lines.map { |line| line.split(',').values_at(0..10, 12..).join(',') }.join }
 

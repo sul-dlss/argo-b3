@@ -1,0 +1,35 @@
+<%= render SdrViewComponents::Tables::RowComponent.new(id: dom_id(bulk_action, 'row')) do |row| %>
+  <% row.with_cell do %><%= link_to(bulk_action.name, bulk_action_path(bulk_action)) %><% end %>
+  <%# Admins see the bulk actions of other users, so the user follows the bulk action name. %>
+  <% if admin? %>
+    <% row.with_cell do %><%= bulk_action.user.sunetid %><% end %>
+  <% end %>
+  <% row.with_cell do %><%= bulk_action.bulk_action_config.label %><% end %>
+  <% row.with_cell do %><%= helpers.format_datetime(bulk_action.created_at) %><% end %>
+  <% row.with_cell do %><%= render BulkActions::StatusComponent.new(bulk_action:) %><% end %>
+  <% row.with_cell do %><%= bulk_action.druid_count_total %> / <%= bulk_action.druid_count_success %> / <%= bulk_action.druid_count_fail %><% end %>
+  <% row.with_cell do %><%= download_links %><% end %>
+  <% row.with_cell do %>
+    <% if bulk_action.clearable? %>
+      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: bulk_action_path(bulk_action),
+                                                                      variant: :'outline-primary',
+                                                                      size: :sm,
+                                                                      method: :delete,
+                                                                      confirm: t('bulk_actions.delete_confirm'),
+                                                                      top: false) do %>
+        <%= helpers.delete_icon(classes: 'me-1') %><%= t('bulk_actions.clear') %>
+      <% end %>
+    <% end %>
+    <% if cancellable_and_allowed? %>
+      <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: cancel_bulk_action_path(bulk_action),
+                                                                      variant: :'outline-primary',
+                                                                      size: :sm,
+                                                                      method: :post,
+                                                                      confirm: t('bulk_actions.cancel_confirm'),
+                                                                      classes: 'mt-2',
+                                                                      top: false) do %>
+        <%= helpers.cancel_icon(classes: 'me-1') %><%= t('bulk_actions.cancel') %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

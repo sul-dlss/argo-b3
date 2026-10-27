@@ -34,4 +34,16 @@ RSpec.describe BulkActionPolicy do
       expect(described_class.new(other_user_bulk_action, user:).apply(:manage?)).to be false
     end
   end
+
+  describe '#cancel?' do
+    it 'authorizes an admin' do
+      admin = create(:user, :admin)
+
+      expect(described_class.new(other_user_bulk_action, user: admin).apply(:cancel?)).to be true
+    end
+
+    it 'does not authorize the user of the bulk action' do
+      expect(described_class.new(user_bulk_action, user:).apply(:cancel?)).to be false
+    end
+  end
 end

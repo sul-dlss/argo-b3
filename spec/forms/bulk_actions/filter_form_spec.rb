@@ -99,7 +99,8 @@ RSpec.describe BulkActions::FilterForm do
   describe '#status_options' do
     it 'returns label and display status pairs' do
       expect(described_class.new.status_options).to eq([%w[Processing processing], %w[Completed completed],
-                                                        ['Completed with errors', 'completed_with_errors']])
+                                                        ['Completed with errors', 'completed_with_errors'],
+                                                        %w[Cancelled cancelled]])
     end
   end
 
