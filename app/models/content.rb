@@ -27,6 +27,16 @@ class Content < ApplicationRecord
     where(druid:).with_staging_states(:staging, :staging_failed).order(updated_at: :desc).first
   end
 
+  # Called once the object or its draft is gone from SDR, so a failure is reported rather than raised.
+  # @param druid [String] the druid of the object
+  def self.delete_mutable_and_staged_files(druid:)
+    where(druid:, immutable: false).destroy_all
+    StagingSupport.delete_staged_files(druid:)
+  rescue StandardError => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: })
+  end
+
   # Staging supersedes staging failures for other Contents for the druid (e.g., one for an earlier lock).
   # @param stage_files_options [Hash] additional keyword arguments for StageFilesJob#perform
   def start_staging!(user:, **stage_files_options)

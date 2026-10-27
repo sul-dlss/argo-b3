@@ -206,15 +206,15 @@ Rails.application.routes.draw do
       get 'structure', to: 'objects#show_structure'
       get 'constituents', to: 'objects#show_constituents'
       post 'republish', to: 'objects#republish'
+      delete 'discard_draft', to: 'objects#discard_draft'
+      delete 'purge', to: 'objects#purge'
       get 'structural_csv', to: 'objects#show_structural_csv'
       get 'descriptive_csv', to: 'objects#show_descriptive_csv'
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end
 
-  resources :items, only: %i[new create edit update] do
-    delete :discard_draft, on: :member
-  end
+  resources :items, only: %i[new create edit update]
 
   resources :apos, only: %i[new create]
   resources :agreements, only: %i[new create]

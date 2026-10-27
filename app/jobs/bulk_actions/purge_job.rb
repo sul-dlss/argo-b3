@@ -8,13 +8,15 @@ module BulkActions
       def perform
         return unless check_update_ability?
 
-        unless purge_service.can_purge?
+        unless purge_service.purgeable?
           return failure!(message: 'Cannot purge item because it has already been submitted')
         end
 
         purge_service.purge(user_name: user_id)
 
         success!(message: 'Purge successful')
+      rescue Sdr::PurgeService::ContentBusyError
+        failure!(message: 'Cannot purge item because its files are being staged or discovered')
       end
 
       def purge_service

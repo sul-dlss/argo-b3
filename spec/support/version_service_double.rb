@@ -4,7 +4,8 @@
 # break specs that don't care about it. Defaults are an open first version that can be closed; override as needed.
 module VersionServiceDouble
   DEFAULTS = { open?: true, openable?: false, closeable?: true, assembling?: false, accessioning?: false,
-               closed?: false, version: 1, version_description: 'Initial version', update_description: nil }.freeze
+               closed?: false, discardable?: false, version: 1, version_description: 'Initial version',
+               update_description: nil }.freeze
 
   def version_service_double(**overrides)
     status = DEFAULTS.merge(overrides)

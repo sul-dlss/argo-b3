@@ -180,7 +180,49 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     toast_and_refresh(t('show.toasts.republish_started'), fallback_location: object_path(druid:))
   end
 
+  def discard_draft
+    cocina_object = Sdr::Repository.find(druid: druid_param)
+    authorize! cocina_object, to: :update?, with: ObjectPolicy
+
+    discard_draft_and_redirect(cocina_object:)
+  end
+
+  def purge
+    cocina_object = Sdr::Repository.find(druid: druid_param)
+    authorize! cocina_object, to: :update?, with: ObjectPolicy
+
+    purge_and_redirect(druid: cocina_object.externalIdentifier)
+  end
+
   private
+
+  def discard_draft_and_redirect(cocina_object:) # rubocop:disable Metrics/AbcSize
+    druid = cocina_object.externalIdentifier
+    Sdr::DiscardDraftService.call(cocina_object:)
+    redirect_to object_path(druid), flash: { toast: t('show.toasts.draft_discarded') }
+  rescue Sdr::DiscardDraftService::ContentBusyError
+    redirect_to object_path(druid), flash: { warning: t('show.warnings.content_busy') }
+  rescue Sdr::DiscardDraftService::NotDiscardableError
+    redirect_to object_path(druid), flash: { warning: t('show.warnings.not_discardable') }
+  rescue Sdr::Repository::Error => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: })
+    redirect_to object_path(druid), flash: { danger: t('show.errors.discard_failed') }
+  end
+
+  def purge_and_redirect(druid:) # rubocop:disable Metrics/AbcSize
+    Sdr::PurgeService.purge(druid:, user_name: current_user.sunetid)
+    # A purged object no longer has an object page.
+    redirect_to root_path, flash: { toast: t('show.toasts.purged') }
+  rescue Sdr::PurgeService::CannotPurgeError
+    redirect_to object_path(druid), flash: { warning: t('show.warnings.cannot_purge') }
+  rescue Sdr::PurgeService::ContentBusyError
+    redirect_to object_path(druid), flash: { warning: t('show.warnings.content_busy') }
+  rescue Sdr::PurgeService::Error => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: })
+    redirect_to object_path(druid), flash: { danger: t('show.errors.purge_failed') }
+  end
 
   def events_filter_params
     EventsFilterForm.params_from(params)

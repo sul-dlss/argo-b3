@@ -27,7 +27,7 @@ RSpec.describe BulkActions::PurgeJob do
 
   context 'when not already submitted' do
     before do
-      allow(purge_service).to receive(:can_purge?).and_return(true)
+      allow(purge_service).to receive(:purgeable?).and_return(true)
       allow(purge_service).to receive(:purge)
     end
 
@@ -35,7 +35,7 @@ RSpec.describe BulkActions::PurgeJob do
       job.perform_now
 
       expect(job_item).to have_received(:check_update_ability?)
-      expect(purge_service).to have_received(:can_purge?)
+      expect(purge_service).to have_received(:purgeable?)
       expect(purge_service).to have_received(:purge).with(user_name: bulk_action.user.sunetid)
 
       expect(bulk_action.reload.druid_count_total).to eq(1)
@@ -46,7 +46,7 @@ RSpec.describe BulkActions::PurgeJob do
 
   context 'when already submitted' do
     before do
-      allow(purge_service).to receive(:can_purge?).and_return(false)
+      allow(purge_service).to receive(:purgeable?).and_return(false)
     end
 
     it 'does not purge the object' do
@@ -57,6 +57,22 @@ RSpec.describe BulkActions::PurgeJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
+    end
+  end
+
+  context 'when the content is busy' do
+    before do
+      allow(purge_service).to receive(:purgeable?).and_return(true)
+      allow(purge_service).to receive(:purge).and_raise(Sdr::PurgeService::ContentBusyError)
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'fails the object without notifying' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(0)
+      expect(Honeybadger).not_to have_received(:notify)
     end
   end
 

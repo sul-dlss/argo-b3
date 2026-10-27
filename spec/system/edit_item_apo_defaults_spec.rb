@@ -50,6 +50,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid],
                                                                     [other_apo_title, other_apo_druid]])
     allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
+    allow(Sdr::WorkflowService).to receive(:submitted?).and_return(false)
     allow(Sdr::VersionService).to receive(:new)
       .and_return(version_service_double(open?: true, version_description: 'Fixing the rights'))
     cocina_objects = { druid => cocina_object, apo_druid => apo_cocina_object,
