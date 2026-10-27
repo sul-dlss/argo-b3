@@ -628,7 +628,12 @@ en:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
     history: 'Bulk actions'
-    delete: 'Delete bulk action'
+    cancel: 'Cancel'
+    cancel_confirm: 'Cancel this bulk action? Changes already made to objects will not be undone.'
+    cancel_failed: 'Bulk action could not be cancelled.'
+    cancel_success: 'Bulk action is being cancelled.'
+    clear: 'Clear'
+    delete_failed: 'Bulk action could not be cleared.'
     delete_success: 'Bulk action successfully deleted.'
     delete_confirm: 'Delete this bulk action from history? Its log and export files will also be deleted. This cannot be undone.'
   multi_item_deposit_actions:

@@ -14,4 +14,16 @@ RSpec.describe BulkActions do
       expect(configs.map(&:action_type)).to include('ADD_WORKFLOW', 'REDEPOSIT', 'REGISTER_CSV')
     end
   end
+
+  describe BulkActions::Config do
+    describe '#cancellable?' do
+      it 'returns true by default' do
+        expect(described_class.new.cancellable?).to be true
+      end
+
+      it 'returns false when cancellable is false' do
+        expect(described_class.new(cancellable: false).cancellable?).to be false
+      end
+    end
+  end
 end

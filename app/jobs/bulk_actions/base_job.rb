@@ -15,14 +15,17 @@ module BulkActions
       Honeybadger.context(bulk_action: bulk_action.id, params:)
 
       bulk_action.reset_druid_counts!
+      # Cancelled while queued.
+      return cancel! if bulk_action.cancelling?
 
-      bulk_action.update(status: 'Processing')
+      bulk_action.started!
 
       log("Starting #{self.class} for BulkAction #{bulk_action.id}")
       update_druid_count!
 
       # Current.user is needed for some jobs, e.g., so that permission changes are recorded as events in SDR.
       Current.set(user:) { perform_bulk_action }
+      return if bulk_action.cancelled?
 
       log("Finished #{self.class} for BulkAction #{bulk_action.id}")
       bulk_action.completed!
@@ -71,6 +74,11 @@ module BulkActions
       self.class.const_get('JobItem')
     end
 
+    def cancelling?
+      # Uncached since the job's query cache is not cleared when the status is changed elsewhere.
+      BulkAction.uncached { BulkAction.cancelling.exists?(bulk_action.id) }
+    end
+
     private
 
     def log_file
@@ -81,6 +89,12 @@ module BulkActions
       Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
 
       broadcast_toast(title: "#{bulk_action.label} completed", user: bulk_action.user)
+    end
+
+    def cancel!
+      log('Cancelled')
+      bulk_action.cancelled!
+      Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
     end
   end
 end

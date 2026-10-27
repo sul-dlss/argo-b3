@@ -49,11 +49,16 @@ module BulkActions
     # @return [Array<String>] druids of the registered objects, in registration order
     def register_objects
       registration_report_filepath = bulk_action.export_filepath(:registration_report)
+      registered_druids = []
       CSV.open(registration_report_filepath, 'wb', write_headers: true, headers: HEADERS) do |registration_report_csv|
-        registrations.each.with_index(index_offset).filter_map do |registration, index|
-          register_object(registration:, index:, registration_report_csv:)
+        registrations.each.with_index(index_offset) do |registration, index|
+          break cancel! if cancelling?
+
+          druid = register_object(registration:, index:, registration_report_csv:)
+          registered_druids << druid if druid
         end
       end
+      registered_druids
     end
 
     # @return [String, nil] druid of the registered object, or nil if registration failed

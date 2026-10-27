@@ -37,4 +37,8 @@ module IconHelper
   def cloud_upload_icon(**)
     icon(icon_classes: %w[bi bi-cloud-arrow-up-fill], **)
   end
+
+  def cancel_icon(**)
+    icon(icon_classes: %w[bi bi-x-square], **)
+  end
 end

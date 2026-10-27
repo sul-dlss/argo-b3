@@ -21,15 +21,28 @@ RSpec.describe 'Deleting a bulk action' do
     expect(flash[:toast]).to eq('Bulk action successfully deleted.')
   end
 
+  context 'when the bulk action is cancelled' do
+    let!(:bulk_action) { create(:bulk_action, user:, status: :cancelled) }
+
+    it 'destroys the bulk action' do
+      expect do
+        delete bulk_action_path(bulk_action), headers: { 'HTTP_REFERER' => bulk_actions_path }
+      end.to change(BulkAction, :count).by(-1)
+
+      expect(response).to redirect_to(bulk_actions_path)
+    end
+  end
+
   context 'when the bulk action is incomplete' do
     let!(:bulk_action) { create(:bulk_action, user:) }
 
-    it 'does not destroy the bulk action' do
+    it 'does not destroy the bulk action and redirects with an alert' do
       expect do
         delete bulk_action_path(bulk_action)
       end.not_to change(BulkAction, :count)
 
-      expect(response).to have_http_status(:conflict)
+      expect(response).to redirect_to(bulk_actions_path)
+      expect(flash[:danger]).to eq('Bulk action could not be cleared.')
       expect(flash[:toast]).to be_nil
     end
   end

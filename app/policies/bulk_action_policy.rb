@@ -12,4 +12,9 @@ class BulkActionPolicy < ApplicationPolicy
   def manage?
     record.user_id == user.id
   end
+
+  def cancel?
+    # Only admins can cancel.
+    false
+  end
 end

@@ -12,6 +12,8 @@ module BulkActions
       end
 
       rows_by_druid.each do |druid, rows|
+        break cancel! if cancelling?
+
         perform_druid(druid:, rows:)
       end
     end

@@ -22,6 +22,8 @@ module BulkActions
     # @param [Hash] item_params additional parameters passed to each bulk action item, e.g., an open export file
     def perform_bulk_action(**item_params)
       druids.each_with_index do |druid, index|
+        break cancel! if cancelling?
+
         perform_item_class.new(druid:, index:, job: self, **item_params).perform
       rescue Sdr::Repository::NotFoundResponse
         failure!(druid:, message: 'Error: Object not found')

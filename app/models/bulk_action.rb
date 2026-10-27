@@ -4,7 +4,14 @@
 class BulkAction < ApplicationRecord
   belongs_to :user
 
-  enum :status, { created: 'created', queued: 'queued', started: 'started', completed: 'completed' }, validate: true
+  enum :status, {
+    created: 'created',
+    queued: 'queued',
+    started: 'started',
+    completed: 'completed',
+    cancelling: 'cancelling',
+    cancelled: 'cancelled'
+  }, validate: true
 
   after_create :create_output_directory!
   before_destroy :remove_output_directory!
@@ -13,20 +20,25 @@ class BulkAction < ApplicationRecord
   DISPLAY_STATUSES = {
     'processing' => 'Processing',
     'completed' => 'Completed',
-    'completed_with_errors' => 'Completed with errors'
+    'completed_with_errors' => 'Completed with errors',
+    'cancelling' => 'Cancelling',
+    'cancelled' => 'Cancelled'
   }.freeze
+
+  # Statuses users can filter by; cancelling bulk actions are filtered as processing.
+  FILTER_STATUSES = DISPLAY_STATUSES.except('cancelling').freeze
 
   delegate :exports, :label, to: :bulk_action_config
 
-  # @param display_statuses [Array<String>] keys of DISPLAY_STATUSES (others are ignored)
-  # @return [ActiveRecord::Relation] the bulk actions with any of the display statuses
-  def self.with_display_statuses(display_statuses)
-    (display_statuses & DISPLAY_STATUSES.keys).map { |display_status| where_display_status(display_status) }
-                                              .reduce(:or) || none
+  # @param filter_statuses [Array<String>] keys of FILTER_STATUSES (others are ignored)
+  # @return [ActiveRecord::Relation] the bulk actions with any of the filter statuses
+  def self.with_filter_statuses(filter_statuses)
+    (filter_statuses & FILTER_STATUSES.keys).map { |filter_status| where_filter_status(filter_status) }
+                                            .reduce(:or) || none
   end
 
   # @param action_types [Array<String>, nil] nil for no limit
-  # @param statuses [Array<String>, nil] keys of DISPLAY_STATUSES; nil for no limit
+  # @param statuses [Array<String>, nil] keys of FILTER_STATUSES; nil for no limit
   # @param submitted_since [ActiveSupport::TimeWithZone, nil] nil for no limit
   # @param user_ids [Array<String>, nil] nil for no limit
   # @return [ActiveRecord::Relation] the bulk actions that match the filters
@@ -34,22 +46,25 @@ class BulkAction < ApplicationRecord
     relation = all
     relation = relation.where(user_id: user_ids) if user_ids
     relation = relation.where(action_type: action_types) if action_types
-    relation = relation.with_display_statuses(statuses) if statuses
+    relation = relation.with_filter_statuses(statuses) if statuses
     relation = relation.where(created_at: submitted_since..) if submitted_since
     relation
   end
 
-  def self.where_display_status(display_status)
-    case display_status
-    when 'processing' then where.not(status: 'completed')
+  def self.where_filter_status(filter_status)
+    case filter_status
+    when 'processing' then where.not(status: %w[completed cancelled])
     when 'completed' then completed.where(druid_count_fail: 0)
     when 'completed_with_errors' then completed.where(druid_count_fail: 1..)
+    when 'cancelled' then cancelled
     end
   end
-  private_class_method :where_display_status
+  private_class_method :where_filter_status
 
   # @return [String] the key of the bulk action's DISPLAY_STATUSES
   def display_status
+    return 'cancelling' if cancelling?
+    return 'cancelled' if cancelled?
     return 'processing' unless completed?
 
     druid_count_fail.positive? ? 'completed_with_errors' : 'completed'
@@ -114,6 +129,15 @@ class BulkAction < ApplicationRecord
     return name if description.blank?
 
     "#{name}: #{description}"
+  end
+
+  def cancellable?
+    bulk_action_config.cancellable? && (queued? || started?)
+  end
+
+  # @return [Boolean] whether the bulk action has finished, so it can be cleared from history
+  def clearable?
+    completed? || cancelled?
   end
 
   private
