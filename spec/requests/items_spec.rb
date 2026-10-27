@@ -130,6 +130,14 @@ RSpec.describe 'Items' do
         expect(page).to have_field('Without embargo', type: 'radio', checked: true)
       end
 
+      it 'renders the button that applies the APO defaults, without applying them when the form is shown' do
+        get "/items/#{druid}/edit"
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('[data-controller="apo-defaults"][data-apo-defaults-apply-on-connect-value="false"]')
+        expect(page).to have_button('Apply APO defaults')
+      end
+
       context 'when the item is embargoed' do
         let(:release_date) { (DateTime.now + 1.year).strftime('%Y-03-15') }
         let(:cocina_object) do

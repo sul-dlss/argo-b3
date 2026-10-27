@@ -1,10 +1,31 @@
-<%= render SdrViewComponents::Forms::SelectFieldComponent.new(
-      form:,
-      field_name: :apo_druid,
-      options:,
-      label_text: t('edit.items.fields.apo_druid.label'),
-      label_mark_required: true,
-      label_classes: 'fw-bold',
-      container_classes:,
-      input_data:
-    ) %>
+<% if apply_defaults_button? %>
+  <%= tag.div class: container_classes do %>
+    <%= render SdrViewComponents::Forms::LabelComponent.new(form:, field_name: :apo_druid,
+                                                            text: t('edit.items.fields.apo_druid.label'),
+                                                            classes: 'fw-bold', mark_required: true) %>
+    <div class="d-flex align-items-start gap-2">
+      <div class="flex-grow-1">
+        <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(
+              form:, field_name: :apo_druid, options:, aria: input_aria, data: input_data
+            ) %>
+        <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :apo_druid) %>
+      </div>
+      <%= render SdrViewComponents::Elements::ButtonComponent.new(
+            label: t('edit.items.fields.apo_druid.apply_defaults'),
+            variant: :'outline-primary',
+            data: { action: 'apo-defaults#apply' }
+          ) %>
+    </div>
+  <% end %>
+<% else %>
+  <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+        form:,
+        field_name: :apo_druid,
+        options:,
+        label_text: t('edit.items.fields.apo_druid.label'),
+        label_mark_required: true,
+        label_classes: 'fw-bold',
+        container_classes:,
+        input_data:
+      ) %>
+<% end %>
