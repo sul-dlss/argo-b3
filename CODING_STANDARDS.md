@@ -29,5 +29,6 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 ## Ruby / Rails
 
 - Controllers stay thin: they authorize, build the form, save, and redirect or render. Domain steps (e.g., opening a version, updating the version description, starting accessioning) belong in the form's `save!`, `CocinaModels::Base#save!`, `Sdr::Repository`, or a service class. When `Metrics/AbcSize` fires on a controller action, move logic down a layer rather than extracting private controller helpers.
+- Authorize inline at the top of each action (`authorize! @bulk_action`), not in a `before_action`, so every endpoint shows its own rule and record. A `before_action` may load the record (e.g., `set_bulk_action`); the action authorizes it. The exception is a controller whose actions are defined elsewhere, such as a base class (`BulkActions::ImportReadUnrestrictedWorkgroupsController`) or a mounted engine (`MissionControlAuthorizationController`).
 - In an `ActiveSupport::Concern`, define instance methods in the module body, not inside `included do`.
 - Every `rescue StandardError` in a job logs the error (`Rails.logger.error(e.full_message)`) and notifies Honeybadger (`Honeybadger.notify(e)`), as in `BulkActions::BaseRegisterJob`.
