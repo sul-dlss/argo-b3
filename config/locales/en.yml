@@ -34,6 +34,8 @@ en:
       date_time: "%Y-%m-%d %H:%M:%S PT"
   errors:
     not_authorized: 'You are not authorized to perform the requested action.'
+    object_permission:
+      duplicate: 'already has this permission'
     mount_path:
       not_found: "does not exist"
       not_in_mount_location: "must be within a mount location"
@@ -665,4 +667,22 @@ en:
         delete: 'Delete permission for %{target}'
       toasts:
         updated: 'Permission updated'
+        deleted: 'Permission deleted'
+    object_permissions:
+      heading: 'Edit %{object_type} permissions'
+      table_label: 'Permissions'
+      empty: 'No permissions.'
+      fields:
+        workgroup:
+          label: 'Workgroup'
+          prompt: 'Select or enter a workgroup'
+        permission_type:
+          label: 'Permission'
+          read_restricted: 'Read'
+          edit: 'Edit'
+      buttons:
+        add: 'Add'
+        delete: 'Delete %{permission} permission for %{workgroup}'
+      toasts:
+        added: 'Permission added'
         deleted: 'Permission deleted'

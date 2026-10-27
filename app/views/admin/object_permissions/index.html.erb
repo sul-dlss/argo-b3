@@ -1,0 +1,50 @@
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<div class="container pb-3">
+  <p>
+    <%= link_to object_path(@druid) do %><%= previous_icon %> <%= @solr_doc.object_type %><% end %>
+  </p>
+
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('admin.object_permissions.heading', object_type: @solr_doc.object_type),
+                                                               classes: 'mb-2') %>
+  <p class="mb-4"><%= @solr_doc.title %> (<%= @solr_doc.bare_druid %>)</p>
+
+  <%# The stable id lets a morph keep the form, rather than moving its radios one at a time into a new form, which leaves no radio checked. %>
+  <%= form_with model: @object_permission_form, url: admin_object_permissions_path(@druid), id: 'object-permission-form' do |form| %>
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+          form:,
+          field_name: :workgroup,
+          options: @object_permission_form.workgroup_options,
+          prompt: t('admin.object_permissions.fields.workgroup.prompt'),
+          label_text: t('admin.object_permissions.fields.workgroup.label'),
+          container_classes: 'mb-3',
+          input_data: { controller: 'creatable-select' }
+        ) %>
+
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('admin.object_permissions.fields.permission_type.label'), classes: 'mb-3') do %>
+      <% Admin::ObjectPermissionForm::PERMISSION_TYPES.each do |permission_type| %>
+        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :permission_type, input_value: permission_type,
+                                                                      label_text: t("admin.object_permissions.fields.permission_type.#{permission_type}")) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('admin.object_permissions.buttons.add')) %>
+  <% end %>
+
+  <hr class="my-4">
+
+  <%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('admin.object_permissions.table_label'), variant: :h3, id: 'object-permissions',
+                                                              empty_message: t('admin.object_permissions.empty')) do |table| %>
+    <%= table.with_header(label: t('admin.object_permissions.fields.workgroup.label')) %>
+    <%= table.with_header(label: t('admin.object_permissions.fields.permission_type.label')) %>
+    <%= table.with_header(label: '') %>
+    <% @permissions.each do |permission| %>
+      <% table.with_row do %>
+        <%= render Admin::ObjectPermissionRowComponent.new(permission:) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
