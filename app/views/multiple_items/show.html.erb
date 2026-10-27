@@ -3,8 +3,11 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multiple_items %>">
+<%= tag.div class: 'container py-2', data: {
+      controller: 'scheduled-refresh',
+      scheduled_refresh_interval_value: Settings.reload_intervals.multiple_items
+    } do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multiple_items.new.title'), classes: 'mb-3') %>
 
   <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: 'Validating...', message_position: :bottom, classes: 'align-items-center') %>
-</div>
+<% end %>

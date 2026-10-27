@@ -1,7 +1,7 @@
 <dl class="row">
   <% entries.each do |key, value| %>
-    <dt class="<%= term_classes %>"><%= term_label(key) %></dt>
-    <dd class="<%= description_classes %>">
+    <%= tag.dt term_label(key), class: term_classes %>
+    <%= tag.dd class: description_classes do %>
       <% values_for(value).each do |item| %>
         <% if item.is_a?(Hash) %>
           <%= render Elements::DescriptionListComponent.new(hash: item, nested: true) %>
@@ -9,6 +9,6 @@
           <div><%= item %></div>
         <% end %>
       <% end %>
-    </dd>
+    <% end %>
   <% end %>
 </dl>

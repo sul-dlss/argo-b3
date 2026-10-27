@@ -15,6 +15,10 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 - Widgets that morphing would break are made morph-safe in their Stimulus controller (e.g., Tom Select controllers use `MorphableTomSelect`). Don't work around them with turbo streams or by skipping the morph.
 - Give a morphed form with radio buttons a stable `id` (e.g., `form_with ..., id: 'object-permission-form'`). Without one, the morph builds a new form and moves the radios into it one at a time, and moving a still-checked radio unchecks the one already reset, leaving none checked.
 
+## Views
+
+- Don't put `<%= %>` inside an HTML attribute. When an element's attributes take Ruby values, build the element with a tag helper (`tag.div`, `tag.span`, `link_to`, etc.) and pass the attributes as arguments, using a `data:` hash for `data-*` attributes (e.g., the container in `objects/show.html.erb`).
+
 ## Specs
 
 ### What to test
