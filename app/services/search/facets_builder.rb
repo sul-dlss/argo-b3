@@ -28,7 +28,7 @@ module Search
     def facet_json_for(facet_config)
       exclude = facet_config.operator == :or || facet_config.exclude_form_field.present?
       Search::FacetBuilder.call(field: facet_config.facet_field, tag: facet_config.field, exclude:,
-                                **facet_config.to_h.slice(:limit, :alpha_sort))
+                                **facet_config.to_h.slice(:limit, :alpha_sort, :missing_value))
     end
   end
 end

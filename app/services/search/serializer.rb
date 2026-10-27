@@ -46,7 +46,9 @@ module Search
       form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.public_send(form_field).blank?
 
-      values = search_form.public_send(form_field).map { |value| quote(value) }
+      values = search_form.public_send(form_field).map do |value|
+        quote(Search::Facets.missing_value?(value) ? facet_value_label(value) : value)
+      end
       combine_label_and_values(facet_config:, values:, exclude:)
     end
 

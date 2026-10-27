@@ -153,4 +153,62 @@ RSpec.describe SearchResults::FacetCounts do
       expect(facet_count.count).to eq 5
     end
   end
+
+  context 'when the facet config offers a missing value' do
+    let(:facet_config) { Search::Facets::LANGUAGES }
+    let(:field) { Search::Fields::LANGUAGES }
+    let(:missing_count) { 7 }
+    let(:solr_response) do
+      {
+        'responseHeader' => { 'params' => { 'json.facet' => facet_json.to_json } },
+        'facets' => {
+          field => {
+            'buckets' => [{ 'val' => 'English', 'count' => 5 }],
+            'missing' => { 'count' => missing_count },
+            'numBuckets' => 1
+          }
+        }
+      }
+    end
+
+    it 'yields No value first' do
+      expect(facet_counts.map { |facet_count| [facet_count.value, facet_count.label, facet_count.count] })
+        .to eq([['_missing_value', 'No value', 7], ['English', 'English', 5]])
+    end
+
+    context 'when not the first page' do
+      let(:offset) { 25 }
+
+      it 'does not yield No value' do
+        expect(facet_counts.map(&:value)).to eq(['English'])
+      end
+    end
+
+    context 'when the missing count is 0' do
+      let(:missing_count) { 0 }
+
+      it 'does not yield No value' do
+        expect(facet_counts.map(&:value)).to eq(['English'])
+      end
+    end
+  end
+
+  context 'when the facet config does not offer a missing value' do
+    let(:solr_response) do
+      {
+        'responseHeader' => { 'params' => { 'json.facet' => facet_json.to_json } },
+        'facets' => {
+          field => {
+            'buckets' => [{ 'val' => 'item', 'count' => 5 }],
+            'missing' => { 'count' => 7 },
+            'numBuckets' => 1
+          }
+        }
+      }
+    end
+
+    it 'does not yield No value' do
+      expect(facet_counts.map(&:value)).to eq(['item'])
+    end
+  end
 end

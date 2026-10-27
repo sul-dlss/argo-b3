@@ -92,6 +92,25 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with a missing value for languages (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(languages: ['_missing_value']) }
+
+    it 'filters on objects without a language' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("(*:* -#{Search::Fields::LANGUAGES}:[* TO *])")
+    end
+  end
+
+  context 'with a language and a missing value for languages (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
+
+    it 'ANDs the language and missing value in the filter query' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq]))
+        .to include("(#{Search::Fields::LANGUAGES}:(\"English\") AND (*:* -#{Search::Fields::LANGUAGES}:[* TO *]))")
+    end
+  end
+
   context 'with admin policy druids (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(admin_policy_druids: ['druid:bc123df4567']) }
 

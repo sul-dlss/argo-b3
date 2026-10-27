@@ -62,6 +62,18 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     end
   end
 
+  context 'when a filter for a missing value' do
+    let(:form_field) { :languages }
+    let(:values) { %w[English _missing_value] }
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
+
+    it 'renders the current filter with the No value label' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: /Language\s+❯\s+English OR No value/)
+    end
+  end
+
   context 'when a filter for a composite facet (e.g. Admin Policies)' do
     let(:form_field) { :admin_policy_druids }
     let(:values) { ['druid:bc123df4567'] }

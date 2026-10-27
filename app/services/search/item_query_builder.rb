@@ -103,13 +103,26 @@ module Search
       form_field = exclude ? facet_config.exclude_form_field : facet_config.form_field
       return if search_form.send(form_field).blank?
 
-      values = join_values(search_form.send(form_field), operator: facet_config.operator)
-      query = "#{'-' if exclude}#{facet_config.field}:(#{values})"
+      query = "#{'-' if exclude}#{value_query(facet_config:, values: search_form.send(form_field))}"
       # Tagging is used to exclude the filter from the facet counts.
       # This is used for :or facets (so that all values for the facet are returned) and for exclusion filters
       # (so that excluded values are still returned).
       # See https://solr.apache.org/guide/8_11/faceting.html#tagging-and-excluding-filters
       exclude || facet_config.operator == :or ? "{!tag=#{facet_config.field}}#{query}" : query
+    end
+
+    # @param facet_config [Search::Facets::Config]
+    # @param values [Array<String>] the selected facet values, possibly including Search::Facets::MISSING_VALUE
+    # @return [String] the query matching the values
+    def value_query(facet_config:, values:)
+      field = facet_config.field
+      missing_values, terms = values.partition { |value| Search::Facets.missing_value?(value) }
+      queries = []
+      queries << "#{field}:(#{join_values(terms, operator: facet_config.operator)})" if terms.any?
+      queries << "(*:* -#{field}:#{Search::Queries::ALL})" if missing_values.any?
+      return queries.first if queries.one?
+
+      "(#{queries.join(" #{facet_config.operator.upcase} ")})"
     end
 
     # @param values [Array<String>] the selected facet values

@@ -49,4 +49,13 @@ RSpec.describe Search::FacetBuilder do
              )).to include(domain: { excludeTags: [Search::Fields::PROJECTS_EXPLODED] })
     end
   end
+
+  context 'when missing_value is true' do
+    it 'includes missing in the facet json' do
+      expect(described_class.call(
+               field: Search::Fields::LANGUAGES,
+               missing_value: true
+             )).to include(missing: true)
+    end
+  end
 end

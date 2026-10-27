@@ -16,6 +16,7 @@ module SearchResults
 
       return if facet_result.nil?
 
+      yield missing_value_facet_count if show_missing_value?
       facet_result['buckets'].each do |bucket|
         value, label = bucket_value_and_label(bucket['val'])
         yield FacetCount.new(value:, label:, count: bucket['count'])
@@ -62,6 +63,20 @@ module SearchResults
 
     def field
       facet_config.facet_field
+    end
+
+    # "No value" is shown first, so only on the first page.
+    def show_missing_value?
+      facet_config.missing_value && offset.zero? && missing_value_count.positive?
+    end
+
+    def missing_value_count
+      facet_result.dig('missing', 'count') || 0
+    end
+
+    def missing_value_facet_count
+      FacetCount.new(value: Search::Facets::MISSING_VALUE, label: I18n.t('search.facet_values._missing_value'),
+                     count: missing_value_count)
     end
 
     def bucket_value_and_label(val)

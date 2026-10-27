@@ -14,9 +14,11 @@ module Search
     # @param facet_prefix [String, nil] optional prefix to filter facet values
     # @param exclude [Boolean] whether to exclude a tagged filter
     # @param page [Integer, nil] optional page number for paged facets
+    # @param missing_value [Boolean] whether to count objects without a value for the field
     # @param tag [String, nil] the filter tag to exclude; defaults to `field`. Needed when faceting on a
     #   different field than the one filters are tagged with (see ItemQueryBuilder#facet_filter_query).
-    def initialize(field:, alpha_sort: false, limit: nil, facet_prefix: nil, exclude: false, page: nil, tag: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(field:, alpha_sort: false, limit: nil, facet_prefix: nil, exclude: false, page: nil, tag: nil, # rubocop:disable Metrics/ParameterLists
+                   missing_value: false)
       @field = field
       @alpha_sort = alpha_sort
       @limit = limit
@@ -24,6 +26,7 @@ module Search
       @exclude = exclude
       @page = page
       @tag = tag || field
+      @missing_value = missing_value
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -31,9 +34,11 @@ module Search
         type: 'terms',
         field:,
         sort: (alpha_sort ? 'index' : 'count'),
-        numBuckets: true
-      }.tap do |facet|
-        facet[:limit] = limit if limit
+        numBuckets: true,
+        limit:,
+        # Counts objects without a value for the field.
+        missing: (true if missing_value)
+      }.compact.tap do |facet|
         facet[:prefix] = facet_prefix if facet_prefix.present?
         # Exclude means that there is a tagged filter that should be ignored when calculating the facet.
         # Tagging is done in ItemQueryBuilder.
@@ -46,6 +51,6 @@ module Search
 
     private
 
-    attr_reader :field, :alpha_sort, :limit, :facet_prefix, :exclude, :page, :tag
+    attr_reader :field, :alpha_sort, :limit, :facet_prefix, :exclude, :page, :tag, :missing_value
   end
 end

@@ -36,6 +36,14 @@ RSpec.describe Search::Serializer do
              'Registered date: ("Last month" AND 2021-02-01 TO 2022-02-01)')
   end
 
+  context 'with a missing value' do
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
+
+    it 'labels the missing value as No value' do
+      expect(serialized_query).to eq('Language: ("English" AND "No value")')
+    end
+  end
+
   context 'with Multi-Item Deposits' do
     let(:search_form) { WorkflowGridSearchForm.new(query: 'maps', multi_item_deposit_action_ids: %w[12 13]) }
 
