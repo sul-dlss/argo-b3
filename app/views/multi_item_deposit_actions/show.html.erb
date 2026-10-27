@@ -5,7 +5,10 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<div class="container py-2" data-controller="scheduled-refresh" data-scheduled-refresh-interval-value="<%= Settings.reload_intervals.multi_item_deposit_show %>">
+<%= tag.div class: 'container py-2', data: {
+      controller: 'scheduled-refresh',
+      scheduled_refresh_interval_value: Settings.reload_intervals.multi_item_deposit_show
+    } do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.show.title'), classes: 'mb-3') %>
 
   <p><%= @multi_item_deposit_action.name %></p>
@@ -15,4 +18,4 @@
   <p><%= t('edit.multi_item_deposits.show.description') %></p>
 
   <%= render MultiItemDeposit::DepositStatusTableComponent.new(object_status_presenters: @object_status_presenters) %>
-</div>
+<% end %>
