@@ -12,4 +12,14 @@ RSpec.describe Search::Facets do
       expect(described_class.find_config_by_form_field(:unknown_field)).to be_nil
     end
   end
+
+  describe '#missing_value?' do
+    it 'returns true for the missing value' do
+      expect(described_class.missing_value?('_missing_value')).to be true
+    end
+
+    it 'returns false for other values' do
+      expect(described_class.missing_value?('English')).to be false
+    end
+  end
 end

@@ -77,6 +77,7 @@ en:
       never: "Not released"
       has_orcids: 'Has contributor ORCIDs'
       has_doi: 'Has DOI'
+      _missing_value: 'No value'
     label: "Search results"
   show:
     status:

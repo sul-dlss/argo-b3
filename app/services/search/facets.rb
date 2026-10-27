@@ -11,6 +11,10 @@ module Search
       nil
     end
 
+    def self.missing_value?(value)
+      value == MISSING_VALUE
+    end
+
     Config = Struct.new('FacetConfig',
                         :form_field,
                         # Provide if this facet supports excluding values.
@@ -44,6 +48,8 @@ module Search
                         # Hash of dynamic facet keys to Solr queries.
                         # This is used for facets like released_to_earthworks.
                         :dynamic_facet,
+                        # True to offer a "No value" option for objects without a value for the field.
+                        :missing_value,
                         # `composite_facet_field` is a solr field whose values encode "<label>:<id>"
                         # (see Search::CompositeFacetValue), where the id is a druid or a URI,
                         # e.g. "Stanford Theses:druid:bc123df4567" or
@@ -59,9 +65,12 @@ module Search
       end
     end
 
+    # Facet value for selecting objects without a value for the field (see Config#missing_value).
+    MISSING_VALUE = '_missing_value'
+
     def Config.with_defaults(**)
       defaults = { alpha_sort: false, limit: 100, operator: :and,
-                   facet_index: false, facet_children: false, facet_search: false }
+                   facet_index: false, facet_children: false, facet_search: false, missing_value: false }
       new(**defaults, **)
     end
 
@@ -107,7 +116,8 @@ module Search
       limit: 25,
       facet_resource: :date_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      missing_value: true
     )
 
     EARLIEST_ACCESSIONED_DATE = Config.with_defaults(
@@ -188,7 +198,8 @@ module Search
       field: Search::Fields::LICENSE_URI,
       composite_facet_field: Search::Fields::LICENSE_LABEL_URI,
       limit: 50,
-      alpha_sort: true
+      alpha_sort: true,
+      missing_value: true
     )
 
     MIMETYPES = Config.with_defaults(
@@ -218,7 +229,8 @@ module Search
       form_field: :formats,
       field: Search::Fields::FORMATS,
       limit: 100,
-      alpha_sort: true
+      alpha_sort: true,
+      missing_value: true
     )
 
     GENRES = Config.with_defaults(
@@ -227,7 +239,8 @@ module Search
       limit: 25,
       facet_resource: :genre_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      missing_value: true
     )
 
     LANGUAGES = Config.with_defaults(
@@ -236,7 +249,8 @@ module Search
       limit: 25,
       facet_resource: :language_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      missing_value: true
     )
 
     METADATA_SOURCES = Config.with_defaults(
@@ -248,7 +262,8 @@ module Search
     MODS_RESOURCE_TYPES = Config.with_defaults(
       form_field: :mods_resource_types,
       field: Search::Fields::MODS_RESOURCE_TYPES,
-      limit: 100
+      limit: 100,
+      missing_value: true
     )
 
     OBJECT_TYPES = Config.with_defaults(
@@ -282,7 +297,8 @@ module Search
       limit: 25,
       facet_resource: :region_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      missing_value: true
     )
 
     REGISTERED_DATE = Config.with_defaults(
@@ -367,7 +383,8 @@ module Search
       limit: 25,
       facet_resource: :topic_facets,
       facet_index: true,
-      facet_search: true
+      facet_search: true,
+      missing_value: true
     )
 
     VERSIONS = Config.with_defaults(

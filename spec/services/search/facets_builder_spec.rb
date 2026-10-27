@@ -9,6 +9,7 @@ RSpec.describe Search::FacetsBuilder do
     [
       Search::Facets::OBJECT_TYPES,
       Search::Facets::ACCESS_RIGHTS,
+      Search::Facets::LANGUAGES,
       Search::Facets::RELEASED_TO_EARTHWORKS
     ]
   end
@@ -29,6 +30,8 @@ RSpec.describe Search::FacetsBuilder do
                   sort: 'index',
                   type: 'terms'
                 })
+    expect(facet_json[Search::Fields::LANGUAGES]).to include(missing: true)
+    expect(facet_json[Search::Fields::ACCESS_RIGHTS]).not_to include(:missing)
     # Only testing one dynamic facet here so that the test is not brittle.
     expect(facet_json).to include(
       "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week",

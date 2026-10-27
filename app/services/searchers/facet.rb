@@ -49,7 +49,7 @@ module Searchers
     def facet_json
       {
         facet_field => Search::FacetBuilder.call(field: facet_field, tag: facet_config.field, alpha_sort:, limit:,
-                                                 page:)
+                                                 page:, missing_value: facet_config.missing_value)
       }
     end
   end

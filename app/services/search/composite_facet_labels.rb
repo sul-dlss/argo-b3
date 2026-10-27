@@ -34,7 +34,7 @@ module Search
     end
 
     def labels_for(facet_config)
-      ids = search_form.send(facet_config.form_field)
+      ids = search_form.send(facet_config.form_field).reject { |id| Search::Facets.missing_value?(id) }
       return {} if ids.blank?
 
       facet_buckets(facet_config:, ids:).each_with_object({}) do |bucket, labels|
