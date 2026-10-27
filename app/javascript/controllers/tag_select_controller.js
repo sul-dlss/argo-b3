@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
+import MorphableTomSelect from 'controllers/morphable_tom_select'
 
 const MIN_QUERY_LENGTH = 3
 
@@ -15,6 +16,11 @@ export default class extends Controller {
   static values = { urlPath: String }
 
   connect () {
+    this.morphable = new MorphableTomSelect(this.element, { build: () => this.build() })
+    this.morphable.connect()
+  }
+
+  build () {
     this.tomSelect = new TomSelect(this.element, {
       maxItems: 1,
       create: true,
@@ -33,6 +39,7 @@ export default class extends Controller {
       load: (query, callback) => this.load(query, callback)
     })
     this.preventReopeningWhenFull()
+    return this.tomSelect
   }
 
   // Throttled refreshes and slow loads would otherwise reopen the dropdown over the next field after a tag is entered.
@@ -45,7 +52,7 @@ export default class extends Controller {
   }
 
   disconnect () {
-    this.tomSelect?.destroy()
+    this.morphable.disconnect()
   }
 
   // Updates Tom Select when the value of the input is set by other code (e.g., has-many#addValue).

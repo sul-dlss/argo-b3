@@ -98,6 +98,27 @@ RSpec.describe 'Show bulk actions history' do
     expect(page).to have_no_css('#bulk-actions-filter select[multiple]:not(.tomselected)', visible: :all)
   end
 
+  it 'keeps an open filter and an unsubmitted selection when the page reloads' do
+    visit bulk_actions_path
+
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
+    click_button 'Select none'
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+
+    bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
+    expect(page).to have_css("tr##{dom_id(bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-dropdown')
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+
+    # Closes the dropdown, leaving the selection unsubmitted.
+    find('h1').click
+    expect(page).to have_no_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-dropdown')
+
+    other_bulk_action = create(:bulk_action, user:, action_type: 'REINDEX')
+    expect(page).to have_css("tr##{dom_id(other_bulk_action, 'row')}")
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+  end
+
   context 'when an admin' do
     let!(:bulk_action_other_user) { create(:bulk_action, user: create(:user, email_address: 'mmouse@stanford.edu')) }
     let(:user) { create(:user, :admin) }

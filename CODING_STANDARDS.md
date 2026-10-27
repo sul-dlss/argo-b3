@@ -7,6 +7,12 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 - Searchable select widgets (tom-select, single or multi) commit the highlighted option, or create a new value, only on Enter or click. Tab always moves focus to the next field without selecting or creating anything, as with a native `<select>`, so keyboard users can move through a form without accidentally changing values. Don't enable tom-select's `selectOnTab`.
 - An `Edit::*` component that renders form fields says in its class comment which concerns the form's object must include or, where no concern provides them, which attributes it must provide (e.g., `Edit::CatalogRecordIdComponent`). Components that only render other edit components are exempt. Update the comment when the fields a component renders change.
 
+## Turbo
+
+- When a form or button changes the page it was submitted from (e.g., adding or deleting a row), update the page with a morph, not turbo streams. The page sets the `turbo-refresh-method` `morph` and `turbo-refresh-scroll` `preserve` meta tags. On success, redirect back to the page (`status: :see_other`, toast in `flash[:toast]`). On failure, render the page with `status: :unprocessable_content`. Turbo morphs both, so you don't need `*.turbo_stream.erb` views or partials pulled out for replacement. On a page that refreshes itself periodically, use `ToastAndRefreshConcern` so the background refresh can't consume the flash.
+- Use turbo streams only when a morph of the submitting page can't do the job: broadcasts to other browsers (`turbo_stream_from`), appending toasts, or updating part of a page that is too costly to re-render.
+- Widgets that morphing would break are made morph-safe in their Stimulus controller (e.g., Tom Select controllers use `MorphableTomSelect`). Don't work around them with turbo streams or by skipping the morph.
+
 ## Specs
 
 ### What to test
