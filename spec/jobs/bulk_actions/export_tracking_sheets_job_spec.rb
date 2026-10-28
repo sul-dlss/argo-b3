@@ -6,7 +6,8 @@ RSpec.describe BulkActions::ExportTrackingSheetsJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:bulk_action) { create(:bulk_action, action_type: 'export_tracking_sheets') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'export_tracking_sheets', user:) }
+  let(:user) { create(:user, :reader) }
   let(:log) { StringIO.new }
 
   let(:solr_doc) do
@@ -69,6 +70,22 @@ RSpec.describe BulkActions::ExportTrackingSheetsJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
+    end
+  end
+
+  context 'when the user lacks read permission' do
+    let(:user) { create(:user) }
+
+    it 'records the druid as failed and generates a PDF without it' do
+      job.perform_now
+
+      expect(TracksheetService).to have_received(:call) do |solr_doc_presenters:|
+        expect(solr_doc_presenters).to be_empty
+      end
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tNot authorized to read"
     end
   end
 

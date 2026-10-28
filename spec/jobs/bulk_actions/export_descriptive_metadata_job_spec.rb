@@ -6,7 +6,8 @@ require 'rails_helper'
 RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
   subject(:job) { described_class.new(bulk_action:, druids:) }
 
-  let(:bulk_action) { create(:bulk_action, action_type: 'export_descriptive_metadata') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'export_descriptive_metadata', user:) }
+  let(:user) { create(:user, :reader) }
   let(:csv_path) { bulk_action.export_filepath(:descriptive_metadata) }
   let(:log) { instance_double(File, puts: nil, close: true) }
 
@@ -53,6 +54,26 @@ RSpec.describe BulkActions::ExportDescriptiveMetadataJob do
       expect(bulk_action.druid_count_success).to eq 2
       expect(bulk_action.druid_count_fail).to eq 1
       expect(bulk_action.druid_count_total).to eq 3
+    end
+  end
+
+  context 'when the user lacks read permission for an object' do
+    let(:item3) { build(:dro_with_metadata, id: druid3) }
+
+    before do
+      create(:permission, :read_restricted, target_druid: druid3)
+      allow(Sdr::Repository).to receive(:find).with(druid: druid3).and_return(item3)
+    end
+
+    it 'does not export the object' do
+      job.perform_now
+
+      csv = CSV.read(csv_path, headers: true)
+      expect(csv['druid']).to eq %w[bc123df4567 bd123fg5678]
+
+      expect(bulk_action.druid_count_success).to eq(2)
+      expect(bulk_action.druid_count_fail).to eq(1)
+      expect(log).to have_received(:puts).with(/#{druid3}\tNot authorized to read/).once
     end
   end
 

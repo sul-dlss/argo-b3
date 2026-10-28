@@ -22,6 +22,7 @@ module BulkActions
       end
 
       def perform
+        return unless check_read_ability?
         return failure!(message: 'No structural metadata to export') if no_structural?
 
         content = Contents::Builder.build(cocina_object:)
