@@ -114,6 +114,9 @@ en:
         heading: "Released to"
       unreleased:
         heading: "Not released"
+    discard:
+      discard_draft: "Discard draft"
+      purge: "Purge object"
     errors:
       discard_failed: "Discarding the draft failed."
       purge_failed: "Purging failed."

@@ -13,7 +13,7 @@ RSpec.describe 'Show object Admin section' do
   before do
     allow(Sdr::Repository).to receive_messages(
       lock: object_lock,
-      find: build(:admin_policy, id: druid),
+      find: build(:admin_policy_with_metadata, id: druid),
       find_solr: { Search::Fields::ID => druid, Search::Fields::TITLE => 'My object',
                    Search::Fields::OBJECT_TYPES => [object_type],
                    Search::Fields::AGREEMENT_DRUID => 'druid:dd123fg4567',
