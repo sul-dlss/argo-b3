@@ -7,9 +7,11 @@ module Contents
     # It uses a strategy for creating a document: each PDF is placed in its own document file set and
     # each other file is placed in its own file file set.
     class Document < Base
+      # DSA rejects hierarchical filepaths for documents.
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a document.
       def self.disqualifying_reasons(content:, **)
         [].tap do |reasons|
+          reasons << :hierarchical_filepaths if content.hierarchical_filepaths?
           reasons << :no_pdfs if content.content_file_binaries.none? { |binary| pdf?(binary.mime_type) }
         end
       end

@@ -7,6 +7,12 @@ module Contents
     # It uses a one FileSet per file strategy, where each FileSet is a file. Agreements are always dark, so every
     # file is dark and preserved but not published or shelved, regardless of its mime type.
     class Agreement < FileSetPerFile
+      # DSA rejects hierarchical filepaths for agreements.
+      # @return [Array<Symbol>] the reasons that the content cannot be structured as an agreement.
+      def self.disqualifying_reasons(content:, **)
+        content.hierarchical_filepaths? ? [:hierarchical_filepaths] : []
+      end
+
       # @param [Content] content
       # @param [Cocina::Models::DROWithMetadata] cocina_object
       def initialize(content:, cocina_object:)

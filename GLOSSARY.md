@@ -47,6 +47,9 @@ The structure of a DRO for one lock: ordered `ContentFileSet`s holding ordered `
 ### Resource
 One ordered `ContentFileSet` within a Content, typed by its role (e.g., a `page` of a book, an `object`). Use "Resource" when talking to users; it is the same thing as a ContentFileSet (a cocina FileSet).
 
+### Hierarchical Filepath
+A file's filepath that includes directories (e.g., `folder1/image1.tif`) rather than a bare filename. Only the file (`object`) and geo content types may have hierarchical filepaths; DSA rejects them for all other content types. Use "hierarchical filepaths" rather than "files in folders".
+
 ### Immutable Content
 A Content that exactly reflects the cocina object's structural metadata at its lock. Use it for anything that shows or exports what was deposited (e.g., the Files tab, structural CSV download from the object page).
 

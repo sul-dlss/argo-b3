@@ -4,7 +4,7 @@ module Contents
   # Selects the populator to use for a Content and explains the selection.
   #
   # The populator for a content type (e.g., Book for a book) may not be able to handle a particular
-  # content, e.g., when the files of a book are organized into folders. In that case the fallback
+  # content, e.g., when the files of a book have hierarchical filepaths. In that case the fallback
   # populator is used instead, and the reasons are provided so that they can be shared with the user.
   #
   # Note that selecting a populator depends on the mime types of the binaries, so this populates the mime

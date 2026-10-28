@@ -118,6 +118,61 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'when there are hierarchical filepaths' do
+    let(:hierarchy_error) { a_string_starting_with('Hierarchical filepaths') }
+
+    before do
+      content_file_binary = create(:content_file_binary, content:, filepath: 'folder1/data.zip')
+      create(:content_file, content_file_set: content.content_file_sets.first, content_file_binary:)
+    end
+
+    context 'with the book content type' do
+      it 'has an error' do
+        expect(result.errors).to include(hierarchy_error)
+      end
+    end
+
+    context 'with the webarchive-binary content type' do
+      let(:content_type) { Cocina::Models::ObjectType.webarchive_binary }
+
+      it 'has an error' do
+        expect(result.errors).to include(hierarchy_error)
+      end
+    end
+
+    context 'with a content type without a validator' do
+      let(:content_type) { Cocina::Models::ObjectType.manuscript }
+
+      it 'has an error' do
+        expect(result.errors).to contain_exactly(hierarchy_error)
+      end
+    end
+
+    context 'with the object content type' do
+      let(:content_type) { Cocina::Models::ObjectType.object }
+
+      it 'has no error' do
+        expect(result.errors).not_to include(hierarchy_error)
+      end
+    end
+
+    context 'with the geo content type' do
+      let(:content_type) { Cocina::Models::ObjectType.geo }
+
+      it 'has no error' do
+        expect(result.errors).not_to include(hierarchy_error)
+      end
+    end
+
+    context 'when dark' do
+      let(:access) { { view: 'dark', download: 'none' } }
+
+      it 'has an error' do
+        expect(result.errors).to contain_exactly(hierarchy_error)
+      end
+    end
+  end
+
   context 'when dark' do
     let(:access) { { view: 'dark', download: 'none' } }
 

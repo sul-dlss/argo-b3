@@ -15,12 +15,22 @@ RSpec.describe Contents::Populators::ThreeDimensional do
 
     context 'when there is a model' do
       before do
-        create(:content_file_binary, content:, filepath: 'folder/model.glb', mime_type: 'model/gltf-binary')
+        create(:content_file_binary, content:, filepath: 'model.glb', mime_type: 'model/gltf-binary')
         create(:content_file_binary, content:, filepath: 'notes.txt', mime_type: 'text/plain')
       end
 
       it 'has no reasons' do
         expect(reasons).to eq([])
+      end
+    end
+
+    context 'when there are hierarchical filepaths' do
+      before do
+        create(:content_file_binary, content:, filepath: 'folder/model.glb', mime_type: 'model/gltf-binary')
+      end
+
+      it 'has the hierarchical filepaths reason' do
+        expect(reasons).to eq([:hierarchical_filepaths])
       end
     end
 

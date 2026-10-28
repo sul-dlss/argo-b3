@@ -12,16 +12,15 @@ module Contents
       OCR_MIME_TYPES = [MimeTypes::XML, MimeTypes::PDF, MimeTypes::PLAIN_TEXT].freeze
       DARK_VIEW = 'dark'
 
-      # Grouping the files of a image by filename only works when the files are not organized into folders,
+      # Grouping the files of a image by filename only works when the files do not have hierarchical filepaths,
       # and there are no pages to group the files into when there are no images. Structuring a dark object
       # as a image is pointless, since none of its files are shelved or published.
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a book.
       def self.disqualifying_reasons(content:, cocina_object:)
-        content_file_binaries = content.content_file_binaries
         [].tap do |reasons|
           reasons << :dark if cocina_object.access.view == DARK_VIEW
-          reasons << :hierarchical_files if content_file_binaries.any?(&:hierarchical?)
-          reasons << :no_images if content_file_binaries.none? { |binary| image?(binary.mime_type) }
+          reasons << :hierarchical_filepaths if content.hierarchical_filepaths?
+          reasons << :no_images if content.content_file_binaries.none? { |binary| image?(binary.mime_type) }
         end
       end
 

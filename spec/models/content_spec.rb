@@ -143,6 +143,37 @@ RSpec.describe Content do
     end
   end
 
+  describe '#hierarchical_filepaths?' do
+    let(:content) { create(:content, druid: 'druid:bc123df4567') }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'file1.pdf')
+    end
+
+    context 'when a binary has a hierarchical filepath' do
+      before do
+        create(:content_file_binary, content:, filepath: 'folder1/file2.pdf')
+      end
+
+      it 'is true' do
+        expect(content.hierarchical_filepaths?).to be true
+      end
+    end
+
+    context 'when no binary has a hierarchical filepath' do
+      it 'is false' do
+        expect(content.hierarchical_filepaths?).to be false
+      end
+    end
+
+    it 'memoizes the result' do
+      content.hierarchical_filepaths?
+      create(:content_file_binary, content:, filepath: 'folder1/file2.pdf')
+
+      expect(content.hierarchical_filepaths?).to be false
+    end
+  end
+
   describe '#staging_or_discovering?' do
     it 'is true only while staging or discovering' do
       expect(build(:content, staging_state: 'staging')).to be_staging_or_discovering

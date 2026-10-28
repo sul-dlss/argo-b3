@@ -7,9 +7,11 @@ module Contents
     # It uses a strategy for creating a 3d object: the first model file is placed in a 3d file set and
     # each other file is placed in its own file file set.
     class ThreeDimensional < Base
+      # DSA rejects hierarchical filepaths for 3d objects.
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a 3d object.
       def self.disqualifying_reasons(content:, **)
         [].tap do |reasons|
+          reasons << :hierarchical_filepaths if content.hierarchical_filepaths?
           reasons << :no_models if content.content_file_binaries.none? { |binary| model?(binary.mime_type) }
         end
       end

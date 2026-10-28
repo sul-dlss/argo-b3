@@ -9,6 +9,26 @@ RSpec.describe Contents::Populators::Agreement do
     create(:content_file_binary, content:, filepath: 'folder/file1.pdf', mime_type: 'application/pdf')
   end
 
+  describe '.disqualifying_reasons' do
+    subject(:reasons) { described_class.disqualifying_reasons(content:, cocina_object:) }
+
+    context 'when there are hierarchical filepaths' do
+      it 'has the hierarchical filepaths reason' do
+        expect(reasons).to eq([:hierarchical_filepaths])
+      end
+    end
+
+    context 'when there are no hierarchical filepaths' do
+      let!(:content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'file1.pdf', mime_type: 'application/pdf')
+      end
+
+      it 'has no reasons' do
+        expect(reasons).to eq([])
+      end
+    end
+  end
+
   describe '.structure' do
     subject(:structure) { described_class.structure(content:, cocina_object:) }
 

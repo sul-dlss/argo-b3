@@ -15,12 +15,22 @@ RSpec.describe Contents::Populators::Document do
 
     context 'when there is a PDF' do
       before do
-        create(:content_file_binary, content:, filepath: 'folder/report.pdf', mime_type: 'application/pdf')
+        create(:content_file_binary, content:, filepath: 'report.pdf', mime_type: 'application/pdf')
         create(:content_file_binary, content:, filepath: 'data.csv', mime_type: 'text/csv')
       end
 
       it 'has no reasons' do
         expect(reasons).to eq([])
+      end
+    end
+
+    context 'when there are hierarchical filepaths' do
+      before do
+        create(:content_file_binary, content:, filepath: 'folder/report.pdf', mime_type: 'application/pdf')
+      end
+
+      it 'has the hierarchical filepaths reason' do
+        expect(reasons).to eq([:hierarchical_filepaths])
       end
     end
 
