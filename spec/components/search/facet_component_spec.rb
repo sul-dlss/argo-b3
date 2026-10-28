@@ -63,6 +63,29 @@ RSpec.describe Search::FacetComponent, type: :component do
     end
   end
 
+  context 'when year range form fields are provided' do
+    let(:component) do
+      described_class.new(facet_counts:, search_form:, form_field: :dates,
+                          year_from_form_field: :dates_from, year_to_form_field: :dates_to)
+    end
+    let(:search_form) { ResultsSearchForm.new(dates_to: '2020') }
+
+    before do
+      allow(facet_counts).to receive(:each)
+        .and_yield(SearchResults::FacetCount.new(value: '2019', count: 100))
+    end
+
+    it 'renders the facet values, the year range inputs, and is expanded' do
+      render_inline(component)
+
+      expect(page).to have_css('section[aria-label="Year"] h3 button[aria-expanded="true"]', text: 'Year')
+      expect(page).to have_link('2019', href: '/search?dates%5B%5D=2019&dates_to=2020')
+      expect(page).to have_field('From', type: 'number')
+      expect(page).to have_field('To', type: 'number', with: '2020')
+      expect(page).to have_button('Filter')
+    end
+  end
+
   context 'when there are no facet counts' do
     before do
       allow(facet_counts).to receive(:any?).and_return(false)

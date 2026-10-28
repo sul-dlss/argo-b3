@@ -1,0 +1,17 @@
+<%= helpers.form_with model: search_form, scope: '', url: url_for(search_form.class.new), method: :get, class: 'facet-values mt-3' do |form| %>
+  <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: [year_from_form_field, year_to_form_field]) %>
+
+  <div class="row g-2">
+    <div class="col">
+      <%= form.label year_from_form_field, 'From', class: 'form-label' %>
+      <%= form.number_field year_from_form_field, **year_field_options %>
+    </div>
+    <div class="col">
+      <%= form.label year_to_form_field, 'To', class: 'form-label' %>
+      <%= form.number_field year_to_form_field, **year_field_options %>
+    </div>
+  </div>
+
+  <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter', variant: :primary,
+                                                           classes: 'btn-sm mt-3') %>
+<% end %>

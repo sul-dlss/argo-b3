@@ -393,6 +393,16 @@ Dynamic facets may optionally have a date range filter (where the user specifies
 2. Add `date_from_form_field`, `date_to_form_field`, and `field` to the configuration constant in `Search::Facets`.
 3. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` provide the `date_from_form_field` and `date_to_form_field` to `Search::DynamicFacetComponent`
 
+### Making a facet of years support a user-supplied year range
+A value facet of years may optionally have a year range filter (where the user specifies a from year and/or to year). See, for example, the "Year" facet.
+
+1. Add `*_from` and `*_to` attributes with the `:year` type (`YearType`, which bounds the years) to `SearchForm`.
+2. Add `year_from_form_field` and `year_to_form_field` to the configuration constant in `Search::Facets`.
+3. Optionally, add labels for the `*_from` and `*_to` attributes (displayed in the current filters) to `en.yml`.
+
+Note:
+* Since years are indexed in a Solr string field, a Solr range query would compare years lexicographically (e.g., 201 is between 2000 and 2020). Instead, `Search::YearRangeQuery` filters on each year in the range.
+
 ### Adding exclude (query negation) to a facet
 Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
 

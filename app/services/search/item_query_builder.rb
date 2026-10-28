@@ -73,16 +73,21 @@ module Search
     end
 
     def filter_queries
-      [multi_item_deposit_filter_query].tap do |queries|
-        FACETS.each do |facet_config|
-          if facet_config.dynamic_facet.present?
-            queries << dynamic_facet_filter_query(facet_config:)
-          else
-            queries << facet_filter_query(facet_config:)
-            queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
-          end
-        end
-      end.compact
+      facet_queries = FACETS.flat_map do |facet_config|
+        next dynamic_facet_filter_query(facet_config:) if facet_config.dynamic_facet.present?
+
+        value_facet_filter_queries(facet_config:)
+      end
+      [multi_item_deposit_filter_query, *facet_queries].compact
+    end
+
+    # @param facet_config [Search::Facets::Config] the configuration for a value (i.e., not dynamic) facet
+    # @return [Array<String, nil>] the filter queries for the selected, excluded, and year range values
+    def value_facet_filter_queries(facet_config:)
+      [facet_filter_query(facet_config:)].tap do |queries|
+        queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
+        queries << YearRangeQuery.call(facet_config:, search_form:) if facet_config.year_from_form_field.present?
+      end
     end
 
     # The terms parser is not subject to the boolean clause limit, so it handles large Multi-Item Deposits.

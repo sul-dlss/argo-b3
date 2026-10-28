@@ -26,7 +26,7 @@ module Search
     attr_reader :facet_config, :facet_counts, :search_form, :facet_component
 
     delegate :form_field, :exclude_form_field, :date_from_form_field, :date_to_form_field,
-             to: :facet_config
+             :year_from_form_field, :year_to_form_field, to: :facet_config
 
     def facet_search_path_helper
       Search::FacetPathResolver.search_path_helper(facet_config:, search_form:)

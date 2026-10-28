@@ -179,6 +179,27 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with a year range for dates' do
+    let(:search_form) { ResultsSearchForm.new(dates: ['2001'], dates_from: '1999', dates_to: '2001') }
+
+    it 'builds filter queries for the dates and the year range' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include(
+        "#{Search::Fields::PUBLICATION_DATE}:(\"2001\")",
+        "{!terms f=#{Search::Fields::PUBLICATION_DATE}}1999,2000,2001"
+      )
+    end
+  end
+
+  context 'with only a from year for dates' do
+    let(:search_form) { ResultsSearchForm.new(dates_from: '9998') }
+
+    it 'builds an open-ended filter query for the year range' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("{!terms f=#{Search::Fields::PUBLICATION_DATE}}9998,9999")
+    end
+  end
+
   context 'with earliest accessioned date (dynamic facet)' do
     context 'with from and to dates' do
       let(:search_form) do

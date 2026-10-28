@@ -1,7 +1,10 @@
-<%= form_builder.hidden_field :query if query_hidden_field? %>
+<%# Hidden fields have no ids, since they would duplicate the ids of inputs for the same fields elsewhere on the page (e.g., a facet's year range inputs), breaking the inputs' labels. %>
+<%= form_builder.hidden_field :query, id: nil if query_hidden_field? %>
 
 <% search_form.facet_attributes.each do |attr_name, values| %>
+  <% next unless hidden_field?(attr_name) %>
+
   <% Array(values).each do |value| %>
-    <%= form_builder.hidden_field(attr_name.to_sym, value:, multiple: true) unless attr_name == form_field %>
+    <%= form_builder.hidden_field(attr_name.to_sym, value:, multiple: values.is_a?(Array), id: nil) %>
   <% end %>
 <% end %>

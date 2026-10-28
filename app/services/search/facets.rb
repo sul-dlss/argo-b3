@@ -29,6 +29,9 @@ module Search
                         # Form field for the from/to dates in a date range facet.
                         :date_from_form_field,
                         :date_to_form_field,
+                        # Form fields for the from/to years in a year range (for a value facet of years).
+                        :year_from_form_field,
+                        :year_to_form_field,
                         # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
                         # Path helpers are resolved from this plus the search form's route scope.
                         # See Search::FacetPathResolver.
@@ -112,6 +115,8 @@ module Search
 
     DATES = Config.with_defaults(
       form_field: :dates,
+      year_from_form_field: :dates_from,
+      year_to_form_field: :dates_to,
       field: Search::Fields::PUBLICATION_DATE,
       limit: 25,
       facet_resource: :date_facets,
