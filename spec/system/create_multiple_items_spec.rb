@@ -292,6 +292,8 @@ RSpec.describe 'Create multiple items' do
 
   context 'when collections are selected' do
     before do
+      create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
+      create(:permission, :edit, workgroup:, target_druid: 'druid:gh456jk7890')
       allow(Searchers::CollectionList).to receive(:call).and_return(
         [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
       )

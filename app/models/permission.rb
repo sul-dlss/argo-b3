@@ -20,9 +20,9 @@ class Permission < ApplicationRecord
     read_restricted: 'read_restricted',
     # A workgroup with read_unrestricted can read any object that is not restricted.
     read_unrestricted: 'read_unrestricted',
-    # A workgroup with edit can create a new object in which:
-    # * the object's collection is the target collection
-    # * the object's APO is the target APO
+    # Creating a new object requires edit for:
+    # * the object's APO, i.e., the target APO
+    # * each of the object's collections, i.e., the target collection or the collection's APO
     # A workgroup with edit can edit:
     # * the target collection or APO
     # * any object that is a member of the target collection

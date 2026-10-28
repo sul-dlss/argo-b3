@@ -39,9 +39,8 @@ class MultipleItemsController < ApplicationController
   end
 
   def create
-    authorize! with: ItemPolicy
-
     @items_registration_form = ItemsRegistrationForm.new(items_registration_form_params)
+    authorize! @items_registration_form, with: ItemPolicy
 
     if params[:commit] == CLEAR_VALUE
       @items_registration_form.item_registrations.clear

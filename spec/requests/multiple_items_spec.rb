@@ -30,9 +30,28 @@ RSpec.describe 'Multiple items' do
     end
   end
 
+  context 'when the user cannot edit the selected collection' do
+    before do
+      create(:permission, :edit, workgroup:, target_druid: 'druid:hv992ry2431')
+      allow(Sdr::Repository).to receive(:find_solr).with(druid: 'druid:bc123df4567')
+                                                   .and_return({ Search::Fields::ID => 'druid:bc123df4567' })
+    end
+
+    it 'denies access' do
+      post multiple_items_path, params: {
+        items_registration: { apo_druid: 'druid:hv992ry2431', collection_druids: ['druid:bc123df4567'] }
+      }
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+      expect(FormValidationAction.count).to eq 0
+    end
+  end
+
   describe 'clearing the items' do
     before do
       create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
+      create(:permission, :edit, workgroup:, target_druid: 'druid:xz987wv6543')
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
       allow(Searchers::CollectionListByDruid).to receive(:call)
         .and_return([['Art History Slides', 'druid:bc123df4567']])

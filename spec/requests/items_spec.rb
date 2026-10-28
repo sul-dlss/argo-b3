@@ -8,6 +8,8 @@ RSpec.describe 'Items' do
   describe 'create' do
     context 'when invalid' do
       before do
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:xz987wv6543')
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
         allow(Searchers::CollectionListByDruid).to receive(:call)
           .and_return([['Art History Slides', 'druid:bc123df4567']])
@@ -30,6 +32,22 @@ RSpec.describe 'Items' do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(Capybara.string(response.body)).to have_link('Cancel', href: '/')
+      end
+    end
+
+    context 'when the user cannot edit the APO' do
+      before do
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
+        allow(Sdr::Repository).to receive(:register)
+        sign_in(user)
+      end
+
+      it 'denies access' do
+        post '/items', params: { item: { apo_druid: 'druid:hv992ry2431', title: 'My item' } }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(Sdr::Repository).not_to have_received(:register)
       end
     end
   end
