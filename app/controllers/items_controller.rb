@@ -43,6 +43,7 @@ class ItemsController < ApplicationController
       flash[:toast] = t('edit.items.new.toasts.register')
       redirect_to create_redirect_path
     else
+      @cancel_path = root_path
       set_apo_and_collection_options(form: @new_item_form)
       render :new, status: :unprocessable_content
     end
