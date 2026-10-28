@@ -6,7 +6,8 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:bulk_action) { create(:bulk_action, action_type: :export_structural_metadata) }
+  let(:bulk_action) { create(:bulk_action, action_type: :export_structural_metadata, user:) }
+  let(:user) { create(:user, :reader) }
   let(:log) { StringIO.new }
 
   let(:structural) do
@@ -194,6 +195,18 @@ RSpec.describe BulkActions::ExportStructuralMetadataJob do
     output = CSV.read(bulk_action.export_filepath(:structural_metadata), headers: true)
     expect(output.size).to eq 4 # header + 2 filesets + 2 files
     expect(output.first.to_csv).to eq "bc123df4567,Image 1,image,1,bb045jk9908_0001.tiff,bb045jk9908_0001.tiff,no,no,yes,world,world,,image/tiff,,,false,false\n" # rubocop:disable Layout/LineLength
+  end
+
+  context 'when the user lacks read permission' do
+    let(:user) { create(:user) }
+
+    it 'records a failure and does not write to CSV' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(log.string).to include "#{druid}\tError: Not authorized to read"
+      expect(CSV.read(bulk_action.export_filepath(:structural_metadata), headers: true).size).to eq 0
+    end
   end
 
   context 'when no structural metadata is present' do

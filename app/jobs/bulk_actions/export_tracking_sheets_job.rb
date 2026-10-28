@@ -17,13 +17,23 @@ module BulkActions
 
     def solr_doc_presenters
       druids.filter_map do |druid|
-        SolrDocPresenter.new(solr_doc: Sdr::Repository.find_solr(druid:)).tap do
+        solr_doc = Sdr::Repository.find_solr(druid:)
+        unless read_allowed?(solr_doc)
+          failure!(druid:, message: 'Not authorized to read')
+          next
+        end
+
+        SolrDocPresenter.new(solr_doc:).tap do
           success!(druid:, message: 'Fetched Solr document for tracking sheet')
         end
       rescue Sdr::Repository::NotFoundResponse => e
         failure!(druid:, message: "Solr document not found: #{e.message}")
         nil
       end
+    end
+
+    def read_allowed?(solr_doc)
+      allowed_to?(:show?, solr_doc, with: ObjectPolicy, context: { user: })
     end
   end
 end

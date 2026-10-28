@@ -7,7 +7,8 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:bare_druid) { 'bc123df4567' }
-  let(:bulk_action) { create(:bulk_action, action_type: 'export_catalog_data') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'export_catalog_data', user:) }
+  let(:user) { create(:user, :reader) }
   let(:log) { StringIO.new }
 
   let(:object_client) { instance_double(Dor::Services::Client::Object, find: cocina_object) }
@@ -48,6 +49,19 @@ RSpec.describe BulkActions::ExportCatalogDataJob do
     csv = CSV.read(bulk_action.export_filepath(:catalog_data), headers: true)
     expect(csv.headers).to eq %w[druid folio_instance_hrid refresh part_label sort_key barcode]
     expect(csv[0].to_h.values).to eq [bare_druid, 'in00000012345', 'true', 'Part 1', '1', '36105010101010']
+  end
+
+  context 'when the user lacks read permission' do
+    let(:user) { create(:user) }
+
+    it 'records a failure and does not write to CSV' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Not authorized to read"
+      expect(CSV.read(bulk_action.export_filepath(:catalog_data), headers: true).size).to eq 0
+    end
   end
 
   context 'when the object has no FOLIO catalog link' do

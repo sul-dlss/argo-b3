@@ -31,9 +31,8 @@ module DescriptiveCsv
     def import # rubocop: disable Metrics/AbcSize
       params = {}
 
-      # The source_id and druid are only there for the user to reference and should be ignored for data processing
-      # druid is only on the bulk sheet
-      headers = @csv_row.headers.excluding('source_id', 'druid')
+      # source_id and druid are only for the user's reference; the purl is always derived from the druid.
+      headers = @csv_row.headers.excluding('source_id', 'druid', 'purl')
       headers.sort_by! { |address| sortable_address(address) }
 
       headers.each do |address|

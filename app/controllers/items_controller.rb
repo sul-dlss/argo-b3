@@ -34,9 +34,8 @@ class ItemsController < ApplicationController
   end
 
   def create
-    authorize! with: ItemPolicy
-
     @new_item_form = NewItemForm.new(new_item_form_params)
+    authorize! @new_item_form, with: ItemPolicy
 
     if @new_item_form.valid?
       @new_item_form.create!(user_name: current_user.sunetid)

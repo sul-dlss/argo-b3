@@ -41,6 +41,21 @@ RSpec.describe DescriptiveCsv::Import do
       expect(result.value!.to_h).not_to have_key(:purl)
       expect(result.value!.title.first.value).to eq('A title')
     end
+
+    context 'when the spreadsheet was downloaded from another object' do
+      let(:csv) do
+        CSV.parse("druid,source_id,purl,title1.value\nbc123df4567,sul:123,https://purl/bc123df4567,A title\n",
+                  headers: true)
+      end
+
+      it 'ignores the druid, source_id, and purl columns' do
+        result = described_class.import(csv_row: csv.first, druid:)
+
+        expect(result.value!).to be_a(Cocina::Models::RequestDescription)
+        expect(result.value!.to_h).not_to have_key(:purl)
+        expect(result.value!.title.first.value).to eq('A title')
+      end
+    end
   end
 
   context 'with a valid csv' do

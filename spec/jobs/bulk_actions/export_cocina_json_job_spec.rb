@@ -6,10 +6,11 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:hj185xx2222' }
-  let(:bulk_action) { create(:bulk_action, action_type: 'export_cocina_json') }
+  let(:bulk_action) { create(:bulk_action, action_type: 'export_cocina_json', user:) }
 
   let(:unzipped_path) { bulk_action.filepath_for(filename: 'unzipped_file.jsonl') }
 
+  let(:user) { create(:user, :reader) }
   let(:cocina_object) { build(:dro_with_metadata, id: druid) }
   let(:log) { StringIO.new }
 
@@ -33,5 +34,20 @@ RSpec.describe BulkActions::ExportCocinaJsonJob do
     expect(File).to exist(bulk_action.export_filepath(:cocina_json))
     File.write(unzipped_path, ActiveSupport::Gzip.decompress(File.read(bulk_action.export_filepath(:cocina_json))))
     expect(File.open(unzipped_path).readlines.size).to eq 1 # rubocop:disable Style/FileOpen
+  end
+
+  context 'when the user lacks read permission' do
+    let(:user) { create(:user) }
+
+    it 'does not export the object' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_success).to eq(0)
+      expect(bulk_action.druid_count_fail).to eq(1)
+      expect(log.string).to include "#{druid}\tError: Not authorized to read"
+
+      File.write(unzipped_path, ActiveSupport::Gzip.decompress(File.read(bulk_action.export_filepath(:cocina_json))))
+      expect(File.read(unzipped_path)).to be_empty
+    end
   end
 end

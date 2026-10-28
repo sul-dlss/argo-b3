@@ -6,24 +6,22 @@ RSpec.describe BulkActions::RepublishJob do
   subject(:job) { described_class.new(bulk_action:, druids: [druid]) }
 
   let(:druid) { 'druid:bb111cc2222' }
-  let(:bulk_action) { create(:bulk_action, action_type: 'republish') }
+  let(:user) { create(:user) }
+  let(:bulk_action) { create(:bulk_action, action_type: 'republish', user:) }
+  let(:log) { StringIO.new }
+  let(:edit_target_druid) { druid }
 
-  let(:cocina_object) { instance_double(Cocina::Models::DRO) }
-
-  let(:job_item) do
-    described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
-      allow(job_item).to receive(:cocina_object).and_return(cocina_object)
-    end
-  end
+  let(:cocina_object) { build(:dro_with_metadata, id: druid) }
 
   let(:object_client) { instance_double(Dor::Services::Client::Object, publish: true) }
 
   before do
-    allow(described_class::JobItem).to receive(:new).and_return(job_item)
+    create(:permission, :edit, workgroup: user.groups.first, target_druid: edit_target_druid)
+    allow(File).to receive(:open).and_call_original
+    allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
+    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
     allow(Sdr::WorkflowService).to receive(:published?).and_return(true)
-
-    allow(cocina_object).to receive_messages(admin_policy?: false, type: Cocina::Models::ObjectType.book)
   end
 
   after do
@@ -41,6 +39,20 @@ RSpec.describe BulkActions::RepublishJob do
     expect(bulk_action.druid_count_success).to eq(1)
   end
 
+  context 'when the user lacks update permission' do
+    let(:edit_target_druid) { 'druid:cd222df3333' }
+
+    it 'does not publish the object' do
+      job.perform_now
+
+      expect(object_client).not_to have_received(:publish)
+
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Not authorized to update"
+    end
+  end
+
   context 'with never published item' do
     before do
       allow(Sdr::WorkflowService).to receive(:published?).and_return(false)
@@ -54,13 +66,12 @@ RSpec.describe BulkActions::RepublishJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Never previously published"
     end
   end
 
   context 'with an APO' do
-    before do
-      allow(cocina_object).to receive(:admin_policy?).and_return(true)
-    end
+    let(:cocina_object) { build(:admin_policy_with_metadata, id: druid) }
 
     it 'does not publish the object' do
       job.perform_now
@@ -70,13 +81,12 @@ RSpec.describe BulkActions::RepublishJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Not an item or collection"
     end
   end
 
   context 'with an agreement' do
-    before do
-      allow(cocina_object).to receive(:type).and_return(Cocina::Models::ObjectType.agreement)
-    end
+    let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.agreement) }
 
     it 'does not publish the object' do
       job.perform_now
@@ -86,6 +96,7 @@ RSpec.describe BulkActions::RepublishJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
+      expect(log.string).to include "#{druid}\tError: Not an item or collection"
     end
   end
 end
