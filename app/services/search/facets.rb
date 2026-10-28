@@ -193,6 +193,12 @@ module Search
     )
 
     # Facets and filters on the license URI, but displays the license label via the composite field.
+    # Filter only; not shown as a facet.
+    LAST_UPDATED_BY = Config.with_defaults(
+      form_field: :last_updated_by,
+      field: Search::Fields::LAST_UPDATED_BY
+    )
+
     LICENSES = Config.with_defaults(
       form_field: :licenses,
       field: Search::Fields::LICENSE_URI,

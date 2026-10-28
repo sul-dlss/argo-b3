@@ -20,6 +20,7 @@ module Search
       Search::Facets::LAST_ACCESSIONED_DATE,
       Search::Facets::LAST_OPENED_DATE,
       Search::Facets::LAST_PUBLISHED_DATE,
+      Search::Facets::LAST_UPDATED_BY,
       Search::Facets::LICENSES,
       Search::Facets::METADATA_SOURCES,
       Search::Facets::MIMETYPES,

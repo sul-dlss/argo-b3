@@ -56,6 +56,20 @@ RSpec.describe Searchers::Item do
     end
   end
 
+  context 'when per page is provided' do
+    let(:search_form) { ResultsSearchForm.new(query:, page: 2) }
+    let(:results) { described_class.call(search_form:, user_scope:, per_page: 5) }
+
+    it 'requests that number of results' do
+      expect(results.per_page).to eq(5)
+      expect(Search::SolrService).to have_received(:post) do |args|
+        solr_query = args[:request].with_indifferent_access
+        expect(solr_query['rows']).to eq(5)
+        expect(solr_query['start']).to eq(5)
+      end
+    end
+  end
+
   context 'when on page 3' do
     let(:search_form) { ResultsSearchForm.new(query:, page: 3) }
 

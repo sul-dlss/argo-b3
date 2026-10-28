@@ -27,6 +27,12 @@ class Content < ApplicationRecord
     where(druid:).with_staging_states(:staging, :staging_failed).order(updated_at: :desc).first
   end
 
+  # @param druids [Array<String>]
+  # @return [Hash<String, Content>] the latest_staging_activity for each druid that has one, keyed by druid
+  def self.latest_staging_activities(druids:)
+    where(druid: druids).with_staging_states(:staging, :staging_failed).order(:updated_at).index_by(&:druid)
+  end
+
   # Called once the object or its draft is gone from SDR, so a failure is reported rather than raised.
   # @param druid [String] the druid of the object
   def self.delete_mutable_and_staged_files(druid:)

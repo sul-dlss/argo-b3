@@ -572,6 +572,8 @@ RSpec.describe 'Show item' do
       allow(Sdr::Repository).to receive_messages(find_solr: build_solr_doc(title: original_title),
                                                  find: build_cocina_object(title: original_title))
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
+      # The dashboard, visited to set the last search cookie, searches for recent drafts and deposits.
+      allow(Searchers::Item).to receive(:call).and_return([])
       allow(Search::SolrService).to receive(:post)
         .with(request: hash_including(start: 1, rows: 3))
         .and_return('response' => { 'numFound' => 10,
