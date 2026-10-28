@@ -4,7 +4,7 @@ module Contents
   # Validates the structure of a Content against a content type, using the validator for the content type.
   #
   # Unlike PopulatorSelector, there is no fallback when the content cannot be handled as the content type,
-  # e.g., a book whose files are organized into folders is still validated as a book. The resulting errors
+  # e.g., a book with hierarchical filepaths is still validated as a book. The resulting errors
   # are wanted, since they tell the user that the content does not suit the content type.
   class Validator
     # The validator for content types without a validator of their own.
@@ -24,6 +24,9 @@ module Contents
       Cocina::Models::ObjectType.webarchive_seed => Contents::Validators::WebarchiveSeed
     }.freeze
 
+    # Mirrors DSA's Cocina::FileHierarchyValidator: only these content types may have hierarchical filepaths.
+    HIERARCHICAL_CONTENT_TYPES = [Cocina::Models::ObjectType.object, Cocina::Models::ObjectType.geo].freeze
+
     def self.call(...)
       new(...).call
     end
@@ -40,7 +43,11 @@ module Contents
 
     # @return [Contents::Validators::Result]
     def call
-      validator.call(content:, dark: dark?)
+      validator.call(content:, dark: dark?).tap do |result|
+        next if HIERARCHICAL_CONTENT_TYPES.include?(content_type)
+
+        result.errors.concat(Contents::Validators::HierarchicalFilepaths.call(content:, dark: dark?).errors)
+      end
     end
 
     private

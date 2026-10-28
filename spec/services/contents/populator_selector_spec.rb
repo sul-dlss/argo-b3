@@ -192,7 +192,35 @@ RSpec.describe Contents::PopulatorSelector do
 
     it 'falls back to the file set per file populator' do
       expect(result).to have_attributes(actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: [:hierarchical_files])
+                                        reasons: [:hierarchical_filepaths])
+    end
+  end
+
+  context 'when the content type is document and the files are organized into folders' do
+    let(:cocina_type) { Cocina::Models::ObjectType.document }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'folder/report.pdf', mime_type: 'application/pdf')
+    end
+
+    it 'falls back to the file set per file populator' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Document,
+                                        actual_populator: Contents::Populators::FileSetPerFile,
+                                        reasons: [:hierarchical_filepaths])
+    end
+  end
+
+  context 'when the content type is file and the files are organized into folders' do
+    let(:cocina_type) { Cocina::Models::ObjectType.object }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'folder/report.pdf', mime_type: 'application/pdf')
+    end
+
+    it 'selects the file populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::ObjectType,
+                                        actual_populator: Contents::Populators::ObjectType,
+                                        reasons: [])
     end
   end
 
@@ -220,7 +248,7 @@ RSpec.describe Contents::PopulatorSelector do
 
     it 'provides all of the reasons in order' do
       expect(result).to have_attributes(actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: %i[dark hierarchical_files no_images])
+                                        reasons: %i[dark hierarchical_filepaths no_images])
     end
   end
 

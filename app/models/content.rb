@@ -43,6 +43,14 @@ class Content < ApplicationRecord
     { runOCR: true, ocrLanguages: ocr_languages }
   end
 
+  # Memoized, since several populators and views may ask for the same Content.
+  # @return [Boolean] true if any of the binaries have hierarchical filepaths (e.g., folder1/image1.tif)
+  def hierarchical_filepaths?
+    return @hierarchical_filepaths if defined?(@hierarchical_filepaths)
+
+    @hierarchical_filepaths = content_file_binaries.where('cardinality(path_parts) > 0').exists?
+  end
+
   # A background job may change the lock of a Content that is staging or discovering.
   def staging_or_discovering?
     staging? || discovering?
