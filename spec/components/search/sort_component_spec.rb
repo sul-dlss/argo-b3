@@ -15,6 +15,8 @@ RSpec.describe Search::SortComponent, type: :component do
       expect(page.all('.dropdown-menu a').map(&:text)).to eq(['Relevance',
                                                               'Last deposited date (ascending)',
                                                               'Last deposited date (descending)',
+                                                              'Last updated date (ascending)',
+                                                              'Last updated date (descending)',
                                                               'Registered date (ascending)',
                                                               'Registered date (descending)',
                                                               'Source ID',
@@ -25,6 +27,8 @@ RSpec.describe Search::SortComponent, type: :component do
                                 href: '/search/items?sort=last_deposited_date_asc')
       expect(page).to have_link('Last deposited date (descending)',
                                 href: '/search/items?sort=last_deposited_date_desc')
+      expect(page).to have_link('Last updated date (ascending)', href: '/search/items?sort=last_updated_date_asc')
+      expect(page).to have_link('Last updated date (descending)', href: '/search/items?sort=last_updated_date_desc')
       expect(page).to have_link('Registered date (ascending)', href: '/search/items?sort=registered_date_asc')
       expect(page).to have_link('Registered date (descending)', href: '/search/items?sort=registered_date_desc')
       expect(page).to have_link('Source ID', href: '/search/items?sort=source_id')

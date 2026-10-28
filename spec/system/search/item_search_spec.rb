@@ -102,6 +102,8 @@ RSpec.describe 'Item search', :solr do
           expect(page.all('.dropdown-item').map(&:text)).to eq(['Relevance',
                                                                 'Last deposited date (ascending)',
                                                                 'Last deposited date (descending)',
+                                                                'Last updated date (ascending)',
+                                                                'Last updated date (descending)',
                                                                 'Registered date (ascending)',
                                                                 'Registered date (descending)',
                                                                 'Source ID',
