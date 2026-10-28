@@ -33,7 +33,7 @@
                                                                             label: t('edit.contents.tabs.details.label'))) do |pane| %>
           <% pane.with_footer do %>
             <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
-                                                               discard_or_purge_action: @discard_or_purge_action, show_previous: false) %>
+                                                               discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: false) %>
           <% end %>
           <%= tag.div data: { controller: 'content-type-dependent ocr-options',
                               ocr_options_allowed_content_types_value: Sdr::TextExtraction::SUPPORTED_TYPES } do %>
@@ -54,7 +54,7 @@
                                                                             label: t('edit.contents.tabs.add_files.label'))) do |pane| %>
           <% pane.with_footer do %>
             <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
-                                                               discard_or_purge_action: @discard_or_purge_action, show_previous: show_details) %>
+                                                               discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: show_details) %>
           <% end %>
 
           <%= render SdrViewComponents::Forms::FieldsetComponent.new(
@@ -151,7 +151,7 @@
                                                                             label: t('edit.contents.tabs.structural.label'))) do |pane| %>
           <% pane.with_footer do %>
             <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
-                                                               discard_or_purge_action: @discard_or_purge_action) %>
+                                                               discard_or_purge_presenter: @discard_or_purge_presenter) %>
           <% end %>
           <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
           <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
@@ -167,7 +167,7 @@
                                                                           mark_required: true)) do |pane| %>
         <% pane.with_footer do %>
           <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
-                                                             discard_or_purge_action: @discard_or_purge_action, show_next: false, show_deposit: true) %>
+                                                             discard_or_purge_presenter: @discard_or_purge_presenter, show_next: false, show_deposit: true) %>
         <% end %>
         <% unless @contents_item_form.initial_version? %>
           <%= render SdrViewComponents::Forms::TextFieldComponent.new(

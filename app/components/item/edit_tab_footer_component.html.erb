@@ -19,7 +19,7 @@
           variant: 'outline-primary',
           data: submit_data
         ) %>
-    <%= render Item::DiscardOrPurgeButtonComponent.new(druid:, action: discard_or_purge_action, data: actions_data) %>
+    <%= render Item::DiscardOrPurgeButtonComponent.new(discard_or_purge_presenter:, data: actions_data) %>
     <% if show_deposit %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(
             label: t('edit.items.edit.buttons.deposit'),

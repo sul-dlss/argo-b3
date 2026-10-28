@@ -8,7 +8,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
                                   show_structural_csv show_descriptive_csv track]
 
-  include DiscardOrPurgeConcern
   include TokenConcern
   include ToastAndRefreshConcern
 
@@ -47,7 +46,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
-    set_discard_or_purge(version_service:)
+    @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: @cocina_object.version, version_service:)
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
@@ -225,13 +224,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: })
     redirect_to object_path(druid), flash: { danger: t('show.errors.purge_failed') }
-  end
-
-  # Purge applies to a first version and discarding a draft to a later one; both require update permission.
-  def set_discard_or_purge(version_service:)
-    return unless allowed_to?(:update?, @solr_doc, with: ObjectPolicy)
-
-    @discard_or_purge_action = discard_or_purge_action(cocina_object: @cocina_object, version_service:)
   end
 
   def events_filter_params

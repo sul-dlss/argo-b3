@@ -1,9 +1,9 @@
 <%# A link rather than a form, since the button is inside the edit form. %>
 <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
-      link: button[:link],
+      link: discard_or_purge_presenter.path,
       variant: :'outline-primary',
       classes: 'ms-2',
-      data: { turbo_method: :delete, turbo_confirm: button[:confirm], **data }
+      data: { turbo_method: :delete, turbo_confirm: discard_or_purge_presenter.confirm, **data }
     ) do %>
-  <%= helpers.delete_icon(classes: 'me-1') %><%= button[:label] %>
+  <%= helpers.delete_icon(classes: 'me-1') %><%= discard_or_purge_presenter.label %>
 <% end %>

@@ -517,7 +517,7 @@ RSpec.describe 'Create an item' do
     end
 
     it 'registers and redirects to add files' do
-      version_service = version_service_double(open?: true, editable?: true, version: 1,
+      version_service = version_service_double(druid:, open?: true, editable?: true, version: 1,
                                                version_description: 'Initial version')
       allow(Sdr::VersionService).to receive(:new).and_return(version_service)
 
