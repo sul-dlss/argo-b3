@@ -8,19 +8,21 @@ module Edit
   class CollectionsComponent < ApplicationComponent
     # @param options [Array<Array(String, String)>] [label, druid] pairs for the selected collections
     # @param show_limit_by_apo [Boolean] show the "limit collections by APO" checkbox (default = true)
-    def initialize(form:, options:, show_limit_by_apo: true)
+    # @param editable [Boolean] limit the options to the collections the user can edit, e.g., when registering
+    def initialize(form:, options:, show_limit_by_apo: true, editable: false)
       @form = form
       @options = options
       @show_limit_by_apo = show_limit_by_apo
+      @editable = editable
       super()
     end
 
-    attr_reader :form, :options, :show_limit_by_apo
+    attr_reader :form, :options, :show_limit_by_apo, :editable
 
     def input_data
       data = {
         controller: 'tom-select',
-        tom_select_url_value: collection_options_path,
+        tom_select_url_value: editable ? collection_options_path(editable: true) : collection_options_path,
         tom_select_placeholder_value: t('edit.items.fields.collection_druids.placeholder')
       }
       return data unless show_limit_by_apo

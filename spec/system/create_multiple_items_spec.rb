@@ -313,7 +313,8 @@ RSpec.describe 'Create multiple items' do
       expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
       expect(page).to have_css('.ts-control .item', text: 'Art Maps')
       expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:).at_least(:once)
+        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:, editable: true)
+        .at_least(:once)
 
       fill_in_two_items
 

@@ -87,6 +87,13 @@ RSpec.describe Searchers::CollectionListByDruid do
       expect(described_class.call(druids:, user_scope:)).to eq([['Art History Slides', 'druid:bc123df4567']])
     end
 
+    it 'returns only the collections the user can edit when editable' do
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: restricted_collection_druid)
+
+      expect(described_class.call(druids:, user_scope:, editable: true))
+        .to eq([['Restricted Art Collection', restricted_collection_druid]])
+    end
+
     it 'returns all of the collections when not given a user scope' do
       expect(described_class.call(druids:))
         .to eq([['Art History Slides', 'druid:bc123df4567'],
