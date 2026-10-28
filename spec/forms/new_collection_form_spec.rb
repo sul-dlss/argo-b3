@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe NewCollectionForm do
   subject(:new_collection_form) do
     described_class.new(title:, description_choice:, catalog_record_id:, access_view:, apo_druid: 'druid:hv992ry2431',
+                        use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
+                        license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
                         other_tags_attributes: { '0' => { tag: 'Some : Tag' } },
                         release_tags_attributes: { searchworks_target: 'collection' })
   end
@@ -17,8 +19,12 @@ RSpec.describe NewCollectionForm do
   describe '.permitted_params' do
     it 'does not permit attributes without a field on the collection form' do
       expect(described_class.permitted_params)
-        .not_to include(:source_id, :use_and_reproduction_statement, :license, :copyright, :catalog_link_refresh,
-                        :catalog_link_part_label, :catalog_link_sort_key, { description_hash: [] })
+        .not_to include(:source_id, :catalog_link_refresh, :catalog_link_part_label, :catalog_link_sort_key,
+                        { description_hash: [] })
+    end
+
+    it 'permits the rights attributes' do
+      expect(described_class.permitted_params).to include(:use_and_reproduction_statement, :license, :copyright)
     end
   end
 
@@ -102,6 +108,9 @@ RSpec.describe NewCollectionForm do
         expect(request_cocina_object.description.title.first.value).to eq('My collection')
         expect(request_cocina_object.administrative.hasAdminPolicy).to eq('druid:hv992ry2431')
         expect(request_cocina_object.access.view).to eq('world')
+        expect(request_cocina_object.access.useAndReproductionStatement).to eq('Use at will.')
+        expect(request_cocina_object.access.copyright).to eq('Copyright © Stanford.')
+        expect(request_cocina_object.access.license).to eq('https://creativecommons.org/licenses/by/4.0/legalcode')
         expect(args[:tags]).to eq(['Some : Tag'])
       end
       expect(Sdr::Repository).to have_received(:create_release_tag)
