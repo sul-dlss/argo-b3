@@ -24,6 +24,13 @@ RSpec.describe 'Items' do
         expect(Searchers::CollectionListByDruid).to have_received(:call)
           .with(druids: %w[druid:bc123df4567 druid:xz987wv6543])
       end
+
+      it 'cancels to the dashboard' do
+        post '/items', params: { item: { title: '' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body)).to have_link('Cancel', href: '/')
+      end
     end
   end
 
