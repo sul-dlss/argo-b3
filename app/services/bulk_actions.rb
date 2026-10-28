@@ -347,6 +347,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   VALIDATE_DESCRIPTIVE_METADATA = Config.new(
     label: 'Validate descriptive metadata spreadsheet',
-    help_text: 'Validate a Cocina descriptive metadata spreadsheet without applying changes.'
+    help_text: 'Validate a Cocina descriptive metadata spreadsheet without applying changes.',
+    job: BulkActions::ValidateDescriptiveMetadataJob,
+    path_helper: to_path_helper(:new_bulk_actions_validate_descriptive_metadata_path),
+    form: BulkActions::ImportDescriptiveMetadataForm
   )
 end

@@ -187,6 +187,7 @@ Rails.application.routes.draw do
     resource :republish, only: %i[new create], controller: 'republish'
     resource :text_extraction, only: %i[new create], controller: 'text_extraction'
     resource :update_governing_apo, only: %i[new create], controller: 'update_governing_apo'
+    resource :validate_descriptive_metadata, only: %i[new create], controller: 'validate_descriptive_metadata'
   end
 
   # Redirect legacy route for object show page
