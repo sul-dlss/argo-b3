@@ -18,6 +18,7 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 ## Views
 
 - Don't put `<%= %>` inside an HTML attribute. When an element's attributes take Ruby values, build the element with a tag helper (`tag.div`, `tag.span`, `link_to`, etc.) and pass the attributes as arguments, using a `data:` hash for `data-*` attributes (e.g., the container in `objects/show.html.erb`).
+- Render dates and times with `format_datetime` (`ApplicationHelper`, `helpers.format_datetime` in components) and a format from `time.formats` in `config/locales/en.yml` (e.g., `format: :date_only`), not `strftime` or `to_fs`. It converts to Pacific time first, so every page shows the same zone and layout. Add a new format to `en.yml` if none fits.
 
 ## Specs
 
