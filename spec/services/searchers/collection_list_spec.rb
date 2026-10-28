@@ -105,5 +105,21 @@ RSpec.describe Searchers::CollectionList do
           .to eq([['Art Prints', 'druid:fr234ty5678']])
       end
     end
+
+    context 'when editable' do
+      let(:editable_apo_druid) { 'druid:hv992ry2431' }
+
+      before do
+        create(:solr_collection, druid: 'druid:fr234ty5678', title: 'Art Prints', apo_druid: editable_apo_druid)
+        create(:solr_collection, druid: 'druid:jk345mn6789', title: 'Art Posters')
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: editable_apo_druid)
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:jk345mn6789')
+      end
+
+      it 'returns only the collections the user can edit, by the collection or its APO' do
+        expect(described_class.call(query: 'art', user_scope:, editable: true).map(&:last))
+          .to contain_exactly('druid:fr234ty5678', 'druid:jk345mn6789')
+      end
+    end
   end
 end

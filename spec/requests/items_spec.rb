@@ -5,6 +5,22 @@ require 'rails_helper'
 RSpec.describe 'Items' do
   let(:user) { create(:user, :reader) }
 
+  describe 'new' do
+    before do
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:hv992ry2431')
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
+      sign_in(user)
+    end
+
+    it 'offers only the APOs the user can edit' do
+      get '/items/new'
+
+      expect(response).to have_http_status(:ok)
+      expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
+                                                                      editable: true)
+    end
+  end
+
   describe 'create' do
     context 'when invalid' do
       before do

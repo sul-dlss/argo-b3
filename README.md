@@ -271,7 +271,7 @@ Staging copies files to the deposit staging location for single-item deposit, or
 
 ## Discovery
 
-Search results are restricted to objects readable by the current user's effective workgroups (logged in or impersonated).`Permissions::UserScope` resolves permissions from PostgreSQL, and `Search::PermissionFilter` constructs a Solr filter over the object ID, collection IDs, and APO ID using the same rules as `ObjectPolicy#show?`.
+Search results are restricted to objects readable by the current user's effective workgroups (logged in or impersonated).`Permissions::UserScope` resolves permissions from PostgreSQL, and `Search::PermissionFilter` constructs a Solr filter over the object ID, collection IDs, and APO ID using the same rules as `ObjectPolicy#show?`. Its editable mode uses the rules of `ObjectPolicy#edit?` instead, e.g., so that registration forms offer only the collections a new item may be added to.
 
 In addition to supporting discovery of items (DROs, collections, and admin policies), the discovery system:
 * Supports search of field values. So, for example, in addition to returning a list of item results, a search from the home page will also return a list of matching projects. (This is a list of projects that match the query, not project facets.)

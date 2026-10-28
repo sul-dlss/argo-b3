@@ -20,7 +20,7 @@ class ItemsController < ApplicationController
     @new_item_form = NewItemForm.new
     @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path
 
-    set_apo_and_collection_options(form: @new_item_form)
+    set_apo_and_collection_options(form: @new_item_form, editable: true)
   end
 
   def edit
@@ -43,7 +43,7 @@ class ItemsController < ApplicationController
       redirect_to create_redirect_path
     else
       @cancel_path = root_path
-      set_apo_and_collection_options(form: @new_item_form)
+      set_apo_and_collection_options(form: @new_item_form, editable: true)
       render :new, status: :unprocessable_content
     end
   end
@@ -130,8 +130,13 @@ class ItemsController < ApplicationController
     render :edit, status: :unprocessable_content
   end
 
-  def set_apo_and_collection_options(form:)
-    @apo_options = apo_options(apo_druid: form.apo_druid)
+  # A new item may only be governed by an APO that the user can edit.
+  def set_apo_and_collection_options(form:, editable: false)
+    @apo_options = if editable
+                     Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
+                   else
+                     apo_options(apo_druid: form.apo_druid)
+                   end
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = form.collection_druids
     titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)

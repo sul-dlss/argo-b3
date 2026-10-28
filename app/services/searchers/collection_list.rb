@@ -22,10 +22,12 @@ module Searchers
     # @param query [String] words from a title (the last may be partial)
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
-    def initialize(query:, user_scope:, apo_druid: nil)
+    # @param editable [Boolean] when true, limits to the collections the user can edit rather than see
+    def initialize(query:, user_scope:, apo_druid: nil, editable: false)
       @query = query
       @user_scope = user_scope
       @apo_druid = apo_druid
+      @editable = editable
     end
 
     # @return [Array<Array(String, String)>] list of [title, druid] pairs, in relevance order
@@ -35,7 +37,7 @@ module Searchers
 
     private
 
-    attr_reader :query, :user_scope, :apo_druid
+    attr_reader :query, :user_scope, :apo_druid, :editable
 
     def solr_docs
       Search::SolrService.post(request: solr_request)['response']['docs']
@@ -47,7 +49,7 @@ module Searchers
         defType: 'edismax',
         qf: QUERY_FIELDS.join(' '),
         mm: '100%', # every word in the query must match
-        fq: ["#{OBJECT_TYPES}:collection", apo_filter, Search::PermissionFilter.call(user_scope:)].compact,
+        fq: ["#{OBJECT_TYPES}:collection", apo_filter, Search::PermissionFilter.call(user_scope:, editable:)].compact,
         fl: [ID, TITLE],
         rows: LIMIT
       }

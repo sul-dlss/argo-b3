@@ -2,7 +2,7 @@
 
 module Search
   # Restricts the Solr results using the same target rules as ObjectPolicy so that search results
-  # match the current user's view/edit permissions.
+  # match the current user's view/edit permissions: ObjectPolicy#show? by default, or ObjectPolicy#edit? when editable.
   class PermissionFilter
     TARGET_FIELDS = [Fields::ID, Fields::COLLECTION_DRUIDS, Fields::APO_DRUID].freeze
     MATCH_NONE_FILTER = '(*:* AND NOT *:*)'
@@ -12,13 +12,27 @@ module Search
     end
 
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
-    def initialize(user_scope:)
+    # @param editable [Boolean] when true, limits to the objects the user can edit rather than read
+    def initialize(user_scope:, editable: false)
       @user_scope = user_scope
+      @editable = editable
     end
 
     def call
       return if user_scope.admin? # admins can see everything, no filtering required
 
+      editable ? editable_filter : readable_filter
+    end
+
+    private
+
+    attr_reader :user_scope, :editable
+
+    def editable_filter
+      target_query(user_scope.edit_targets) || MATCH_NONE_FILTER
+    end
+
+    def readable_filter
       # not an admin?  first include any objects the user can explicitly edit or has read_restricted access to
       queries = [target_query(user_scope.allowed_targets)]
 
@@ -37,10 +51,6 @@ module Search
 
       queries.join(' OR ')
     end
-
-    private
-
-    attr_reader :user_scope
 
     # Builds a query matching target druids from permission records (`Permission`) against
     # an object's druid, collection druids, or governing APO druid.

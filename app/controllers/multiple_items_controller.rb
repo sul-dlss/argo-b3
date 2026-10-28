@@ -59,7 +59,7 @@ class MultipleItemsController < ApplicationController
   private
 
   def set_apo_and_collection_options
-    @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
+    @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = @items_registration_form.collection_druids
     titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)

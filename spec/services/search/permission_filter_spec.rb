@@ -110,4 +110,44 @@ RSpec.describe Search::PermissionFilter, :solr do
         .to contain_exactly(object_druid, collection_druid)
     end
   end
+
+  context 'when editable' do
+    shared_examples 'the editable object policy scope' do
+      it 'matches exactly the documents ObjectPolicy authorizes editing' do
+        expected_ids = documents.select { |document| ObjectPolicy.new(document, user:).apply(:edit?) }
+                                .pluck(Search::Fields::ID)
+        filter = described_class.call(user_scope:, editable: true)
+        response = Search::SolrService.post(request: { q: '*:*', fq: [filter].compact })
+
+        expect(response.fetch('response').fetch('docs').pluck(Search::Fields::ID)).to match_array(expected_ids)
+        expect(response.fetch('response').fetch('numFound')).to eq(expected_ids.size)
+      end
+    end
+
+    context 'without permissions' do
+      it_behaves_like 'the editable object policy scope'
+    end
+
+    context 'when an administrator' do
+      let(:user) { create(:user, :admin) }
+
+      it_behaves_like 'the editable object policy scope'
+    end
+
+    context 'when an unrestricted reader' do
+      let(:user) { create(:user, :reader) }
+
+      it_behaves_like 'the editable object policy scope'
+    end
+
+    %i[object_druid collection_druid apo_druid].product(%i[edit read_restricted]).each do |target, permission_type|
+      context "with #{permission_type} on #{target}" do
+        before do
+          create(:permission, permission_type, workgroup: user.groups.first, target_druid: public_send(target))
+        end
+
+        it_behaves_like 'the editable object policy scope'
+      end
+    end
+  end
 end
