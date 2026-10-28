@@ -5,11 +5,11 @@ module Contents
     # Populates an existing Content with ContentFileSets and ContentFiles for the ContentFileBinaries
     # that are not yet part of its structure.
     # It uses a strategy for grouping by the files that share a basename (filename ignoring the extension),
-    # e.g., the master, the deliverable, and the OCR for an image, are grouped into a single file set.
-    # Ported from pre-assembly's simple book content metadata creation style.
+    # e.g., the master, the deliverable, the OCR, and the annotations for an image, are grouped into a single
+    # file set. Ported from pre-assembly's simple book content metadata creation style.
     class Image < Base
       # The mime types of the files that, when accompanying an image, indicate that a file set contains OCR.
-      OCR_MIME_TYPES = [MimeTypes::XML, MimeTypes::PDF, MimeTypes::PLAIN_TEXT].freeze
+      OCR_MIME_TYPES = [MimeTypes::XML, MimeTypes::PDF, MimeTypes::PLAIN_TEXT, MimeTypes::HTML].freeze
       DARK_VIEW = 'dark'
 
       # Grouping the files of a image by filename only works when the files do not have hierarchical filepaths,
@@ -90,52 +90,71 @@ module Contents
           end
       end
 
-      # Adding OCR to a file set changes the attributes of the files that are already in it, e.g., the
-      # deliverable image becomes preserved. The existing files are only updated when the OCR status changes,
-      # so that appending to a file set does not otherwise overwrite attributes that have been edited by hand.
+      # Adding OCR or an image to a file set changes the attributes of the files that are already in it, e.g.,
+      # the deliverable image becomes preserved or the JSON becomes annotations. The existing files are only
+      # updated when one of these changes, so that appending to a file set does not otherwise overwrite
+      # attributes that have been edited by hand.
       def append_to_content_file_set(content_file_set:, content_file_binaries:)
         existing_content_files = content_file_set.content_files.to_a
-        was_ocr = ocr?(existing_content_files.map(&:content_file_binary))
-        ocr = ocr?(existing_content_files.map(&:content_file_binary) + content_file_binaries)
+        existing_content_file_binaries = existing_content_files.map(&:content_file_binary)
+        all_content_file_binaries = existing_content_file_binaries + content_file_binaries
+        ocr = ocr?(all_content_file_binaries)
+        with_image = with_image?(all_content_file_binaries)
 
-        create_content_files(content_file_set:, content_file_binaries:, ocr:)
-        return unless ocr && !was_ocr
+        create_content_files(content_file_set:, content_file_binaries:, ocr:, with_image:)
+        return unless gains_ocr_or_image?(existing_content_file_binaries:, all_content_file_binaries:)
 
         existing_content_files.each do |content_file|
-          content_file.update!(**Contents::FileAttributes.call(mime_type: content_file.mime_type, ocr:, dark: dark?))
+          content_file.update!(**file_attributes_for(mime_type: content_file.mime_type, ocr:, with_image:))
         end
+      end
+
+      # @param [Array<ContentFileBinary>] existing_content_file_binaries the binaries already in the file set
+      # @param [Array<ContentFileBinary>] all_content_file_binaries the existing and the appended binaries
+      # @return [Boolean] true when appending makes the file set contain OCR or an image
+      def gains_ocr_or_image?(existing_content_file_binaries:, all_content_file_binaries:)
+        (ocr?(all_content_file_binaries) && !ocr?(existing_content_file_binaries)) ||
+          (with_image?(all_content_file_binaries) && !with_image?(existing_content_file_binaries))
       end
 
       # New file sets are positioned at the end of the existing file sets by the positioning gem.
       def create_content_file_set(content_file_binaries:)
         file_set_type = file_set_type_for(content_file_binaries)
         content_file_set = content.content_file_sets.create!(file_set_type:, label: label_for(file_set_type))
-        create_content_files(content_file_set:, content_file_binaries:, ocr: ocr?(content_file_binaries))
+        create_content_files(content_file_set:, content_file_binaries:, ocr: ocr?(content_file_binaries),
+                             with_image: with_image?(content_file_binaries))
       end
 
-      def create_content_files(content_file_set:, content_file_binaries:, ocr:)
+      def create_content_files(content_file_set:, content_file_binaries:, ocr:, with_image:)
         content_file_binaries.each do |content_file_binary|
           content_file_set.content_files.create!(
             content_file_binary:,
             label: content_file_binary.filepath,
-            **Contents::FileAttributes.call(mime_type: content_file_binary.mime_type, ocr:, dark: dark?),
+            **file_attributes_for(mime_type: content_file_binary.mime_type, ocr:, with_image:),
             **file_access_attributes
           )
         end
       end
 
+      def file_attributes_for(mime_type:, ocr:, with_image:)
+        Contents::FileAttributes.call(mime_type:, ocr:, with_image:, dark: dark?)
+      end
+
       # All of the file sets are images, unless a file set contains no images at all.
       def file_set_type_for(content_file_binaries)
-        return image_file_set_type if content_file_binaries.any? { |binary| image?(binary.mime_type) }
+        return image_file_set_type if with_image?(content_file_binaries)
 
         FileSetTypes::OBJECT
+      end
+
+      def with_image?(content_file_binaries)
+        content_file_binaries.any? { |binary| image?(binary.mime_type) }
       end
 
       # Whereas pre-assembly asks the user whether a batch has OCR, here it is inferred from the files
       # that are grouped into a file set.
       def ocr?(content_file_binaries)
-        mime_types = content_file_binaries.map(&:mime_type)
-        mime_types.any? { |mime_type| image?(mime_type) } && mime_types.intersect?(OCR_MIME_TYPES)
+        with_image?(content_file_binaries) && content_file_binaries.map(&:mime_type).intersect?(OCR_MIME_TYPES)
       end
     end
   end

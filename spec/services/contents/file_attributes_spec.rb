@@ -25,6 +25,14 @@ RSpec.describe Contents::FileAttributes do
       end
     end
 
+    context 'when the mime type is JSON' do
+      let(:mime_type) { 'application/json' }
+
+      it 'is not annotations' do
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
+      end
+    end
+
     context 'when the mime type is XML' do
       let(:mime_type) { 'application/xml' }
 
@@ -88,8 +96,16 @@ RSpec.describe Contents::FileAttributes do
     context 'when the mime type is plain text' do
       let(:mime_type) { 'text/plain' }
 
-      it 'is not a transcription' do
-        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
+      it 'is a transcription' do
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: 'transcription' })
+      end
+    end
+
+    context 'when the mime type is HTML' do
+      let(:mime_type) { 'text/html' }
+
+      it 'is a transcription' do
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: 'transcription' })
       end
     end
 
@@ -97,6 +113,35 @@ RSpec.describe Contents::FileAttributes do
       let(:mime_type) { 'application/zip' }
 
       it 'falls back to the mapping without OCR' do
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+      end
+    end
+  end
+
+  describe 'with an image' do
+    let(:options) { { with_image: true } }
+
+    context 'when the mime type is JSON' do
+      let(:mime_type) { 'application/json' }
+
+      it 'is annotations' do
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: 'annotations' })
+      end
+    end
+
+    context 'when the mime type is JSON and the file set also contains OCR' do
+      let(:mime_type) { 'application/json' }
+      let(:options) { { with_image: true, ocr: true } }
+
+      it 'is annotations' do
+        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: 'annotations' })
+      end
+    end
+
+    context 'when the mime type is not in the image mapping' do
+      let(:mime_type) { 'application/xml' }
+
+      it 'falls back to the mapping without an image' do
         expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
       end
     end

@@ -85,11 +85,48 @@ RSpec.describe Contents::Populators::Image do
       it 'preserves and publishes the extra files (other than the image)' do
         structure
 
-        expect(content.content_files.find_by(label: 'image_0001.html')).to have_attributes(use: nil)
-
         %w[image_0001.txt image_0001.html image_0001.pdf image_0001.json].each do |label|
           expect(content.content_files.find_by(label:)).to have_attributes(preserve: true, shelve: true, publish: true)
         end
+      end
+
+      it 'marks the TXT, HTML, and PDF as transcriptions and the JSON as annotations' do
+        structure
+
+        expect(content.content_files.pluck(:label, :use)).to contain_exactly(
+          %w[image_0001.html transcription], %w[image_0001.json annotations], %w[image_0001.pdf transcription],
+          ['image_0001.tif', nil], %w[image_0001.txt transcription]
+        )
+      end
+    end
+
+    context 'when an image has only a JSON file and a JP2 file' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+        create(:content_file_binary, content:, filepath: 'image_0001.json', mime_type: 'application/json')
+      end
+
+      it 'marks the JSON as annotations without treating the file set as containing OCR' do
+        structure
+
+        expect(content.content_files.find_by(label: 'image_0001.json'))
+          .to have_attributes(preserve: true, shelve: true, publish: true, use: 'annotations')
+        expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: false)
+      end
+    end
+
+    context 'when a JSON file does not share a basename with an image' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+        create(:content_file_binary, content:, filepath: 'notes.json', mime_type: 'application/json')
+      end
+
+      it 'places it in its own file set without marking it as annotations' do
+        structure
+
+        expect(content.content_files.find_by(label: 'notes.json').content_file_set)
+          .to have_attributes(file_set_type: 'object')
+        expect(content.content_files.find_by(label: 'notes.json')).to have_attributes(use: nil)
       end
     end
 
@@ -99,12 +136,12 @@ RSpec.describe Contents::Populators::Image do
         create(:content_file_binary, content:, filepath: 'image_0001.txt', mime_type: 'text/plain')
       end
 
-      it 'publishes the TXT and preserves the deliverable JP2' do
+      it 'publishes the TXT as a transcription and preserves the deliverable JP2' do
         structure
 
         expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: true)
         expect(content.content_files.find_by(label: 'image_0001.txt'))
-          .to have_attributes(preserve: true, shelve: true, publish: true, use: nil)
+          .to have_attributes(preserve: true, shelve: true, publish: true, use: 'transcription')
       end
     end
 
@@ -248,6 +285,41 @@ RSpec.describe Contents::Populators::Image do
 
         expect(content.content_files.find_by(label: 'image_0001.jp2'))
           .to have_attributes(preserve: true, shelve: true, publish: true)
+      end
+    end
+
+    context 'when the new binary is annotations for an existing file set' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.json', mime_type: 'application/json')
+      end
+
+      it 'marks it as annotations and leaves the existing files alone' do
+        append
+
+        expect(content.content_files.find_by(label: 'image_0001.json'))
+          .to have_attributes(preserve: true, shelve: true, publish: true, use: 'annotations')
+        expect(content.content_files.find_by(label: 'image_0001.jp2'))
+          .to have_attributes(preserve: false, shelve: true, publish: true)
+      end
+    end
+
+    context 'when the new binary is an image for an existing file set that contains annotations' do
+      let(:existing_content_file_set) do
+        create(:content_file_set, content:, file_set_type: 'object', label: 'Object 1', position: 1)
+      end
+      let!(:existing_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.json', mime_type: 'application/json')
+      end
+
+      before do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+      end
+
+      it 'updates the existing JSON to be annotations' do
+        append
+
+        expect(content.content_files.find_by(content_file_binary: existing_content_file_binary))
+          .to have_attributes(preserve: true, shelve: true, publish: true, use: 'annotations')
       end
     end
 
