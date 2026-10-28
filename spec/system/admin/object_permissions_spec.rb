@@ -22,6 +22,8 @@ RSpec.describe 'Admin object permissions' do
     # Enter a workgroup that does not yet have any permissions.
     find('.ts-control input').set('sdr:newgroup')
     find('.ts-dropdown .create', text: 'sdr:newgroup').click
+    # Waits for tom-select to take the selection before submitting.
+    expect(page).to have_css('.ts-control .item', text: 'sdr:newgroup')
     choose 'Edit'
     click_button 'Add'
 
@@ -53,6 +55,7 @@ RSpec.describe 'Admin object permissions' do
 
     find('.ts-control input').set('sdr:existing')
     find('.ts-dropdown .option', text: 'sdr:existing', exact_text: true).click
+    expect(page).to have_css('.ts-control .item', text: 'sdr:existing')
     choose 'Edit'
     click_button 'Add'
 
