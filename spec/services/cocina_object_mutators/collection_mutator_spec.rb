@@ -24,4 +24,39 @@ RSpec.describe CocinaObjectMutators::CollectionMutator do
       expect(result.lock).to eq(cocina_object.lock)
     end
   end
+
+  context 'when the cocina model has updated rights' do
+    before do
+      cocina_model.use_and_reproduction_statement = 'Use at will.'
+      cocina_model.copyright = 'Copyright © Stanford.'
+      cocina_model.license = 'https://creativecommons.org/licenses/by/4.0/legalcode'
+    end
+
+    it 'returns a CollectionWithMetadata with the rights' do
+      expect(result.access.useAndReproductionStatement).to eq('Use at will.')
+      expect(result.access.copyright).to eq('Copyright © Stanford.')
+      expect(result.access.license).to eq('https://creativecommons.org/licenses/by/4.0/legalcode')
+    end
+  end
+
+  context 'when the cocina model has blank rights' do
+    let(:cocina_object) do
+      build(:collection_with_metadata).new(
+        access: { view: 'world', useAndReproductionStatement: 'Use at will.', copyright: 'Copyright © Stanford.',
+                  license: 'https://creativecommons.org/licenses/by/4.0/legalcode' }
+      )
+    end
+
+    before do
+      cocina_model.use_and_reproduction_statement = ''
+      cocina_model.copyright = ''
+      cocina_model.license = ''
+    end
+
+    it 'returns a CollectionWithMetadata without the rights' do
+      expect(result.access.useAndReproductionStatement).to be_nil
+      expect(result.access.copyright).to be_nil
+      expect(result.access.license).to be_nil
+    end
+  end
 end

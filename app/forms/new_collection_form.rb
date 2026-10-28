@@ -15,8 +15,7 @@ class NewCollectionForm < CocinaModels::Collection
   # Not permitted as params, since the collection form has no fields for them.
   # @return [Array<Symbol>]
   def self.immutable_attributes
-    %i[source_id use_and_reproduction_statement license copyright description_hash
-       catalog_link_refresh catalog_link_part_label catalog_link_sort_key]
+    %i[source_id description_hash catalog_link_refresh catalog_link_part_label catalog_link_sort_key]
   end
 
   attribute :access_view, :string, default: 'world'

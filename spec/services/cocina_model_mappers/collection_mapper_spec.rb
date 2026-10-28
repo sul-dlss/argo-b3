@@ -8,7 +8,8 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
 
     let(:cocina_object) do
       build(:collection_with_metadata, source_id:).new(
-        access: { view: },
+        access: { view:, useAndReproductionStatement: 'Use at will.', copyright: 'Copyright © Stanford.',
+                  license: 'https://creativecommons.org/licenses/by/4.0/legalcode' },
         identification: {
           sourceId: source_id,
           catalogLinks: [{
@@ -21,11 +22,14 @@ RSpec.describe CocinaModelMappers::CollectionMapper do
     let(:source_id) { 'test:123' }
     let(:view) { 'world' }
 
-    it 'returns a hash with the source_id from the cocina object' do
+    it 'returns a hash of the attributes from the cocina object' do
       expect(result).to eq(
         source_id:,
         description_hash: cocina_object.description.to_h,
         access_view: view,
+        use_and_reproduction_statement: 'Use at will.',
+        copyright: 'Copyright © Stanford.',
+        license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
         folio_catalog_links_attributes: [
           { catalog_record_id: 'in11403803' }
         ],

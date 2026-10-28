@@ -2,7 +2,7 @@
 
 module Edit
   # Component for rendering edit form for copyright
-  # The form's object must include CocinaModels::AccessConcern.
+  # The form's object must have a copyright attribute.
   class CopyrightComponent < ApplicationComponent
     INPUT_ROWS = 3
 

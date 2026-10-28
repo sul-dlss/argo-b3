@@ -39,6 +39,8 @@ RSpec.describe 'Collections' do
     let(:registered_cocina_object) { build(:collection_with_metadata, id: 'druid:xz987wv6543') }
     let(:collection_params) do
       { title: 'My collection', description_choice: 'title', apo_druid:, access_view: 'dark',
+        use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
+        license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
         release_tags_attributes: { searchworks_target: 'self' } }
     end
 
@@ -59,6 +61,9 @@ RSpec.describe 'Collections' do
           expect(request_cocina_object.description.title.first.value).to eq('My collection')
           expect(request_cocina_object.administrative.hasAdminPolicy).to eq(apo_druid)
           expect(request_cocina_object.access.view).to eq('dark')
+          expect(request_cocina_object.access.useAndReproductionStatement).to eq('Use at will.')
+          expect(request_cocina_object.access.copyright).to eq('Copyright © Stanford.')
+          expect(request_cocina_object.access.license).to eq('https://creativecommons.org/licenses/by/4.0/legalcode')
         end
         expect(Sdr::Repository).to have_received(:create_release_tag)
           .with(druid: 'druid:xz987wv6543', user_name: user.sunetid, release_target: 'Searchworks', release: true,
