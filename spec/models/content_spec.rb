@@ -84,6 +84,47 @@ RSpec.describe Content do
     end
   end
 
+  describe '.delete_mutable_and_staged_files' do
+    let(:staged_filepath) do
+      StagingSupport.staging_filepath(druid:, filepath: 'folder1/image1.tif',
+                                      staging_location: StagingSupport.locations.first)
+    end
+    let!(:mutable_content) { create(:content, :mutable, druid:) }
+    let!(:immutable_content) { create(:content, druid:) }
+    let!(:other_object_mutable_content) { create(:content, :mutable, druid: 'druid:df123bc4589') }
+
+    before do
+      FileUtils.mkdir_p(File.dirname(staged_filepath))
+      FileUtils.touch(staged_filepath)
+    end
+
+    after do
+      StagingSupport.delete_staged_files(druid:)
+    end
+
+    it 'deletes the mutable contents and staged files for the druid only' do
+      described_class.delete_mutable_and_staged_files(druid:)
+
+      expect(described_class.exists?(mutable_content.id)).to be false
+      expect(described_class.exists?(immutable_content.id)).to be true
+      expect(described_class.exists?(other_object_mutable_content.id)).to be true
+      expect(StagingSupport.staged_files?(druid:)).to be false
+    end
+
+    context 'when deleting fails' do
+      before do
+        allow(described_class).to receive(:where).and_raise(ActiveRecord::ActiveRecordError)
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'notifies without raising' do
+        expect { described_class.delete_mutable_and_staged_files(druid:) }.not_to raise_error
+
+        expect(Honeybadger).to have_received(:notify).with(ActiveRecord::ActiveRecordError, context: { druid: })
+      end
+    end
+  end
+
   describe '#workflow_context' do
     context 'when performing OCR' do
       subject(:content) { build(:content, perform_ocr: true, ocr_languages: %w[English Spanish]) }
