@@ -36,4 +36,21 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
                                text: 'Deposit')
     end
   end
+
+  context 'with submit and actions data' do
+    it 'renders the data on the submit buttons, the actions fieldset, and the discard draft link' do
+      render_inline(described_class.new(pane:, form_id: 'item_form', cancel_path: '/objects/druid:bc123df4567',
+                                        druid: 'druid:bc123df4567', discard_or_purge_action: :discard_draft,
+                                        show_next: false, show_deposit: true,
+                                        submit_data: { unassociated_files_target: 'submit' },
+                                        actions_data: { disable_actions_target: 'disableable' }))
+
+      expect(page).to have_css('fieldset[data-disable-actions-target="disableable"] ' \
+                               'button[value="draft"][data-unassociated-files-target="submit"]')
+      expect(page).to have_css('fieldset[data-disable-actions-target="disableable"] ' \
+                               'button[value="deposit"][data-unassociated-files-target="submit"]')
+      expect(page).to have_css('a[data-disable-actions-target="disableable"][data-turbo-method="delete"]',
+                               text: 'Discard draft')
+    end
+  end
 end

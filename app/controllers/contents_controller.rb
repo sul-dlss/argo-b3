@@ -2,11 +2,13 @@
 
 # Controller for managing content (structural)
 class ContentsController < ContentsApplicationController
+  include DiscardOrPurgeConcern
+
   skip_verify_authorized only: %i[show]
 
-  # Values for submit buttons
-  DEPOSIT_VALUE = 'deposit'
-  DRAFT_VALUE = 'draft'
+  # Values for submit buttons, which are rendered by Item::EditTabFooterComponent.
+  DEPOSIT_VALUE = ItemsController::DEPOSIT_VALUE
+  DRAFT_VALUE = ItemsController::DRAFT_VALUE
 
   def show
     @content_token = params[:id]
@@ -96,6 +98,8 @@ class ContentsController < ContentsApplicationController
     @solr_doc = fetch_solr_doc(druid: cocina_object.externalIdentifier)
     @content_token = generate_token(@content.id)
     @content_form = ContentForm.new
+    # Computed once, since every pane's footer renders the discard or purge button.
+    @discard_or_purge_action = discard_or_purge_action(cocina_object:, version_service:)
   end
 
   def build_prefilled_contents_item_form(cocina_object:)

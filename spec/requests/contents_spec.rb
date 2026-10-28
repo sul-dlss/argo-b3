@@ -22,6 +22,7 @@ RSpec.describe 'Contents' do
                                                find_solr: build(:solr_item, druid:))
     allow(Sdr::VersionService).to receive_messages(new: version_service, open: opened_cocina_object)
     allow(StageFilesJob).to receive(:perform_later)
+    allow(Sdr::PurgeService).to receive(:purgeable?).and_return(true)
     create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
     sign_in(user)
   end
@@ -55,6 +56,22 @@ RSpec.describe 'Contents' do
         expect(page).to have_css('[role="tab"]', text: 'Item details')
         expect(page).to have_select('Content type', visible: :all)
       end
+
+      it 'renders the navigation, save as draft, purge, and deposit buttons' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_link('Cancel', href: "/objects/#{druid}", count: 4)
+        expect(page).to have_button('Previous', count: 3)
+        expect(page).to have_button('Next', count: 3)
+        expect(page).to have_css('button[type="submit"][form="item_form"][value="draft"]', text: 'Save as draft',
+                                                                                           count: 4)
+        expect(page).to have_css('button[type="submit"][form="item_form"][value="deposit"]', text: 'Deposit',
+                                                                                             count: 1)
+        expect(page).to have_link('Purge', href: "/objects/#{druid}/purge", count: 4)
+        expect(page).to have_no_link('Discard draft')
+        expect(Sdr::PurgeService).to have_received(:purgeable?).with(druid:, version: 1).once
+      end
     end
 
     context 'when an agreement' do
@@ -72,6 +89,15 @@ RSpec.describe 'Contents' do
         expect(page).to have_no_css('[role="tab"]', text: 'Item details')
         expect(page).to have_no_select('Content type', visible: :all)
       end
+
+      it 'renders the navigation without previous on the first tab' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_button('Save as draft', count: 3)
+        expect(page).to have_button('Previous', count: 2)
+        expect(page).to have_button('Next', count: 2)
+      end
     end
 
     context 'when the version is open' do
@@ -82,6 +108,22 @@ RSpec.describe 'Contents' do
 
         expect(Capybara.string(response.body)).to have_field('Version description', with: 'Initial version')
         expect(Sdr::VersionService).to have_received(:new).with(druid:).once
+      end
+    end
+
+    context 'when the open version is not the first version' do
+      let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
+      let(:version_service) { version_service_double(open?: true, editable?: true, version: 2, discardable?: true) }
+
+      # A later version is not purgeable without checking SDR.
+      before { allow(Sdr::PurgeService).to receive(:purgeable?).and_call_original }
+
+      it 'renders the discard draft button' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_link('Discard draft', href: "/objects/#{druid}/discard_draft", count: 4)
+        expect(page).to have_no_link('Purge')
       end
     end
 

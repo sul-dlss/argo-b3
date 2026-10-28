@@ -2,6 +2,7 @@
 
 # Controller for items (DRO)
 class ItemsController < ApplicationController
+  include DiscardOrPurgeConcern
   include TokenConcern
 
   # Matches ObjectsController so its descriptive CSV download accepts the druid token.
@@ -118,18 +119,10 @@ class ItemsController < ApplicationController
 
   def set_edit_view
     @title = Cocina::Models::Builders::TitleBuilder.build(@cocina_object.description.title)
-    @cancel_path = object_path(@druid)
     # Computed once, since every pane's footer renders the discard or purge button.
-    @discard_or_purge_action = discard_or_purge_action
+    @discard_or_purge_action = discard_or_purge_action(cocina_object: @cocina_object, version_service:)
     @druid_token = generate_token(@druid)
     set_apo_and_collection_options(form: @edit_item_form)
-  end
-
-  # @return [Symbol, nil] :purge, :discard_draft, or nil if neither is possible
-  def discard_or_purge_action
-    return :purge if Sdr::PurgeService.purgeable?(druid: @druid, version: @cocina_object.version)
-
-    :discard_draft if Sdr::DiscardDraftService.discardable?(cocina_object: @cocina_object, version_service:)
   end
 
   def render_invalid_edit

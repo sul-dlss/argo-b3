@@ -88,6 +88,60 @@ RSpec.describe 'Manage files' do
     expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
   end
 
+  it 'navigates between tabs with next and previous' do
+    visit "/contents/#{druid}/edit"
+
+    expect(page).to have_css('.nav-link.active', text: 'Add files')
+
+    click_button 'Next'
+    expect(page).to have_css('.nav-link.active', text: 'Structure')
+
+    click_button 'Previous'
+    expect(page).to have_css('.nav-link.active', text: 'Add files')
+
+    click_button 'Previous'
+    expect(page).to have_css('.nav-link.active', text: 'Item details')
+    # Item details is the first tab.
+    expect(page).to have_no_button('Previous')
+  end
+
+  it 'saves as a draft from a tab other than deposit' do
+    visit "/contents/#{druid}/edit"
+
+    click_button 'Save as draft'
+
+    expect(page).to have_current_path("/objects/#{druid}")
+    content = Content.find_by!(druid:, immutable: false)
+    expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+  end
+
+  context 'when discarding the draft' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
+    let(:version_status) do
+      Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 2, open: true, openable: false,
+                                                              closeable: true, assembling: false,
+                                                              accessioning: false, discardable: true,
+                                                              versionDescription: 'Added files')
+    end
+
+    before do
+      allow(version_client).to receive(:discard)
+    end
+
+    it 'confirms, discards the version and the mutable content, and returns to the object page' do
+      visit "/contents/#{druid}/edit"
+
+      accept_confirm(/\ADiscard this draft\?/) do
+        click_link 'Discard draft'
+      end
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Draft discarded.')
+      expect(version_client).to have_received(:discard)
+      expect(Content.exists?(druid:, immutable: false)).to be false
+    end
+  end
+
   it 'warns about embedded text when running OCR on a document' do
     warning = 'Do not run OCR for files that already have embedded text.'
 
