@@ -3,7 +3,7 @@
       link: button[:link],
       variant: :'outline-primary',
       classes: 'ms-2',
-      data: { turbo_method: :delete, turbo_confirm: button[:confirm] }
+      data: { turbo_method: :delete, turbo_confirm: button[:confirm], **data }
     ) do %>
   <%= helpers.delete_icon(classes: 'me-1') %><%= button[:label] %>
 <% end %>

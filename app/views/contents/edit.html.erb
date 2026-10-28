@@ -30,7 +30,11 @@
                  builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |item_form| %>
       <% if show_details %>
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
-                                                                            label: t('edit.contents.tabs.details.label'))) do %>
+                                                                            label: t('edit.contents.tabs.details.label'))) do |pane| %>
+          <% pane.with_footer do %>
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+                                                               discard_or_purge_action: @discard_or_purge_action, show_previous: false) %>
+          <% end %>
           <%= tag.div data: { controller: 'content-type-dependent ocr-options',
                               ocr_options_allowed_content_types_value: Sdr::TextExtraction::SUPPORTED_TYPES } do %>
             <%= render Edit::ContentTypeComponent.new(form: item_form, input_data: { content_type_dependent_target: 'contentType',
@@ -47,7 +51,11 @@
 
       <% form_with(model: @content_form, url: '#', html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
-                                                                            label: t('edit.contents.tabs.add_files.label'))) do %>
+                                                                            label: t('edit.contents.tabs.add_files.label'))) do |pane| %>
+          <% pane.with_footer do %>
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+                                                               discard_or_purge_action: @discard_or_purge_action, show_previous: show_details) %>
+          <% end %>
 
           <%= render SdrViewComponents::Forms::FieldsetComponent.new(
                 label: t('edit.items.fields.file_choice.label'),
@@ -140,7 +148,11 @@
         <% end %>
 
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
-                                                                            label: t('edit.contents.tabs.structural.label'))) do %>
+                                                                            label: t('edit.contents.tabs.structural.label'))) do |pane| %>
+          <% pane.with_footer do %>
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+                                                               discard_or_purge_action: @discard_or_purge_action) %>
+          <% end %>
           <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
           <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
@@ -152,7 +164,11 @@
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
                                                                           label: t('edit.contents.tabs.deposit.label'),
-                                                                          mark_required: true)) do %>
+                                                                          mark_required: true)) do |pane| %>
+        <% pane.with_footer do %>
+          <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+                                                             discard_or_purge_action: @discard_or_purge_action, show_next: false, show_deposit: true) %>
+        <% end %>
         <% unless @contents_item_form.initial_version? %>
           <%= render SdrViewComponents::Forms::TextFieldComponent.new(
                 form: item_form,
@@ -162,11 +178,6 @@
                 container_classes: 'mb-3'
               ) %>
         <% end %>
-        <%# A fieldset so that disabling while uploading doesn't conflict with the unassociated-files disabling of the buttons. %>
-        <fieldset class="d-flex justify-content-end" data-disable-actions-target="disableable">
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.draft'), value: ContentsController::DRAFT_VALUE, form_id: item_form_id, variant: 'outline-primary', classes: 'me-2', data: { unassociated_files_target: 'submit' }) %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.edit.buttons.deposit'), value: ContentsController::DEPOSIT_VALUE, form_id: item_form_id, data: { unassociated_files_target: 'submit' }) %>
-        </fieldset>
       <% end %>
     <% end %>
   <% end %>

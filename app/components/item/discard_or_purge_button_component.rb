@@ -2,13 +2,15 @@
 
 module Item
   # Component for rendering the purge button (for a purgeable item) or the discard draft button (for a discardable
-  # draft) of the item edit form.
+  # draft) of the item edit and manage files forms.
   class DiscardOrPurgeButtonComponent < ApplicationComponent
     # @param druid [String] The druid of the item
     # @param action [Symbol, nil] :purge, :discard_draft, or nil to render nothing
-    def initialize(druid:, action:)
+    # @param data [Hash] Additional data attributes for the link
+    def initialize(druid:, action:, data: {})
       @druid = druid
       @action = action
+      @data = data
       super()
     end
 
@@ -28,6 +30,6 @@ module Item
 
     private
 
-    attr_reader :druid, :action
+    attr_reader :druid, :action, :data
   end
 end

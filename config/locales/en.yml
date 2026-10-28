@@ -218,9 +218,7 @@ en:
           label: 'Files'
         title: "Manage files"
         buttons:
-          deposit: "Deposit"
           discover_files: "Discover files"
-          draft: "Save as draft"
         errors:
           save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
         toasts:
@@ -332,7 +330,7 @@ en:
           draft: "Save as draft"
           draft_edit_files: "Save draft and edit files"
           purge: "Purge"
-          purge_confirm: "Purge this item? It and all of its files will be permanently deleted. This cannot be undone."
+          purge_confirm: "Purge this object? It and all of its files will be permanently deleted. This cannot be undone."
         warnings:
           content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
           not_editable: "Item is not editable."

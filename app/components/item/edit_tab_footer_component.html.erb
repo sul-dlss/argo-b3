@@ -1,28 +1,33 @@
 <div class="d-flex">
   <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:) %>
-  <% if show_edit_files %>
+  <%# A fieldset, so that disabling it (e.g., while uploading) doesn't conflict with disabling the submit buttons. %>
+  <%= tag.fieldset class: 'd-flex ms-auto', data: actions_data do %>
+    <% if show_edit_files %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(
+            label: t('edit.items.edit.buttons.draft_edit_files'),
+            form_id:,
+            value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
+            variant: 'outline-primary',
+            classes: 'me-2',
+            data: submit_data
+          ) %>
+    <% end %>
     <%= render SdrViewComponents::Forms::SubmitComponent.new(
-          label: t('edit.items.edit.buttons.draft_edit_files'),
+          label: t('edit.items.edit.buttons.draft'),
           form_id:,
-          value: ItemsController::DRAFT_TO_ADD_FILES_VALUE,
+          value: ItemsController::DRAFT_VALUE,
           variant: 'outline-primary',
-          classes: 'ms-auto'
+          data: submit_data
         ) %>
-  <% end %>
-  <%= render SdrViewComponents::Forms::SubmitComponent.new(
-        label: t('edit.items.edit.buttons.draft'),
-        form_id:,
-        value: ItemsController::DRAFT_VALUE,
-        variant: 'outline-primary',
-        classes: show_edit_files ? 'ms-2' : 'ms-auto'
-      ) %>
-  <%= render Item::DiscardOrPurgeButtonComponent.new(druid:, action: discard_or_purge_action) %>
-  <% if show_deposit %>
-    <%= render SdrViewComponents::Forms::SubmitComponent.new(
-          label: t('edit.items.edit.buttons.deposit'),
-          form_id:,
-          value: ItemsController::DEPOSIT_VALUE,
-          classes: 'ms-2'
-        ) %>
+    <%= render Item::DiscardOrPurgeButtonComponent.new(druid:, action: discard_or_purge_action, data: actions_data) %>
+    <% if show_deposit %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(
+            label: t('edit.items.edit.buttons.deposit'),
+            form_id:,
+            value: ItemsController::DEPOSIT_VALUE,
+            classes: 'ms-2',
+            data: submit_data
+          ) %>
+    <% end %>
   <% end %>
 </div>
