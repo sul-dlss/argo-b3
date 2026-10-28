@@ -2,7 +2,7 @@
 
 # Controller for collection select options, e.g., for a Tom Select field that loads options as the user types.
 class CollectionOptionsController < ApplicationController
-  # The options are restricted to the collections the user can see (or, when editable, edit).
+  # The options are restricted to the collections the user can edit, i.e., add items to.
   skip_verify_authorized
 
   def index
@@ -15,15 +15,10 @@ class CollectionOptionsController < ApplicationController
     query = params.require(:q).strip
     if druid_query?(query)
       Searchers::CollectionListByDruid.call(druids: [DruidSupport.prefixed_druid_from(query)],
-                                            user_scope: current_user_scope, apo_druid: limit_apo_druid, editable:)
+                                            user_scope: current_user_scope, apo_druid: limit_apo_druid)
     else
-      Searchers::CollectionList.call(query:, user_scope: current_user_scope, apo_druid: limit_apo_druid, editable:)
+      Searchers::CollectionList.call(query:, user_scope: current_user_scope, apo_druid: limit_apo_druid)
     end
-  end
-
-  # Whether to limit to the collections the user can edit, e.g., when registering an item.
-  def editable
-    ActiveModel::Type::Boolean.new.cast(params[:editable]) || false
   end
 
   # The APO to limit the collections to, if limiting by APO and an APO is selected.

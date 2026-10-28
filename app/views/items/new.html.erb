@@ -50,7 +50,7 @@
         <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: @new_item_form.errors.empty? } do %>
           <%= render Edit::ApoComponent.new(form:, options: @apo_options, apo_defaults: true) %>
 
-          <%= render Edit::CollectionsComponent.new(form:, options: @collection_options, editable: true) %>
+          <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
 
           <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 

@@ -58,6 +58,7 @@ class ItemsController < ApplicationController
     return redirect_content_busy if @content&.staging_or_discovering?
 
     @edit_item_form = build_submitted_edit_item_form
+    authorize! added_collection_druids, to: :add_to_collections?, with: ItemPolicy
     return render_invalid_edit unless @edit_item_form.valid?
 
     @edit_item_form.save!(user_name: current_user.sunetid, accession: deposit?)
@@ -80,6 +81,11 @@ class ItemsController < ApplicationController
 
   def edit_item_form_params
     EditItemForm.params_from(params)
+  end
+
+  # Collections the item is already a member of may be kept even if the user cannot edit them.
+  def added_collection_druids
+    @edit_item_form.collection_druids - Array(@cocina_object.structural&.isMemberOf)
   end
 
   def version_service

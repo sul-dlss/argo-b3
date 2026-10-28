@@ -62,14 +62,14 @@ RSpec.describe Searchers::CollectionList do
       let(:user) { create(:user, :reader) }
 
       before do
-        create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: 'druid:gh456jk7890')
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:gh456jk7890')
       end
 
-      it 'restricts to the collections the user can see' do
+      it 'restricts to the collections the user can edit' do
         described_class.call(query: 'art', user_scope:)
 
         expect(Search::SolrService).to have_received(:post) do |args|
-          expect(args[:request][:fq]).to include(Search::PermissionFilter.call(user_scope:))
+          expect(args[:request][:fq]).to include(Search::PermissionFilter.call(user_scope:, editable: true))
         end
       end
     end
@@ -77,48 +77,33 @@ RSpec.describe Searchers::CollectionList do
 
   context 'with Solr', :solr do
     let(:user) { create(:user, :reader) }
-    let(:restricted_collection_druid) { 'druid:gh456jk7890' }
+    let(:editable_apo_druid) { 'druid:hv992ry2431' }
 
     before do
       create(:solr_collection, druid: 'druid:bc123df4567', title: 'Art History Slides')
       create(:solr_collection, druid: 'druid:dm456jk7812', title: 'Maps of Palo Alto')
-      create(:solr_collection, druid: restricted_collection_druid, title: 'Restricted Art Collection')
+      create(:solr_collection, druid: 'druid:fr234ty5678', title: 'Art Prints', apo_druid: editable_apo_druid)
+      create(:solr_collection, druid: 'druid:jk345mn6789', title: 'Art Posters')
       create(:solr_item, druid: 'druid:kp789pq0123', title: 'Art History Lecture')
-      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_collection_druid)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:dm456jk7812')
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: editable_apo_druid)
     end
 
-    it 'returns the visible collections with titles matching the words, treating the last as a prefix' do
+    it 'returns the editable collections with titles matching the words, treating the last as a prefix' do
       expect(described_class.call(query: 'art hist', user_scope:))
         .to eq([['Art History Slides', 'druid:bc123df4567']])
-      expect(described_class.call(query: 'art', user_scope:).map(&:last)).to eq(['druid:bc123df4567'])
+    end
+
+    it 'returns only the collections the user can edit, by the collection or its APO' do
+      expect(described_class.call(query: 'art', user_scope:).map(&:last))
+        .to contain_exactly('druid:bc123df4567', 'druid:fr234ty5678')
     end
 
     context 'with an APO' do
-      let(:apo_druid) { 'druid:hv992ry2431' }
-
-      before do
-        create(:solr_collection, druid: 'druid:fr234ty5678', title: 'Art Prints', apo_druid:)
-      end
-
       it 'returns only the collections governed by the APO' do
-        expect(described_class.call(query: 'art', user_scope:, apo_druid:))
+        expect(described_class.call(query: 'art', user_scope:, apo_druid: editable_apo_druid))
           .to eq([['Art Prints', 'druid:fr234ty5678']])
-      end
-    end
-
-    context 'when editable' do
-      let(:editable_apo_druid) { 'druid:hv992ry2431' }
-
-      before do
-        create(:solr_collection, druid: 'druid:fr234ty5678', title: 'Art Prints', apo_druid: editable_apo_druid)
-        create(:solr_collection, druid: 'druid:jk345mn6789', title: 'Art Posters')
-        create(:permission, :edit, workgroup: user.groups.first, target_druid: editable_apo_druid)
-        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:jk345mn6789')
-      end
-
-      it 'returns only the collections the user can edit, by the collection or its APO' do
-        expect(described_class.call(query: 'art', user_scope:, editable: true).map(&:last))
-          .to contain_exactly('druid:fr234ty5678', 'druid:jk345mn6789')
       end
     end
   end

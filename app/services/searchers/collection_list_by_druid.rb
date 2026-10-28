@@ -10,15 +10,13 @@ module Searchers
     end
 
     # @param druids [Array<String>] prefixed druids
-    # @param user_scope [Permissions::UserScope, nil] the permission scope of the requesting user.
-    #   Omit for collections that are already selected, which must not be dropped when the user cannot see them.
+    # @param user_scope [Permissions::UserScope, nil] the permission scope of the requesting user, to limit to the
+    #   collections the user can edit. Omit for collections that are already selected, which must not be dropped.
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
-    # @param editable [Boolean] when true (with user_scope), limits to the collections the user can edit
-    def initialize(druids:, user_scope: nil, apo_druid: nil, editable: false)
+    def initialize(druids:, user_scope: nil, apo_druid: nil)
       @druids = druids
       @user_scope = user_scope
       @apo_druid = apo_druid
-      @editable = editable
     end
 
     # @return [Array<Array(String, String)>] list of [title, druid] pairs, in the order of the druids.
@@ -32,7 +30,7 @@ module Searchers
 
     private
 
-    attr_reader :druids, :user_scope, :apo_druid, :editable
+    attr_reader :druids, :user_scope, :apo_druid
 
     def solr_docs
       Search::SolrService.post(request: solr_request)['response']['docs']
@@ -57,7 +55,7 @@ module Searchers
     end
 
     def permission_filter
-      Search::PermissionFilter.call(user_scope:, editable:) if user_scope
+      Search::PermissionFilter.call(user_scope:, editable: true) if user_scope
     end
   end
 end

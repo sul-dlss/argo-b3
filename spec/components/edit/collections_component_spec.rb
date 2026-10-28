@@ -27,18 +27,6 @@ RSpec.describe Edit::CollectionsComponent, type: :component do
     expect(page).to have_no_field('item[limit_collection_by_apo]', type: 'hidden', visible: :all)
   end
 
-  context 'when editable' do
-    let(:component) { described_class.new(form:, options:, editable: true) }
-
-    it 'loads the options from the editable collections' do
-      render_inline(component)
-
-      expect(page).to have_css(
-        'select[data-tom-select-url-value="/collection_options?editable=true"]', visible: :all
-      )
-    end
-  end
-
   context 'when show_limit_by_apo is false' do
     let(:component) { described_class.new(form:, options:, show_limit_by_apo: false) }
 

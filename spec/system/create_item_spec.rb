@@ -69,8 +69,7 @@ RSpec.describe 'Create an item' do
       expect(page).to have_css('.ts-control .item', text: 'Art History Slides')
       expect(page).to have_css('.ts-control .item', text: 'Art Maps')
       expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:, editable: true)
-        .at_least(:once)
+        .with(query: 'Art', user_scope: an_instance_of(Permissions::UserScope), apo_druid:).at_least(:once)
 
       # Only the section for the selected access settings toggle option is shown. The other
       # section is disabled so that its fields are not submitted.

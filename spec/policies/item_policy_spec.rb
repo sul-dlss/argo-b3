@@ -128,4 +128,56 @@ RSpec.describe ItemPolicy do
       end
     end
   end
+
+  describe '#add_to_collections?' do
+    subject { described_class.new(collection_druids, user:).apply(:add_to_collections?) }
+
+    let(:user) { create(:user, groups: [workgroup]) }
+    let(:workgroup) { 'sdr:test-workgroup' }
+    let(:collection_druid) { 'druid:gh456jk7890' }
+    let(:collection_apo_druid) { 'druid:mn789pq0123' }
+    let(:collection_druids) { [collection_druid] }
+    let(:collection_solr_doc) do
+      { Search::Fields::ID => collection_druid, Search::Fields::APO_DRUID => [collection_apo_druid] }
+    end
+
+    before do
+      Current.effective_groups = user.groups
+      allow(Sdr::Repository).to receive(:find_solr).with(druid: collection_druid).and_return(collection_solr_doc)
+    end
+
+    context 'when the user has edit permission for the collection' do
+      before { create(:permission, :edit, workgroup:, target_druid: collection_druid) }
+
+      it { is_expected.to be true }
+    end
+
+    context "when the user has edit permission for the collection's APO" do
+      before { create(:permission, :edit, workgroup:, target_druid: collection_apo_druid) }
+
+      it { is_expected.to be true }
+    end
+
+    context 'when the user does not have edit permission for the collection' do
+      before { create(:permission, :read_restricted, workgroup:, target_druid: collection_druid) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the collection is not found' do
+      before do
+        create(:permission, :edit, workgroup:, target_druid: collection_apo_druid)
+        allow(Sdr::Repository).to receive(:find_solr).with(druid: collection_druid)
+                                                     .and_raise(Sdr::Repository::NotFoundResponse)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'when there are no collections' do
+      let(:collection_druids) { [] }
+
+      it { is_expected.to be true }
+    end
+  end
 end

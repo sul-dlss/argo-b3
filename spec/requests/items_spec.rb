@@ -313,6 +313,45 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when adding a collection the user cannot edit' do
+      let(:item_params) do
+        { version_description: 'Changed collection', lock: cocina_object.lock,
+          collection_druids: ['druid:cd234fg5678'] }
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).with(druid: 'druid:cd234fg5678')
+                                                     .and_return({ Search::Fields::ID => 'druid:cd234fg5678' })
+      end
+
+      it 'denies access' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when keeping a collection the user cannot edit' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid).new(structural: { isMemberOf: ['druid:cd234fg5678'] })
+      end
+      let(:item_params) do
+        { version_description: 'Changed type', lock: cocina_object.lock,
+          content_type: Cocina::Models::ObjectType.image, collection_druids: ['druid:cd234fg5678'] }
+      end
+
+      it 'saves' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.image), user_name: user.sunetid,
+                description: nil)
+      end
+    end
+
     context 'when saving as a draft and editing files' do
       let(:commit) { ItemsController::DRAFT_TO_ADD_FILES_VALUE }
 

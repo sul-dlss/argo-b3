@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Searchers
-  # Searcher that returns the collections the user can see with titles matching a query,
+  # Searcher that returns the collections the user can edit (i.e., add items to) with titles matching a query,
   # for populating select options.
   class CollectionList
     include Search::Fields
@@ -22,12 +22,10 @@ module Searchers
     # @param query [String] words from a title (the last may be partial)
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
-    # @param editable [Boolean] when true, limits to the collections the user can edit rather than see
-    def initialize(query:, user_scope:, apo_druid: nil, editable: false)
+    def initialize(query:, user_scope:, apo_druid: nil)
       @query = query
       @user_scope = user_scope
       @apo_druid = apo_druid
-      @editable = editable
     end
 
     # @return [Array<Array(String, String)>] list of [title, druid] pairs, in relevance order
@@ -37,7 +35,7 @@ module Searchers
 
     private
 
-    attr_reader :query, :user_scope, :apo_druid, :editable
+    attr_reader :query, :user_scope, :apo_druid
 
     def solr_docs
       Search::SolrService.post(request: solr_request)['response']['docs']
@@ -49,7 +47,7 @@ module Searchers
         defType: 'edismax',
         qf: QUERY_FIELDS.join(' '),
         mm: '100%', # every word in the query must match
-        fq: ["#{OBJECT_TYPES}:collection", apo_filter, Search::PermissionFilter.call(user_scope:, editable:)].compact,
+        fq: ["#{OBJECT_TYPES}:collection", apo_filter, permission_filter].compact,
         fl: [ID, TITLE],
         rows: LIMIT
       }
@@ -60,6 +58,10 @@ module Searchers
       words = query.split.map { |word| RSolr.solr_escape(word) }
       words[-1] = "#{words.last}*"
       words.join(' ')
+    end
+
+    def permission_filter
+      Search::PermissionFilter.call(user_scope:, editable: true)
     end
 
     def apo_filter

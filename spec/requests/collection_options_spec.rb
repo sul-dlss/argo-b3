@@ -19,7 +19,7 @@ RSpec.describe 'Collection options' do
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to eq([{ 'value' => 'druid:bc123df4567', 'text' => 'Art History Slides' }])
       expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'art hist', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil, editable: false)
+        .with(query: 'art hist', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
       expect(Searchers::CollectionListByDruid).not_to have_received(:call)
     end
   end
@@ -30,8 +30,7 @@ RSpec.describe 'Collection options' do
 
       expect(response.parsed_body).to eq([{ 'value' => 'druid:xz987wv6543', 'text' => 'Maps of Palo Alto' }])
       expect(Searchers::CollectionListByDruid).to have_received(:call)
-        .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil,
-              editable: false)
+        .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
       expect(Searchers::CollectionList).not_to have_received(:call)
     end
   end
@@ -41,8 +40,7 @@ RSpec.describe 'Collection options' do
       get '/collection_options', params: { q: 'druid:xz987wv6543' }
 
       expect(Searchers::CollectionListByDruid).to have_received(:call)
-        .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil,
-              editable: false)
+        .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
     end
   end
 
@@ -51,8 +49,7 @@ RSpec.describe 'Collection options' do
       get '/collection_options', params: { q: 'art', limit_by_apo: '1', apo_druid: 'druid:hv992ry2431' }
 
       expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: 'druid:hv992ry2431',
-              editable: false)
+        .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: 'druid:hv992ry2431')
     end
 
     it 'limits druid queries to the collections governed by the APO' do
@@ -60,7 +57,7 @@ RSpec.describe 'Collection options' do
 
       expect(Searchers::CollectionListByDruid).to have_received(:call)
         .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope),
-              apo_druid: 'druid:hv992ry2431', editable: false)
+              apo_druid: 'druid:hv992ry2431')
     end
 
     context 'when no APO is selected' do
@@ -68,7 +65,7 @@ RSpec.describe 'Collection options' do
         get '/collection_options', params: { q: 'art', limit_by_apo: '1' }
 
         expect(Searchers::CollectionList).to have_received(:call)
-          .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil, editable: false)
+          .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
       end
     end
   end
@@ -78,24 +75,7 @@ RSpec.describe 'Collection options' do
       get '/collection_options', params: { q: 'art', apo_druid: 'druid:hv992ry2431' }
 
       expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil, editable: false)
-    end
-  end
-
-  context 'when limiting to editable collections' do
-    it 'limits title queries to the collections the user can edit' do
-      get '/collection_options', params: { q: 'art', editable: 'true' }
-
-      expect(Searchers::CollectionList).to have_received(:call)
-        .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil, editable: true)
-    end
-
-    it 'limits druid queries to the collections the user can edit' do
-      get '/collection_options', params: { q: 'xz987wv6543', editable: 'true' }
-
-      expect(Searchers::CollectionListByDruid).to have_received(:call)
-        .with(druids: ['druid:xz987wv6543'], user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil,
-              editable: true)
+        .with(query: 'art', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
     end
   end
 

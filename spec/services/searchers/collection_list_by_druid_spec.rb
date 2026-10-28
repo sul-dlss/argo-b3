@@ -40,14 +40,14 @@ RSpec.describe Searchers::CollectionListByDruid do
       let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
 
       before do
-        create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: 'druid:gh456jk7890')
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:gh456jk7890')
       end
 
-      it 'restricts to the collections the user can see' do
+      it 'restricts to the collections the user can edit' do
         described_class.call(druids:, user_scope:)
 
         expect(Search::SolrService).to have_received(:post) do |args|
-          expect(args[:request][:fq]).to include(Search::PermissionFilter.call(user_scope:))
+          expect(args[:request][:fq]).to include(Search::PermissionFilter.call(user_scope:, editable: true))
         end
       end
     end
@@ -74,30 +74,24 @@ RSpec.describe Searchers::CollectionListByDruid do
   context 'with Solr', :solr do
     let(:user) { create(:user, :reader) }
     let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
-    let(:restricted_collection_druid) { 'druid:gh456jk7890' }
-    let(:druids) { ['druid:bc123df4567', restricted_collection_druid] }
+    let(:editable_collection_druid) { 'druid:gh456jk7890' }
+    let(:druids) { ['druid:bc123df4567', editable_collection_druid] }
 
     before do
       create(:solr_collection, druid: 'druid:bc123df4567', title: 'Art History Slides')
-      create(:solr_collection, druid: restricted_collection_druid, title: 'Restricted Art Collection')
-      create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_collection_druid)
+      create(:solr_collection, druid: editable_collection_druid, title: 'Editable Art Collection')
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: editable_collection_druid)
     end
 
-    it 'returns only the collections the user can see when given a user scope' do
-      expect(described_class.call(druids:, user_scope:)).to eq([['Art History Slides', 'druid:bc123df4567']])
-    end
-
-    it 'returns only the collections the user can edit when editable' do
-      create(:permission, :edit, workgroup: user.groups.first, target_druid: restricted_collection_druid)
-
-      expect(described_class.call(druids:, user_scope:, editable: true))
-        .to eq([['Restricted Art Collection', restricted_collection_druid]])
+    it 'returns only the collections the user can edit when given a user scope' do
+      expect(described_class.call(druids:, user_scope:))
+        .to eq([['Editable Art Collection', editable_collection_druid]])
     end
 
     it 'returns all of the collections when not given a user scope' do
       expect(described_class.call(druids:))
         .to eq([['Art History Slides', 'druid:bc123df4567'],
-                ['Restricted Art Collection', restricted_collection_druid]])
+                ['Editable Art Collection', editable_collection_druid]])
     end
   end
 end
