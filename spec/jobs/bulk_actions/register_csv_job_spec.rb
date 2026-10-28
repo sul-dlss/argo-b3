@@ -32,6 +32,9 @@ RSpec.describe BulkActions::RegisterCsvJob do
   let(:pdf) { instance_double(Prawn::Document, render_file: nil) }
 
   before do
+    %w[druid:bc123df4567 druid:dj123qx4567 druid:bk024qs1808].each do |target_druid|
+      create(:permission, :edit, workgroup: bulk_action.user.groups.first, target_druid:)
+    end
     allow(Sdr::Repository).to receive(:register).and_return(cocina_object)
     allow(Sdr::Repository).to receive(:find_solr) { |druid:| { Search::Fields::ID => druid } }
     allow(TracksheetService).to receive(:call).and_return(pdf)
@@ -59,6 +62,29 @@ RSpec.describe BulkActions::RegisterCsvJob do
         .with(/.*does not match "\^druid:\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{3\}\[b-df-hjkmnp-tv-z\]\{2\}\[0-9\]\{4\}\$"/)
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
+    end
+  end
+
+  context 'when the user cannot edit the APO or collection for a row' do
+    let(:csv_string) do
+      <<~CSV
+        administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download
+        druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world
+        druid:hv992ry2431,druid:bk024qs1808,accessionWF,book,foo:456,Not my APO,world,world
+        druid:bc123df4567,druid:mn789pq0123,accessionWF,book,foo:789,Not my collection,world,world
+      CSV
+    end
+
+    it 'registers only the permitted rows' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:register).once
+      expect(log).to have_received(:puts)
+        .with(/line 3\t\tError: Not authorized to register with this APO and collections/).once
+      expect(log).to have_received(:puts)
+        .with(/line 4\t\tError: Not authorized to register with this APO and collections/).once
+      expect(bulk_action.druid_count_success).to eq 1
+      expect(bulk_action.druid_count_fail).to eq 2
     end
   end
 
