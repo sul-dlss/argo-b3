@@ -560,6 +560,34 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when depositing a structure that is invalid for the content type' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+          .new(access: { view: 'world', download: 'world' })
+      end
+      let(:item_params) { { version_description: 'Redeposit', lock: cocina_object.lock } }
+      let(:commit) { ItemsController::DEPOSIT_VALUE }
+
+      before do
+        content = create(:content, druid:, lock: cocina_object.lock)
+        # Published files in a file resource are an error for a book.
+        create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
+                              publish: true)
+        allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+        allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
+        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+      end
+
+      it 'renders the edit page with the error without depositing' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body)).to have_css('.invalid-feedback', text: 'The files are not valid ' \
+                                                                                      'for the content type.')
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
     context 'when depositing with a closed version and nothing changed' do
       let(:open) { false }
       let(:commit) { ItemsController::DEPOSIT_VALUE }

@@ -88,6 +88,41 @@ RSpec.describe EditItemForm do
     end
   end
 
+  describe 'structure validation' do
+    let(:cocina_object) { unembargoed_cocina_object.new(access: { view: 'world', download: 'world' }) }
+
+    before do
+      content = create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock)
+      # Published files in a file resource are an error for a book.
+      create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
+                            publish: true)
+      edit_item_form.version_description = 'Redeposit'
+    end
+
+    it 'is not valid when depositing' do
+      expect(edit_item_form.valid?(:deposit)).to be false
+      expect(edit_item_form.errors[:content])
+        .to eq(['The files are not valid for the content type. "Save draft and edit files" to fix them before depositing.']) # rubocop:disable Layout/LineLength
+    end
+
+    it 'is valid when not depositing' do
+      expect(edit_item_form).to be_valid
+    end
+
+    it 'is valid when depositing as a content type for which the structure is valid' do
+      edit_item_form.update(content_type: Cocina::Models::ObjectType.object)
+
+      expect(edit_item_form.valid?(:deposit)).to be true
+    end
+
+    it 'is valid when depositing after making the item dark' do
+      # A dark object's structure errors are only warnings.
+      edit_item_form.update(access_view: 'dark', access_download: 'none')
+
+      expect(edit_item_form.valid?(:deposit)).to be true
+    end
+  end
+
   describe 'description_csv_file' do
     before { edit_item_form.update(version_description: 'Updated the description', description_csv_file:) }
 

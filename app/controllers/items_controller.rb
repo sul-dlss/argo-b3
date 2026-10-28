@@ -59,7 +59,7 @@ class ItemsController < ApplicationController
     @edit_item_form = build_submitted_edit_item_form
     authorize! @edit_item_form, to: :add_to_collections?, with: ItemPolicy
     authorize! @edit_item_form, to: :update_apo?, with: ItemPolicy
-    return render_invalid_edit unless @edit_item_form.valid?
+    return render_invalid_edit unless @edit_item_form.valid?(deposit? ? :deposit : nil)
 
     @edit_item_form.save!(user_name: current_user.sunetid, accession: deposit?)
     redirect_updated

@@ -81,6 +81,7 @@
               label_mark_required: true,
               container_classes: 'mb-3'
             ) %>
+        <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form:, classes: 'mb-3') %>
 
         <% pane.with_footer do %>
           <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_next: false, show_edit_files: true, show_deposit: true) %>
