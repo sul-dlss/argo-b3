@@ -58,6 +58,9 @@ RSpec.describe 'Admin object permissions' do
     find('.ts-control input').set('sdr:existing')
     find('.ts-dropdown .option', text: 'sdr:existing', exact_text: true).click
     expect(page).to have_css('.ts-control .item', text: 'sdr:existing')
+    # Left open when Add is clicked, since the blur is ignored.
+    find('.ts-control').click
+    expect(page).to have_css('.ts-dropdown', visible: :visible)
     choose 'Edit'
     click_button 'Add'
 
