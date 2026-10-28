@@ -22,7 +22,7 @@ module BulkActions
       end
 
       def perform
-        return unless check_object_type?(allow_admin_policy: false)
+        return unless check_read_ability? && check_object_type?(allow_admin_policy: false)
 
         export_csv << [DruidSupport.bare_druid_from(druid), *catalog_data]
         success!(message: 'Exported catalog data')

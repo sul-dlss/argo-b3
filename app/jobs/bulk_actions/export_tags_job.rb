@@ -17,6 +17,8 @@ module BulkActions
       end
 
       def perform
+        return unless check_read_ability?
+
         export_csv << [DruidSupport.bare_druid_from(druid), *export_tags]
         success!(message: 'Exported tags')
       end

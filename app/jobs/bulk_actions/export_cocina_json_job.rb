@@ -19,6 +19,8 @@ module BulkActions
       end
 
       def perform
+        return unless check_read_ability?
+
         export_gzip << "#{cocina_object.to_json}\n"
         success!(message: 'Exported full Cocina JSON')
       end
