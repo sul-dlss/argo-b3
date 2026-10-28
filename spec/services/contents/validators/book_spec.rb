@@ -69,17 +69,39 @@ RSpec.describe Contents::Validators::Book do
     end
   end
 
-  context 'when a page has published files that are not JP2, XML, TXT, HTML, PDF, or JSON' do
+  context 'when a page publishes other files alongside one published JP2' do
     before do
       create_resource(file_set_type: 'page', label: 'Page 1',
                       files: [['page_0001.jp2', 'image/jp2', true],
-                              ['page_0001.dat', nil, true],
-                              ['page_0001.zip', 'application/zip', false]])
+                              ['page_0001.tif', 'image/tiff', true],
+                              ['page_0001.dat', nil, true]])
     end
 
-    it 'has an error listing the files' do
-      expect(result.errors).to eq(['Resource 1 (Page 1) has published files that are not JP2, XML, TXT, HTML, ' \
-                                   'PDF, or JSON: page_0001.dat.'])
+    it 'has no errors' do
+      expect(result.errors).to eq([])
+    end
+  end
+
+  context 'when a page has published files but no published JP2 or TIFF, PNG, or JPEG' do
+    before do
+      create_resource(file_set_type: 'page', label: 'Page 1',
+                      files: [['page_0001.jp2', 'image/jp2', false], ['page_0001.txt', 'text/plain', true]])
+    end
+
+    it 'has an error' do
+      expect(result.errors).to eq(['Resource 1 (Page 1) has published files but no published JP2 file ' \
+                                   'or TIFF, PNG, or JPEG file.'])
+    end
+  end
+
+  context 'when a page has published files and a TIFF but no published JP2' do
+    before do
+      create_resource(file_set_type: 'page', label: 'Page 1',
+                      files: [['page_0001.tif', 'image/tiff', false], ['page_0001.txt', 'text/plain', true]])
+    end
+
+    it 'has no errors' do
+      expect(result.errors).to eq([])
     end
   end
 
@@ -136,7 +158,7 @@ RSpec.describe Contents::Validators::Book do
   context 'when no page has a published JP2 or a TIFF, PNG, or JPEG' do
     before do
       create_resource(file_set_type: 'page', label: 'Page 1',
-                      files: [['page_0001.jp2', 'image/jp2', false], ['page_0001.txt', 'text/plain', true]])
+                      files: [['page_0001.jp2', 'image/jp2', false], ['page_0001.txt', 'text/plain', false]])
       create_resource(file_set_type: 'object', label: 'Object 1', files: [['image1.tif', 'image/tiff', false]])
     end
 
