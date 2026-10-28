@@ -28,6 +28,7 @@ FactoryBot.define do
       earliest_accessioned_date { 1.year.ago }
       earliest_registered_date { nil }
       last_deposited_date { nil }
+      last_updated_date { nil }
       collection_druids { [generate(:unique_druid)] }
       collection_titles { ['David Rumsey Map Collection'] }
       admin_policy_titles { ['University Archives'] }
@@ -75,6 +76,7 @@ FactoryBot.define do
         Search::Fields::EARLIEST_ACCESSIONED_DATE => earliest_accessioned_date.utc.iso8601,
         Search::Fields::EARLIEST_REGISTERED_DATE => earliest_registered_date&.utc&.iso8601,
         Search::Fields::LAST_DEPOSITED_DATE => last_deposited_date&.utc&.iso8601,
+        Search::Fields::LAST_UPDATED_DATE => last_updated_date&.utc&.iso8601,
         Search::Fields::COLLECTION_DRUIDS => collection_druids,
         Search::Fields::COLLECTION_TITLES => collection_titles,
         Search::Fields::COLLECTION_TITLE_DRUIDS => collection_titles.zip(collection_druids).map do |title, druid|

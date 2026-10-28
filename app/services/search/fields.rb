@@ -44,6 +44,7 @@ module Search
     LAST_DEPOSITED_DATE = 'deposited_latest_dtpsidv'
     LAST_OPENED_DATE = 'opened_latest_dtpsidv'
     LAST_PUBLISHED_DATE = 'published_latest_dtpsidv'
+    LAST_UPDATED_DATE = 'last_updated_at_dtpsidv'
     LICENSE_LABEL = 'use_license_label_ss'
     LICENSE_LABEL_URI = 'use_license_label_uri_ssidv'
     LICENSE_URI = 'use_license_uri_ssidv'

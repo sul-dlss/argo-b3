@@ -129,6 +129,38 @@ RSpec.describe Searchers::Item do
     end
   end
 
+  context 'when sorting by last updated date', :solr do
+    let(:search_form) { ResultsSearchForm.new(query: 'Test', sort:) }
+    # Last updated date takes precedence over last deposited date.
+    let!(:oldest) { create(:solr_item, last_updated_date: 3.years.ago, last_deposited_date: 1.month.ago) }
+    # Falls back to last deposited date.
+    let!(:middle) { create(:solr_item, last_deposited_date: 2.years.ago) }
+    let!(:newest) { create(:solr_item, last_updated_date: 1.year.ago, last_deposited_date: 4.years.ago) }
+    let!(:undated) { create(:solr_item) }
+    let(:dated_druids) { [oldest, middle, newest].map { |solr_doc| solr_doc.fetch(Search::Fields::ID) } }
+    let(:undated_druid) { undated.fetch(Search::Fields::ID) }
+
+    before do
+      allow(Search::SolrService).to receive(:post).and_call_original
+    end
+
+    context 'when ascending' do
+      let(:sort) { 'last_updated_date_asc' }
+
+      it 'returns the least recently updated first and undated last' do
+        expect(results.map(&:druid)).to eq(dated_druids + [undated_druid])
+      end
+    end
+
+    context 'when descending' do
+      let(:sort) { 'last_updated_date_desc' }
+
+      it 'returns the most recently updated first and undated last' do
+        expect(results.map(&:druid)).to eq(dated_druids.reverse + [undated_druid])
+      end
+    end
+  end
+
   context 'when sorting by title', :solr do
     let(:search_form) { ResultsSearchForm.new(query: 'atlas', sort: 'title') }
     # Created out of alphabetical order, and mixed case, since the sort key DSA indexes is downcased.

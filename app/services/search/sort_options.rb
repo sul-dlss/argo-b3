@@ -31,6 +31,15 @@ module Search
     LAST_DEPOSITED_DATE_DESC = Config.new(label: 'Last deposited date (descending)',
                                           sort_value: "exists(#{Search::Fields::LAST_DEPOSITED_DATE}) desc, " \
                                                       "#{Search::Fields::LAST_DEPOSITED_DATE} desc, id asc")
+    # Objects without a last updated date fall back to their last deposited date.
+    # See https://solr.apache.org/guide/solr/latest/query-guide/function-queries.html#def-function
+    LAST_UPDATED_OR_DEPOSITED_DATE = "def(#{Search::Fields::LAST_UPDATED_DATE},#{Search::Fields::LAST_DEPOSITED_DATE})".freeze
+    LAST_UPDATED_DATE_ASC = Config.new(label: 'Last updated date (ascending)',
+                                       sort_value: "exists(#{LAST_UPDATED_OR_DEPOSITED_DATE}) desc, " \
+                                                   "#{LAST_UPDATED_OR_DEPOSITED_DATE} asc, id asc")
+    LAST_UPDATED_DATE_DESC = Config.new(label: 'Last updated date (descending)',
+                                        sort_value: "exists(#{LAST_UPDATED_OR_DEPOSITED_DATE}) desc, " \
+                                                    "#{LAST_UPDATED_OR_DEPOSITED_DATE} desc, id asc")
     REGISTERED_DATE_ASC = Config.new(label: 'Registered date (ascending)',
                                      sort_value: "#{Search::Fields::EARLIEST_REGISTERED_DATE} asc, id asc")
     REGISTERED_DATE_DESC = Config.new(label: 'Registered date (descending)',
