@@ -58,9 +58,10 @@ export default class MorphableTomSelect {
   }
 
   inUse () {
-    // Checks the DOM's focus, since Tom Select ignores blurs (leaving isFocused set) while the document lacks focus.
+    // Checks the DOM's focus (the dropdown is inside the wrapper), since Tom Select ignores blurs (leaving isFocused
+    // and isOpen set) while the document lacks focus.
     const isFocused = this.tomSelect.wrapper.contains(document.activeElement)
-    return this.tomSelect.isOpen || isFocused || this.currentValue() !== this.submittedValue
+    return isFocused || this.currentValue() !== this.submittedValue
   }
 
   captureSubmittedValue = () => {
