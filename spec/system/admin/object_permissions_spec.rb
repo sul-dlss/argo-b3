@@ -22,6 +22,8 @@ RSpec.describe 'Admin object permissions' do
     # Enter a workgroup that does not yet have any permissions.
     find('.ts-control input').set('sdr:newgroup')
     find('.ts-dropdown .create', text: 'sdr:newgroup').click
+    # Waits for tom-select to take the selection before submitting.
+    expect(page).to have_css('.ts-control .item', text: 'sdr:newgroup')
     choose 'Edit'
     click_button 'Add'
 
@@ -50,13 +52,18 @@ RSpec.describe 'Admin object permissions' do
 
   it 'shows an error when adding a permission that the workgroup already has' do
     visit admin_object_permissions_path(druid)
+    # As in CI, where the browser window may lack focus (so Tom Select ignores blurs).
+    page.execute_script('document.hasFocus = () => false')
 
     find('.ts-control input').set('sdr:existing')
     find('.ts-dropdown .option', text: 'sdr:existing', exact_text: true).click
+    expect(page).to have_css('.ts-control .item', text: 'sdr:existing')
     choose 'Edit'
     click_button 'Add'
 
     expect(page).to have_css('.invalid-feedback', text: 'already has this permission')
+    # The workgroup select is rebuilt from the page with errors.
+    expect(page).to have_css('.ts-wrapper.is-invalid')
     expect(page).not_to have_toast('Permission added')
     expect(page).to have_css('#object-permissions tbody tr', count: 1)
 
