@@ -84,6 +84,25 @@ RSpec.describe Content do
     end
   end
 
+  describe '.latest_staging_activities' do
+    let(:other_druid) { 'druid:df123bc4589' }
+    let(:no_activity_druid) { 'druid:gh123jk4567' }
+    let!(:latest_content) do
+      create(:content, druid:, lock: 'lock-2', staging_state: 'staging_failed', updated_at: 1.minute.ago)
+    end
+    let!(:other_content) { create(:content, druid: other_druid, lock: 'lock-1', staging_state: 'staging') }
+
+    before do
+      create(:content, druid:, lock: 'lock-1', staging_state: 'staging', updated_at: 2.minutes.ago)
+      create(:content, druid: no_activity_druid, lock: 'lock-1', staging_state: 'staging_not_in_progress')
+    end
+
+    it 'returns the most recently updated staging activity of each druid that has one' do
+      expect(described_class.latest_staging_activities(druids: [druid, other_druid, no_activity_druid]))
+        .to eq(druid => latest_content, other_druid => other_content)
+    end
+  end
+
   describe '.delete_mutable_and_staged_files' do
     let(:staged_filepath) do
       StagingSupport.staging_filepath(druid:, filepath: 'folder1/image1.tif',

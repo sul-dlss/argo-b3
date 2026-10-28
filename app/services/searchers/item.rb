@@ -29,7 +29,8 @@ module Searchers
       Search::Fields::TICKETS,
       Search::Fields::TITLE,
       Search::Fields::WORKFLOW_ERRORS,
-      Search::Fields::FIRST_SHELVED_IMAGE
+      Search::Fields::FIRST_SHELVED_IMAGE,
+      Search::Fields::LAST_UPDATED_DATE
     ].freeze
 
     # Primary facets that are included in the main item search request
@@ -44,19 +45,21 @@ module Searchers
 
     # @param search_form [SearchForm]
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
-    def initialize(search_form:, user_scope:)
+    # @param per_page [Integer] the number of results per page
+    def initialize(search_form:, user_scope:, per_page: PER_PAGE)
       @search_form = search_form
       @user_scope = user_scope
+      @per_page = per_page
     end
 
     # @return [SearchResults::Items] search results
     def call
-      SearchResults::Items.new(solr_response:, per_page: PER_PAGE)
+      SearchResults::Items.new(solr_response:, per_page:)
     end
 
     private
 
-    attr_reader :search_form, :user_scope
+    attr_reader :search_form, :user_scope, :per_page
 
     def solr_response
       Search::SolrService.post(request: solr_request)
@@ -66,7 +69,7 @@ module Searchers
       Search::ItemQueryBuilder.call(search_form:, user_scope:).merge(
         {
           fl: FIELD_LIST,
-          rows: PER_PAGE,
+          rows: per_page,
           start:,
           sort:,
           'json.facet': facet_json
@@ -84,7 +87,7 @@ module Searchers
     end
 
     def start
-      (search_form.page - 1) * PER_PAGE
+      (search_form.page - 1) * per_page
     end
   end
 end

@@ -29,6 +29,9 @@ The changes in an object's open version that have not yet been deposited. Discar
 ### Purge
 Permanently deleting an object from SDR, along with its Mutable Content and staged files. Only an object that has never been submitted for accessioning can be purged, which in practice means a first version. Unlike discarding a Draft, which returns the object to its last closed version, purging leaves no object behind.
 
+### Last Updated
+When, and by whom, an object was most recently registered, opened, updated, or closed. Other activity, such as accessioning or releasing, does not count.
+
 ### Multi-Item Deposit
 A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit. The deposit step is initiated once a version is open and staging has started for every Item Deposit; staging and accessioning then proceed for each Item independently.
 

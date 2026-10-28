@@ -62,6 +62,12 @@
 
       <%= render Dashboard::MultiItemDepositsTableComponent.new(multi_item_deposit_actions: @recent_multi_item_deposit_actions) %>
 
+      <%= render Dashboard::RecentDraftsAndDepositsTableComponent.new(
+            object_docs: @recent_draft_and_deposit_docs,
+            statuses: @recent_draft_and_deposit_statuses,
+            search_form: @recent_drafts_and_deposits_search_form
+          ) %>
+
       <div class="mb-5">
         <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
       </div>

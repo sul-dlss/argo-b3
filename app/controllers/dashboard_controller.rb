@@ -26,11 +26,13 @@ class DashboardController < ApplicationController
   ].freeze
 
   RECENT_MULTI_ITEM_DEPOSITS_LIMIT = 5
+  RECENT_DRAFTS_AND_DEPOSITS_LIMIT = 5
 
   def index
     @go_to_druid_form = GoToDruidForm.new
     set_recent_object_docs
     set_recent_multi_item_deposit_actions
+    set_recent_drafts_and_deposits
     set_pinned_object_docs
     set_pinned_searches
     set_pinned_tags
@@ -44,6 +46,7 @@ class DashboardController < ApplicationController
     else
       set_recent_object_docs
       set_recent_multi_item_deposit_actions
+      set_recent_drafts_and_deposits
       set_pinned_object_docs
       set_pinned_searches
       set_pinned_tags
@@ -72,6 +75,30 @@ class DashboardController < ApplicationController
     @recent_multi_item_deposit_actions = MultiItemDepositAction.where(user: current_user)
                                                                .order(updated_at: :desc, id: :desc)
                                                                .limit(RECENT_MULTI_ITEM_DEPOSITS_LIMIT)
+  end
+
+  def set_recent_drafts_and_deposits
+    @recent_drafts_and_deposits_search_form = ResultsSearchForm.new(last_updated_by: [current_user.sunetid],
+                                                                    object_types: ['item'],
+                                                                    sort: 'last_updated_date_desc')
+    @recent_draft_and_deposit_docs = Searchers::Item.call(search_form: @recent_drafts_and_deposits_search_form,
+                                                          user_scope: current_user_scope,
+                                                          per_page: RECENT_DRAFTS_AND_DEPOSITS_LIMIT)
+                                                    .map { |result| SolrDocPresenter.new(solr_doc: result.solr_doc) }
+    @recent_draft_and_deposit_statuses = statuses_for(@recent_draft_and_deposit_docs)
+  end
+
+  # @return [Hash<String, Symbol>] the ObjectStatusPresenter#status of each doc, keyed by druid
+  def statuses_for(docs)
+    druids = docs.map(&:druid)
+    return {} if druids.empty?
+
+    version_statuses = Sdr::VersionService.statuses(druids:)
+    contents = Content.latest_staging_activities(druids:)
+    docs.to_h do |doc|
+      version_service = Sdr::VersionService.new(druid: doc.druid, status: version_statuses[doc.druid])
+      [doc.druid, ObjectStatusPresenter.new(document: doc, version_service:, content: contents[doc.druid]).status]
+    end
   end
 
   def set_pinned_searches

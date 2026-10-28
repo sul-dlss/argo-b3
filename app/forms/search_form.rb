@@ -85,6 +85,7 @@ class SearchForm < ApplicationForm
   attribute :last_published_date, array: true, default: -> { [] }
   attribute :last_published_date_from, :date, default: nil
   attribute :last_published_date_to, :date, default: nil
+  attribute :last_updated_by, array: true, default: -> { [] }
   attribute :metadata_sources, array: true, default: -> { [] }
   attribute :mimetypes, array: true, default: -> { [] }
   attribute :mods_resource_types, array: true, default: -> { [] }

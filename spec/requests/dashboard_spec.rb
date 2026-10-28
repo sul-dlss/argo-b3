@@ -55,6 +55,58 @@ RSpec.describe 'Dashboard' do
       end
     end
 
+    context 'when the user has recently updated Items', :solr do
+      let!(:item_docs) do
+        Array.new(6) do |index|
+          create(:solr_item, last_updated_by: user.sunetid, last_updated_date: index.days.ago)
+        end
+      end
+      let!(:other_user_item_doc) { create(:solr_item, last_updated_by: 'otheruser', last_updated_date: Time.zone.now) }
+      let!(:collection_doc) do
+        create(:solr_item, object_type: 'collection', last_updated_by: user.sunetid, last_updated_date: Time.zone.now)
+      end
+
+      before do
+        create(:permission, :read_unrestricted, workgroup: user.groups.first)
+        allow(Sdr::VersionService).to receive_messages(statuses: {}, new: version_service_double(closed?: true))
+      end
+
+      it 'lists the 5 Items most recently updated by the user' do
+        get root_path
+
+        expect(response).to have_http_status(:ok)
+        table = rendered_page.find('table#recent-drafts-and-deposits-table')
+        expect(table.all('tbody tr td:first-child').map { |cell| cell.text.strip })
+          .to eq(item_docs.take(5).map { |item_doc| item_doc.fetch(Search::Fields::TITLE) })
+        expect(table).to have_no_text(other_user_item_doc.fetch(Search::Fields::TITLE))
+        expect(table).to have_no_text(collection_doc.fetch(Search::Fields::TITLE))
+        expect(table).to have_css('tbody tr td:nth-child(4)', text: 'Deposited', count: 5)
+        expect(Sdr::VersionService).to have_received(:statuses)
+          .with(druids: item_docs.take(5).map { |item_doc| item_doc.fetch(Search::Fields::ID) })
+        expect(rendered_page).to have_link('View complete list of your recent drafts and deposits',
+                                           href: search_items_path(last_updated_by: [user.sunetid],
+                                                                   object_types: ['item'],
+                                                                   sort: 'last_updated_date_desc'))
+      end
+    end
+
+    context 'when the user has no recently updated Items', :solr do
+      before do
+        create(:permission, :read_unrestricted, workgroup: user.groups.first)
+        create(:solr_item, last_updated_by: 'otheruser', last_updated_date: Time.zone.now)
+        allow(Sdr::VersionService).to receive(:statuses)
+      end
+
+      it 'does not render the recent drafts and deposits table' do
+        get root_path
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_page).to have_no_css('#recent-drafts-and-deposits-table')
+        expect(rendered_page).to have_no_link('View complete list of your recent drafts and deposits')
+        expect(Sdr::VersionService).not_to have_received(:statuses)
+      end
+    end
+
     context 'when objects have recently been viewed' do
       let(:recent_object_druids) do
         %w[

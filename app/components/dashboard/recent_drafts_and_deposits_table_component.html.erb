@@ -1,0 +1,36 @@
+<div class="mb-5">
+  <%= render SdrViewComponents::Tables::TableComponent.new(
+        label:,
+        id: 'recent-drafts-and-deposits-table',
+        responsive: true
+      ) do |component| %>
+    <% component.with_caption do %>
+      <%= label %>
+    <% end %>
+    <% component.with_header(label: 'Title') %>
+    <% component.with_header(label: 'Druid') %>
+    <% component.with_header(label: 'Collection') %>
+    <% component.with_header(label: 'Status') %>
+    <% component.with_header(label: 'Last updated') %>
+    <% object_docs.each do |object_doc| %>
+      <% component.with_row do |row_component| %>
+        <% row_component.with_cell do %>
+          <%= title_link(object_doc) %>
+        <% end %>
+        <% row_component.with_cell do %>
+          <%= object_doc.bare_druid %>
+        <% end %>
+        <% row_component.with_cell do %>
+          <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: collection_link_values(object_doc)) %>
+        <% end %>
+        <% row_component.with_cell do %>
+          <%= status_label(object_doc) %>
+        <% end %>
+        <% row_component.with_cell do %>
+          <%= last_updated_date(object_doc) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <%= link_to 'View complete list of your recent drafts and deposits', search_path %>
+</div>

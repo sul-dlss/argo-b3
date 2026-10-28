@@ -140,6 +140,15 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with last updated by (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(last_updated_by: ['jlittman']) }
+
+    it 'builds the correct filter query for the user' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::LAST_UPDATED_BY}:(\"jlittman\")")
+    end
+  end
+
   context 'with a facet value containing a double quote (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(projects: ['2" quad']) }
 
