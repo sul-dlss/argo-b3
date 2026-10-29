@@ -3,7 +3,7 @@
     <!-- From component library: https://sul-dlss.github.io/component-library/forms/ -->
     <search class="search-card d-flex position-relative flex-column py-2 rounded">
       <%= helpers.form_with model: search_form, scope: '', url:, method: :get, class: 'search-query-form col-md-12 col-lg-8' do |form| %>
-        <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_field: :query) %>
+        <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_fields: :query) %>
         <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
                                                                 field_name: :object_types,
                                                                 text: 'Select object type',
