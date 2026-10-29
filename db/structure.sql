@@ -186,7 +186,9 @@ CREATE TABLE public.content_file_binaries (
     sha1_digest character varying,
     size bigint,
     updated_at timestamp(6) without time zone NOT NULL,
-    mount_path character varying
+    mount_path character varying,
+    height integer,
+    width integer
 );
 
 
@@ -256,7 +258,6 @@ CREATE TABLE public.content_files (
     created_at timestamp(6) without time zone NOT NULL,
     download character varying NOT NULL,
     external_identifier character varying,
-    height integer,
     label character varying NOT NULL,
     language_tag character varying,
     location character varying,
@@ -267,8 +268,7 @@ CREATE TABLE public.content_files (
     shelve boolean NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     use character varying,
-    view character varying NOT NULL,
-    width integer
+    view character varying NOT NULL
 );
 
 
@@ -1195,6 +1195,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261029120000'),
 ('20261019120000'),
 ('20261016120000'),
 ('20261014120000'),

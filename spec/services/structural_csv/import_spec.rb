@@ -38,14 +38,14 @@ RSpec.describe StructuralCsv::Import do
   end
 
   def create_binary(filepath)
-    create(:content_file_binary, content:, filepath:, file_location: 'deposited', mime_type: 'image/tiff')
+    create(:content_file_binary, content:, filepath:, file_location: 'deposited', mime_type: 'image/tiff',
+                                 width: 100, height: 200)
   end
 
   def create_file(content_file_set, content_file_binary, external_identifier)
     create(:content_file, content_file_set:, content_file_binary:, external_identifier:,
                           label: "Label for #{content_file_binary.filepath}", use: 'transcription',
-                          language_tag: 'en', sdr_generated_text: true, corrected_for_accessibility: true,
-                          width: 100, height: 200)
+                          language_tag: 'en', sdr_generated_text: true, corrected_for_accessibility: true)
   end
 
   def file_sets

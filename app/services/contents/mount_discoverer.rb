@@ -53,6 +53,8 @@ module Contents
       content_file_binary.mime_type = Marcel::MimeType.for(Pathname.new(full_filepath), name: filepath)
       content_file_binary.sha1_digest = nil
       content_file_binary.md5_digest = nil
+      content_file_binary.height = nil
+      content_file_binary.width = nil
       content_file_binary.save!
     end
   end
