@@ -130,11 +130,12 @@ RSpec.describe 'Manage files' do
 
     it 'confirms, discards the version and the mutable content, and returns to the object page' do
       visit "/contents/#{druid}/edit"
-      # The files frame loading moves the footer, which can make the click miss the link.
+      # The loaded files frame shows that Turbo is running, so it handles the click.
       expect(page).to have_css("turbo-frame[id^='show_content_'] p", text: 'No files yet')
 
+      # Clicking via JS, since layout shifts after load can make a positional click miss the link.
       accept_confirm(/\ADiscard this draft\?/) do
-        click_link 'Discard draft'
+        page.execute_script('arguments[0].click()', find_link('Discard draft'))
       end
 
       expect(page).to have_current_path("/objects/#{druid}")
