@@ -25,10 +25,22 @@ module BulkActions
       alias convert_result registration
 
       def valid?
-        return true unless convert_result.failure?
+        message = if convert_result.failure?
+                    convert_result.failure.message
+                  elsif !create_allowed?
+                    'Not authorized to register with this APO and collections'
+                  end
+        return true unless message
 
-        failure!(message: convert_result.failure.message)
+        failure!(message:)
         false
+      end
+
+      def create_allowed?
+        request_cocina_object = convert_result.value![:request_cocina_object]
+        dro = CocinaModels::Dro.new(apo_druid: request_cocina_object.administrative.hasAdminPolicy,
+                                    collection_druids: Array(request_cocina_object.structural&.isMemberOf))
+        allowed_to?(:create?, dro, with: ItemPolicy, context: { user: })
       end
 
       def register
