@@ -102,12 +102,34 @@ class MultiItemDepositAction < ApplicationRecord
     !item_deposit_actions.exists?(initial_version: [false, nil])
   end
 
-  # @return [String, nil] the path of the structural metadata CSV at the root of the mount path, if it exists
-  def mount_structural_metadata_csv_path
-    return if mount_path.blank?
+  # @return [String, nil] the directory the files are in: the mount path, or the Globus directory on the local
+  #   Globus mount
+  def files_path
+    file_location_globus? ? globus_directory&.local_path : mount_path.presence
+  end
 
-    path = File.join(mount_path, STRUCTURAL_METADATA_CSV_FILENAME)
+  # @return [String, nil] the path of the structural metadata CSV at the root of the files path, if it exists
+  def mount_structural_metadata_csv_path
+    return if files_path.nil?
+
+    path = File.join(files_path, STRUCTURAL_METADATA_CSV_FILENAME)
     path if File.file?(path)
+  end
+
+  # @return [GlobusDirectory, nil] the Globus directory created for transferring files, if any
+  def globus_directory
+    GlobusDirectory.new(path: globus_path, user:) if globus_path.present?
+  end
+
+  # Creates the Globus directory for transferring files, unless already created (e.g., a double submit).
+  # @return [Boolean] true if the directory exists; false if Globus returned an error
+  def create_globus_directory!
+    return true if globus_path.present?
+
+    new_globus_directory = GlobusDirectory.for_multi_item_deposit(user:)
+    return false unless new_globus_directory.create
+
+    update!(globus_path: new_globus_directory.path)
   end
 
   state_machine :discovery_state, initial: :discovery_not_in_progress do

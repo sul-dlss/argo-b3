@@ -64,18 +64,28 @@
       <%= render SdrViewComponents::Forms::FieldsetComponent.new(
             label: t('edit.multi_item_deposits.fields.file_location.label'),
             mark_required: true,
-            data: { controller: 'radio' }
+            data: { controller: 'radio', action: 'turbo:frame-load->radio#refresh' }
           ) do %>
-        <%# Globus is not yet supported. %>
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
               form:,
               field_name: :file_location,
               label_text: t('edit.multi_item_deposits.fields.file_location.globus.label'),
               input_value: MultiItemDepositAction.file_locations[:globus],
-              input_disabled: true,
               input_data: { radio_target: 'radio', action: 'radio#toggle' },
               container_classes: 'my-fieldset'
-            ) %>
+            ) do |component| %>
+          <% component.with_additional_container_content do %>
+            <div class="my-field">
+              <%# Loaded when the radio is selected (see radio controller). The spinner is hidden until then. %>
+              <%= turbo_frame_tag @multi_item_deposit_action, 'globus', data: { radio_src: new_multi_item_deposit_action_globus_path(@multi_item_deposit_action) } do %>
+                <div class="radio-hide">
+                  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
+                </div>
+              <% end %>
+              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :globus_path) %>
+            </div>
+          <% end %>
+        <% end %>
 
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
               form:,
@@ -117,5 +127,9 @@
         <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon %>
       <% end %>
     </div>
+  <% end %>
+  <%# Submitted by the "Create Globus link" button in the Globus turbo frame. %>
+  <%= form_with url: multi_item_deposit_action_globus_path(@multi_item_deposit_action), method: :post, id: 'create-globus-link-form',
+                data: { turbo_frame: dom_id(@multi_item_deposit_action, :globus) } do %>
   <% end %>
 </div>

@@ -34,7 +34,7 @@ class ContentGlobusController < ContentsApplicationController
   private
 
   def set_globus_directory
-    @globus_directory = GlobusDirectory.new(druid: @content.druid, user: current_user)
+    @globus_directory = GlobusDirectory.for_object(druid: @content.druid, user: current_user)
   end
 
   def discovery_frame_name

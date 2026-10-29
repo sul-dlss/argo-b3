@@ -76,7 +76,7 @@ module MultiItemDeposit
     def discover!
       discard_existing_content
       @content = Content.create!(druid:, lock: cocina_object.lock, immutable: false, mount_state: 'discovering')
-      Contents::MountDiscoverer.call(content:, mount_path: folder_path)
+      Contents::MountDiscoverer.call(content:, mount_path: folder_path, file_location:)
       content.discovery_completed!
       item_deposit_action.assign_attributes(content:, initial_version: initial_version?, content_type:)
     end
@@ -133,8 +133,12 @@ module MultiItemDeposit
       UriSupport.last(uri: cocina_object.type)
     end
 
+    def file_location
+      item_deposit_action.file_location.to_sym
+    end
+
     def folder_path
-      @folder_path ||= File.join(item_deposit_action.mount_path, item_deposit_action.path)
+      @folder_path ||= File.join(item_deposit_action.files_path, item_deposit_action.path)
     end
 
     def filepaths

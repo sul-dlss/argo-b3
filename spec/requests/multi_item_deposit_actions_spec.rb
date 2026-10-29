@@ -231,7 +231,11 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
         expect(rendered_page).to have_field('Include with your files below', type: 'radio')
         expect(rendered_page).to have_field('Upload manifest file', type: 'file')
-        expect(rendered_page).to have_field('Globus', type: 'radio', disabled: true)
+        expect(rendered_page).to have_field('Use files from Globus', type: 'radio', disabled: false)
+        expect(rendered_page).to have_css('turbo-frame[data-radio-src=' \
+                                          "'#{new_multi_item_deposit_action_globus_path(multi_item_deposit_action)}']")
+        expect(rendered_page).to have_css("form#create-globus-link-form[action='" \
+                                          "#{multi_item_deposit_action_globus_path(multi_item_deposit_action)}']")
         expect(rendered_page).to have_field('Use files from mount', type: 'radio', checked: true)
         expect(rendered_page).to have_field('Mount path')
         expect(rendered_page).to have_no_css('table[aria-label="Error details"]')
@@ -687,6 +691,61 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:unprocessable_content)
         expect(rendered_page).to have_text('does not exist')
         expect(multi_item_deposit_action.reload.mount_path).to be_nil
+      end
+    end
+
+    context 'when the files are on Globus' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, globus_path: '/uploads/jdoe/2026-10-28-14-03-22-417')
+      end
+      let(:globus_local_path) { "#{Settings.globus.directory}/uploads/jdoe/2026-10-28-14-03-22-417" }
+      let(:mount_params) { { file_location: 'globus' } }
+
+      before do
+        FileUtils.mkdir_p(globus_local_path)
+        File.write(File.join(globus_local_path, 'manifest.csv'), "druid,folder_name\ncd234fg5678,folder2\n")
+      end
+
+      after do
+        FileUtils.rm_rf(Settings.globus.directory)
+      end
+
+      it 'starts discovery from the Globus directory' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        multi_item_deposit_action.reload
+        expect(multi_item_deposit_action).to be_discovering
+        expect(multi_item_deposit_action).to be_file_location_globus
+        expect(multi_item_deposit_action.mount_path).to be_nil
+        expect(multi_item_deposit_action.files_path).to eq(globus_local_path)
+        expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid, :path))
+          .to eq([['druid:cd234fg5678', 'folder2']])
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+
+      context 'when a Globus path is submitted' do
+        let(:mount_params) { { file_location: 'globus', globus_path: '/uploads/other' } }
+
+        it 'uses the saved Globus directory' do
+          patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+          expect(multi_item_deposit_action.reload.globus_path).to eq('/uploads/jdoe/2026-10-28-14-03-22-417')
+          expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid, :path))
+            .to eq([['druid:cd234fg5678', 'folder2']])
+        end
+      end
+
+      context 'when the Globus link has not been created' do
+        let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner) }
+
+        it 'does not save and renders the discovery page' do
+          patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(rendered_page).to have_text('Create a Globus link before discovering files')
+          expect(multi_item_deposit_action.reload.item_deposit_actions).to be_empty
+        end
       end
     end
 

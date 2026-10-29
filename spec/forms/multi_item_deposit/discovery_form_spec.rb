@@ -62,7 +62,7 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
 
     it 'is not valid' do
       expect(form).not_to be_valid
-      expect(form.errors[:manifest_file]).to eq(['Folders outside the mount path: ../folder1.'])
+      expect(form.errors[:manifest_file]).to eq(['Folders outside the file location: ../folder1.'])
     end
   end
 
@@ -114,7 +114,7 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
 
     it 'is not valid' do
       expect(form).not_to be_valid
-      expect(form.errors[:manifest_source]).to eq(['manifest.csv not found in the mount path'])
+      expect(form.errors[:manifest_source]).to eq(['manifest.csv not found in the file location'])
     end
   end
 
@@ -207,6 +207,55 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     it 'is not valid' do
       expect(form).not_to be_valid
       expect(form.errors[:file_location]).to be_present
+    end
+  end
+
+  context 'when the files are on Globus' do
+    subject(:form) do
+      described_class.new(manifest_source: 'mount', file_location: 'globus', mount_path: nil)
+                     .tap { |form| form.multi_item_deposit_action = multi_item_deposit_action }
+    end
+
+    let(:multi_item_deposit_action) do
+      build(:multi_item_deposit_action, globus_path: '/uploads/jdoe/2026-10-28-14-03-22-417')
+    end
+    let(:globus_local_path) { "#{Settings.globus.directory}/uploads/jdoe/2026-10-28-14-03-22-417" }
+
+    before do
+      FileUtils.mkdir_p(File.join(globus_local_path, 'folder1'))
+      File.write(File.join(globus_local_path, 'manifest.csv'), csv_string)
+    end
+
+    after do
+      FileUtils.rm_rf(Settings.globus.directory)
+    end
+
+    it 'reads the manifest from the Globus directory' do
+      expect(form).to be_valid
+      expect(form.multi_item_deposit_action_attributes)
+        .to include(file_location: 'globus', mount_path: nil,
+                    manifest_csv: "druid,folder_name\ndruid:bc123df4567,folder1\n")
+    end
+
+    context 'when the Globus link has not been created' do
+      let(:multi_item_deposit_action) { build(:multi_item_deposit_action) }
+
+      it 'is not valid' do
+        expect(form).not_to be_valid
+        expect(form.errors[:globus_path]).to eq(['Create a Globus link before discovering files'])
+        expect(form.errors[:manifest_source]).to be_empty
+      end
+    end
+
+    context 'when the manifest is not in the Globus directory' do
+      before do
+        FileUtils.rm(File.join(globus_local_path, 'manifest.csv'))
+      end
+
+      it 'is not valid' do
+        expect(form).not_to be_valid
+        expect(form.errors[:manifest_source]).to eq(['manifest.csv not found in the file location'])
+      end
     end
   end
 

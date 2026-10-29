@@ -181,8 +181,9 @@ class MultiItemDepositActionsController < ApplicationController
     MultiItemDeposit::FilterForm.params_from(params)
   end
 
+  # The deposit (e.g., its Globus path) is provided by the controller, not the submitted params.
   def discovery_form_params
-    MultiItemDeposit::DiscoveryForm.params_from(params)
+    MultiItemDeposit::DiscoveryForm.params_from(params).merge(multi_item_deposit_action: @multi_item_deposit_action)
   end
 
   # A saved uploaded structural metadata CSV is used for an upload unless another CSV is provided.

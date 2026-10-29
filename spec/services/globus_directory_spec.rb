@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe GlobusDirectory do
-  subject(:globus_directory) { described_class.new(druid: 'druid:bc123df4567', user:) }
+  subject(:globus_directory) { described_class.for_object(druid: 'druid:bc123df4567', user:) }
 
   let(:user) { create(:user, email_address: 'jdoe@stanford.edu') }
   let(:object_path) { '/uploads/jdoe/objects/bc123df4567' }
@@ -13,9 +13,17 @@ RSpec.describe GlobusDirectory do
     FileUtils.rm_rf(Settings.globus.directory)
   end
 
-  describe '#object_path' do
-    it 'returns the endpoint path for the user and object' do
-      expect(globus_directory.object_path).to eq(object_path)
+  describe '.for_object' do
+    it 'returns the directory for the user and object' do
+      expect(globus_directory.path).to eq(object_path)
+    end
+  end
+
+  describe '.for_multi_item_deposit' do
+    it 'returns a directory for the user named by the time it is created' do
+      travel_to Time.zone.local(2026, 10, 28, 14, 3, 22.417r), with_usec: true do
+        expect(described_class.for_multi_item_deposit(user:).path).to eq('/uploads/jdoe/2026-10-28-14-03-22-417')
+      end
     end
   end
 
@@ -55,7 +63,7 @@ RSpec.describe GlobusDirectory do
       it 'notifies Honeybadger and returns false' do
         expect(globus_directory.writable?).to be false
 
-        expect(Honeybadger).to have_received(:notify).with(error, context: { druid: 'druid:bc123df4567' })
+        expect(Honeybadger).to have_received(:notify).with(error, context: { path: object_path })
       end
     end
 
@@ -101,7 +109,7 @@ RSpec.describe GlobusDirectory do
       it 'notifies Honeybadger and returns false' do
         expect(globus_directory.create).to be false
 
-        expect(Honeybadger).to have_received(:notify).with(error, context: { druid: 'druid:bc123df4567' })
+        expect(Honeybadger).to have_received(:notify).with(error, context: { path: object_path })
       end
     end
 

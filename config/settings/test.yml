@@ -20,4 +20,5 @@ mount_locations:
   - <%= Rails.root.join('tmp') %>
 
 globus:
-  directory: <%= Rails.root.join('tmp', "globus#{ENV['TEST_ENV_NUMBER']}") %>
+  # Separate from development's tmp/globus, which specs would otherwise delete when cleaning up.
+  directory: <%= Rails.root.join('tmp', "globus_test#{ENV['TEST_ENV_NUMBER']}") %>

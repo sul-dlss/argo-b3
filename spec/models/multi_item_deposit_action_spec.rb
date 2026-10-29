@@ -178,6 +178,28 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '#files_path' do
+    it 'returns the mount path for files on a mount' do
+      multi_item_deposit_action.assign_attributes(file_location: 'mount', mount_path: '/dor/staging/deposit')
+
+      expect(multi_item_deposit_action.files_path).to eq('/dor/staging/deposit')
+    end
+
+    it 'returns the Globus directory on the local Globus mount for files on Globus' do
+      multi_item_deposit_action.assign_attributes(file_location: 'globus', mount_path: '/dor/staging/deposit',
+                                                  globus_path: '/uploads/jdoe/2026-10-28-14-03-22-417')
+
+      expect(multi_item_deposit_action.files_path)
+        .to eq("#{Settings.globus.directory}/uploads/jdoe/2026-10-28-14-03-22-417")
+    end
+
+    it 'returns nil for files on Globus without a Globus directory' do
+      multi_item_deposit_action.file_location = 'globus'
+
+      expect(multi_item_deposit_action.files_path).to be_nil
+    end
+  end
+
   describe '#mount_structural_metadata_csv_path' do
     let(:mount_directory) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
 
@@ -200,6 +222,50 @@ RSpec.describe MultiItemDepositAction do
       multi_item_deposit_action.mount_path = nil
 
       expect(multi_item_deposit_action.mount_structural_metadata_csv_path).to be_nil
+    end
+  end
+
+  describe '#create_globus_directory!' do
+    subject(:multi_item_deposit_action) { create(:multi_item_deposit_action, user:, globus_path:) }
+
+    let(:user) { create(:user, email_address: 'jdoe@stanford.edu') }
+    let(:globus_path) { nil }
+
+    before do
+      allow(GlobusClient).to receive(:mkdir)
+    end
+
+    it 'creates the Globus directory for the user and saves its path' do
+      travel_to Time.zone.local(2026, 10, 28, 14, 3, 22.417r), with_usec: true do
+        expect(multi_item_deposit_action.create_globus_directory!).to be true
+      end
+
+      expect(GlobusClient).to have_received(:mkdir)
+        .with(path: '/uploads/jdoe/2026-10-28-14-03-22-417', user_id: 'jdoe@stanford.edu', notify_email: false)
+      expect(multi_item_deposit_action.reload.globus_path).to eq('/uploads/jdoe/2026-10-28-14-03-22-417')
+    end
+
+    context 'when Globus returns an error' do
+      before do
+        allow(GlobusClient).to receive(:mkdir).and_raise(GlobusClient::ForbiddenError)
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'returns false and does not save a path' do
+        expect(multi_item_deposit_action.create_globus_directory!).to be false
+        expect(multi_item_deposit_action.reload.globus_path).to be_nil
+      end
+    end
+
+    context 'when the Globus directory has already been created' do
+      let(:globus_path) { '/uploads/jdoe/2026-10-28-14-03-22-417' }
+
+      it 'does not create another' do
+        expect(multi_item_deposit_action.create_globus_directory!).to be true
+
+        expect(GlobusClient).not_to have_received(:mkdir)
+        expect(multi_item_deposit_action.reload.globus_path).to eq('/uploads/jdoe/2026-10-28-14-03-22-417')
+      end
     end
   end
 

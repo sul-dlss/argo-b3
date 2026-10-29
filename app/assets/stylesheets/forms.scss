@@ -53,12 +53,13 @@
 }
 
 // A .submit-spinner (e.g., a structure button's) is shown only while the form in its
-// .spinner-on-submit container is submitting (Turbo sets aria-busy).
+// .spinner-on-submit container, or the form targeting its turbo frame, is submitting (Turbo sets aria-busy).
 // !important overrides the spinner's d-flex.
 .spinner-on-submit .submit-spinner {
   display: none !important;
 }
 
-.spinner-on-submit:has(form[aria-busy="true"]) .submit-spinner {
+.spinner-on-submit:has(form[aria-busy="true"]) .submit-spinner,
+turbo-frame[aria-busy="true"] .spinner-on-submit .submit-spinner {
   display: flex !important;
 }
