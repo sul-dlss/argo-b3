@@ -76,12 +76,12 @@ RSpec.describe 'Show bulk actions history' do
 
     visit bulk_actions_path
 
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '32 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '33 selected')
     find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
     click_button 'Select none'
     expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
     click_button 'Select all'
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '32 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '33 selected')
     click_button 'Select none'
     find('.ts-dropdown .option', text: 'Redeposit').click
     expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
@@ -160,7 +160,7 @@ RSpec.describe 'Show bulk actions history' do
 
     expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
     expect(page).to have_css("tr##{dom_id(reindex_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '32 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '33 selected')
 
     page.go_back
 
