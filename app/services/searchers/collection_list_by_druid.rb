@@ -10,8 +10,8 @@ module Searchers
     end
 
     # @param druids [Array<String>] prefixed druids
-    # @param user_scope [Permissions::UserScope, nil] the permission scope of the requesting user.
-    #   Omit for collections that are already selected, which must not be dropped when the user cannot see them.
+    # @param user_scope [Permissions::UserScope, nil] the permission scope of the requesting user, to limit to the
+    #   collections the user can edit. Omit for collections that are already selected, which must not be dropped.
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
     def initialize(druids:, user_scope: nil, apo_druid: nil)
       @druids = druids
@@ -55,7 +55,7 @@ module Searchers
     end
 
     def permission_filter
-      Search::PermissionFilter.call(user_scope:) if user_scope
+      Search::PermissionFilter.call(user_scope:, editable: true) if user_scope
     end
   end
 end

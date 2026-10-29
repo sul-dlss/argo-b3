@@ -15,10 +15,14 @@ RSpec.describe 'Multiple items' do
       create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
     end
 
-    it 'renders the new page' do
+    it 'renders the new page with only the APOs the user can edit' do
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+
       get new_multiple_item_path
 
       expect(response).to have_http_status(:ok)
+      expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
+                                                                      editable: true)
     end
   end
 

@@ -57,6 +57,8 @@ class ItemsController < ApplicationController
     return redirect_content_busy if @content&.staging_or_discovering?
 
     @edit_item_form = build_submitted_edit_item_form
+    authorize! @edit_item_form, to: :add_to_collections?, with: ItemPolicy
+    authorize! @edit_item_form, to: :update_apo?, with: ItemPolicy
     return render_invalid_edit unless @edit_item_form.valid?
 
     @edit_item_form.save!(user_name: current_user.sunetid, accession: deposit?)
@@ -130,20 +132,20 @@ class ItemsController < ApplicationController
   end
 
   def set_apo_and_collection_options(form:)
-    @apo_options = apo_options(apo_druid: form.apo_druid)
+    @apo_options = apo_options(current_apo_druid: form.previous_cocina_object&.administrative&.hasAdminPolicy)
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = form.collection_druids
     titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
     @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
   end
 
-  # The current APO is always an option (even if the user cannot otherwise select it),
+  # The APOs the user can edit, plus an existing item's current APO (even if the user cannot edit it),
   # so that saving an edit does not change it.
-  def apo_options(apo_druid:)
-    options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
-    return options if apo_druid.blank? || options.any? { |_title, druid| druid == apo_druid }
+  def apo_options(current_apo_druid:)
+    options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
+    return options if current_apo_druid.blank? || options.any? { |_title, druid| druid == current_apo_druid }
 
-    [[apo_title(apo_druid:), apo_druid]] + options
+    [[apo_title(apo_druid: current_apo_druid), current_apo_druid]] + options
   end
 
   # Falls back to the bare druid if the APO is not found.

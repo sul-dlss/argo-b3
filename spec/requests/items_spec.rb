@@ -5,6 +5,22 @@ require 'rails_helper'
 RSpec.describe 'Items' do
   let(:user) { create(:user, :reader) }
 
+  describe 'new' do
+    before do
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:hv992ry2431')
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
+      sign_in(user)
+    end
+
+    it 'offers only the APOs the user can edit' do
+      get '/items/new'
+
+      expect(response).to have_http_status(:ok)
+      expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
+                                                                      editable: true)
+    end
+  end
+
   describe 'create' do
     context 'when invalid' do
       before do
@@ -214,10 +230,12 @@ RSpec.describe 'Items' do
             .and_return([['My APO', cocina_object.administrative.hasAdminPolicy]])
         end
 
-        it 'selects the APO by title' do
+        it 'selects the APO by title from the APOs the user can edit' do
           get "/items/#{druid}/edit"
 
           expect(Capybara.string(response.body)).to have_select('APO', selected: 'My APO', options: ['My APO'])
+          expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
+                                                                          editable: true)
         end
       end
 
@@ -294,6 +312,75 @@ RSpec.describe 'Items' do
                 user_name: user.sunetid, description: nil)
         expect(Sdr::Repository).not_to have_received(:accession)
         expect(version_service).not_to have_received(:update_description)
+      end
+    end
+
+    context 'when adding a collection the user cannot edit' do
+      let(:item_params) do
+        { version_description: 'Changed collection', lock: cocina_object.lock,
+          collection_druids: ['druid:cd234fg5678'] }
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).with(druid: 'druid:cd234fg5678')
+                                                     .and_return({ Search::Fields::ID => 'druid:cd234fg5678' })
+      end
+
+      it 'denies access' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when keeping a collection the user cannot edit' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid).new(structural: { isMemberOf: ['druid:cd234fg5678'] })
+      end
+      let(:item_params) do
+        { version_description: 'Changed type', lock: cocina_object.lock,
+          content_type: Cocina::Models::ObjectType.image, collection_druids: ['druid:cd234fg5678'] }
+      end
+
+      it 'saves' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.image), user_name: user.sunetid,
+                description: nil)
+      end
+    end
+
+    context 'when changing to an APO the user cannot edit' do
+      let(:item_params) do
+        { version_description: 'Changed APO', lock: cocina_object.lock, apo_druid: 'druid:cd234fg5678' }
+      end
+
+      it 'denies access' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when changing to an APO the user can edit' do
+      let(:new_apo_druid) { 'druid:cd234fg5678' }
+      let(:item_params) { { version_description: 'Changed APO', lock: cocina_object.lock, apo_druid: new_apo_druid } }
+
+      before { create(:permission, :edit, workgroup: user.groups.first, target_druid: new_apo_druid) }
+
+      it 'saves' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(administrative: having_attributes(hasAdminPolicy: new_apo_druid)),
+                user_name: user.sunetid, description: nil)
       end
     end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Searchers
-  # Searcher that returns the collections the user can see with titles matching a query,
+  # Searcher that returns the collections the user can edit (i.e., add items to) with titles matching a query,
   # for populating select options.
   class CollectionList
     include Search::Fields
@@ -47,7 +47,7 @@ module Searchers
         defType: 'edismax',
         qf: QUERY_FIELDS.join(' '),
         mm: '100%', # every word in the query must match
-        fq: ["#{OBJECT_TYPES}:collection", apo_filter, Search::PermissionFilter.call(user_scope:)].compact,
+        fq: ["#{OBJECT_TYPES}:collection", apo_filter, permission_filter].compact,
         fl: [ID, TITLE],
         rows: LIMIT
       }
@@ -58,6 +58,10 @@ module Searchers
       words = query.split.map { |word| RSolr.solr_escape(word) }
       words[-1] = "#{words.last}*"
       words.join(' ')
+    end
+
+    def permission_filter
+      Search::PermissionFilter.call(user_scope:, editable: true)
     end
 
     def apo_filter

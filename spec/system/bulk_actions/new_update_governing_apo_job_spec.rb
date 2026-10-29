@@ -26,6 +26,7 @@ RSpec.describe 'Create a new update governing APO bulk action' do
     click_link bulk_action_label
 
     expect(page).to have_css('h1', text: bulk_action_label)
+    expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope, editable: true)
 
     select new_apo_title, from: 'New governing APO'
 
