@@ -2,7 +2,7 @@
 
 # Controller for collection select options, e.g., for a Tom Select field that loads options as the user types.
 class CollectionOptionsController < ApplicationController
-  # The options are restricted to the collections the user can see.
+  # The options are restricted to the collections the user can edit, i.e., add items to.
   skip_verify_authorized
 
   def index

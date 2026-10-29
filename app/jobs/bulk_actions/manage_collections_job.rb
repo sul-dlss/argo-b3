@@ -19,6 +19,9 @@ module BulkActions
         return unless check_object_type?(allow_collection: false, allow_admin_policy: false)
 
         cocina_model.collection_druids = collection_druids
+        unless allowed_to?(:add_to_collections?, cocina_model, with: ItemPolicy, context: { user: })
+          return failure!(message: 'Not authorized to add to collections')
+        end
 
         return failure!(message: cocina_model.errors.full_messages.join(', ')) unless cocina_model.valid?
         return success!(message: 'No changes to collections') unless cocina_model.changed?

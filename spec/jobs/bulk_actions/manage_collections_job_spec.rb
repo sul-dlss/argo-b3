@@ -21,6 +21,7 @@ RSpec.describe BulkActions::ManageCollectionsJob do
   end
 
   before do
+    create(:permission, :edit, workgroup: bulk_action.user.groups.first, target_druid: 'druid:bk123gh4567')
     allow(described_class::JobItem).to receive(:new).and_return(job_item)
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
@@ -45,6 +46,40 @@ RSpec.describe BulkActions::ManageCollectionsJob do
       expect(bulk_action.reload.druid_count_total).to eq(1)
       expect(bulk_action.druid_count_success).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(0)
+    end
+  end
+
+  context 'when the user cannot edit a collection being added' do
+    let(:collection_druids) { ['druid:bk123gh4567', 'druid:cd234fg5678'] }
+
+    before do
+      allow(Sdr::Repository).to receive(:find_solr).with(druid: 'druid:cd234fg5678')
+                                                   .and_return({ Search::Fields::ID => 'druid:cd234fg5678' })
+    end
+
+    it 'does not update the object and logs an error' do
+      job.perform_now
+
+      expect(Sdr::Repository).not_to have_received(:update)
+      expect(log.string).to include("#{druid}\tError: Not authorized to add to collections")
+      expect(bulk_action.reload.druid_count_success).to eq(0)
+      expect(bulk_action.druid_count_fail).to eq(1)
+    end
+  end
+
+  context 'when keeping a collection the user cannot edit' do
+    let(:collection_druids) { ['druid:bk123gh4567', 'druid:cd234fg5678'] }
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid).new(structural: { isMemberOf: ['druid:cd234fg5678'] })
+    end
+
+    it 'updates the collections' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:update) do |args|
+        expect(args[:cocina_object].structural.isMemberOf).to eq(['druid:bk123gh4567', 'druid:cd234fg5678'])
+      end
+      expect(bulk_action.reload.druid_count_success).to eq(1)
     end
   end
 

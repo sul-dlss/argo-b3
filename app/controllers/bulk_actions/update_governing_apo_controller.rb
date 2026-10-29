@@ -17,8 +17,9 @@ module BulkActions
       }
     end
 
+    # Moving an item requires edit permission on the new APO, which the job also checks.
     def set_form_options
-      @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope)
+      @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     end
   end
 end
