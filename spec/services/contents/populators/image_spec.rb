@@ -241,6 +241,24 @@ RSpec.describe Contents::Populators::Image do
         expect(content.content_files.sole).to have_attributes(view: 'stanford', download: 'stanford')
       end
     end
+
+    context 'when restructuring an image that has presentation metadata' do
+      let(:jp2_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2',
+                                     height: 6561, width: 4420)
+      end
+
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:), content_file_binary: jp2_binary)
+      end
+
+      it 'retains the height and width' do
+        structure
+
+        expect(content.content_files.sole).to have_attributes(content_file_binary: jp2_binary, height: 6561,
+                                                              width: 4420)
+      end
+    end
   end
 
   describe '.append' do

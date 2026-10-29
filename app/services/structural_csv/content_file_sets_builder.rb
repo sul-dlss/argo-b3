@@ -65,9 +65,7 @@ module StructuralCsv
         **access_attributes(row),
         **administrative_attributes(row),
         **descriptive_attributes(row:, existing_content_file:),
-        external_identifier: existing_content_file&.external_identifier,
-        width: existing_content_file&.width,
-        height: existing_content_file&.height
+        external_identifier: existing_content_file&.external_identifier
       )
     end
 

@@ -48,7 +48,7 @@ RSpec.describe Contents::MountDiscoverer do
       let!(:content_file_binary) do
         create(:content_file_binary, content:, filepath: 'file1.txt', file_location: 'deposited',
                                      size: 123, md5_digest: 'existing-md5', sha1_digest: 'existing-sha1',
-                                     mime_type: 'image/tiff')
+                                     mime_type: 'image/tiff', height: 200, width: 100)
       end
 
       it 'reuses the binary and replaces its metadata' do
@@ -56,7 +56,8 @@ RSpec.describe Contents::MountDiscoverer do
 
         expect(content_file_binary.reload).to have_attributes(file_location: 'mount', mount_path:, size: 8,
                                                               mime_type: 'text/plain',
-                                                              md5_digest: nil, sha1_digest: nil)
+                                                              md5_digest: nil, sha1_digest: nil,
+                                                              height: nil, width: nil)
       end
     end
 

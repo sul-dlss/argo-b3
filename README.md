@@ -245,7 +245,7 @@ Unlike other parts of a cocina object, structural metadata (file sets and files)
 * `Content` - the structure of a DRO for a particular version of the cocina object, identified by the druid and the cocina object's lock.
 * `ContentFileSet` - a cocina file set, ordered within the `Content`.
 * `ContentFile` - a cocina file as it occurs within a particular file set, ordered within the `ContentFileSet` and holding the file-level attributes (e.g., access, preserve / shelve / publish).
-* `ContentFileBinary` - the physical file, identified by its filepath. Since the same file may be referenced by more than one file set, a binary may have multiple `ContentFile`s. A binary that is not referenced by any `ContentFile` ("unassociated") is not part of the structure (e.g., a file that has been uploaded but not yet placed in a file set).
+* `ContentFileBinary` - the physical file, identified by its filepath. It holds the properties of the physical file (e.g., size, digests, mime type, and image dimensions), so they are retained when the structure is rebuilt. Since the same file may be referenced by more than one file set, a binary may have multiple `ContentFile`s. A binary that is not referenced by any `ContentFile` ("unassociated") is not part of the structure (e.g., a file that has been uploaded but not yet placed in a file set).
 
 A `Content` is either **immutable**, in which case it exactly reflects the structural metadata of the cocina object version identified by its lock (e.g., for display and structural CSV export), or **mutable**, in which case it is being edited and may have deviated from the cocina object.
 

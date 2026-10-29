@@ -139,7 +139,8 @@ module Contents
         **filepath_attributes(filepath:),
         **message_digest_attributes(cocina_file:),
         size: cocina_file.size,
-        mime_type: cocina_file.hasMimeType
+        mime_type: cocina_file.hasMimeType,
+        **presentation_attributes(cocina_file:)
       }
     end
 
@@ -168,8 +169,7 @@ module Contents
         sdr_generated_text: cocina_file.sdrGeneratedText,
         corrected_for_accessibility: cocina_file.correctedForAccessibility,
         **access_attributes(cocina_file:),
-        **administrative_attributes(cocina_file:),
-        **presentation_attributes(cocina_file:)
+        **administrative_attributes(cocina_file:)
       }
     end
 

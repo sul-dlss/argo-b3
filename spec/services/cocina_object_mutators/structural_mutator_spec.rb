@@ -44,7 +44,8 @@ RSpec.describe CocinaObjectMutators::StructuralMutator do
     let(:first_content_file_binary) do
       create(:content_file_binary, content:, filepath: 'folder1/image1.tif',
                                    size: 12_345, md5_digest: 'md5digest', sha1_digest: 'sha1digest',
-                                   mime_type: 'image/tiff', file_location: 'deposited')
+                                   mime_type: 'image/tiff', file_location: 'deposited',
+                                   height: 5833, width: 4001)
     end
     let(:second_content_file_binary) do
       create(:content_file_binary, content:, filepath: 'image2.tif',
@@ -59,8 +60,7 @@ RSpec.describe CocinaObjectMutators::StructuralMutator do
                             language_tag: 'en', use: 'transcription',
                             sdr_generated_text: true, corrected_for_accessibility: true,
                             view: 'location-based', download: 'location-based', location: 'music',
-                            publish: true, preserve: false, shelve: true,
-                            height: 5833, width: 4001)
+                            publish: true, preserve: false, shelve: true)
       create(:content_file, content_file_set: second_content_file_set, content_file_binary: second_content_file_binary,
                             position: 1, label: 'Page 1 file',
                             external_identifier: 'https://cocina.sul.stanford.edu/file/second',
