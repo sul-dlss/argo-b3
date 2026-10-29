@@ -71,17 +71,39 @@ RSpec.describe Contents::Validators::Image do
     end
   end
 
-  context 'when an image has published files that are not JP2, XML, TXT, HTML, PDF, or JSON' do
+  context 'when an image publishes other files alongside one published JP2' do
     before do
       create_resource(file_set_type: 'image', label: 'Image 1',
                       files: [['image1.jp2', 'image/jp2', true],
-                              ['image1.dat', nil, true],
-                              ['image1.zip', 'application/zip', false]])
+                              ['image1.tif', 'image/tiff', true],
+                              ['image1.dat', nil, true]])
     end
 
-    it 'has an error listing the files' do
-      expect(result.errors).to eq(['Resource 1 (Image 1) has published files that are not JP2, XML, TXT, HTML, ' \
-                                   'PDF, or JSON: image1.dat.'])
+    it 'has no errors' do
+      expect(result.errors).to eq([])
+    end
+  end
+
+  context 'when an image has published files but no published JP2 or TIFF, PNG, or JPEG' do
+    before do
+      create_resource(file_set_type: 'image', label: 'Image 1',
+                      files: [['image1.jp2', 'image/jp2', false], ['image1.txt', 'text/plain', true]])
+    end
+
+    it 'has an error' do
+      expect(result.errors).to eq(['Resource 1 (Image 1) has published files but no published JP2 file ' \
+                                   'or TIFF, PNG, or JPEG file.'])
+    end
+  end
+
+  context 'when an image has published files and a TIFF but no published JP2' do
+    before do
+      create_resource(file_set_type: 'image', label: 'Image 1',
+                      files: [['image1.tif', 'image/tiff', false], ['image1.txt', 'text/plain', true]])
+    end
+
+    it 'has no errors' do
+      expect(result.errors).to eq([])
     end
   end
 
@@ -138,7 +160,7 @@ RSpec.describe Contents::Validators::Image do
   context 'when no image has a published JP2 or a TIFF, PNG, or JPEG' do
     before do
       create_resource(file_set_type: 'image', label: 'Image 1',
-                      files: [['image1.jp2', 'image/jp2', false], ['image1.txt', 'text/plain', true]])
+                      files: [['image1.jp2', 'image/jp2', false], ['image1.txt', 'text/plain', false]])
       create_resource(file_set_type: 'object', label: 'Object 1', files: [['image1.tif', 'image/tiff', false]])
     end
 

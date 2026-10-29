@@ -27,13 +27,16 @@ RSpec.describe Contents::Validators::Media do
     before do
       create_resource(file_set_type: 'video', label: 'Video 1',
                       files: [['video.mp4', 'video/mp4', true], ['captions.vtt', 'text/vtt', true],
-                              ['poster.jp2', 'image/jp2', true], ['transcript.txt', 'text/plain', true]])
+                              ['poster.jp2', 'image/jp2', true], ['transcript.txt', 'text/plain', true],
+                              ['video_notes.pdf', 'application/pdf', true]])
       create_resource(file_set_type: 'audio', label: 'Audio 1', files: [['audio.m4a', 'audio/mp4', true]])
       create_resource(file_set_type: 'file', files: [['notes.pdf', 'application/pdf', true]])
       create_resource(file_set_type: 'image',
-                      files: [['cover.jpg', 'image/jpeg', true], ['cover.tif', 'image/tiff', true],
-                              ['cover.png', 'image/png', true], ['cover.jp2', 'image/jp2', true]])
-      create_resource(file_set_type: 'document', files: [['unpublished.pdf', 'application/pdf', false]])
+                      files: [['cover.tif', 'image/tiff', true], ['cover.jp2', 'image/jp2', true],
+                              ['cover.txt', 'text/plain', true]])
+      create_resource(file_set_type: 'document',
+                      files: [['booklet.pdf', 'application/pdf', true], ['booklet.txt', 'text/plain', true]])
+      create_resource(file_set_type: 'object', files: [['unpublished.pdf', 'application/pdf', false]])
     end
 
     it 'has no errors or warnings' do
@@ -64,46 +67,83 @@ RSpec.describe Contents::Validators::Media do
       end
     end
 
-    context "when a #{file_set_type} resource publishes unsupported files" do
+    context "when a #{file_set_type} resource has published files but no published MP4/M4A or source file" do
       before do
         create_resource(file_set_type:, label: 'Media 1',
-                        files: [['video.mp4', 'video/mp4', true], ['source.wav', 'audio/wav', true],
-                                ['unknown.dat', nil, true], ['notes.pdf', 'application/pdf', false]])
+                        files: [['video.mp4', 'video/mp4', false], ['captions.vtt', 'text/vtt', true]])
       end
 
-      it 'has an error listing only the unsupported published files' do
-        expect(result.errors).to eq([
-                                      'Resource 1 (Media 1) has published files that are not ' \
-                                      'MP4/M4A, VTT, JP2, or TXT: ' \
-                                      'source.wav, unknown.dat.'
-                                    ])
+      it 'has an error' do
+        expect(result.errors).to eq(['Resource 1 (Media 1) has published files but no published MP4/M4A file ' \
+                                     'or MP3, MOV, MKV, or WAV file.'])
+      end
+    end
+
+    context "when a #{file_set_type} resource has published files and a source file but no published MP4/M4A" do
+      before do
+        create_resource(file_set_type:,
+                        files: [['source.mov', 'video/quicktime', false], ['captions.vtt', 'text/vtt', true]])
+      end
+
+      it 'has no errors' do
+        expect(result.errors).to eq([])
       end
     end
   end
 
-  context 'when another resource type publishes non-image files' do
+  context 'when another resource type publishes files' do
     before do
-      create_resource(file_set_type: 'object', label: 'Object 1', files: [['notes.pdf', 'application/pdf', true]])
+      create_resource(file_set_type: 'object', label: 'Object 1', files: [['cover.jp2', 'image/jp2', true]])
     end
 
     it 'has an error' do
-      expect(result.errors).to eq([
-                                    'Resource 1 (Object 1) has published files other than JPEG, TIFF, PNG, or JP2 ' \
-                                    'but is not a video, audio, or file resource.'
-                                  ])
+      expect(result.errors).to eq(['Resource 1 (Object 1) has published files but is not a video, audio, image, ' \
+                                   'document, or file resource.'])
     end
   end
 
-  context 'when an invalid resource has a blank label' do
+  context 'when an image resource has more than one published JP2 and more than one TIFF, PNG, or JPEG' do
+    before do
+      create_resource(file_set_type: 'image', label: 'Image 1',
+                      files: [['cover.jp2', 'image/jp2', true], ['cover2.jp2', 'image/jp2', true],
+                              ['cover.tif', 'image/tiff', false], ['cover.png', 'image/png', false]])
+    end
+
+    it 'has errors' do
+      expect(result.errors).to eq(['Resource 1 (Image 1) has more than one published JP2 file.',
+                                   'Resource 1 (Image 1) has more than one TIFF, PNG, or JPEG file.'])
+    end
+  end
+
+  context 'when an image resource has published files but no published JP2 or TIFF, PNG, or JPEG' do
     before do
       create_resource(file_set_type: 'image', files: [['notes.pdf', 'application/pdf', true]])
     end
 
-    it 'names the resource without a label' do
-      expect(result.errors).to eq([
-                                    'Resource 1 has published files other than JPEG, TIFF, PNG, or JP2 ' \
-                                    'but is not a video, audio, or file resource.'
-                                  ])
+    it 'has an error naming the resource without a label' do
+      expect(result.errors).to eq(['Resource 1 has published files but no published JP2 file ' \
+                                   'or TIFF, PNG, or JPEG file.'])
+    end
+  end
+
+  context 'when a document resource has more than one published PDF' do
+    before do
+      create_resource(file_set_type: 'document', label: 'Booklet',
+                      files: [['booklet.pdf', 'application/pdf', true], ['booklet2.pdf', 'application/pdf', true]])
+    end
+
+    it 'has an error' do
+      expect(result.errors).to eq(['Resource 1 (Booklet) has more than one published PDF file.'])
+    end
+  end
+
+  context 'when a document resource has published files but no published PDF' do
+    before do
+      create_resource(file_set_type: 'document', label: 'Booklet', files: [['booklet.txt', 'text/plain', true]])
+    end
+
+    it 'has an error' do
+      expect(result.errors).to eq(['Resource 1 (Booklet) has published files but no published PDF file.'])
     end
   end
 
@@ -113,7 +153,8 @@ RSpec.describe Contents::Validators::Media do
     before do
       create_resource(file_set_type: 'video', label: 'Video 1',
                       files: [['video.mp4', 'video/mp4', true], ['video2.mp4', 'video/mp4', true],
-                              ['notes.pdf', 'application/pdf', true], ['source.mov', 'video/quicktime', false]])
+                              ['source.mov', 'video/quicktime', false]])
+      create_resource(file_set_type: 'document', label: 'Booklet', files: [['booklet.txt', 'text/plain', true]])
       create_resource(file_set_type: 'object', label: 'Object 1', files: [['data.zip', 'application/zip', true]])
     end
 
@@ -121,9 +162,9 @@ RSpec.describe Contents::Validators::Media do
       expect(result).to have_attributes(
         errors: [],
         warnings: ['Resource 1 (Video 1) has more than one published MP4/M4A file.',
-                   'Resource 1 (Video 1) has published files that are not MP4/M4A, VTT, JP2, or TXT: notes.pdf.',
-                   'Resource 2 (Object 1) has published files other than JPEG, TIFF, PNG, or JP2 ' \
-                   'but is not a video, audio, or file resource.']
+                   'Resource 2 (Booklet) has published files but no published PDF file.',
+                   'Resource 3 (Object 1) has published files but is not a video, audio, image, ' \
+                   'document, or file resource.']
       )
     end
   end
@@ -186,7 +227,7 @@ RSpec.describe Contents::Validators::Media do
     before do
       create_resource(file_set_type: 'file',
                       files: [['video.mp4', 'video/mp4', true], ['source.wav', 'audio/wav', false]])
-      create_resource(file_set_type: 'audio', files: [['captions.vtt', 'text/vtt', true]])
+      create_resource(file_set_type: 'audio', files: [['captions.vtt', 'text/vtt', false]])
     end
 
     it 'has a warning but no errors' do
