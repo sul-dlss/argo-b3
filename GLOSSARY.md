@@ -26,6 +26,9 @@ The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has ex
 ### Draft
 The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version, and deletes the draft's Mutable Content and staged files. A first version cannot be discarded, but it can be purged.
 
+### Deposit
+Submitting a Draft for accessioning. If the object has staged files, depositing starts an assembly workflow, which closes the version once assembly is done; otherwise it closes the version directly, which starts accessioning. Depositing from manage files stages the Mutable Content first; depositing from elsewhere (e.g., the edit item form) deposits the structure as last staged, so it is not possible while the Mutable Content has unsaved changes.
+
 ### Purge
 Permanently deleting an object from SDR, along with its Mutable Content and staged files. Only an object that has never been submitted for accessioning can be purged, which in practice means a first version. Unlike discarding a Draft, which returns the object to its last closed version, purging leaves no object behind.
 
@@ -58,6 +61,9 @@ A Content that exactly reflects the cocina object's structural metadata at its l
 
 ### Mutable Content
 A Content being edited (uploads, discovery, reordering, structural CSV import); it may deviate from the cocina object. It reaches the cocina object only through **staging**. While the version is open, it moves to each new lock of the object (e.g., after a draft save or an item edit), and it holds the OCR settings (whether to run OCR and in which languages) used when depositing.
+
+### Unsaved Changes
+Changes to a Mutable Content that have not been staged to the cocina object, such as new files or edited resources. Saving as a draft or depositing from manage files stages them; discarding the Draft deletes them.
 
 ### Staging
 Saving a mutable Content to the cocina object (`StageFilesJob`): `CocinaObjectMutators::StructuralMutator` rebuilds the cocina structural metadata from the Content and `Sdr::Repository.update` saves it. When depositing, the Content becomes immutable for the new lock and accessioning starts; when saving as a draft, the Content stays mutable and moves to the new lock.

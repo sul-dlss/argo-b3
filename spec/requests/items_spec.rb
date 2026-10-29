@@ -588,6 +588,41 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when the mutable content has unsaved changes' do
+      let(:item_params) { { version_description: 'Redeposit', lock: cocina_object.lock } }
+
+      before do
+        content = create(:content, :mutable, druid:, lock: cocina_object.lock)
+        # A file that has not been staged is an unsaved change.
+        create(:content_file_binary, content:, file_location: 'attached')
+        allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+        allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
+        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+      end
+
+      context 'when depositing' do
+        let(:commit) { ItemsController::DEPOSIT_VALUE }
+
+        it 'renders the edit page with the error without depositing' do
+          patch "/items/#{druid}", params: { item: item_params, commit: }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(Capybara.string(response.body))
+            .to have_css('.invalid-feedback', text: 'Files have unsaved changes. Save or deposit them ' \
+                                                    'from Manage files.')
+          expect(Sdr::Repository).not_to have_received(:accession)
+        end
+      end
+
+      context 'when saving as a draft' do
+        it 'is not blocked by the unsaved changes' do
+          patch "/items/#{druid}", params: { item: item_params, commit: }
+
+          expect(response).to redirect_to(object_path(druid))
+        end
+      end
+    end
+
     context 'when depositing with a closed version and nothing changed' do
       let(:open) { false }
       let(:commit) { ItemsController::DEPOSIT_VALUE }

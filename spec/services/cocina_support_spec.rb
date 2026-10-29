@@ -53,7 +53,7 @@ RSpec.describe CocinaSupport do
     end
   end
 
-  describe '.agreement?, .virtual_object?, and .item?' do
+  describe '.agreement?, .virtual_object?, .item?, and .object_type_with_content?' do
     let(:item) { build(:dro, type: Cocina::Models::ObjectType.book) }
     let(:agreement) { build(:dro, type: Cocina::Models::ObjectType.agreement) }
     let(:virtual_object) do
@@ -88,6 +88,14 @@ RSpec.describe CocinaSupport do
       expect(described_class.item?(collection)).to be false
       expect(described_class.item?(admin_policy)).to be false
       expect(described_class.virtual_object?(collection)).to be false
+    end
+
+    it 'identifies Items and Agreements as object types with Content' do
+      expect(described_class.object_type_with_content?(item)).to be true
+      expect(described_class.object_type_with_content?(agreement)).to be true
+      expect(described_class.object_type_with_content?(virtual_object)).to be false
+      expect(described_class.object_type_with_content?(collection)).to be false
+      expect(described_class.object_type_with_content?(admin_policy)).to be false
     end
   end
 end

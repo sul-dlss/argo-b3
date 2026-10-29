@@ -28,6 +28,8 @@ class EditItemForm < CocinaModels::Dro
 
   # Only depositing requires the structure to be valid for the content type.
   validate :structure_valid_for_content_type, on: :deposit
+  # Depositing deposits the structure as last staged, so it would discard unsaved changes.
+  validate :content_is_saved, on: :deposit
 
   # The object's mutable Content, if any; not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
@@ -46,7 +48,7 @@ class EditItemForm < CocinaModels::Dro
     validate!
     prepare_version!(user_name:, open_version: changed? || accession)
     super(user_name:, accession:, workflow_context: content&.workflow_context || {})
-    # Depositing deposits the cocina structure, so changes to the content that were not staged are discarded.
+    # The content has no unsaved changes, so it matches what is deposited.
     content&.destroy! if accession
   ensure
     rebase_content_lock
@@ -70,6 +72,12 @@ class EditItemForm < CocinaModels::Dro
     return if Contents::Validator.call(content: immutable_content, cocina_object: mutated_cocina_object).valid?
 
     errors.add(:content, I18n.t('edit.items.fields.content.validations.invalid'))
+  end
+
+  def content_is_saved
+    return unless Contents::UnsavedChanges.call(content:, cocina_object: previous_cocina_object)
+
+    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved'))
   end
 
   def description_csv_file_absent_when_refreshed
