@@ -26,7 +26,7 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
     expect(page).to have_no_css('form[data-turbo-confirm]')
     expect(page).to have_css('input[name="_method"][value="delete"]', visible: :hidden)
     expect(page).to have_button('Delete image1.tif')
-    expect(page).to have_no_button(class: 'disabled')
+    expect(page).to have_no_button(disabled: true)
   end
 
   context 'when the binary is not the only file in its resource' do
@@ -81,7 +81,7 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
     it 'disables the delete button' do
       render_inline(component)
 
-      expect(page).to have_button('Delete image1.tif', class: 'disabled')
+      expect(page).to have_button('Delete image1.tif', disabled: true)
     end
   end
 

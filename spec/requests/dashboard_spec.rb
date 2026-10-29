@@ -180,15 +180,15 @@ RSpec.describe 'Dashboard' do
         expect(rendered_page).to have_css('h1', text: 'Argo dashboard')
 
         expect(rendered_page).to have_css('h2', text: 'Register & deposit single object')
-        expect(rendered_page).to have_button('Item', class: 'disabled')
-        expect(rendered_page).to have_button('Collection', class: 'disabled')
-        expect(rendered_page).to have_button('APO', class: 'disabled')
-        expect(rendered_page).to have_button('Agreement', class: 'disabled')
+        expect(rendered_page).to have_button('Item', disabled: true)
+        expect(rendered_page).to have_button('Collection', disabled: true)
+        expect(rendered_page).to have_button('APO', disabled: true)
+        expect(rendered_page).to have_button('Agreement', disabled: true)
 
         expect(rendered_page).to have_css('h2', text: 'Register or deposit multiple items')
-        expect(rendered_page).to have_button('Register multiple items')
-        expect(rendered_page).to have_css('a.disabled', exact_text: 'Register multiple items')
-        expect(rendered_page).to have_css('.disabled', exact_text: 'Deposit multiple items')
+        expect(rendered_page).to have_button('Register multiple items', exact: true, disabled: true)
+        expect(rendered_page).to have_button('Register multiple items (via CSV)', disabled: true)
+        expect(rendered_page).to have_button('Deposit multiple items', disabled: true)
 
         expect(rendered_page).to have_css('table[aria-label="Recent objects"]')
         expect(rendered_page).to have_css('table[aria-label="Pinned searches"]')
@@ -209,20 +209,17 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'enables the Item, Collection, Register multiple items, and Deposit multiple items buttons' do
-        expect(rendered_page).to have_link('Item', href: new_item_path)
-        expect(rendered_page).to have_no_css('a.disabled', text: 'Item')
+        expect(rendered_page).to have_css("form[action='#{new_item_path}'] button:not([disabled])", exact_text: 'Item')
+        expect(rendered_page).to have_css("form[action='#{new_collection_path}'] button:not([disabled])",
+                                          exact_text: 'Collection')
+        expect(rendered_page).to have_css("form[action='#{new_multiple_item_path}'] button:not([disabled])",
+                                          exact_text: 'Register multiple items')
+        expect(rendered_page).to have_css(
+          "form[action='#{multi_item_deposit_actions_path}'][method='post'] button:not([disabled])",
+          exact_text: 'Deposit multiple items'
+        )
 
-        expect(rendered_page).to have_link('Collection', href: new_collection_path)
-        expect(rendered_page).to have_no_css('a.disabled', text: 'Collection')
-
-        expect(rendered_page).to have_link('Register multiple items', href: new_multiple_item_path)
-        expect(rendered_page).to have_no_css('a.disabled', exact_text: 'Register multiple items')
-
-        expect(rendered_page).to have_css("form[action='#{multi_item_deposit_actions_path}'][method='post']",
-                                          text: 'Deposit multiple items')
-        expect(rendered_page).to have_no_css('.disabled', exact_text: 'Deposit multiple items')
-
-        expect(rendered_page).to have_button('Agreement', class: 'disabled')
+        expect(rendered_page).to have_button('Agreement', disabled: true)
       end
     end
 
@@ -236,8 +233,8 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'enables the Agreement button' do
-        expect(rendered_page).to have_link('Agreement', href: new_agreement_path)
-        expect(rendered_page).to have_no_css('a.disabled', text: 'Agreement')
+        expect(rendered_page).to have_css("form[action='#{new_agreement_path}'] button:not([disabled])",
+                                          exact_text: 'Agreement')
       end
     end
 
@@ -248,8 +245,7 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'enables the APO button' do
-        expect(rendered_page).to have_link('APO', href: new_apo_path)
-        expect(rendered_page).to have_no_css('a.disabled', exact_text: 'APO')
+        expect(rendered_page).to have_css("form[action='#{new_apo_path}'] button:not([disabled])", exact_text: 'APO')
       end
     end
   end
@@ -268,8 +264,8 @@ RSpec.describe 'Dashboard' do
       it 'renders the Admin section with an enabled Impersonate button' do
         expect(admin_section).to have_css("form[action='#{admin_workgroup_permissions_path}'] button",
                                           text: 'Manage permissions')
-        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button", text: 'Impersonate')
-        expect(admin_section).to have_no_css('.disabled', text: 'Impersonate')
+        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button:not([disabled])",
+                                          text: 'Impersonate')
       end
     end
 
@@ -285,7 +281,7 @@ RSpec.describe 'Dashboard' do
       it 'renders the Admin section with a disabled Impersonate button' do
         expect(admin_section).to have_css("form[action='#{admin_workgroup_permissions_path}'] button",
                                           text: 'Manage permissions')
-        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button.disabled",
+        expect(admin_section).to have_css("form[action='#{admin_impersonate_path}'] button[disabled]",
                                           text: 'Impersonate')
       end
     end

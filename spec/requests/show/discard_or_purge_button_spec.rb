@@ -43,7 +43,7 @@ RSpec.describe 'Show object purge / discard draft button' do
     it 'renders a disabled Purge object button' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_button('Purge', class: 'disabled')
+      expect(rendered_page).to have_button('Purge', disabled: true)
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe 'Show object purge / discard draft button' do
     it 'renders a disabled Discard draft button' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_button('Discard draft', class: 'disabled')
+      expect(rendered_page).to have_button('Discard draft', disabled: true)
     end
   end
 
@@ -86,7 +86,7 @@ RSpec.describe 'Show object purge / discard draft button' do
     it 'renders a disabled button without checking whether the object can be purged or discarded' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_button('Purge', class: 'disabled')
+      expect(rendered_page).to have_button('Purge', disabled: true)
       expect(Sdr::PurgeService).not_to have_received(:purgeable?)
       expect(Sdr::DiscardDraftService).not_to have_received(:discardable?)
     end
