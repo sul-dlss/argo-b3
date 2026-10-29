@@ -9,6 +9,8 @@ end
 
 def select_multi_option(option_label, from:)
   find_multi_select(from).find('.ts-control input').set(option_label)
+  # Wait for the throttled filtering, which otherwise refocuses the field after the next one is focused.
+  find('.ts-dropdown .option.active', text: option_label)
   find('.ts-dropdown .option', text: option_label, exact_text: true).click
 end
 
