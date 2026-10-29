@@ -404,6 +404,9 @@ en:
           label: "Collections"
           placeholder: "Start typing the collection name or druid..."
           limit_label: "Only view collections in selected APO"
+        content:
+          validations:
+            invalid: "The files are not valid for the content type. \"Save draft and edit files\" to fix them before depositing."
         content_type:
           label: "Content type"
         copyright:
