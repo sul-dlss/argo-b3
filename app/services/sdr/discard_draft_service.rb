@@ -12,8 +12,14 @@ module Sdr
       new(...).call
     end
 
-    def self.discardable?(...)
-      new(...).discardable?
+    # SDR does not discard a first version.
+    # @param version [Integer] the object's version
+    # @param version_service [Sdr::VersionService] the object's version service
+    # @return [Boolean] true if the draft can be discarded
+    def self.discardable?(version:, version_service:)
+      return false if version == 1
+
+      version_service.open? && version_service.discardable?
     end
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the object, at the open version
@@ -35,12 +41,9 @@ module Sdr
       Content.delete_mutable_and_staged_files(druid:)
     end
 
-    # SDR does not discard a first version.
     # @return [Boolean] true if the draft can be discarded
     def discardable?
-      return false if cocina_object.version == 1
-
-      version_service.open? && version_service.discardable?
+      self.class.discardable?(version: cocina_object.version, version_service:)
     end
 
     private

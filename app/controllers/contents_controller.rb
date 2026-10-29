@@ -2,8 +2,6 @@
 
 # Controller for managing content (structural)
 class ContentsController < ContentsApplicationController
-  include DiscardOrPurgeConcern
-
   skip_verify_authorized only: %i[show]
 
   # Values for submit buttons, which are rendered by Item::EditTabFooterComponent.
@@ -99,7 +97,7 @@ class ContentsController < ContentsApplicationController
     @content_token = generate_token(@content.id)
     @content_form = ContentForm.new
     # Computed once, since every pane's footer renders the discard or purge button.
-    @discard_or_purge_action = discard_or_purge_action(cocina_object:, version_service:)
+    @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: cocina_object.version, version_service:)
   end
 
   def build_prefilled_contents_item_form(cocina_object:)

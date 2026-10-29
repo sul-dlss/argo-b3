@@ -77,7 +77,7 @@ RSpec.describe Sdr::DiscardDraftService do
   end
 
   describe '.discardable?' do
-    subject(:discardable?) { described_class.discardable?(cocina_object:, version_service:) }
+    subject(:discardable?) { described_class.discardable?(version: cocina_object.version, version_service:) }
 
     it { is_expected.to be true }
 

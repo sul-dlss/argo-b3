@@ -28,7 +28,7 @@
               label_text: t('edit.items.fields.source_id.label')
             ) %>
         <% pane.with_footer do %>
-          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_action: @discard_or_purge_action, show_previous: false) %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: false) %>
         <% end %>
       <% end %>
 
@@ -38,7 +38,7 @@
         <%= render Edit::ItemDescriptionComponent.new(form:, druid_token: @druid_token) %>
 
         <% pane.with_footer do %>
-          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_action: @discard_or_purge_action, show_previous: true) %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: true) %>
         <% end %>
       <% end %>
 
@@ -68,7 +68,7 @@
         <% end %>
 
         <% pane.with_footer do %>
-          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_action: @discard_or_purge_action) %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter) %>
         <% end %>
       <% end %>
 
@@ -83,7 +83,7 @@
             ) %>
 
         <% pane.with_footer do %>
-          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_action: @discard_or_purge_action, show_next: false, show_edit_files: true, show_deposit: true) %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_next: false, show_edit_files: true, show_deposit: true) %>
         <% end %>
       <% end %>
     <% end %>

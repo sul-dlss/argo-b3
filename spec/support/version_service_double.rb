@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 # Builds an Sdr::VersionService double with every status method stubbed, so adding a method to the service doesn't
-# break specs that don't care about it. Defaults are an open first version that can be closed; override as needed.
+# break specs that don't care about it. Defaults are an open first version of druid:bc123df4567 that can be closed;
+# override as needed.
 module VersionServiceDouble
-  DEFAULTS = { open?: true, openable?: false, closeable?: true, assembling?: false, accessioning?: false,
-               closed?: false, discardable?: false, version: 1, version_description: 'Initial version',
-               update_description: nil }.freeze
+  DEFAULTS = { druid: 'druid:bc123df4567', open?: true, openable?: false, closeable?: true, assembling?: false,
+               accessioning?: false, closed?: false, discardable?: false, version: 1,
+               version_description: 'Initial version', update_description: nil }.freeze
 
   def version_service_double(**overrides)
     status = DEFAULTS.merge(overrides)
