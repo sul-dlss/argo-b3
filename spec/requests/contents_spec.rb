@@ -149,6 +149,34 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when the content is invalid for the content type' do
+      # A dark object's content errors are only warnings.
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+          .new(access: { view: 'world', download: 'world' })
+      end
+
+      before do
+        # Published files in a file resource are an error for a book.
+        create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
+                              publish: true)
+      end
+
+      it 'renders the content error when depositing from elsewhere found it' do
+        get edit_content_path(druid, deposit: true)
+
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body))
+          .to have_css('#structural-pane .is-invalid', text: 'Content errors must be fixed.')
+      end
+
+      it 'does not render the content error otherwise' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_no_css('#structural-pane .is-invalid')
+      end
+    end
+
     context 'when the user cannot edit the object' do
       before { Permission.permission_type_edit.destroy_all }
 

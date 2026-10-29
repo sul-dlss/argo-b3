@@ -44,7 +44,7 @@ RSpec.describe 'Impersonation permissions' do
         expect(response).to have_http_status(:ok)
 
         rendered_page = Capybara.string(response.body)
-        expect(rendered_page).to have_button('Item', class: 'btn btn-outline-primary disabled')
+        expect(rendered_page).to have_button('Item', class: 'btn btn-outline-primary disabled', disabled: true)
       end
     end
   end

@@ -180,13 +180,13 @@ RSpec.describe 'Dashboard' do
         expect(rendered_page).to have_css('h1', text: 'Argo dashboard')
 
         expect(rendered_page).to have_css('h2', text: 'Register & deposit single object')
-        expect(rendered_page).to have_button('Item', class: 'disabled')
-        expect(rendered_page).to have_button('Collection', class: 'disabled')
-        expect(rendered_page).to have_button('APO', class: 'disabled')
-        expect(rendered_page).to have_button('Agreement', class: 'disabled')
+        expect(rendered_page).to have_button('Item', class: 'disabled', disabled: true)
+        expect(rendered_page).to have_button('Collection', class: 'disabled', disabled: true)
+        expect(rendered_page).to have_button('APO', class: 'disabled', disabled: true)
+        expect(rendered_page).to have_button('Agreement', class: 'disabled', disabled: true)
 
         expect(rendered_page).to have_css('h2', text: 'Register or deposit multiple items')
-        expect(rendered_page).to have_button('Register multiple items')
+        expect(rendered_page).to have_button('Register multiple items (via CSV)', class: 'disabled', disabled: true)
         expect(rendered_page).to have_css('a.disabled', exact_text: 'Register multiple items')
         expect(rendered_page).to have_css('.disabled', exact_text: 'Deposit multiple items')
 
@@ -222,7 +222,7 @@ RSpec.describe 'Dashboard' do
                                           text: 'Deposit multiple items')
         expect(rendered_page).to have_no_css('.disabled', exact_text: 'Deposit multiple items')
 
-        expect(rendered_page).to have_button('Agreement', class: 'disabled')
+        expect(rendered_page).to have_button('Agreement', class: 'disabled', disabled: true)
       end
     end
 

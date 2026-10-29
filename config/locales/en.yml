@@ -89,6 +89,7 @@ en:
         heading: "Deposited"
       draft:
         heading: "Draft, not deposited"
+        unsaved_content_changes: "Files have unsaved changes. Deposit from Manage files."
       initiating:
         heading: "Initiating deposit..."
       depositing:
@@ -115,17 +116,21 @@ en:
       unreleased:
         heading: "Not released"
     errors:
+      deposit_failed: "Depositing failed."
       discard_failed: "Discarding the draft failed."
       purge_failed: "Purging failed."
     toasts:
+      deposit_started: "Deposit started."
       draft_discarded: "Draft discarded."
       purged: "Object purged."
       republish_started: "Republishing started"
     warnings:
       cannot_purge: "This object cannot be purged because it has been submitted."
       content_busy: "Files for this object are being staged or discovered. Try again when that has finished."
+      not_depositable: "This draft cannot be deposited."
       not_discardable: "This draft cannot be discarded."
       republish_failed: "Republish is not possible"
+      unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
   workflow_grid:
     label: "Workflow status"
   edit:

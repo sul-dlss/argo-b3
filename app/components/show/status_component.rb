@@ -3,26 +3,34 @@
 module Show
   # Component for rendering the deposit status box on the show page.
   class StatusComponent < ApplicationComponent
-    def initialize(object_status_presenter:, solr_doc:)
+    # @param unsaved_content_changes [Boolean] true if the object's mutable Content has unsaved changes
+    def initialize(object_status_presenter:, solr_doc:, unsaved_content_changes: false)
       @object_status_presenter = object_status_presenter
       @solr_doc = solr_doc
+      @unsaved_content_changes = unsaved_content_changes
       super()
     end
 
-    attr_reader :object_status_presenter, :solr_doc
+    attr_reader :object_status_presenter, :solr_doc, :unsaved_content_changes
 
     delegate :status, :workflow_error_messages, :druid, :version_editable?, to: :object_status_presenter
-    delegate :item?, :agreement?, :collection?, :admin_policy?, :virtual_object?, to: :solr_doc
+    delegate :item?, :agreement?, :collection?, :admin_policy?, :virtual_object?, :object_type_with_content?,
+             to: :solr_doc
 
     def heading
       render(Show::StatusLabelComponent.new(status:))
+    end
+
+    def draft?
+      status == :draft
     end
 
     def edit_label
       I18n.t("show.status.actions.#{edit_action}")
     end
 
-    def edit?
+    # Only items have an edit form so far.
+    def can_edit?
       item? && editable?
     end
 
@@ -30,13 +38,17 @@ module Show
       edit_item_path(druid)
     end
 
-    # Files are managed for items and agreements.
-    def manage_files?
-      item? || agreement?
+    def manage_files_button
+      Show::ManageFilesButtonComponent.new(druid:, enabled: object_type_with_content? && editable?)
     end
 
-    def manage_files_button
-      Show::ManageFilesButtonComponent.new(druid:, enabled: manage_files? && editable?)
+    # Depositing would discard unsaved content changes, so they must be deposited from managing files.
+    def can_deposit?
+      editable? && !unsaved_content_changes_blocking_deposit?
+    end
+
+    def unsaved_content_changes_note?
+      draft? && editable? && unsaved_content_changes_blocking_deposit?
     end
 
     def staging_failed_body
@@ -44,6 +56,10 @@ module Show
     end
 
     private
+
+    def unsaved_content_changes_blocking_deposit?
+      object_type_with_content? && unsaved_content_changes
+    end
 
     def editable?
       version_editable? && helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)

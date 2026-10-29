@@ -41,8 +41,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
     content = Content.latest_staging_activity(druid:)
-    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:,
-                                                         content:)
+    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:, content:)
+    @unsaved_content_changes = unsaved_content_changes?
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
@@ -182,6 +182,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     toast_and_refresh(t('show.toasts.republish_started'), fallback_location: object_path(druid:))
   end
 
+  def deposit
+    cocina_object = Sdr::Repository.find(druid: druid_param)
+    authorize! cocina_object, to: :update?, with: ObjectPolicy
+
+    deposit_and_respond(cocina_object:)
+  end
+
   def discard_draft
     cocina_object = Sdr::Repository.find(druid: druid_param)
     authorize! cocina_object, to: :update?, with: ObjectPolicy
@@ -197,6 +204,24 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  def deposit_and_respond(cocina_object:) # rubocop:disable Metrics/AbcSize
+    Sdr::DepositDraftService.call(cocina_object:, user_name: current_user.sunetid)
+    toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
+  rescue Sdr::DepositDraftService::ContentBusyError
+    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.content_busy') }
+  rescue Sdr::DepositDraftService::NotDepositableError
+    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.not_depositable') }
+  rescue Sdr::DepositDraftService::UnsavedChangesError
+    redirect_to edit_content_path(druid_param), flash: { warning: t('show.warnings.unsaved_content_changes') }
+  rescue Sdr::DepositDraftService::InvalidContentError
+    # Manage files shows the content errors.
+    redirect_to edit_content_path(druid_param, deposit: true)
+  rescue Sdr::Repository::Error => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: druid_param })
+    redirect_to object_path(druid_param), flash: { danger: t('show.errors.deposit_failed') }
+  end
 
   def discard_draft_and_redirect(cocina_object:) # rubocop:disable Metrics/AbcSize
     druid = cocina_object.externalIdentifier
@@ -236,6 +261,12 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Sdr::Event.list(druid: @druid,
                     event_types: @events_filter_form.event_types_filter(available_event_types: @event_types),
                     from: @events_filter_form.from_time, to: @events_filter_form.to_time)
+  end
+
+  def unsaved_content_changes?
+    return false unless CocinaSupport.object_type_with_content?(@cocina_object)
+
+    Contents::UnsavedChanges.call(content: Content.mutable_for(@cocina_object), cocina_object: @cocina_object)
   end
 
   def republishable?
