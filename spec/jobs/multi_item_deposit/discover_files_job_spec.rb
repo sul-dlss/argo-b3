@@ -7,9 +7,9 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:apo_druid) { 'druid:hv992ry2431' }
-  let(:mount_path) { Dir.mktmpdir }
-  let(:folder_path) { File.join(mount_path, 'item1') }
-  let(:multi_item_deposit_action) { create(:multi_item_deposit_action, mount_path:) }
+  let(:files_path) { Dir.mktmpdir }
+  let(:folder_path) { File.join(files_path, 'item1') }
+  let(:multi_item_deposit_action) { create(:multi_item_deposit_action, mount_path: files_path) }
   let(:item_deposit_action) do
     create(:item_deposit_action, multi_item_deposit_action:, druid:, path: 'item1',
                                  discovery_errors: ['Old error'], discovery_warnings: ['Old warning'])
@@ -33,7 +33,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   after do
-    FileUtils.rm_rf(mount_path)
+    FileUtils.rm_rf(files_path)
   end
 
   def perform
@@ -58,6 +58,24 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
     end
   end
 
+  context 'when the files are on Globus' do
+    let(:files_path) { "#{Settings.globus.directory}/uploads/jdoe/2026-10-28-14-03-22-417" }
+    let(:multi_item_deposit_action) do
+      create(:multi_item_deposit_action, file_location: 'globus', globus_path: '/uploads/jdoe/2026-10-28-14-03-22-417')
+    end
+
+    after do
+      FileUtils.rm_rf(Settings.globus.directory)
+    end
+
+    it 'records the files in the Globus directory as on Globus' do
+      perform
+
+      expect(item_deposit_action.content.content_file_binaries.pluck(:file_location, :mount_path))
+        .to eq([['globus', folder_path], ['globus', folder_path]])
+    end
+  end
+
   context 'when the object is an initial version' do
     let(:version_service) { version_service_double(open?: true, closeable?: true, version: 1) }
 
@@ -67,7 +85,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
   end
 
   context 'when the folder does not exist' do
-    let(:folder_path) { File.join(mount_path, 'other') }
+    let(:folder_path) { File.join(files_path, 'other') }
 
     it 'records an error and does not create a Content' do
       perform
@@ -250,7 +268,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
 
   context 'when there is an existing mutable Content and other errors' do
     let!(:existing_content) { create(:content, :mutable, druid:, lock: 'abc123') }
-    let(:folder_path) { File.join(mount_path, 'other') }
+    let(:folder_path) { File.join(files_path, 'other') }
 
     it 'keeps the existing Content' do
       perform

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ManifestCsv
-  # Validates a multi-item deposit manifest, which maps each druid to its folder on the mount.
+  # Validates a multi-item deposit manifest, which maps each druid to its folder in the file location.
   class Validator
     DRUID_COLUMN = 'druid'
     FOLDER_NAME_COLUMN = 'folder_name'
@@ -11,10 +11,11 @@ module ManifestCsv
     attr_reader :errors
 
     # @param csv [String] the manifest (already run through CsvUpload::Normalizer)
-    # @param mount_path [String, nil] the mount path that folders must be within; nil skips that check
-    def initialize(csv:, mount_path:)
+    # @param files_path [String, nil] the directory (a mount path or a Globus directory) that folders must be
+    #   within; nil skips that check
+    def initialize(csv:, files_path:)
       @csv = CSV.parse(csv, headers: true)
-      @mount_path = mount_path
+      @files_path = files_path
       @errors = []
     end
 
@@ -27,13 +28,13 @@ module ManifestCsv
       validate_blank_cells
       validate_duplicate_druids
       validate_shared_folder_names
-      validate_folder_names_within_mount_path if mount_path
+      validate_folder_names_within_files_path if files_path
       errors.empty?
     end
 
     private
 
-    attr_reader :csv, :mount_path
+    attr_reader :csv, :files_path
 
     def validate_columns
       missing_columns = REQUIRED_COLUMNS - csv.headers
@@ -65,12 +66,12 @@ module ManifestCsv
     end
 
     # Lexical, so that the folders need not exist yet.
-    def validate_folder_names_within_mount_path
-      root_path = Pathname.new(mount_path).cleanpath
+    def validate_folder_names_within_files_path
+      root_path = Pathname.new(files_path).cleanpath
       escaping_folder_names = present_values(FOLDER_NAME_COLUMN).uniq.reject do |folder_name|
         root_path.join(folder_name).cleanpath.ascend.drop(1).include?(root_path)
       end
-      errors << "Folders outside the mount path: #{escaping_folder_names.join(', ')}." if escaping_folder_names.any?
+      errors << "Folders outside the file location: #{escaping_folder_names.join(', ')}." if escaping_folder_names.any?
     end
 
     def present_values(column)

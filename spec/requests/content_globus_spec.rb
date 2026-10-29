@@ -62,13 +62,13 @@ RSpec.describe 'Content globus' do
     let(:created) { true }
 
     before do
-      allow(GlobusDirectory).to receive(:new).and_return(globus_directory)
+      allow(GlobusDirectory).to receive(:for_object).and_return(globus_directory)
     end
 
     it 'creates the Globus directory and redirects to new' do
       post content_globus_path(content_id: content_token)
 
-      expect(GlobusDirectory).to have_received(:new).with(druid: 'druid:bc123df4567', user:)
+      expect(GlobusDirectory).to have_received(:for_object).with(druid: 'druid:bc123df4567', user:)
       expect(globus_directory).to have_received(:create)
       expect(response).to redirect_to(new_content_globus_path(content_id: content_token))
     end

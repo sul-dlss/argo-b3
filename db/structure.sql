@@ -436,7 +436,8 @@ CREATE TABLE public.multi_item_deposit_actions (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     manifest_source character varying DEFAULT 'upload'::character varying NOT NULL,
-    manifest_csv text
+    manifest_csv text,
+    globus_path character varying
 );
 
 
@@ -1196,6 +1197,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261029120000'),
+('20261028120000'),
 ('20261019120000'),
 ('20261016120000'),
 ('20261014120000'),

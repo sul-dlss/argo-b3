@@ -491,6 +491,9 @@ en:
         viewing_direction:
           label: "Viewing direction"
     multi_item_deposits:
+      globus:
+        instructions: >-
+          Go to Globus and transfer your files. Once your files are transferred, click "Discover files and check manifest".
       show:
         title: "Multi-item deposit"
         description: "Your deposit has been submitted and is in progress. If you have errors below, go to the items' pages to address."
@@ -526,9 +529,12 @@ en:
         file_location:
           label: "Select how to upload files"
           globus:
-            label: "Globus"
+            label: "Use files from Globus"
           mount:
             label: "Use files from mount"
+        globus_path:
+          validations:
+            blank: "Create a Globus link before discovering files"
         mount_path:
           label: "Mount path"
         manifest_file:
@@ -541,7 +547,7 @@ en:
           upload:
             label: "Upload from a computer"
           validations:
-            manifest_not_found: "%{filename} not found in the mount path"
+            manifest_not_found: "%{filename} not found in the file location"
         publish_preserve_all:
           label: "Select publish / preserve settings"
           default:
@@ -557,7 +563,7 @@ en:
           none:
             label: "No"
           validations:
-            not_found: "%{filename} not found in the mount path"
+            not_found: "%{filename} not found in the file location"
             required: "A structural metadata CSV is required for media items"
         structural_metadata_csv_file:
           label: "Upload structural metadata CSV"

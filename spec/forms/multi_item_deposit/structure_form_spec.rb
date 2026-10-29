@@ -173,7 +173,7 @@ RSpec.describe MultiItemDeposit::StructureForm do
 
         expect(form).not_to be_valid
         expect(form.errors[:structural_metadata_csv_choice])
-          .to eq(['structural_metadata.csv not found in the mount path'])
+          .to eq(['structural_metadata.csv not found in the file location'])
       end
     end
 

@@ -1,0 +1,18 @@
+<%= turbo_frame_tag @multi_item_deposit_action, 'globus' do %>
+  <% if @error %>
+    <p class="text-danger"><%= @error %></p>
+  <% end %>
+  <% if @multi_item_deposit_action.globus_directory %>
+    <p><%= t('edit.multi_item_deposits.globus.instructions') %></p>
+    <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.contents.globus.buttons.open'),
+                                                                    link: @multi_item_deposit_action.globus_directory.url,
+                                                                    target: '_blank', rel: 'noopener') %>
+  <% else %>
+    <%# Creating the link can take several seconds, so a spinner is shown while it is created.
+        The button submits a form outside the discovery form, since forms cannot be nested. %>
+    <div class="spinner-on-submit">
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.globus.buttons.create'), form_id: 'create-globus-link-form') %>
+      <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.spinner'), classes: 'submit-spinner mt-2') %>
+    </div>
+  <% end %>
+<% end %>

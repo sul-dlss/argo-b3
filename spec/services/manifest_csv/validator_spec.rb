@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe ManifestCsv::Validator do
-  subject(:validator) { described_class.new(csv:, mount_path:) }
+  subject(:validator) { described_class.new(csv:, files_path:) }
 
-  let(:mount_path) { '/dor/staging/deposit' }
+  let(:files_path) { '/dor/staging/deposit' }
   let(:csv) do
     <<~CSV
       druid,folder_name
@@ -82,7 +82,7 @@ RSpec.describe ManifestCsv::Validator do
     end
   end
 
-  context 'when folders are outside the mount path' do
+  context 'when folders are outside the files path' do
     let(:csv) do
       <<~CSV
         druid,folder_name
@@ -95,12 +95,12 @@ RSpec.describe ManifestCsv::Validator do
 
     it 'reports the folders' do
       expect(validator).not_to be_valid
-      expect(validator.errors).to eq(['Folders outside the mount path: ../../etc, /etc, ., folder1/../../other.'])
+      expect(validator.errors).to eq(['Folders outside the file location: ../../etc, /etc, ., folder1/../../other.'])
     end
   end
 
-  context 'when there is no mount path' do
-    let(:mount_path) { nil }
+  context 'when there is no files path' do
+    let(:files_path) { nil }
     let(:csv) { "druid,folder_name\ndruid:bc123df4567,../../etc\n" }
 
     it 'does not check the folders' do

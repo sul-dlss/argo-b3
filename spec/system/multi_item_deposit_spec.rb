@@ -225,4 +225,62 @@ RSpec.describe 'Multi-item deposit' do
     expect(version_service).to have_received(:open).twice
     expect(StageFilesJob).to have_been_enqueued.twice
   end
+
+  context 'when the files are on Globus' do
+    before do
+      allow(GlobusClient).to receive(:mkdir) do |path:, **|
+        FileUtils.mkdir_p(File.join(Settings.globus.directory, path))
+      end
+    end
+
+    after do
+      FileUtils.rm_rf(Settings.globus.directory)
+    end
+
+    it 'creates the Globus link and discovers the files and manifest there' do
+      visit root_path
+      click_on 'Deposit multiple items'
+
+      expect(page).to have_css('h1', text: 'Multi-item deposit')
+      multi_item_deposit_action = MultiItemDepositAction.last
+
+      # Globus isn't called until the Globus radio is selected.
+      expect(page).to have_no_button('Create Globus link')
+
+      choose 'Use files from Globus'
+      click_button 'Create Globus link'
+
+      expect(page).to have_link('Open Globus')
+      expect(GlobusClient).to have_received(:mkdir)
+      globus_path = multi_item_deposit_action.reload.globus_path
+      expect(globus_path).to match(%r{\A/uploads/#{user.sunetid}/\d{4}(-\d{2}){5}-\d{3}\z})
+      globus_directory = "#{Settings.globus.directory}#{globus_path}"
+
+      # The user transfers the manifest and folders to Globus.
+      FileUtils.cp_r(Dir.glob(File.join(mount_path, '*')), globus_directory)
+      File.write(File.join(globus_directory, 'manifest.csv'),
+                 "druid,folder_name\nbc123df4567,folder1\ncd234fg5678,folder2\n")
+
+      choose 'Include with your files below'
+      click_on 'Discover files and check manifest'
+
+      expect(page).to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}")
+      expect(multi_item_deposit_action.reload)
+        .to have_attributes(file_location: 'globus', mount_path: nil, files_path: globus_directory)
+      expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid, :path))
+        .to contain_exactly(['druid:bc123df4567', 'folder1'], ['druid:cd234fg5678', 'folder2'])
+
+      multi_item_deposit_action.item_deposit_actions.each do |item_deposit_action|
+        MultiItemDeposit::DiscoverFilesJob.perform_now(item_deposit_action:, effective_groups: user.groups)
+      end
+      MultiItemDeposit::DiscoverFilesFinishJob.perform_now(multi_item_deposit_action:)
+
+      expect(page).to have_css('.alert-success', text: 'No errors with manifest')
+      # The Globus directory is kept, so the user can return to it.
+      expect(page).to have_field('Use files from Globus', checked: true)
+      expect(page).to have_link('Open Globus')
+      expect(page).to have_field('Mount path', with: '', disabled: true)
+      expect(ContentFileBinary.pluck(:file_location)).to eq(%w[globus globus])
+    end
+  end
 end
