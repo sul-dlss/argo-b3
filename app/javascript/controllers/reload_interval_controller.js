@@ -29,7 +29,9 @@ export default class extends Controller {
     this.submitting = true
   }
 
-  handleSubmitEnd = () => {
-    this.submitting = false
+  // Turbo ends a successful submission before visiting its response, so a reload then would cancel that visit.
+  // The visit replaces this element, so only a failed submission needs to resume reloading.
+  handleSubmitEnd = (event) => {
+    if (!event.detail.success) this.submitting = false
   }
 }
