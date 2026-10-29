@@ -61,6 +61,8 @@ en:
       formats: "Format"
       mimetypes: "MIME type"
       dates: "Year"
+      dates_from: "Year from"
+      dates_to: "Year to"
       access_rights: "Access rights"
       mods_resource_types: "MODS resource type"
       multi_item_deposit_action_ids: "Multi-item deposit"

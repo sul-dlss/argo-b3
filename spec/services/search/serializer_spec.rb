@@ -44,6 +44,22 @@ RSpec.describe Search::Serializer do
     end
   end
 
+  context 'with a year range for dates' do
+    let(:search_form) { ResultsSearchForm.new(dates: ['2001'], dates_from: '1999', dates_to: '2001') }
+
+    it 'includes the dates and the year range' do
+      expect(serialized_query).to eq('Year: "2001" AND Year: 1999 TO 2001')
+    end
+  end
+
+  context 'with only a to year for dates' do
+    let(:search_form) { ResultsSearchForm.new(dates_to: '-10') }
+
+    it 'includes the open-ended year range' do
+      expect(serialized_query).to eq('Year: * TO -10')
+    end
+  end
+
   context 'with Multi-Item Deposits' do
     let(:search_form) { WorkflowGridSearchForm.new(query: 'maps', multi_item_deposit_action_ids: %w[12 13]) }
 

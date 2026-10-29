@@ -64,6 +64,8 @@ class SearchForm < ApplicationForm
   attribute :collection_druids, array: true, default: -> { [] }
   attribute :content_types, array: true, default: -> { [] }
   attribute :dates, array: true, default: -> { [] }
+  attribute :dates_from, :year, default: nil
+  attribute :dates_to, :year, default: nil
   attribute :earliest_accessioned_date, array: true, default: -> { [] }
   attribute :earliest_accessioned_date_from, :date, default: nil
   attribute :earliest_accessioned_date_to, :date, default: nil

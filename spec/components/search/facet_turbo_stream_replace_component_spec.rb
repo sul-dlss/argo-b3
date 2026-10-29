@@ -40,6 +40,21 @@ RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
     end
   end
 
+  context 'when the facet has a year range' do
+    let(:facet_config) { Search::Facets::DATES }
+    let(:search_form) { ResultsSearchForm.new(dates: ['2001']) }
+    let(:facet_count) { SearchResults::FacetCount.new(value: '2001', count: 10) }
+
+    it 'renders the facet with the year range inputs inside the turbo stream' do
+      results = render_inline(component)
+
+      expect(page).to have_css("turbo-stream[action='replace'][target='dates-facet']")
+      # The content inside the template is not available to Capybara for some reason.
+      expect(results.to_html).to include('<section aria-label="Year"')
+      expect(results.to_html).to include('type="number" name="dates_from"', 'type="number" name="dates_to"')
+    end
+  end
+
   context 'when an invalid facet component is specified' do
     let(:component) do
       described_class.new(facet_config:, facet_counts:, search_form:, facet_component: :invalid)

@@ -9,6 +9,7 @@
     <%= render Search::DynamicFacetComponent.new(facet_counts:, search_form:, form_field:,
                                                  date_from_form_field:, date_to_form_field:) %>
   <% else %>
-    <%= render Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:, facet_page_path_helper:, facet_search_path_helper:) %>
+    <%= render Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:, facet_page_path_helper:, facet_search_path_helper:,
+                                          year_from_form_field:, year_to_form_field:) %>
   <% end %>
 <% end %>
