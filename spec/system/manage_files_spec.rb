@@ -754,7 +754,7 @@ RSpec.describe 'Manage files' do
       click_button 'Discover files'
 
       expect(page).to have_text('Discovering files...')
-      expect(page).to have_button('Delete page_0001.png', class: 'disabled')
+      expect(page).to have_button('Delete page_0001.png', class: 'disabled', disabled: true)
 
       DiscoverFilesJob.perform_now(content: Content.find_by!(druid:), mount_path:)
 

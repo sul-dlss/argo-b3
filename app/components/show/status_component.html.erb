@@ -2,7 +2,7 @@
   <% case status %>
   <% when :deposited, :draft %>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-      <% if edit? %>
+      <% if can_edit? %>
         <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
                                                                         variant: :'outline-primary', size: :sm) %>
       <% else %>
@@ -10,12 +10,17 @@
                                                                     variant: :'outline-primary', size: :sm,
                                                                     disabled: true) %>
       <% end %>
-      <%= render manage_files_button if manage_files? %>
-      <% if status == :draft %>
-        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: I18n.t('show.status.actions.deposit'),
-                                                                    variant: :primary, size: :sm, disabled: true) %>
+      <%= render manage_files_button if object_type_with_content? %>
+      <% if draft? %>
+        <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: deposit_object_path(druid), method: :post,
+                                                                        label: I18n.t('show.status.actions.deposit'),
+                                                                        variant: :primary, size: :sm,
+                                                                        disabled: !can_deposit?) %>
       <% end %>
     </div>
+    <% if unsaved_content_changes_note? %>
+      <p class="mt-3 mb-0"><%= I18n.t('show.status.draft.unsaved_content_changes') %></p>
+    <% end %>
   <% when :staging, :assembling, :depositing %>
     <p><%= I18n.t('show.status.depositing.body') %></p>
   <% when :staging_failed %>

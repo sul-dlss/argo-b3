@@ -207,6 +207,7 @@ Rails.application.routes.draw do
       get 'structure', to: 'objects#show_structure'
       get 'constituents', to: 'objects#show_constituents'
       post 'republish', to: 'objects#republish'
+      post 'deposit', to: 'objects#deposit'
       delete 'discard_draft', to: 'objects#discard_draft'
       delete 'purge', to: 'objects#purge'
       get 'structural_csv', to: 'objects#show_structural_csv'

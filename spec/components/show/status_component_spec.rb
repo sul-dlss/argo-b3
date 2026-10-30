@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:, solr_doc: document) }
+  subject(:component) { described_class.new(object_status_presenter:, solr_doc: document, unsaved_content_changes:) }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
   let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }
@@ -19,6 +19,7 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:accessioning) { false }
   let(:assembling) { false }
   let(:content) { nil }
+  let(:unsaved_content_changes) { false }
 
   context 'when the version is open' do
     it 'renders the draft status' do
@@ -27,7 +28,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2', text: 'Draft, not deposited')
       expect(page).to have_button('Edit item', class: 'disabled')
       expect(page).to have_button('Manage files', class: 'disabled')
-      expect(page).to have_button('Deposit', class: 'disabled')
+      expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
     end
   end
 
@@ -166,6 +167,52 @@ RSpec.describe Show::StatusComponent, type: :component do
 
       expect(page).to have_button('Edit virtual object', class: 'disabled')
       expect(page).to have_no_button('Manage files')
+    end
+  end
+
+  context 'when the item is a draft and the user can edit' do
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders an enabled deposit button' do
+      render_inline(component)
+
+      expect(page).to have_css("form[action='/objects/#{druid}/deposit'][method='post'] button", text: 'Deposit')
+      expect(page).to have_button('Deposit', disabled: false)
+      expect(page).to have_no_text('Files have unsaved changes.')
+    end
+
+    context 'when the files have unsaved changes' do
+      let(:unsaved_content_changes) { true }
+
+      it 'renders a disabled deposit button with a note' do
+        render_inline(component)
+
+        expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
+        expect(page).to have_text('Files have unsaved changes. Deposit from Manage files.')
+      end
+    end
+  end
+
+  context 'when the collection is a draft and the user can edit' do
+    let(:object_type) { 'collection' }
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders an enabled deposit button' do
+      render_inline(component)
+
+      expect(page).to have_css("form[action='/objects/#{druid}/deposit'] button", text: 'Deposit')
     end
   end
 

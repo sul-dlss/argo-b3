@@ -81,7 +81,7 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
     it 'disables the delete button' do
       render_inline(component)
 
-      expect(page).to have_button('Delete image1.tif', class: 'disabled')
+      expect(page).to have_button('Delete image1.tif', class: 'disabled', disabled: true)
     end
   end
 

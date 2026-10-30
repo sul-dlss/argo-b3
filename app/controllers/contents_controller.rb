@@ -22,6 +22,8 @@ class ContentsController < ContentsApplicationController
 
     cache_cocina_hash(cocina_object:)
     @contents_item_form = build_prefilled_contents_item_form(cocina_object:)
+    # Shows the content errors when depositing from elsewhere (e.g., the status box) found them.
+    @contents_item_form.valid?(:deposit) if params[:deposit].present?
     set_edit_form(cocina_object:, content: @contents_item_form.content)
   end
 
