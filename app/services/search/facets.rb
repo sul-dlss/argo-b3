@@ -126,10 +126,10 @@ module Search
       date_to_form_field: :earliest_accessioned_date_to,
       field: Search::Fields::EARLIEST_ACCESSIONED_DATE,
       dynamic_facet: {
-        last_day: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_DAY}",
-        last_week: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_MONTH}",
-        last_year: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_YEAR}",
+        today: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::YEAR_TO_DATE}",
         all: "#{Search::Fields::EARLIEST_ACCESSIONED_DATE}:#{Search::Queries::ALL}"
       }
     )
@@ -140,10 +140,9 @@ module Search
       date_to_form_field: :embargo_release_date_to,
       field: Search::Fields::EMBARGO_RELEASE_DATE,
       dynamic_facet: {
-        last_day: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::LAST_DAY}",
-        last_week: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::LAST_MONTH}",
-        last_year: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::LAST_YEAR}",
+        next_7_days: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::NEXT_7_DAYS}",
+        next_30_days: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::NEXT_30_DAYS}",
+        next_year: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::NEXT_YEAR}",
         all: "#{Search::Fields::EMBARGO_RELEASE_DATE}:#{Search::Queries::ALL}"
       }
     )
@@ -163,8 +162,10 @@ module Search
       date_to_form_field: :last_accessioned_date_to,
       field: Search::Fields::LAST_ACCESSIONED_DATE,
       dynamic_facet: {
-        last_week: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::LAST_MONTH}",
+        today: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::YEAR_TO_DATE}",
         all: "#{Search::Fields::LAST_ACCESSIONED_DATE}:#{Search::Queries::ALL}"
       }
     )
@@ -187,8 +188,10 @@ module Search
       date_to_form_field: :last_published_date_to,
       field: Search::Fields::LAST_PUBLISHED_DATE,
       dynamic_facet: {
-        last_week: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::LAST_MONTH}"
+        today: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::LAST_PUBLISHED_DATE}:#{Search::Queries::YEAR_TO_DATE}"
       }
     )
 
@@ -313,8 +316,10 @@ module Search
       date_to_form_field: :registered_date_to,
       field: Search::Fields::REGISTERED_DATE,
       dynamic_facet: {
-        last_week: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::LAST_MONTH}",
+        today: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::YEAR_TO_DATE}",
         all: "#{Search::Fields::REGISTERED_DATE}:#{Search::Queries::ALL}"
       }
     )
@@ -325,9 +330,10 @@ module Search
       date_to_form_field: :released_to_earthworks_date_to,
       field: Search::Fields::RELEASED_TO_EARTHWORKS,
       dynamic_facet: {
-        last_week: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_MONTH}",
-        last_year: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_YEAR}",
+        today: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::YEAR_TO_DATE}",
         ever: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::ALL}",
         never: "-#{Search::Fields::RELEASED_TO_EARTHWORKS}:#{Search::Queries::ALL}"
       }
@@ -339,9 +345,10 @@ module Search
       date_to_form_field: :released_to_purl_sitemap_date_to,
       field: Search::Fields::RELEASED_TO_PURL_SITEMAP,
       dynamic_facet: {
-        last_week: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_MONTH}",
-        last_year: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_YEAR}",
+        today: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::YEAR_TO_DATE}",
         ever: "#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::ALL}",
         never: "-#{Search::Fields::RELEASED_TO_PURL_SITEMAP}:#{Search::Queries::ALL}"
       }
@@ -353,9 +360,10 @@ module Search
       date_to_form_field: :released_to_searchworks_date_to,
       field: Search::Fields::RELEASED_TO_SEARCHWORKS,
       dynamic_facet: {
-        last_week: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_WEEK}",
-        last_month: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_MONTH}",
-        last_year: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_YEAR}",
+        today: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::YEAR_TO_DATE}",
         ever: "#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::ALL}",
         never: "-#{Search::Fields::RELEASED_TO_SEARCHWORKS}:#{Search::Queries::ALL}"
       }

@@ -48,17 +48,17 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
 
   context 'when a filter for a dynamic facet' do
     let(:form_field) { :released_to_earthworks }
-    let(:values) { ['last_year'] }
+    let(:values) { ['year_to_date'] }
     let(:search_form) do
       ResultsSearchForm.new(
-        released_to_earthworks: ['last_year']
+        released_to_earthworks: ['year_to_date']
       )
     end
 
     it 'renders the current filter' do
       render_inline(component)
 
-      expect(page).to have_css('li', text: /Released to EarthWorks\s+❯\s+Last year/)
+      expect(page).to have_css('li', text: /Released to EarthWorks\s+❯\s+Year to date/)
     end
   end
 

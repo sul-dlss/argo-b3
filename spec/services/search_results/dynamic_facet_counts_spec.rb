@@ -9,13 +9,16 @@ RSpec.describe SearchResults::DynamicFacetCounts do
     {
 
       'facets' => {
-        'released_to_earthworks-last_week' => {
+        'released_to_earthworks-today' => {
           'count' => 0
         },
-        'released_to_earthworks-last_month' => {
+        'released_to_earthworks-last_7_days' => {
           'count' => 0
         },
-        'released_to_earthworks-last_year' => {
+        'released_to_earthworks-last_30_days' => {
+          'count' => 12
+        },
+        'released_to_earthworks-year_to_date' => {
           'count' => 306
         },
         'released_to_earthworks-ever' => {
@@ -39,9 +42,10 @@ RSpec.describe SearchResults::DynamicFacetCounts do
         end
 
         expect(yielded_values).to eq([
-                                       { value: 'last_week', count: 0 },
-                                       { value: 'last_month', count: 0 },
-                                       { value: 'last_year', count: 306 },
+                                       { value: 'today', count: 0 },
+                                       { value: 'last_7_days', count: 0 },
+                                       { value: 'last_30_days', count: 12 },
+                                       { value: 'year_to_date', count: 306 },
                                        { value: 'ever', count: 28_858 },
                                        { value: 'never', count: 2_417_690 }
                                      ])
@@ -64,7 +68,7 @@ RSpec.describe SearchResults::DynamicFacetCounts do
   describe '#to_ary' do
     it 'returns an array of facet counts' do
       expect(facet_counts.to_ary).to be_an(Array)
-      expect(facet_counts.to_ary.size).to eq(5)
+      expect(facet_counts.to_ary.size).to eq(6)
     end
   end
 end
