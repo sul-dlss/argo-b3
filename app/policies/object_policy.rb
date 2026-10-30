@@ -24,10 +24,6 @@ class ObjectPolicy < ApplicationPolicy
 
   private
 
-  def permission_scope
-    @permission_scope ||= Permissions::UserScope.new(groups: current_groups)
-  end
-
   def permission_target_druids
     [record_druid, *record_collection_druids, record_admin_policy_druid].compact.uniq
   end

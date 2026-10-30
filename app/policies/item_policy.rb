@@ -8,9 +8,7 @@ class ItemPolicy < ApplicationPolicy
 
   def new?
     # User belongs to a workgroup that has edit permissions on anything.
-    Permission.permission_type_edit.exists?(
-      workgroup: current_groups
-    )
+    permission_scope.edit_targets.any?
   end
 
   # The user must be able to edit the APO and every collection.
@@ -38,7 +36,7 @@ class ItemPolicy < ApplicationPolicy
   def apo_editable?
     return new? if record.apo_druid.blank?
 
-    edit_targets.include?(record.apo_druid)
+    permission_scope.edit_targets.include?(record.apo_druid)
   end
 
   def collections_editable?(collection_druids)
@@ -47,14 +45,10 @@ class ItemPolicy < ApplicationPolicy
 
   # Editable when an edit permission targets the collection or its APO.
   def collection_editable?(collection_druid)
-    return true if edit_targets.include?(collection_druid)
+    return true if permission_scope.edit_targets.include?(collection_druid)
 
     allowed_to?(:edit?, Sdr::Repository.find_solr(druid: collection_druid), with: ObjectPolicy)
   rescue Sdr::Repository::NotFoundResponse
     false
-  end
-
-  def edit_targets
-    @edit_targets ||= Permissions::UserScope.new(groups: current_groups).edit_targets
   end
 end
