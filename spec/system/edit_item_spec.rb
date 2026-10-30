@@ -188,8 +188,9 @@ RSpec.describe 'Edit an item' do
     it 'confirms, discards the version and the mutable content, and returns to the object page' do
       visit edit_item_path(druid)
 
+      # Clicking via JS, since layout shifts after load can make a positional click miss the link.
       accept_confirm(/\ADiscard this draft\?/) do
-        click_link 'Discard draft'
+        page.execute_script('arguments[0].click()', find_link('Discard draft'))
       end
 
       expect(page).to have_current_path(object_path(druid))
