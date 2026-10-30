@@ -70,10 +70,10 @@ RSpec.describe 'Workflow grid as a view of the current search', :solr do
     click_link('Workflow status view')
 
     within('table#workflow-table-accessionWF tbody tr:nth-of-type(7) td:nth-of-type(4)') do
-      click_button 'Reset'
+      click_button 'Retry'
     end
 
-    expect(page).to have_toast('Resetting errors for accessionWF - update-doi.')
+    expect(page).to have_toast('Retrying errors for accessionWF - update-doi.')
 
     expect(ResetWorkflowErrorsJob).to have_received(:perform_later) do |args|
       expect(args[:workflow_name]).to eq('accessionWF')

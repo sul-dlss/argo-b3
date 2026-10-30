@@ -26,6 +26,7 @@ class WorkflowGridController < SearchApplicationController
   end
 
   # Resets workflow errors to waiting
+  # Note that effectively a user can reset workflow steps for any object for which they have read permissions.
   def reset
     @workflow_name = params[:workflow_name]
     @process_name = params[:process_name]
