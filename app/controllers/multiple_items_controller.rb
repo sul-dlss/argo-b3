@@ -23,7 +23,7 @@ class MultipleItemsController < ApplicationController
       flash[:toast] = "#{bulk_action_config.label} submitted"
       redirect_to bulk_action_path(bulk_action)
     when 'invalid', 'failed'
-      set_apo_and_collection_options
+      set_form_options(apply_apo_defaults_on_connect: false)
       flash.now[:warning] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
       render :new, status: :unprocessable_content
     else
@@ -35,7 +35,7 @@ class MultipleItemsController < ApplicationController
     authorize! with: ItemPolicy
 
     @items_registration_form = ItemsRegistrationForm.new
-    set_apo_and_collection_options
+    set_form_options(apply_apo_defaults_on_connect: true)
   end
 
   def create
@@ -44,7 +44,7 @@ class MultipleItemsController < ApplicationController
 
     if params[:commit] == CLEAR_VALUE
       @items_registration_form.item_registrations.clear
-      set_apo_and_collection_options
+      set_form_options(apply_apo_defaults_on_connect: false)
       render :new, status: :unprocessable_content
     else
       form_validation_action = FormValidationAction.create!(user: current_user, form: @items_registration_form,
@@ -58,7 +58,11 @@ class MultipleItemsController < ApplicationController
 
   private
 
-  def set_apo_and_collection_options
+  # @param apply_apo_defaults_on_connect [Boolean] true to apply the selected APO's defaults when the form is
+  #   displayed. Only a new form does, so that a form redisplayed after validation (which may have no errors,
+  #   e.g., when validation failed) or after clearing the items keeps the user's values.
+  def set_form_options(apply_apo_defaults_on_connect:)
+    @apply_apo_defaults_on_connect = apply_apo_defaults_on_connect
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = @items_registration_form.collection_druids

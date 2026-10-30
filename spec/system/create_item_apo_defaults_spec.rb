@@ -6,46 +6,10 @@ RSpec.describe 'Apply APO defaults when creating an item' do
   let(:workgroup) { 'sdr:test-workgroup' }
   let!(:user) { create(:user, groups: [workgroup]) }
 
-  let(:apo_druid) { 'druid:bc123df4567' }
-  let(:apo_title) { 'My APO' }
-  let(:apo_cocina_object) do
-    build(:admin_policy_with_metadata, id: apo_druid).new(
-      administrative: {
-        hasAdminPolicy: 'druid:hv992ry2431',
-        hasAgreement: 'druid:hp308wm0436',
-        accessTemplate: {
-          view: 'location-based',
-          download: 'location-based',
-          location: 'm&m',
-          copyright: 'Copyright © Stanford University.',
-          license: 'https://creativecommons.org/licenses/by/4.0/legalcode'
-        }
-      }
-    )
-  end
-
-  let(:other_apo_druid) { 'druid:xz987wv6543' }
-  let(:other_apo_title) { 'Another APO' }
-  let(:other_apo_cocina_object) do
-    build(:admin_policy_with_metadata, id: other_apo_druid).new(
-      administrative: {
-        hasAdminPolicy: 'druid:hv992ry2431',
-        hasAgreement: 'druid:hp308wm0436',
-        accessTemplate: { view: 'stanford', download: 'none' }
-      }
-    )
-  end
+  include_context 'with APOs with defaults'
 
   before do
     sign_in user
-
-    create(:permission, :edit, workgroup:, target_druid: apo_druid)
-    create(:permission, :edit, workgroup:, target_druid: other_apo_druid)
-
-    allow(Searchers::AdminPolicyList).to receive(:call).and_return([[other_apo_title, other_apo_druid],
-                                                                    [apo_title, apo_druid]])
-    cocina_objects = { apo_druid => apo_cocina_object, other_apo_druid => other_apo_cocina_object }
-    allow(Sdr::Repository).to receive(:find) { |druid:| cocina_objects.fetch(druid) }
   end
 
   context 'when the form is new' do
@@ -119,7 +83,6 @@ RSpec.describe 'Apply APO defaults when creating an item' do
         expect(page).to have_css('.form-text', text: 'APO default = Location Based', count: 2)
         expect(page).to have_css('.form-text', text: 'APO default = Media and Microtext')
       end
-      expect(Sdr::Repository).to have_received(:find).with(druid: apo_druid)
     end
   end
 

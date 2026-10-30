@@ -11,23 +11,27 @@
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-    <%= render Edit::ApoComponent.new(form:, options: @apo_options) %>
+    <%# Selecting an APO applies its object defaults to the rights fields. %>
+    <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: @apply_apo_defaults_on_connect } do %>
+      <%= render Edit::ApoComponent.new(form:, options: @apo_options, apo_defaults: true) %>
 
-    <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
+      <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>
 
-    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-    <%= render Edit::AccessAndEmbargoComponent.new(form:) %>
+      <%= render Edit::AccessAndEmbargoComponent.new(form:, apo_defaults: true) %>
 
-    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-    <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset') %>
+      <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset',
+                                                                apo_defaults: true) %>
 
-    <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset') %>
+      <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
 
-    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-    <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset') %>
+      <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
+    <% end %>
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 

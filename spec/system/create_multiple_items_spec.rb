@@ -16,10 +16,18 @@ RSpec.describe 'Create multiple items' do
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
     allow(Searchers::TagSuggestions).to receive(:call).and_return([])
-    allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+    allow(Sdr::Repository).to receive_messages(source_id_exists?: false,
+                                               find: build(:admin_policy_with_metadata, id: apo_druid))
     allow(CatalogRepository).to receive(:exists?).and_return(true)
 
     sign_in user
+  end
+
+  # Visits the registration form, waiting for the selected APO's defaults to be applied so that they do not
+  # overwrite values entered afterwards.
+  def visit_new_multiple_item
+    visit new_multiple_item_path
+    expect(page).to have_css('#items_registration_copyright_help', text: 'APO default')
   end
 
   # The container for the item registrations. Item rows are scoped to it since the tag rows on the
@@ -30,7 +38,7 @@ RSpec.describe 'Create multiple items' do
 
   # Fills in the registration form with two items and submits it.
   def submit_two_items
-    visit new_multiple_item_path
+    visit_new_multiple_item
 
     expect(page).to have_css('h1', text: 'Register items')
 
@@ -90,7 +98,7 @@ RSpec.describe 'Create multiple items' do
 
   # Fills in the registration form with a valid item and an item missing a title, then submits it.
   def submit_valid_and_invalid_item
-    visit new_multiple_item_path
+    visit_new_multiple_item
 
     expect(page).to have_css('h1', text: 'Register items')
 
@@ -115,16 +123,6 @@ RSpec.describe 'Create multiple items' do
         # Leaving Title and FOLIO Instance HRID blank.
         fill_in 'Source ID', with: 'sul:second-item'
       end
-    end
-  end
-
-  # Waits for the validating page, which is shown while the form validation action is pending.
-  # @return [FormValidationAction] the form validation action for the submitted form
-  def wait_for_validating_page
-    expect(page).to have_text('Validating...')
-
-    FormValidationAction.last.tap do |form_validation_action|
-      expect(page).to have_current_path(multiple_item_path(form_validation_action))
     end
   end
 
@@ -186,7 +184,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'retains the choice to deposit with Goobi' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
       choose 'Yes'
@@ -206,7 +204,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'disables the choice to deposit with Goobi unless the content type is book or image' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
       choose 'Yes'
@@ -236,7 +234,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'sets the viewing direction' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
       select 'right-to-left', from: 'Viewing direction'
@@ -256,7 +254,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'disables the viewing direction unless the content type is book or image' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       select 'map', from: 'Content type'
       expect(page).to have_select('Viewing direction', disabled: true)
@@ -302,7 +300,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'enqueues a register form bulk action with the collections' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
 
@@ -336,7 +334,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'retains the collections when invalid' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
 
@@ -363,7 +361,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when no license or rights statements are provided' do
     it 'enqueues a register form bulk action without a license or rights statements' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       select 'image', from: 'Content type'
       select apo_title, from: 'APO'
@@ -394,7 +392,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when invalid' do
     it 'shows a validation error and does not enqueue a bulk action' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       select apo_title, from: 'APO'
       choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
@@ -416,7 +414,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when tags are provided' do
     it 'enqueues a register form bulk action with the tags' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_css('h1', text: 'Register items')
 
@@ -441,7 +439,7 @@ RSpec.describe 'Create multiple items' do
     end
 
     it 'enqueues a register form bulk action with tags entered all at once' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_css('h1', text: 'Register items')
 
@@ -488,7 +486,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when an other tag is malformed' do
     it 'shows a validation error, retains the tag, and does not enqueue a bulk action' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_css('h1', text: 'Register items')
 
@@ -563,7 +561,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when there are no item errors' do
     it 'does not show the clear all items button' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_button('Register items')
       expect(page).to have_no_button('Clear all items and enter again')
@@ -572,7 +570,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when entering a tab-delimited list of items' do
     it 'enqueues a register form bulk action with an item per row' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_css('h1', text: 'Register items')
 
@@ -607,7 +605,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when the tab-delimited list is blank' do
     it 'shows the presence error for the text area and does not enqueue a bulk action' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       fill_in_registration_settings
 
@@ -630,7 +628,7 @@ RSpec.describe 'Create multiple items' do
 
   context 'when uploading a CSV of items' do
     it 'enqueues a register form bulk action with an item per row' do
-      visit new_multiple_item_path
+      visit_new_multiple_item
 
       expect(page).to have_css('h1', text: 'Register items')
 
@@ -662,7 +660,7 @@ RSpec.describe 'Create multiple items' do
 
     context 'when the CSV has no rows' do
       it 'shows the presence error for the file field and does not enqueue a bulk action' do
-        visit new_multiple_item_path
+        visit_new_multiple_item
 
         fill_in_registration_settings
 
@@ -685,7 +683,7 @@ RSpec.describe 'Create multiple items' do
 
     context 'when the CSV is missing the source_id column' do
       it 'shows a validation error for the file field and does not enqueue a bulk action' do
-        visit new_multiple_item_path
+        visit_new_multiple_item
 
         fill_in_registration_settings
 
