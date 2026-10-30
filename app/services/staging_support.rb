@@ -16,6 +16,13 @@ class StagingSupport
     File.join(druid_tree_folder, 'content')
   end
 
+  # Creates the staging content directory for the druid, unless some staging location already has the druid's folder.
+  def self.ensure_staging_folder(druid:)
+    return if locations.any? { |staging_location| File.directory?(DruidTools::Druid.new(druid, staging_location).path) }
+
+    FileUtils.mkdir_p(staging_content_path(druid:))
+  end
+
   # Deletes the staging content directory for the druid in every staging location.
   def self.delete_staged_files(druid:)
     locations.each { |staging_location| FileUtils.rm_rf(staging_content_path(druid:, staging_location:)) }

@@ -238,29 +238,81 @@ RSpec.describe Sdr::Repository do
       instance_double(Dor::Services::Client::Object, version: version_client, workflow: workflow_client)
     end
     let(:type) { Cocina::Models::ObjectType.image }
-    let(:cocina_object) { build(:dro, id: druid, type:, version: 2) }
+    let(:file_sets) do
+      [
+        {
+          type: Cocina::Models::FileSetType.image,
+          externalIdentifier: 'https://cocina.sul.stanford.edu/fileSet/e43590ae-abf9-4a5c-88f2-a8627969dc23',
+          label: 'Image 1',
+          version: 1,
+          structural: {
+            contains: [
+              {
+                type: Cocina::Models::ObjectType.file,
+                externalIdentifier: 'https://cocina.sul.stanford.edu/file/de24d694-2fe8-41a5-9113-ae6adf4506fd',
+                label: 'Image 1 file',
+                filename: 'image1.tif',
+                version: 1,
+                hasMessageDigests: [],
+                access: { view: 'world', download: 'world' },
+                administrative: { publish: true, sdrPreserve: true, shelve: true }
+              }
+            ]
+          }
+        }
+      ]
+    end
+    let(:cocina_object) do
+      build(:dro, id: druid, type:, version: 2)
+        .new(access: { view: 'world', download: 'world' }, structural: { contains: file_sets })
+    end
     let(:staged_files) { true }
 
     before do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
       allow(StagingSupport).to receive(:staged_files?).with(druid:).and_return(staged_files)
+      allow(StagingSupport).to receive(:ensure_staging_folder)
     end
 
-    context 'when there are files in staging' do
-      it 'creates an assemblyWF' do
+    context 'when the object has files' do
+      it 'ensures the staging folder and creates an assemblyWF' do
         described_class.accession(cocina_object:, user_name:)
 
+        expect(StagingSupport).to have_received(:ensure_staging_folder).with(druid:)
         expect(object_client).to have_received(:workflow).with('assemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
         expect(version_client).not_to have_received(:close)
       end
     end
 
-    context 'when there are files in staging and a context is given' do
+    context 'when the object has files but none are staged' do
+      let(:staged_files) { false }
+
+      it 'creates an assemblyWF' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(object_client).to have_received(:workflow).with('assemblyWF')
+        expect(version_client).not_to have_received(:close)
+      end
+    end
+
+    context 'when the object has files and a context is given' do
       it 'creates an assemblyWF with the context' do
         described_class.accession(cocina_object:, user_name:, context: { runOCR: true })
 
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: { runOCR: true })
+      end
+    end
+
+    context 'when the object has no files' do
+      let(:file_sets) { [] }
+
+      it 'closes the version to initiate accessioning' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(object_client).not_to have_received(:workflow)
+        expect(StagingSupport).not_to have_received(:ensure_staging_folder)
       end
     end
 
@@ -275,7 +327,8 @@ RSpec.describe Sdr::Repository do
       end
     end
 
-    context 'when there are no files in staging' do
+    context 'when the object is geo and there are no files in staging' do
+      let(:type) { Cocina::Models::ObjectType.geo }
       let(:staged_files) { false }
 
       it 'closes the version to initiate accessioning' do

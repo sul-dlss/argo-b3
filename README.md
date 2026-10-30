@@ -267,7 +267,7 @@ Since a `Content` is only ever used for the cocina object's current lock, `Conte
 
 A staging failure is recorded on the `Content` (rather than raised), so the object page shows it until it is superseded. Staging is retried by staging the same mutable `Content` again, which resumes where the failure left off, since files already copied to staging are skipped. Starting staging for any `Content` of an object clears earlier failures for that object's other `Content`s.
 
-Staging copies files to the deposit staging location for single-item deposit, or the assembly location for Multi-Item Deposit. Once an object has staged files, later staging continues in that location (so that its files are not split, since assembly reads only the first location with the object's files), and accessioning looks in both.
+Staging copies files to the deposit staging location for single-item deposit, or the assembly location for Multi-Item Deposit. Once an object has staged files, later staging continues in that location (so that its files are not split, since assembly reads only the first location with the object's files), and accessioning looks in both. An object deposited without staged files still gets an (empty) staging folder, since assembly requires one.
 
 ## Discovery
 
