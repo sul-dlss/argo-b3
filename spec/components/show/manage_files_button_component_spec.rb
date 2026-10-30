@@ -14,17 +14,17 @@ RSpec.describe Show::ManageFilesButtonComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_no_css('a.disabled', text: 'Manage files')
     end
   end
 
   context 'when not enabled' do
     let(:enabled) { false }
 
-    it 'renders a disabled button' do
+    it 'renders a disabled link' do
       render_inline(component)
 
-      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
       expect(page).to have_no_link('Manage files')
     end
   end
