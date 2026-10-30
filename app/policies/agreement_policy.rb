@@ -7,6 +7,6 @@ class AgreementPolicy < ApplicationPolicy
   # Agreements are governed by the ur APO (Internal System Objects), so only users who can edit
   # that APO may register them.
   def create?
-    Permissions::UserScope.new(groups: current_groups).edit_targets.include?(Settings.ur_apo_druid)
+    permission_scope.edit_targets.include?(Settings.ur_apo_druid)
   end
 end

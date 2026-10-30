@@ -18,6 +18,11 @@ class ApplicationPolicy < ActionPolicy::Base
 
   private
 
+  # @return [Permissions::UserScope]
+  def permission_scope
+    @permission_scope ||= Permissions::UserScope.new(groups: current_groups)
+  end
+
   def admin_workgroups
     # This is the simplest possible form of caching on the assumption
     # that admin groups will rarely (if ever) be changing.

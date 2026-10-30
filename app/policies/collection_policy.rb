@@ -18,11 +18,4 @@ class CollectionPolicy < ApplicationPolicy
 
     permission_scope.edit_targets.include?(record)
   end
-
-  private
-
-  # @return [Permissions::UserScope]
-  def permission_scope
-    @permission_scope ||= Permissions::UserScope.new(groups: current_groups)
-  end
 end
