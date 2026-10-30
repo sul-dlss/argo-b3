@@ -1,5 +1,1 @@
-<% if enabled? %>
-  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: path, label:, variant: :'outline-primary', size: :sm) %>
-<% else %>
-  <%= render SdrViewComponents::Elements::ButtonComponent.new(label:, variant: :'outline-primary', size: :sm, disabled: true) %>
-<% end %>
+<%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: path, label:, variant: :'outline-primary', size: :sm, disabled: !enabled?) %>

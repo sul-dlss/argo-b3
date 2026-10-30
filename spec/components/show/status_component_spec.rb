@@ -26,8 +26,8 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Draft, not deposited')
-      expect(page).to have_button('Edit item', class: 'disabled')
-      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
       expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
     end
   end
@@ -53,7 +53,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_no_css('a.disabled', text: 'Manage files')
     end
   end
 
@@ -64,10 +64,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(user)
     end
 
-    it 'renders a disabled edit item button' do
+    it 'renders a disabled edit item link' do
       render_inline(component)
 
-      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_no_link('Edit item')
     end
   end
@@ -80,10 +80,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(create(:user))
     end
 
-    it 'renders a disabled edit item button' do
+    it 'renders a disabled edit item link' do
       render_inline(component)
 
-      expect(page).to have_button('Edit item', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_no_link('Edit item')
     end
   end
@@ -99,10 +99,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(user)
     end
 
-    it 'renders a disabled edit collection button' do
+    it 'renders a disabled edit collection link' do
       render_inline(component)
 
-      expect(page).to have_button('Edit collection', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit collection')
       expect(page).to have_no_link('Edit collection')
     end
   end
@@ -110,11 +110,11 @@ RSpec.describe Show::StatusComponent, type: :component do
   context 'when the object is an agreement' do
     let(:object_type) { 'agreement' }
 
-    it 'renders disabled edit agreement and manage files buttons' do
+    it 'renders disabled edit agreement and manage files links' do
       render_inline(component)
 
-      expect(page).to have_button('Edit agreement', class: 'disabled')
-      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit agreement')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
     end
   end
 
@@ -129,10 +129,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(user)
     end
 
-    it 'renders a disabled edit agreement button and an enabled manage files link' do
+    it 'renders a disabled edit agreement link and an enabled manage files link' do
       render_inline(component)
 
-      expect(page).to have_button('Edit agreement', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit agreement')
       expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
     end
   end
@@ -140,33 +140,33 @@ RSpec.describe Show::StatusComponent, type: :component do
   context 'when the object is a collection' do
     let(:object_type) { 'collection' }
 
-    it 'renders the edit collection button without manage files' do
+    it 'renders the edit collection link without manage files' do
       render_inline(component)
 
-      expect(page).to have_button('Edit collection', class: 'disabled')
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit collection')
+      expect(page).to have_no_css('a', text: 'Manage files')
     end
   end
 
   context 'when the object is an APO' do
     let(:object_type) { 'APO' }
 
-    it 'renders the edit APO button without manage files' do
+    it 'renders the edit APO link without manage files' do
       render_inline(component)
 
-      expect(page).to have_button('Edit APO', class: 'disabled')
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit APO')
+      expect(page).to have_no_css('a', text: 'Manage files')
     end
   end
 
   context 'when the object is a virtual object' do
     let(:object_type) { 'virtual object' }
 
-    it 'renders the edit virtual object button without manage files' do
+    it 'renders the edit virtual object link without manage files' do
       render_inline(component)
 
-      expect(page).to have_button('Edit virtual object', class: 'disabled')
-      expect(page).to have_no_button('Manage files')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit virtual object')
+      expect(page).to have_no_css('a', text: 'Manage files')
     end
   end
 
@@ -224,8 +224,8 @@ RSpec.describe Show::StatusComponent, type: :component do
 
       expect(page).to have_css('h2', text: 'Deposited')
       expect(page).to have_css('h2 i.bi-check-circle-fill')
-      expect(page).to have_button('Edit item', class: 'disabled')
-      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
       expect(page).to have_no_button('Deposit')
     end
   end
@@ -298,7 +298,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2 i.bi-exclamation-triangle-fill')
       expect(page).to have_text("Files could not be staged. Contact SDR support at #{Settings.support_email}")
       expect(page).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
-      expect(page).to have_button('Manage files', class: 'disabled')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
     end
 
     context 'when the item version is editable and the user can edit' do
@@ -314,7 +314,7 @@ RSpec.describe Show::StatusComponent, type: :component do
         render_inline(component)
 
         expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
-        expect(page).to have_no_button('Manage files')
+        expect(page).to have_no_css('a.disabled', text: 'Manage files')
       end
     end
   end

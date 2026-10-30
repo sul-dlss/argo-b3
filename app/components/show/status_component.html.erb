@@ -2,14 +2,9 @@
   <% case status %>
   <% when :deposited, :draft %>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-      <% if can_edit? %>
-        <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
-                                                                        variant: :'outline-primary', size: :sm) %>
-      <% else %>
-        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: edit_label,
-                                                                    variant: :'outline-primary', size: :sm,
-                                                                    disabled: true) %>
-      <% end %>
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
+                                                                      variant: :'outline-primary', size: :sm,
+                                                                      disabled: !can_edit?) %>
       <%= render manage_files_button if object_type_with_content? %>
       <% if draft? %>
         <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: deposit_object_path(druid), method: :post,
