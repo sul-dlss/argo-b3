@@ -2,6 +2,9 @@
 
 # Base class for application policies
 class ApplicationPolicy < ActionPolicy::Base
+  # Callers checking many records (e.g., jobs) may share one scope across policies.
+  authorize :permission_scope, optional: true
+
   pre_check :allow_admins
 
   def allow_admins

@@ -40,7 +40,7 @@ module BulkActions
         request_cocina_object = convert_result.value![:request_cocina_object]
         dro = CocinaModels::Dro.new(apo_druid: request_cocina_object.administrative.hasAdminPolicy,
                                     collection_druids: Array(request_cocina_object.structural&.isMemberOf))
-        allowed_to?(:create?, dro, with: ItemPolicy, context: { user: })
+        allowed_to?(:create?, dro, with: ItemPolicy)
       end
 
       def register

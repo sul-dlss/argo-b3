@@ -9,6 +9,9 @@ module MultiItemDeposit
 
     queue_as :real_time
 
+    authorize :user
+    authorize :permission_scope
+
     # @param multi_item_deposit_action [MultiItemDepositAction]
     # @param effective_groups [Array<String>] the requesting user's authorization workgroups
     def perform(multi_item_deposit_action:, effective_groups:)
@@ -121,8 +124,13 @@ module MultiItemDeposit
 
     def update_allowed?(cocina_object)
       Current.set(effective_groups:) do
-        allowed_to?(:update?, cocina_object, with: ObjectPolicy, context: { user: })
+        allowed_to?(:update?, cocina_object, with: ObjectPolicy)
       end
+    end
+
+    # Shared by every Item Deposit's check, so permissions are looked up once.
+    def permission_scope
+      @permission_scope ||= Permissions::UserScope.new(groups: effective_groups)
     end
 
     def item_deposit_actions
