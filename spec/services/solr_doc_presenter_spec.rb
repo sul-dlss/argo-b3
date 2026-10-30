@@ -154,6 +154,32 @@ RSpec.describe SolrDocPresenter do
     end
   end
 
+  describe '#object_type_with_content?' do
+    context 'when the object type is item' do
+      let(:object_type) { 'item' }
+
+      it 'returns true' do
+        expect(presenter.object_type_with_content?).to be true
+      end
+    end
+
+    context 'when the object type is agreement' do
+      let(:object_type) { 'agreement' }
+
+      it 'returns true' do
+        expect(presenter.object_type_with_content?).to be true
+      end
+    end
+
+    context 'when the object type is virtual object' do
+      let(:object_type) { 'virtual object' }
+
+      it 'returns false' do
+        expect(presenter.object_type_with_content?).to be false
+      end
+    end
+  end
+
   describe '#releasable_type?' do
     context 'when the object type is item' do
       let(:object_type) { 'item' }

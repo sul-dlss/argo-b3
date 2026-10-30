@@ -407,6 +407,7 @@ en:
         content:
           validations:
             invalid: "The files are not valid for the content type. \"Save draft and edit files\" to fix them before depositing."
+            unsaved: "Files have unsaved changes. Save or deposit them from Manage files."
         content_type:
           label: "Content type"
         copyright:

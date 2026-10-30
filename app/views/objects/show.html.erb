@@ -41,7 +41,7 @@
         <% if @solr_doc.object_type?('item', 'virtual object', 'collection') %>
           <% component.with_button(link: descriptive_csv_object_path(druid: @druid_token), label: 'Download description', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
-        <% if @solr_doc.object_type?('item', 'agreement') %>
+        <% if @solr_doc.object_type_with_content? %>
           <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
         <%# Only show the republish button for object types that can be republished, but disable if never published or user doesn't have a permission to edit %>
@@ -96,7 +96,7 @@
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.publishable_type? %>
         <% if @solr_doc.virtual_object? %>
           <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') %>
-        <% elsif @solr_doc.object_type?('item', 'agreement') %>
+        <% elsif @solr_doc.object_type_with_content? %>
           <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
           <% component.with_tab(id: 'structure-tab', pane_id: 'structure-pane', label: 'Structure') %>
         <% end %>
@@ -126,7 +126,7 @@
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
-        <% elsif @solr_doc.object_type?('item', 'agreement') %>
+        <% elsif @solr_doc.object_type_with_content? %>
           <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
             <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>

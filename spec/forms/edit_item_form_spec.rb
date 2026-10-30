@@ -123,6 +123,26 @@ RSpec.describe EditItemForm do
     end
   end
 
+  describe 'unsaved changes validation' do
+    before do
+      content = create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock)
+      # A file that has not been staged is an unsaved change.
+      create(:content_file_binary, content:, file_location: 'attached')
+      edit_item_form.content = content
+      edit_item_form.version_description = 'Redeposit'
+    end
+
+    it 'is not valid when depositing' do
+      expect(edit_item_form.valid?(:deposit)).to be false
+      expect(edit_item_form.errors[:content])
+        .to eq(['Files have unsaved changes. Save or deposit them from Manage files.'])
+    end
+
+    it 'is valid when not depositing' do
+      expect(edit_item_form).to be_valid
+    end
+  end
+
   describe 'description_csv_file' do
     before { edit_item_form.update(version_description: 'Updated the description', description_csv_file:) }
 
