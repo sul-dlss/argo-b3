@@ -310,9 +310,7 @@ RSpec.describe 'Show item' do
 
     # Cocina model tab
     click_button 'Cocina JSON'
-    # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
-    expect(page).to have_css('andypf-json-viewer', text: druid)
-    expect(page).to have_css('andypf-json-viewer', text: original_title)
+    expect_cocina_json_title(original_title)
 
     # Workflows tab
     click_button 'Workflows'
@@ -496,7 +494,7 @@ RSpec.describe 'Show item' do
     end
 
     click_button 'Cocina JSON'
-    expect(page).to have_css('andypf-json-viewer', text: updated_title)
+    expect_cocina_json_title(updated_title)
 
     click_button 'Workflows'
     expect(page).to have_css('.accordion-item',
