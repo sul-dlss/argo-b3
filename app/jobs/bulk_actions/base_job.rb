@@ -6,6 +6,9 @@ module BulkActions
     include ActionPolicy::Behaviour
     include ApplicationHelper
 
+    authorize :user
+    authorize :permission_scope
+
     attr_reader :bulk_action, :druids
 
     # @param [BulkAction] bulk_action BulkAction object
@@ -47,6 +50,12 @@ module BulkActions
 
     def user_id
       user.sunetid
+    end
+
+    # Shared by every policy check in the run, so permissions are looked up once per run.
+    # @return [Permissions::UserScope]
+    def permission_scope
+      @permission_scope ||= Permissions::UserScope.new(groups: user.groups)
     end
 
     def log(message)

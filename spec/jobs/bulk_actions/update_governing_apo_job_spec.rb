@@ -108,7 +108,10 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
 
     let(:workgroup) { 'sdr:test-workgroup' }
     let(:job_user) { create(:user, groups: [workgroup]) }
-    let(:job) { instance_double(described_class, user: job_user, new_apo_id:) }
+    let(:job) do
+      instance_double(described_class, user: job_user, new_apo_id:,
+                                       permission_scope: Permissions::UserScope.new(groups: job_user.groups))
+    end
 
     before do
       allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)

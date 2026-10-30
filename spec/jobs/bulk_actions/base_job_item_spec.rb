@@ -226,7 +226,7 @@ RSpec.describe BulkActions::BaseJobItem do
       it 'returns true' do
         expect(bulk_action_item.check_update_ability?).to be true
         expect(bulk_action_item).to have_received(:allowed_to?)
-          .with(:update?, cocina_object, with: ObjectPolicy, context: { user: })
+          .with(:update?, cocina_object, with: ObjectPolicy)
       end
     end
 
@@ -258,7 +258,7 @@ RSpec.describe BulkActions::BaseJobItem do
       it 'returns true' do
         expect(bulk_action_item.check_read_ability?).to be true
         expect(bulk_action_item).to have_received(:allowed_to?)
-          .with(:show?, cocina_object, with: ObjectPolicy, context: { user: })
+          .with(:show?, cocina_object, with: ObjectPolicy)
       end
     end
 
