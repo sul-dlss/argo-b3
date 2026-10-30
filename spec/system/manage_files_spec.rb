@@ -55,17 +55,17 @@ RSpec.describe 'Manage files' do
 
     click_on 'Item details'
 
-    expect(page).to have_select('Viewing direction', disabled: true)
+    expect(page).to have_select('Viewing direction', disabled: true, visible: :hidden)
     # The default content type cannot be OCRed.
-    expect(page).to have_field('Yes', type: 'radio', disabled: true)
-    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
+    expect(page).to have_field('Yes', type: 'radio', disabled: true, visible: :hidden)
+    expect(page).to have_no_css('label', text: 'Search for a language')
 
     select 'book', from: 'Content type'
     select 'right-to-left', from: 'Viewing direction'
 
     expect(page).to have_field('Yes', type: 'radio', disabled: false)
-    # The languages remain disabled until OCR is requested.
-    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
+    # The languages remain hidden until OCR is requested.
+    expect(page).to have_no_css('label', text: 'Search for a language')
 
     choose 'Yes'
 
@@ -166,7 +166,7 @@ RSpec.describe 'Manage files' do
     expect(page).to have_no_text(warning)
   end
 
-  it 'disables the OCR options again when the content type can no longer be OCRed' do
+  it 'hides the OCR options again when the content type can no longer be OCRed' do
     visit "/contents/#{druid}/edit"
 
     click_on 'Item details'
@@ -177,8 +177,9 @@ RSpec.describe 'Manage files' do
 
     select 'map', from: 'Content type'
 
-    expect(page).to have_field('Yes', type: 'radio', disabled: true)
-    expect(find_multi_select('Search for a language')[:class]).to include('disabled')
+    expect(page).to have_field('Yes', type: 'radio', disabled: true, visible: :hidden)
+    expect(page).to have_no_css('label', text: 'Search for a language')
+    expect(find('select[name$="[ocr_languages][]"]', visible: :all)).to be_disabled
   end
 
   context 'when no files have been uploaded yet' do
@@ -371,13 +372,13 @@ RSpec.describe 'Manage files' do
 
       click_on 'Add files'
       choose 'Use files from mount'
-      expect(page).to have_css('#file-dropzone.opacity-50')
+      expect(page).to have_css('#file-dropzone.opacity-50', visible: :hidden)
 
       dispatch_structure_event('submit-start')
       dispatch_structure_event('submit-end')
 
       expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
-      expect(page).to have_css('#file-dropzone.opacity-50')
+      expect(page).to have_css('#file-dropzone.opacity-50', visible: :hidden)
     end
   end
 
@@ -687,15 +688,14 @@ RSpec.describe 'Manage files' do
     end
   end
 
-  it 'disables the dropzone when using files from a mount' do
+  it 'hides the dropzone when using files from a mount' do
     visit "/contents/#{druid}/edit"
 
     expect(page).to have_css('#file-dropzone.dz-clickable:not(.opacity-50)')
 
     choose 'Use files from mount'
 
-    expect(page).to have_css('#file-dropzone.opacity-50:not(.dz-clickable)')
-    expect(page).to have_button('Select files to upload', disabled: true)
+    expect(page).to have_css('#file-dropzone.opacity-50:not(.dz-clickable)', visible: :hidden)
 
     choose 'Upload files from computer'
 
@@ -793,10 +793,10 @@ RSpec.describe 'Manage files' do
       expect(GlobusClient).to have_received(:mkdir)
 
       choose 'Use files from mount'
-      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Open Globus')
+      expect(page).to have_no_link('Open Globus')
 
       choose 'Select files from Globus'
-      expect(page).to have_no_css('a.disabled', text: 'Open Globus')
+      expect(page).to have_link('Open Globus')
 
       FileUtils.cp(file_fixture('dropzone_upload.txt'), File.join(globus_path, 'dropzone_upload.txt'))
       within('turbo-frame', id: /globus/) { click_button 'Discover files' }

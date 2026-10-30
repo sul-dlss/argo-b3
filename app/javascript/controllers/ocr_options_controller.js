@@ -1,9 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
+import { setFieldsAvailable } from 'controllers/dependent_fields'
 
-// Enables the OCR section only for content types that can be OCRed, and the language selector only
-// when OCR has been requested. Disabling rather than hiding keeps the fields out of the submitted
-// params without changing which of them are selected, so previous selections are shown again when
-// the fields are re-enabled; the form clears the values that were not submitted.
+// Shows and enables the OCR section only for content types that can be OCRed, and the language selector
+// only when OCR has been requested. Disabling keeps the fields out of the submitted params without
+// changing which of them are selected, so previous selections are shown again when the fields are
+// re-enabled; the form clears the values that were not submitted.
 // Mark the content type select with (without one, OCR is allowed):
 //   <select data-ocr-options-target="contentType" data-action="ocr-options#toggle"></select>
 // Mark the section holding the Run OCR? radios, which must be a fieldset so that disabling it
@@ -26,12 +27,15 @@ export default class extends Controller {
   toggle () {
     const contentType = this.hasContentTypeTarget ? this.contentTypeTarget.value : null
     const ocrAllowed = !this.hasContentTypeTarget || this.allowedContentTypesValue.includes(contentType)
-    this.sectionTarget.disabled = !ocrAllowed
+    setFieldsAvailable(this.sectionTarget, ocrAllowed)
 
     const ocrRequested = this.performOcrTargets.some((radio) => radio.checked && radio.value === 'true')
     // The multi-select controller owns the tom-select widget, so ask it to disable itself rather
     // than relying on the disabled fieldset, which leaves the widget interactive.
-    this.languagesTarget.dataset.multiSelectDisabledValue = String(!(ocrAllowed && ocrRequested))
+    const languagesEnabled = ocrAllowed && ocrRequested
+    this.languagesTarget.dataset.multiSelectDisabledValue = String(!languagesEnabled)
+    // Hidden as well as disabled, since a disabled selector was not obviously unavailable.
+    this.languagesTarget.classList.toggle('d-none', !languagesEnabled)
 
     this.warningTargets.forEach((warning) => {
       const warnFor = JSON.parse(warning.dataset.ocrOptionsWarnContentTypes)

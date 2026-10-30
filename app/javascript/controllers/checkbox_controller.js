@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
+import { choiceContent } from 'controllers/dependent_fields'
 
-// Disable/enable associated inputs based on checkbox selection
+// Shows and enables the content of a checkbox (e.g., its inputs) only while it is checked.
 export default class extends Controller {
   connect () {
     this.toggle()
@@ -14,5 +15,7 @@ export default class extends Controller {
         input.disabled = !this.element.checked
       }
     })
+    // Hidden as well as disabled, since disabled inputs alone were not obviously unavailable.
+    choiceContent(this.element).forEach((element) => element.classList.toggle('d-none', !this.element.checked))
   }
 }

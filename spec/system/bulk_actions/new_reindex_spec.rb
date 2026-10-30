@@ -75,6 +75,15 @@ RSpec.describe 'Create a new reindex bulk action' do
       expect(Searchers::DruidList).to have_received(:call).with(matching_form(search_form))
       expect(BulkActions::ReindexJob).to have_been_enqueued.with(druids:, bulk_action:)
     end
+
+    it 'shows the last search while entering a druid list' do
+      visit new_bulk_actions_reindex_path
+
+      choose 'From druid list'
+
+      expect(page).to have_text('items for: "test"')
+      expect(page).to have_field('Enter druid list', type: 'textarea')
+    end
   end
 
   context 'when no druids are provided' do

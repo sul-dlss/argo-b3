@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { setFieldsAvailable } from 'controllers/dependent_fields'
 
 // Download options permitted for each view option.
 const DOWNLOAD_OPTIONS_BY_VIEW = {
@@ -11,7 +12,7 @@ const DOWNLOAD_OPTIONS_BY_VIEW = {
 
 // This controller is used to toggle access rights options on the manage rights bulk action form.
 export default class extends Controller {
-  static targets = ['view', 'download', 'location']
+  static targets = ['view', 'download', 'location', 'locationField']
 
   connect () {
     this.toggle()
@@ -20,8 +21,8 @@ export default class extends Controller {
   toggle () {
     this.enableOptions(this.downloadTarget, DOWNLOAD_OPTIONS_BY_VIEW[this.viewTarget.value] ?? [])
     // Read the download value after enableOptions, which may have changed it.
-    this.locationTarget.disabled = this.viewTarget.value !== 'location-based' &&
-      this.downloadTarget.value !== 'location-based'
+    setFieldsAvailable(this.locationFieldTarget, this.viewTarget.value === 'location-based' ||
+      this.downloadTarget.value === 'location-based')
   }
 
   enableOptions (select, enabledValues) {

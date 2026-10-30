@@ -203,15 +203,15 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
-    it 'disables the choice to deposit with Goobi unless the content type is book or image' do
+    it 'hides the choice to deposit with Goobi unless the content type is book or image' do
       visit_new_multiple_item
 
       fill_in_registration_settings
       choose 'Yes'
 
       select 'map', from: 'Content type'
-      expect(page).to have_field('Yes', type: 'radio', checked: true, disabled: true)
-      expect(page).to have_field('No', type: 'radio', disabled: true)
+      expect(page).to have_field('Yes', type: 'radio', checked: true, disabled: true, visible: :hidden)
+      expect(page).to have_field('No', type: 'radio', disabled: true, visible: :hidden)
 
       select 'book', from: 'Content type'
       expect(page).to have_field('Yes', type: 'radio', checked: true, disabled: false)
@@ -253,11 +253,11 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
-    it 'disables the viewing direction unless the content type is book or image' do
+    it 'hides the viewing direction unless the content type is book or image' do
       visit_new_multiple_item
 
       select 'map', from: 'Content type'
-      expect(page).to have_select('Viewing direction', disabled: true)
+      expect(page).to have_select('Viewing direction', disabled: true, visible: :hidden)
 
       select 'book', from: 'Content type'
       expect(page).to have_select('Viewing direction', disabled: false)

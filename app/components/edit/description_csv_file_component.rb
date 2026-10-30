@@ -6,15 +6,15 @@ module Edit
   class DescriptionCsvFileComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder]
     # @param druid_token [String] the token for the druid whose description spreadsheet is downloaded
-    # @param input_data [Hash] data attributes for the file input
-    def initialize(form:, druid_token:, input_data: {})
+    # @param container_data [Hash] data attributes for the field's container
+    def initialize(form:, druid_token:, container_data: {})
       @form = form
       @druid_token = druid_token
-      @input_data = input_data
+      @container_data = container_data
       super()
     end
 
-    attr_reader :form, :druid_token, :input_data
+    attr_reader :form, :druid_token, :container_data
 
     def download_link
       link_to(descriptive_csv_object_path(druid: druid_token), download: true, data: { turbo: false }) do

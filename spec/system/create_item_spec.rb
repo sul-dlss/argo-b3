@@ -724,7 +724,7 @@ RSpec.describe 'Create an item' do
       let(:title) { nil }
 
       it 'does not allow retrieving the title' do
-        expect(page).to have_button('Preview FOLIO record', disabled: true)
+        expect(page).to have_no_button('Preview FOLIO record')
       end
     end
 

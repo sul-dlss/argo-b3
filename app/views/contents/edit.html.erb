@@ -42,8 +42,8 @@
                                                                                      action: 'content-type-dependent#toggle ocr-options#toggle structure-content-type#update' }) %>
 
             <%= render Edit::ViewingDirectionComponent.new(form: item_form, container_classes: 'my-fieldset', label_classes: 'fw-bold',
-                                                           input_data: { content_type_dependent_target: 'dependent',
-                                                                         content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
+                                                           container_data: { content_type_dependent_target: 'dependent',
+                                                                             content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
             <%= render Edit::OcrComponent.new(form: item_form) %>
           <% end %>
         <% end %>
@@ -109,12 +109,9 @@
                 ) do |component| %>
               <% component.with_additional_container_content do %>
                 <div class="my-fieldset">
-                  <%# Loaded when the radio is selected (see radio controller), since it calls the Globus API.
-                      The spinner is hidden until then. %>
+                  <%# Loaded when the radio is selected (see radio controller), since it calls the Globus API. %>
                   <%= turbo_frame_tag @content, 'globus', data: { radio_src: new_content_globus_path(@content_token) } do %>
-                    <div class="radio-hide">
-                      <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
-                    </div>
+                    <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
                   <% end %>
                 </div>
               <% end %>

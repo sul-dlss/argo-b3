@@ -131,11 +131,11 @@ RSpec.describe 'Multi-item deposit' do
     expect(page).to have_no_field('Yes, use structural metadata CSV found in file location')
     expect(page).to have_no_css('legend', text: 'Run OCR?')
     expect(page).to have_field('No', checked: true)
-    expect(page).to have_field('Upload structural metadata CSV', disabled: true)
+    expect(page).to have_field('Upload structural metadata CSV', disabled: true, visible: :hidden)
     expect(page).to have_button('Next', disabled: true)
 
     choose 'Yes, upload a structural metadata CSV'
-    expect(page).to have_field('Default by file type', disabled: true)
+    expect(page).to have_field('Default by file type', disabled: true, visible: :hidden)
     attach_file 'Upload structural metadata CSV', write_manifest('structural.csv', "druid,sequence\nbc123df4567,1\n")
     click_on 'Check files'
 
@@ -279,7 +279,7 @@ RSpec.describe 'Multi-item deposit' do
       # The Globus directory is kept, so the user can return to it.
       expect(page).to have_field('Use files from Globus', checked: true)
       expect(page).to have_link('Open Globus')
-      expect(page).to have_field('Mount path', with: '', disabled: true)
+      expect(page).to have_field('Mount path', with: '', disabled: true, visible: :hidden)
       expect(ContentFileBinary.pluck(:file_location)).to eq(%w[globus globus])
     end
   end
