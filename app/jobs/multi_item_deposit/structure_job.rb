@@ -4,6 +4,8 @@ module MultiItemDeposit
   # Structuring for one Item Deposit: builds the file sets and files of its mutable Content from the structural
   # metadata CSV (or else a populator), validates the structure for the content type, and records the file changes.
   class StructureJob < ApplicationJob
+    queue_as :background # A single multi-item deposit can spawn many of these jobs so don't want to block real-time.
+
     # @param item_deposit_action [ItemDepositAction]
     def perform(item_deposit_action:)
       @item_deposit_action = item_deposit_action

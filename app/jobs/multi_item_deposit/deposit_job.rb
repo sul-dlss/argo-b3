@@ -7,6 +7,8 @@ module MultiItemDeposit
   class DepositJob < ApplicationJob
     include ActionPolicy::Behaviour
 
+    queue_as :real_time
+
     # @param multi_item_deposit_action [MultiItemDepositAction]
     # @param effective_groups [Array<String>] the requesting user's authorization workgroups
     def perform(multi_item_deposit_action:, effective_groups:)

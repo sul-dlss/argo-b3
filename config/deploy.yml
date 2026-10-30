@@ -107,6 +107,8 @@ env:
     SETTINGS__RABBITMQ__VHOST: workflow
     SETTINGS__RABBITMQ__ENABLED: true
     RAILS_LOG_TO_FILE: /var/log/argo/production.log
+    # Number of Solid Queue workers.
+    JOB_CONCURRENCY: 4
 
     # Governs how long SolidQueue's supervisor waits for in-flight jobs to
     # finish on shutdown (see config/initializers/solid_queue.rb); the job
