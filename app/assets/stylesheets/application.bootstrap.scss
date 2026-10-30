@@ -72,6 +72,11 @@ $search-color: rgb(#{$search-color-rgb});
   color: rgb(var(--stanford-archway-dark-rgb)) !important;
 }
 
+// Render form help text at the normal font size rather than Bootstrap's small size.
+.form-text {
+  font-size: $font-size-base;
+}
+
 .required {
   font-weight: $font-weight-bold;
   color: var(--stanford-poppy-dark);
