@@ -19,9 +19,10 @@ RSpec.describe 'Dynamic facets', :solr do
 
     # Released to EarthWorks is a dynamic facet.
     find_facet_section('Released to EarthWorks').click
-    expect(page).to have_facet_value('Last week', count: 5, facet: 'Released to EarthWorks')
-    expect(page).to have_facet_value('Last month', count: 5, facet: 'Released to EarthWorks')
-    expect(page).to have_facet_value('Last year', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Today', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Last 7 days', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Last 30 days', count: 5, facet: 'Released to EarthWorks')
+    expect(page).to have_facet_value('Year to date', count: 5, facet: 'Released to EarthWorks')
     expect(page).to have_facet_value('Currently released', count: 5, facet: 'Released to EarthWorks')
     expect(page).to have_facet_value('Not released', count: 4, facet: 'Released to EarthWorks')
 

@@ -6,13 +6,13 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
   let(:component) do
     described_class.new(facet_counts:, search_form:, form_field: :released_to_earthworks)
   end
-  let(:search_form) { ResultsSearchForm.new(released_to_earthworks: ['last_week'], page: 2) }
+  let(:search_form) { ResultsSearchForm.new(released_to_earthworks: ['today'], page: 2) }
   let(:facet_counts) { instance_double(SearchResults::DynamicFacetCounts) }
 
   before do
     allow(facet_counts).to receive(:each)
-      .and_yield(SearchResults::FacetCount.new(value: 'last_week', count: 5))
-      .and_yield(SearchResults::FacetCount.new(value: 'last_month', count: 10))
+      .and_yield(SearchResults::FacetCount.new(value: 'today', count: 5))
+      .and_yield(SearchResults::FacetCount.new(value: 'last_7_days', count: 10))
     allow(facet_counts).to receive(:any?).and_return(true)
   end
 
@@ -22,12 +22,12 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
     expect(page).to have_css('section[aria-label="Released to EarthWorks"] h3', text: 'Released to EarthWorks')
 
     # Add a new facet value
-    item = page.find('li', text: 'Last month')
-    expect(item).to have_link('Last month',
-                              href: '/search?released_to_earthworks%5B%5D=last_week&released_to_earthworks%5B%5D=last_month') # rubocop:disable Layout/LineLength
+    item = page.find('li', text: 'Last 7 days')
+    expect(item).to have_link('Last 7 days',
+                              href: '/search?released_to_earthworks%5B%5D=today&released_to_earthworks%5B%5D=last_7_days') # rubocop:disable Layout/LineLength
 
     # Remove an existing facet value
-    collection_item = page.find('li', text: 'Last week')
+    collection_item = page.find('li', text: 'Today')
     expect(collection_item).to have_link('Remove', href: '/search')
   end
 
@@ -47,7 +47,7 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
                           date_from_form_field: :earliest_accessioned_date_from,
                           date_to_form_field: :earliest_accessioned_date_to)
     end
-    let(:search_form) { ResultsSearchForm.new(earliest_accessioned_date: ['last_week'], page: 2) }
+    let(:search_form) { ResultsSearchForm.new(earliest_accessioned_date: ['today'], page: 2) }
 
     it 'renders the date range inputs' do
       render_inline(component)

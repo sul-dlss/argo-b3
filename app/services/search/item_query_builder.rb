@@ -61,7 +61,9 @@ module Search
         debugQuery: search_form.debug,
         qf: query_fields,
         defType: 'dismax',
-        'q.alt': '*:*'
+        'q.alt': '*:*',
+        # Date math rounding (e.g., NOW/DAY) is in Pacific time.
+        TZ: Constants::SOLR_TIME_ZONE
       }.compact_blank
     end
 
@@ -136,9 +138,10 @@ module Search
     # Construct a facet filter query for the given dynamic facet configuration.
     # @param facet_config [Search::Facets::Config]
     def dynamic_facet_filter_query(facet_config:)
-      query_parts = search_form.send(facet_config.form_field).map do |value|
+      # Unknown values (e.g., from a bookmarked URL with a retired value) are ignored.
+      query_parts = search_form.send(facet_config.form_field).filter_map do |value|
         query = facet_config.dynamic_facet[value.to_sym]
-        "(#{query})"
+        "(#{query})" if query
       end
       date_range_query_part = date_range_query_part(facet_config:)
       query_parts << date_range_query_part if date_range_query_part.present?
