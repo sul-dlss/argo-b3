@@ -3,9 +3,17 @@ default: &default
     - polling_interval: 1
       batch_size: 500
   workers:
-    - queues: "*"
+    # real_time is any jobs that the user is staring at a spinner waiting for to complete.
+    # background are jobs that the user has initiated, but expects to take some time.
+    # default are for framework jobs, e.g., action mailer and active storage.
+    # cleanup are jobs not tied to a user.
+    - queues: [ real_time ]
       threads: 3
-      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      processes: <%= [ ENV.fetch("JOB_CONCURRENCY", 1).to_i / 2, 1 ].max %> # Half of the workers
+      polling_interval: 0.1
+    - queues: [ background, default, cleanup ]
+      threads: 3
+      processes: <%= [ ENV.fetch("JOB_CONCURRENCY", 1).to_i / 2, 1 ].max %> # Half of the workers
       polling_interval: 0.1
 
 development:

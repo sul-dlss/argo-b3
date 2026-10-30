@@ -3,6 +3,8 @@
 # Job that copies files to staging, generates fixities, determines mimetype,
 # updates the object, and optionally accessions.
 class StageFilesJob < ApplicationJob
+  queue_as :background
+
   # @param [Content] content the content whose files should be staged
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging

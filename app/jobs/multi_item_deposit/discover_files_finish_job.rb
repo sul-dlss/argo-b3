@@ -3,6 +3,8 @@
 module MultiItemDeposit
   # Batch on_finish callback for a Multi-Item Deposit's DiscoverFilesJobs: completes discovery and notifies the user.
   class DiscoverFilesFinishJob < ApplicationJob
+    queue_as :real_time
+
     # @param multi_item_deposit_action [MultiItemDepositAction]
     def perform(multi_item_deposit_action:)
       multi_item_deposit_action.size = size_for(multi_item_deposit_action)

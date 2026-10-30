@@ -2,6 +2,8 @@
 
 # Job for validating a form asynchronously.
 class ValidateFormJob < ApplicationJob
+  queue_as :real_time
+
   def perform(form_validation_action:)
     form_validation_action.status_started!
 
