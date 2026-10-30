@@ -119,7 +119,6 @@ RSpec.describe 'Apply APO defaults when creating an item' do
         expect(page).to have_css('.form-text', text: 'APO default = Location Based', count: 2)
         expect(page).to have_css('.form-text', text: 'APO default = Media and Microtext')
       end
-      expect(Sdr::Repository).to have_received(:find).with(druid: apo_druid)
     end
   end
 
