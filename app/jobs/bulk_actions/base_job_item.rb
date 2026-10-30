@@ -6,6 +6,9 @@ module BulkActions
   class BaseJobItem
     include ActionPolicy::Behaviour
 
+    authorize :user
+    authorize :permission_scope
+
     def initialize(druid:, index:, job:)
       @druid = druid
       @index = index
@@ -13,7 +16,7 @@ module BulkActions
       Honeybadger.context(druid:)
     end
 
-    delegate :log, :user, :user_id, :close_version?, to: :job
+    delegate :log, :user, :user_id, :permission_scope, :close_version?, to: :job
 
     attr_reader :druid, :index, :job
 
@@ -70,14 +73,14 @@ module BulkActions
     end
 
     def check_update_ability?
-      return true if allowed_to?(:update?, cocina_object, with: ObjectPolicy, context: { user: })
+      return true if allowed_to?(:update?, cocina_object, with: ObjectPolicy)
 
       failure!(message: 'Not authorized to update')
       false
     end
 
     def check_read_ability?
-      return true if allowed_to?(:show?, cocina_object, with: ObjectPolicy, context: { user: })
+      return true if allowed_to?(:show?, cocina_object, with: ObjectPolicy)
 
       failure!(message: 'Not authorized to read')
       false

@@ -96,6 +96,20 @@ RSpec.describe ObjectPolicy, type: :policy do
         end
       end
 
+      context 'when a permission scope is provided' do
+        subject(:policy) { described_class.new(record, user:, permission_scope:) }
+
+        let(:permission_scope) { Permissions::UserScope.new(groups: ['sdr:job-group']) }
+
+        before do
+          Permission.create!(workgroup: 'sdr:job-group', permission_type: :edit, target_druid: object_druid)
+        end
+
+        it 'authorizes based on the provided permission scope' do
+          expect(policy.apply(:edit?)).to be true
+        end
+      end
+
       context 'when record values are unprefixed druids' do
         let(:record) do
           double(

@@ -39,6 +39,27 @@ RSpec.describe BulkActions::RepublishJob do
     expect(bulk_action.druid_count_success).to eq(1)
   end
 
+  context 'with multiple druids' do
+    subject(:job) { described_class.new(bulk_action:, druids: [druid, other_druid]) }
+
+    let(:other_druid) { 'druid:cd222dd3355' }
+
+    before do
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: other_druid)
+      allow(Sdr::Repository).to receive(:find).with(druid: other_druid)
+                                              .and_return(build(:dro_with_metadata, id: other_druid))
+      allow(Dor::Services::Client).to receive(:object).with(other_druid).and_return(object_client)
+      allow(Permission).to receive(:where).and_call_original
+    end
+
+    it 'looks up the user permissions once' do
+      job.perform_now
+
+      expect(bulk_action.reload.druid_count_success).to eq(2)
+      expect(Permission).to have_received(:where).with(workgroup: user.groups).once
+    end
+  end
+
   context 'when the user lacks update permission' do
     let(:edit_target_druid) { 'druid:cd222df3333' }
 

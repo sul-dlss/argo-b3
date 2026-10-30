@@ -36,7 +36,7 @@ module BulkActions
     end
 
     def read_allowed?(item)
-      allowed_to?(:show?, item, with: ObjectPolicy, context: { user: })
+      allowed_to?(:show?, item, with: ObjectPolicy)
     end
   end
 end
