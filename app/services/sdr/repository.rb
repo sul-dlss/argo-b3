@@ -101,8 +101,8 @@ module Sdr
       false
     end
 
-    # DROs with files in staging are assembled (e.g., to create derivatives) before accessioning:
-    # gisAssemblyWF for geo objects, otherwise assemblyWF. Assembly closes the version.
+    # DROs with files are assembled (e.g., to create derivatives) before accessioning; assembly closes the version.
+    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them.
     # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
@@ -112,7 +112,9 @@ module Sdr
     # @raise [Error] if there is an error initiating accession
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
-      if cocina_object.dro? && StagingSupport.staged_files?(druid: cocina_object.externalIdentifier)
+      if assemble?(cocina_object:)
+        # Assembly requires the object's staging folder, even when nothing is staged.
+        StagingSupport.ensure_staging_folder(druid: cocina_object.externalIdentifier)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
@@ -122,8 +124,16 @@ module Sdr
       raise Error, "Initiating accession failed: #{e.message}"
     end
 
+    def self.assemble?(cocina_object:)
+      return false unless cocina_object.dro?
+      return StagingSupport.staged_files?(druid: cocina_object.externalIdentifier) if CocinaSupport.geo?(cocina_object)
+
+      cocina_object.structural.contains.any? { |file_set| file_set.structural.contains.any? }
+    end
+    private_class_method :assemble?
+
     def self.assembly_workflow_name(cocina_object:)
-      cocina_object.type == Cocina::Models::ObjectType.geo ? 'gisAssemblyWF' : 'assemblyWF'
+      CocinaSupport.geo?(cocina_object) ? 'gisAssemblyWF' : 'assemblyWF'
     end
     private_class_method :assembly_workflow_name
 

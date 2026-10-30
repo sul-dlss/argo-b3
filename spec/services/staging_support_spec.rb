@@ -45,6 +45,38 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.ensure_staging_folder' do
+    # A druid of its own, since its folders are deleted while other specs may stage files in parallel.
+    let(:druid) { 'druid:zy987wx6543' }
+
+    def delete_druid_folders
+      described_class.locations.each do |staging_location|
+        FileUtils.rm_rf(DruidTools::Druid.new(druid, staging_location).path)
+      end
+    end
+
+    before { delete_druid_folders }
+    after { delete_druid_folders }
+
+    context 'when no staging location has the druid folder' do
+      it 'creates the staging content directory' do
+        described_class.ensure_staging_folder(druid:)
+
+        expect(File.directory?(described_class.staging_content_path(druid:))).to be true
+      end
+    end
+
+    context 'when the assembly location has the druid folder' do
+      before { stage_file(staging_location: Settings.assembly_location) }
+
+      it 'does not create the staging content directory' do
+        described_class.ensure_staging_folder(druid:)
+
+        expect(File.exist?(described_class.staging_content_path(druid:))).to be false
+      end
+    end
+  end
+
   describe '.staged_files?' do
     context 'when the staging content directory does not exist' do
       it 'returns false' do

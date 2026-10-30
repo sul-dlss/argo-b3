@@ -32,6 +32,12 @@ class CocinaSupport
     cocina_object.type == Cocina::Models::ObjectType.agreement
   end
 
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [Boolean] true if the object is a geo object
+  def self.geo?(cocina_object)
+    cocina_object.type == Cocina::Models::ObjectType.geo
+  end
+
   # A Virtual Object is identified by structure (its member orders reference other objects), not by type.
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
   # @return [Boolean] true if the object is a Virtual Object

@@ -98,4 +98,12 @@ RSpec.describe CocinaSupport do
       expect(described_class.object_type_with_content?(admin_policy)).to be false
     end
   end
+
+  describe '.geo?' do
+    it 'identifies a geo object' do
+      expect(described_class.geo?(build(:dro, type: Cocina::Models::ObjectType.geo))).to be true
+      expect(described_class.geo?(build(:dro, type: Cocina::Models::ObjectType.image))).to be false
+      expect(described_class.geo?(build(:collection))).to be false
+    end
+  end
 end
