@@ -13,7 +13,7 @@ RSpec.describe Search::ItemQueryBuilder do
 
     it 'builds the correct query parts' do
       result = described_class.call(search_form:, user_scope:)
-      expect(result).to include('q.alt': '*:*', defType: 'dismax')
+      expect(result).to include('q.alt': '*:*', defType: 'dismax', TZ: 'America/Los_Angeles')
       expect(result).not_to have_key(:fq)
       expect(result).to have_key(:qf)
     end
@@ -178,13 +178,31 @@ RSpec.describe Search::ItemQueryBuilder do
   end
 
   context 'with released to earthworks (dynamic facet)' do
-    let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[last_year never]) }
+    let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[year_to_date never]) }
 
     it 'builds the correct filter query for released to earthworks' do
       result = described_class.call(search_form:, user_scope:)
       expect(Array(result[:fq]))
-        .to include("(#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-1YEAR/DAY TO *]) AND " \
-                    "(-#{Search::Fields::RELEASED_TO_EARTHWORKS}:[* TO *])")
+        .to include('(released_to_earthworks_dtpsidv:[NOW/YEAR TO *]) AND (-released_to_earthworks_dtpsidv:[* TO *])')
+    end
+
+    context 'with an unknown value' do
+      let(:search_form) { ResultsSearchForm.new(released_to_earthworks: %w[last_week never]) }
+
+      it 'ignores the unknown value' do
+        result = described_class.call(search_form:, user_scope:)
+        expect(Array(result[:fq])).to include('(-released_to_earthworks_dtpsidv:[* TO *])')
+      end
+    end
+  end
+
+  context 'with embargo release date (dynamic facet)' do
+    let(:search_form) { ResultsSearchForm.new(embargo_release_date: %w[next_7_days]) }
+
+    it 'builds a filter query for upcoming embargo release dates' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq]))
+        .to include('(embargo_release_dtpsimdv:[NOW/DAY TO NOW/DAY+7DAYS})')
     end
   end
 

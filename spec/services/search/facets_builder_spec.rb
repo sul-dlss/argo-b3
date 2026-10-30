@@ -34,16 +34,17 @@ RSpec.describe Search::FacetsBuilder do
     expect(facet_json[Search::Fields::ACCESS_RIGHTS]).not_to include(:missing)
     # Only testing one dynamic facet here so that the test is not brittle.
     expect(facet_json).to include(
-      "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week",
-      "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_month",
-      "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_year",
-      "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-ever",
-      "#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-never"
+      'released_to_earthworks-today',
+      'released_to_earthworks-last_7_days',
+      'released_to_earthworks-last_30_days',
+      'released_to_earthworks-year_to_date',
+      'released_to_earthworks-ever',
+      'released_to_earthworks-never'
     )
-    expect(facet_json["#{Search::Facets::RELEASED_TO_EARTHWORKS.form_field}-last_week"])
+    expect(facet_json['released_to_earthworks-last_7_days'])
       .to match({
                   type: 'query',
-                  q: "#{Search::Fields::RELEASED_TO_EARTHWORKS}:[NOW-7DAY/DAY TO *]"
+                  q: 'released_to_earthworks_dtpsidv:[NOW/DAY-7DAYS TO *]'
                 })
   end
 end
