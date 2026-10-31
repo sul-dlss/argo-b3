@@ -115,6 +115,6 @@ RSpec.describe 'Create a new manage rights bulk action' do
   end
 
   def expect_locations_disabled
-    expect(page).to have_field('Location', disabled: true)
+    expect(page).to have_field('Location', disabled: true, visible: :hidden)
   end
 end

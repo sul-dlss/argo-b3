@@ -145,9 +145,9 @@ RSpec.describe 'Apply APO defaults when creating an item' do
         expect(page).to have_select('View access', selected: 'Stanford')
         expect(page).to have_select('Download access', selected: 'None')
         expect(page).to have_css('.form-text', text: 'APO default = Stanford')
-        # The location of the previously selected APO is cleared. It is disabled, since access is not location-based.
-        expect(page).to have_field('Location', with: '', disabled: true)
-        expect(page).to have_css('.form-text', text: 'APO default = none')
+        # The location of the previously selected APO is cleared. It is hidden, since access is not location-based.
+        expect(page).to have_field('Location', with: '', disabled: true, visible: :hidden)
+        expect(page).to have_css('.form-text', text: 'APO default = none', visible: :hidden)
       end
     end
   end

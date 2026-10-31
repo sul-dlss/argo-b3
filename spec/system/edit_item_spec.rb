@@ -126,18 +126,18 @@ RSpec.describe 'Edit an item' do
       expect(CatalogRepository).to have_received(:title).with(catalog_record_id: 'in222')
     end
 
-    it 'disables uploading a description spreadsheet while refreshing on deposit' do
+    it 'hides uploading a description spreadsheet while refreshing on deposit' do
       visit edit_item_path(druid)
 
       click_button 'Description'
       expect(page).to have_field('Refresh on deposit', checked: true)
-      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true)
+      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true, visible: :hidden)
 
       uncheck 'Refresh on deposit'
       expect(page).to have_field('Upload a CSV file', type: 'file', disabled: false)
 
       check 'Refresh on deposit'
-      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true)
+      expect(page).to have_field('Upload a CSV file', type: 'file', disabled: true, visible: :hidden)
     end
 
     it 'replaces the additional FOLIO Instance HRIDs' do

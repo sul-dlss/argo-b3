@@ -6,8 +6,8 @@
                                                                    action: 'content-type-dependent#toggle' }) %>
 
     <%= render Edit::ViewingDirectionComponent.new(form:, container_classes: 'my-fieldset', label_classes: 'fw-bold',
-                                                   input_data: { content_type_dependent_target: 'dependent',
-                                                                 content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
+                                                   container_data: { content_type_dependent_target: 'dependent',
+                                                                     content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
 
     <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 

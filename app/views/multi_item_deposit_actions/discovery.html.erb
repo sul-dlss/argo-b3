@@ -76,11 +76,9 @@
             ) do |component| %>
           <% component.with_additional_container_content do %>
             <div class="my-field">
-              <%# Loaded when the radio is selected (see radio controller). The spinner is hidden until then. %>
+              <%# Loaded when the radio is selected (see radio controller). %>
               <%= turbo_frame_tag @multi_item_deposit_action, 'globus', data: { radio_src: new_multi_item_deposit_action_globus_path(@multi_item_deposit_action) } do %>
-                <div class="radio-hide">
-                  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
-                </div>
+                <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
               <% end %>
               <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :globus_path) %>
             </div>

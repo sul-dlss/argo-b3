@@ -1,6 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
+import { choiceContent } from 'controllers/dependent_fields'
 
-// Disable/enable associated inputs and buttons based on radio button selection
+// Shows and enables the content of the selected radio button (e.g., its inputs), and hides and disables
+// the content of the others.
 // Borrowed from H3.
 // Mark the radio buttons with: <input data-radio-target="radio" data-action="radio#toggle" type="radio" ></input>
 // If inputs are loaded later (e.g., in a turbo-frame), add data-action="turbo:frame-load->radio#refresh"
@@ -12,11 +14,7 @@ export default class extends Controller {
   }
 
   refresh () {
-    this.radioTargets.forEach((radio) => {
-      if (radio.checked) {
-        this.toggle({ target: radio })
-      }
-    })
+    this.radioTargets.forEach((radio) => this.disableInputs(radio, !radio.checked))
   }
 
   toggle (event) {
@@ -40,24 +38,8 @@ export default class extends Controller {
       // the selected radio button.
       input.setAttribute('aria-required', !disable)
     })
-    // Buttons are disabled so that, for example, rows cannot be added or removed
-    // for a radio button that is not selected.
-    const buttons = containerElem.querySelectorAll('button')
-    buttons.forEach((button) => {
-      button.disabled = disable
-    })
-    // Links styled as buttons (e.g., ButtonLinkComponent) can't be disabled with the disabled attribute,
-    // so they get Bootstrap's disabled class, which prevents clicking.
-    const buttonLinks = containerElem.querySelectorAll('a.btn')
-    buttonLinks.forEach((link) => {
-      link.classList.toggle('disabled', disable)
-      link.setAttribute('aria-disabled', disable)
-      if (disable) {
-        link.setAttribute('tabindex', '-1')
-      } else {
-        link.removeAttribute('tabindex')
-      }
-    })
+    // Hidden as well as disabled, since disabled inputs alone were not obviously unavailable.
+    choiceContent(radioElem).forEach((element) => element.classList.toggle('d-none', disable))
     // Turbo frames with data-radio-src are loaded from that url the first time the radio is selected,
     // so that they aren't loaded (e.g., calling an external API) unless needed.
     if (!disable) {
@@ -72,16 +54,6 @@ export default class extends Controller {
     const disableableEls = containerElem.querySelectorAll('.radio-disableable')
     disableableEls.forEach((el) => {
       this.dispatch(disable ? 'disable' : 'enable', { target: el, bubbles: false })
-    })
-    // Elements that have radio-hide class will be hidden when the radio is not selected.
-    const hideEls = containerElem.querySelectorAll('.radio-hide')
-    hideEls.forEach((el) => {
-      el.classList.toggle('d-none', disable)
-    })
-    // Elements that have radio-show class will be shown when the radio is not selected.
-    const showEls = containerElem.querySelectorAll('.radio-show')
-    showEls.forEach((el) => {
-      el.classList.toggle('d-none', !disable)
     })
   }
 }

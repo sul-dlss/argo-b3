@@ -26,7 +26,7 @@
   <%= render Edit::SerialsComponent.new(form:) %>
 
   <%= render Edit::DescriptionCsvFileComponent.new(form:, druid_token:,
-                                                   input_data: { disable_when_checked_target: 'input' }) %>
+                                                   container_data: { disable_when_checked_target: 'dependent' }) %>
 </div>
 
 <p class="mt-4 mb-5">You can view a preview of your changes on the item page once you click "Save as draft."</p>

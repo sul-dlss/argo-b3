@@ -127,7 +127,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       expect(page).to have_field('With embargo', type: 'radio', checked: true, visible: :all)
       within('[data-apo-defaults-group="embargo_ends"]') do
         expect(page).to have_select('View access', selected: 'World')
-        expect(page).to have_css('.form-text', text: 'APO default = Media and Microtext')
+        expect(page).to have_css('.form-text', text: 'APO default = Media and Microtext', visible: :hidden)
       end
 
       click_button 'Apply APO defaults'
