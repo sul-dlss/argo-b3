@@ -188,9 +188,7 @@ RSpec.describe 'Edit an item' do
     it 'confirms, discards the version and the mutable content, and returns to the object page' do
       visit edit_item_path(druid)
 
-      accept_confirm(/\ADiscard this draft\?/) do
-        click_link 'Discard draft'
-      end
+      click_and_accept_confirm(/\ADiscard this draft\?/, find_link('Discard draft'))
 
       expect(page).to have_current_path(object_path(druid))
       expect(page).to have_toast('Draft discarded.')
