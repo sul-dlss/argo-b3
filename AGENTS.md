@@ -3,39 +3,25 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 ## Architecture
 
-- Domain behavior usually lives in Cocina-backed Active Model form objects and presenters rather than conventional Active Record models.
-- See the Voids gem (https://github.com/sul-dlss/voids) for the implementation of the form objects, which are similar to Active Record models.
+- Domain behavior usually lives in Cocina-backed Active Model form objects and presenters (built on Voids; see References) rather than conventional Active Record models.
 - Structural metadata lives in Active Record `Content*` models (see GLOSSARY "Structural Metadata Terms"); read README "Structural metadata" before planning changes to it. Structural changes reach the cocina object via `CocinaObjectMutators::StructuralMutator` and `Sdr::Repository.update`, as in `StageFilesJob`.
 - Authorization: `ApplicationPolicy` has `pre_check :allow_admins`, so admins pass every rule; policy rules decide only for non-admins.
+- `Current.effective_groups` is read only by the `Authentication` concern and Action Policy classes. Search and Solr services never read it; they receive a `Permissions::UserScope` as an explicit `user_scope:` argument, which controllers and jobs supply (`current_user_scope` in controllers).
 
 ## Conventions
 
-- Before writing or reviewing code or specs, read `CODING_STANDARDS.md`: the judgement calls linters don't enforce (forms, Turbo page updates, specs, controllers, and which checks and validations to write).
-- Match existing service, presenter, form object, and view component patterns before introducing new abstractions.
-- Keep changes focused and avoid rewriting established search flow patterns unless the task requires it.
-- Solr fields are referred to by constants which are defined in `app/services/search/fields.rb`.
-- CSV import / export services live in a `<Kind>Csv` namespace (`::Import`, `::Export`, `::Validator`), e.g., `app/services/descriptive_csv/`, `app/services/structural_csv/`.
-- Prefer full variable names instead of abbreviations (e.g., `full_variable_name` instead of `fvn` or `full_var_name`).
-- `Current.effective_groups` is read only by the `Authentication` concern and Action Policy classes. Search and Solr services never read it; they receive a `Permissions::UserScope` as an explicit `user_scope:` argument, which controllers and jobs supply (`current_user_scope` in controllers).
+- Before writing or reviewing code or specs, read `CODING_STANDARDS.md`: the judgement calls linters don't enforce.
+- Before changing models, forms, presenters, or search, or adding a facet, search result field, sort option, or bulk action, read the matching `README.md` section; the "Adding ..." sections are step-by-step recipes.
 - Changes and additions to the README should be for high level architectural notes and design choices only and should not include code level implementation details (which can be added inline in the code if warranted).
 
 ## Testing notes
 
 - In a new git worktree, run `bin/setup-worktree` before specs or linters (it copies gitignored local files, installs JS dependencies, and builds CSS).
 - Run only the specs relevant to the change (`bin/rspec <files>`); for broad or full runs use `bin/parallel_rspec`. Set `COVERAGE=false` to drop SimpleCov output.
-- Druids should match the pattern "^druid:[b-df-hjkmnp-tv-z]{2}[0-9]{3}[b-df-hjkmnp-tv-z]{2}[0-9]{4}$", e.g., "druid:bc123df4567".
-- When creating multiple, unique druids for the same spec, vary at least the first 2 characters and the last 2 characters.
-- For cocina factories, see https://github.com/sul-dlss/cocina-models/blob/main/lib/cocina/rspec/factories.rb
 
 ## Integration tests
 
-End-to-end Argo-B3 functionality is covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`). Current specs and the functionality they cover:
-
-- `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, searching, and viewing the item and its PURL.
-
-When writing or reviewing a change to this functionality, remind the developer to run the integration tests before merging.
-
-If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update this list.
+End-to-end Argo-B3 flows are covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`); read them to see which flows they exercise. When writing or reviewing a change to one of those flows, remind the developer to run the integration tests before merging.
 
 ## Checks
 
@@ -44,7 +30,7 @@ If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update th
 ## References
 For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
 
-- See `README.md` for setup, linting, testing, models / forms, structural metadata, bulk actions, and discovery / search / faceting details.
+- Voids (Repository: https://github.com/sul-dlss/voids) - Active Record-like base for the form objects and models. It can usually be found locally for reading at `../voids`.
 - Cocina Models (Repository: https://github.com/sul-dlss/cocina-models, Namespace: `Cocina::Models`) - Ruby implementation of the SDR data model for DROs (digital repository objects), Collections, and Admin Policies. It can usually be found locally for reading at `../cocina-models`.
 - DOR Services Client (Repository: https://github.com/sul-dlss/dor-services-client, Namespace: `Dor::Services::Client`) - Client for interacting with DOR Services App (DSA), the backend of SDR. It can usually be found locally for reading at `../dor-services-client`.
 - Technical Metadata Service (Repository: https://github.com/sul-dlss/technical-metadata-service) - Provides technical metadata (e.g., mimetype, dimensions) for deposited files. The API, including response schemas, is in `openapi.yml`; it can usually be found locally at `../technical-metadata-service`.
