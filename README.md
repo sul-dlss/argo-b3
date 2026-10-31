@@ -204,9 +204,6 @@ Solr document test fixtures can be created with the Solr factories. For example:
 let!(:solr_doc) { create(:solr_item) }
 ```
 
-### Request specs vs. system specs
-Prefer request specs, which are much faster than system specs. Reserve system specs for behavior that requires a browser, such as JavaScript (Stimulus controllers, lazy Turbo frames, auto-refresh) or file downloads. If a system spec does not need JavaScript (e.g., a multi-page flow), mark it `:rack_test`.
-
 ### Running tests in parallel
 [parallel_tests](https://github.com/grosser/parallel_tests) will significantly speed up running tests locally.
 
