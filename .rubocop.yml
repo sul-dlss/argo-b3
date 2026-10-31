@@ -679,6 +679,14 @@ ArgoB3/AcceptConfirmClick:
   Include:
     - 'spec/**/*.rb'
 
+RSpec/DescribeClass:
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    # Specs for herb linter rules, which are JS rather than Ruby classes.
+    - 'spec/lint/**/*'
+
 ArgoB3/FormParamsFrom:
   Include:
     - 'app/controllers/**/*.rb'

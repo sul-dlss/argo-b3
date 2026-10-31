@@ -1,0 +1,5 @@
+<div class="title <%= title_class %>">Title</div>
+<a href="<%= object_path %>" data-druid="<%= druid %>">Object</a>
+<li class="<% if active %>active<% end %>">Item</li>
+<div class="static">Static</div>
+<%= tag.div class: title_class, data: { druid: } %>

@@ -1,6 +1,18 @@
 version: 2.1
 orbs:
+  node: circleci/node@7.2.1
   ruby-rails: sul-dlss/ruby-rails@5.0.0
+jobs:
+  # The orb's herblint job runs only `herb analyze`; the herb linter (with custom rules) runs on Node.
+  herblint:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Lint ERB templates with herb
+          command: yarn run herb-lint app
 workflows:
   build:
     jobs:
@@ -10,8 +22,7 @@ workflows:
       - ruby-rails/lint-erb:
           context: dlss
       - ruby-rails/lint-js
-      - ruby-rails/herblint:
-          name: herblint
+      - herblint
       - ruby-rails/stylelint:
           name: stylelint
       - ruby-rails/brakeman:

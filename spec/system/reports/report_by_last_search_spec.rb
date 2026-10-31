@@ -46,12 +46,12 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: true)
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: false)
 
-    click_link 'Select All'
+    click_button 'Select All'
     # All checkboxes are selected
     expect(page).to have_no_field('report[fields][]', type: 'checkbox', checked: false)
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: true)
 
-    click_link 'Deselect All'
+    click_button 'Deselect All'
     expect(page).to have_no_field('report[fields][]', type: 'checkbox', checked: true)
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: false)
     expect(page).to have_button('Download', disabled: true)

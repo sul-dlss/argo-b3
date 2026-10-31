@@ -1,0 +1,14 @@
+# Herb linter configuration: https://herb-tools.dev/configuration
+# Pinning the version keeps a herb upgrade from enabling new rules until this is bumped.
+version: 0.11.1
+
+framework: actionview
+
+linter:
+  enabled: true
+  # Linted only by its spec, which passes --force.
+  exclude:
+    - 'spec/fixtures/herb/**/*'
+
+formatter:
+  enabled: false
