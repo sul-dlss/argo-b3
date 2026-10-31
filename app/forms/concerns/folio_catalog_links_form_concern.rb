@@ -13,7 +13,7 @@ module FolioCatalogLinksFormConcern
 
     # Defined here to override the writer defined by has_many.
     # Replaces rather than appends, since removed rows are only removed in the browser.
-    def additional_folio_catalog_links_attributes=(attributes)
+    def additional_folio_catalog_links_attributes=(attributes) # rubocop:disable ArgoB3/ConcernIncludedMethods
       additional_folio_catalog_links.clear
       assign_nested_attributes_for_collection_association(:additional_folio_catalog_links, attributes)
     end
