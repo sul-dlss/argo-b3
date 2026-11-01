@@ -312,7 +312,6 @@ RSpec.describe 'Show item' do
     click_button 'Cocina JSON'
     # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
     expect(page).to have_css('andypf-json-viewer', text: druid)
-    expect(page).to have_css('andypf-json-viewer', text: original_title)
 
     # Workflows tab
     click_button 'Workflows'
@@ -457,6 +456,10 @@ RSpec.describe 'Show item' do
     find_table_row('events-table', '2021-03-31 13:23:30 PT').click
     expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
 
+    # Load the Cocina JSON frame, to check that it reloads when the lock changes.
+    click_button 'Cocina JSON'
+    expect(page).to have_css('andypf-json-viewer', text: 'abc123')
+
     # Update the object and look for changes.
     allow(Sdr::Repository).to receive(:find_solr)
       .and_return(build_solr_doc(title: updated_title, last_deposited: nil, license_label: 'CC Zero 1.0'))
@@ -470,7 +473,7 @@ RSpec.describe 'Show item' do
                                         useAndReproductionStatement: 'My updated use statement'
                                       },
                                       part_label: 'Part 2',
-                                      sort_key: nil))
+                                      sort_key: nil).new(lock: 'def456'))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
@@ -496,7 +499,7 @@ RSpec.describe 'Show item' do
     end
 
     click_button 'Cocina JSON'
-    expect(page).to have_css('andypf-json-viewer', text: updated_title)
+    expect(page).to have_css('andypf-json-viewer', text: 'def456')
 
     click_button 'Workflows'
     expect(page).to have_css('.accordion-item',

@@ -18,6 +18,7 @@ export default class extends Controller {
   connect () {
     document.addEventListener('turbo:before-morph-attribute', this.preserveTab)
     document.addEventListener('turbo:before-morph-element', this.preserveNavigatedFrame)
+    document.addEventListener('turbo:before-morph-element', this.preserveLockKeyedFrame)
     document.addEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.addEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.addEventListener('turbo:frame-missing', this.handleMissingFrame)
@@ -40,6 +41,7 @@ export default class extends Controller {
 
     document.removeEventListener('turbo:before-morph-attribute', this.preserveTab)
     document.removeEventListener('turbo:before-morph-element', this.preserveNavigatedFrame)
+    document.removeEventListener('turbo:before-morph-element', this.preserveLockKeyedFrame)
     document.removeEventListener('turbo:before-fetch-response', this.handleFrameResponse)
     document.removeEventListener('turbo:before-frame-render', this.preventFailedFrameRender)
     document.removeEventListener('turbo:frame-missing', this.handleMissingFrame)
@@ -80,6 +82,18 @@ export default class extends Controller {
     currentElement.reload()
   }
 
+  // A lock-keyed frame (e.g., files or structure) depends only on the object's lock, which is in its src.
+  // It keeps its content on a refresh and reloads only when the lock (and so its src) changes.
+  preserveLockKeyedFrame = (event) => {
+    const { currentElement, newElement } = event.detail
+    if (currentElement.tagName !== 'TURBO-FRAME' || !('lockKeyed' in currentElement.dataset)) return
+
+    event.preventDefault()
+    const currentSrc = currentElement.getAttribute('src')
+    const newSrc = newElement.getAttribute('src')
+    if (newSrc && this.absoluteUrl(currentSrc) !== this.absoluteUrl(newSrc)) currentElement.src = newSrc
+  }
+
   absoluteUrl (url) {
     return new URL(url, window.location.href).href
   }
@@ -87,8 +101,8 @@ export default class extends Controller {
   // Refreshes the whole page (via Turbo's morph-based page refresh) on each interval, rather than
   // reloading each turbo frame individually. The show action refreshes the solr doc / cocina hash
   // caches only when the object's lock has changed, so this single request is what drives every
-  // frame (each tagged `refresh="morph"`) to reload off of already-warm caches, without needing to
-  // stagger the frame reloads to avoid bursts of requests.
+  // loaded frame tagged `refresh="morph"` to reload off of already-warm caches, without needing to
+  // stagger the frame reloads to avoid bursts of requests. Lock-keyed frames reload only on a lock change.
   scheduleReload = () => {
     this.reloadTimeout = setTimeout(() => {
       if (this.href === window.location.href && document.visibilityState === 'visible') {

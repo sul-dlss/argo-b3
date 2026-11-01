@@ -115,7 +115,7 @@
 
         <% if @solr_doc.publishable_type? %>
           <%= component.with_pane(id: 'purl-preview-pane', tab_id: 'purl-preview-tab') do %>
-            <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'purl_preview', src: purl_preview_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
@@ -123,50 +123,50 @@
 
         <% if @solr_doc.virtual_object? %>
           <%= component.with_pane(id: 'constituents-pane', tab_id: 'constituents-tab') do %>
-            <%= turbo_frame_tag(@solr_doc.druid, 'constituents', src: constituents_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'constituents', src: constituents_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
         <% elsif @solr_doc.object_type_with_content? %>
           <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
-            <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
 
           <%= component.with_pane(id: 'structure-pane', tab_id: 'structure-tab') do %>
-            <%= turbo_frame_tag(@solr_doc.druid, 'structure', src: structure_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'structure', src: structure_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'versions-pane', tab_id: 'versions-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'versions', src: versions_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'events-pane', tab_id: 'events-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'events', src: events_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'events', src: events_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'cocina-model-pane', tab_id: 'cocina-model-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'cocina_json', src: json_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
 
         <%= component.with_pane(id: 'solr-doc-pane', tab_id: 'solr-doc-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'solr_doc', src: solr_doc_object_path(druid: @druid_token), refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'solr_doc', src: solr_doc_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
