@@ -26,7 +26,7 @@ RSpec.describe 'Multi-item deposit' do
       File.write(File.join(mount_path, folder_name, "#{folder_name}.txt"), folder_name)
     end
 
-    allow(Sdr::Repository).to receive(:find) do |druid:|
+    allow(Sdr::Repository).to receive(:find) do |druid:, **|
       build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
     end
     allow(Sdr::VersionService).to receive(:new).and_return(version_service)

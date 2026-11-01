@@ -34,7 +34,7 @@ RSpec.describe 'Create a collection' do
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', apo_druid]])
     cocina_objects = { apo_druid => apo_cocina_object, druid => registered_cocina_object }
-    allow(Sdr::Repository).to receive(:find) { |druid:| cocina_objects.fetch(druid) }
+    allow(Sdr::Repository).to receive(:find) { |druid:, **| cocina_objects.fetch(druid) }
     allow(Sdr::Repository).to receive_messages(register: registered_cocina_object,
                                                find_solr: build(:solr_item, druid:, title: 'My collection',
                                                                             object_type: 'collection',

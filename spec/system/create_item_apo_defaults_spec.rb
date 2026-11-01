@@ -45,7 +45,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[other_apo_title, other_apo_druid],
                                                                     [apo_title, apo_druid]])
     cocina_objects = { apo_druid => apo_cocina_object, other_apo_druid => other_apo_cocina_object }
-    allow(Sdr::Repository).to receive(:find) { |druid:| cocina_objects.fetch(druid) }
+    allow(Sdr::Repository).to receive(:find) { |druid:, **| cocina_objects.fetch(druid) }
   end
 
   context 'when the form is new' do
