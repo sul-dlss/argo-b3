@@ -26,6 +26,9 @@ export default class extends Controller {
     document.addEventListener('turbo:submit-end', this.handleSubmitEnd)
     document.addEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
     document.addEventListener('turbo:before-render', this.skipRefreshRenderWhileSubmitting)
+    document.addEventListener('turbo:before-render', this.suspendRefreshOfLoadingFrames)
+    document.addEventListener('turbo:before-morph-element', this.preserveSuspendedFrame)
+    document.addEventListener('turbo:render', this.resumeRefreshOfSuspendedFrames)
 
     this.href = window.location.href
     if (this.reloadTimeout) return
@@ -49,6 +52,9 @@ export default class extends Controller {
     document.removeEventListener('turbo:submit-end', this.handleSubmitEnd)
     document.removeEventListener('turbo:before-visit', this.preventRefreshWhileSubmitting)
     document.removeEventListener('turbo:before-render', this.skipRefreshRenderWhileSubmitting)
+    document.removeEventListener('turbo:before-render', this.suspendRefreshOfLoadingFrames)
+    document.removeEventListener('turbo:before-morph-element', this.preserveSuspendedFrame)
+    document.removeEventListener('turbo:render', this.resumeRefreshOfSuspendedFrames)
   }
 
   // This preserves the active tab when the page is refreshed
@@ -91,7 +97,33 @@ export default class extends Controller {
     event.preventDefault()
     const currentSrc = currentElement.getAttribute('src')
     const newSrc = newElement.getAttribute('src')
-    if (newSrc && this.absoluteUrl(currentSrc) !== this.absoluteUrl(newSrc)) currentElement.src = newSrc
+    if (!newSrc || this.absoluteUrl(currentSrc) === this.absoluteUrl(newSrc)) return
+
+    currentElement.src = newSrc
+    // A lazy frame doesn't load a changed src until its first load finishes, so make it load now.
+    if (currentElement.hasAttribute('busy')) currentElement.loading = 'eager'
+  }
+
+  // Turbo's morph refresh reloads each refresh="morph" frame, cancelling a load in flight. A lazy frame whose
+  // first load is cancelled is never loaded, so its refresh is suspended until its load finishes.
+  suspendRefreshOfLoadingFrames = (event) => {
+    if (event.detail.renderMethod !== 'morph' || this.submitting) return
+
+    document.querySelectorAll('turbo-frame[refresh="morph"][busy]').forEach((frame) => {
+      frame.removeAttribute('refresh')
+      frame.dataset.refreshSuspended = 'true'
+    })
+  }
+
+  preserveSuspendedFrame = (event) => {
+    if (event.detail.currentElement.dataset.refreshSuspended) event.preventDefault()
+  }
+
+  resumeRefreshOfSuspendedFrames = () => {
+    document.querySelectorAll('turbo-frame[data-refresh-suspended]').forEach((frame) => {
+      frame.setAttribute('refresh', 'morph')
+      delete frame.dataset.refreshSuspended
+    })
   }
 
   absoluteUrl (url) {
