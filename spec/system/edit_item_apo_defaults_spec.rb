@@ -55,7 +55,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       .and_return(version_service_double(open?: true, version_description: 'Fixing the rights'))
     cocina_objects = { druid => cocina_object, apo_druid => apo_cocina_object,
                        other_apo_druid => other_apo_cocina_object }
-    allow(Sdr::Repository).to receive(:find) { |druid:| cocina_objects.fetch(druid) }
+    allow(Sdr::Repository).to receive(:find) { |druid:, **| cocina_objects.fetch(druid) }
   end
 
   context 'without an embargo' do

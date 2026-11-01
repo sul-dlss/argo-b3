@@ -9,6 +9,9 @@ RSpec.describe 'Show files' do
   end
   let(:invalid_token) { 'not-a-valid-token' }
   let(:cocina_object) { Cocina::Models.with_metadata(Cocina::Models.build(cocina_hash), 'abc123') }
+  let(:cocina_object_without_contains) do
+    Cocina::Models.with_metadata(Cocina::Models.build(cocina_hash.merge(structural: {})), 'abc123')
+  end
   let(:cocina_hash) do
     {
       type: Cocina::Models::ObjectType.image,
@@ -75,7 +78,9 @@ RSpec.describe 'Show files' do
 
   before do
     sign_in(create(:user))
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true)
+                                            .and_return(cocina_object_without_contains)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: false).and_return(cocina_object)
   end
 
   describe 'GET /objects/:druid/files' do
@@ -84,6 +89,7 @@ RSpec.describe 'Show files' do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('folder1/bc123df4567_0001.tiff')
+      expect(Sdr::Repository).to have_received(:find).with(druid:, without_structural_contains: false)
     end
 
     context 'when the immutable Content already exists for the lock' do
@@ -98,6 +104,7 @@ RSpec.describe 'Show files' do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('folder1/bc123df4567_0001.tiff')
         expect(Contents::Builder).not_to have_received(:find_or_create)
+        expect(Sdr::Repository).not_to have_received(:find).with(druid:, without_structural_contains: false)
       end
     end
 
