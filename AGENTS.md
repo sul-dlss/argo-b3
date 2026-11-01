@@ -27,7 +27,10 @@ End-to-end Argo-B3 functionality is covered by `spec/features/accessioning/argo_
 - `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, searching, and viewing the item and its PURL.
 - `argo_b3_multi_item_deposit_spec.rb`: registering items with different content types (Register items bulk action), a Multi-Item Deposit from a mount with an uploaded manifest, then a second Multi-Item Deposit that adds and deletes files, verifying the items, their PURLs, and preservation.
 
-When writing or reviewing a change to this functionality, remind the developer to run the integration tests before merging.
+Remind the developer to run an integration spec before merging, naming the spec, when a change could break it in ways argo-b3's specs can't catch:
+
+- calls to other SDR services in the spec's flow: repository saves and version open / close (`Sdr::Repository`, `Sdr::VersionService`), staging files (`StageFilesJob`, `CocinaObjectMutators::StructuralMutator`), or starting accessioning.
+- a label, heading, id, or page flow that the spec drives (search the spec file for it).
 
 If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update this list.
 
