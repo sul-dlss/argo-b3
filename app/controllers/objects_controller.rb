@@ -26,6 +26,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # keeps the frame actions themselves unaware of the lock: they just read whatever is in the cache,
   # trusting that this action (which always runs moments before them, as the parent page load) has
   # already made it fresh.
+  # The cached cocina hash omits the file sets (structural.contains), which can be large; frames that need them
+  # use the full cocina hash, which is fetched on demand.
   def show # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     druid = druid_param
     lock = Sdr::Repository.lock(druid:)
@@ -42,7 +44,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     version_service = Sdr::VersionService.new(druid:)
     content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:, content:)
-    @unsaved_content_changes = unsaved_content_changes?
+    @unsaved_content_changes = unsaved_content_changes?(druid)
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
@@ -73,7 +75,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_json
-    @cocina_hash = cocina_hash
+    @cocina_hash = full_cocina_hash
 
     render layout: false
   end
@@ -113,7 +115,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def show_purl_preview
-    @cocina_hash = cocina_hash
+    @cocina_hash = full_cocina_hash
     @preview = fetch_purl_preview(@cocina_hash)
     render layout: false
   end
@@ -263,10 +265,14 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                     from: @events_filter_form.from_time, to: @events_filter_form.to_time)
   end
 
-  def unsaved_content_changes?
+  def unsaved_content_changes?(druid)
     return false unless CocinaSupport.object_type_with_content?(@cocina_object)
 
-    Contents::UnsavedChanges.call(content: Content.mutable_for(@cocina_object), cocina_object: @cocina_object)
+    content = Content.mutable_for(@cocina_object)
+    return false unless content
+
+    full_cocina_object = CocinaSupport.build_from_cocina_hash(fetch_full_cocina_hash(druid).dup)
+    Contents::UnsavedChanges.call(content:, cocina_object: full_cocina_object)
   end
 
   def republishable?
@@ -355,8 +361,20 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     value
   end
 
-  def compute_cocina_hash(druid)
-    cocina_object = Sdr::Repository.find(druid:)
+  # The full cocina hash is fresh if its lock matches the cocina hash's (which #show keeps fresh).
+  def fetch_full_cocina_hash(druid)
+    lock = fetch_cocina_hash(druid)[:lock]
+    cache_key = full_cocina_hash_cache_key(druid)
+    cached = Rails.cache.read(cache_key)
+    return cached[:value] if cached && cached[:lock] == lock
+
+    value = compute_cocina_hash(druid, without_structural_contains: false)
+    Rails.cache.write(cache_key, { lock: value[:lock], value: }, expires_in: 1.hour)
+    value
+  end
+
+  def compute_cocina_hash(druid, without_structural_contains: true)
+    cocina_object = Sdr::Repository.find(druid:, without_structural_contains:)
     CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h, preserve_keys: [:label])
   end
 
@@ -365,6 +383,10 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   def cocina_hash_cache_key(druid)
+    "objects/cocina-hash-without-contains/#{druid}"
+  end
+
+  def full_cocina_hash_cache_key(druid)
     "objects/cocina-hash/#{druid}"
   end
 
@@ -387,15 +409,20 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @cocina_hash ||= fetch_cocina_hash(verified_druid)
   end
 
+  def full_cocina_hash
+    @full_cocina_hash ||= fetch_full_cocina_hash(verified_druid)
+  end
+
+  # Without the file sets (structural.contains).
   def cocina_object
     # dup since build_from_cocina_hash deletes keys from the hash it is given.
     @cocina_object ||= CocinaSupport.build_from_cocina_hash(cocina_hash.dup)
   end
 
-  # The immutable Content usually exists for the lock, so the cocina object is only built when it doesn't.
+  # The immutable Content usually exists for the lock, so the full cocina object is only fetched when it doesn't.
   def fetch_content
     Content.find_by(druid: verified_druid, lock: cocina_hash[:lock], immutable: true) ||
-      Contents::Builder.find_or_create(cocina_object:)
+      Contents::Builder.find_or_create(cocina_object: CocinaSupport.build_from_cocina_hash(full_cocina_hash.dup))
   end
 
   # The immutable Content is fixed for a lock, so its validation result for a content type is too.

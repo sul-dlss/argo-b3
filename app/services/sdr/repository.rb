@@ -13,8 +13,9 @@ module Sdr
     # @return [Cocina::Models::DROWithMetadata] the returned model
     # @raise [Error] if there is an error retrieving the object
     # @raise [NotFoundResponse] if the object is not found
-    def self.find(druid:)
-      Dor::Services::Client.object(druid).find
+    # @param without_structural_contains [Boolean] omit the file sets; the result must not be used for an update
+    def self.find(druid:, without_structural_contains: false)
+      Dor::Services::Client.object(druid).find(without_structural_contains:)
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
     end
