@@ -125,7 +125,7 @@ RSpec.describe 'Show APO' do
     expect_cocina_json_title(original_title)
 
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
-    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
+    allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title).new(lock: 'def456'))
 
     expect(page).to have_css('h1', text: updated_title)
     expect_cocina_json_title(updated_title)

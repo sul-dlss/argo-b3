@@ -136,7 +136,7 @@ RSpec.describe 'Show collection' do
                                         copyright: 'My updated copyright statement',
                                         license: 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
                                         useAndReproductionStatement: 'My updated use statement'
-                                      }))
+                                      }).new(lock: 'def456'))
 
     expect(page).to have_css('h1', text: updated_title)
 
