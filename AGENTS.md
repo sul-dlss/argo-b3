@@ -6,6 +6,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - Domain behavior usually lives in Cocina-backed Active Model form objects and presenters rather than conventional Active Record models.
 - See the Voids gem (https://github.com/sul-dlss/voids) for the implementation of the form objects, which are similar to Active Record models.
 - Structural metadata lives in Active Record `Content*` models (see GLOSSARY "Structural Metadata Terms"); read README "Structural metadata" before planning changes to it. Structural changes reach the cocina object via `CocinaObjectMutators::StructuralMutator` and `Sdr::Repository.update`, as in `StageFilesJob`.
+- The database schema is `db/structure.sql` (there is no `schema.rb`); local services (Postgres, Redis, Solr, DSA, SURI) are in `compose.yaml`.
 - Authorization: `ApplicationPolicy` has `pre_check :allow_admins`, so admins pass every rule; policy rules decide only for non-admins.
 
 ## Conventions
