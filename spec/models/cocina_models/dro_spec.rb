@@ -471,7 +471,7 @@ RSpec.describe CocinaModels::Dro do
 
     context 'when access combination is invalid' do
       let(:access_view) { 'stanford' }
-      let(:access_download) { 'none' }
+      let(:access_download) { 'world' }
 
       it 'is not valid and adds an access error' do
         expect(dro).not_to be_valid
@@ -623,7 +623,7 @@ RSpec.describe CocinaModels::Dro do
 
     context 'when embargo access combination is invalid' do
       let(:embargo_view) { 'stanford' }
-      let(:embargo_download) { 'none' }
+      let(:embargo_download) { 'world' }
 
       it 'is not valid and adds an embargo_access error' do
         expect(dro).not_to be_valid
@@ -653,7 +653,7 @@ RSpec.describe CocinaModels::Dro do
     context 'when embargo_release_date is absent' do
       let(:embargo_release_date) { nil }
       let(:embargo_view) { 'stanford' }
-      let(:embargo_download) { 'none' }
+      let(:embargo_download) { 'world' }
 
       it 'skips embargo validation' do
         expect(dro).to be_valid

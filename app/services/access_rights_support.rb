@@ -34,7 +34,7 @@ class AccessRightsSupport
   end
 
   def self.stanford?(view:, download:, location:)
-    match?(view:, download:, location:, allowed_views: 'stanford', allowed_downloads: 'stanford')
+    match?(view:, download:, location:, allowed_views: 'stanford', allowed_downloads: %w[stanford none])
   end
 
   def self.world?(view:, download:, location:)
