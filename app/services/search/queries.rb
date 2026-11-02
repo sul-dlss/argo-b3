@@ -12,8 +12,6 @@ module Search
     NEXT_7_DAYS = '[NOW/DAY TO NOW/DAY+7DAYS}'
     NEXT_30_DAYS = '[NOW/DAY TO NOW/DAY+30DAYS}'
     NEXT_YEAR = '[NOW/DAY TO NOW/DAY+1YEAR}'
-    MORE_THAN_WEEK_AGO = '[* TO NOW/DAY-7DAYS]'
-    MORE_THAN_MONTH_AGO = '[* TO NOW/DAY-30DAYS]'
     ALL = '[* TO *]'
   end
 end

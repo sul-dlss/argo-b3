@@ -176,8 +176,10 @@ module Search
       date_to_form_field: :last_opened_date_to,
       field: Search::Fields::LAST_OPENED_DATE,
       dynamic_facet: {
-        more_than_week_ago: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::MORE_THAN_WEEK_AGO}",
-        more_than_month_ago: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::MORE_THAN_MONTH_AGO}",
+        today: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::YEAR_TO_DATE}",
         all: "#{Search::Fields::LAST_OPENED_DATE}:#{Search::Queries::ALL}"
       }
     )
