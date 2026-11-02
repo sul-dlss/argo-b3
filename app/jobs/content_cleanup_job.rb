@@ -5,6 +5,8 @@
 # Deleting a Content deletes its file sets, files, and binaries, and purges files attached via Active Storage.
 # Files at other locations (e.g., staging, mounts) are not deleted.
 class ContentCleanupJob < ApplicationJob
+  queue_as :cleanup
+
   # Contents created more recently than this are not cleaned up.
   MINIMUM_AGE = 3.days
 

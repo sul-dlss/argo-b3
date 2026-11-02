@@ -6,6 +6,8 @@ module MultiItemDeposit
   class DiscoverFilesJob < ApplicationJob
     include ActionPolicy::Behaviour
 
+    queue_as :background # A single multi-item deposit can spawn many of these jobs so don't want to block real-time.
+
     MAX_FILE_SIZE = 4 * (1000**4) # 4 TB
 
     # @param item_deposit_action [ItemDepositAction]

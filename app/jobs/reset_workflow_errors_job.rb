@@ -2,6 +2,8 @@
 
 # Job to reset workflow errors for a set of druids based on a search form.
 class ResetWorkflowErrorsJob < ApplicationJob
+  queue_as :background
+
   # @param effective_groups [Array<String>] the requesting user's authorization workgroups. This is
   #   a snapshot taken at enqueue time, so it preserves the requesting user's impersonation context
   #   even if their workgroups change before the job runs.

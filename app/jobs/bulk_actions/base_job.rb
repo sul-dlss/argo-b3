@@ -6,6 +6,8 @@ module BulkActions
     include ActionPolicy::Behaviour
     include ApplicationHelper
 
+    queue_as :background
+
     attr_reader :bulk_action, :druids
 
     # @param [BulkAction] bulk_action BulkAction object
