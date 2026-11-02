@@ -122,14 +122,12 @@ RSpec.describe 'Show APO' do
 
     # Cocina model tab
     click_button 'Cocina JSON'
-    # andypf-json-viewer uses a shadow DOM, so can't check for content within it.
-    expect(page).to have_css('andypf-json-viewer', text: 'druid')
-    expect(page).to have_css('andypf-json-viewer', text: original_title)
+    expect_cocina_json_title(original_title)
 
     allow(Sdr::Repository).to receive(:find_solr).and_return(build_solr_doc(title: updated_title))
     allow(Sdr::Repository).to receive(:find).and_return(build_cocina_object(title: updated_title))
 
     expect(page).to have_css('h1', text: updated_title)
-    expect(page).to have_css('andypf-json-viewer', text: updated_title)
+    expect_cocina_json_title(updated_title)
   end
 end

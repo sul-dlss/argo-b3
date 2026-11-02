@@ -1,3 +1,4 @@
+<%# The json is an attribute (not content), since the viewer re-renders on attribute changes (e.g., from a morph). %>
 <%= tag.andypf_json_viewer indent: 3,
                            expanded:,
                            theme: 'cupertino',
@@ -7,9 +8,8 @@
                            'show-copy': true,
                            'show-size': false,
                            'preserve-expanded': false,
-                           'expand-empty': false do %>
-  <%= hash %>
-                           <% end %>
+                           'expand-empty': false,
+                           data: hash %>
 <% if show_tip %>
   <p class="mt-2"><small><em>Tip: Shift + Click to expand/collapse all nodes.</em></small></p>
 <% end %>
