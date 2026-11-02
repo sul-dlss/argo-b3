@@ -1,6 +1,7 @@
 inherit_from: .rubocop_todo.yml
 
 require:
+  - ./lib/rubocop/cop/argo_b3/accept_confirm_click
   - ./lib/rubocop/cop/argo_b3/form_params_from
 
 plugins:
@@ -670,6 +671,10 @@ RSpecRails/HttpStatusNameConsistency: # new in 2.32
   Enabled: true
 RSpecRails/ReceivePerformLater: # new in 2.33
   Enabled: false
+
+ArgoB3/AcceptConfirmClick:
+  Include:
+    - 'spec/**/*.rb'
 
 ArgoB3/FormParamsFrom:
   Include:

@@ -133,10 +133,7 @@ RSpec.describe 'Manage files' do
       # The loaded files frame shows that Turbo is running, so it handles the click.
       expect(page).to have_css("turbo-frame[id^='show_content_'] p", text: 'No files yet')
 
-      # Clicking via JS, since layout shifts after load can make a positional click miss the link.
-      accept_confirm(/\ADiscard this draft\?/) do
-        page.execute_script('arguments[0].click()', find_link('Discard draft'))
-      end
+      click_and_accept_confirm(/\ADiscard this draft\?/, find_link('Discard draft'))
 
       expect(page).to have_current_path("/objects/#{druid}")
       expect(page).to have_toast('Draft discarded.')
@@ -590,9 +587,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Structure built from files')
 
-      accept_confirm('Delete resource 1 and its files?') do
-        click_button 'Delete resource 1'
-      end
+      click_and_accept_confirm('Delete resource 1 and its files?', find_button('Delete resource 1'))
 
       expect(page).to have_toast('Resource deleted')
       # The structure is reloaded and the deleted file's binary is gone.
@@ -671,9 +666,8 @@ RSpec.describe 'Manage files' do
       expect(page).to have_toast('Structure built from files')
 
       click_on 'Add files'
-      accept_confirm('Deleting dropzone_upload.txt will also delete resource 1. Continue?') do
-        click_button 'Delete dropzone_upload.txt'
-      end
+      click_and_accept_confirm('Deleting dropzone_upload.txt will also delete resource 1. Continue?',
+                               find_button('Delete dropzone_upload.txt'))
 
       expect(page).to have_toast('File deleted')
       within("turbo-frame[id^='show_content_']") do
