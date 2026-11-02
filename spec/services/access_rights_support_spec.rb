@@ -12,6 +12,7 @@ RSpec.describe AccessRightsSupport do
       { view: 'stanford', download: 'location-based', location: 'spec' },
       { view: 'world', download: 'location-based', location: 'spec' },
       { view: 'stanford', download: 'stanford', location: nil },
+      { view: 'stanford', download: 'none', location: nil },
       { view: 'world', download: 'world', location: nil },
       { view: 'world', download: 'stanford', location: nil },
       { view: 'world', download: 'none', location: nil }
