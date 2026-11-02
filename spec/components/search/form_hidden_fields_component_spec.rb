@@ -66,6 +66,18 @@ RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
     end
   end
 
+  context 'when the search is sorted' do
+    let(:search_form) { ResultsSearchForm.new(sort: 'registered_date desc', page: 2, content_types: ['image']) }
+    let(:form_fields) { :content_types }
+
+    it 'renders a hidden field for the sort but not the page' do
+      render_inline(component)
+
+      expect(page).to have_field('sort', with: 'registered_date desc', type: 'hidden')
+      expect(page).to have_no_field('page', type: 'hidden')
+    end
+  end
+
   context 'when excluding query' do
     let(:form_fields) { :query }
 
