@@ -204,9 +204,6 @@ Solr document test fixtures can be created with the Solr factories. For example:
 let!(:solr_doc) { create(:solr_item) }
 ```
 
-### Request specs vs. system specs
-Prefer request specs, which are much faster than system specs. Reserve system specs for behavior that requires a browser, such as JavaScript (Stimulus controllers, lazy Turbo frames, auto-refresh) or file downloads. If a system spec does not need JavaScript (e.g., a multi-page flow), mark it `:rack_test`.
-
 ### Running tests in parallel
 [parallel_tests](https://github.com/grosser/parallel_tests) will significantly speed up running tests locally.
 
@@ -421,44 +418,13 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 
 ### Adding a bulk action
 
-1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object.
+1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object (see `CODING_STANDARDS.md`).
 2. Add a new resource to `routes.rb` under the `bulk_actions` namespace.
 3. Add configuration to `services/bulk_actions.rb`.
 4. Add the bulk action to the list of bulk actions in `views/bulk_actions/new.html.erb`.
 5. Add a controller for the bulk action that is a subclass of `BulkActionApplicationController`.
 6. Add a `new.html.erb` view.
 7. Add a request spec. For bulk actions that use `BulkActions::BasicForm` without additional fields, use the `'a simple bulk action controller'` shared examples (see for example, `spec/requests/bulk_actions/purge_spec.rb`). Add a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
-
-## Conventions
-
-### Dates / times
-Application-rendered dates / times should use one of these formats, which are defined in `en.yml`:
-
-* `date_only`: `YYYY-MM-DD` (for example, `2026-07-29`)
-* `date_time`: `YYYY-MM-DD HH:MM:SS PT` (for example, `2026-07-29 14:56:58 PT`)
-
-Use the `format_datetime` helper, which defaults to `date_time` and renders values in the "Pacific Time (US & Canada)" time zone. Pass `format: :date_only` for a date without a time. The `PT` label is intentionally used year-round while the underlying time observes daylight saving time.
-
-CSV report values are an exception because Argo receives them as preformatted values from Solr. Machine-readable dates / times, such as Solr query values, repository API values, and HTTP headers, should continue to use the format required by their protocol.
-
-### Notifications
-
-#### Error notifications
-The user should be notified of errors using a danger alert.
-
-The danger alert can be triggered with a `flash[:danger]`.
-
-#### Informational notifications
-The user should be notified of informational messages (e.g., status updates, success) using disappearing toasts.
-
-Toasts can be triggered with `flash[:toast]` or by broadcasting to the `notifications` channel:
-```
-component = SdrViewComponents::Elements::ToastComponent.new(title: "#{bulk_action.label} completed",
-                                                                  disappearing: true)
-      Turbo::StreamsChannel.broadcast_append_to('notifications', bulk_action.user,
-                                                target: 'toast-container',
-                                                html: ApplicationController.render(component, layout: false))
-```
 
 ## Design
 Where ever possible design components from the [DLSS component style library](https://github.com/sul-dlss/component-library/) and view components from [SDR View Components](https://github.com/sul-dlss/sdr_view_components) should be re-used.

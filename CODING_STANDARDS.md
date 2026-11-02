@@ -1,6 +1,6 @@
 # Coding Standards
 
-Judgement calls checked during review. Mechanical rules are enforced by RuboCop, erb_lint, herb, and the JS / SCSS linters (`bin/rake lint`), so they are not repeated here.
+Judgement calls checked during review. Mechanical rules are enforced by RuboCop, erb_lint, herb, and the JS / SCSS linters (`bin/rake lint`), so they are not repeated here. When reviewing, check each rule against every changed file it applies to.
 
 ## Forms
 
@@ -12,18 +12,27 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 
 - When a form or button changes the page it was submitted from (e.g., adding or deleting a row), update the page with a morph, not turbo streams. The page sets the `turbo-refresh-method` `morph` and `turbo-refresh-scroll` `preserve` meta tags. On success, redirect back to the page (`status: :see_other`, toast in `flash[:toast]`). On failure, render the page with `status: :unprocessable_content`. Turbo morphs both, so you don't need `*.turbo_stream.erb` views or partials pulled out for replacement. On a page that refreshes itself periodically, use `ToastAndRefreshConcern` so the background refresh can't consume the flash.
 - Use turbo streams only when a morph of the submitting page can't do the job: broadcasts to other browsers (`turbo_stream_from`), appending toasts, or updating part of a page that is too costly to re-render.
-- Widgets that morphing would break are made morph-safe in their Stimulus controller (e.g., Tom Select controllers use `MorphableTomSelect`). Don't work around them with turbo streams or by skipping the morph.
+- Widgets that morphing would break are made morph-safe in their Stimulus controller (e.g., Tom Select controllers use `MorphableTomSelect`).
 - Give a morphed form with radio buttons a stable `id` (e.g., `form_with ..., id: 'object-permission-form'`). Without one, the morph builds a new form and moves the radios into it one at a time, and moving a still-checked radio unchecks the one already reset, leaving none checked.
 
 ## Views
 
 - Don't put `<%= %>` inside an HTML attribute. When an element's attributes take Ruby values, build the element with a tag helper (`tag.div`, `tag.span`, `link_to`, etc.) and pass the attributes as arguments, using a `data:` hash for `data-*` attributes (e.g., the container in `objects/show.html.erb`).
 - Render dates and times with `format_datetime` (`ApplicationHelper`, `helpers.format_datetime` in components) and a format from `time.formats` in `config/locales/en.yml` (e.g., `format: :date_only`), not `strftime` or `to_fs`. It converts to Pacific time first, so every page shows the same zone and layout. Add a new format to `en.yml` if none fits.
+  - The `PT` label is used year-round, though the time observes daylight saving. Exceptions: CSV report values, which arrive preformatted from Solr, and machine-readable values (Solr queries, repository API values, HTTP headers), which use their protocol's format.
+- Notify the user of an error with a danger alert (`flash[:danger]`), and of informational messages (status updates, success) with a disappearing toast (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
+
+## Naming and structure
+
+- Use full variable names (e.g., `full_variable_name`, not `fvn` or `full_var_name`).
+- Refer to Solr fields by the constants in `app/services/search/fields.rb`.
+- Put CSV import / export services in a `<Kind>Csv` namespace (`::Import`, `::Export`, `::Validator`), e.g., `app/services/descriptive_csv/`, `app/services/structural_csv/`.
 
 ## Specs
 
 ### What to test
-- Unless specifically asked, do not write tests for memoization, caching, getters, or default values. These restate the implementation and break on refactors without catching regressions. Security-relevant behavior is not a "default" and should be tested (e.g., an attribute excluded from `permitted_params`, a field that cannot be changed).
+- Test behavior a refactor would preserve. Unless asked, leave out tests of memoization, caching, getters, and default values: they restate the implementation and break on refactors without catching regressions. Security-relevant behavior is not a "default" and should be tested (e.g., an attribute excluded from `permitted_params`, a field that cannot be changed).
+- Prefer request specs, which are much faster than system specs. Reserve system specs for behavior that requires a browser, such as JavaScript (Stimulus controllers, lazy Turbo frames, auto-refresh) or file downloads. If a system spec does not need JavaScript (e.g., a multi-page flow), mark it `:rack_test`.
 - Every `describe` / `context` / `it` description is backed by an assertion. For example, a "with errors" context asserts the error message (e.g., `have_invalid_feedback`), not just the absence of success.
 - Every change to a component's rendered output adds or updates its component spec (`spec/components/...`), even when a system spec also covers it.
 
@@ -31,8 +40,12 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 - Expected values are independent of the implementation. Do not compute them with the code under test or the helpers, constants, or expressions it uses (e.g., `DruidSupport.bare_druid_from`, `Form.permitted_params`, `File.size(filepath_on_disk)`); use literals instead (e.g., `'bc123df4567'`, `[:tag]`, `52`).
 - Configuration is an input, not the code under test: reference `Settings.*` (e.g., `"#{Settings.purl.url}/preview"`) rather than copying values from `config/settings.yml` into the spec, so specs survive config changes.
 
+### Test data
+- Druids match `^druid:[b-df-hjkmnp-tv-z]{2}[0-9]{3}[b-df-hjkmnp-tv-z]{2}[0-9]{4}$`, e.g., `druid:bc123df4567`. When a spec needs several, vary at least the first 2 and the last 2 characters.
+- Build cocina objects with the cocina-models factories (`../cocina-models/lib/cocina/rspec/factories.rb`).
+
 ### Stubbing
-- Do not stub the class under test (e.g., `allow(described_class).to receive(:new)`). Stub at external boundaries (Solr, `Dor::Services::Client`) and assert on what the code sends or returns.
+- Stub at external boundaries (Solr, `Dor::Services::Client`), not the class under test (e.g., `allow(described_class).to receive(:new)`), and assert on what the code sends or returns.
 - Test arguments with `with` in the `expect(...).to have_received`, not in the `allow`; do not test them in both.
 
 ### Layout
