@@ -73,4 +73,16 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       expect(page).to have_field('Enter title myself', type: 'radio', checked: false)
     end
   end
+
+  context 'when the description choice has an error' do
+    let(:new_item_form) { NewItemForm.new.tap { |form| form.errors.add(:description_choice, 'is invalid') } }
+
+    it 'renders the error once for the radio buttons' do
+      render_inline(component)
+
+      expect(page).to have_css('#description_choice_error.invalid-feedback', text: 'is invalid', count: 1)
+      expect(page).to have_css('input[type="radio"][aria-invalid="true"][aria-describedby~="description_choice_error"]',
+                               count: 3)
+    end
+  end
 end

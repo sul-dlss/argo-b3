@@ -694,6 +694,24 @@ RSpec.describe 'Multi-item deposit actions' do
       end
     end
 
+    context 'when the manifest included with the files is not found' do
+      let(:owner) { user }
+
+      before { FileUtils.rm(File.join(mount_directory, 'manifest.csv')) }
+
+      it 'renders the error once for the manifest source radio buttons' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_source_error',
+                                          text: 'manifest.csv not found in the file location', count: 1)
+        expect(rendered_page).to have_css('input[name="multi_item_deposit_discovery[manifest_source]"]' \
+                                          '[aria-invalid="true"]' \
+                                          '[aria-describedby~="multi_item_deposit_discovery_manifest_source_error"]',
+                                          count: 2)
+      end
+    end
+
     context 'when the files are on Globus' do
       let(:owner) { user }
       let(:multi_item_deposit_action) do
@@ -880,6 +898,49 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(multi_item_deposit_action.reload).to be_structuring
         expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: csv_string,
                                                              structural_metadata_csv_source: 'mount')
+      end
+    end
+
+    context 'when building the structure from a structural metadata CSV not on the mount' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+      let(:params) { { multi_item_deposit_structure: { structural_metadata_csv_choice: 'mount' } } }
+
+      # The mount radio button is not rendered without a CSV on the mount, so the error follows the other choices.
+      it 'renders the error once for the structural metadata CSV choice radio buttons' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('#multi_item_deposit_structure_structural_metadata_csv_choice_error',
+                                          text: 'structural_metadata.csv not found in the file location', count: 1)
+        expect(rendered_page).to have_css(
+          'input[name="multi_item_deposit_structure[structural_metadata_csv_choice]"][aria-invalid="true"]' \
+          '[aria-describedby~="multi_item_deposit_structure_structural_metadata_csv_choice_error"]', count: 2
+        )
+        expect(multi_item_deposit_action.reload).not_to be_structuring
+      end
+    end
+
+    context 'when building the structure without a required structural metadata CSV' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+      let(:params) { { multi_item_deposit_structure: { structural_metadata_csv_choice: 'none' } } }
+
+      before do
+        create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media')
+      end
+
+      it 'renders the error once for the structural metadata CSV choice radio buttons' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('#multi_item_deposit_structure_structural_metadata_csv_choice_error',
+                                          text: 'A structural metadata CSV is required for media items', count: 1)
+        expect(rendered_page).to have_css(
+          'input[name="multi_item_deposit_structure[structural_metadata_csv_choice]"][aria-invalid="true"]' \
+          '[aria-describedby~="multi_item_deposit_structure_structural_metadata_csv_choice_error"]', count: 1
+        )
+        expect(multi_item_deposit_action.reload).not_to be_structuring
       end
     end
 

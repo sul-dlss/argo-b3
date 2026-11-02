@@ -1,10 +1,9 @@
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.content_file_sets.fields.content_files.administrative.label'),
-                                                           mark_required: true,
-                                                           classes: container_classes) do %>
+<%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(form:, field_name: :administrative,
+                                                                   label: t('edit.content_file_sets.fields.content_files.administrative.label'),
+                                                                   mark_required: true,
+                                                                   classes: container_classes) do |group| %>
   <% ContentFileForm::ADMINISTRATIVE_OPTIONS.each do |administrative_option| %>
-    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :administrative,
-                                                                  input_value: administrative_option,
-                                                                  label_text: label_text_for(administrative_option)) %>
+    <% group.with_radio_button(input_value: administrative_option,
+                               label_text: label_text_for(administrative_option)) %>
   <% end %>
-  <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :administrative_options) %>
 <% end %>

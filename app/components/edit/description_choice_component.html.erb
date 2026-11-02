@@ -1,60 +1,50 @@
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+<%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+      form:,
+      field_name: :description_choice,
       label: t('edit.items.fields.description_choice.label'),
       mark_required: true,
       data: { controller: 'radio' }
-    ) do %>
+    ) do |group| %>
 
-  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-        form:,
-        field_name: :description_choice,
-        label_text: t('edit.items.fields.description_choice.title.label'),
-        input_value: DescriptionChoiceFormConcern::DESCRIPTION_TITLE_CHOICE,
-        input_data: { radio_target: 'radio', action: 'radio#toggle' },
-        container_classes: 'my-fieldset'
-      ) do |component| %>
-    <% component.with_additional_container_content do %>
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
-                                                                  label_text: t('edit.items.fields.title.label'),
-                                                                  label_mark_required: true,
-                                                                  container_classes: 'my-field') %>
-    <% end %>
+  <% group.with_radio_button(
+       label_text: t('edit.items.fields.description_choice.title.label'),
+       input_value: DescriptionChoiceFormConcern::DESCRIPTION_TITLE_CHOICE,
+       input_data: { radio_target: 'radio', action: 'radio#toggle' },
+       container_classes: 'my-fieldset'
+     ) do %>
+    <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                                label_text: t('edit.items.fields.title.label'),
+                                                                label_mark_required: true,
+                                                                container_classes: 'my-field') %>
   <% end %>
 
-  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-        form:,
-        field_name: :description_choice,
-        label_text: t('edit.items.fields.description_choice.catalog_id.label'),
-        input_value: DescriptionChoiceFormConcern::DESCRIPTION_CATALOG_ID_CHOICE,
-        input_data: { radio_target: 'radio', action: 'radio#toggle' },
-        container_classes: 'my-fieldset'
-      ) do |component| %>
-    <% component.with_additional_container_content do %>
-      <%= render Edit::CatalogRecordIdComponent.new(form:) %>
+  <% group.with_radio_button(
+       label_text: t('edit.items.fields.description_choice.catalog_id.label'),
+       input_value: DescriptionChoiceFormConcern::DESCRIPTION_CATALOG_ID_CHOICE,
+       input_data: { radio_target: 'radio', action: 'radio#toggle' },
+       container_classes: 'my-fieldset'
+     ) do %>
+    <%= render Edit::CatalogRecordIdComponent.new(form:) %>
 
-      <% if item_fields? %>
-        <%= render Edit::BarcodeComponent.new(form:) %>
+    <% if item_fields? %>
+      <%= render Edit::BarcodeComponent.new(form:) %>
 
-        <%= render Edit::SerialsComponent.new(form:) %>
-      <% end %>
+      <%= render Edit::SerialsComponent.new(form:) %>
     <% end %>
   <% end %>
 
   <% if item_fields? %>
-    <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-          form:,
-          field_name: :description_choice,
-          label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
-          input_value: NewItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
-          input_data: { radio_target: 'radio', action: 'radio#toggle' },
-          container_classes: 'my-fieldset'
-        ) do |component| %>
-      <% component.with_additional_container_content do %>
-        <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                               field_name: :description_csv_file,
-                                                               container_classes: 'my-field',
-                                                               label_text: t('edit.items.fields.description_csv_file.label'),
-                                                               label_hidden: true) %>
-      <% end %>
+    <% group.with_radio_button(
+         label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
+         input_value: NewItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
+         input_data: { radio_target: 'radio', action: 'radio#toggle' },
+         container_classes: 'my-fieldset'
+       ) do %>
+      <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                             field_name: :description_csv_file,
+                                                             container_classes: 'my-field',
+                                                             label_text: t('edit.items.fields.description_csv_file.label'),
+                                                             label_hidden: true) %>
     <% end %>
   <% end %>
 

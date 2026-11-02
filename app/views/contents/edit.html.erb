@@ -57,81 +57,71 @@
                                                                discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: show_details) %>
           <% end %>
 
-          <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+          <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+                form:,
+                field_name: :file_location_choice,
                 label: t('edit.items.fields.file_choice.label'),
                 mark_required: true,
                 data: { controller: 'radio', action: 'turbo:frame-load->radio#refresh' }
-              ) do %>
+              ) do |group| %>
 
-            <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-                  form:,
-                  field_name: :file_location_choice,
-                  label_text: t('edit.items.fields.file_choice.upload.label'),
-                  input_value: ContentForm::UPLOAD_FILE_LOCATION_CHOICE,
-                  input_data: { radio_target: 'radio', action: 'radio#toggle' },
-                  container_classes: 'my-fieldset'
-                ) do |component| %>
-              <% component.with_additional_container_content do %>
-                <%= form_with model: @content,
-                              url: content_dropzone_path(@content_token),
-                              data: {
-                                controller: 'dropzone',
-                                dropzone_max_filesize_value: Settings.file_upload.max_filesize,
-                                dropzone_reloadable_frame_outlet: '.content-files-frame',
-                                action: 'radio:disable->dropzone#disable radio:enable->dropzone#enable ' \
-                                        'disable-actions:disable->dropzone#disable disable-actions:enable->dropzone#enable',
-                                disable_actions_target: 'disableable'
-                              }, id: 'file-dropzone', class: 'dropzone radio-disableable my-fieldset' do %>
-                  <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
-                    <span data-dropzone-target="folderAlertText"></span>
-                    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
-                  <% end %>
-                  <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
-                  <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
-                  <div class="dz-message">
-                    <div class="fs-1"><%= cloud_upload_icon %></div>
-                    <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
-                    <div class="fs-5">or</div>
-                    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
-                  </div>
-                  <div id="dropzone-hidden-input-container"></div>
+            <% group.with_radio_button(
+                 label_text: t('edit.items.fields.file_choice.upload.label'),
+                 input_value: ContentForm::UPLOAD_FILE_LOCATION_CHOICE,
+                 input_data: { radio_target: 'radio', action: 'radio#toggle' },
+                 container_classes: 'my-fieldset'
+               ) do %>
+              <%= form_with model: @content,
+                            url: content_dropzone_path(@content_token),
+                            data: {
+                              controller: 'dropzone',
+                              dropzone_max_filesize_value: Settings.file_upload.max_filesize,
+                              dropzone_reloadable_frame_outlet: '.content-files-frame',
+                              action: 'radio:disable->dropzone#disable radio:enable->dropzone#enable ' \
+                                      'disable-actions:disable->dropzone#disable disable-actions:enable->dropzone#enable',
+                              disable_actions_target: 'disableable'
+                            }, id: 'file-dropzone', class: 'dropzone radio-disableable my-fieldset' do %>
+                <%= render SdrViewComponents::Elements::AlertComponent.new(classes: 'd-none', data: { dropzone_target: 'folderAlert' }) do %>
+                  <span data-dropzone-target="folderAlertText"></span>
+                  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Reset', variant: 'outline-primary', classes: 'ms-3', data: { action: 'dropzone#clearBasePath' }) %>
                 <% end %>
+                <%= render SdrViewComponents::Elements::ProgressBarComponent.new(label: 'Upload progress', classes: 'd-none', data: { dropzone_target: 'progress' }) %>
+                <ul data-dropzone-target="error" class="d-none list-unstyled text-danger"></ul>
+                <div class="dz-message">
+                  <div class="fs-1"><%= cloud_upload_icon %></div>
+                  <div class="fs-5">Drag and drop your files here, up to 10GB or 25,000 files.</div>
+                  <div class="fs-5">or</div>
+                  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select files to upload', variant: :'outline-primary', classes: 'mt-2') %>
+                </div>
+                <div id="dropzone-hidden-input-container"></div>
               <% end %>
             <% end %>
 
-            <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-                  form:,
-                  field_name: :file_location_choice,
-                  label_text: t('edit.items.fields.file_choice.globus.label'),
-                  input_value: ContentForm::GLOBUS_FILE_LOCATION_CHOICE,
-                  input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
-                  container_classes: 'my-fieldset'
-                ) do |component| %>
-              <% component.with_additional_container_content do %>
-                <div class="my-fieldset">
-                  <%# Loaded when the radio is selected (see radio controller), since it calls the Globus API. %>
-                  <%= turbo_frame_tag @content, 'globus', data: { radio_src: new_content_globus_path(@content_token) } do %>
-                    <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
-                  <% end %>
-                </div>
-              <% end %>
+            <% group.with_radio_button(
+                 label_text: t('edit.items.fields.file_choice.globus.label'),
+                 input_value: ContentForm::GLOBUS_FILE_LOCATION_CHOICE,
+                 input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
+                 container_classes: 'my-fieldset'
+               ) do %>
+              <div class="my-fieldset">
+                <%# Loaded when the radio is selected (see radio controller), since it calls the Globus API. %>
+                <%= turbo_frame_tag @content, 'globus', data: { radio_src: new_content_globus_path(@content_token) } do %>
+                  <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
+                <% end %>
+              </div>
             <% end %>
 
-            <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-                  form:,
-                  field_name: :file_location_choice,
-                  label_text: t('edit.items.fields.file_choice.mount.label'),
-                  input_value: ContentForm::MOUNT_FILE_LOCATION_CHOICE,
-                  input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
-                  container_classes: 'my-fieldset'
-                ) do |component| %>
-              <% component.with_additional_container_content do %>
-                <div class="my-fieldset">
-                  <%= turbo_frame_tag @content, 'mount', src: new_content_mount_path(@content_token) do %>
-                    <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
-                  <% end %>
-                </div>
-              <% end %>
+            <% group.with_radio_button(
+                 label_text: t('edit.items.fields.file_choice.mount.label'),
+                 input_value: ContentForm::MOUNT_FILE_LOCATION_CHOICE,
+                 input_data: { radio_target: 'radio', action: 'radio#toggle', disable_actions_target: 'disableable' },
+                 container_classes: 'my-fieldset'
+               ) do %>
+              <div class="my-fieldset">
+                <%= turbo_frame_tag @content, 'mount', src: new_content_mount_path(@content_token) do %>
+                  <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+                <% end %>
+              </div>
             <% end %>
           <% end %>
 

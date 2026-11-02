@@ -1,38 +1,34 @@
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(
+<%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+      form:,
+      field_name: :perform_ocr,
       label: t('edit.items.fields.perform_ocr.label'),
       classes: 'my-fieldset',
       data: { ocr_options_target: 'section' }
-    ) do %>
+    ) do |group| %>
 
-  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-        form:,
-        field_name: :perform_ocr,
-        label_text: 'No',
-        input_value: 'false',
-        input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
-        container_classes: 'my-fieldset'
-      ) %>
+  <% group.with_radio_button(
+       label_text: 'No',
+       input_value: 'false',
+       input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
+       container_classes: 'my-fieldset'
+     ) %>
 
-  <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-        form:,
-        field_name: :perform_ocr,
-        label_text: 'Yes',
-        input_value: 'true',
-        input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
-        container_classes: 'my-fieldset'
-      ) do |component| %>
-    <% component.with_additional_container_content do %>
-      <%= render SdrViewComponents::Elements::AlertComponent.new(
-            variant: :info,
-            classes: 'd-none',
-            data: { ocr_options_target: 'warning',
-                    ocr_options_warn_content_types: EMBEDDED_TEXT_CONTENT_TYPES.to_json }
-          ) do %>
-        <p class="mb-0">Do not run OCR for files that already have embedded text.</p>
-      <% end %>
-
-      <%= render LanguageSelectorComponent.new(form:, label_classes: 'fw-bold',
-                                               container_data: { ocr_options_target: 'languages' }) %>
+  <% group.with_radio_button(
+       label_text: 'Yes',
+       input_value: 'true',
+       input_data: { ocr_options_target: 'performOcr', action: 'ocr-options#toggle' },
+       container_classes: 'my-fieldset'
+     ) do %>
+    <%= render SdrViewComponents::Elements::AlertComponent.new(
+          variant: :info,
+          classes: 'd-none',
+          data: { ocr_options_target: 'warning',
+                  ocr_options_warn_content_types: EMBEDDED_TEXT_CONTENT_TYPES.to_json }
+        ) do %>
+      <p class="mb-0">Do not run OCR for files that already have embedded text.</p>
     <% end %>
+
+    <%= render LanguageSelectorComponent.new(form:, label_classes: 'fw-bold',
+                                             container_data: { ocr_options_target: 'languages' }) %>
   <% end %>
 <% end %>

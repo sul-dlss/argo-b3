@@ -209,7 +209,7 @@ RSpec.describe ContentFileSetForm do
         form.assign_attributes(label: 'New label')
 
         expect(form.save).to be false
-        expect(form.errors.attribute_names).to include(:'content_files[0].administrative_options')
+        expect(form.errors.attribute_names).to include(:'content_files[0].administrative')
         expect(content_file_set.reload.label).to eq('Original label')
       end
 
