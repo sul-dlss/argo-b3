@@ -20,6 +20,11 @@ module EmbargoFormConcern
     self.with_embargo = embargo_release_date.present? if with_embargo.nil?
   end
 
+  # When built from a cocina object, with_embargo is derived from its embargo release date.
+  def model_attrs_for(cocina_object)
+    super.then { |attrs| attrs.merge(with_embargo: attrs[:embargo_release_date].present?) }
+  end
+
   def nullify_embargo_access_rights
     self.embargo_release_date = nil
     self.embargo_view = nil

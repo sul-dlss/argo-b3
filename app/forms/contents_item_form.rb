@@ -6,12 +6,13 @@ class ContentsItemForm < CocinaModels::Dro
   include PermittedParamsConcern
   include TextExtractionConcern
   include VersionDescriptionConcern
+  include EmbargoFormConcern
 
   # The initial version's description is set at registration, so it is not entered.
   validates :version_description, presence: true, unless: :initial_version?
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages].freeze
+  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages with_embargo].freeze
 
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
@@ -32,8 +33,12 @@ class ContentsItemForm < CocinaModels::Dro
   # The content errors themselves are shown by the structure validation frame.
   validate :content_valid_for_content_type, on: :deposit
 
+  # The access fields, which structuring also uses (before they are saved) to set the access of files.
+  ACCESS_PARAMS = %i[with_embargo embargo_release_date access_view access_download access_location
+                     embargo_view embargo_download embargo_location].freeze
+
   def self.permitted_params
-    [:content_type, :viewing_direction, :perform_ocr, :version_description, { ocr_languages: [] }]
+    [:content_type, :viewing_direction, :perform_ocr, :version_description, { ocr_languages: [] }, *ACCESS_PARAMS]
   end
 
   # Saves the OCR settings with the content. Then opens a new version if the version is closed (since staging
@@ -68,9 +73,13 @@ class ContentsItemForm < CocinaModels::Dro
     self.ocr_languages = []
   end
 
+  # Validated against the object as edited, since the form may change its access.
+  # Skipped when the edited object cannot be built, since the invalid fields have their own errors.
   def content_valid_for_content_type
-    return if Contents::Validator.call(content:, cocina_object: previous_cocina_object, content_type:).valid?
+    return if Contents::Validator.call(content:, cocina_object: mutated_cocina_object, content_type:).valid?
 
     errors.add(:content, I18n.t('edit.contents.fields.content.validations.invalid'))
+  rescue Cocina::Models::ValidationError
+    nil
   end
 end

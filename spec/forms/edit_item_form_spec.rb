@@ -121,6 +121,14 @@ RSpec.describe EditItemForm do
 
       expect(edit_item_form.valid?(:deposit)).to be true
     end
+
+    it 'does not validate the structure when the access is invalid' do
+      edit_item_form.update(access_view: 'dark', access_download: 'world')
+
+      expect(edit_item_form.valid?(:deposit)).to be false
+      expect(edit_item_form.errors[:access]).to be_present
+      expect(edit_item_form.errors[:content]).to be_empty
+    end
   end
 
   describe 'unsaved changes validation' do

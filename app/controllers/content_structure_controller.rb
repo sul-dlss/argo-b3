@@ -73,8 +73,10 @@ class ContentStructureController < ContentsApplicationController
   end
 
   def redirect_to_edit_with_structure_changed
-    redirect_to edit_content_structure_path(@content_token, structure_changed: true,
-                                                            content_type: params[:content_type].presence)
+    redirect_to edit_content_structure_path(@content_token,
+                                            structure_changed: true,
+                                            content_type: params[:content_type].presence,
+                                            ContentsItemForm.model_name.param_key => @selected_access.presence)
   end
 
   # Replaces the structure with the uploaded CSV. Nothing is changed unless the CSV is entirely valid.
@@ -129,7 +131,16 @@ class ContentStructureController < ContentsApplicationController
     @content_token = params[:content_id]
     verified_content_id = verify_token(@content_token)
     @content = Content.with_structural_associations.find(verified_content_id)
-    @cocina_object = fetch_cocina_object(druid: @content.druid, lock: @content.lock)
+    @selected_access = selected_access_params
+    @cocina_object = Contents::ApplySelectedAccess.call(cocina_object: fetch_cocina_object(druid: @content.druid,
+                                                                                           lock: @content.lock),
+                                                        params: @selected_access)
+  end
+
+  # The access selected on the item details, which may not have been saved yet.
+  # @return [Hash] empty when no access was selected
+  def selected_access_params
+    params.fetch(ContentsItemForm.model_name.param_key, {}).permit(*ContentsItemForm::ACCESS_PARAMS).to_h
   end
 
   def fetch_cocina_object(druid:, lock:)

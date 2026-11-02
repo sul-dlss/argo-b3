@@ -19,9 +19,32 @@ RSpec.describe ContentsItemForm do
   end
 
   describe '.permitted_params' do
-    it 'permits the content type, viewing direction, OCR settings, and version description' do
+    it 'permits the content type, viewing direction, OCR settings, version description, and access' do
       expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :perform_ocr,
-                                                      :version_description, { ocr_languages: [] }])
+                                                      :version_description, { ocr_languages: [] },
+                                                      :with_embargo, :embargo_release_date, :access_view,
+                                                      :access_download, :access_location, :embargo_view,
+                                                      :embargo_download, :embargo_location])
+    end
+  end
+
+  describe 'with_embargo' do
+    context 'without an embargo' do
+      it 'is without embargo' do
+        expect(contents_item_form.with_embargo).to be false
+      end
+    end
+
+    context 'with an embargo' do
+      let(:cocina_object) do
+        embargo = { releaseDate: '2030-01-01T00:00:00Z', view: 'world', download: 'world' }
+        build(:dro_with_metadata).new(access: { view: 'stanford', download: 'stanford', embargo: })
+      end
+
+      it 'is with embargo' do
+        expect(contents_item_form.with_embargo).to be true
+        expect(contents_item_form.embargo_release_date).to eq(Time.zone.parse('2030-01-01'))
+      end
     end
   end
 
@@ -136,6 +159,20 @@ RSpec.describe ContentsItemForm do
       contents_item_form.update(content_type: Cocina::Models::ObjectType.object)
 
       expect(contents_item_form.valid?(:deposit)).to be true
+    end
+
+    it 'is valid when depositing with access for which the content errors are only warnings' do
+      contents_item_form.update(access_view: 'dark', access_download: 'none')
+
+      expect(contents_item_form.valid?(:deposit)).to be true
+    end
+
+    it 'does not validate the content when the access is invalid' do
+      contents_item_form.update(access_view: 'dark', access_download: 'world')
+
+      expect(contents_item_form.valid?(:deposit)).to be false
+      expect(contents_item_form.errors[:access]).to be_present
+      expect(contents_item_form.errors[:content]).to be_empty
     end
 
     it 'is not changed by setting the content' do
