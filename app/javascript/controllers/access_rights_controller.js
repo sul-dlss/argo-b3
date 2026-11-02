@@ -6,7 +6,7 @@ const DOWNLOAD_OPTIONS_BY_VIEW = {
   world: ['world', 'stanford', 'location-based', 'none'],
   dark: ['none'],
   'citation-only': ['none'],
-  stanford: ['stanford', 'location-based', 'none'],
+  stanford: ['stanford', 'location-based'],
   'location-based': ['location-based', 'none']
 }
 

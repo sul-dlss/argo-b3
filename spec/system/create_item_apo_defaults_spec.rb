@@ -31,7 +31,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       administrative: {
         hasAdminPolicy: 'druid:hv992ry2431',
         hasAgreement: 'druid:hp308wm0436',
-        accessTemplate: { view: 'stanford', download: 'none' }
+        accessTemplate: { view: 'stanford', download: 'stanford' }
       }
     )
   end
@@ -55,7 +55,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       expect(page).to have_select('APO', selected: other_apo_title)
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
-        expect(page).to have_select('Download access', selected: 'None')
+        expect(page).to have_select('Download access', selected: 'Stanford')
         expect(page).to have_css('.form-text', text: 'APO default = Stanford')
       end
       expect(page).to have_css('#item_copyright_help', text: 'APO default = none')
@@ -143,7 +143,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       expect(page).to have_css('#item_license_help', text: 'APO default = none')
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
-        expect(page).to have_select('Download access', selected: 'None')
+        expect(page).to have_select('Download access', selected: 'Stanford')
         expect(page).to have_css('.form-text', text: 'APO default = Stanford')
         # The location of the previously selected APO is cleared. It is hidden, since access is not location-based.
         expect(page).to have_field('Location', with: '', disabled: true, visible: :hidden)

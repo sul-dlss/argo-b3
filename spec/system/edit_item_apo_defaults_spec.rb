@@ -37,7 +37,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       administrative: {
         hasAdminPolicy: 'druid:hv992ry2431',
         hasAgreement: 'druid:hp308wm0436',
-        accessTemplate: { view: 'stanford', download: 'none' }
+        accessTemplate: { view: 'stanford', download: 'stanford' }
       }
     )
   end
@@ -110,7 +110,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       expect(page).to have_select('License', selected: '')
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
-        expect(page).to have_select('Download access', selected: 'None')
+        expect(page).to have_select('Download access', selected: 'Stanford')
       end
     end
   end

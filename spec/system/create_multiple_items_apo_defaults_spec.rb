@@ -31,7 +31,7 @@ RSpec.describe 'Apply APO defaults when creating multiple items' do
       administrative: {
         hasAdminPolicy: 'druid:hv992ry2431',
         hasAgreement: 'druid:hp308wm0436',
-        accessTemplate: { view: 'stanford', download: 'none' }
+        accessTemplate: { view: 'stanford', download: 'stanford' }
       }
     )
   end
@@ -58,7 +58,7 @@ RSpec.describe 'Apply APO defaults when creating multiple items' do
       expect(page).to have_select('APO', selected: other_apo_title)
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
-        expect(page).to have_select('Download access', selected: 'None')
+        expect(page).to have_select('Download access', selected: 'Stanford')
         expect(page).to have_css('.form-text', text: 'APO default = Stanford')
       end
       expect(page).to have_css('#items_registration_copyright_help', text: 'APO default = none')

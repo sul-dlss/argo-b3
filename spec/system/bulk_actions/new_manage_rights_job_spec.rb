@@ -35,9 +35,11 @@ RSpec.describe 'Create a new manage rights bulk action' do
     expect_download_rights_enabled ['None']
     expect(page).to have_select('Download access', selected: 'None')
 
-    # When stanford view is selected, stanford and location-based download are enabled
+    # When stanford view is selected, only stanford and location-based download are enabled,
+    # so the none download carried over from citation-only is replaced by stanford
     choose_view_right 'Stanford'
-    expect_download_rights_enabled ['Stanford', 'Location Based', 'None']
+    expect_download_rights_enabled ['Stanford', 'Location Based']
+    expect(page).to have_select('Download access', selected: 'Stanford')
 
     # When location-based view is selected, location-based and none download are enabled
     choose_view_right 'Location Based'
