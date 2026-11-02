@@ -2,7 +2,10 @@ inherit_from: .rubocop_todo.yml
 
 require:
   - ./lib/rubocop/cop/argo_b3/accept_confirm_click
+  - ./lib/rubocop/cop/argo_b3/concern_included_methods
+  - ./lib/rubocop/cop/argo_b3/format_datetime
   - ./lib/rubocop/cop/argo_b3/form_params_from
+  - ./lib/rubocop/cop/argo_b3/job_rescue_reporting
 
 plugins:
   - rubocop-capybara
@@ -679,3 +682,18 @@ ArgoB3/AcceptConfirmClick:
 ArgoB3/FormParamsFrom:
   Include:
     - 'app/controllers/**/*.rb'
+
+ArgoB3/ConcernIncludedMethods:
+  Include:
+    - 'app/**/concerns/**/*.rb'
+
+ArgoB3/FormatDatetime:
+  # Leading **/ so the patterns also match when erb_lint runs RuboCop on ERB.
+  Include:
+    - '**/app/components/**/*'
+    - '**/app/helpers/**/*'
+    - '**/app/views/**/*'
+
+ArgoB3/JobRescueReporting:
+  Include:
+    - 'app/jobs/**/*.rb'

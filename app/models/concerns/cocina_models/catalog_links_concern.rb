@@ -15,35 +15,35 @@ module CocinaModels
       # A blank field is nil, as when mapped from a link without one, so that it is not a change.
       normalizes_whitespace :catalog_link_part_label, :catalog_link_sort_key
       validate :sort_key_requires_part_label
+    end
 
-      def find_folio_catalog_link(catalog_record_id:)
-        folio_catalog_links.find { |link| link.catalog_record_id == catalog_record_id }
-      end
+    def find_folio_catalog_link(catalog_record_id:)
+      folio_catalog_links.find { |link| link.catalog_record_id == catalog_record_id }
+    end
 
-      def catalog_link_refresh? = catalog_link_refresh
+    def catalog_link_refresh? = catalog_link_refresh
 
-      def folio_catalog_links_changed?
-        folio_catalog_links.map(&:catalog_record_id).sort != existing_folio_catalog_record_ids.sort
-      end
+    def folio_catalog_links_changed?
+      folio_catalog_links.map(&:catalog_record_id).sort != existing_folio_catalog_record_ids.sort
+    end
 
-      # @return [Array<String>] the catalog record ids of the Folio catalog links of the previous Cocina object
-      def existing_folio_catalog_record_ids
-        Array(previous_cocina_object&.identification&.catalogLinks)
-          .filter_map { |link| link.catalogRecordId if link.catalog == 'folio' }
-      end
+    # @return [Array<String>] the catalog record ids of the Folio catalog links of the previous Cocina object
+    def existing_folio_catalog_record_ids
+      Array(previous_cocina_object&.identification&.catalogLinks)
+        .filter_map { |link| link.catalogRecordId if link.catalog == 'folio' }
+    end
 
-      # This bubbles up changes to the parent objects.
-      def tracked_associations_changed?
-        super || folio_catalog_links_changed?
-      end
+    # This bubbles up changes to the parent objects.
+    def tracked_associations_changed?
+      super || folio_catalog_links_changed?
+    end
 
-      private
+    private
 
-      def sort_key_requires_part_label
-        return unless catalog_link_sort_key.present? && catalog_link_part_label.blank?
+    def sort_key_requires_part_label
+      return unless catalog_link_sort_key.present? && catalog_link_part_label.blank?
 
-        errors.add(:catalog_link_sort_key, 'requires catalog_link_part_label to be present')
-      end
+      errors.add(:catalog_link_sort_key, 'requires catalog_link_part_label to be present')
     end
   end
 end
