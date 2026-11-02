@@ -5,6 +5,9 @@ module Constants # rubocop:disable Metrics/ModuleLength
   # Time zone in which times are displayed and entered.
   TIME_ZONE = 'Pacific Time (US & Canada)'
 
+  # IANA ID for TIME_ZONE, as required by Solr's TZ param.
+  SOLR_TIME_ZONE = ActiveSupport::TimeZone[TIME_ZONE].tzinfo.name
+
   RELEASE_TARGETS = [
     %w[Searchworks Searchworks],
     %w[Earthworks Earthworks],

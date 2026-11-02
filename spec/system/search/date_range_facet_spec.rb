@@ -20,10 +20,10 @@ RSpec.describe 'Date range dynamic facets', :solr do
 
     # First deposited date is a dynamic facet.
     find_facet_section('First deposited date').click
-    expect(page).to have_facet_value('Last day', count: 1, facet: 'First deposited date')
-    expect(page).to have_facet_value('Last week', count: 1, facet: 'First deposited date')
-    expect(page).to have_facet_value('Last month', count: 1, facet: 'First deposited date')
-    expect(page).to have_facet_value('Last year', count: 2, facet: 'First deposited date')
+    expect(page).to have_facet_value('Today', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Last 7 days', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Last 30 days', count: 1, facet: 'First deposited date')
+    expect(page).to have_facet_value('Year to date', count: 1, facet: 'First deposited date')
     expect(page).to have_facet_value('All', count: 2, facet: 'First deposited date')
 
     within(find_facet_section('First deposited date')) do
