@@ -2,17 +2,24 @@
 
 module Edit
   # Component for rendering edit form for access settings, including embargo
-  # The form's object must include CocinaModels::AccessConcern, CocinaModels::EmbargoConcern, and EmbargoFormConcern.
+  # The form's object must include CocinaModels::AccessConcern, CocinaModels::EmbargoConcern, and EmbargoFormConcern,
+  # and FileAccessFormConcern when showing the overwrite file access checkbox.
   class AccessAndEmbargoComponent < ApplicationComponent
     # @param apo_defaults [Boolean] true to show (and apply) the selected APO's default access, using the
     #   apo-defaults Stimulus controller
-    def initialize(form:, apo_defaults: false)
+    # @param overwrite_file_access [Boolean] true to show the checkbox for applying the access to the files
+    def initialize(form:, apo_defaults: false, overwrite_file_access: false)
       @form = form
       @apo_defaults = apo_defaults
+      @overwrite_file_access = overwrite_file_access
       super()
     end
 
     attr_reader :form
+
+    def overwrite_file_access?
+      @overwrite_file_access
+    end
 
     # @param group [String] the apo-defaults group of the access fields
     # @return [String, nil] the group, if showing APO defaults

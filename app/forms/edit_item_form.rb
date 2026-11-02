@@ -10,6 +10,7 @@ class EditItemForm < CocinaModels::Dro
   include VersionDescriptionConcern
   include DescriptionCsvFormConcern
   include EmbargoFormConcern
+  include FileAccessFormConcern
   include CollectionFormConcern
   include CatalogRecordIdFormConcern
   include CatalogRecordIdExistsFormConcern
@@ -37,19 +38,21 @@ class EditItemForm < CocinaModels::Dro
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
   # catalog_record_id is not one, since changing it can move refresh and serials to another Folio catalog link.
   FORM_ONLY_ATTRIBUTES = %w[version_description lock with_embargo limit_collection_by_apo
-                            description_csv_file].freeze
+                            description_csv_file overwrite_file_access].freeze
 
   # Before saving, opens a new version if the version
   # is closed and there is something to save or deposit; otherwise updates the open version's description if changed.
+  # A change to the access is applied to the files of the cocina object and, unless depositing, of the content.
   # @param [String] user_name the sunetid of the user performing the action
   # @param [Boolean] accession whether to start accessioning after saving
   # @raise [ActiveModel::ValidationError] if the form is invalid
   def save!(user_name:, accession: false)
     validate!
     prepare_version!(user_name:, open_version: changed? || accession)
+    overwrite = content_file_access_overwrite
     super(user_name:, accession:, workflow_context: content&.workflow_context || {})
     # The content has no unsaved changes, so it matches what is deposited.
-    content&.destroy! if accession
+    accession ? content&.destroy! : overwrite_content_file_access!(overwrite)
   ensure
     rebase_content_lock
   end

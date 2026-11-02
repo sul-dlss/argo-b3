@@ -7,12 +7,13 @@ class ContentsItemForm < CocinaModels::Dro
   include TextExtractionConcern
   include VersionDescriptionConcern
   include EmbargoFormConcern
+  include FileAccessFormConcern
 
   # The initial version's description is set at registration, so it is not entered.
   validates :version_description, presence: true, unless: :initial_version?
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages with_embargo].freeze
+  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages with_embargo overwrite_file_access].freeze
 
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
@@ -38,18 +39,22 @@ class ContentsItemForm < CocinaModels::Dro
                      embargo_view embargo_download embargo_location].freeze
 
   def self.permitted_params
-    [:content_type, :viewing_direction, :perform_ocr, :version_description, { ocr_languages: [] }, *ACCESS_PARAMS]
+    [:content_type, :viewing_direction, :perform_ocr, :version_description, :overwrite_file_access,
+     { ocr_languages: [] }, *ACCESS_PARAMS]
   end
 
   # Saves the OCR settings with the content. Then opens a new version if the version is closed (since staging
   # always updates the structure); otherwise updates the description of the open version if it changed.
+  # Afterwards, applies a change to the access to the content's files, so that staging them saves it.
   # @param [String] user_name the sunetid of the user performing the action
   # @raise [ActiveModel::ValidationError] if the form is invalid
   def save!(user_name:)
     validate!
     content&.update!(ocr_settings_attributes)
     prepare_version!(user_name:, open_version: true)
+    overwrite = content_file_access_overwrite
     super
+    overwrite_content_file_access!(overwrite)
   ensure
     # Keeps the content on the object's current lock, even if saving failed after opening a version.
     content&.update!(lock: previous_cocina_object.lock)

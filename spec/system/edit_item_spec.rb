@@ -10,6 +10,7 @@ RSpec.describe 'Edit an item' do
   let(:apo_druid) { cocina_object.administrative.hasAdminPolicy }
   let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
   let!(:user) { create(:user) }
+  let(:world_cocina_object) { cocina_object.new(access: { view: 'world', download: 'world' }) }
 
   # The version is closed, so editing opens a new version.
   let(:version_status) do
@@ -98,6 +99,30 @@ RSpec.describe 'Edit an item' do
       .with(cocina_object: having_attributes(identification: having_attributes(sourceId: 'sul:changed')),
             user_name: user.sunetid, description: nil)
     expect(Sdr::Repository).not_to have_received(:accession)
+  end
+
+  it 'makes the files dark when the item is made dark, even when not overwriting file-level rights' do
+    allow(Sdr::Repository).to receive(:find).and_return(world_cocina_object)
+    allow(version_client).to receive(:open).and_return(world_cocina_object.new(version: 2, lock: 'opened-lock'))
+    content = create(:content, :mutable, druid:, lock: world_cocina_object.lock)
+    content_file = create(:content_file, content_file_set: create(:content_file_set, content:))
+
+    visit edit_item_path(druid)
+
+    click_button 'APO, collection, rights'
+    uncheck 'Overwrite file-level rights'
+    select 'Dark', from: 'View access'
+    expect(page).to have_field('Overwrite file-level rights', checked: true, disabled: true)
+
+    find_by_id('deposit-tab').click
+    fill_in 'Version description', with: 'Made dark'
+    click_button 'Save as draft', match: :first
+
+    expect(page).to have_toast('Item updated.')
+    expect(Sdr::Repository).to have_received(:update)
+      .with(cocina_object: having_attributes(access: having_attributes(view: 'dark', download: 'none')),
+            user_name: user.sunetid, description: nil)
+    expect(content_file.reload).to have_attributes(view: 'dark', download: 'none', shelve: false, publish: false)
   end
 
   context 'when the item has Folio catalog links' do

@@ -151,6 +151,52 @@ RSpec.describe EditItemForm do
     end
   end
 
+  describe 'file access' do
+    let(:content) { create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+    let!(:content_file) { create(:content_file, content_file_set: create(:content_file_set, content:)) }
+
+    before do
+      allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
+      edit_item_form.version_service = version_service_double
+      edit_item_form.content = content
+      edit_item_form.version_description = 'Initial version'
+    end
+
+    context 'when the access changed' do
+      before { edit_item_form.update(access_view: 'stanford', access_download: 'stanford') }
+
+      it 'applies it to the content files, which are rebased onto the saved object' do
+        edit_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford', shelve: true)
+        expect(content.reload.lock).to eq('updated-lock')
+      end
+    end
+
+    context 'when the access changed without overwriting file access' do
+      before do
+        edit_item_form.update(access_view: 'stanford', access_download: 'stanford', overwrite_file_access: false)
+      end
+
+      it 'does not change the content files' do
+        edit_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'world', download: 'world')
+      end
+    end
+
+    context 'when changed to dark without overwriting file access' do
+      before { edit_item_form.update(access_view: 'dark', access_download: 'none', overwrite_file_access: false) }
+
+      it 'makes the content files dark and unshelved' do
+        edit_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'dark', download: 'none', preserve: true,
+                                                       shelve: false, publish: false)
+      end
+    end
+  end
+
   describe 'description_csv_file' do
     before { edit_item_form.update(version_description: 'Updated the description', description_csv_file:) }
 

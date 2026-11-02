@@ -117,6 +117,37 @@ RSpec.describe 'Manage files' do
             user_name: user.sunetid, description: nil)
   end
 
+  context 'with a structured file' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
+    let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
+    let!(:content_file) { create(:content_file, content_file_set: create(:content_file_set, content:)) }
+
+    it 'overwrites the file access, which is required while dark' do
+      visit "/contents/#{druid}/edit"
+
+      click_on 'Item details'
+
+      expect(page).to have_field('Overwrite file-level rights', checked: true, disabled: false)
+
+      within_fieldset('Access settings without embargo') do
+        select 'Dark', from: 'View access'
+      end
+      expect(page).to have_field('Overwrite file-level rights', checked: true, disabled: true)
+
+      within_fieldset('Access settings without embargo') do
+        select 'Stanford', from: 'View access'
+        select 'Stanford', from: 'Download access'
+      end
+      expect(page).to have_field('Overwrite file-level rights', checked: true, disabled: false)
+
+      click_on 'Save as draft'
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford')
+      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+    end
+  end
+
   it 'navigates between tabs with next and previous' do
     visit "/contents/#{druid}/edit"
 
@@ -286,16 +317,19 @@ RSpec.describe 'Manage files' do
       click_on 'Item details'
       choose 'With embargo', allow_label_click: true
       fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
-      within_fieldset('Access settings once embargo ends') do
+      within_fieldset('Access settings during embargo') do
         select 'Stanford', from: 'View access'
+      end
+      within_fieldset('Access settings once embargo ends') do
+        select 'World', from: 'View access'
       end
 
       click_on 'Structure'
-      expect(page).to have_field('contents_item[embargo_view]', with: 'stanford', type: :hidden)
+      expect(page).to have_field('contents_item[access_view]', with: 'stanford', type: :hidden)
       click_button('Clear and structure files again')
 
       expect(page).to have_toast('Structure built from files')
-      # The files have the access once the embargo ends.
+      # The files have the access during the embargo; releasing the embargo updates them.
       content_file = Content.find_by!(druid:).content_files.sole
       expect(content_file).to have_attributes(view: 'stanford', download: 'stanford', shelve: true, publish: true)
     end

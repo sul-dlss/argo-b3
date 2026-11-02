@@ -2,7 +2,8 @@
 
 module Contents
   # Applies the access selected on the manage files form (which may not have been saved yet) to a cocina object,
-  # so that structuring and validating the structure use it.
+  # so that structuring and validating the structure use it. The embargo is not applied, since files get the
+  # object's current access (see Contents::DefaultFileAccess).
   class ApplySelectedAccess
     def self.call(...)
       new(...).call
@@ -27,28 +28,12 @@ module Contents
 
     attr_reader :cocina_object, :params
 
+    # The location is omitted when blank, matching DroMutator.
     def access_props
-      cocina_object.access.to_h.except(:embargo)
-                   .merge(rights_props('access'), embargo: (embargo_props if embargo?))
+      cocina_object.access.to_h.except(:location)
+                   .merge(view: params[:access_view], download: params[:access_download],
+                          location: params[:access_location].presence)
                    .compact
-    end
-
-    # @param prefix [String] 'access' or 'embargo'
-    # @return [Hash] view, download, and location, which is omitted when blank (matching DroMutator)
-    def rights_props(prefix)
-      { view: params[:"#{prefix}_view"], download: params[:"#{prefix}_download"],
-        location: params[:"#{prefix}_location"].presence }
-    end
-
-    # The release date may not be entered yet, but files still get the access once the embargo ends.
-    def embargo?
-      ActiveModel::Type::Boolean.new.cast(params[:with_embargo])
-    end
-
-    # Cocina requires a release date, so a placeholder stands in until one is entered; structuring does not use it.
-    def embargo_props
-      { releaseDate: params[:embargo_release_date].presence || Time.zone.today.to_s,
-        **rights_props('embargo') }.compact
     end
   end
 end
