@@ -67,11 +67,14 @@ class EditItemForm < CocinaModels::Dro
 
   # Depositing deposits the cocina structure, not the mutable Content, so the immutable Content is validated
   # against the object as edited (since the form may change its content type and access).
+  # Skipped when the edited object cannot be built, since the invalid fields have their own errors.
   def structure_valid_for_content_type
     immutable_content = Contents::Builder.find_or_create(cocina_object: previous_cocina_object)
     return if Contents::Validator.call(content: immutable_content, cocina_object: mutated_cocina_object).valid?
 
     errors.add(:content, I18n.t('edit.items.fields.content.validations.invalid'))
+  rescue Cocina::Models::ValidationError
+    nil
   end
 
   def content_is_saved
@@ -87,8 +90,6 @@ class EditItemForm < CocinaModels::Dro
   end
 
   def model_attrs_for(cocina_object)
-    super.then do |attrs|
-      attrs.merge(lock: cocina_object.lock, with_embargo: attrs[:embargo_release_date].present?)
-    end
+    super.merge(lock: cocina_object.lock)
   end
 end

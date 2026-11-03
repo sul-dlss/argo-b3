@@ -2,7 +2,9 @@
 <%# disable-actions disables actions (e.g., deleting files, changing the structure, depositing) while files are
     uploading and while the structure is changing (forms with DisableActionsHelper#disable_actions_form_data, e.g.,
     structuring files). %>
-<div class="container py-2" data-controller="unassociated-files structure-content-type disable-actions"
+<div class="container py-2" data-controller="unassociated-files structure-item-details disable-actions"
+     data-structure-item-details-access-fields-value="<%= ContentsItemForm::ACCESS_PARAMS.to_json %>"
+     data-structure-item-details-param-key-value="<%= ContentsItemForm.model_name.param_key %>"
      data-action="dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.contents.edit.title')) %>
 
@@ -39,13 +41,21 @@
                               ocr_options_allowed_content_types_value: Sdr::TextExtraction::SUPPORTED_TYPES } do %>
             <%= render Edit::ContentTypeComponent.new(form: item_form, input_data: { content_type_dependent_target: 'contentType',
                                                                                      ocr_options_target: 'contentType',
-                                                                                     action: 'content-type-dependent#toggle ocr-options#toggle structure-content-type#update' }) %>
+                                                                                     action: 'content-type-dependent#toggle ocr-options#toggle structure-item-details#update' }) %>
 
             <%= render Edit::ViewingDirectionComponent.new(form: item_form, container_classes: 'my-fieldset', label_classes: 'fw-bold',
                                                            container_data: { content_type_dependent_target: 'dependent',
                                                                              content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
             <%= render Edit::OcrComponent.new(form: item_form) %>
           <% end %>
+
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+          <%# Structuring uses the selected access, which may not have been saved yet. %>
+          <%= tag.div data: { action: 'change->structure-item-details#update' } do %>
+            <%= render Edit::AccessAndEmbargoComponent.new(form: item_form) %>
+          <% end %>
+
         <% end %>
       <% end %>
 
@@ -141,7 +151,7 @@
                                                                discard_or_purge_presenter: @discard_or_purge_presenter) %>
           <% end %>
           <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
-          <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_content_type_target: 'frame' }, class: 'content-files-frame' do %>
+          <%= turbo_frame_tag @content, 'edit-structure', src: edit_content_structure_path(@content_token, content_type: @contents_item_form.content_type), data: { controller: 'reloadable-frame', structure_item_details_target: 'frame' }, class: 'content-files-frame' do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <%# Until the structure section has loaded, assume there are unassociated files. %>
             <span hidden data-unassociated-files-target="unassociated"></span>

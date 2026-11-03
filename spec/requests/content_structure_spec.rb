@@ -121,6 +121,16 @@ RSpec.describe 'Content structure' do
       expect(response.body).to include('Resource 1 (Page 1) has more than one published JP2 file.')
     end
 
+    context 'when dark access is selected' do
+      it 'renders the violations as warnings' do
+        get validation_content_structure_path(content_id: content_token,
+                                              contents_item: { access_view: 'dark', access_download: 'none' })
+
+        expect(response.body).not_to include('Content errors')
+        expect(response.body).to include('Content warnings')
+      end
+    end
+
     context 'when dark' do
       let(:access) { { view: 'dark', download: 'none' } }
 
@@ -199,6 +209,48 @@ RSpec.describe 'Content structure' do
 
       expect(response).to redirect_to(edit_content_structure_path(content_id: content_token, structure_changed: true,
                                                                   content_type: Cocina::Models::ObjectType.book))
+    end
+  end
+
+  describe 'editing with selected access' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.image)
+        .new(access: { view: 'world', download: 'world' })
+    end
+
+    before do
+      create(:content_file_binary, content:, filepath: 'image_0001.tif', mime_type: 'image/tiff')
+    end
+
+    it 'uses the selected access to select the populator and keeps it for structuring' do
+      get edit_content_structure_path(content_id: content_token,
+                                      contents_item: { with_embargo: false, access_view: 'dark',
+                                                       access_download: 'none' })
+
+      # A dark object is not structured as an image.
+      expect(response.body).to include('Strategy for structuring: Default (resource per file)')
+      form = response.parsed_body.at_css(%(form[action="#{content_structure_path(content_id: content_token)}"]))
+      expect(form.at_css('input[name="contents_item[access_view]"]')['value']).to eq('dark')
+    end
+  end
+
+  describe 'updating with selected access' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
+    let(:selected_access) { { 'with_embargo' => 'false', 'access_view' => 'dark', 'access_download' => 'none' } }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'document.pdf', mime_type: 'application/pdf')
+    end
+
+    it 'structures the files with the selected access and redirects to edit with it' do
+      patch content_structure_path(content_id: content_token),
+            params: { commit: ContentStructureController::STRUCTURE_VALUE, populator: 'FileSetPerFile',
+                      contents_item: selected_access }
+
+      expect(response).to redirect_to(edit_content_structure_path(content_id: content_token, structure_changed: true,
+                                                                  contents_item: selected_access))
+      expect(content.content_files.sole).to have_attributes(view: 'dark', download: 'none', preserve: true,
+                                                            shelve: false, publish: false)
     end
   end
 

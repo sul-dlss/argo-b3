@@ -88,6 +88,35 @@ RSpec.describe 'Manage files' do
     expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
   end
 
+  it 'adds an embargo from the item details' do
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+
+    expect(page).to have_field('Without embargo', type: 'radio', checked: true, visible: :all)
+    expect(page).to have_no_css('legend', text: 'Access settings during embargo')
+
+    choose 'With embargo', allow_label_click: true
+    fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
+    within_fieldset('Access settings during embargo') do
+      select 'Dark', from: 'View access'
+    end
+    within_fieldset('Access settings once embargo ends') do
+      select 'Stanford', from: 'View access'
+    end
+
+    click_on 'Save as draft'
+
+    expect(page).to have_current_path("/objects/#{druid}")
+    expect(Sdr::Repository).to have_received(:update)
+      .with(cocina_object: having_attributes(
+        access: having_attributes(view: 'dark',
+                                  embargo: having_attributes(releaseDate: Time.zone.parse('2040-06-01'),
+                                                             view: 'stanford'))
+      ),
+            user_name: user.sunetid, description: nil)
+  end
+
   it 'navigates between tabs with next and previous' do
     visit "/contents/#{druid}/edit"
 
@@ -229,6 +258,46 @@ RSpec.describe 'Manage files' do
       expect(page).to have_current_path("/objects/#{druid}")
 
       expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+    end
+  end
+
+  context 'when access is selected before structuring' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
+
+    it 'structures the files with the selected access' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_on 'Item details'
+      within_fieldset('Access settings without embargo') do
+        select 'Dark', from: 'View access'
+      end
+
+      click_on 'Structure'
+      # Waits for the structure frame to reload with the selected access.
+      expect(page).to have_field('contents_item[access_view]', with: 'dark', type: :hidden)
+      click_button('Structure files')
+
+      expect(page).to have_toast('Structure built from files')
+      content_file = Content.find_by!(druid:).content_files.sole
+      expect(content_file).to have_attributes(view: 'dark', download: 'none', shelve: false, publish: false)
+
+      click_on 'Item details'
+      choose 'With embargo', allow_label_click: true
+      fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
+      within_fieldset('Access settings once embargo ends') do
+        select 'Stanford', from: 'View access'
+      end
+
+      click_on 'Structure'
+      expect(page).to have_field('contents_item[embargo_view]', with: 'stanford', type: :hidden)
+      click_button('Clear and structure files again')
+
+      expect(page).to have_toast('Structure built from files')
+      # The files have the access once the embargo ends.
+      content_file = Content.find_by!(druid:).content_files.sole
+      expect(content_file).to have_attributes(view: 'stanford', download: 'stanford', shelve: true, publish: true)
     end
   end
 

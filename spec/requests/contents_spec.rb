@@ -57,6 +57,13 @@ RSpec.describe 'Contents' do
         expect(page).to have_select('Content type', visible: :all)
       end
 
+      it 'selects the embargo toggle from the object' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_checked_field('Without embargo', visible: :all)
+      end
+
       it 'renders the navigation, save as draft, purge, and deposit buttons' do
         get edit_content_path(druid)
 
@@ -204,6 +211,22 @@ RSpec.describe 'Contents' do
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
         expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
+      end
+    end
+
+    context 'when adding an embargo' do
+      it 'updates the access of the object' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { with_embargo: true, embargo_release_date: '2030-01-01',
+                                                              access_view: 'dark', access_download: 'none',
+                                                              embargo_view: 'world', embargo_download: 'world' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(
+            access: having_attributes(view: 'dark', download: 'none',
+                                      embargo: having_attributes(view: 'world', download: 'world'))
+          ), user_name: user.sunetid, description: nil)
       end
     end
 

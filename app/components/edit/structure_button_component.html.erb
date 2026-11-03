@@ -2,7 +2,7 @@
   <%# While structuring, actions (e.g., the resources' actions, depositing, uploading) are disabled. %>
   <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: content_token),
                                                                   label:,
-                                                                  params: { commit:, populator:, content_type: },
+                                                                  params:,
                                                                   top: false,
                                                                   method: :patch,
                                                                   variant: :'outline-primary',
