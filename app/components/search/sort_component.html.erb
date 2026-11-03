@@ -6,11 +6,13 @@
                                                               aria: { expanded: false }) %>
 
   <div class="dropdown-menu" role="menu">
+    <%# Full page visit so that facets and filters outside the items-search frame get the sort. %>
     <% sort_options.each do |sort| %>
       <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(
             label: label_for(sort),
-            link: search_items_path(search_form.with_attributes(sort:, page: nil)),
-            role: 'menuitem'
+            link: search_path(search_form.with_attributes(sort:, page: nil)),
+            role: 'menuitem',
+            data: { turbo_frame: '_top' }
           ) %>
     <% end %>
   </div>

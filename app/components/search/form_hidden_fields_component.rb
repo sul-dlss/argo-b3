@@ -19,5 +19,9 @@ module Search
     def query_hidden_field?
       search_form.query.present? && form_fields.exclude?('query')
     end
+
+    def sort_hidden_field?
+      search_form.sortable? && search_form.sort.present?
+    end
   end
 end

@@ -123,6 +123,28 @@ RSpec.describe 'Item search', :solr do
           expect(page).to have_button('Sort by Registered date (descending)')
         end
       end
+
+      it 'persists the sort when applying a facet' do
+        visit search_path(query: 'Item')
+
+        within(find_item_results_section) do
+          click_link_or_button('Sort by Relevance')
+          click_link_or_button('Registered date (descending)')
+          expect(page).to have_button('Sort by Registered date (descending)')
+        end
+
+        # Access rights is rendered outside the items-search frame.
+        find_facet_section('Access rights').click
+        within(find_facet_section('Access rights')) do
+          click_link('stanford')
+        end
+
+        expect(page).to have_current_filter('Access rights', 'stanford')
+        expect(page).to have_current_path(%r{/search\?.*sort=registered_date_desc})
+        within(find_item_results_section) do
+          expect(page).to have_button('Sort by Registered date (descending)')
+        end
+      end
     end
 
     context 'when query is blank' do

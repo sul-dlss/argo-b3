@@ -1,4 +1,5 @@
 <%= form_builder.hidden_field :query if query_hidden_field? %>
+<%= form_builder.hidden_field :sort if sort_hidden_field? %>
 
 <% search_form.facet_attributes.each do |attr_name, values| %>
   <% next if form_fields.include?(attr_name) %>
