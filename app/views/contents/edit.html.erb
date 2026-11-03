@@ -2,10 +2,11 @@
 <%# disable-actions disables actions (e.g., deleting files, changing the structure, depositing) while files are
     uploading and while the structure is changing (forms with DisableActionsHelper#disable_actions_form_data, e.g.,
     structuring files). %>
-<div class="container py-2" data-controller="unassociated-files structure-item-details disable-actions"
-     data-structure-item-details-access-fields-value="<%= ContentsItemForm::ACCESS_PARAMS.to_json %>"
-     data-structure-item-details-param-key-value="<%= ContentsItemForm.model_name.param_key %>"
-     data-action="dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable">
+<%= tag.div class: 'container py-2',
+            data: { controller: 'unassociated-files structure-item-details disable-actions',
+                    structure_item_details_access_fields_value: ContentsItemForm::ACCESS_PARAMS,
+                    structure_item_details_param_key_value: ContentsItemForm.model_name.param_key,
+                    action: 'dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable' } do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.contents.edit.title')) %>
 
   <p class="mb-4"><%= @solr_doc.title %></p>
@@ -178,4 +179,4 @@
       <% end %>
     <% end %>
   <% end %>
-</div>
+<% end %>
