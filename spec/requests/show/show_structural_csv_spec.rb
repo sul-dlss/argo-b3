@@ -9,6 +9,9 @@ RSpec.describe 'Show structural CSV' do
   end
   let(:invalid_token) { 'not-a-valid-token' }
   let(:cocina_object) { Cocina::Models.with_metadata(Cocina::Models.build(cocina_hash), 'abc123') }
+  let(:cocina_object_without_contains) do
+    Cocina::Models.with_metadata(Cocina::Models.build(cocina_hash.merge(structural: {})), 'abc123')
+  end
   let(:cocina_hash) do
     {
       type: Cocina::Models::ObjectType.image,
@@ -75,7 +78,9 @@ RSpec.describe 'Show structural CSV' do
 
   before do
     sign_in(create(:user))
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true)
+                                            .and_return(cocina_object_without_contains)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: false).and_return(cocina_object)
   end
 
   describe 'GET /objects/:druid/structural_csv' do
@@ -92,7 +97,7 @@ RSpec.describe 'Show structural CSV' do
     end
 
     context 'when the object is not a DRO' do
-      let(:cocina_object) { build(:collection_with_metadata, id: druid) }
+      let(:cocina_object_without_contains) { build(:collection_with_metadata, id: druid) }
 
       it 'returns not found' do
         get "/objects/#{token}/structural_csv"

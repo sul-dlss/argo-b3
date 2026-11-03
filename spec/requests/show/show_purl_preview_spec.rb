@@ -18,7 +18,8 @@ RSpec.describe 'Show purl preview' do
 
   before do
     sign_in(create(:user))
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: false).and_return(cocina_object)
     allow(PurlPreviewService).to receive(:call).with(cocina_hash:).and_raise(error)
     allow(Honeybadger).to receive(:notify)
   end

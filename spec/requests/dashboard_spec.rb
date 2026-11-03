@@ -135,7 +135,7 @@ RSpec.describe 'Dashboard' do
 
         allow(Sdr::Repository).to receive(:lock) { |druid:| "lock-#{druid}" }
         allow(Sdr::Repository).to receive(:find_solr) { |druid:| solr_doc_for.call(druid) }
-        allow(Sdr::Repository).to receive(:find) { |druid:| build(:dro_with_metadata, id: druid) }
+        allow(Sdr::Repository).to receive(:find) { |druid:, **| build(:dro_with_metadata, id: druid) }
         allow(Sdr::Repository).to receive(:release_tags).and_return([])
         allow(Sdr::VersionService).to receive(:new).and_return(version_service)
         allow(Sdr::WorkflowService).to receive(:published?).and_return(false)

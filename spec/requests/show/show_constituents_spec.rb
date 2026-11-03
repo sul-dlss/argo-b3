@@ -55,7 +55,7 @@ RSpec.describe 'Show constituents' do
 
   before do
     sign_in(create(:user, :reader))
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true).and_return(cocina_object)
     allow(Searchers::ItemByDruid).to receive(:call).and_return(
       [
         SearchResults::Item.new(solr_doc: { Search::Fields::ID => first_constituent_druid,

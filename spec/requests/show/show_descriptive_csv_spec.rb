@@ -75,7 +75,7 @@ RSpec.describe 'Show descriptive CSV' do
 
   before do
     sign_in(create(:user))
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+    allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true).and_return(cocina_object)
   end
 
   describe 'GET /objects/:druid/descriptive_csv' do
