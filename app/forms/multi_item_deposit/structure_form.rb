@@ -31,7 +31,7 @@ module MultiItemDeposit
     def from_model(multi_item_deposit_action)
       super
       self.multi_item_deposit_action = multi_item_deposit_action
-      prefill_ocr_settings(multi_item_deposit_action)
+      prefill_text_extraction_settings(multi_item_deposit_action)
       self.structural_metadata_csv = nil unless multi_item_deposit_action.structural_metadata_csv_source_upload?
       self.structural_metadata_csv_choice = default_structural_metadata_csv_choice
       self
@@ -61,7 +61,7 @@ module MultiItemDeposit
 
     # @return [Hash] the attributes to save on the MultiItemDepositAction
     def multi_item_deposit_action_attributes
-      ocr_settings_attributes.merge(structural_metadata_attributes)
+      text_extraction_settings_attributes.merge(structural_metadata_attributes)
     end
 
     private

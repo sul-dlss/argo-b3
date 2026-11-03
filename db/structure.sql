@@ -305,7 +305,8 @@ CREATE TABLE public.contents (
     updated_at timestamp(6) without time zone NOT NULL,
     mount_state character varying DEFAULT 'discovery_not_in_progress'::character varying NOT NULL,
     perform_ocr boolean DEFAULT false NOT NULL,
-    ocr_languages jsonb DEFAULT '[]'::jsonb NOT NULL
+    ocr_languages jsonb DEFAULT '[]'::jsonb NOT NULL,
+    perform_speech_to_text boolean DEFAULT false NOT NULL
 );
 
 
@@ -437,7 +438,8 @@ CREATE TABLE public.multi_item_deposit_actions (
     updated_at timestamp(6) without time zone NOT NULL,
     manifest_source character varying DEFAULT 'upload'::character varying NOT NULL,
     manifest_csv text,
-    globus_path character varying
+    globus_path character varying,
+    perform_speech_to_text boolean DEFAULT false NOT NULL
 );
 
 
@@ -1196,6 +1198,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261103120000'),
 ('20261029120000'),
 ('20261028120000'),
 ('20261019120000'),

@@ -84,7 +84,7 @@ module MultiItemDeposit
     def deposit(item_deposit_action)
       content = item_deposit_action.content
       lock = open_version(druid: item_deposit_action.druid) || content.lock
-      content.update!(lock:, **ocr_settings(item_deposit_action))
+      content.update!(lock:, **text_extraction_settings(item_deposit_action))
       content.start_staging!(user:, accession: true, notify: false, staging_location: Settings.assembly_location)
     rescue StandardError => e
       handle_deposit_error(e, item_deposit_action:)
@@ -98,11 +98,16 @@ module MultiItemDeposit
       Sdr::VersionService.open(druid:, description: version_description, opening_user_name: user.sunetid).lock
     end
 
-    def ocr_settings(item_deposit_action)
-      if MultiItemDepositAction::OCR_CONTENT_TYPES.include?(item_deposit_action.content_type)
-        multi_item_deposit_action.slice(:perform_ocr, :ocr_languages).symbolize_keys
+    # Each Item Deposit gets only the text extraction settings for its own content type.
+    def text_extraction_settings(item_deposit_action)
+      content_type = Cocina::Models::ObjectType[item_deposit_action.content_type]
+      settings = { perform_ocr: false, ocr_languages: [], perform_speech_to_text: false }
+      if Sdr::TextExtraction.ocr_type?(content_type)
+        settings.merge(multi_item_deposit_action.slice(:perform_ocr, :ocr_languages).symbolize_keys)
+      elsif Sdr::TextExtraction.speech_to_text_type?(content_type)
+        settings.merge(perform_speech_to_text: multi_item_deposit_action.perform_speech_to_text)
       else
-        { perform_ocr: false, ocr_languages: [] }
+        settings
       end
     end
 

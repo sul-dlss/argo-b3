@@ -19,9 +19,10 @@ RSpec.describe ContentsItemForm do
   end
 
   describe '.permitted_params' do
-    it 'permits the content type, viewing direction, OCR settings, version description, and access' do
+    it 'permits the content type, viewing direction, text extraction settings, version description, and access' do
       expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :perform_ocr,
-                                                      :version_description, :overwrite_file_access,
+                                                      :perform_speech_to_text, :version_description,
+                                                      :overwrite_file_access,
                                                       { ocr_languages: [] },
                                                       :with_embargo, :embargo_release_date, :access_view,
                                                       :access_download, :access_location, :embargo_view,
@@ -119,6 +120,40 @@ RSpec.describe ContentsItemForm do
       expect(contents_item_form).to be_valid
       expect(contents_item_form.perform_ocr).to be false
       expect(contents_item_form.ocr_languages).to eq([])
+    end
+  end
+
+  context 'when changing to media with speech to text requested' do
+    before do
+      contents_item_form.update(content_type: Cocina::Models::ObjectType.media, perform_speech_to_text: true,
+                                perform_ocr: true, ocr_languages: ['English'])
+    end
+
+    it 'keeps speech to text and clears the OCR settings' do
+      expect(contents_item_form).to be_valid
+      expect(contents_item_form).to have_attributes(perform_speech_to_text: true, perform_ocr: false,
+                                                    ocr_languages: [])
+    end
+  end
+
+  context 'when changing to media and speech to text is not enabled' do
+    before do
+      allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false)
+      contents_item_form.update(content_type: Cocina::Models::ObjectType.media, perform_speech_to_text: true)
+    end
+
+    it 'clears speech to text' do
+      expect(contents_item_form).to be_valid
+      expect(contents_item_form.perform_speech_to_text).to be false
+    end
+  end
+
+  context 'when requesting speech to text for a content type that speech to text cannot run on' do
+    before { contents_item_form.update(perform_speech_to_text: true) }
+
+    it 'clears speech to text' do
+      expect(contents_item_form).to be_valid
+      expect(contents_item_form.perform_speech_to_text).to be false
     end
   end
 
@@ -230,13 +265,15 @@ RSpec.describe ContentsItemForm do
     end
   end
 
-  describe '#prefill_ocr_settings' do
+  describe '#prefill_text_extraction_settings' do
     before do
-      contents_item_form.prefill_ocr_settings(create(:content, perform_ocr: true, ocr_languages: ['English']))
+      content = create(:content, perform_ocr: true, ocr_languages: ['English'], perform_speech_to_text: true)
+      contents_item_form.prefill_text_extraction_settings(content)
     end
 
-    it 'prefills the OCR settings saved with the content without changing the form' do
-      expect(contents_item_form).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+    it 'prefills the text extraction settings saved with the content without changing the form' do
+      expect(contents_item_form).to have_attributes(perform_ocr: true, ocr_languages: ['English'],
+                                                    perform_speech_to_text: true)
       expect(contents_item_form).not_to be_changed
     end
   end
@@ -387,6 +424,25 @@ RSpec.describe ContentsItemForm do
 
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+      end
+    end
+
+    context 'when speech to text is requested for media' do
+      let(:open) { true }
+      let(:version) { 1 }
+      let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+      let(:cocina_object) { build(:dro_with_metadata, type: Cocina::Models::ObjectType.media) }
+
+      before do
+        contents_item_form.update(perform_speech_to_text: true)
+        contents_item_form.content = content
+      end
+
+      it 'saves speech to text with the content without updating the cocina object' do
+        contents_item_form.save!(user_name:)
+
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.perform_speech_to_text).to be true
       end
     end
 

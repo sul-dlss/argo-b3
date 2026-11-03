@@ -7,6 +7,9 @@
     <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, classes: 'mt-2') do %>
       <p>Do not run this process for images that contain no printed or typed text. This process will not overwrite OCR files
         that were generated outside SDR or that have been corrected to comply with accessibility standards.</p>
+      <% if Sdr::TextExtraction.speech_to_text_types.any? %>
+        <p>Do not auto-generate captions/transcripts for media files that do not contain any speech or lyrics.</p>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

@@ -6,7 +6,7 @@ RSpec.describe Sdr::DepositDraftService do
   subject(:deposit_draft) { described_class.call(cocina_object:, user_name: 'jdoe') }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:cocina_object) { build(:dro_with_metadata, id: druid) }
+  let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
   let(:version_service) { version_service_double(open?: open, closeable?: closeable) }
   let(:open) { true }
   let(:closeable) { true }

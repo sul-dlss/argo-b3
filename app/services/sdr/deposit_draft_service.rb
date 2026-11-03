@@ -33,7 +33,8 @@ module Sdr
       check_depositable!
       check_content! if CocinaSupport.object_type_with_content?(cocina_object)
 
-      Sdr::Repository.accession(cocina_object:, user_name:, context: mutable_content&.workflow_context || {})
+      context = mutable_content&.workflow_context(content_type: cocina_object.type) || {}
+      Sdr::Repository.accession(cocina_object:, user_name:, context:)
       # The mutable Content has no unsaved changes, so it matches what is deposited.
       mutable_content&.destroy!
     end

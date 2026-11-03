@@ -142,6 +142,28 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '#speech_to_text_applicable?' do
+    it 'is true when an Item Deposit is media' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media')
+
+      expect(multi_item_deposit_action).to be_speech_to_text_applicable
+    end
+
+    it 'is false when no Item Deposit is media' do
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+
+      expect(multi_item_deposit_action).not_to be_speech_to_text_applicable
+    end
+
+    it 'is false when speech to text is not enabled' do
+      allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false)
+      create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media')
+
+      expect(multi_item_deposit_action).not_to be_speech_to_text_applicable
+    end
+  end
+
   describe '#structural_metadata_csv_required?' do
     it 'is true when an Item Deposit is media' do
       create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')

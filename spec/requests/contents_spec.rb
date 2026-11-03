@@ -310,6 +310,20 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when requesting speech to text for media' do
+      let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.media) }
+
+      it 'saves the speech to text setting with the content and stages the object' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { perform_speech_to_text: 'true' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_speech_to_text: true)
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+      end
+    end
+
     context 'when requesting OCR without a language' do
       it 'renders the edit page' do
         patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,

@@ -109,3 +109,7 @@ mount_locations:
   - /was_unaccessioned_data
 
 ur_apo_druid: 'druid:hv992ry2431'
+
+features:
+  # Lets users request speech to text (speechToTextWF) for media objects.
+  speech_to_text_workflow: true

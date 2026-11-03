@@ -50,7 +50,7 @@ class EditItemForm < CocinaModels::Dro
     validate!
     prepare_version!(user_name:, open_version: changed? || accession)
     overwrite = content_file_access_overwrite
-    super(user_name:, accession:, workflow_context: content&.workflow_context || {})
+    super(user_name:, accession:, workflow_context: content&.workflow_context(content_type:) || {})
     # The content has no unsaved changes, so it matches what is deposited.
     accession ? content&.destroy! : overwrite_content_file_access!(overwrite)
   ensure

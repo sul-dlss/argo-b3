@@ -17,7 +17,7 @@ RSpec.describe BulkActions::TextExtractionJob do
   end
 
   let(:cocina_object) { instance_double(Cocina::Models::DRO) }
-  let(:text_extraction) { instance_double(Sdr::TextExtraction, call: true, ocr_able?: true) }
+  let(:text_extraction) { instance_double(Sdr::TextExtraction, call: true, possible?: true, workflow_name: 'ocrWF') }
   let(:version_service) { version_service_double(open?: false, assembling?: false) }
 
   before do
@@ -41,7 +41,7 @@ RSpec.describe BulkActions::TextExtractionJob do
 
   context 'when text extraction is not possible for the object' do
     before do
-      allow(text_extraction).to receive(:ocr_able?).and_return(false)
+      allow(text_extraction).to receive(:possible?).and_return(false)
     end
 
     it 'records a failure' do

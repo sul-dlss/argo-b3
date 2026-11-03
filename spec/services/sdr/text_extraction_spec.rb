@@ -13,12 +13,12 @@ RSpec.describe Sdr::TextExtraction do
   let(:object_type) { Cocina::Models::ObjectType.document }
   let(:already_opened) { true }
 
-  describe '#ocr_able?' do
+  describe '#possible?' do
     context 'when the object is a document' do
       let(:object_type) { Cocina::Models::ObjectType.document }
 
       it 'returns true' do
-        expect(text_extraction.ocr_able?).to be true
+        expect(text_extraction.possible?).to be true
       end
     end
 
@@ -26,7 +26,7 @@ RSpec.describe Sdr::TextExtraction do
       let(:object_type) { Cocina::Models::ObjectType.image }
 
       it 'returns true' do
-        expect(text_extraction.ocr_able?).to be true
+        expect(text_extraction.possible?).to be true
       end
     end
 
@@ -34,15 +34,25 @@ RSpec.describe Sdr::TextExtraction do
       let(:object_type) { Cocina::Models::ObjectType.book }
 
       it 'returns true' do
-        expect(text_extraction.ocr_able?).to be true
+        expect(text_extraction.possible?).to be true
       end
     end
 
     context 'when the object is media' do
       let(:object_type) { Cocina::Models::ObjectType.media }
 
+      it 'returns true' do
+        expect(text_extraction.possible?).to be true
+      end
+    end
+
+    context 'when the object is media and speech to text is not enabled' do
+      let(:object_type) { Cocina::Models::ObjectType.media }
+
+      before { allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false) }
+
       it 'returns false' do
-        expect(text_extraction.ocr_able?).to be false
+        expect(text_extraction.possible?).to be false
       end
     end
 
@@ -50,15 +60,15 @@ RSpec.describe Sdr::TextExtraction do
       let(:dro) { false }
 
       it 'returns false' do
-        expect(text_extraction.ocr_able?).to be false
+        expect(text_extraction.possible?).to be false
       end
     end
 
-    context 'when the object is not a document, image or book' do
+    context 'when the object is not a document, image, book or media' do
       let(:object_type) { Cocina::Models::ObjectType.map }
 
       it 'returns false' do
-        expect(text_extraction.ocr_able?).to be false
+        expect(text_extraction.possible?).to be false
       end
     end
   end
@@ -78,6 +88,7 @@ RSpec.describe Sdr::TextExtraction do
 
         it 'starts ocrWF and returns true' do
           expect(text_extraction.call).to be true
+          expect(fake_object_client).to have_received(:workflow).with('ocrWF')
           expect(fake_workflow_client).to have_received(:create).with(version:, lane_id: 'low', context: ocr_context)
         end
       end
@@ -85,10 +96,10 @@ RSpec.describe Sdr::TextExtraction do
       context 'when the object is media' do
         let(:object_type) { Cocina::Models::ObjectType.media }
 
-        it 'does not start ocrWF' do
-          text_extraction.call
-
-          expect(fake_workflow_client).not_to have_received(:create)
+        it 'starts speechToTextWF and returns true' do
+          expect(text_extraction.call).to be true
+          expect(fake_object_client).to have_received(:workflow).with('speechToTextWF')
+          expect(fake_workflow_client).to have_received(:create).with(version:, lane_id: 'low', context: {})
         end
       end
     end
@@ -107,17 +118,17 @@ RSpec.describe Sdr::TextExtraction do
     context 'when the object is not an item' do
       let(:dro) { false }
 
-      it 'does not start ocrWF' do
+      it 'does not start a workflow' do
         text_extraction.call
 
         expect(fake_workflow_client).not_to have_received(:create)
       end
     end
 
-    context 'when the object is not a document, image or book' do
+    context 'when the object is not a document, image, book or media' do
       let(:object_type) { Cocina::Models::ObjectType.map }
 
-      it 'does not start ocrWF' do
+      it 'does not start a workflow' do
         text_extraction.call
 
         expect(fake_workflow_client).not_to have_received(:create)

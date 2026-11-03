@@ -51,12 +51,19 @@ class Content < ApplicationRecord
     StageFilesJob.perform_later(content: self, user:, **stage_files_options)
   end
 
-  # The assembly workflow reads these from its context to decide whether to run OCR.
+  # Accessioning reads these from its context to decide whether to start OCR or speech to text.
+  # Only the text extraction for the content type is requested, since the content type may have changed since
+  # the settings were saved.
+  # @param content_type [String] the cocina type URI of the object being accessioned
   # @return [Hash] the workflow context to start accessioning with
-  def workflow_context
-    return {} unless perform_ocr
-
-    { runOCR: true, ocrLanguages: ocr_languages }
+  def workflow_context(content_type:)
+    if perform_ocr && Sdr::TextExtraction.ocr_type?(content_type)
+      { runOCR: true, ocrLanguages: ocr_languages }
+    elsif perform_speech_to_text && Sdr::TextExtraction.speech_to_text_type?(content_type)
+      { runSpeechToText: true }
+    else
+      {}
+    end
   end
 
   # Memoized, since several populators and views may ask for the same Content.
