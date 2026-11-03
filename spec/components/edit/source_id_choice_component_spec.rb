@@ -33,4 +33,16 @@ RSpec.describe Edit::SourceIdChoiceComponent, type: :component do
       expect(page).to have_field('Source ID prefix', type: 'text', with: 'sul')
     end
   end
+
+  context 'when the source id choice has an error' do
+    let(:new_item_form) { NewItemForm.new.tap { |form| form.errors.add(:source_id_choice, 'is invalid') } }
+
+    it 'renders the error once for the radio buttons' do
+      render_inline(component)
+
+      expect(page).to have_css('#source_id_choice_error.invalid-feedback', text: 'is invalid', count: 1)
+      expect(page).to have_css('input[type="radio"][aria-invalid="true"][aria-describedby~="source_id_choice_error"]',
+                               count: 2)
+    end
+  end
 end

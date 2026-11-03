@@ -19,6 +19,16 @@
     margin-bottom: $spacer;
   }
 
+  // A radio group's error follows its last radio button, so keep the error next to that radio
+  // and put the radio's fieldset margin below the error instead.
+  .form-fieldset > .form-check.my-fieldset:has(+ .invalid-feedback) {
+    margin-bottom: 0;
+  }
+
+  .form-fieldset > .form-check.my-fieldset + .invalid-feedback {
+    margin-bottom: $spacer * 1.5;
+  }
+
   // Bootstrap only fades a radio or checkbox label that follows its disabled input.
   fieldset:disabled .form-check-label {
     opacity: $form-check-label-disabled-opacity;

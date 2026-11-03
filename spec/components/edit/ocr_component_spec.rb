@@ -57,4 +57,19 @@ RSpec.describe Edit::OcrComponent, type: :component do
       expect(page).to have_css('select option[value="English"][selected]', visible: :all)
     end
   end
+
+  context 'when perform OCR has an error' do
+    let(:contents_item_form) do
+      super().tap { |form| form.errors.add(:perform_ocr, 'is invalid') }
+    end
+
+    it 'renders the error once for the radio buttons' do
+      render_inline(component)
+
+      expect(page).to have_css('#contents_item_perform_ocr_error.invalid-feedback', text: 'is invalid', count: 1)
+      expect(page).to have_css(
+        'input[type="radio"][aria-invalid="true"][aria-describedby~="contents_item_perform_ocr_error"]', count: 2
+      )
+    end
+  end
 end

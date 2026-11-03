@@ -38,4 +38,15 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
       expect(page).to have_field('Enter druid list', type: 'textarea')
     end
   end
+
+  context 'when the source has an error' do
+    before { bulk_action_form.errors.add(:source, 'is invalid') }
+
+    it 'renders the error once for the radio buttons' do
+      render_inline(component)
+
+      expect(page).to have_css('#source_error.invalid-feedback', text: 'is invalid', count: 1)
+      expect(page).to have_css('input[type="radio"][aria-invalid="true"][aria-describedby~="source_error"]', count: 2)
+    end
+  end
 end

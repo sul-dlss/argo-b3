@@ -19,86 +19,72 @@
           help_text: t('edit.multi_item_deposits.fields.discovery.help_text'),
           mark_required: true
         ) do %>
-      <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+            form:,
+            field_name: :manifest_source,
             label: t('edit.multi_item_deposits.fields.manifest_source.label'),
             mark_required: true,
             data: { controller: 'radio' }
-          ) do %>
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :manifest_source,
-              label_text: t('edit.multi_item_deposits.fields.manifest_source.upload.label'),
-              input_value: MultiItemDepositAction.manifest_sources[:upload],
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <% if @discovery_form.unsaved_manifest_csv?(@multi_item_deposit_action) %>
-              <%= form.hidden_field :manifest_csv, value: @discovery_form.retainable_manifest_csv %>
-            <% end %>
-            <% if @discovery_form.retainable_manifest_csv.present? %>
-              <p class="mb-1"><%= t('edit.multi_item_deposits.fields.manifest_file.retained') %></p>
-            <% end %>
-            <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                                   field_name: :manifest_file,
-                                                                   container_classes: 'my-field',
-                                                                   label_text: t('edit.multi_item_deposits.fields.manifest_file.label'),
-                                                                   label_hidden: true) %>
+          ) do |group| %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.manifest_source.upload.label'),
+             input_value: MultiItemDepositAction.manifest_sources[:upload],
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) do %>
+          <% if @discovery_form.unsaved_manifest_csv?(@multi_item_deposit_action) %>
+            <%= form.hidden_field :manifest_csv, value: @discovery_form.retainable_manifest_csv %>
           <% end %>
+          <% if @discovery_form.retainable_manifest_csv.present? %>
+            <p class="mb-1"><%= t('edit.multi_item_deposits.fields.manifest_file.retained') %></p>
+          <% end %>
+          <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                 field_name: :manifest_file,
+                                                                 container_classes: 'my-field',
+                                                                 label_text: t('edit.multi_item_deposits.fields.manifest_file.label'),
+                                                                 label_hidden: true) %>
         <% end %>
 
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :manifest_source,
-              label_text: t('edit.multi_item_deposits.fields.manifest_source.mount.label'),
-              input_value: MultiItemDepositAction.manifest_sources[:mount],
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :manifest_source) %>
-          <% end %>
-        <% end %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.manifest_source.mount.label'),
+             input_value: MultiItemDepositAction.manifest_sources[:mount],
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) %>
       <% end %>
 
-      <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+      <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+            form:,
+            field_name: :file_location,
             label: t('edit.multi_item_deposits.fields.file_location.label'),
             mark_required: true,
             data: { controller: 'radio', action: 'turbo:frame-load->radio#refresh' }
-          ) do %>
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :file_location,
-              label_text: t('edit.multi_item_deposits.fields.file_location.globus.label'),
-              input_value: MultiItemDepositAction.file_locations[:globus],
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <div class="my-field">
-              <%# Loaded when the radio is selected (see radio controller). %>
-              <%= turbo_frame_tag @multi_item_deposit_action, 'globus', data: { radio_src: new_multi_item_deposit_action_globus_path(@multi_item_deposit_action) } do %>
-                <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
-              <% end %>
-              <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :globus_path) %>
-            </div>
-          <% end %>
+          ) do |group| %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.file_location.globus.label'),
+             input_value: MultiItemDepositAction.file_locations[:globus],
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) do %>
+          <div class="my-field">
+            <%# Loaded when the radio is selected (see radio controller). %>
+            <%= turbo_frame_tag @multi_item_deposit_action, 'globus', data: { radio_src: new_multi_item_deposit_action_globus_path(@multi_item_deposit_action) } do %>
+              <%= render Elements::RosetteSpinnerComponent.new(size: :small, message: t('edit.contents.globus.checking')) %>
+            <% end %>
+            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :globus_path) %>
+          </div>
         <% end %>
 
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :file_location,
-              label_text: t('edit.multi_item_deposits.fields.file_location.mount.label'),
-              input_value: MultiItemDepositAction.file_locations[:mount],
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
-                                                                        field_name: :mount_path,
-                                                                        container_classes: 'my-field',
-                                                                        label_text: t('edit.multi_item_deposits.fields.mount_path.label')) %>
-          <% end %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.file_location.mount.label'),
+             input_value: MultiItemDepositAction.file_locations[:mount],
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) do %>
+          <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
+                                                                      field_name: :mount_path,
+                                                                      container_classes: 'my-field',
+                                                                      label_text: t('edit.multi_item_deposits.fields.mount_path.label')) %>
         <% end %>
       <% end %>
     <% end %>

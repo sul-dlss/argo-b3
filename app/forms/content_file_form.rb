@@ -61,12 +61,10 @@ class ContentFileForm < ApplicationForm
     end
   end
 
-  # The error is added to administrative_options (rather than administrative) so that it is rendered once
-  # for the fieldset instead of for each radio button.
   def validate_administrative
     return if ADMINISTRATIVE_OPTIONS.include?(administrative)
 
-    errors.add(:administrative_options,
+    errors.add(:administrative,
                I18n.t('edit.content_file_sets.fields.content_files.administrative.validations.required'))
   end
 

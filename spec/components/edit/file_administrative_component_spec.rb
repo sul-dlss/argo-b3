@@ -21,10 +21,15 @@ RSpec.describe Edit::FileAdministrativeComponent, type: :component do
 
     let(:content_file_form) { ContentFileForm.new(administrative: nil) }
 
-    it 'renders the error' do
+    it 'renders the error once for the radio buttons' do
       render_inline(component)
 
-      expect(page).to have_css('.invalid-feedback', text: 'must be selected')
+      expect(page).to have_css(
+        '#content_file_administrative_error.invalid-feedback', text: 'must be selected', count: 1
+      )
+      expect(page).to have_css(
+        'input[type="radio"][aria-invalid="true"][aria-describedby~="content_file_administrative_error"]', count: 3
+      )
     end
   end
 end

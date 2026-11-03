@@ -14,84 +14,67 @@
       <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
     <% end %>
 
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(
+    <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+          form:,
+          field_name: :structural_metadata_csv_choice,
           label: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.label'),
           classes: 'my-fieldset',
           mark_required: true,
           data: { controller: 'radio' }
-        ) do %>
-      <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-            form:,
-            field_name: :structural_metadata_csv_choice,
-            label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.upload.label'),
-            input_value: MultiItemDeposit::StructureForm::UPLOAD_CHOICE,
-            input_data: { radio_target: 'radio', action: 'radio#toggle' },
-            container_classes: 'my-fieldset'
-          ) do |component| %>
-        <% component.with_additional_container_content do %>
-          <% if @structure_form.unsaved_structural_metadata_csv? %>
-            <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
-          <% end %>
-          <% if @structure_form.retainable_structural_metadata_csv.present? %>
-            <p class="mb-2"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
-          <% end %>
-          <div class="my-2">
-            <%= link_to structural_metadata_csv_template_multi_item_deposit_action_path(@multi_item_deposit_action), download: true do %>
-              <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.template') %>
-            <% end %>
-          </div>
-          <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                                 field_name: :structural_metadata_csv_file,
-                                                                 container_classes: 'my-field',
-                                                                 label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_file.label')) %>
-          <% if @multi_item_deposit_action.structural_metadata_csv_required? %>
-            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :structural_metadata_csv_choice) %>
-          <% end %>
+        ) do |group| %>
+      <% group.with_radio_button(
+           label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.upload.label'),
+           input_value: MultiItemDeposit::StructureForm::UPLOAD_CHOICE,
+           input_data: { radio_target: 'radio', action: 'radio#toggle' },
+           container_classes: 'my-fieldset'
+         ) do %>
+        <% if @structure_form.unsaved_structural_metadata_csv? %>
+          <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
         <% end %>
+        <% if @structure_form.retainable_structural_metadata_csv.present? %>
+          <p class="mb-2"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
+        <% end %>
+        <div class="my-2">
+          <%= link_to structural_metadata_csv_template_multi_item_deposit_action_path(@multi_item_deposit_action), download: true do %>
+            <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.template') %>
+          <% end %>
+        </div>
+        <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                               field_name: :structural_metadata_csv_file,
+                                                               container_classes: 'my-field',
+                                                               label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_file.label')) %>
       <% end %>
 
       <% if @multi_item_deposit_action.mount_structural_metadata_csv_path %>
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :structural_metadata_csv_choice,
-              label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.mount.label'),
-              input_value: MultiItemDeposit::StructureForm::MOUNT_CHOICE,
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(form:, field_name: :structural_metadata_csv_choice) %>
-          <% end %>
-        <% end %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.mount.label'),
+             input_value: MultiItemDeposit::StructureForm::MOUNT_CHOICE,
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) %>
       <% end %>
 
       <% unless @multi_item_deposit_action.structural_metadata_csv_required? %>
-        <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-              form:,
-              field_name: :structural_metadata_csv_choice,
-              label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.none.label'),
-              input_value: MultiItemDeposit::StructureForm::NONE_CHOICE,
-              input_data: { radio_target: 'radio', action: 'radio#toggle' },
-              container_classes: 'my-fieldset'
-            ) do |component| %>
-          <% component.with_additional_container_content do %>
-            <%= render SdrViewComponents::Forms::FieldsetComponent.new(
-                  label: t('edit.multi_item_deposits.fields.publish_preserve_all.label'),
-                  classes: 'my-fieldset'
-                ) do %>
-              <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-                    form:,
-                    field_name: :publish_preserve_all,
-                    label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.default.label'),
-                    input_value: 'false'
-                  ) %>
-              <%= render SdrViewComponents::Forms::RadioButtonComponent.new(
-                    form:,
-                    field_name: :publish_preserve_all,
-                    label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.all.label'),
-                    input_value: 'true'
-                  ) %>
-            <% end %>
+        <% group.with_radio_button(
+             label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_choice.none.label'),
+             input_value: MultiItemDeposit::StructureForm::NONE_CHOICE,
+             input_data: { radio_target: 'radio', action: 'radio#toggle' },
+             container_classes: 'my-fieldset'
+           ) do %>
+          <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+                form:,
+                field_name: :publish_preserve_all,
+                label: t('edit.multi_item_deposits.fields.publish_preserve_all.label'),
+                classes: 'my-fieldset'
+              ) do |publish_preserve_group| %>
+            <% publish_preserve_group.with_radio_button(
+                 label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.default.label'),
+                 input_value: 'false'
+               ) %>
+            <% publish_preserve_group.with_radio_button(
+                 label_text: t('edit.multi_item_deposits.fields.publish_preserve_all.all.label'),
+                 input_value: 'true'
+               ) %>
           <% end %>
         <% end %>
       <% end %>
