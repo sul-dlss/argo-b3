@@ -1,5 +1,5 @@
 <%= form_with model: @bulk_action_form, url: bulk_actions_manage_license_and_rights_statements_path do |form| %>
-  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do |component| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do %>
     <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Use and reproduction statement') do %>
       <p><%= link_to_new_tab 'Sample use and reproduction statements.', 'https://consul.stanford.edu/display/APO/Sample+Access+Condition+statements' %></p>
       <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :use_and_reproduction_statement_action,

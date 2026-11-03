@@ -28,10 +28,10 @@ begin
     sh('yarn run stylelint')
   end
 
-  desc 'Run herb against ERB files'
+  desc 'Run herb linter against ERB files'
   task herb: :environment do
-    puts 'Running ERB linter...'
-    sh('bin/herb analyze app --no-timing')
+    puts 'Running herb linter...'
+    sh('yarn run herb-lint app')
   end
 
   desc 'Check for missing and unused i18n keys'

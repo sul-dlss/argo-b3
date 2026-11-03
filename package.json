@@ -19,7 +19,8 @@
     "build:css": "yarn build:css:compile && yarn build:css:prefix",
     "watch:css": "nodemon --watch ./app/assets/stylesheets/ --ext scss --exec \"yarn build:css\"",
     "lint": "standard",
-    "stylelint": "stylelint \"app/assets/stylesheets/**/*.scss\""
+    "stylelint": "stylelint \"app/assets/stylesheets/**/*.scss\"",
+    "herb-lint": "herb-lint --no-timing"
   },
   "browserslist": [
     "defaults"
@@ -28,6 +29,7 @@
     "browserslist": "^4.28.4"
   },
   "devDependencies": {
+    "@herb-tools/linter": "0.11.1",
     "standard": "*",
     "stylelint": "^16.25.0",
     "stylelint-config-standard-scss": "*"

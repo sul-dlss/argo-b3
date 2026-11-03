@@ -4,12 +4,12 @@
   </h3>
 
   <ul class="list-unstyled placeholder-glow">
-    <% for index in 1..number_of_placeholders %>
+    <% (1..number_of_placeholders).each do |index| %>
       <%= tag.li class: 'mb-5' do %>
         <%= render SdrViewComponents::Tables::RawTableComponent.new(id: "placeholder-#{index}") do |component| %>
           <% component.with_caption do %>
-            <%= render Search::ResultHeadingComponent.new(index:) do |component| %>
-              <%= component.with_link do %>
+            <%= render Search::ResultHeadingComponent.new(index:) do |heading| %>
+              <%= heading.with_link do %>
                 <span class="placeholder col-8"></span>
               <% end %>
             <% end %>
