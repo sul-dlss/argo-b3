@@ -15,6 +15,7 @@ module SearchFormConcern
   # Maps the view_form route default to a search form class.
   SEARCH_FORM_CLASSES = {
     'results' => ResultsSearchForm,
+    'advanced' => AdvancedSearchForm,
     'workflow_grid' => WorkflowGridSearchForm
   }.freeze
 

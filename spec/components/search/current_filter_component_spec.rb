@@ -6,6 +6,32 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
   let(:component) { described_class.new(form_field:, values:, search_form:, facet_labels:) }
   let(:facet_labels) { {} }
 
+  context 'with a keyword query' do
+    let(:form_field) { 'query' }
+    let(:values) { ['Miller OR octopus'] }
+    let(:search_form) { ResultsSearchForm.new(query: 'Miller OR octopus') }
+
+    it 'renders the query without a prefix' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: 'Miller OR octopus')
+      expect(page).to have_no_css('.selected-item-separator')
+      expect(page).to have_link('', href: '/search', title: 'Remove Miller OR octopus')
+    end
+
+    context 'when the query is advanced' do
+      let(:search_form) { AdvancedSearchForm.new(query: 'Miller OR octopus', projects: ['Google Books'], page: 2) }
+
+      it 'prefixes the expression and removes it while preserving other selections' do
+        render_inline(component)
+
+        expect(page).to have_css('li', text: /Advanced search\s+❯\s+Miller OR octopus/)
+        expect(page).to have_link('', href: '/advanced_search?projects%5B%5D=Google+Books',
+                                      title: 'Remove Advanced search > Miller OR octopus')
+      end
+    end
+  end
+
   context 'when there are current filters' do
     let(:form_field) { :projects }
     let(:values) { ['Project 1'] }

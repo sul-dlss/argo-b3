@@ -60,11 +60,10 @@ module Search
         fq: (filter_queries + [permission_filter]).compact,
         debugQuery: search_form.debug,
         qf: query_fields,
-        defType: 'edismax',
         'q.alt': '*:*',
         # Date math rounding (e.g., NOW/DAY) is in Pacific time.
         TZ: Constants::SOLR_TIME_ZONE
-      }.compact_blank
+      }.merge(search_form.solr_query_parameters).compact_blank
     end
 
     private
