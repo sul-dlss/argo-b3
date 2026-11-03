@@ -468,7 +468,7 @@ RSpec.describe 'Show item' do
                                         useAndReproductionStatement: 'My updated use statement'
                                       },
                                       part_label: 'Part 2',
-                                      sort_key: nil))
+                                      sort_key: nil).new(lock: 'def456'))
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([registration_workflow,
                                                                        build_accession_workflow(complete: true)])
 
