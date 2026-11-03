@@ -33,7 +33,7 @@ module BulkActions
     end
 
     def read_allowed?(solr_doc)
-      allowed_to?(:show?, solr_doc, with: ObjectPolicy, context: { user: })
+      allowed_to?(:show?, solr_doc, with: ObjectPolicy)
     end
   end
 end

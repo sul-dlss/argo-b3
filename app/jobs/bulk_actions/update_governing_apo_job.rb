@@ -37,7 +37,7 @@ module BulkActions
       def can_update_governing_apo?
         return true if admin?
 
-        allowed_to?(:update?, cocina_object, with: ObjectPolicy, context: { user: }) &&
+        allowed_to?(:update?, cocina_object, with: ObjectPolicy) &&
           Permission.permission_type_edit.exists?(workgroup: user.groups, target_druid: new_apo_id)
       end
 

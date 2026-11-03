@@ -115,6 +115,14 @@ RSpec.describe MultiItemDeposit::DepositJob do
       end
     end
 
+    it 'looks up the user permissions once' do
+      allow(Permission).to receive(:where).and_call_original
+
+      perform
+
+      expect(Permission).to have_received(:where).with(workgroup: effective_groups).once
+    end
+
     context 'when another Content for the object failed staging' do
       let!(:failed_content) { create(:content, :mutable, druid:, lock: 'old-lock', staging_state: 'staging_failed') }
 
