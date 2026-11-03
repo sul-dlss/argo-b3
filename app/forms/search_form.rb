@@ -36,6 +36,10 @@ class SearchForm < ApplicationForm
 
   delegate :route_scope, to: :class
 
+  def solr_query_parameters
+    { defType: 'dismax' }
+  end
+
   # @return [Boolean] whether this search can be pinned
   def pinnable?
     false
