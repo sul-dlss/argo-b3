@@ -15,7 +15,7 @@ module Sdr
 
     # @return [Array<String>] the content types that speech to text can run on; none unless the feature is enabled
     def self.speech_to_text_types
-      Settings.features.speech_to_text_workflow ? SPEECH_TO_TEXT_TYPES : []
+      Settings.feature_flags.speech_to_text_workflow ? SPEECH_TO_TEXT_TYPES : []
     end
 
     # @param [String] content_type the cocina type URI

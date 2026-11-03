@@ -49,7 +49,7 @@ RSpec.describe Sdr::TextExtraction do
     context 'when the object is media and speech to text is not enabled' do
       let(:object_type) { Cocina::Models::ObjectType.media }
 
-      before { allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false) }
+      before { allow(Settings.feature_flags).to receive(:speech_to_text_workflow).and_return(false) }
 
       it 'returns false' do
         expect(text_extraction.possible?).to be false

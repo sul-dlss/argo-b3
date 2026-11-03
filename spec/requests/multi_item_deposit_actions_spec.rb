@@ -435,7 +435,7 @@ RSpec.describe 'Multi-item deposit actions' do
         end
 
         context 'when speech to text is not enabled' do
-          before { allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false) }
+          before { allow(Settings.feature_flags).to receive(:speech_to_text_workflow).and_return(false) }
 
           it 'does not render the speech to text question' do
             get edit_multi_item_deposit_action_path(multi_item_deposit_action)

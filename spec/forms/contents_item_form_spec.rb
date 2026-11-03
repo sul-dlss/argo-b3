@@ -138,7 +138,7 @@ RSpec.describe ContentsItemForm do
 
   context 'when changing to media and speech to text is not enabled' do
     before do
-      allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false)
+      allow(Settings.feature_flags).to receive(:speech_to_text_workflow).and_return(false)
       contents_item_form.update(content_type: Cocina::Models::ObjectType.media, perform_speech_to_text: true)
     end
 

@@ -110,6 +110,6 @@ mount_locations:
 
 ur_apo_druid: 'druid:hv992ry2431'
 
-features:
+feature_flags:
   # Lets users request speech to text (speechToTextWF) for media objects.
   speech_to_text_workflow: true

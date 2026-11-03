@@ -18,7 +18,7 @@ RSpec.describe 'Text extraction bulk action' do
     end
 
     context 'when speech to text is not enabled' do
-      before { allow(Settings.features).to receive(:speech_to_text_workflow).and_return(false) }
+      before { allow(Settings.feature_flags).to receive(:speech_to_text_workflow).and_return(false) }
 
       it 'does not warn against speech to text' do
         get new_bulk_actions_text_extraction_path
