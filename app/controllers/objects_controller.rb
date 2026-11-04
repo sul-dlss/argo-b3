@@ -130,6 +130,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   def show_structure
     @content = fetch_content
     @content_file_sets = @content.content_file_sets.includes(content_files: :content_file_binary).to_a
+    @content_type = cocina_hash[:type]
     @content_validation_result = fetch_content_validation_result(content: @content)
 
     render layout: false
