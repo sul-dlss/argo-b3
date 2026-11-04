@@ -228,7 +228,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   IMPORT_TAGS = Config.new(
     label: 'Import tags',
-    help_text: 'Update tags, including project and ticket tags, by uploading a spreadsheet.'
+    help_text: 'Update tags, including project and ticket tags, by uploading a spreadsheet.',
+    job: BulkActions::ImportTagsJob,
+    path_helper: to_path_helper(:new_bulk_actions_import_tags_path),
+    form: BulkActions::ImportTagsForm
   )
 
   MANAGE_COLLECTIONS = Config.new(

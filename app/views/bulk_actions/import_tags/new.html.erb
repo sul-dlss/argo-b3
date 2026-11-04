@@ -1,0 +1,10 @@
+<%= form_with model: @bulk_action_form, url: bulk_actions_import_tags_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: 'Upload a CSV or Excel file',
+                                                           label_classes: 'fw-bold',
+                                                           variant: :help_text_below,
+                                                           help_text: 'Do not include column headers. Each row has the druid in the first column, followed by the tags for that object (e.g., "Project : Example"). Existing tags are replaced, not added to. To remove all tags from an object, include only the druid.') %>
+  <% end %>
+<% end %>
