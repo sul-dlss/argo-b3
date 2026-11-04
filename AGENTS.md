@@ -22,7 +22,17 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 ## Integration tests
 
-End-to-end Argo-B3 flows are covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`); read them to see which flows they exercise. When writing or reviewing a change to one of those flows, remind the developer to run the integration tests before merging.
+End-to-end Argo-B3 functionality is covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`). Current specs and the functionality they cover:
+
+- `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, searching, and viewing the item and its PURL.
+- `argo_b3_multi_item_deposit_spec.rb`: registering items with different content types (Register items bulk action), a Multi-Item Deposit from a mount with an uploaded manifest, then a second Multi-Item Deposit that adds and deletes files, verifying the items, their PURLs, and preservation.
+
+Remind the developer to run an integration spec before merging, naming the spec, when a change could break it in ways argo-b3's specs can't catch:
+
+- calls to other SDR services in the spec's flow: repository saves and version open / close (`Sdr::Repository`, `Sdr::VersionService`), staging files (`StageFilesJob`, `CocinaObjectMutators::StructuralMutator`), or starting accessioning.
+- a label, heading, id, or page flow that the spec drives (search the spec file for it).
+
+If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update this list.
 
 ## Checks
 
