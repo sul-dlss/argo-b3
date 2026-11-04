@@ -177,4 +177,54 @@ RSpec.describe StructuralCsv::Validator do
       )
     end
   end
+
+  context 'when files would be deleted and deletion is not allowed' do
+    subject(:errors) { described_class.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion: false) }
+
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,bogus,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns the deletion error, not for a row, with the row errors' do
+      expect(reasons).to eq(
+        [
+          [3, 'Sequence "bogus" is not a positive integer'],
+          [nil, 'Files would be deleted: image2.tif. Select "Allow files to be deleted" to delete them.']
+        ]
+      )
+    end
+  end
+
+  context 'when files would be deleted and deletion is allowed' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns no errors' do
+      expect(errors).to be_empty
+    end
+  end
+
+  context 'when files are moved between file sets and deletion is not allowed' do
+    subject(:errors) { described_class.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion: false) }
+
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image2.tif,,yes,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,2,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns no errors' do
+      expect(errors).to be_empty
+    end
+  end
 end

@@ -126,6 +126,28 @@ RSpec.describe StructuralCsv::Import do
     end
   end
 
+  context 'when a file is omitted and deletion is not allowed' do
+    subject(:result) { described_class.call(rows:, content:, allow_file_deletion: false) }
+
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,Image 1 label,yes,yes,yes,world,world,,image/tiff,,,no,no
+        bc123df4567,Image 2,image,2,image2.tif,Image 2 label,yes,yes,yes,world,world,,image/tiff,,,no,no
+      CSV
+    end
+
+    it 'returns failure and does not change the content' do
+      expect(result).to be_failure
+      expect(result.failure).to eq(
+        [StructuralCsv::ValidationError.new(nil, 'Files would be deleted: image3.tif. ' \
+                                                 'Select "Allow files to be deleted" to delete them.')]
+      )
+      expect(file_sets.size).to eq(3)
+      expect(ContentFileBinary.exists?(image3_binary.id)).to be true
+    end
+  end
+
   context 'when optional columns are absent' do
     let(:csv_string) do
       <<~CSV

@@ -49,5 +49,11 @@ RSpec.describe StructuralCsvForm do
 
       expect(form.errors[:csv_file]).to eq(['Row 3: Bad value'])
     end
+
+    it 'adds an error that is not for a row without a row number' do
+      form.add_validation_errors([StructuralCsv::ValidationError.new(nil, 'Bad file')])
+
+      expect(form.errors[:csv_file]).to eq(['Bad file'])
+    end
   end
 end

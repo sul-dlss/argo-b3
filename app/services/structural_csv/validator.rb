@@ -13,9 +13,11 @@ module StructuralCsv
     # @param rows [Array<Row>] the rows for a single object
     # @param content_file_binaries_by_filepath [Hash<String, ContentFileBinary>] the Content's binaries, with their
     #   ContentFiles loaded
-    def initialize(rows:, content_file_binaries_by_filepath:)
+    # @param allow_file_deletion [Boolean] whether files omitted from the rows may be deleted
+    def initialize(rows:, content_file_binaries_by_filepath:, allow_file_deletion: true)
       @all_rows = rows
       @content_file_binaries_by_filepath = content_file_binaries_by_filepath
+      @allow_file_deletion = allow_file_deletion
       @errors = []
     end
 
@@ -31,7 +33,7 @@ module StructuralCsv
 
     private
 
-    attr_reader :all_rows, :content_file_binaries_by_filepath, :errors
+    attr_reader :all_rows, :content_file_binaries_by_filepath, :allow_file_deletion, :errors
 
     def add_error(row, reason)
       errors << ValidationError.new(row.number, reason)
@@ -65,6 +67,7 @@ module StructuralCsv
       rows.each { |row| validate_row(row) }
       validate_mimetypes
       validate_groups
+      validate_file_deletion
     end
 
     # Validates the values of a single row.
@@ -136,6 +139,18 @@ module StructuralCsv
       return unless content_file_binary.content_files.min_by(&:id)&.preserve == false
 
       add_error(row, "#{row.filename} cannot be changed from preserve=no to preserve=yes")
+    end
+
+    # Validates that no file would be deleted (by being omitted from every row) unless deletion is allowed.
+    # The error is not for a row, so it has no line number.
+    def validate_file_deletion
+      return if allow_file_deletion
+
+      deleted_filepaths = content_file_binaries_by_filepath.keys - rows.map(&:filename)
+      return if deleted_filepaths.empty?
+
+      errors << ValidationError.new(nil, "Files would be deleted: #{deleted_filepaths.sort.join(', ')}. " \
+                                         'Select "Allow files to be deleted" to delete them.')
     end
 
     # Validates that every row with the same filename has the same mimetype, since the mime type is stored on the

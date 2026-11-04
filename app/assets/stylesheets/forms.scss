@@ -54,6 +54,11 @@
   align-items: center;
   column-gap: $spacer * .5;
 
+  // An option (e.g., a checkbox) below the input.
+  .inline-upload-option {
+    grid-column: 2 / -1;
+  }
+
   .invalid-feedback {
     grid-column: 2 / -1;
 
