@@ -196,6 +196,34 @@ RSpec.describe 'Edit an item' do
     end
   end
 
+  context 'when the item is in a collection' do
+    let(:collection_druid) { 'druid:cd234fg5678' }
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid).new(structural: { isMemberOf: [collection_druid] })
+    end
+
+    before do
+      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['Art History Slides', collection_druid]])
+    end
+
+    it 'removes the item from all collections' do
+      visit edit_item_path(druid)
+
+      click_button 'APO, collection, rights'
+      within('.ts-control .item', text: 'Art History Slides') { find('.remove').click }
+      expect(page).to have_no_css('.ts-control .item')
+
+      find_by_id('deposit-tab').click
+      fill_in 'Version description', with: 'Removed the collection'
+      click_button 'Save as draft', match: :first
+
+      expect(page).to have_toast('Item updated.')
+      expect(Sdr::Repository).to have_received(:update)
+        .with(cocina_object: having_attributes(structural: having_attributes(isMemberOf: [])),
+              user_name: user.sunetid, description: nil)
+    end
+  end
+
   context 'when discarding the draft' do
     let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
     let(:version_status) do
