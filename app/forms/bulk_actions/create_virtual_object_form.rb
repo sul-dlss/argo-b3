@@ -22,7 +22,7 @@ module BulkActions
     end
 
     def prefixed_druids(uploaded_row)
-      uploaded_row.map { |druid| DruidSupport.prefixed_druid_from(druid.sub(/\Adruid:/i, 'druid:')) }
+      uploaded_row.map { |druid| DruidSupport.prefixed_druid_from(druid) }
     end
 
     def validate_normalized_csv

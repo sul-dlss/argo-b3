@@ -10,7 +10,7 @@ RSpec.describe BulkActions::CreateVirtualObjectForm do
 
   describe 'validations' do
     context 'when the rows are valid' do
-      let(:csv) { "bc123df4567,druid:cd234fg5678,DRUID:df345gh6789\nDruid:fg456hj7890,hj567km8901\n" }
+      let(:csv) { "bc123df4567,druid:cd234fg5678,druid:df345gh6789\ndruid:fg456hj7890,hj567km8901\n" }
 
       it 'is valid and normalizes the druid prefixes' do
         expect(form.valid?).to be true

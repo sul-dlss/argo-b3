@@ -22,7 +22,7 @@ module BulkActions
 
     def prefixed_row(uploaded_row)
       druid, *tags = uploaded_row
-      [DruidSupport.prefixed_druid_from(druid.sub(/\Adruid:/i, 'druid:')), *tags]
+      [DruidSupport.prefixed_druid_from(druid), *tags]
     end
 
     def validate_normalized_csv

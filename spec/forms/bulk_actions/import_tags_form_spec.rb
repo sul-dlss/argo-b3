@@ -10,7 +10,7 @@ RSpec.describe BulkActions::ImportTagsForm do
 
   describe 'validations' do
     context 'when the rows are valid' do
-      let(:csv) { "bc123df4567, Project : Testing ,Test Tag : Testing 2\nDRUID:fg456hj7890,\n\n" }
+      let(:csv) { "bc123df4567, Project : Testing ,Test Tag : Testing 2\ndruid:fg456hj7890,\n\n" }
 
       it 'is valid and normalizes the rows' do
         expect(form.valid?).to be true
