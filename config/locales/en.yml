@@ -336,6 +336,17 @@ en:
         deleted: 'Resource deleted'
         moved: 'Resource moved'
         updated: 'Resource updated'
+    item_releases:
+      new:
+        title: 'Manage release'
+        buttons:
+          cancel: 'Cancel'
+          save: 'Save'
+      toasts:
+        updated: 'Release updated'
+      errors:
+        dark: 'Dark objects cannot be released.'
+        save_failed: 'The release could not be saved. Try again, or contact SDR support if the problem continues.'
     items:
       edit:
         title: "Edit item"

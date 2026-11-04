@@ -34,13 +34,13 @@ module BulkActions
       raise NotImplementedError
     end
 
-    def row # rubocop:disable Metrics/AbcSize
+    def row
       [
         DruidSupport.bare_druid_from(cocina_object.externalIdentifier),
         cocina_object.identification.barcode,
         cocina_object.identification.catalogLinks.first&.catalogRecordId,
         cocina_object.identification.sourceId,
-        Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title)
+        CocinaSupport.title(cocina_object)
       ]
     end
 

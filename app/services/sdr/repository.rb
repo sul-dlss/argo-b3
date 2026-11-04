@@ -167,8 +167,9 @@ module Sdr
     end
 
     # @param [String] druid the druid of the object
-    def self.release_tags(druid:)
-      Dor::Services::Client.object(druid).release_tags.list(public: true)
+    # @param [Boolean] public true to merge in collection tags (latest per target); false for only the object's own tags
+    def self.release_tags(druid:, public: true)
+      Dor::Services::Client.object(druid).release_tags.list(public:)
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
     end

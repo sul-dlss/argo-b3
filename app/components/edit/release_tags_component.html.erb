@@ -1,7 +1,7 @@
 <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
       form:,
       field_name: :searchworks_target,
-      options:,
+      options: options_for(:searchworks_target),
       label_text: t('release_tags.searchworks'),
       label_classes: 'order-1 mb-0',
       input_classes: 'w-auto',
@@ -11,7 +11,7 @@
 <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
       form:,
       field_name: :earthworks_target,
-      options:,
+      options: options_for(:earthworks_target),
       label_text: t('release_tags.earthworks'),
       label_classes: 'order-1 mb-0',
       input_classes: 'w-auto',
@@ -21,7 +21,7 @@
 <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
       form:,
       field_name: :purl_sitemap_target,
-      options:,
+      options: options_for(:purl_sitemap_target),
       label_text: t('release_tags.purl_sitemap'),
       label_classes: 'order-1 mb-0',
       input_classes: 'w-auto',

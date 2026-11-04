@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe ObjectStatusPresenter do
-  subject(:presenter) { described_class.new(document:, version_service:, content:, initiating:) }
+  subject(:presenter) { described_class.new(solr_doc:, version_service:, content:, initiating:) }
 
-  let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
+  let(:solr_doc) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:)) }
   let(:druid) { 'druid:bc123df4567' }
   let(:workflow_errors) { [] }
 

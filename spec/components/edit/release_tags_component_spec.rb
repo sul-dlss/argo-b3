@@ -27,6 +27,19 @@ RSpec.describe Edit::ReleaseTagsComponent, type: :component do
     end
   end
 
+  context 'when follow collection is disabled for a target' do
+    let(:component) { described_class.new(form:, follow_collection_disabled_fields: [:searchworks_target]) }
+    let(:release_tags_form) { ReleaseTagsForm.new(searchworks_target: 'no_release') }
+
+    it 'disables the follow collection choice for only that target' do
+      render_inline(component)
+
+      expect(page).to have_select('SearchWorks', selected: 'Do not release',
+                                                 disabled_options: ['Follow collection settings'])
+      expect(page).to have_select('Search engines', disabled_options: [])
+    end
+  end
+
   context 'with options for a collection' do
     let(:component) do
       described_class.new(form:, options: [['Do not release', 'no_release'], ['Release collection', 'self']])

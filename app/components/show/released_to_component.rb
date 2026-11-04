@@ -10,6 +10,10 @@ module Show
 
     attr_reader :object_released_presenter
 
-    delegate :heading, :release_tag_links, to: :object_released_presenter
+    delegate :heading, :release_tag_links, :solr_doc, to: :object_released_presenter
+
+    def release?
+      object_released_presenter.manageable? && helpers.allowed_to?(:release?, solr_doc, with: ObjectPolicy)
+    end
   end
 end

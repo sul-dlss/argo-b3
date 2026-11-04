@@ -4,16 +4,23 @@
 class ObjectReleasedPresenter
   include LinkHelper
 
-  def initialize(document:, version_service:, release_tags:)
-    @document = document
+  def initialize(solr_doc:, version_service:, release_tags:)
+    @solr_doc = solr_doc
     @version_service = version_service
     @release_tags = release_tags
   end
+
+  attr_reader :solr_doc
 
   def heading
     return I18n.t('show.released_to.unreleased.heading') if unreleased?
 
     I18n.t('show.released_to.released.heading')
+  end
+
+  # Dark items cannot be released.
+  def manageable?
+    solr_doc.object_type?('item', 'virtual object') && !solr_doc.dark?
   end
 
   def release_tag_links
@@ -24,7 +31,7 @@ class ObjectReleasedPresenter
 
   private
 
-  attr_reader :document, :version_service, :release_tags
+  attr_reader :version_service, :release_tags
 
   def released_release_tags
     # A release tag can have release=false indicating that the object should not be released to that target
@@ -43,15 +50,15 @@ class ObjectReleasedPresenter
   def release_tag_url(release_tag)
     case release_tag.to
     when 'PURL sitemap'
-      Cocina::Models::Mapping::Purl.for(druid: document.druid)
+      Cocina::Models::Mapping::Purl.for(druid: solr_doc.druid)
     when 'Searchworks'
-      searchworks_url(document.druid, catalog_record_id)
+      searchworks_url(solr_doc.druid, catalog_record_id)
     when 'Earthworks'
-      earthworks_url(document.druid)
+      earthworks_url(solr_doc.druid)
     end
   end
 
   def catalog_record_id
-    Array(document.catalog_record_id).first
+    Array(solr_doc.catalog_record_id).first
   end
 end

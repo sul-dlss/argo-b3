@@ -1,7 +1,15 @@
 <% box_content = content %>
 <%= render SdrViewComponents::Elements::CardComponent.new(classes: %w[border object-type-border object-type-bg-light]) do |card| %>
   <% card.with_body do %>
-    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: heading) %>
+    <% if heading_action? %>
+      <%# The margin is on the row, so the heading is centered with the action. %>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title mb-0', text: heading) %>
+        <%= heading_action %>
+      </div>
+    <% else %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: heading) %>
+    <% end %>
     <div class="card-text"><%= box_content %></div>
   <% end %>
 <% end %>

@@ -7,7 +7,7 @@ RSpec.describe MultiItemDeposit::DepositStatusTableComponent, type: :component d
   let(:object_status_presenters) do
     { 'druid:bc123df4567' => version_service_double(closed?: true), 'druid:cd234fg5678' => version_service_double }
       .map do |druid, version_service|
-        ObjectStatusPresenter.new(document: SolrDocPresenter.new(solr_doc: build(:solr_item, druid:)),
+        ObjectStatusPresenter.new(solr_doc: SolrDocPresenter.new(solr_doc: build(:solr_item, druid:)),
                                   version_service:, content: nil)
       end
   end

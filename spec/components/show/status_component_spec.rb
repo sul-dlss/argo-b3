@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:, solr_doc: document, unsaved_content_changes:) }
+  subject(:component) { described_class.new(object_status_presenter:, solr_doc:, unsaved_content_changes:) }
 
-  let(:object_status_presenter) { ObjectStatusPresenter.new(document:, version_service:, content:) }
-  let(:document) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }
+  let(:object_status_presenter) { ObjectStatusPresenter.new(solr_doc:, version_service:, content:) }
+  let(:solr_doc) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }
   let(:druid) { 'druid:bc123df4567' }
   let(:workflow_errors) { [] }
   let(:object_type) { 'item' }

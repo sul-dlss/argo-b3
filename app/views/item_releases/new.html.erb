@@ -1,0 +1,20 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.item_releases.new.title')) %>
+
+  <p class="mb-4"><%= @title %></p>
+
+  <p>
+    If the item is not already in a collection, "Follow collection settings" will not have any effect until the item is added to a
+    collection. Choosing "Release" or "Do not release" will override any collection-level release settings for this item.
+  </p>
+
+  <%= form_with model: @item_release_tags_form, url: item_releases_path(@druid), class: 'b3-form' do |form| %>
+    <%= render Edit::ReleaseTagsComponent.new(form:, follow_collection_disabled_fields: @follow_collection_disabled_fields) %>
+
+    <div class="mt-4">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.item_releases.new.buttons.cancel'), link: object_path(@druid),
+                                                                      variant: :link, classes: 'me-3') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_releases.new.buttons.save')) %>
+    </div>
+  <% end %>
+</div>

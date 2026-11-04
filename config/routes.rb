@@ -218,6 +218,9 @@ Rails.application.routes.draw do
   end
 
   resources :items, only: %i[new create edit update]
+  scope 'items/:druid', as: :item do
+    resources :releases, only: %i[new create], controller: 'item_releases'
+  end
 
   resources :apos, only: %i[new create edit update]
   resources :agreements, only: %i[new create]

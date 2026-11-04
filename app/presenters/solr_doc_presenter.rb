@@ -36,6 +36,10 @@ class SolrDocPresenter < SearchResults::Item
     object_type == 'item'
   end
 
+  def dark?
+    Array(access_rights).include?('dark')
+  end
+
   # @param object_types [Array<String>] object types to match, e.g., 'item', 'virtual object', 'collection',
   #   'APO', 'agreement'
   # @return [Boolean] true if the object type is any of the provided object types

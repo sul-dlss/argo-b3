@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ObjectReleasedPresenter do
-  subject(:presenter) { described_class.new(document:, version_service:, release_tags:) }
+  subject(:presenter) { described_class.new(solr_doc:, version_service:, release_tags:) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:document) do
+  let(:solr_doc) do
     SolrDocPresenter.new(solr_doc: { Search::Fields::ID => druid,
                                      Search::Fields::CATALOG_RECORD_ID => catalog_record_id })
   end
@@ -115,6 +115,44 @@ RSpec.describe ObjectReleasedPresenter do
 
       it 'returns no links' do
         expect(presenter.release_tag_links).to eq([])
+      end
+    end
+  end
+
+  describe '#manageable?' do
+    let(:release_tags) { [] }
+    let(:solr_doc) do
+      SolrDocPresenter.new(solr_doc: { Search::Fields::ID => druid, Search::Fields::OBJECT_TYPES => [object_type],
+                                       Search::Fields::ACCESS_RIGHTS => access_rights })
+    end
+    let(:object_type) { 'item' }
+    let(:access_rights) { ['world'] }
+
+    it 'is true for an item' do
+      expect(presenter.manageable?).to be true
+    end
+
+    context 'when a virtual object' do
+      let(:object_type) { 'virtual object' }
+
+      it 'is true' do
+        expect(presenter.manageable?).to be true
+      end
+    end
+
+    context 'when a dark item' do
+      let(:access_rights) { ['dark'] }
+
+      it 'is false' do
+        expect(presenter.manageable?).to be false
+      end
+    end
+
+    context 'when a collection' do
+      let(:object_type) { 'collection' }
+
+      it 'is false' do
+        expect(presenter.manageable?).to be false
       end
     end
   end

@@ -43,10 +43,10 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @druid_token = generate_token(druid)
     version_service = Sdr::VersionService.new(druid:)
     content = Content.latest_staging_activity(druid:)
-    @object_status_presenter = ObjectStatusPresenter.new(document: @solr_doc, version_service:, content:)
+    @object_status_presenter = ObjectStatusPresenter.new(solr_doc: @solr_doc, version_service:, content:)
     @unsaved_content_changes = unsaved_content_changes?(druid)
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
-    @object_released_presenter = ObjectReleasedPresenter.new(document: @solr_doc, version_service:, release_tags:)
+    @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
     @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: @cocina_object.version, version_service:)
 
