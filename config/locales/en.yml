@@ -158,6 +158,15 @@ en:
         tags:
           label: "Tags"
     apos:
+      edit:
+        title: "Edit and deposit APO"
+        buttons:
+          deposit: "Deposit"
+        toasts:
+          deposited: "APO updated and deposit started."
+        warnings:
+          not_editable: "APO is not editable."
+          stale: "This APO was changed since you opened it. Review the current values and make your changes again."
       new:
         title: "Register and deposit APO"
         buttons:
@@ -180,6 +189,8 @@ en:
           help_text: "The following defaults will apply to all newly registered objects."
         use_and_reproduction_statement:
           label: "Default use and reproduction"
+        version_description:
+          label: "Version description"
     collections:
       new:
         title: "Register and deposit collection"

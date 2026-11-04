@@ -159,6 +159,42 @@ RSpec.describe Show::StatusComponent, type: :component do
     end
   end
 
+  context 'when the APO version is editable and the user can edit' do
+    let(:object_type) { 'APO' }
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders an enabled edit APO link' do
+      render_inline(component)
+
+      expect(page).to have_link('Edit APO', href: "/apos/#{druid}/edit")
+      expect(page).to have_no_css('a.disabled', text: 'Edit APO')
+    end
+  end
+
+  context 'when the APO version is editable but the user cannot edit' do
+    let(:object_type) { 'APO' }
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      allow(Current).to receive(:user).and_return(create(:user))
+    end
+
+    it 'renders a disabled edit APO link' do
+      render_inline(component)
+
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit APO')
+      expect(page).to have_no_link('Edit APO')
+    end
+  end
+
   context 'when the object is a virtual object' do
     let(:object_type) { 'virtual object' }
 

@@ -23,6 +23,10 @@ module CocinaModels
       CocinaModelMappers::AdminPolicyMapper.call(cocina_object:)
     end
 
+    def mutated_cocina_object
+      CocinaObjectMutators::AdminPolicyMutator.call(cocina_object: previous_cocina_object, cocina_model: self)
+    end
+
     def request_cocina_object
       Cocina::Models.build_request(
         {

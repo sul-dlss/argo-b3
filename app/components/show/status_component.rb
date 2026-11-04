@@ -29,13 +29,13 @@ module Show
       I18n.t("show.status.actions.#{edit_action}")
     end
 
-    # Only items have an edit form so far.
+    # Only items and APOs have an edit form so far.
     def can_edit?
-      item? && editable?
+      (item? || admin_policy?) && editable?
     end
 
     def edit_path
-      edit_item_path(druid)
+      admin_policy? ? edit_apo_path(druid) : edit_item_path(druid)
     end
 
     def manage_files_button
