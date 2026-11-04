@@ -291,11 +291,11 @@ RSpec.describe 'Dashboard' do
     end
 
     context 'when signed in as an admin who is impersonating a non-admin group' do
-      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
+      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:map-staff']) }
 
       before do
         sign_in(admin_user)
-        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
         get root_path
       end
 

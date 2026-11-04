@@ -1,27 +1,92 @@
 # frozen_string_literal: true
 
 module Impersonation
-  # Handles deriving available workgroups and reading/writing impersonated workgroups from encrypted cookies.
+  # Lists the workgroups available for impersonation and reads/writes the impersonated workgroups cookie.
   class Workgroups
     COOKIE_KEY = :impersonated_workgroups
-    ADMIN_GROUP_SUFFIX = '/administrator'
+    # Workgroups offered for impersonation; update when a new team starts using Argo.
+    WORKGROUPS = %w[
+      sdr:3d-staff
+      sdr:accessioning
+      sdr:acquisitions-staff
+      sdr:admin-docs
+      sdr:admin-temporary
+      sdr:administrator
+      sdr:administrator-role
+      sdr:api-authorized-users
+      sdr:argo-access
+      sdr:argo-message-editors
+      sdr:argo_administrators
+      sdr:ars-staff
+      sdr:art-staff
+      sdr:berman-archive
+      sdr:bibliographers-staff
+      sdr:big_local_data
+      sdr:cantor-staff
+      sdr:catalhoyuk
+      sdr:cesta-admin-staff
+      sdr:chs-staff
+      sdr:cidr-staff
+      sdr:conservation-staff
+      sdr:curator-staff
+      sdr:developer
+      sdr:development-hourlies
+      sdr:dpg-hourlies
+      sdr:dpg-staff
+      sdr:eal-staff
+      sdr:eresources-staff
+      sdr:etds-quarterly-reports
+      sdr:etds-registrar-staff
+      sdr:etds-sul-staff
+      sdr:forensics-staff
+      sdr:gb-ill-staff
+      sdr:geospecimen-staff
+      sdr:gsb-library
+      sdr:hoover-staff
+      sdr:hopkins-staff
+      sdr:hydrus-collection-managers
+      sdr:hydrus-manager-role
+      sdr:hydrus-service-team
+      sdr:hydrus-staff
+      sdr:lanciani-archive
+      sdr:lane-staff
+      sdr:law-staff
+      sdr:lockss-staff
+      sdr:manager-role
+      sdr:map-hourlies
+      sdr:map-staff
+      sdr:martin-wong
+      sdr:media-microtext
+      sdr:metadata-staff
+      sdr:music-staff
+      sdr:nash-photo-archive
+      sdr:office-tech-license
+      sdr:osc
+      sdr:otl
+      sdr:parker-staff
+      sdr:production-coordinators
+      sdr:psm-staff
+      sdr:sa-print-collection-staff
+      sdr:sagr-staff
+      sdr:serg-staff
+      sdr:service-manager
+      sdr:service-team
+      sdr:smpl-staff
+      sdr:sohp-staff
+      sdr:spec-staff
+      sdr:staff
+      sdr:suac-staff
+      sdr:summer-student
+      sdr:sup-staff
+      sdr:sustaining-websites
+      sdr:twala
+      sdr:ua-students
+      sdr:url-managers
+      sdr:viewer-role
+      sdr:was-staff
+    ].freeze
 
     class << self
-      # Returns a normalized list of workgroups a user can impersonate.
-      #
-      # Removes any trailing administrator suffix, drops blanks, de-duplicates,
-      # and sorts for stable display in the impersonation UI.
-      #
-      # @param user [User] the currently authenticated user
-      # @return [Array<String>] sorted unique impersonable workgroups
-      def available_for_user(user:)
-        user.groups
-            .map { |group| group.delete_suffix(ADMIN_GROUP_SUFFIX) }
-            .compact_blank
-            .uniq
-            .sort
-      end
-
       # Reads impersonated workgroups from the encrypted cookie.
       #
       # Always returns an array and removes blank entries.

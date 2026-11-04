@@ -11,12 +11,12 @@ RSpec.describe 'Impersonation permissions' do
     end
 
     context 'when effective groups from impersonation have edit permission' do
-      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:impersonated-group']) }
+      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:map-staff']) }
 
       before do
-        create(:permission, :edit, workgroup: 'sdr:impersonated-group')
+        create(:permission, :edit, workgroup: 'sdr:map-staff')
         sign_in(admin_user)
-        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:impersonated-group'] } }
+        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
         sign_in(user)
       end
 
@@ -29,12 +29,12 @@ RSpec.describe 'Impersonation permissions' do
     end
 
     context 'when actual groups have edit permission but impersonated groups do not' do
-      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:no-permission-group']) }
+      let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:hoover-staff']) }
 
       before do
         create(:permission, :edit, workgroup: 'sdr:actual-group')
         sign_in(admin_user)
-        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:no-permission-group'] } }
+        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:hoover-staff'] } }
         sign_in(user)
       end
 

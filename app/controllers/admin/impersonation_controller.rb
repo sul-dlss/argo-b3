@@ -3,15 +3,13 @@
 module Admin
   # Controller for impersonating workgroups
   class ImpersonationController < ApplicationController
-    WORKGROUPS_PER_COLUMN = 12
+    WORKGROUP_COLUMNS = 4
 
     def edit
       authorize! to: :impersonate?, with: AdminPolicy
 
-      available_workgroups = Impersonation::Workgroups.available_for_user(user: current_user)
-
       @selected_workgroups = Current.impersonated_groups || []
-      @workgroup_columns = available_workgroups.each_slice(WORKGROUPS_PER_COLUMN).to_a
+      @workgroup_columns = workgroups.each_slice(workgroups.size.fdiv(WORKGROUP_COLUMNS).ceil).to_a
     end
 
     def update
@@ -44,8 +42,11 @@ module Admin
 
     def impersonated_workgroups
       selected_workgroups = impersonation_params[:workgroups] || []
-      available_workgroups = Impersonation::Workgroups.available_for_user(user: current_user)
-      Array(selected_workgroups) & available_workgroups
+      Array(selected_workgroups) & workgroups
+    end
+
+    def workgroups
+      Impersonation::Workgroups::WORKGROUPS
     end
   end
 end
