@@ -15,6 +15,8 @@ module CocinaModelMappers
     # @return [Hash] the mapped attributes
     def call # rubocop:disable Metrics/AbcSize
       {
+        # Mapped so that saving retains the description rather than replacing it with the default.
+        description_hash: cocina_object.description.to_h,
         access_view: cocina_object.administrative.accessTemplate.view,
         access_download: cocina_object.administrative.accessTemplate.download,
         access_location: cocina_object.administrative.accessTemplate.location,

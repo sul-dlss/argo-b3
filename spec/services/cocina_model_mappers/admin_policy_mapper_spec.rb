@@ -16,7 +16,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
     let(:agreement_druid) { 'druid:bb008zm4587' }
 
     let(:cocina_object) do
-      build(:admin_policy_with_metadata).new(
+      build(:admin_policy_with_metadata, id: 'druid:bc123df4567').new(
         administrative: {
           hasAdminPolicy: apo_druid,
           hasAgreement: agreement_druid,
@@ -34,6 +34,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
 
     it 'returns a hash from the cocina object' do
       expect(result).to eq(
+        description_hash: cocina_object.description.to_h,
         access_view: view,
         access_download: download,
         access_location: location,
@@ -49,7 +50,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
       let(:view) { 'world' }
       let(:download) { 'world' }
       let(:cocina_object) do
-        build(:admin_policy_with_metadata).new(
+        build(:admin_policy_with_metadata, id: 'druid:bc123df4567').new(
           administrative: {
             hasAdminPolicy: apo_druid,
             hasAgreement: agreement_druid,
@@ -63,6 +64,7 @@ RSpec.describe CocinaModelMappers::AdminPolicyMapper do
 
       it 'omits the blank attributes' do
         expect(result).to eq(
+          description_hash: cocina_object.description.to_h,
           access_view: view,
           access_download: download,
           apo_druid:,

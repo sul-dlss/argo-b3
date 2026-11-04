@@ -49,6 +49,33 @@ RSpec.describe CocinaModels::AdminPolicy do
     end
   end
 
+  describe '#save!' do
+    let(:user_name) { 'test_user' }
+
+    before do
+      allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object }
+    end
+
+    context 'with valid and changed attributes' do
+      before do
+        admin_policy.agreement_druid = 'druid:bb008zm4587'
+      end
+
+      it 'saves the mutated cocina object' do
+        admin_policy.save!(user_name:)
+
+        expect(Sdr::Repository).to have_received(:update) do |args|
+          new_cocina_object = args[:cocina_object]
+          expect(new_cocina_object).to be_a(Cocina::Models::AdminPolicyWithMetadata)
+          expect(new_cocina_object.lock).to eq(cocina_object.lock)
+          expect(new_cocina_object.administrative.hasAgreement).to eq('druid:bb008zm4587')
+          expect(args[:user_name]).to eq(user_name)
+        end
+        expect(admin_policy.changed?).to be false
+      end
+    end
+  end
+
   describe '#create!' do
     let(:user_name) { 'test_user' }
 
