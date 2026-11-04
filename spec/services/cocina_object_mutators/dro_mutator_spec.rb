@@ -340,7 +340,7 @@ RSpec.describe CocinaObjectMutators::DroMutator do
                 filename: 'report.pdf',
                 version: 1,
                 access: { view: 'world', download: 'world' },
-                administrative: { publish: true, sdrPreserve: true, shelve: true }
+                administrative: { publish: true, sdrPreserve: sdr_preserve, shelve: true }
               }]
             }
           }]
@@ -352,6 +352,7 @@ RSpec.describe CocinaObjectMutators::DroMutator do
                                         access: { view: 'stanford', download: 'stanford' }, overwrite:)
     end
     let(:overwrite) { true }
+    let(:sdr_preserve) { true }
     let(:file) { result.structural.contains.first.structural.contains.first }
 
     context 'when the access changed' do
@@ -381,6 +382,17 @@ RSpec.describe CocinaObjectMutators::DroMutator do
       it 'makes the files dark and unshelved, which cocina requires' do
         expect(file.access).to have_attributes(view: 'dark', download: 'none')
         expect(file.administrative).to have_attributes(publish: false, sdrPreserve: true, shelve: false)
+      end
+    end
+
+    context 'when changed to dark with a file that is not preserved' do
+      let(:file_access_overwrite) { nil }
+      let(:sdr_preserve) { false }
+
+      before { cocina_model.update(access_view: 'dark', access_download: 'none') }
+
+      it 'removes the file and the file set it empties' do
+        expect(result.structural.contains).to be_empty
       end
     end
   end

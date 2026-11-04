@@ -39,11 +39,7 @@ module CocinaObjectMutators
                                                     access: new_cocina_props[:access], overwrite: false)
       return unless overwrite.apply?
 
-      Array(new_cocina_props[:structural][:contains]).each do |file_set_props|
-        Array(file_set_props.dig(:structural, :contains)).each do |file_props|
-          overwrite.apply_to_cocina_file!(file_props)
-        end
-      end
+      overwrite.apply_to_cocina_structural!(new_cocina_props[:structural])
     end
 
     def update_embargo(access_hash)
