@@ -116,15 +116,15 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(table).to have_css('tbody tr', count: 3)
       expect(table).to have_css('tbody tr:nth-of-type(1) td', count: 5)
       expect(table).to have_css("tbody tr:nth-of-type(1) td:nth-of-type(1) a[href='/objects/druid:bc123df4567']",
-                                text: 'druid:bc123df4567')
+                                exact_text: 'bc123df4567')
       expect(table).to have_css('tbody tr:nth-of-type(1) td:nth-of-type(5)', text: 'First title')
       # The druid is blank for a failed registration, but the row still has a cell for every column.
       expect(table).to have_css('tbody tr:nth-of-type(2) td', count: 5)
       expect(table).to have_css('tbody tr:nth-of-type(2) td:nth-of-type(5)', text: 'Second title')
       expect(table).to have_no_css('tbody tr:nth-of-type(2) td:nth-of-type(1) a')
-      # A bare druid is linked as a full druid.
+      # A bare druid is shown bare and linked as a full druid.
       expect(table).to have_css("tbody tr:nth-of-type(3) td:nth-of-type(1) a[href='/objects/druid:hj456kl7890']",
-                                text: 'druid:hj456kl7890')
+                                exact_text: 'hj456kl7890')
 
       downloads_box = page.find('h2', text: 'Downloads').ancestor('.card')
       expect(downloads_box).to have_link('Registration report',
@@ -146,7 +146,7 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
 
       table = page.find('table#bulk-action-registration-report-table')
       expect(table).to have_css("tbody td:nth-of-type(1) a[href='/objects/druid:mn789pq1234']",
-                                text: 'druid:mn789pq1234')
+                                exact_text: 'mn789pq1234')
       expect(table).to have_no_css('tbody td:nth-of-type(2) a')
     end
   end

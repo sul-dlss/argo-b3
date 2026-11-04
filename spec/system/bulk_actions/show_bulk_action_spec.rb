@@ -70,7 +70,7 @@ RSpec.describe 'Show a bulk action' do
       table = page.find('table#bulk-action-registration-report-table')
       expect(table).to have_css('thead th', text: 'Druid')
       expect(table).to have_css('thead th', text: 'Folio Instance HRID')
-      expect(table).to have_css('tbody td', text: 'druid:bc123df4567')
+      expect(table).to have_css('tbody td', exact_text: 'bc123df4567')
       expect(table).to have_css('tbody td', text: 'First title')
 
       # The download link is still available.
