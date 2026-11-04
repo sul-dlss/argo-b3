@@ -55,6 +55,8 @@ A named group of users (e.g., `sdr:map-staff`) managed outside Argo. Permissions
 
 ### Impersonation
 An admin temporarily acting with the permissions of one or more chosen Workgroups instead of their own, to see what members of those Workgroups can see and do.
+### File Flag
+An underscore-separated token in an SMPL filename that describes the file rather than the content (e.g., `pm` preservation master, `sl` service low, `cap` caption, `script` transcript). Files of the same recording share a filename once role and processing flags (`pm`, `sh`, `sl`, `sp`) and the `thumb`, `cap`, and `script` flags are removed; other flags (side, part, track, etc.) distinguish recordings.
 
 ## Structural Metadata Terms
 Structural metadata (file sets and files) is held in Active Record models rather than cocina models. See README "Structural metadata" for the full model and flows.

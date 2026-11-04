@@ -70,12 +70,23 @@ RSpec.describe Contents::Validators::Media do
     context "when a #{file_set_type} resource has published files but no published MP4/M4A or source file" do
       before do
         create_resource(file_set_type:, label: 'Media 1',
-                        files: [['video.mp4', 'video/mp4', false], ['captions.vtt', 'text/vtt', true]])
+                        files: [['captions.vtt', 'text/vtt', true], ['poster.jp2', 'image/jp2', true]])
       end
 
       it 'has an error' do
         expect(result.errors).to eq(['Resource 1 (Media 1) has published files but no published MP4/M4A file ' \
-                                     'or MP3, MOV, MKV, or WAV file.'])
+                                     'or MP3, MOV, MKV, WAV, or unpublished MP4/M4A file.'])
+      end
+    end
+
+    context "when a #{file_set_type} resource has published files and an unpublished MP4/M4A" do
+      before do
+        create_resource(file_set_type:,
+                        files: [['video.mp4', 'video/mp4', false], ['captions.vtt', 'text/vtt', true]])
+      end
+
+      it 'has no errors' do
+        expect(result.errors).to eq([])
       end
     end
 
