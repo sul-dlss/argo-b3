@@ -319,4 +319,69 @@ RSpec.describe CocinaObjectMutators::DroMutator do
       end
     end
   end
+
+  describe 'file access' do
+    subject(:result) { described_class.call(cocina_object:, cocina_model:, file_access_overwrite:) }
+
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: 'druid:bc123df4567').new(
+        access: { view: 'world', download: 'world' },
+        structural: {
+          contains: [{
+            type: Cocina::Models::FileSetType.file,
+            externalIdentifier: 'bc123df4567_1',
+            label: 'Object 1',
+            version: 1,
+            structural: {
+              contains: [{
+                type: Cocina::Models::ObjectType.file,
+                externalIdentifier: 'druid:bc123df4567/report.pdf',
+                label: 'report.pdf',
+                filename: 'report.pdf',
+                version: 1,
+                access: { view: 'world', download: 'world' },
+                administrative: { publish: true, sdrPreserve: true, shelve: true }
+              }]
+            }
+          }]
+        }
+      )
+    end
+    let(:file_access_overwrite) do
+      Contents::FileAccessOverwrite.new(previous_access: cocina_object.access,
+                                        access: { view: 'stanford', download: 'stanford' }, overwrite:)
+    end
+    let(:overwrite) { true }
+    let(:file) { result.structural.contains.first.structural.contains.first }
+
+    context 'when the access changed' do
+      before { cocina_model.update(access_view: 'stanford', access_download: 'stanford') }
+
+      it 'applies it to the files' do
+        expect(file.access).to have_attributes(view: 'stanford', download: 'stanford')
+        expect(file.administrative).to have_attributes(publish: true, sdrPreserve: true, shelve: true)
+      end
+    end
+
+    context 'when the access changed without overwriting file access' do
+      let(:overwrite) { false }
+
+      before { cocina_model.update(access_view: 'stanford', access_download: 'stanford') }
+
+      it 'does not change the files' do
+        expect(file.access).to have_attributes(view: 'world', download: 'world')
+      end
+    end
+
+    context 'when changed to dark without a file access overwrite' do
+      let(:file_access_overwrite) { nil }
+
+      before { cocina_model.update(access_view: 'dark', access_download: 'none') }
+
+      it 'makes the files dark and unshelved, which cocina requires' do
+        expect(file.access).to have_attributes(view: 'dark', download: 'none')
+        expect(file.administrative).to have_attributes(publish: false, sdrPreserve: true, shelve: false)
+      end
+    end
+  end
 end

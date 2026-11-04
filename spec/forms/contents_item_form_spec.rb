@@ -21,7 +21,8 @@ RSpec.describe ContentsItemForm do
   describe '.permitted_params' do
     it 'permits the content type, viewing direction, OCR settings, version description, and access' do
       expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :perform_ocr,
-                                                      :version_description, { ocr_languages: [] },
+                                                      :version_description, :overwrite_file_access,
+                                                      { ocr_languages: [] },
                                                       :with_embargo, :embargo_release_date, :access_view,
                                                       :access_download, :access_location, :embargo_view,
                                                       :embargo_download, :embargo_location])
@@ -237,6 +238,49 @@ RSpec.describe ContentsItemForm do
     it 'prefills the OCR settings saved with the content without changing the form' do
       expect(contents_item_form).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
       expect(contents_item_form).not_to be_changed
+    end
+  end
+
+  describe 'file access' do
+    let(:content) { create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+    let!(:content_file) { create(:content_file, content_file_set: create(:content_file_set, content:)) }
+
+    before do
+      allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
+      contents_item_form.content = content
+    end
+
+    context 'when the access changed' do
+      before { contents_item_form.update(access_view: 'stanford', access_download: 'stanford') }
+
+      it 'applies it to the content files, so that staging saves it' do
+        contents_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford', shelve: true)
+      end
+    end
+
+    context 'when the access changed without overwriting file access' do
+      before do
+        contents_item_form.update(access_view: 'stanford', access_download: 'stanford',
+                                  overwrite_file_access: false)
+      end
+
+      it 'does not change the content files' do
+        contents_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'world', download: 'world')
+      end
+    end
+
+    context 'when changed to citation-only' do
+      before { contents_item_form.update(access_view: 'citation-only', access_download: 'none') }
+
+      it 'makes the content files dark, without unshelving them' do
+        contents_item_form.save!(user_name: 'jlittman')
+
+        expect(content_file.reload).to have_attributes(view: 'dark', download: 'none', shelve: true, publish: true)
+      end
     end
   end
 

@@ -1,4 +1,4 @@
-<div data-controller="toggle">
+<div data-controller="toggle overwrite-file-access" data-action="change->overwrite-file-access#update">
   <%= render SdrViewComponents::Forms::ToggleComponent.new(form:,
                                                            field_name: :with_embargo,
                                                            label_text: 'Access settings',
@@ -43,4 +43,15 @@
                                                  apo_defaults_group: apo_defaults_group('embargo_ends')) %>
     <% end %>
   </div>
+
+  <% if overwrite_file_access? %>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+          form:,
+          field_name: :overwrite_file_access,
+          label_text: t('edit.items.fields.overwrite_file_access.label'),
+          help_text: t('edit.items.fields.overwrite_file_access.help_text'),
+          container_classes: 'my-field',
+          input_data: { overwrite_file_access_target: 'checkbox' }
+        ) %>
+  <% end %>
 </div>

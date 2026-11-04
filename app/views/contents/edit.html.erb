@@ -54,7 +54,7 @@
 
           <%# Structuring uses the selected access, which may not have been saved yet. %>
           <%= tag.div data: { action: 'change->structure-item-details#update' } do %>
-            <%= render Edit::AccessAndEmbargoComponent.new(form: item_form) %>
+            <%= render Edit::AccessAndEmbargoComponent.new(form: item_form, overwrite_file_access: true) %>
           <% end %>
 
         <% end %>

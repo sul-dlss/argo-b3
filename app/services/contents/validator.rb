@@ -58,9 +58,9 @@ module Contents
       VALIDATORS_FOR_CONTENT_TYPES.fetch(content_type, DEFAULT_VALIDATOR)
     end
 
-    # Validates based on what the file access will be after any embargo is lifted.
+    # Validates based on the access that the files get from the object.
     def dark?
-      Contents::DefaultFileAccess.new(cocina_object:).dark?
+      Contents::DefaultFileAccess.new(access: cocina_object.access).dark?
     end
   end
 end

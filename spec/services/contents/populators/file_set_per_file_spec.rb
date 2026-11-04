@@ -81,18 +81,18 @@ RSpec.describe Contents::Populators::FileSetPerFile do
       let(:cocina_object) do
         build(:dro_with_metadata, id: content.druid).new(
           access: {
-            view: 'citation-only',
-            download: 'none',
+            view: 'stanford',
+            download: 'stanford',
             embargo: {
               releaseDate: DateTime.parse('2040-06-15T19:00:00Z'),
-              view: 'stanford',
-              download: 'stanford'
+              view: 'world',
+              download: 'world'
             }
           }
         )
       end
 
-      it 'uses the embargo access settings' do
+      it 'uses the access during the embargo' do
         structure
 
         expect(content.content_files.sole).to have_attributes(view: 'stanford', download: 'stanford')

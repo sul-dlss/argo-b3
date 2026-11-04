@@ -23,6 +23,15 @@ Governs the administrative/access rules applied to the objects under it. "APO" a
 ### Governing APO
 The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has exactly one governing APO. The relationship means the same thing regardless of the subject's type — including when the subject is itself an APO (an APO can be governed by another APO).
 
+### Object Access
+The access (view, download, location) of a DRO as a whole. It applies now, during any embargo; an embargo's access replaces it when the embargo is released.
+
+### File Access
+The access of an individual file. New files get the Object Access, with citation-only becoming dark, since a file cannot be citation-only. The files of a dark object must be dark and unshelved. When an embargo is released, every file gets the embargo's access.
+
+### Overwrite File Access
+Applying the Object Access to every file when saving an item whose Object Access changed. It always happens when the object is dark.
+
 ### Draft
 The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version, and deletes the draft's Mutable Content and staged files. A first version cannot be discarded, but it can be purged.
 

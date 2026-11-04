@@ -189,10 +189,10 @@ RSpec.describe Contents::Validator do
     end
   end
 
-  context 'when embargoed as dark' do
+  context 'when dark during an embargo' do
     let(:access) do
-      { view: 'world', download: 'world',
-        embargo: { releaseDate: 1.year.from_now.iso8601, view: 'dark', download: 'none' } }
+      { view: 'dark', download: 'none',
+        embargo: { releaseDate: 1.year.from_now.iso8601, view: 'world', download: 'world' } }
     end
 
     it 'has warnings instead of errors' do

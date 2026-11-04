@@ -459,6 +459,11 @@ en:
             Enter a list of tags separated by tabs or new lines. You can add Project and Ticket tags here as well.
         other_tag:
           label: 'Tag'
+        overwrite_file_access:
+          label: 'Overwrite file-level rights'
+          help_text: >-
+            When the access settings change, apply them to every file. The files are always made dark when the
+            view access is dark, and are not shelved or published again when it changes from dark.
         part_label:
           label: 'Part label'
         perform_ocr:

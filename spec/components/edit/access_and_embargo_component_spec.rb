@@ -49,11 +49,32 @@ RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
   it 'renders the targets that the toggle Stimulus controller expects' do
     render_inline(component)
 
-    expect(page).to have_css('[data-controller="toggle"]')
+    expect(page).to have_css('[data-controller="toggle overwrite-file-access"]')
     expect(page).to have_css('input[data-toggle-target="radio"][data-toggle-section="without-embargo"]')
     expect(page).to have_css('input[data-toggle-target="radio"][data-toggle-section="with-embargo"]')
     expect(page).to have_css('[data-toggle-target="section"][data-toggle-section="without-embargo"]')
     expect(page).to have_css('[data-toggle-target="section"][data-toggle-section="with-embargo"]')
+  end
+
+  it 'does not render the overwrite file access checkbox' do
+    render_inline(component)
+
+    expect(page).to have_no_field('Overwrite file-level rights')
+  end
+
+  context 'when showing the overwrite file access checkbox' do
+    let(:component) { described_class.new(form:, overwrite_file_access: true) }
+    let(:form) { ActionView::Helpers::FormBuilder.new(:item, edit_item_form, vc_test_view_context, {}) }
+    let(:edit_item_form) { EditItemForm.build_from_cocina_object(build(:dro_with_metadata)) }
+
+    it 'renders the checkbox, checked, for the overwrite-file-access Stimulus controller' do
+      render_inline(component)
+
+      expect(page).to have_field('Overwrite file-level rights', type: 'checkbox', checked: true,
+                                                                name: 'item[overwrite_file_access]')
+      expect(page).to have_css('input[data-overwrite-file-access-target="checkbox"]')
+      expect(page).to have_text('When the access settings change, apply them to every file.')
+    end
   end
 
   context 'when showing APO defaults' do

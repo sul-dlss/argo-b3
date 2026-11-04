@@ -51,7 +51,7 @@ module Contents
       end
 
       def default_file_access
-        @default_file_access ||= Contents::DefaultFileAccess.new(cocina_object:)
+        @default_file_access ||= Contents::DefaultFileAccess.new(access: cocina_object.access)
       end
 
       def file_access_attributes

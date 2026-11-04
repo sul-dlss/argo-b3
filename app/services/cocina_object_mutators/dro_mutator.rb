@@ -3,7 +3,15 @@
 module CocinaObjectMutators
   # Mapper for merging a CocinaModels::Dro with an existing Cocina::Models::DROWithMetadata.
   class DroMutator < BaseMutator
+    # @param file_access_overwrite [Contents::FileAccessOverwrite, nil] the form's decision to apply the access to files
+    def initialize(file_access_overwrite: nil, **)
+      @file_access_overwrite = file_access_overwrite
+      super(**)
+    end
+
     private
+
+    attr_reader :file_access_overwrite
 
     def build_new_cocina_props # rubocop:disable Metrics/AbcSize
       super.tap do |new_cocina_props|
@@ -17,6 +25,24 @@ module CocinaObjectMutators
         new_cocina_props[:structural][:isMemberOf] = cocina_model.collection_druids
 
         update_embargo(new_cocina_props[:access])
+        update_file_access(new_cocina_props)
+      end
+    end
+
+    # Updated with the access, since cocina rejects a dark object with files that are not dark.
+    def update_file_access(new_cocina_props)
+      return if request_object?
+
+      # Without a form's decision (e.g., bulk rights), only dark is applied.
+      overwrite = file_access_overwrite ||
+                  Contents::FileAccessOverwrite.new(previous_access: cocina_object.access,
+                                                    access: new_cocina_props[:access], overwrite: false)
+      return unless overwrite.apply?
+
+      Array(new_cocina_props[:structural][:contains]).each do |file_set_props|
+        Array(file_set_props.dig(:structural, :contains)).each do |file_props|
+          overwrite.apply_to_cocina_file!(file_props)
+        end
       end
     end
 
