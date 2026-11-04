@@ -7,6 +7,14 @@ class StagingSupport
     [Settings.staging_location, Settings.assembly_location]
   end
 
+  # Web archive seeds stage to the assembly location, since accessioning replaces the workspace (where
+  # wasSeedPreassemblyWF puts the seed's thumbnail) with the object's folder in the deposit staging location.
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  # @return [String] where to stage the object's files when none are staged yet
+  def self.default_location(cocina_object:)
+    CocinaSupport.webarchive_seed?(cocina_object) ? Settings.assembly_location : Settings.staging_location
+  end
+
   def self.staging_filepath(druid:, filepath:, staging_location: Settings.staging_location)
     File.join(staging_content_path(druid:, staging_location:), filepath)
   end
@@ -16,11 +24,14 @@ class StagingSupport
     File.join(druid_tree_folder, 'content')
   end
 
-  # Creates the staging content directory for the druid, unless some staging location already has the druid's folder.
-  def self.ensure_staging_folder(druid:)
+  # Creates the staging content directory for the object in its default location, unless some staging location
+  # already has the druid's folder.
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  def self.ensure_staging_folder(cocina_object:)
+    druid = cocina_object.externalIdentifier
     return if locations.any? { |staging_location| File.directory?(DruidTools::Druid.new(druid, staging_location).path) }
 
-    FileUtils.mkdir_p(staging_content_path(druid:))
+    FileUtils.mkdir_p(staging_content_path(druid:, staging_location: default_location(cocina_object:)))
   end
 
   # Deletes the staging content directory for the druid in every staging location.

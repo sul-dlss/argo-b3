@@ -15,7 +15,7 @@ RSpec.describe RegistrationCsvConverter do
         administrative: { hasAdminPolicy: 'druid:bc123df4567' },
         description: { title: [{ value: 'My new object' }] },
         identification: { sourceId: 'foo:123' },
-        structural: { isMemberOf: ['druid:bk024qs1808'] }
+        structural: { isMemberOf: ['druid:mn456pq7890'] }
       }
     )
   end
@@ -24,8 +24,8 @@ RSpec.describe RegistrationCsvConverter do
     let(:csv_string) do
       <<~CSV
         administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download,tags,tags,tickets,tickets
-        druid:bc123df4567,druid:bk024qs1808,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two,DIGREQ-1234,DIGREQ-5678
-        xdruid:dj123qx4567,druid:bk024qs1808,accessionWF,book,foo:123,A Title,world,world
+        druid:bc123df4567,druid:mn456pq7890,accessionWF,book,foo:123,My new object,world,world,csv : test,Project : two,DIGREQ-1234,DIGREQ-5678
+        xdruid:dj123qx4567,druid:mn456pq7890,accessionWF,book,foo:123,A Title,world,world
       CSV
     end
 
@@ -38,11 +38,26 @@ RSpec.describe RegistrationCsvConverter do
     end
   end
 
+  context 'when a web archive seed has no collection' do
+    let(:csv_string) do
+      <<~CSV
+        administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download
+        druid:bc123df4567,,accessionWF,webarchive-seed,foo:123,https://example.com,world,world
+        druid:bc123df4567,druid:mn456pq7890,accessionWF,webarchive-seed,foo:456,https://example.org,world,world
+      CSV
+    end
+
+    it 'fails the seed without a collection' do
+      expect(results.first.failure.message).to eq('A web archive seed must be in a collection.')
+      expect(results.second.success?).to be true
+    end
+  end
+
   context 'when druids in CSV lack the druid: prefix' do
     let(:csv_string) do
       <<~CSV
         administrative_policy_object,collection,initial_workflow,content_type,source_id,title,rights_view,rights_download
-        bc123df4567,bk024qs1808,accessionWF,book,foo:123,My new object,world,world
+        bc123df4567,mn456pq7890,accessionWF,book,foo:123,My new object,world,world
       CSV
     end
 
@@ -65,7 +80,7 @@ RSpec.describe RegistrationCsvConverter do
     let(:params) do
       {
         administrative_policy_object: 'druid:bc123df4567',
-        collection: 'druid:bk024qs1808',
+        collection: 'druid:mn456pq7890',
         initial_workflow: 'accessionWF',
         content_type: Cocina::Models::ObjectType.book,
         rights_view: 'world',
@@ -96,7 +111,7 @@ RSpec.describe RegistrationCsvConverter do
     let(:params) do
       {
         administrative_policy_object: 'druid:bc123df4567',
-        collection: 'druid:bk024qs1808',
+        collection: 'druid:mn456pq7890',
         initial_workflow: 'accessionWF',
         content_type: Cocina::Models::ObjectType.book,
         tags: ['csv : test', 'Project : two']
@@ -121,7 +136,7 @@ RSpec.describe RegistrationCsvConverter do
     let(:params) do
       {
         administrative_policy_object: 'druid:bc123df4567',
-        collection: 'druid:bk024qs1808',
+        collection: 'druid:mn456pq7890',
         initial_workflow: 'accessionWF',
         content_type: Cocina::Models::ObjectType.book,
         rights_view: 'citation-only',
@@ -149,7 +164,7 @@ RSpec.describe RegistrationCsvConverter do
     let(:params) do
       {
         administrative_policy_object: 'druid:bc123df4567',
-        collection: 'druid:bk024qs1808',
+        collection: 'druid:mn456pq7890',
         initial_workflow: 'accessionWF',
         content_type: Cocina::Models::ObjectType.book,
         tags: ['csv : test', 'Project : two']

@@ -186,6 +186,18 @@ RSpec.describe StageFilesJob do
       end
     end
 
+    context 'when the object is a web archive seed' do
+      let(:type) { Cocina::Models::ObjectType.webarchive_seed }
+
+      it 'stages to the assembly location' do
+        job.perform(content:, user:)
+
+        expect(File.binread(staged_filepath('image1.tif', staging_location: Settings.assembly_location)))
+          .to eq(attached_content_file_binary.file.download)
+        expect(File.exist?(staging_filepath)).to be false
+      end
+    end
+
     context 'when files are already staged in another staging location' do
       let(:previously_staged_filepath) { staged_filepath('previous.tif') }
 

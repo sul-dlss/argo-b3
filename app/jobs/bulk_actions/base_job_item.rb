@@ -68,8 +68,19 @@ module BulkActions
 
       raise 'Unable to close version' unless Sdr::VersionService.closeable?(druid:)
 
-      Sdr::VersionService.close(druid:)
-      log('Closed version')
+      close_or_accession!
+    end
+
+    # Closes the version, except for a seed: accessioning it starts wasSeedPreassemblyWF, which closes the version
+    # once it is done.
+    def close_or_accession!
+      if CocinaSupport.webarchive_seed?(cocina_object)
+        Sdr::Repository.accession(cocina_object:, user_name: user_id, lane_id: 'default')
+        log('Started wasSeedPreassemblyWF, which will close the version')
+      else
+        Sdr::VersionService.close(druid:)
+        log('Closed version')
+      end
     end
 
     def check_update_ability?

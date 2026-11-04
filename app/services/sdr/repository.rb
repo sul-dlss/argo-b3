@@ -8,6 +8,11 @@ module Sdr
 
     REGISTERED_BY_TAG_PREFIX = 'Registered By : '
     FIND_ALL_SLICE_SIZE = 25
+    # The assembly workflow for content types that do not use assemblyWF.
+    ASSEMBLY_WORKFLOWS = {
+      Cocina::Models::ObjectType.geo => 'gisAssemblyWF',
+      Cocina::Models::ObjectType.webarchive_seed => 'wasSeedPreassemblyWF'
+    }.freeze
 
     # @param [String] druid the druid of the object
     # @return [Cocina::Models::DROWithMetadata] the returned model
@@ -105,6 +110,7 @@ module Sdr
     # DROs with files are assembled (e.g., to create derivatives) before accessioning; assembly closes the version.
     # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them,
     # and their staged files are first moved to the assembly location, the only one gisAssemblyWF reads.
+    # Web archive seeds are always assembled (wasSeedPreassemblyWF), which decides what to generate or keep.
     # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
@@ -119,7 +125,7 @@ module Sdr
       StagingSupport.move_to_assembly(druid:) if CocinaSupport.geo?(cocina_object)
       if assemble?(cocina_object:)
         # Assembly requires the object's staging folder, even when nothing is staged.
-        StagingSupport.ensure_staging_folder(druid:)
+        StagingSupport.ensure_staging_folder(cocina_object:)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
@@ -131,6 +137,8 @@ module Sdr
 
     def self.assemble?(cocina_object:)
       return false unless cocina_object.dro?
+
+      return true if CocinaSupport.webarchive_seed?(cocina_object)
       return StagingSupport.staged_files?(druid: cocina_object.externalIdentifier) if CocinaSupport.geo?(cocina_object)
 
       cocina_object.structural.contains.any? { |file_set| file_set.structural.contains.any? }
@@ -138,7 +146,7 @@ module Sdr
     private_class_method :assemble?
 
     def self.assembly_workflow_name(cocina_object:)
-      CocinaSupport.geo?(cocina_object) ? 'gisAssemblyWF' : 'assemblyWF'
+      ASSEMBLY_WORKFLOWS.fetch(cocina_object.type, 'assemblyWF')
     end
     private_class_method :assembly_workflow_name
 

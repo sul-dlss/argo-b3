@@ -107,6 +107,14 @@ RSpec.describe CocinaSupport do
     end
   end
 
+  describe '.webarchive_seed?' do
+    it 'identifies a web archive seed' do
+      expect(described_class.webarchive_seed?(build(:dro, type: Cocina::Models::ObjectType.webarchive_seed))).to be true
+      expect(described_class.webarchive_seed?(build(:dro, type: Cocina::Models::ObjectType.image))).to be false
+      expect(described_class.webarchive_seed?(build(:collection))).to be false
+    end
+  end
+
   describe '.dark?' do
     it 'is true for a dark object' do
       expect(described_class.dark?(build(:dro).new(access: { view: 'dark', download: 'none' }))).to be true

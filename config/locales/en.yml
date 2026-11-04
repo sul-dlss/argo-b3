@@ -442,6 +442,8 @@ en:
           label: "Collections"
           placeholder: "Start typing the collection name or druid..."
           limit_label: "Only view collections in selected APO"
+          validations:
+            webarchive_seed: "A web archive seed must be in a collection."
         content:
           validations:
             invalid: "The files are not valid for the content type. \"Save draft and edit files\" to fix them before depositing."
