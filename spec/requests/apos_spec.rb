@@ -111,6 +111,7 @@ RSpec.describe 'APOs' do
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       expect(page).to have_css('h1', text: 'Edit and deposit APO')
+      expect(page).to have_css('h1 + p', text: 'My APO')
       expect(page).to have_field('Title', with: 'My APO')
       expect(page).to have_select('Agreement', selected: 'My Agreement')
       expect(page).to have_select('View access', selected: 'World')
@@ -236,6 +237,9 @@ RSpec.describe 'APOs' do
         expect(response).to have_http_status(:unprocessable_content)
         page = Capybara.string(response.body)
         expect(page).to have_css('h1', text: 'Edit and deposit APO')
+        # The saved title, not the submitted one.
+        expect(page).to have_css('h1 + p', text: 'My APO')
+        expect(page).to have_no_css('h1 + p', text: 'My new APO')
         expect(page).to have_css('.invalid-feedback', text: "can't be blank")
         expect(page).to have_select('Agreement', selected: 'My Agreement')
         expect(Sdr::Repository).not_to have_received(:update)

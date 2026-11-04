@@ -20,7 +20,7 @@ class AposController < ApplicationController
     @edit_apo_form = EditApoForm.build_from_cocina_object(@cocina_object)
     @edit_apo_form.version_service = version_service
     @edit_apo_form.prefill_version_description
-    set_edit_agreement_options
+    set_edit_view
   end
 
   def create
@@ -86,8 +86,14 @@ class AposController < ApplicationController
     redirect_to edit_apo_path(@druid), flash: { warning: t('edit.apos.edit.warnings.stale') }
   end
 
+  # The saved title is shown, so that it is not replaced by an invalid submitted title.
+  def set_edit_view
+    @title = Cocina::Models::Builders::TitleBuilder.build(@cocina_object.description.title)
+    set_agreement_options(current_agreement_druid: @cocina_object.administrative.hasAgreement)
+  end
+
   def render_invalid_edit
-    set_edit_agreement_options
+    set_edit_view
     render :edit, status: :unprocessable_content
   end
 
@@ -102,10 +108,6 @@ class AposController < ApplicationController
     return options if current_agreement_druid.blank? || options.any? { |option| option.last == current_agreement_druid }
 
     [[DruidSupport.bare_druid_from(current_agreement_druid), current_agreement_druid]] + options
-  end
-
-  def set_edit_agreement_options
-    set_agreement_options(current_agreement_druid: @cocina_object.administrative.hasAgreement)
   end
 
   def set_druid_and_cocina_object
