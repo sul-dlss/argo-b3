@@ -57,6 +57,15 @@ RSpec.describe 'Content structure' do
       expect(button.text.strip).to eq('Delete all files and resources')
       expect(button.at_css('i.bi.bi-trash')).to be_present
     end
+
+    it 'renders the CSV upload with an unchecked allow files to be deleted checkbox' do
+      get edit_content_structure_path(content_id: content_token)
+
+      checkbox = response.parsed_body.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
+      expect(checkbox['checked']).to be_nil
+      expect(response.parsed_body.at_css("label[for=\"#{checkbox['id']}\"]").text.strip)
+        .to eq('Allow files to be deleted')
+    end
   end
 
   describe 'destroy' do
@@ -284,6 +293,10 @@ RSpec.describe 'Content structure' do
                       **params }
     end
 
+    def allow_file_deletion_checkbox
+      response.parsed_body.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
+    end
+
     it 'updates the structure and redirects to edit with a reload of the files section' do
       upload
 
@@ -333,6 +346,44 @@ RSpec.describe 'Content structure' do
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('Row 2: page_0002.tif is not an existing file (files cannot be added)')
         expect(content.content_file_sets.reload.sole.content_files.sole.content_file_binary).to eq(content_file_binary)
+      end
+    end
+
+    context 'when a file would be deleted' do
+      let!(:omitted_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'page_0002.tif', mime_type: 'image/tiff')
+      end
+
+      it 'renders the error without deleting the file, keeping the checkbox unchecked' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Files would be deleted: page_0002.tif. ' \
+                                         'Select &quot;Allow files to be deleted&quot; to delete them.')
+        expect(ContentFileBinary.exists?(omitted_content_file_binary.id)).to be true
+        expect(allow_file_deletion_checkbox['checked']).to be_nil
+      end
+
+      context 'when deletion is allowed' do
+        it 'deletes the file' do
+          upload({ structural_csv: { csv_file:, allow_file_deletion: '1' } })
+
+          expect(response).to have_http_status(:redirect)
+          expect(ContentFileBinary.exists?(omitted_content_file_binary.id)).to be false
+          expect(content.content_file_sets.reload.sole.label).to eq('New label')
+        end
+      end
+
+      context 'when deletion is allowed but the CSV has other errors' do
+        let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', '') }
+
+        it 'renders the errors, keeping the checkbox checked' do
+          upload({ structural_csv: { csv_file:, allow_file_deletion: '1' } })
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include('Row 2: Missing druid')
+          expect(allow_file_deletion_checkbox['checked']).to eq('checked')
+        end
       end
     end
   end

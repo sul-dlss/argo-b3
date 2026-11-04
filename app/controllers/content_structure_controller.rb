@@ -87,7 +87,7 @@ class ContentStructureController < ContentsApplicationController
     druid_errors = csv_druid_errors
     return render_csv_errors(druid_errors) if druid_errors.any?
 
-    import_result = StructuralCsv::Import.call(rows: @structural_csv_form.numbered_rows, content: @content)
+    import_result = @structural_csv_form.import(content: @content)
     return render_csv_errors(import_result.failure) if import_result.failure?
 
     flash[:toast] = t('edit.contents.structure.toasts.csv')

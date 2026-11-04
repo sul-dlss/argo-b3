@@ -56,20 +56,23 @@ module StructuralCsv
     #   row number (used in error messages). Rows for an object need not be contiguous in the spreadsheet.
     # @param content [Content] the mutable Content to update, whose ContentFileBinaries the rows are matched against
     #   by filename
+    # @param allow_file_deletion [Boolean] whether files omitted from the rows may be deleted (otherwise, a validation
+    #   error)
     # @raise [ArgumentError] if the Content is immutable
-    def initialize(rows:, content:)
+    def initialize(rows:, content:, allow_file_deletion: true)
       raise ArgumentError, 'Content must be mutable' if content.immutable?
 
       # Build StructuralCsv:Rows (not CSV:Rows)
       @rows = rows.map { |number, csv_row| Row.new(number:, csv_row:) }
       @content = content
+      @allow_file_deletion = allow_file_deletion
     end
 
     # Nothing is saved unless the rows and the built records are all valid.
     # @return [Dry::Monads::Result] Success if the content was successfully updated, or
     #   Failure with an Array<ValidationError>
     def call
-      errors = Validator.call(rows:, content_file_binaries_by_filepath:)
+      errors = Validator.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion:)
       return Failure(errors) if errors.any?
 
       built_content_file_sets = build_content_file_sets
@@ -82,7 +85,7 @@ module StructuralCsv
 
     private
 
-    attr_reader :rows, :content
+    attr_reader :rows, :content, :allow_file_deletion
 
     # Entirely blank rows are ignored (as they are by the Validator).
     def build_content_file_sets

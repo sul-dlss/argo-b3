@@ -51,6 +51,9 @@
                                                                  error_classes: 'order-last') do |component| %>
             <% component.with_additional_container_content do %>
               <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload', variant: :'outline-primary', classes: 'btn-sm', value: ContentStructureController::CSV_VALUE) %>
+              <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
+                                                                         label_text: 'Allow files to be deleted',
+                                                                         container_classes: 'inline-upload-option') %>
             <% end %>
           <% end %>
         <% end %>
