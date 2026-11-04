@@ -10,14 +10,7 @@ RSpec.describe 'Admin impersonate' do
   describe 'GET /admin/impersonate' do
     context 'when signed in as an admin user' do
       let(:admin_user) do
-        create(:user, groups: [
-                 AuthenticationHelpers::ADMIN_GROUP,
-                 'sdr:zeta',
-                 'sdr:alpha/administrator',
-                 'sdr:alpha',
-                 'sdr:zeta',
-                 'sdr:beta'
-               ])
+        create(:user, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:not-listed'])
       end
 
       before do
@@ -25,19 +18,16 @@ RSpec.describe 'Admin impersonate' do
         get admin_impersonate_path
       end
 
-      it 'allows access and renders vertically sorted workgroups without administrator suffixes' do
+      it 'allows access and renders the listed workgroups in order, not the admin’s own groups' do
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include('sdr:alpha')
-        expect(response.body).to include('sdr:beta')
-        expect(response.body).to include('sdr:zeta')
-        expect(response.body).not_to include('sdr:alpha/administrator')
+        expect(response.body).not_to include('sdr:not-listed')
 
-        alpha_position = response.body.index('sdr:alpha')
-        beta_position = response.body.index('sdr:beta')
-        zeta_position = response.body.index('sdr:zeta')
+        first_position = response.body.index('sdr:3d-staff')
+        middle_position = response.body.index('sdr:map-staff')
+        last_position = response.body.index('sdr:was-staff')
 
-        expect(alpha_position).to be < beta_position
-        expect(beta_position).to be < zeta_position
+        expect(first_position).to be < middle_position
+        expect(middle_position).to be < last_position
       end
     end
 
@@ -58,8 +48,7 @@ RSpec.describe 'Admin impersonate' do
 
   describe 'PATCH /admin/impersonate' do
     let(:admin_user) do
-      create(:user,
-             groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a', 'sdr:group-b', 'sdr:group-c/administrator'])
+      create(:user, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:not-listed'])
     end
 
     before do
@@ -69,23 +58,23 @@ RSpec.describe 'Admin impersonate' do
     it 'stores selected allowed workgroups in encrypted cookies' do
       patch admin_impersonate_path, params: {
         impersonation: {
-          workgroups: ['sdr:group-b', 'sdr:group-a']
+          workgroups: ['sdr:map-staff', 'sdr:hoover-staff']
         }
       }
 
       expect(response).to redirect_to(root_path)
       expect(flash[:success]).to eq('You are now impersonating the selected workgroups.')
-      expect(encrypted_impersonated_workgroups).to eq(['sdr:group-a', 'sdr:group-b'])
+      expect(encrypted_impersonated_workgroups).to eq(['sdr:hoover-staff', 'sdr:map-staff'])
     end
 
-    it 'filters out workgroups not available to the admin' do
+    it 'filters out workgroups that are not listed, including the admin’s own' do
       patch admin_impersonate_path, params: {
         impersonation: {
-          workgroups: ['sdr:group-a', 'sdr:not-allowed', 'sdr:group-d']
+          workgroups: ['sdr:map-staff', 'sdr:not-listed', 'sdr:not-allowed']
         }
       }
 
-      expect(encrypted_impersonated_workgroups).to eq(['sdr:group-a'])
+      expect(encrypted_impersonated_workgroups).to eq(['sdr:map-staff'])
     end
 
     it 'does not enable impersonation when no workgroups are selected' do
@@ -104,7 +93,7 @@ RSpec.describe 'Admin impersonate' do
       end
 
       it 'is unauthorized' do
-        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+        patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
 
         expect(response).to be_unauthorized
       end
@@ -112,11 +101,11 @@ RSpec.describe 'Admin impersonate' do
   end
 
   describe 'DELETE /admin/impersonate' do
-    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
+    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:map-staff']) }
 
     before do
       sign_in(admin_user)
-      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
     end
 
     it 'deletes the impersonation cookie' do
@@ -161,12 +150,12 @@ RSpec.describe 'Admin impersonate' do
   end
 
   describe 'GET /admin/impersonate while impersonating as non-admin' do
-    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
+    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:map-staff']) }
     let(:user) { create(:user, groups: ['sdr:user-group']) }
 
     before do
       sign_in(admin_user)
-      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
       sign_in(user)
     end
 
@@ -178,12 +167,12 @@ RSpec.describe 'Admin impersonate' do
   end
 
   describe 'DELETE /admin/impersonate while impersonating as non-admin' do
-    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:group-a']) }
+    let(:admin_user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP, 'sdr:map-staff']) }
     let(:user) { create(:user, groups: ['sdr:user-group']) }
 
     before do
       sign_in(admin_user)
-      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:group-a'] } }
+      patch admin_impersonate_path, params: { impersonation: { workgroups: ['sdr:map-staff'] } }
       sign_in(user)
     end
 

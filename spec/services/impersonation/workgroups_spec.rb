@@ -3,14 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Impersonation::Workgroups do
-  describe '.available_for_user' do
-    let(:user) do
-      build_stubbed(:user, groups: ['sdr:zeta', 'sdr:alpha/administrator', 'sdr:alpha', 'sdr:zeta', 'sdr:beta',
-                                    '/administrator'])
-    end
-
-    it 'removes administrator suffixes, dedupes, and sorts' do
-      expect(described_class.available_for_user(user:)).to eq(['sdr:alpha', 'sdr:beta', 'sdr:zeta'])
+  describe 'WORKGROUPS' do
+    it 'is sorted and unique' do
+      expect(described_class::WORKGROUPS).to eq(described_class::WORKGROUPS.uniq.sort)
     end
   end
 

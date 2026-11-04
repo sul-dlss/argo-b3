@@ -41,6 +41,12 @@ A single user-run deposit of many Items whose files are on a mount, carried out 
 ### Item Deposit
 One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount.
 
+### Workgroup
+A named group of users (e.g., `sdr:map-staff`) managed outside Argo. Permissions are granted to workgroups, never to individual users.
+
+### Impersonation
+An admin temporarily acting with the permissions of one or more chosen Workgroups instead of their own, to see what members of those Workgroups can see and do.
+
 ## Structural Metadata Terms
 Structural metadata (file sets and files) is held in Active Record models rather than cocina models. See README "Structural metadata" for the full model and flows.
 
