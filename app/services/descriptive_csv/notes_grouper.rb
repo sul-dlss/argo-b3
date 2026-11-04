@@ -57,8 +57,8 @@ module DescriptiveCsv
                                             .values.first
 
           # Look up the note number of the [displayLabel, type] tuple value
-          new_note_number = case description.slice(*description.keys.grep(/note.+(displayLabel|type)/))
-                                            .group_by { |k, _v| k.match(/(.*note\d+)\./)[1] }
+          new_note_number = case description.slice(*description.keys.grep(/\A(old_)?note\d+\.(displayLabel|type)\z/))
+                                            .group_by { |k, _v| k.match(/\A((?:old_)?note\d+)\./)[1] }
                                             .count do |_key, value|
                                    hash = value.to_h
                                    num = hash.keys.first[/\d+/]
