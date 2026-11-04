@@ -44,6 +44,10 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                           self[:exports] || []
                         end
 
+                        def path
+                          path_helper.call
+                        end
+
                         def cancellable?
                           cancellable
                         end

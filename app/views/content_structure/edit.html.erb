@@ -36,8 +36,8 @@
         <%= form_with model: @structural_csv_form, url: content_structure_path(content_id: @content_token), method: :patch, class: 'mt-3',
                       data: disable_actions_form_data do |form| %>
           <%= hidden_field_tag :content_type, @content_type %>
-          <% @selected_access.each do |field_name, value| %>
-            <%= hidden_field_tag "#{ContentsItemForm.model_name.param_key}[#{field_name}]", value, id: nil %>
+          <% @selected_access.each do |attribute_name, value| %>
+            <%= hidden_field_tag "#{ContentsItemForm.model_name.param_key}[#{attribute_name}]", value, id: nil %>
           <% end %>
           <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
           <%= render SdrViewComponents::Forms::FileComponent.new(form:,
@@ -74,7 +74,7 @@
       </fieldset>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
       <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
-        <div class='mb-2'>
+        <div class="mb-2">
           <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>
             <%= render Show::FileSetComponent.new(content_file_set:, content_token: @content_token, content_file_set_counter: index,
                                                   content_file_set_total: @content.content_file_sets.size) %>
