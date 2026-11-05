@@ -6,13 +6,15 @@ module Show
     # @param versions [Array<VersionsPresenter::Version>]
     # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata,
     #   Cocina::Models::AdminPolicyWithMetadata] the object, which may omit its file sets
-    def initialize(versions:, cocina_object:)
+    # @param druid_token [String] the signed druid, which authorizes the download links
+    def initialize(versions:, cocina_object:, druid_token:)
       @versions = versions
       @cocina_object = cocina_object
+      @druid_token = druid_token
       super()
     end
 
-    attr_reader :versions, :cocina_object
+    attr_reader :versions, :cocina_object, :druid_token
 
     # Only Items and Virtual Objects have User Versions.
     def user_version_columns?

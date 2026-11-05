@@ -6,10 +6,11 @@
   <% component.with_header(label: 'Public version') if user_version_columns? %>
   <% component.with_header(label: 'Registered / opened') %>
   <% component.with_header(label: 'Deposited') %>
+  <% component.with_header(label: 'Download') %>
   <% component.with_header(label: 'PURL') if user_version_columns? %>
   <% versions.each do |version| %>
     <% component.with_row do %>
-      <%= render Show::VersionRowComponent.new(version:, cocina_object:) %>
+      <%= render Show::VersionRowComponent.new(version:, cocina_object:, druid_token:) %>
     <% end %>
   <% end %>
 <% end %>

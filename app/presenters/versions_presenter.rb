@@ -3,7 +3,11 @@
 # Presenter for versions information about an object.
 class VersionsPresenter
   Version = Struct.new('Version', :version, :user_version, :description, :opened_at, :accessioned_at, :purl_url,
-                       :withdrawn) do
+                       :cocina, :withdrawn) do
+    def cocina?
+      cocina
+    end
+
     def withdrawn?
       withdrawn
     end
@@ -26,6 +30,7 @@ class VersionsPresenter
                   description: version.message,
                   opened_at: opened_at(version: version.version),
                   accessioned_at: milestone_at(version: version.version, milestone: 'accessioned'),
+                  cocina: version.cocina?,
                   **user_version_attrs(user_version_for(version: version.version)))
     end
   end

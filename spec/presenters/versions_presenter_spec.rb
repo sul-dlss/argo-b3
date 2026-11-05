@@ -56,4 +56,8 @@ RSpec.describe VersionsPresenter do
       )
     end
   end
+
+  it 'indicates whether DSA has stored cocina for each version' do
+    expect(versions.map(&:cocina?)).to eq([true, true, false])
+  end
 end
