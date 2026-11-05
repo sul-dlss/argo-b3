@@ -1,0 +1,14 @@
+<%= turbo_frame_tag(@druid, 'releases') do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Releases', classes: 'mb-3') %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'releases-table', label: 'Releases', show_label: false,
+                                                           empty_message: 'No releases yet.') do |component| %>
+    <% component.with_header(label: 'Release') %>
+    <% component.with_header(label: 'What') %>
+    <% component.with_header(label: 'To') %>
+    <% component.with_header(label: 'User') %>
+    <% component.with_header(label: 'Date') %>
+    <% @release_tags.each do |release_tag| %>
+      <% component.with_row(values: [release_tag.release.to_s, release_tag.what, release_tag.to, release_tag.who, format_datetime(release_tag.date)]) %>
+    <% end %>
+  <% end %>
+<% end %>

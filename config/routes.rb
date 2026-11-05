@@ -202,6 +202,7 @@ Rails.application.routes.draw do
       get 'workflows', to: 'objects#show_workflows'
       get 'versions', to: 'objects#show_versions'
       get 'events', to: 'objects#show_events'
+      get 'releases', to: 'objects#show_releases'
       get 'purl_preview', to: 'objects#show_purl_preview'
       get 'solr_doc', to: 'objects#show_solr_doc'
       get 'files', to: 'objects#show_files'

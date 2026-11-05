@@ -74,6 +74,7 @@ RSpec.describe 'Show collection' do
     # Tabs
     expect(page).to have_css('.nav-link.active', text: 'Overview')
     expect(page).to have_css('.nav-link', text: 'Events')
+    expect(page).to have_css('.nav-link', text: 'Releases')
     expect(page).to have_css('.nav-link', text: 'Cocina JSON')
     expect(page).to have_css('.nav-link', text: 'SOLR doc')
     expect(page).to have_css('.nav-link', text: 'Description preview')
@@ -117,6 +118,10 @@ RSpec.describe 'Show collection' do
     # Events tab
     click_button 'Events'
     expect(page).to have_css('#events-pane p', text: 'No events.')
+
+    # Releases tab
+    click_button 'Releases'
+    expect(page).to have_css('#releases-pane p', text: 'No releases yet.')
 
     # Cocina model tab
     click_button 'Cocina JSON'
