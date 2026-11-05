@@ -7,17 +7,19 @@ module Show
     # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata,
     #   Cocina::Models::AdminPolicyWithMetadata] the object, which may omit its file sets
     # @param druid_token [String] the signed druid, which authorizes the download links
-    def initialize(version:, cocina_object:, druid_token:)
+    # @param manage_user_versions [Boolean] true if the user may withdraw and restore user versions
+    def initialize(version:, cocina_object:, druid_token:, manage_user_versions:)
       @version = version
       @cocina_object = cocina_object
       @druid_token = druid_token
+      @manage_user_versions = manage_user_versions
       super()
     end
 
     attr_reader :cocina_object, :druid_token
 
     delegate :version, :description, :user_version, :opened_at, :accessioned_at, :purl_url, :cocina?, :withdrawn?,
-             to: :@version
+             :withdrawable?, :restorable?, to: :@version
 
     # Only Items and Virtual Objects have User Versions.
     def user_version_columns?
@@ -29,6 +31,17 @@ module Show
       return "#{user_version} (withdrawn)" if withdrawn?
 
       user_version.to_s
+    end
+
+    # Disabled when the user cannot manage user versions.
+    # @return [SdrViewComponents::Elements::ButtonFormComponent, nil] the withdraw or restore button, if any
+    def user_version_button
+      user_version_path_params = { object_druid: cocina_object.externalIdentifier, user_version: }
+      if withdrawable?
+        user_version_button_component('Withdraw', withdraw_object_user_version_path(**user_version_path_params))
+      elsif restorable?
+        user_version_button_component('Restore', restore_object_user_version_path(**user_version_path_params))
+      end
     end
 
     def purl_link
@@ -46,6 +59,12 @@ module Show
     end
 
     private
+
+    def user_version_button_component(label, path)
+      SdrViewComponents::Elements::ButtonFormComponent.new(link: path, label:, method: :post,
+                                                           variant: :'outline-primary', size: :sm,
+                                                           disabled: !@manage_user_versions)
+    end
 
     def path_params
       { object_druid: druid_token, version: }

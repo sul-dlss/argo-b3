@@ -384,6 +384,7 @@ RSpec.describe 'Show item' do
     expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
     expect(cells[5]).to have_no_link
     expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567/version/1')
+    expect(cells[2]).to have_button('Withdraw')
 
     # Events tab
     click_button 'Events'

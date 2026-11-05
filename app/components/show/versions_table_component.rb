@@ -20,5 +20,11 @@ module Show
     def user_version_columns?
       CocinaSupport.item_or_virtual_object?(cocina_object)
     end
+
+    def manage_user_versions?
+      return @manage_user_versions if defined?(@manage_user_versions)
+
+      @manage_user_versions = helpers.allowed_to?(:manage_user_versions?, cocina_object, with: ObjectPolicy)
+    end
   end
 end
