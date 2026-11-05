@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Edit
-  # Component for rendering edit forms for the tags of an item (other, project, and ticket tags)
+  # Component for rendering edit forms for the tags of an object (other, project, and ticket tags)
   # The form's object must include TagsFormConcern.
   class TagsComponent < ApplicationComponent
     # Marks the has_many sections that the multiple-tags Stimulus controller distributes tags into.

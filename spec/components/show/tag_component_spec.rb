@@ -5,10 +5,33 @@ require 'rails_helper'
 RSpec.describe Show::TagComponent, type: :component do
   include Rails.application.routes.url_helpers
 
-  subject(:component) { described_class.new(tags:, pinned_tags:) }
+  subject(:component) { described_class.new(solr_doc:, tags:, pinned_tags:) }
 
+  let(:druid) { 'druid:bc123df4567' }
+  let(:solr_doc) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:)) }
+  let(:user) { create(:user) }
   let(:tags) { ['Registered By : ABC'] }
   let(:pinned_tags) { Set.new }
+
+  before { allow(Current).to receive(:user).and_return(user) }
+
+  context 'when the user can manage tags' do
+    before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
+
+    it 'renders a manage tags link' do
+      render_inline(component)
+
+      expect(page).to have_link('Manage tags', href: "/objects/#{druid}/tags/edit")
+    end
+  end
+
+  context 'when the user cannot manage tags' do
+    it 'does not render a manage tags link' do
+      render_inline(component)
+
+      expect(page).to have_no_link('Manage tags')
+    end
+  end
 
   it 'renders a link and pin button for each tag' do
     render_inline(component)

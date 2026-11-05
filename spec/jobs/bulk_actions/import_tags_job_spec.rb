@@ -83,7 +83,8 @@ RSpec.describe BulkActions::ImportTagsJob do
     it 'records the failure' do
       job.perform_now
 
-      expect(log.string).to include("line 1\t#{druid}\tError: Dor::Services::Client::UnexpectedResponse")
+      expect(log.string)
+        .to include("line 1\t#{druid}\tError: Sdr::AdministrativeTags::Error Replacing administrative tags failed")
       expect(bulk_action.reload.druid_count_success).to eq(1)
       expect(bulk_action.druid_count_fail).to eq(1)
     end

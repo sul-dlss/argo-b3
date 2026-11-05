@@ -335,7 +335,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   # Note that this is a "live" solr document built from latest DSA data.
   def fetch_solr_doc(druid)
-    Rails.cache.fetch(solr_doc_cache_key(druid), expires_in: solr_doc_cache_expires_in) do
+    Rails.cache.fetch(CacheSupport.solr_doc_cache_key(druid:), expires_in: solr_doc_cache_expires_in) do
       { lock: nil, value: Sdr::Repository.find_solr(druid:) }
     end.fetch(:value)
   end
@@ -349,7 +349,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # Refreshes the cached solr doc if the lock has changed (or the cache is empty), used only by #show.
   # A short TTL is kept as a safety net, since the solr doc can change independently of the lock.
   def refresh_solr_doc(druid, lock)
-    cache_key = solr_doc_cache_key(druid)
+    cache_key = CacheSupport.solr_doc_cache_key(druid:)
     cached = Rails.cache.read(cache_key)
     return cached[:value] if cached && cached[:lock] == lock
 
@@ -385,10 +385,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   def compute_cocina_hash(druid, without_structural_contains: true)
     cocina_object = Sdr::Repository.find(druid:, without_structural_contains:)
     CocinaDisplay::Utils.deep_compact_blank(cocina_object.to_h, preserve_keys: [:label])
-  end
-
-  def solr_doc_cache_key(druid)
-    "objects/solr-doc/#{druid}"
   end
 
   def cocina_hash_cache_key(druid)

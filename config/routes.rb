@@ -217,6 +217,9 @@ Rails.application.routes.draw do
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
   end
+  scope 'objects/:druid', as: :object do
+    resource :tags, only: %i[edit update], controller: 'administrative_tags'
+  end
 
   resources :items, only: %i[new create edit update]
   scope 'items/:druid', as: :item do
