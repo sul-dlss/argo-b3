@@ -5,6 +5,8 @@ module Sdr
   class Repository
     class Error < StandardError; end
     class NotFoundResponse < Error; end
+    # A version's stored cocina that is no longer valid against the current cocina models.
+    InvalidCocina = Struct.new(:cocina_hash)
 
     REGISTERED_BY_TAG_PREFIX = 'Registered By : '
     FIND_ALL_SLICE_SIZE = 25
@@ -23,6 +25,20 @@ module Sdr
       Dor::Services::Client.object(druid).find(without_structural_contains:)
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
+    # @param [String] druid the druid of the object
+    # @param [Integer] version the version of the object
+    # @return [Cocina::Models::DROWithMetadata, InvalidCocina] the version's stored cocina,
+    #   or an InvalidCocina if it is no longer valid
+    # @raise [NotFoundResponse] if the object or version is not found
+    def self.find_version(druid:, version:)
+      cocina_object = Dor::Services::Client.object(druid).version.find(version)
+      return cocina_object unless cocina_object.is_a?(Dor::Services::Client::InvalidCocina)
+
+      InvalidCocina.new(cocina_hash: cocina_object.to_h.except(:error_message))
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object version not found: #{druid} version #{version}"
     end
 
     # Objects that are not found are omitted.

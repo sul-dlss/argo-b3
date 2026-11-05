@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # Concern for controllers that render the versions table of the object show page.
+# The including controller must include TokenConcern with the 'show' token purpose.
 module VersionsTableConcern
   extend ActiveSupport::Concern
 
@@ -15,6 +16,7 @@ module VersionsTableConcern
                                                version_inventory: Sdr::VersionService.inventory(druid:),
                                                milestones: Sdr::WorkflowService.milestones(druid:),
                                                user_version_inventory: Sdr::UserVersionService.inventory(druid:))
-    Show::VersionsTableComponent.new(versions: versions_presenter.versions, cocina_object:)
+    Show::VersionsTableComponent.new(versions: versions_presenter.versions, cocina_object:,
+                                     druid_token: generate_token(druid))
   end
 end

@@ -6,6 +6,11 @@
   <% end %>
   <% row.with_cell do %><%= helpers.format_datetime(opened_at) %><% end %>
   <% row.with_cell do %><%= helpers.format_datetime(accessioned_at) %><% end %>
+  <% row.with_cell do %>
+    <% if cocina? %>
+      <%= render SdrViewComponents::Tables::ListCellComponent.new(item_values: download_links) %>
+    <% end %>
+  <% end %>
   <% if user_version_columns? %>
     <% row.with_cell do %><%= purl_link %><% end %>
   <% end %>
