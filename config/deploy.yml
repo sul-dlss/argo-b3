@@ -38,9 +38,14 @@ aliases:
 # publish (and collide on) a host port.
 proxy:
   ssl: false
+  # Uploads are buffered before forwarding, so this only covers Rails processing a large upload (default 30s).
+  response_timeout: 600
   run:
     http_port: 3000
     https_port: 3001 # unused (ssl disabled), just must not collide with Apache's 443
+    # Spill buffered upload bodies to the host's /tmp volume rather than Docker storage (requires `kamal proxy reboot`).
+    options:
+      volume: "/tmp:/tmp"
 
 # Kamal always attaches app containers to its own "kamal" bridge network (no
 # config to disable that), so host networking isn't possible: instead we
@@ -69,6 +74,8 @@ ssh:
 
 # Bind-mount host paths for durable bulk action output and Rails log output (for host-level log shipping).
 volumes:
+  # Upload tempfiles (Puma, Rack multipart) go to the host's /tmp volume rather than Docker storage.
+  - "/tmp:/tmp"
   - "/workspace/bulk:/workspace/bulk"
   - "/var/log/argo:/var/log/argo"
   - "/sdr-deposit-staging:/sdr-deposit-staging"
@@ -109,6 +116,11 @@ env:
     RAILS_LOG_TO_FILE: /var/log/argo/production.log
     # Number of Solid Queue workers.
     JOB_CONCURRENCY: 4
+
+    # Thruster's request read (body from kamal-proxy) and response write (through Rails processing) timeouts
+    # for large uploads; write must cover read plus kamal-proxy's response_timeout (defaults 30s).
+    HTTP_READ_TIMEOUT: 600
+    HTTP_WRITE_TIMEOUT: 1200
 
     # Governs how long SolidQueue's supervisor waits for in-flight jobs to
     # finish on shutdown (see config/initializers/solid_queue.rb); the job

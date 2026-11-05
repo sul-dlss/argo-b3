@@ -292,6 +292,23 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when the upload fails on the server' do
+    it 'shows a message for the status rather than the error page' do
+      visit "/contents/#{druid}/edit"
+      expect(page).to have_css('p', text: title)
+
+      # The content is gone (e.g., the draft was discarded in another tab), so the upload responds with a 404 page.
+      Content.find_by!(druid:).destroy!
+
+      click_on 'Add files'
+      attach_file(nil, Rails.root.join('spec/fixtures/files/dropzone_upload.txt'), class: 'dz-hidden-input',
+                                                                                   make_visible: true)
+
+      expect(page).to have_css('li.text-danger, .text-danger li',
+                               exact_text: 'dropzone_upload.txt: Upload failed (server error 404). Try again.')
+    end
+  end
+
   context 'when access is selected before structuring' do
     let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
 
