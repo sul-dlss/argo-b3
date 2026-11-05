@@ -8,8 +8,9 @@ RSpec.describe StageFilesJob do
   let(:druid) { 'druid:bc123df4567' }
   let(:user) { create(:user) }
   let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
-  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-1') }
-  let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-2') }
+  let(:type) { Cocina::Models::ObjectType.book }
+  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-1') }
+  let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
 
   let(:attached_content_file_binary) do
@@ -201,6 +202,26 @@ RSpec.describe StageFilesJob do
       end
     end
 
+    context 'when the object is geo' do
+      let(:type) { Cocina::Models::ObjectType.geo }
+      let(:previously_staged_filepath) { staged_filepath('previous.tif') }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(previously_staged_filepath))
+        FileUtils.touch(previously_staged_filepath)
+      end
+
+      it 'moves the staged files to the assembly location and stages there' do
+        job.perform(content:, user:)
+
+        expect(File.binread(staged_filepath('image1.tif', staging_location: Settings.assembly_location)))
+          .to eq(attached_content_file_binary.file.download)
+        expect(File.exist?(staged_filepath('previous.tif', staging_location: Settings.assembly_location))).to be true
+        expect(File.exist?(previously_staged_filepath)).to be false
+        expect(File.exist?(staging_filepath)).to be false
+      end
+    end
+
     it 'does not accession the object' do
       job.perform(content:, user:)
 
@@ -262,7 +283,7 @@ RSpec.describe StageFilesJob do
 
     context 'when updating SDR does not change the lock' do
       # The structure is unchanged, so an immutable Content for the lock may already exist.
-      let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-1') }
+      let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-1') }
       let!(:existing_content) { create(:content, druid:, lock: 'druid-version-1', immutable: true) }
 
       it 'replaces the existing immutable content' do
