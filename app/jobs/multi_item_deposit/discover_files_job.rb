@@ -33,6 +33,7 @@ module MultiItemDeposit
 
     def check_folder
       return add_error(:folder_not_found, path: item_deposit_action.path) unless File.directory?(folder_path)
+      return add_error(:folder_permission_denied, path: item_deposit_action.path) unless File.readable?(folder_path)
 
       check_folder_contents
     end

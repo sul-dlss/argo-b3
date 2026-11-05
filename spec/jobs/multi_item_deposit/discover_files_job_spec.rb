@@ -95,6 +95,19 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
     end
   end
 
+  context 'when the folder cannot be read' do
+    before { File.chmod(0o000, folder_path) }
+
+    after { File.chmod(0o755, folder_path) }
+
+    it 'records an error and does not create a Content' do
+      perform
+
+      expect(item_deposit_action.discovery_errors).to eq(['Permission denied: item1'])
+      expect(item_deposit_action.content).to be_nil
+    end
+  end
+
   context 'when the folder has only ignored files' do
     before do
       FileUtils.rm_rf(File.join(folder_path, 'folder'))

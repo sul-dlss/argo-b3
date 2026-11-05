@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
-# Validates that an attribute is an existing path within one of the configured mount locations.
+# Validates that an attribute is an existing, readable path within one of the configured mount locations.
 # Blank values are skipped; combine with presence: true to require a path.
 class MountPathValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     return if value.blank?
     return record.errors.add(attribute, I18n.t('errors.mount_path.not_found')) unless File.exist?(value)
-    return if within_mount_location?(value)
+    unless within_mount_location?(value)
+      return record.errors.add(attribute, I18n.t('errors.mount_path.not_in_mount_location'))
+    end
+    return if File.readable?(value)
 
-    record.errors.add(attribute, I18n.t('errors.mount_path.not_in_mount_location'))
+    record.errors.add(attribute, I18n.t('errors.mount_path.permission_denied'))
   end
 
   private
