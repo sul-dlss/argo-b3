@@ -75,16 +75,33 @@ export default class extends Controller {
         data.append(`content[paths][${i}]`, path)
       }
     })
-    this.dropzone.on('errormultiple', (files, message) => {
+    this.dropzone.on('errormultiple', (files, message, xhr) => {
       this.clearErrors()
 
       this.errorTarget.classList.remove('d-none')
+      const errorMessage = xhr ? this.uploadErrorMessage(xhr) : message
       files.forEach(file => {
         const errorElement = document.createElement('li')
-        errorElement.textContent = `${file.name}: ${message}`
+        errorElement.textContent = `${file.name}: ${errorMessage}`
         this.errorTarget.appendChild(errorElement)
       })
     })
+  }
+
+  // Failed uploads have a response body that is an error page (e.g., from the proxy), so show a message for the status.
+  uploadErrorMessage (xhr) {
+    switch (xhr.status) {
+      case 0:
+        return 'Upload failed because the connection to the server was lost. Try again.'
+      case 408:
+      case 502:
+      case 504:
+        return 'Upload timed out. Try again, uploading fewer or smaller files at a time.'
+      case 413:
+        return 'Upload failed because the files are too large. Try uploading fewer files at a time.'
+      default:
+        return `Upload failed (server error ${xhr.status}). Try again.`
+    }
   }
 
   // Clear errors if this is the first error in the batch.
