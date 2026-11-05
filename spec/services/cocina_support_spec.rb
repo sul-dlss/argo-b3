@@ -106,4 +106,38 @@ RSpec.describe CocinaSupport do
       expect(described_class.geo?(build(:collection))).to be false
     end
   end
+
+  describe '.dark?' do
+    it 'is true for a dark object' do
+      expect(described_class.dark?(build(:dro).new(access: { view: 'dark', download: 'none' }))).to be true
+    end
+
+    it 'is false for an object that is not dark' do
+      expect(described_class.dark?(build(:dro).new(access: { view: 'world', download: 'world' }))).to be false
+    end
+
+    it 'is false for an APO' do
+      expect(described_class.dark?(build(:admin_policy))).to be false
+    end
+  end
+
+  describe '.title' do
+    let(:dro) { build(:dro, title: 'My title') }
+
+    it 'returns the title of an object without catalog links' do
+      expect(described_class.title(dro)).to eq 'My title'
+    end
+
+    it 'includes the part label from the Folio catalog link' do
+      cocina_object = dro.new(identification: dro.identification.new(
+        catalogLinks: [{ catalog: 'folio', catalogRecordId: 'a123', refresh: true, partLabel: 'Vol. 1' }]
+      ))
+
+      expect(described_class.title(cocina_object)).to eq 'My title, Vol. 1'
+    end
+
+    it 'returns the title of an APO' do
+      expect(described_class.title(build(:admin_policy, title: 'My APO'))).to eq 'My APO'
+    end
+  end
 end

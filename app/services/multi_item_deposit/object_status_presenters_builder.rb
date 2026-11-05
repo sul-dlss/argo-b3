@@ -26,7 +26,7 @@ module MultiItemDeposit
         document = documents_by_druid[druid]
         next unless document
 
-        ObjectStatusPresenter.new(document:,
+        ObjectStatusPresenter.new(solr_doc: document,
                                   version_service: Sdr::VersionService.new(druid:, status: version_statuses[druid]),
                                   content: item_deposit_action.content,
                                   initiating: initiating?(item_deposit_action))

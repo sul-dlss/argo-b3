@@ -3,14 +3,14 @@
 # Presenter for determining the deposit status of an object.
 class ObjectStatusPresenter
   # @param initiating [Boolean] true if the object's deposit is being initiated but has not yet started staging
-  def initialize(document:, version_service:, content:, initiating: false)
-    @document = document
+  def initialize(solr_doc:, version_service:, content:, initiating: false)
+    @solr_doc = solr_doc
     @version_service = version_service
     @content = content
     @initiating = initiating
   end
 
-  delegate :workflow_errors, :druid, :bare_druid, to: :document
+  delegate :workflow_errors, :druid, :bare_druid, to: :solr_doc
 
   def status
     # For the purposes of the status, treating these states as mutually exclusive.
@@ -36,7 +36,7 @@ class ObjectStatusPresenter
 
   private
 
-  attr_reader :document, :version_service, :content, :initiating
+  attr_reader :solr_doc, :version_service, :content, :initiating
 
   def version_status
     return :assembling if version_service.assembling?

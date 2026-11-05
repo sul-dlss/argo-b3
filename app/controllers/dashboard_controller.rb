@@ -97,7 +97,7 @@ class DashboardController < ApplicationController
     contents = Content.latest_staging_activities(druids:)
     docs.to_h do |doc|
       version_service = Sdr::VersionService.new(druid: doc.druid, status: version_statuses[doc.druid])
-      [doc.druid, ObjectStatusPresenter.new(document: doc, version_service:, content: contents[doc.druid]).status]
+      [doc.druid, ObjectStatusPresenter.new(solr_doc: doc, version_service:, content: contents[doc.druid]).status]
     end
   end
 

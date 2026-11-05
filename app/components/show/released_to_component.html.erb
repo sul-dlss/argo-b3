@@ -1,4 +1,10 @@
-<%= render Show::BoxComponent.new(heading:) do %>
+<%= render Show::BoxComponent.new(heading:) do |box| %>
+  <% if release? %>
+    <% box.with_heading_action do %>
+      <%= render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :edit, label: 'Manage release',
+                                                                          link: new_item_release_path(solr_doc.druid)) %>
+    <% end %>
+  <% end %>
   <% if release_tag_links.any? %>
     <ul class="dotted-underline-links">
       <% release_tag_links.each do |release_tag_link| %>

@@ -59,4 +59,20 @@ class CocinaSupport
   def self.object_type_with_content?(cocina_object)
     item?(cocina_object) || agreement?(cocina_object)
   end
+
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [Boolean] true if the object is dark (APOs have no access, so are never dark)
+  def self.dark?(cocina_object)
+    return false if cocina_object.admin_policy?
+
+    cocina_object.access.view == 'dark'
+  end
+
+  # Matches the display title DSA indexes (Search::Fields::TITLE).
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [String] the display title
+  def self.title(cocina_object)
+    catalog_links = cocina_object.admin_policy? ? [] : Array(cocina_object.identification.catalogLinks)
+    Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title, catalog_links:)
+  end
 end

@@ -480,6 +480,11 @@ RSpec.describe Sdr::Repository do
         expect(Dor::Services::Client).to have_received(:object).with(druid)
         expect(release_tags_client).to have_received(:list).with(public: true)
       end
+
+      it 'returns only the object tags when not public' do
+        expect(described_class.release_tags(druid:, public: false)).to eq(release_tags)
+        expect(release_tags_client).to have_received(:list).with(public: false)
+      end
     end
 
     context 'when the object is not found' do
