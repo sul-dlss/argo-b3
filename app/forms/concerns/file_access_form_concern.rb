@@ -25,7 +25,7 @@ module FileAccessFormConcern
   def overwrite_content_file_access!(overwrite)
     return unless content && overwrite.apply?
 
-    content.content_files.update_all(overwrite.content_file_attributes) # rubocop:disable Rails/SkipsModelValidations
+    overwrite.apply_to_content!(content)
   end
 
   def mutated_cocina_object
