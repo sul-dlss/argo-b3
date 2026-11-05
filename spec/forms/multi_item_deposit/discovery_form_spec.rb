@@ -192,6 +192,17 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     end
   end
 
+  context 'when the mount path cannot be read' do
+    let(:mount_path) { File.join(mount_directory, 'unreadable').tap { |path| Dir.mkdir(path, 0o000) } }
+
+    after { File.chmod(0o755, mount_path) }
+
+    it 'is not valid' do
+      expect(form).not_to be_valid
+      expect(form.errors[:mount_path]).to eq(['Permission denied'])
+    end
+  end
+
   context 'when the mount path is outside the mount locations' do
     let(:mount_path) { Rails.root.join('app').to_s }
 

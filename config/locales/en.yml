@@ -39,6 +39,7 @@ en:
     mount_path:
       not_found: "does not exist"
       not_in_mount_location: "must be within a mount location"
+      permission_denied: "Permission denied"
   release_tags:
     earthworks: "EarthWorks (requires geo coordinates or release will not be successful)"
     purl_sitemap: "Search engines"
@@ -662,6 +663,7 @@ en:
         not_authorized: 'Not authorized to update'
         content_in_progress: 'Files are being staged or discovered for this object'
         folder_not_found: 'Folder not found: %{path}'
+        folder_permission_denied: 'Permission denied: %{path}'
         no_files: 'No files found in folder: %{path}'
         files_too_large: 'Files larger than 4 TB: %{filepaths}'
         unexpected: 'An unexpected error occurred during discovery. Contact SDR support for assistance.'

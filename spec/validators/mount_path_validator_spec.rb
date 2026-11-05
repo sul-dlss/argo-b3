@@ -45,6 +45,17 @@ RSpec.describe MountPathValidator do
     end
   end
 
+  context 'when the path cannot be read' do
+    let(:path) { File.join(mount_directory, 'unreadable').tap { |unreadable| Dir.mkdir(unreadable, 0o000) } }
+
+    after { File.chmod(0o755, path) }
+
+    it 'is not valid' do
+      expect(record).not_to be_valid
+      expect(record.errors[:path]).to eq(['Permission denied'])
+    end
+  end
+
   context 'when the path is a mount location' do
     let(:path) { Rails.root.join('tmp').to_s }
 
