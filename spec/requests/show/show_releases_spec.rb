@@ -48,11 +48,11 @@ RSpec.describe 'Show releases' do
         expect(page).to have_css('th', text: 'Date')
       end
 
-      cells = page.find(:xpath, "//table[@id='releases-table']//tr[./th[normalize-space()='true']]").all('td')
-      expect(cells.map(&:text)).to eq(['collection', 'Searchworks', 'estanfor', '2021-07-16 15:58:07 PT'])
-
-      cells = page.find(:xpath, "//table[@id='releases-table']//tr[./th[normalize-space()='false']]").all('td')
-      expect(cells.map(&:text)).to eq(['self', 'Earthworks', 'jdoe', '2022-01-05 09:00:00 PT'])
+      rows = page.all('table#releases-table tbody tr').map { |row| row.all('td').map(&:text) }
+      expect(rows).to eq([
+                           ['true', 'collection', 'Searchworks', 'estanfor', '2021-07-16 15:58:07 PT'],
+                           ['false', 'self', 'Earthworks', 'jdoe', '2022-01-05 09:00:00 PT']
+                         ])
     end
 
     context 'when there are no release tags' do
