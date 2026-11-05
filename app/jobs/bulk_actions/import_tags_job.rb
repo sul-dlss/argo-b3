@@ -31,28 +31,14 @@ module BulkActions
       def perform
         return unless check_update_ability?
 
-        if tags.empty?
-          destroy_tags
-          success!(message: 'Removed all tags')
-        else
-          tags_client.replace(tags:)
-          success!(message: "Replaced tags (#{tags.join(', ')})")
-        end
+        Sdr::AdministrativeTags.replace(druid:, tags:)
+        success!(message: tags.empty? ? 'Removed all tags' : "Replaced tags (#{tags.join(', ')})")
       end
 
       private
 
       def tags
         row.drop(1)
-      end
-
-      def tags_client
-        Dor::Services::Client.object(druid).administrative_tags
-      end
-
-      # DSA does not allow replacing tags with an empty list, so delete them one at a time.
-      def destroy_tags
-        tags_client.list.each { |tag| tags_client.destroy(tag:) }
       end
     end
   end

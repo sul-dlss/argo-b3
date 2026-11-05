@@ -336,6 +336,16 @@ en:
         deleted: 'Resource deleted'
         moved: 'Resource moved'
         updated: 'Resource updated'
+    administrative_tags:
+      edit:
+        title: 'Manage tags'
+        buttons:
+          cancel: 'Cancel'
+          save: 'Save'
+      toasts:
+        updated: 'Tags updated'
+      errors:
+        save_failed: 'The tags could not be saved. Try again, or contact SDR support if the problem continues.'
     item_releases:
       new:
         title: 'Manage release'

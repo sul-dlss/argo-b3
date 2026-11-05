@@ -57,6 +57,8 @@
                                    disabled: !(@object_released_presenter.manageable? &&
                                                allowed_to?(:release?, @solr_doc, with: ObjectPolicy))) %>
         <% end %>
+        <% component.with_button(link: edit_object_tags_path(@solr_doc.druid), label: 'Manage tags', variant: 'outline-primary',
+                                 disabled: !allowed_to?(:tag?, @solr_doc, with: ObjectPolicy)) %>
       <% end %>
 
       <% if @solr_doc.object_type?('APO', 'collection') && allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
@@ -94,7 +96,7 @@
           </div>
         <% end %>
         <div class="show-box flex-fill">
-          <%= render Show::TagComponent.new(tags: Array(@solr_doc.all_tags), pinned_tags: @pinned_tags) %>
+          <%= render Show::TagComponent.new(solr_doc: @solr_doc, tags: Array(@solr_doc.all_tags), pinned_tags: @pinned_tags) %>
         </div>
       </div>
 

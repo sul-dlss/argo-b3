@@ -1,4 +1,10 @@
-<%= render Show::BoxComponent.new(heading: 'Tags') do %>
+<%= render Show::BoxComponent.new(heading: 'Tags') do |box| %>
+  <% if tag? %>
+    <% box.with_heading_action do %>
+      <%= render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :edit, label: 'Manage tags',
+                                                                          link: edit_object_tags_path(solr_doc.druid)) %>
+    <% end %>
+  <% end %>
   <ul class="object-type-tag mb-0 dotted-underline-links">
     <% tags.each do |object_tag| %>
       <li>

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Concern for the tags of an object, which are entered as separate other, project, and ticket
-# tags and combined into the single list of tags applied at registration.
+# tags and combined into the single list of tags applied to the object.
 #
 # Requires a tags attribute, as provided by CocinaModels::Base.
 module TagsFormConcern

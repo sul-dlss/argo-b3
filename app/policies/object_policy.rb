@@ -3,7 +3,7 @@
 # Policy for digital objects.
 class ObjectPolicy < ApplicationPolicy
   alias_rule :show_json?, to: :show?
-  alias_rule :update?, :release?, to: :edit?
+  alias_rule :update?, :release?, :tag?, to: :edit?
 
   # 1. If you can edit the object, you can read it
   # 2. If the object is restricted, only users with a matching restricted permission can read.
