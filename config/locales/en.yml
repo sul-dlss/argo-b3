@@ -134,6 +134,12 @@ en:
       not_discardable: "This draft cannot be discarded."
       republish_failed: "Republish is not possible"
       unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
+  user_versions:
+    errors:
+      update_failed: "Updating the public version failed."
+    toasts:
+      restored: "Public version restored"
+      withdrawn: "Public version withdrawn"
   object_versions:
     errors:
       invalid_cocina_descriptive: "Cocina is not valid, so cannot generate descriptive metadata CSV."

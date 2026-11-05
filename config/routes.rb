@@ -216,6 +216,12 @@ Rails.application.routes.draw do
       get 'descriptive_csv', to: 'objects#show_descriptive_csv'
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
+    resources :user_versions, only: [], param: :user_version do
+      member do
+        post 'withdraw'
+        post 'restore'
+      end
+    end
     resources :versions, only: [], param: :version, controller: 'object_versions' do
       member do
         get 'cocina'

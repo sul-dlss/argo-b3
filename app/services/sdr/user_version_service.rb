@@ -14,5 +14,17 @@ module Sdr
     rescue Dor::Services::Client::Error => e
       raise Error, "Retrieving user versions failed: #{e.message}"
     end
+
+    # @param druid [String]
+    # @param user_version [Integer] the user version to withdraw or restore
+    # @param withdraw [Boolean] true to withdraw the user version, false to restore it
+    # @raise [Error] if updating the user version fails
+    def self.update(druid:, user_version:, withdraw:)
+      Dor::Services::Client.object(druid).user_version.update(
+        user_version: Dor::Services::Client::UserVersion::Version.new(userVersion: user_version, withdrawn: withdraw)
+      )
+    rescue Dor::Services::Client::Error => e
+      raise Error, "Updating user version failed: #{e.message}"
+    end
   end
 end
