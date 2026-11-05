@@ -10,7 +10,8 @@
   <% component.with_header(label: 'PURL') if user_version_columns? %>
   <% versions.each do |version| %>
     <% component.with_row do %>
-      <%= render Show::VersionRowComponent.new(version:, cocina_object:, druid_token:) %>
+      <%= render Show::VersionRowComponent.new(version:, cocina_object:, druid_token:,
+                                               manage_user_versions: manage_user_versions?) %>
     <% end %>
   <% end %>
 <% end %>
