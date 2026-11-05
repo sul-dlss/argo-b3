@@ -633,7 +633,19 @@ en:
       art: "Art"
       hoover: "Hoover Institute"
       m&m: "Media and Microtext"
+  progress_stepper:
+    step_number: 'Step %{number}'
+    statuses:
+      completed: 'Completed'
+      in_progress: 'In progress'
+      pending: 'Pending'
   multi_item_deposit:
+    progress:
+      label: 'Multi-item deposit progress'
+      steps:
+        discovery: 'Discover files and check manifest'
+        structure: 'Configure deposit and check files'
+        deposit: 'Deposit'
     deposit_status:
       label: 'Deposit status'
       headers:

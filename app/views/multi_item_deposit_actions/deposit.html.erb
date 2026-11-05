@@ -5,6 +5,8 @@
 
   <p><%= @multi_item_deposit_action.name %></p>
 
+  <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
   <%= form_with model: @deposit_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
     <% if @multi_item_deposit_action.all_initial_versions? %>
       <%# When all are initial versions, the version description is fixed, so rendering a disabled text input. %>

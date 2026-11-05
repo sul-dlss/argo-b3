@@ -5,6 +5,8 @@
 
   <p><%= @multi_item_deposit_action.name %></p>
 
+  <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
   <%= form_with model: @structure_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
     <%# A deposit may have items of several content types, so each text extraction applies to its own types. %>
     <% if @multi_item_deposit_action.ocr_applicable? %>

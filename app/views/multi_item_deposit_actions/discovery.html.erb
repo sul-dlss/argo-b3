@@ -5,6 +5,8 @@
 
   <p><%= @multi_item_deposit_action.name %></p>
 
+  <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
   <%= form_with model: @discovery_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
     <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
                                                                field_name: :description,

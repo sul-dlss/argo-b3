@@ -9,5 +9,7 @@
     } do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
 
+  <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
   <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: t('edit.multi_item_deposits.wait.message', name: @multi_item_deposit_action.name), message_position: :bottom, classes: 'align-items-center') %>
 <% end %>
