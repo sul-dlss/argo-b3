@@ -53,6 +53,12 @@ class CocinaSupport
     cocina_object.dro? && !agreement?(cocina_object) && !virtual_object?(cocina_object)
   end
 
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [Boolean] true if the object is an Item or a Virtual Object, i.e., a DRO that is not an Agreement
+  def self.item_or_virtual_object?(cocina_object)
+    cocina_object.dro? && !agreement?(cocina_object)
+  end
+
   # Items and Agreements have Content (see GLOSSARY), so their files are managed.
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
   # @return [Boolean] true if the object is an Item or an Agreement

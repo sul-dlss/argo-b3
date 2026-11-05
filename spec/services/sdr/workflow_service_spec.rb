@@ -10,6 +10,20 @@ RSpec.describe Sdr::WorkflowService do
     allow(Dor::Services::Client).to receive(:object).and_return(object_client)
   end
 
+  describe '.milestones' do
+    let(:milestones_client) { instance_double(Dor::Services::Client::Milestones, list: milestones) }
+    let(:milestones) { [{ milestone: 'accessioned', at: Time.zone.parse('2026-01-01'), version: '1' }] }
+
+    before do
+      allow(object_client).to receive(:milestones).and_return(milestones_client)
+    end
+
+    it 'returns the milestones' do
+      expect(described_class.milestones(druid:)).to eq(milestones)
+      expect(Dor::Services::Client).to have_received(:object).with(druid)
+    end
+  end
+
   describe '#workflows_for' do
     subject(:service) { described_class.workflows_for(druid:) }
 
