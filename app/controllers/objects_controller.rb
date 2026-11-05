@@ -10,6 +10,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   include TokenConcern
   include ToastAndRefreshConcern
+  include VersionsTableConcern
 
   # The strategy is to authorize on show, but not repeat authorization on other show endpoints.
   # This avoids having to make additional calls that would be required for the authorization, but not the showing.
@@ -89,10 +90,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_versions
     @druid = verified_druid
-    object_client = Dor::Services::Client.object(@druid)
-    @versions_presenter = VersionsPresenter.new(version_inventory: object_client.version.inventory,
-                                                milestones: object_client.milestones.list,
-                                                user_version_inventory: object_client.user_version.inventory)
+    @versions_table = versions_table_component(druid: @druid, cocina_object:)
+
+    render layout: false
   end
 
   def show_events

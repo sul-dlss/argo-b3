@@ -32,6 +32,12 @@ The access of an individual file. New files get the Object Access, with citation
 ### Overwrite File Access
 Applying the Object Access to every file when saving an item whose Object Access changed. It always happens when the object is dark, which also unpublishes the files; a file that is then neither preserved, shelved, nor published (e.g., a derivative) is removed, along with any Resource it empties.
 
+### Version
+A numbered state of an object in SDR; a new version is opened for changes and closed when deposited. DSA stores cocina for each version except legacy versions, and a version's stored cocina may no longer be valid against the current cocina models.
+
+### User Version (AKA Public Version)
+A Version made publicly available on PURL, numbered separately from Versions. The latest User Version is shown at the object's PURL; earlier ones at `<purl>/<druid>/version/<user version>`. A User Version other than the latest can be withdrawn, removing it from PURL, and later restored. When an object is made dark, all User Versions other than the latest are permanently withdrawn and can't be restored.
+
 ### Draft
 The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version, and deletes the draft's Mutable Content and staged files. A first version cannot be discarded, but it can be purged.
 

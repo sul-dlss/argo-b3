@@ -40,14 +40,15 @@ RSpec.describe 'Show item' do
   end
   let(:version_inventory) do
     [
-      Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
+      Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: false),
       Dor::Services::Client::ObjectVersion::Version.new(versionId: 2, message: 'Second version', cocina: true)
     ]
   end
 
   let(:user_version_inventory) do
     [
-      Dor::Services::Client::UserVersion::Version.new(version: 2, userVersion: 1)
+      Dor::Services::Client::UserVersion::Version.new(version: 1, userVersion: 1, head: false, withdrawable: true),
+      Dor::Services::Client::UserVersion::Version.new(version: 2, userVersion: 2, head: true)
     ]
   end
 
@@ -355,27 +356,34 @@ RSpec.describe 'Show item' do
     within(find_table('versions-table')) do
       expect(page).to have_css('th', text: 'Version')
       expect(page).to have_css('th', text: 'Description')
-      expect(page).to have_css('th', text: 'User Version')
+      expect(page).to have_css('th', text: 'Public version')
       expect(page).to have_css('th', text: 'Registered / opened')
-      expect(page).to have_css('th', text: 'Submitted')
-      expect(page).to have_css('th', text: 'Accessioned')
+      expect(page).to have_css('th', text: 'Deposited')
+      expect(page).to have_css('th', text: 'Download')
+      expect(page).to have_css('th', text: 'PURL')
     end
 
-    row = find_table_row('versions-table', '1')
-    cells = row.all('td')
-    expect(cells[0]).to have_text('Initial version')
-    expect(cells[1]).to have_text('')
-    expect(cells[2]).to have_text('2020-02-28 12:23:30 PT')
-    expect(cells[3]).to have_text('2020-02-28 12:23:35 PT')
-    expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
-
-    row = find_table_row('versions-table', '2')
-    cells = row.all('td')
-    expect(cells[0]).to have_text('Second version')
-    expect(cells[1]).to have_text('1')
-    expect(cells[2]).to have_text('2021-03-31 13:23:30 PT')
-    expect(cells[3]).to have_text('2021-03-31 13:23:35 PT')
+    rows = find_table('versions-table').all('tbody tr')
+    cells = rows[0].all('td')
+    expect(cells[0]).to have_text('2')
+    expect(cells[1]).to have_text('Second version')
+    expect(cells[2]).to have_text('2')
+    expect(cells[3]).to have_text('2021-03-31 13:23:30 PT')
     expect(cells[4]).to have_text('2021-03-31 14:02:03 PT')
+    expect(cells[5]).to have_link('Cocina')
+    expect(cells[5]).to have_link('Structural metadata')
+    expect(cells[5]).to have_link('Descriptive metadata')
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567')
+
+    cells = rows[1].all('td')
+    expect(cells[0]).to have_text('1')
+    expect(cells[1]).to have_text('Initial version')
+    expect(cells[2]).to have_text('1')
+    expect(cells[3]).to have_text('2020-02-28 12:23:30 PT')
+    expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
+    expect(cells[5]).to have_no_link
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567/version/1')
+    expect(cells[2]).to have_button('Withdraw')
 
     # Events tab
     click_button 'Events'

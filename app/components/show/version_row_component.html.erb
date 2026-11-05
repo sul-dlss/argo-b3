@@ -1,0 +1,18 @@
+<%= render SdrViewComponents::Tables::RowComponent.new do |row| %>
+  <% row.with_cell do %><%= version %><% end %>
+  <% row.with_cell do %><%= description %><% end %>
+  <% if user_version_columns? %>
+    <% row.with_cell do %>
+      <div class="d-flex align-items-center justify-content-between gap-2">
+        <%= user_version_label %>
+        <%= render user_version_button if user_version_button %>
+      </div>
+    <% end %>
+  <% end %>
+  <% row.with_cell do %><%= helpers.format_datetime(opened_at) %><% end %>
+  <% row.with_cell do %><%= helpers.format_datetime(accessioned_at) %><% end %>
+  <% row.with_cell do %><%= download_list %><% end %>
+  <% if user_version_columns? %>
+    <% row.with_cell do %><%= purl_link %><% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,10 @@
+<%= render Elements::FlashToastComponent.new %>
+<% if flash[:danger] %>
+  <%= turbo_stream.update 'flash-alerts' do %>
+    <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, title: flash[:danger]) %>
+  <% end %>
+<% end %>
+<%# Updates only the versions frame (keeping its attributes), since refreshing the whole object show page is slow. %>
+<%= turbo_stream.update "#{@druid}_versions" do %>
+  <%= render @versions_table %>
+<% end %>
