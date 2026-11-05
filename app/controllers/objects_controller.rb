@@ -4,7 +4,7 @@
 class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassLength
   RECENT_OBJECTS_LIMIT = 5
 
-  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events
+  skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events show_releases
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
                                   show_structural_csv show_descriptive_csv track]
 
@@ -104,6 +104,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
                             EventsFilterForm.with_defaults(available_event_types: @event_types)
                           end
     @events = fetch_events
+
+    render layout: false
+  end
+
+  def show_releases
+    @druid = verified_druid
+    @release_tags = Sdr::Repository.release_tags(druid: @druid, public: false)
 
     render layout: false
   end

@@ -111,6 +111,7 @@
         <% component.with_tab(id: 'workflows-tab', pane_id: 'workflows-pane', label: 'Workflows') %>
         <% component.with_tab(id: 'versions-tab', pane_id: 'versions-pane', label: 'Versions') %>
         <% component.with_tab(id: 'events-tab', pane_id: 'events-pane', label: 'Events') %>
+        <% component.with_tab(id: 'releases-tab', pane_id: 'releases-pane', label: 'Releases') if @solr_doc.releasable_type? %>
         <% component.with_tab(id: 'cocina-model-tab', pane_id: 'cocina-model-pane', label: 'Cocina JSON') %>
         <% component.with_tab(id: 'solr-doc-tab', pane_id: 'solr-doc-pane', label: 'SOLR doc') %>
 
@@ -163,6 +164,14 @@
         <%= component.with_pane(id: 'events-pane', tab_id: 'events-tab') do %>
           <%= turbo_frame_tag(@solr_doc.druid, 'events', src: events_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+          <% end %>
+        <% end %>
+
+        <% if @solr_doc.releasable_type? %>
+          <%= component.with_pane(id: 'releases-pane', tab_id: 'releases-tab') do %>
+            <%= turbo_frame_tag(@solr_doc.druid, 'releases', src: releases_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
+              <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+            <% end %>
           <% end %>
         <% end %>
 

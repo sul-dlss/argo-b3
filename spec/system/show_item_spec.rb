@@ -238,6 +238,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('.nav-link', text: 'Workflows')
     expect(page).to have_css('.nav-link', text: 'Versions')
     expect(page).to have_css('.nav-link', text: 'Events')
+    expect(page).to have_css('.nav-link', text: 'Releases')
     expect(page).to have_css('.nav-link', text: 'Files')
     expect(page).to have_css('.nav-link', text: 'Structure')
     expect(page).to have_css('.nav-link', text: 'Description preview')
@@ -427,6 +428,17 @@ RSpec.describe 'Show item' do
     # The filtered events frame is also reloaded on each page refresh, so may have been requested more than once.
     expect(events_client).to have_received(:list)
       .with(event_types: ['version_open'], from: Time.utc(2021, 3, 31, 20, 0, 0), to: nil).at_least(:once)
+
+    # Releases tab
+    click_button 'Releases'
+
+    expect(page).to have_css('#releases-pane h2', text: 'Releases')
+    within(find_table('releases-table')) do
+      expect(page).to have_css('td', text: 'Searchworks')
+      expect(page).to have_css('td', text: 'PURL sitemap')
+      expect(page).to have_css('td', text: '2026-08-01 14:02:03 PT', count: 2)
+    end
+    expect(release_tags_client).to have_received(:list).with(public: false)
 
     # Files tab
     click_button 'Files'
