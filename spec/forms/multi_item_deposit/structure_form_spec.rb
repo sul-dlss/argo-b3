@@ -203,8 +203,9 @@ RSpec.describe MultiItemDeposit::StructureForm do
                           structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)
 
         expect(form.multi_item_deposit_action_attributes)
-          .to eq(perform_ocr: true, ocr_languages: ['English'], structural_metadata_csv: normalized_csv_string,
-                 structural_metadata_csv_source: 'upload', publish_preserve_all: false)
+          .to eq(perform_ocr: true, ocr_languages: ['English'], perform_speech_to_text: false,
+                 structural_metadata_csv: normalized_csv_string, structural_metadata_csv_source: 'upload',
+                 publish_preserve_all: false)
       end
     end
 
@@ -224,7 +225,7 @@ RSpec.describe MultiItemDeposit::StructureForm do
                           structural_metadata_csv: csv_string)
 
         expect(form.multi_item_deposit_action_attributes)
-          .to eq(perform_ocr: false, ocr_languages: [], structural_metadata_csv: nil,
+          .to eq(perform_ocr: false, ocr_languages: [], perform_speech_to_text: false, structural_metadata_csv: nil,
                  structural_metadata_csv_source: nil, publish_preserve_all: true)
       end
     end

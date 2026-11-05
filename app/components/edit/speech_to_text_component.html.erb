@@ -1,0 +1,10 @@
+<%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+      form:,
+      field_name: :perform_speech_to_text,
+      label: t('edit.items.fields.perform_speech_to_text.label'),
+      classes: 'my-fieldset',
+      data:
+    ) do |group| %>
+  <% group.with_radio_button(label_text: 'No', input_value: 'false', container_classes: 'my-fieldset') %>
+  <% group.with_radio_button(label_text: 'Yes', input_value: 'true', container_classes: 'my-fieldset') %>
+<% end %>

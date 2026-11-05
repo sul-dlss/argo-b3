@@ -21,6 +21,7 @@ env:
     SETTINGS__RABBITMQ__HOSTNAME: sul-rabbit-prod.stanford.edu
     SETTINGS__TECH_MD_SERVICE__URL: https://techmd-prod.stanford.edu
     SETTINGS__GLOBUS__DIRECTORY: /globus/argo_ingest/prod
+    SETTINGS__FEATURE_FLAGS__SPEECH_TO_TEXT_WORKFLOW: false
 
     DATABASE_HOSTNAME: argo-b3-db-prod-a
 

@@ -6,10 +6,19 @@
   <p><%= @multi_item_deposit_action.name %></p>
 
   <%= form_with model: @structure_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
+    <%# A deposit may have items of several content types, so each text extraction applies to its own types. %>
     <% if @multi_item_deposit_action.ocr_applicable? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h5, text: t('edit.multi_item_deposits.edit.text_extraction.ocr_heading')) %>
       <div data-controller="ocr-options">
         <%= render Edit::OcrComponent.new(form:) %>
       </div>
+
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+    <% end %>
+
+    <% if @multi_item_deposit_action.speech_to_text_applicable? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h5, text: t('edit.multi_item_deposits.edit.text_extraction.speech_to_text_heading')) %>
+      <%= render Edit::SpeechToTextComponent.new(form:) %>
 
       <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
     <% end %>

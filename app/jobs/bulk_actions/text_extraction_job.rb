@@ -17,13 +17,13 @@ module BulkActions
       def perform
         return unless check_update_ability?
 
-        return failure!(message: 'Text extraction is not possible for this object') unless text_extraction.ocr_able?
+        return failure!(message: 'Text extraction is not possible for this object') unless text_extraction.possible?
 
         return failure!(message: 'Object is currently assembling') if version_service.assembling?
 
         text_extraction.call
 
-        success!(message: "#{Sdr::TextExtraction::WORKFLOW_NAME} successfully started")
+        success!(message: "#{text_extraction.workflow_name} successfully started")
       end
 
       private

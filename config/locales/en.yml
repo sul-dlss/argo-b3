@@ -490,6 +490,8 @@ en:
           label: 'Part label'
         perform_ocr:
           label: 'Run OCR?'
+        perform_speech_to_text:
+          label: 'Do you want to auto-generate captions or transcripts for the media?'
         project_tag:
           label: 'Project name'
         retrieved_title:
@@ -545,6 +547,9 @@ en:
           heading: "Results of checking manifest"
         structure_results:
           heading: "Results of checking files"
+        text_extraction:
+          ocr_heading: "For book, image, or document/PDF content types"
+          speech_to_text_heading: "For media content types"
         discovery_errors_alert:
           title: "We found errors with the manifest."
           body: 'Please fix your manifest and / or files and click "%{discover_label}" again.'

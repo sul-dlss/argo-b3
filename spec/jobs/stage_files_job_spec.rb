@@ -8,8 +8,8 @@ RSpec.describe StageFilesJob do
   let(:druid) { 'druid:bc123df4567' }
   let(:user) { create(:user) }
   let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
-  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
-  let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-2') }
+  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-1') }
+  let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
 
   let(:attached_content_file_binary) do
@@ -253,7 +253,7 @@ RSpec.describe StageFilesJob do
 
     context 'when updating SDR does not change the lock' do
       # The structure is unchanged, so an immutable Content for the lock may already exist.
-      let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, lock: 'druid-version-1') }
+      let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type: Cocina::Models::ObjectType.book, lock: 'druid-version-1') }
       let!(:existing_content) { create(:content, druid:, lock: 'druid-version-1', immutable: true) }
 
       it 'replaces the existing immutable content' do

@@ -39,7 +39,7 @@
                                                                discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: false) %>
           <% end %>
           <%= tag.div data: { controller: 'content-type-dependent ocr-options',
-                              ocr_options_allowed_content_types_value: Sdr::TextExtraction::SUPPORTED_TYPES } do %>
+                              ocr_options_allowed_content_types_value: Sdr::TextExtraction::OCR_TYPES } do %>
             <%= render Edit::ContentTypeComponent.new(form: item_form, input_data: { content_type_dependent_target: 'contentType',
                                                                                      ocr_options_target: 'contentType',
                                                                                      action: 'content-type-dependent#toggle ocr-options#toggle structure-item-details#update' }) %>
@@ -48,6 +48,11 @@
                                                            container_data: { content_type_dependent_target: 'dependent',
                                                                              content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
             <%= render Edit::OcrComponent.new(form: item_form) %>
+            <% if Sdr::TextExtraction.speech_to_text_types.any? %>
+              <%= render Edit::SpeechToTextComponent.new(form: item_form,
+                                                         data: { content_type_dependent_target: 'dependent',
+                                                                 content_type_dependent_allowed: Sdr::TextExtraction.speech_to_text_types }) %>
+            <% end %>
           <% end %>
 
           <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>

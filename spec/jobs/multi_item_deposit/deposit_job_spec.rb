@@ -12,7 +12,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
   let(:multi_item_deposit_action) do
     create(:multi_item_deposit_action, user:, step: 'deposit', initiating_deposit_state: 'initiating_depositing',
                                        version_description: 'Adding files', perform_ocr: true,
-                                       ocr_languages: ['English'])
+                                       ocr_languages: ['English'], perform_speech_to_text: true)
   end
   # Content locks come from find as ETags, while find_all returns bare locks ('abc123').
   let(:content) { create(:content, :mutable, druid:, lock: 'W/"abc123-gzip"') }
@@ -100,8 +100,22 @@ RSpec.describe MultiItemDeposit::DepositJob do
     it 'sets the OCR settings only for content types that can be OCRed' do
       perform
 
-      expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
-      expect(other_content.reload).to have_attributes(perform_ocr: false, ocr_languages: [])
+      expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'],
+                                                perform_speech_to_text: false)
+      expect(other_content.reload).to have_attributes(perform_ocr: false, ocr_languages: [],
+                                                      perform_speech_to_text: false)
+    end
+
+    context 'when an Item Deposit is media' do
+      before { other_item_deposit_action.update!(content_type: 'media') }
+
+      it 'sets the speech to text setting only for media' do
+        perform
+
+        expect(other_content.reload).to have_attributes(perform_speech_to_text: true, perform_ocr: false,
+                                                        ocr_languages: [])
+        expect(content.reload.perform_speech_to_text).to be false
+      end
     end
 
     it 'starts staging each Content to the assembly location for accessioning' do

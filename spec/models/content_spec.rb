@@ -149,15 +149,33 @@ RSpec.describe Content do
       subject(:content) { build(:content, perform_ocr: true, ocr_languages: %w[English Spanish]) }
 
       it 'requests OCR in the languages' do
-        expect(content.workflow_context).to eq({ runOCR: true, ocrLanguages: %w[English Spanish] })
+        expect(content.workflow_context(content_type: Cocina::Models::ObjectType.book))
+          .to eq({ runOCR: true, ocrLanguages: %w[English Spanish] })
+      end
+
+      it 'is empty for a content type that cannot be OCRed' do
+        expect(content.workflow_context(content_type: Cocina::Models::ObjectType.media)).to eq({})
       end
     end
 
-    context 'when not performing OCR' do
+    context 'when performing speech to text' do
+      subject(:content) { build(:content, perform_speech_to_text: true) }
+
+      it 'requests speech to text' do
+        expect(content.workflow_context(content_type: Cocina::Models::ObjectType.media))
+          .to eq({ runSpeechToText: true })
+      end
+
+      it 'is empty for a content type that speech to text cannot run on' do
+        expect(content.workflow_context(content_type: Cocina::Models::ObjectType.book)).to eq({})
+      end
+    end
+
+    context 'when not performing text extraction' do
       subject(:content) { build(:content, perform_ocr: false) }
 
       it 'is empty' do
-        expect(content.workflow_context).to eq({})
+        expect(content.workflow_context(content_type: Cocina::Models::ObjectType.book)).to eq({})
       end
     end
   end

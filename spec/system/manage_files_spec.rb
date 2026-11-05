@@ -239,6 +239,24 @@ RSpec.describe 'Manage files' do
     expect(find('select[name$="[ocr_languages][]"]', visible: :all)).to be_disabled
   end
 
+  it 'shows the speech to text question in place of the OCR question for media' do
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+
+    select 'book', from: 'Content type'
+
+    expect(page).to have_css('legend', text: 'Run OCR?')
+    expect(page).to have_no_css('legend', text: 'Do you want to auto-generate captions or transcripts for the media?')
+
+    select 'media', from: 'Content type'
+
+    expect(page).to have_css('legend', text: 'Do you want to auto-generate captions or transcripts for the media?')
+    expect(page).to have_no_css('legend', text: 'Run OCR?')
+    expect(find('input[name$="[perform_ocr]"][value="true"]', visible: :all)).to be_disabled
+    expect(find('input[name$="[perform_speech_to_text]"][value="true"]')).not_to be_disabled
+  end
+
   context 'when no files have been uploaded yet' do
     it 'reports that there are no files' do
       visit "/contents/#{druid}/edit"

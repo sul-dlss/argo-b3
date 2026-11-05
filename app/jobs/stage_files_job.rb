@@ -65,7 +65,8 @@ class StageFilesJob < ApplicationJob
 
   # The Content becomes immutable only once accessioning has started, so that it stays mutable if accessioning fails.
   def accession!(content:, cocina_object:)
-    Sdr::Repository.accession(cocina_object:, user_name: user.sunetid, context: content.workflow_context)
+    Sdr::Repository.accession(cocina_object:, user_name: user.sunetid,
+                              context: content.workflow_context(content_type: cocina_object.type))
     make_immutable!(content:, lock: cocina_object.lock)
   end
 

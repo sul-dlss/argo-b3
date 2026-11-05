@@ -8,7 +8,7 @@ class MultiItemDepositAction < ApplicationRecord
   has_many :item_deposit_actions, dependent: :destroy
 
   # Item Deposit content types are stored as the last segment of the cocina type URI.
-  OCR_CONTENT_TYPES = Sdr::TextExtraction::SUPPORTED_TYPES.map { |type| UriSupport.last(uri: type) }.freeze
+  OCR_CONTENT_TYPES = Sdr::TextExtraction::OCR_TYPES.map { |type| UriSupport.last(uri: type) }.freeze
   STRUCTURAL_METADATA_CSV_REQUIRED_CONTENT_TYPES = [UriSupport.last(uri: Cocina::Models::ObjectType.media)].freeze
   STRUCTURAL_METADATA_CSV_FILENAME = 'structural_metadata.csv'
 
@@ -90,6 +90,12 @@ class MultiItemDepositAction < ApplicationRecord
   # @return [Boolean] whether any Item Deposit has a content type that can be OCRed
   def ocr_applicable?
     item_deposit_actions.exists?(content_type: OCR_CONTENT_TYPES)
+  end
+
+  # @return [Boolean] whether any Item Deposit has a content type that speech to text can run on
+  def speech_to_text_applicable?
+    content_types = Sdr::TextExtraction.speech_to_text_types.map { |type| UriSupport.last(uri: type) }
+    item_deposit_actions.exists?(content_type: content_types)
   end
 
   # @return [Boolean] whether any Item Deposit has a content type that can only be structured from a CSV

@@ -82,7 +82,7 @@ class ContentsController < ContentsApplicationController
 
   # @return [Boolean] false if saving to SDR failed
   def save_and_stage(content:)
-    # Saving also saves the OCR settings with the content and rebases it onto the saved object's lock.
+    # Saving also saves the text extraction settings with the content and rebases it onto the saved object's lock.
     @contents_item_form.save!(user_name: current_user.sunetid)
 
     content.start_staging!(user: current_user, accession: params[:commit] == ContentsController::DEPOSIT_VALUE)
@@ -107,7 +107,7 @@ class ContentsController < ContentsApplicationController
       form.version_service = version_service
       form.prefill_version_description
       form.content = find_or_create_content(cocina_object:)
-      form.prefill_ocr_settings(form.content)
+      form.prefill_text_extraction_settings(form.content)
     end
   end
 

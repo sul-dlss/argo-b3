@@ -418,8 +418,46 @@ RSpec.describe 'Multi-item deposit actions' do
           get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
           expect(rendered_page).to have_field('Yes, upload a structural metadata CSV', type: 'radio', checked: true)
-          expect(rendered_page).to have_no_field('No', type: 'radio')
+          expect(rendered_page).to have_no_css('input[type="radio"][name$="[structural_metadata_csv_choice]"]' \
+                                               '[value="none"]')
           expect(rendered_page).to have_no_field('Default by file type')
+        end
+
+        it 'renders the speech to text question with No selected, and not the OCR question' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(rendered_page).to have_css('h2', text: 'For media content types')
+          expect(rendered_page).to have_css('legend',
+                                            text: 'Do you want to auto-generate captions or transcripts for the media?')
+          expect(rendered_page).to have_css('input[type="radio"][name$="[perform_speech_to_text]"][value="false"]' \
+                                            '[checked]')
+          expect(rendered_page).to have_no_css('legend', text: 'Run OCR?')
+        end
+
+        context 'when speech to text is not enabled' do
+          before { allow(Settings.feature_flags).to receive(:speech_to_text_workflow).and_return(false) }
+
+          it 'does not render the speech to text question' do
+            get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+            expect(rendered_page).to have_no_css('input[name$="[perform_speech_to_text]"]')
+          end
+        end
+      end
+
+      context 'when the Item Deposits are a book and media' do
+        before do
+          create(:item_deposit_action, multi_item_deposit_action:, content_type: 'book')
+          create(:item_deposit_action, multi_item_deposit_action:, content_type: 'media')
+        end
+
+        it 'renders both the OCR and speech to text questions under their headings' do
+          get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+          expect(rendered_page).to have_css('h2', text: 'For book, image, or document/PDF content types')
+          expect(rendered_page).to have_css('legend', text: 'Run OCR?')
+          expect(rendered_page).to have_css('h2', text: 'For media content types')
+          expect(rendered_page).to have_css('input[name$="[perform_speech_to_text]"]', count: 2)
         end
       end
     end
@@ -822,14 +860,16 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
       let!(:item_deposit_action) { create(:item_deposit_action, multi_item_deposit_action:) }
       let(:params) do
-        { multi_item_deposit_structure: { perform_ocr: 'true', ocr_languages: ['', 'English'] } }
+        { multi_item_deposit_structure: { perform_ocr: 'true', ocr_languages: ['', 'English'],
+                                          perform_speech_to_text: 'true' } }
       end
 
-      it 'saves the OCR settings, starts structuring, and redirects to the edit page' do
+      it 'saves the text extraction settings, starts structuring, and redirects to the edit page' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(multi_item_deposit_action.reload).to be_structuring
-        expect(multi_item_deposit_action).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+        expect(multi_item_deposit_action).to have_attributes(perform_ocr: true, ocr_languages: ['English'],
+                                                             perform_speech_to_text: true)
         expect(MultiItemDeposit::StructureJob).to have_been_enqueued.with(item_deposit_action:)
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
