@@ -1,0 +1,5 @@
+<nav class="mb-2" aria-label="Breadcrumb">
+  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link:, variant: :link, classes: 'ps-0') do %>
+    <span aria-hidden="true">←</span> <%= label %>
+  <% end %>
+</nav>

@@ -74,6 +74,7 @@ RSpec.describe 'Admin workgroup permissions' do
       it 'renders the workgroup, the read unrestricted toggle, and the additional permissions table' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'sdr:alpha')
+        expect(rendered_page).to have_link('← Workgroup permissions', href: '/admin/workgroup_permissions')
         expect(rendered_page).to have_checked_field('Yes')
 
         rows = rendered_page.all('#additional-permissions-table tbody tr')

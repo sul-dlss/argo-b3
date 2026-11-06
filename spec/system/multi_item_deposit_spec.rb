@@ -216,6 +216,7 @@ RSpec.describe 'Multi-item deposit' do
 
     # The wait page refreshes to the show page once the deposit is submitted.
     expect(page).to have_css('h2', text: 'Deposit status')
+    expect(page).to have_link('← Dashboard', href: '/')
     expect(page).to have_text('My multi-item deposit')
     deposit_status_rows = page.find('table[aria-label="Deposit status"]').all('tbody tr')
     expect(deposit_status_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
