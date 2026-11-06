@@ -37,7 +37,8 @@
   </head>
 
   <body>
-    <%= turbo_stream_from 'notifications', current_user, data: { turbo_permanent: true } %>
+    <%# An id keeps morph refreshes from adding duplicate subscriptions (and so duplicate toasts). %>
+    <%= turbo_stream_from 'notifications', current_user, id: 'notifications-stream', data: { turbo_permanent: true } %>
     <%= render HeaderComponent.new %>
     <% search_bar_form = @search_form || @last_search_form || ResultsSearchForm.new %>
     <%= render Search::FormComponent.new(search_form: search_bar_form, url: url_for(search_bar_form)) %>
