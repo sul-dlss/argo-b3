@@ -26,6 +26,7 @@ module ManifestCsv
       return false if errors.any?
 
       validate_blank_cells
+      validate_druids
       validate_duplicate_druids
       validate_shared_folder_names
       validate_folder_names_within_files_path if files_path
@@ -51,6 +52,11 @@ module ManifestCsv
         row_numbers = csv.each.with_index(2).filter_map { |row, row_number| row_number if row[column].blank? }
         errors << "Blank #{column} in rows: #{row_numbers.join(', ')}." if row_numbers.any?
       end
+    end
+
+    def validate_druids
+      invalid_druids = present_values(DRUID_COLUMN).uniq.reject { |druid| DruidTools::Druid.valid?(druid, true) }
+      errors << "Invalid druids: #{invalid_druids.join(', ')}." if invalid_druids.any?
     end
 
     def validate_duplicate_druids
