@@ -2,6 +2,7 @@
 
 # Controller for items (DRO)
 class ItemsController < ApplicationController
+  include RegisterCancelConcern
   include TokenConcern
 
   # Matches ObjectsController so its descriptive CSV download accepts the druid token.
@@ -17,7 +18,7 @@ class ItemsController < ApplicationController
     authorize! with: ItemPolicy
 
     @new_item_form = NewItemForm.new
-    @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_item_path)) || root_path
+    @cancel_path = register_cancel_path
 
     set_apo_and_collection_options(form: @new_item_form)
   end

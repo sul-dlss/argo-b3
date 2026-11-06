@@ -2,14 +2,15 @@
 
 # Controller for registering and depositing collections
 class CollectionsController < ApplicationController
+  include RegisterCancelConcern
+
   # Renders the form for registering and depositing a collection.
   # @return [void]
   def new
     authorize! with: CollectionPolicy
 
     @new_collection_form = NewCollectionForm.new
-    @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_collection_path)) ||
-                   root_path
+    @cancel_path = register_cancel_path
     set_apo_options(form: @new_collection_form)
   end
 

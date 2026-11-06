@@ -19,6 +19,18 @@ RSpec.describe 'Items' do
       expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
                                                                       editable: true)
     end
+
+    it 'cancels to the referring page' do
+      get '/items/new', headers: { 'HTTP_REFERER' => 'http://www.example.com/search?q=maps' }
+
+      expect(Capybara.string(response.body)).to have_link('Cancel', href: 'http://www.example.com/search?q=maps')
+    end
+
+    it 'cancels to the dashboard when coming from another register form' do
+      get '/items/new', headers: { 'HTTP_REFERER' => 'http://www.example.com/collections/new' }
+
+      expect(Capybara.string(response.body)).to have_link('Cancel', href: '/')
+    end
   end
 
   describe 'create' do
