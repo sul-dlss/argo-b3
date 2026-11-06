@@ -52,6 +52,22 @@ RSpec.describe ManifestCsv::Validator do
     end
   end
 
+  context 'when a druid is invalid' do
+    let(:csv) do
+      <<~CSV
+        druid,folder_name
+        druid:bc123df4567,folder1
+        druid:something else,folder2
+        druid:somethingelse,folder3
+      CSV
+    end
+
+    it 'reports the druids' do
+      expect(validator).not_to be_valid
+      expect(validator.errors).to eq(['Invalid druids: druid:something else, druid:somethingelse.'])
+    end
+  end
+
   context 'when a druid is duplicated' do
     let(:csv) do
       <<~CSV
