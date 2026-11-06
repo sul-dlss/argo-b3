@@ -41,4 +41,8 @@ module IconHelper
   def cancel_icon(**)
     icon(icon_classes: %w[bi bi-x-square], **)
   end
+
+  def in_progress_icon(**)
+    icon(icon_classes: %w[bi bi-clock-history], **)
+  end
 end

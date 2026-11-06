@@ -163,3 +163,20 @@
 .toggle-row-data > td {
   --bs-table-bg: var(--stanford-fog-light);
 }
+
+// Accordion button with its chevron before the label, as in the collapsible section component.
+.accordion-button-toggle-start::after {
+  order: -1;
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+.workflow-accordion {
+  --bs-accordion-btn-bg: var(--stanford-fog-light);
+  --bs-accordion-active-bg: var(--stanford-fog-light);
+  --bs-accordion-border-color: var(--stanford-40-black);
+}
+
+.workflow-in-progress {
+  color: #ad4e00;
+}

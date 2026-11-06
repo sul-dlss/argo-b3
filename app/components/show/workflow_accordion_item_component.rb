@@ -21,7 +21,7 @@ module Show
     end
 
     def button_classes
-      merge_classes('accordion-button', expanded? ? nil : 'collapsed')
+      merge_classes('accordion-button', 'accordion-button-toggle-start', expanded? ? nil : 'collapsed')
     end
 
     def accordion_collapse_classes

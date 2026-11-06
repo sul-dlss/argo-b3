@@ -3,9 +3,9 @@
     <%= tag.button class: button_classes, type: 'button', data: { bs_toggle: 'collapse', bs_target: "##{accordion_collapse_id}" }, aria: { expanded: expanded?, controls: accordion_collapse_id } do %>
       <%= workflow_name %>
       <% if complete? %>
-        <span class="badge bg-success ms-2">Complete</span>
+        <span class="text-success ms-2"><%= helpers.success_icon(aria: { hidden: true }) %> Complete</span>
       <% else %>
-        <span class="badge bg-warning text-dark ms-2">In progress</span>
+        <span class="workflow-in-progress ms-2"><%= helpers.in_progress_icon(aria: { hidden: true }) %> In progress</span>
       <% end %>
     <% end %>
   </h2>

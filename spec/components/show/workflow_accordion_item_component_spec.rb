@@ -40,12 +40,12 @@ RSpec.describe Show::WorkflowAccordionItemComponent, type: :component do
       expect(page).to have_css('h2.accordion-header button.accordion-button', text: 'accessionWF')
       expect(page).to have_css('button[data-bs-target="#accessionwf-collapse"][aria-controls="accessionwf-collapse"]' \
                                '[aria-expanded="true"]')
-      expect(page).to have_css('span.badge', text: 'In progress')
+      expect(page).to have_css('span.workflow-in-progress i.bi-clock-history')
+      expect(page).to have_css('span.workflow-in-progress', text: 'In progress')
       expect(page).to have_css('div#accessionwf-collapse.accordion-collapse.collapse.show')
       expect(page).to have_css('table#accessionwf-2-table caption', text: 'accessionWF - Version 2')
       expect(page).to have_css('table#accessionwf-1-table caption', text: 'accessionWF - Version 1')
-      expect(page).to have_css('td.text-danger', text: 'Error: Something went wrong')
-      expect(page).to have_css('td.text-success-emphasis', text: 'Note: Retry queued')
+      expect(page).to have_css('table#accessionwf-1-table td span.text-danger', text: 'Something went wrong')
 
       expect(rendered_content.index('accessionWF - Version 2'))
         .to be < rendered_content.index('accessionWF - Version 1')
@@ -55,13 +55,14 @@ RSpec.describe Show::WorkflowAccordionItemComponent, type: :component do
   context 'when the workflow is complete' do
     let(:complete) { true }
 
-    it 'renders a collapsed accordion item with a complete badge' do
+    it 'renders a collapsed accordion item with a complete indicator' do
       render_inline(component)
 
       expect(page).to have_css('h2.accordion-header button.accordion-button.collapsed', text: 'accessionWF')
       expect(page).to have_css('button[data-bs-target="#accessionwf-collapse"][aria-controls="accessionwf-collapse"]' \
                                '[aria-expanded="false"]')
-      expect(page).to have_css('span.badge', text: 'Complete')
+      expect(page).to have_css('span.text-success i.bi-check-circle-fill')
+      expect(page).to have_css('span.text-success', text: 'Complete')
       expect(page).to have_css('div#accessionwf-collapse.accordion-collapse.collapse')
       expect(page).to have_no_css('div#accessionwf-collapse.show')
     end
