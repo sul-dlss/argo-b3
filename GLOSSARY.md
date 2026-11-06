@@ -56,6 +56,9 @@ An instruction to release an object to (or withhold it from) a discovery target:
 ### Tag
 An administrative label on an object, made of two or more terms separated by ` : ` (e.g., `Project : Maps : 2024`), used to find and group objects in Argo; tags are not public. **Project** and **Ticket** tags are tags whose first term is `Project` or `Ticket`. Unlike Release Tags, tags can be changed and removed.
 
+### Process
+One step of a workflow (e.g., `shelve` in `accessionWF`) for one version of an object, performed by a robot. A process in error can be retried (set back to waiting, so it is queued again) by users who can edit the object; admins can also skip or complete it. Use "process" rather than "workflow step".
+
 ### Multi-Item Deposit
 A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit. The deposit step is initiated once a version is open and staging has started for every Item Deposit; staging and accessioning then proceed for each Item independently.
 

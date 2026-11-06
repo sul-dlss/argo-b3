@@ -157,7 +157,7 @@
         <% end %>
 
         <%= component.with_pane(id: 'workflows-pane', tab_id: 'workflows-tab') do %>
-          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top') do %>
+          <%= turbo_frame_tag(@solr_doc.druid, 'workflows', src: workflows_object_path(druid: @druid_token), loading: :lazy, refresh: 'morph', target: '_top', data: { controller: 'reloadable-frame' }, class: 'workflows-frame') do %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>

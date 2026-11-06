@@ -25,6 +25,36 @@ RSpec.describe ObjectPolicy, type: :policy do
     it 'resolves show_json? to show?' do
       expect(policy.resolve_rule(:show_json?)).to eq(:show?)
     end
+
+    it 'resolves retry_process? to edit?' do
+      expect(policy.resolve_rule(:retry_process?)).to eq(:edit?)
+    end
+
+    it 'resolves skip_process? and complete_process? to override_process?' do
+      expect(policy.resolve_rule(:skip_process?)).to eq(:override_process?)
+      expect(policy.resolve_rule(:complete_process?)).to eq(:override_process?)
+    end
+  end
+
+  describe '#override_process?' do
+    let(:record) { { Search::Fields::ID => object_druid } }
+
+    before do
+      Current.effective_groups = user.groups
+      Permission.create!(workgroup: 'sdr:object-editors', permission_type: :edit, target_druid: object_druid)
+    end
+
+    it 'does not authorize a user who can edit the object' do
+      expect(policy.apply(:override_process?)).to be false
+    end
+
+    context 'when the user is an admin' do
+      let(:user) { create(:user, :admin) }
+
+      it 'authorizes' do
+        expect(policy.apply(:override_process?)).to be true
+      end
+    end
   end
 
   describe '#edit?' do

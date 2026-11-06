@@ -3,13 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe Show::WorkflowSectionComponent, type: :component do
-  let(:component) { described_class.new(workflow:) }
+  let(:component) { described_class.new(workflow:, solr_doc:) }
+
+  let(:solr_doc) { SolrDocPresenter.new(solr_doc: { Search::Fields::ID => 'druid:bc123df4567' }) }
 
   let(:workflow) { instance_double(Dor::Services::Response::Workflow, workflow_name: 'accessionWF', complete?: complete, processes:) }
   let(:version_two_process) do
     instance_double(Dor::Services::Response::Process,
                     name: 'accessioning-init',
                     version: 2,
+                    active_version?: true,
                     lifecycle: 'accessioning',
                     status: 'completed',
                     datetime: nil,
@@ -21,6 +24,7 @@ RSpec.describe Show::WorkflowSectionComponent, type: :component do
     instance_double(Dor::Services::Response::Process,
                     name: 'shelve',
                     version: 1,
+                    active_version?: false,
                     lifecycle: 'accessioning',
                     status: 'error',
                     datetime: nil,

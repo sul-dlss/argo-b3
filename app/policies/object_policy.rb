@@ -3,7 +3,8 @@
 # Policy for digital objects.
 class ObjectPolicy < ApplicationPolicy
   alias_rule :show_json?, to: :show?
-  alias_rule :update?, :release?, :tag?, :manage_user_versions?, to: :edit?
+  alias_rule :update?, :release?, :tag?, :manage_user_versions?, :retry_process?, to: :edit?
+  alias_rule :skip_process?, :complete_process?, to: :override_process?
 
   # 1. If you can edit the object, you can read it
   # 2. If the object is restricted, only users with a matching restricted permission can read.
@@ -20,6 +21,11 @@ class ObjectPolicy < ApplicationPolicy
   # APO.
   def edit?
     permission_scope.edit_targets.intersect?(permission_target_druids)
+  end
+
+  # Only admins (who pass every rule) can skip or complete a process.
+  def override_process?
+    false
   end
 
   private
