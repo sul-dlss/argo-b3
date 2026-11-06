@@ -9,15 +9,14 @@ class StageFilesJob < ApplicationJob
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging
   # @param [Boolean] notify whether to notify the user (with toasts) when staging completes or fails
-  # @param [String] staging_location where to stage, unless files are already staged elsewhere
+  # @param [String] staging_location where to stage, unless files are already staged elsewhere or the object is geo
   # @param [String] lane_id the lane for assembly / accessioning
   def perform(content:, user:, accession: false, notify: true, staging_location: Settings.staging_location, # rubocop:disable Metrics/ParameterLists
               lane_id: 'high')
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
     @notify = notify
-    # Already staged files win, since assembly reads only the first location with the druid's files.
-    @staging_location = StagingSupport.staged_location(druid:) || staging_location
+    @staging_location = resolve_staging_location(staging_location)
     set_hb_context
 
     check_lock! # Check cocina lock version and raise if optimistic lock problem
@@ -48,6 +47,15 @@ class StageFilesJob < ApplicationJob
            .associated
            .where(file_location: %w[attached mount globus])
            .includes(file_attachment: :blob)
+  end
+
+  # Geo files go to the assembly location, where GIS assembly reads them. Otherwise, already staged files win,
+  # since assembly reads only the first location with the druid's files.
+  def resolve_staging_location(staging_location)
+    return StagingSupport.staged_location(druid:) || staging_location unless CocinaSupport.geo?(cocina_object)
+
+    StagingSupport.move_to_assembly(druid:)
+    Settings.assembly_location
   end
 
   def check_lock!

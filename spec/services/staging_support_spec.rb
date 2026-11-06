@@ -111,6 +111,52 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.move_to_assembly' do
+    let(:assembly_filepath) do
+      File.join(Settings.assembly_location, 'bc/123/df/4567/bc123df4567/content/images/image1.tif')
+    end
+
+    context 'when files are staged in the deposit staging location' do
+      before { stage_file(staging_location: Settings.staging_location) }
+
+      it 'moves them to the assembly location' do
+        described_class.move_to_assembly(druid:)
+
+        expect(File.exist?(assembly_filepath)).to be true
+        expect(File.exist?(File.join(Settings.staging_location, 'bc/123/df/4567/bc123df4567'))).to be false
+      end
+    end
+
+    context 'when files are also staged in the assembly location' do
+      let(:existing_assembly_filepath) do
+        File.join(Settings.assembly_location, 'bc/123/df/4567/bc123df4567/content/existing.tif')
+      end
+
+      before do
+        stage_file(staging_location: Settings.staging_location)
+        FileUtils.mkdir_p(File.dirname(existing_assembly_filepath))
+        FileUtils.touch(existing_assembly_filepath)
+      end
+
+      it 'replaces the files in the assembly location' do
+        described_class.move_to_assembly(druid:)
+
+        expect(File.exist?(assembly_filepath)).to be true
+        expect(File.exist?(existing_assembly_filepath)).to be false
+      end
+    end
+
+    context 'when no files are staged in the deposit staging location' do
+      before { stage_file(staging_location: Settings.assembly_location) }
+
+      it 'leaves the assembly location unchanged' do
+        described_class.move_to_assembly(druid:)
+
+        expect(File.exist?(assembly_filepath)).to be true
+      end
+    end
+  end
+
   describe '.staged_location' do
     context 'when no files are staged' do
       it 'returns nil' do

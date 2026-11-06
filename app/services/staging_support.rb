@@ -36,9 +36,23 @@ class StagingSupport
 
   # @return [String, nil] the first staging location with staged files for the druid
   def self.staged_location(druid:)
-    locations.find do |staging_location|
-      content_path = staging_content_path(druid:, staging_location:)
-      Dir.glob('**/*', base: content_path).any? { |path| File.file?(File.join(content_path, path)) }
-    end
+    locations.find { |staging_location| staged_files_in?(druid:, staging_location:) }
   end
+
+  # Moves the druid's staged files from the deposit staging location to the assembly location (where GIS assembly
+  # reads them), replacing any files already in the assembly location.
+  def self.move_to_assembly(druid:)
+    return unless staged_files_in?(druid:, staging_location: Settings.staging_location)
+
+    assembly_druid_path = DruidTools::Druid.new(druid, Settings.assembly_location).path
+    FileUtils.rm_rf(assembly_druid_path)
+    FileUtils.mkdir_p(File.dirname(assembly_druid_path))
+    FileUtils.mv(DruidTools::Druid.new(druid, Settings.staging_location).path, assembly_druid_path)
+  end
+
+  def self.staged_files_in?(druid:, staging_location:)
+    content_path = staging_content_path(druid:, staging_location:)
+    Dir.glob('**/*', base: content_path).any? { |path| File.file?(File.join(content_path, path)) }
+  end
+  private_class_method :staged_files_in?
 end

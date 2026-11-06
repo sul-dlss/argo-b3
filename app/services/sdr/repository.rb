@@ -103,7 +103,8 @@ module Sdr
     end
 
     # DROs with files are assembled (e.g., to create derivatives) before accessioning; assembly closes the version.
-    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them.
+    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them,
+    # and their staged files are first moved to the assembly location, the only one gisAssemblyWF reads.
     # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
@@ -112,10 +113,13 @@ module Sdr
     #   version does not accept a context, so it is ignored when assembly is skipped.
     # @raise [Error] if there is an error initiating accession
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
-      object_client = Dor::Services::Client.object(cocina_object.externalIdentifier)
+      druid = cocina_object.externalIdentifier
+      object_client = Dor::Services::Client.object(druid)
+      # E.g., for an object that became geo after its files were staged.
+      StagingSupport.move_to_assembly(druid:) if CocinaSupport.geo?(cocina_object)
       if assemble?(cocina_object:)
         # Assembly requires the object's staging folder, even when nothing is staged.
-        StagingSupport.ensure_staging_folder(druid: cocina_object.externalIdentifier)
+        StagingSupport.ensure_staging_folder(druid:)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else

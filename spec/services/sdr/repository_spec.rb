@@ -272,6 +272,7 @@ RSpec.describe Sdr::Repository do
       allow(Dor::Services::Client).to receive(:object).with(druid).and_return(object_client)
       allow(StagingSupport).to receive(:staged_files?).with(druid:).and_return(staged_files)
       allow(StagingSupport).to receive(:ensure_staging_folder)
+      allow(StagingSupport).to receive(:move_to_assembly)
     end
 
     context 'when the object has files' do
@@ -279,6 +280,7 @@ RSpec.describe Sdr::Repository do
         described_class.accession(cocina_object:, user_name:)
 
         expect(StagingSupport).to have_received(:ensure_staging_folder).with(druid:)
+        expect(StagingSupport).not_to have_received(:move_to_assembly)
         expect(object_client).to have_received(:workflow).with('assemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
         expect(version_client).not_to have_received(:close)
@@ -319,9 +321,10 @@ RSpec.describe Sdr::Repository do
     context 'when the object is geo and there are files in staging' do
       let(:type) { Cocina::Models::ObjectType.geo }
 
-      it 'creates a gisAssemblyWF' do
+      it 'moves the staged files to the assembly location and creates a gisAssemblyWF' do
         described_class.accession(cocina_object:, user_name:)
 
+        expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
         expect(object_client).to have_received(:workflow).with('gisAssemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
       end

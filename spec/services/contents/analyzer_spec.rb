@@ -145,6 +145,65 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
+    context 'when the file on a mount is a FlatGeobuf' do
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path, filepath: 'index_map.fgb',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+      end
+
+      it 'sniffs the FlatGeobuf mime type' do
+        call
+
+        expect(content_file_binary.mime_type).to eq('application/vnd.fgb')
+      end
+    end
+
+    context 'when the file on a mount is a PMTiles archive' do
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path,
+                                     filepath: 'index_map.pmtiles', md5_digest: 'existing-md5',
+                                     sha1_digest: 'existing-sha1')
+      end
+
+      it 'sniffs the PMTiles mime type' do
+        call
+
+        expect(content_file_binary.mime_type).to eq('application/vnd.pmtiles')
+      end
+    end
+
+    {
+      'shapefile.shp' => 'application/vnd.shp',
+      'shapefile.shx' => 'application/octet-stream',
+      'SANB_a2725322.prj' => 'text/plain'
+    }.each do |filepath, mime_type|
+      context "when the file on a mount is #{filepath}" do
+        let(:content_file_binary) do
+          create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path, filepath:,
+                                       md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+        end
+
+        it "uses the #{mime_type} mime type" do
+          call
+
+          expect(content_file_binary.mime_type).to eq(mime_type)
+        end
+      end
+    end
+
+    context 'when the file on a mount is a GDAL overview' do
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'mount', mount_path: file_fixture_path, filepath: 'overview.ovr',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
+      end
+
+      it 'uses the octet-stream mime type rather than sniffing a TIFF' do
+        call
+
+        expect(content_file_binary.mime_type).to eq('application/octet-stream')
+      end
+    end
+
     context 'when the size is not yet set' do
       let(:content_file_binary) do
         create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',
