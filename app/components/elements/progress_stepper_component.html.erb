@@ -1,17 +1,5 @@
 <%= tag.ol class: classes, 'aria-label': label do %>
   <% steps.each.with_index(1) do |step, number| %>
-    <%= tag.li class: step_classes(step), 'aria-current': aria_current(step) do %>
-      <div class="progress-stepper-marker" aria-hidden="true">
-        <span class="progress-stepper-circle">
-          <% if completed?(step) %>
-            <i class="bi bi-check-lg"></i>
-          <% end %>
-        </span>
-        <span class="progress-stepper-line"></span>
-      </div>
-      <div class="progress-stepper-number"><%= t('progress_stepper.step_number', number:) %></div>
-      <div class="progress-stepper-label"><%= step[:label] %></div>
-      <span class="progress-stepper-status badge rounded-pill"><%= status_text(step) %></span>
-    <% end %>
+    <%= render Elements::ProgressStepperStepComponent.new(number:, label: step[:label], status: step[:status]) %>
   <% end %>
 <% end %>

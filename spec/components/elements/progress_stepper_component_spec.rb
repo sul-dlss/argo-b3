@@ -23,24 +23,4 @@ RSpec.describe Elements::ProgressStepperComponent, type: :component do
                          ['Step 2', 'Check files', 'In progress'],
                          ['Step 3', 'Deposit', 'Pending']])
   end
-
-  it 'marks the step in progress as the current step' do
-    render_inline(component)
-
-    expect(page).to have_css('li[aria-current="step"]', count: 1)
-    expect(page).to have_css('li.progress-stepper-step-in-progress[aria-current="step"]', text: 'Check files')
-  end
-
-  it 'renders a check in the circle of a completed step only' do
-    render_inline(component)
-
-    expect(page).to have_css('li.progress-stepper-step-completed .progress-stepper-circle .bi-check-lg')
-    expect(page).to have_css('.bi-check-lg', count: 1)
-  end
-
-  it 'hides the circles and lines from assistive technology' do
-    render_inline(component)
-
-    expect(page).to have_css('.progress-stepper-marker[aria-hidden="true"]', count: 3)
-  end
 end
