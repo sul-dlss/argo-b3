@@ -38,7 +38,7 @@ RSpec.describe 'Admin object permissions' do
         expect(Sdr::Repository).to have_received(:find_solr).with(druid:)
 
         expect(rendered_page).to have_css('h1', text: 'Edit APO permissions')
-        expect(rendered_page).to have_link('APO', exact: true, href: '/objects/druid:bc123df4567')
+        expect(rendered_page).to have_link('← APO', exact: true, href: '/objects/druid:bc123df4567')
         expect(rendered_page).to have_text('My APO')
 
         expect(rendered_page.all('select#admin_object_permission_workgroup option').map(&:text))
@@ -66,6 +66,7 @@ RSpec.describe 'Admin object permissions' do
 
       it 'renders the collection heading and the empty message' do
         expect(rendered_page).to have_css('h1', text: 'Edit collection permissions')
+        expect(rendered_page).to have_link('← Collection', exact: true, href: '/objects/druid:bc123df4567')
         expect(rendered_page).to have_text('No permissions.')
       end
     end

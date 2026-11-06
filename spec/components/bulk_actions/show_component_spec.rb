@@ -14,7 +14,7 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
     it 'renders the pill, boxes, and polls for updates, without tabs' do
       render_inline(component)
 
-      expect(page).to have_link('← Bulk action', href: '/bulk_actions')
+      expect(page).to have_link('← Bulk actions', href: '/bulk_actions')
       expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: Test description")
       expect(page).to have_css('.object-type-bulk-action span.object-type-bg', text: 'Bulk action')
       expect(page).to have_css('div[data-controller="scheduled-refresh"]' \

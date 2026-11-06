@@ -4,9 +4,7 @@
 <% end %>
 
 <div class="container pb-3">
-  <p>
-    <%= link_to object_path(@druid) do %><%= previous_icon %> <%= @solr_doc.object_type %><% end %>
-  </p>
+  <%= render Elements::BreadcrumbComponent.new(label: @solr_doc.object_type_label, link: object_path(@druid)) %>
 
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('admin.object_permissions.heading', object_type: @solr_doc.object_type),
                                                                classes: 'mb-2') %>

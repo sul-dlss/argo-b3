@@ -1,7 +1,5 @@
-<div class="d-flex align-items-center flex-wrap">
-  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: '← Search results', classes: 'ps-0',
-                                                                  variant: :link,
-                                                                  link: url_for(last_search_form)) %>
+<div class="d-flex align-items-baseline flex-wrap">
+  <%= render Elements::BreadcrumbComponent.new(label: 'Search results', link: url_for(last_search_form)) %>
 
   <% if item_navigation? %>
     <nav class="item-search-navigation d-flex align-items-center ms-3" aria-label="Search results navigation" data-turbo-prefetch="false">
