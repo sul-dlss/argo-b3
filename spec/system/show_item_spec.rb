@@ -441,7 +441,8 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('td', text: 'PURL sitemap')
       expect(page).to have_css('td', text: '2026-08-01 14:02:03 PT', count: 2)
     end
-    expect(release_tags_client).to have_received(:list).with(public: false)
+    # The releases frame is also reloaded on each page refresh, so may have been requested more than once.
+    expect(release_tags_client).to have_received(:list).with(public: false).at_least(:once)
 
     # Files tab
     click_button 'Files'
