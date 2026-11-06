@@ -21,6 +21,26 @@ RSpec.describe MultiItemDeposit::SummaryRowsComponent, type: :component do
     end
   end
 
+  context 'when the Item Deposit has the object content type' do
+    let(:item_deposit_action) do
+      build(:item_deposit_action, druid: 'druid:bc123df4567', content_type: 'object', initial_version: true)
+    end
+
+    it 'renders the user-facing content type name' do
+      expect(rows.first.all('td')[2].text.strip).to eq('file')
+    end
+  end
+
+  context 'when the Item Deposit has a content type that is not mapped in the constants' do
+    let(:item_deposit_action) do
+      build(:item_deposit_action, druid: 'druid:bc123df4567', content_type: 'manuscript', initial_version: true)
+    end
+
+    it 'renders the stored content type' do
+      expect(rows.first.all('td')[2].text.strip).to eq('manuscript')
+    end
+  end
+
   context 'when the Item Deposit has structure errors and warnings' do
     let(:item_deposit_action) do
       build(:item_deposit_action, druid: 'druid:bc123df4567', content_type: 'book', initial_version: false,

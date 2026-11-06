@@ -14,10 +14,17 @@ module MultiItemDeposit
 
     attr_reader :item_deposit_action, :file_count
 
-    delegate :content_type, :content_type_structure_warnings, :structure_errors, to: :item_deposit_action
+    delegate :content_type_structure_warnings, :structure_errors, to: :item_deposit_action
 
     def bare_druid
       DruidSupport.bare_druid_from(item_deposit_action.druid)
+    end
+
+    # The user-facing name of the content type (e.g., file rather than object), falling back to the stored
+    # short name for content types that are not selectable on a registration form.
+    def content_type
+      uri = Constants::CONTENT_TYPES[item_deposit_action.content_type]
+      Constants::REGISTRATION_CONTENT_TYPES.key(uri) || item_deposit_action.content_type
     end
 
     def deposit_type
