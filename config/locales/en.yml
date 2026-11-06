@@ -136,6 +136,14 @@ en:
       unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
   workflow_grid:
     label: "Workflow status"
+  workflow_processes:
+    errors:
+      conflict: "This process has changed since the page was loaded."
+      update_failed: "Process could not be updated: %{message}"
+    toasts:
+      completed: "Completed process."
+      skipped: "Skipped process."
+      waiting: "Retrying process."
   edit:
     agreements:
       new:

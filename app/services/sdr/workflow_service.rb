@@ -8,6 +8,16 @@ module Sdr
       Dor::Services::Client.object(druid).workflows.workflows.sort_by(&:workflow_name)
     end
 
+    PROCESS_NOTES = { 'skipped' => 'Skipped by', 'completed' => 'Completed by' }.freeze
+
+    # Changes the status of a process in error, noting who skipped or completed it.
+    # @raise [Dor::Services::Client::ConflictResponse] if the process is no longer in error
+    def self.update_process(druid:, workflow_name:, process:, version:, status:, sunetid:) # rubocop:disable Metrics/ParameterLists
+      note = ("#{PROCESS_NOTES[status]} #{sunetid}" if PROCESS_NOTES.key?(status))
+      Dor::Services::Client.object(druid).workflow(workflow_name).process(process)
+                           .update(status:, note:, version:, current_status: 'error')
+    end
+
     # @return [Boolean] if the object has been submitted or not before
     def self.submitted?(druid:)
       return true if Dor::Services::Client.object(druid).milestones.date(milestone_name: 'submitted')

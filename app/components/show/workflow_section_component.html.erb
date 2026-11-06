@@ -11,7 +11,7 @@
   <div class="workflow-section-body">
     <% version_groups = workflow.processes.group_by(&:version) %>
     <% version_groups.keys.sort.reverse_each do |version| %>
-      <%= render Show::WorkflowTableComponent.new(workflow:, version:, processes: version_groups[version]) %>
+      <%= render Show::WorkflowTableComponent.new(workflow:, version:, processes: version_groups[version], solr_doc:) %>
     <% end %>
   </div>
 <% end %>
