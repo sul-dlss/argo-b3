@@ -24,8 +24,9 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 End-to-end Argo-B3 functionality is covered by `spec/features/accessioning/argo_b3_*_spec.rb` in sul-dlss/infrastructure-integration-test (usually at `../infrastructure-integration-test`). Current specs and the functionality they cover:
 
-- `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, searching, and viewing the item and its PURL.
+- `argo_b3_single_item_deposit_spec.rb`: registering an item, uploading files, structuring files, depositing, verifying technical metadata, searching, and viewing the item and its PURL; then changing the title via the description spreadsheet, deleting and adding files in manage files, and redepositing; then making the item dark (Overwrite File Access) and redepositing, verifying it is removed from PURL.
 - `argo_b3_multi_item_deposit_spec.rb`: registering items with different content types (Register items bulk action), a Multi-Item Deposit from a mount with an uploaded manifest, then a second Multi-Item Deposit that adds and deletes files, verifying the items, their PURLs, and preservation.
+- `argo_b3_geo_multi_item_deposit_spec.rb` (stage only): registering raster and vector geo items (Register multiple items form), a Multi-Item Deposit from a mount, verifying the GIS workflows (gisAssemblyWF, gisDerivativeWF), file details (sizes, mime types, roles), and the description published to PURL, then releasing to EarthWorks (Manage release form).
 
 Remind the developer to run an integration spec before merging, naming the spec, when a change could break it in ways argo-b3's specs can't catch:
 
