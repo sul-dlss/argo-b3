@@ -10,7 +10,9 @@ class StageFilesJob < ApplicationJob
   # @param [Boolean] accession whether to close the version and accession after staging
   # @param [Boolean] notify whether to notify the user (with toasts) when staging completes or fails
   # @param [String] staging_location where to stage, unless files are already staged elsewhere
-  def perform(content:, user:, accession: false, notify: true, staging_location: Settings.staging_location)
+  # @param [String] lane_id the lane for assembly / accessioning
+  def perform(content:, user:, accession: false, notify: true, staging_location: Settings.staging_location, # rubocop:disable Metrics/ParameterLists
+              lane_id: 'high')
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
     @notify = notify
@@ -23,7 +25,7 @@ class StageFilesJob < ApplicationJob
     analyze! # Generate digests, size, and mimetypes
     stage! # Copy to staging
     updated_cocina_object = update_sdr!(content:)
-    accession!(content:, cocina_object: updated_cocina_object) if accession
+    accession!(content:, cocina_object: updated_cocina_object, lane_id:) if accession
     content.staging_completed!
 
     perform_broadcast
@@ -64,8 +66,8 @@ class StageFilesJob < ApplicationJob
   end
 
   # The Content becomes immutable only once accessioning has started, so that it stays mutable if accessioning fails.
-  def accession!(content:, cocina_object:)
-    Sdr::Repository.accession(cocina_object:, user_name: user.sunetid,
+  def accession!(content:, cocina_object:, lane_id:)
+    Sdr::Repository.accession(cocina_object:, user_name: user.sunetid, lane_id:,
                               context: content.workflow_context(content_type: cocina_object.type))
     make_immutable!(content:, lock: cocina_object.lock)
   end

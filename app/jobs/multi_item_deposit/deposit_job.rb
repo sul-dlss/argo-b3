@@ -85,7 +85,9 @@ module MultiItemDeposit
       content = item_deposit_action.content
       lock = open_version(druid: item_deposit_action.druid) || content.lock
       content.update!(lock:, **text_extraction_settings(item_deposit_action))
-      content.start_staging!(user:, accession: true, notify: false, staging_location: Settings.assembly_location)
+      # A batch of items goes in the default lane, leaving the high lane for single deposits.
+      content.start_staging!(user:, accession: true, notify: false, staging_location: Settings.assembly_location,
+                             lane_id: 'default')
     rescue StandardError => e
       handle_deposit_error(e, item_deposit_action:)
     end

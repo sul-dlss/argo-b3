@@ -125,7 +125,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
         expect(staged_content.reload.staging_state).to eq('staging')
         expect(StageFilesJob).to have_been_enqueued
           .with(content: staged_content, user:, accession: true, notify: false,
-                staging_location: Settings.assembly_location)
+                staging_location: Settings.assembly_location, lane_id: 'default')
       end
     end
 
@@ -163,7 +163,8 @@ RSpec.describe MultiItemDeposit::DepositJob do
         expect(content.reload).to have_attributes(lock: 'W/"abc123-gzip"', staging_state: 'staging_not_in_progress')
         expect(Honeybadger).to have_received(:notify).with(error)
         expect(StageFilesJob).to have_been_enqueued.with(content: other_content, user:, accession: true,
-                                                         notify: false, staging_location: Settings.assembly_location)
+                                                         notify: false, staging_location: Settings.assembly_location,
+                                                         lane_id: 'default')
         expect(StageFilesJob).not_to have_been_enqueued.with(hash_including(content:))
         expect(multi_item_deposit_action).to have_attributes(
           step: 'submitted', initiating_deposit_state: 'initiating_deposit_not_in_progress'
