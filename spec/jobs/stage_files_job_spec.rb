@@ -212,7 +212,16 @@ RSpec.describe StageFilesJob do
         job.perform(content:, user:, accession: true)
 
         expect(Sdr::Repository).to have_received(:accession).with(cocina_object: updated_cocina_object,
-                                                                  user_name: user.sunetid, context: {})
+                                                                  user_name: user.sunetid, lane_id: 'high',
+                                                                  context: {})
+      end
+
+      context 'with a lane_id' do
+        it 'accessions the object in that lane' do
+          job.perform(content:, user:, accession: true, lane_id: 'default')
+
+          expect(Sdr::Repository).to have_received(:accession).with(hash_including(lane_id: 'default'))
+        end
       end
 
       it "updates the content's lock and marks it immutable" do
@@ -231,7 +240,7 @@ RSpec.describe StageFilesJob do
           job.perform(content:, user:, accession: true)
 
           expect(Sdr::Repository).to have_received(:accession)
-            .with(cocina_object: updated_cocina_object, user_name: user.sunetid,
+            .with(cocina_object: updated_cocina_object, user_name: user.sunetid, lane_id: 'high',
                   context: { runOCR: true, ocrLanguages: ['English'] })
         end
       end
