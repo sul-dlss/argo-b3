@@ -24,6 +24,9 @@
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, classes: 'mb-xl-4 mb-3 d-flex order-1') do %>
           <%= @solr_doc.title %>
           <%= render Pin::PinnedObjectComponent.new(druid: @solr_doc.druid, pinned: @pinned) unless @solr_doc.agreement? %>
+          <% unless allowed_to?(:update?, @solr_doc, with: ObjectPolicy) %>
+            <span class="read-only-badge fw-semibold text-uppercase rounded-pill border border-dark px-3 fs-5 ms-3 align-self-center">Read only</span>
+          <% end %>
         <% end %>
       </div>
 
