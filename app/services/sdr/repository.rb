@@ -108,9 +108,9 @@ module Sdr
     end
 
     # DROs with files are assembled (e.g., to create derivatives) before accessioning; assembly closes the version.
-    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them,
-    # and their staged files are first moved to the assembly location, the only one gisAssemblyWF reads.
+    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them.
     # Web archive seeds are always assembled (wasSeedPreassemblyWF), which decides what to generate or keep.
+    # Both first have their staged files moved to the assembly location, the only one their assembly reads.
     # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
@@ -121,8 +121,8 @@ module Sdr
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       druid = cocina_object.externalIdentifier
       object_client = Dor::Services::Client.object(druid)
-      # E.g., for an object that became geo after its files were staged.
-      StagingSupport.move_to_assembly(druid:) if CocinaSupport.geo?(cocina_object)
+      # E.g., files staged in the deposit staging location before the object became geo or a seed.
+      StagingSupport.move_to_assembly(druid:) if StagingSupport.stages_to_assembly?(cocina_object)
       if assemble?(cocina_object:)
         # Assembly requires the object's staging folder, even when nothing is staged.
         StagingSupport.ensure_staging_folder(cocina_object:)

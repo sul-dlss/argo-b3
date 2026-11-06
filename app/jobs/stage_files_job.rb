@@ -9,10 +9,10 @@ class StageFilesJob < ApplicationJob
   # @param [User] user the user initiating the staging
   # @param [Boolean] accession whether to close the version and accession after staging
   # @param [Boolean] notify whether to notify the user (with toasts) when staging completes or fails
-  # @param [String] staging_location where to stage, unless files are already staged elsewhere or the object is geo
-  #   (defaults to StagingSupport.default_location for the object)
+  # @param [String] staging_location where to stage, unless files are already staged elsewhere or the object stages to
+  #   the assembly location (see StagingSupport.stages_to_assembly?)
   # @param [String] lane_id the lane for assembly / accessioning
-  def perform(content:, user:, accession: false, notify: true, staging_location: nil, # rubocop:disable Metrics/ParameterLists
+  def perform(content:, user:, accession: false, notify: true, staging_location: Settings.staging_location, # rubocop:disable Metrics/ParameterLists
               lane_id: 'high')
     @content = Content.with_structural_associations.find(content.id) # Pre-fetching for efficiency.
     @user = user
@@ -41,11 +41,6 @@ class StageFilesJob < ApplicationJob
     @cocina_object ||= Sdr::Repository.find(druid:)
   end
 
-  # Already staged files win, since assembly reads only the first location with the druid's files.
-  def staging_location_for(requested_location:)
-    StagingSupport.staged_location(druid:) || requested_location || StagingSupport.default_location(cocina_object:)
-  end
-
   def stageable_content_file_binaries
     content.content_file_binaries
            # Binaries that are not part of the structure are not deposited, so they are not staged.
@@ -55,9 +50,12 @@ class StageFilesJob < ApplicationJob
            .includes(file_attachment: :blob)
   end
 
-  # Geo files go to the assembly location, where GIS assembly reads them.
+  # Geo and web archive seed files go to the assembly location, where their assembly reads them. Otherwise, already
+  # staged files win, since assembly reads only the first location with the druid's files.
   def resolve_staging_location(staging_location)
-    return staging_location_for(requested_location: staging_location) unless CocinaSupport.geo?(cocina_object)
+    unless StagingSupport.stages_to_assembly?(cocina_object)
+      return StagingSupport.staged_location(druid:) || staging_location
+    end
 
     StagingSupport.move_to_assembly(druid:)
     Settings.assembly_location

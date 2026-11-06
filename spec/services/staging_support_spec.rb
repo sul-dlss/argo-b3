@@ -45,6 +45,15 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.stages_to_assembly?' do
+    it 'is true for geo objects and web archive seeds only' do
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.geo))).to be true
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.webarchive_seed)))
+        .to be true
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.image))).to be false
+    end
+  end
+
   describe '.ensure_staging_folder' do
     # A druid of its own, since its folders are deleted while other specs may stage files in parallel.
     let(:druid) { 'druid:zy987wx6543' }

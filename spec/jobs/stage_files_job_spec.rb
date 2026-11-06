@@ -196,6 +196,23 @@ RSpec.describe StageFilesJob do
           .to eq(attached_content_file_binary.file.download)
         expect(File.exist?(staging_filepath)).to be false
       end
+
+      context 'when files are already staged in the deposit staging location' do
+        let(:previously_staged_filepath) { staged_filepath('previous.jp2') }
+
+        before do
+          FileUtils.mkdir_p(File.dirname(previously_staged_filepath))
+          FileUtils.touch(previously_staged_filepath)
+        end
+
+        it 'moves the staged files to the assembly location and stages there' do
+          job.perform(content:, user:)
+
+          expect(File.exist?(staged_filepath('image1.tif', staging_location: Settings.assembly_location))).to be true
+          expect(File.exist?(staged_filepath('previous.jp2', staging_location: Settings.assembly_location))).to be true
+          expect(File.exist?(previously_staged_filepath)).to be false
+        end
+      end
     end
 
     context 'when files are already staged in another staging location' do

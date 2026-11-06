@@ -335,9 +335,10 @@ RSpec.describe Sdr::Repository do
       let(:file_sets) { [] }
       let(:staged_files) { false }
 
-      it 'ensures the staging folder and creates a wasSeedPreassemblyWF' do
+      it 'moves staged files to assembly, ensures the staging folder, and creates a wasSeedPreassemblyWF' do
         described_class.accession(cocina_object:, user_name:)
 
+        expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
         expect(StagingSupport).to have_received(:ensure_staging_folder).with(cocina_object:)
         expect(object_client).to have_received(:workflow).with('wasSeedPreassemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
