@@ -29,6 +29,11 @@ module Sdr
       false
     end
 
+    # @return [Array<Hash>] the milestones (milestone:, at:, version:) for all versions of the object
+    def self.milestones(druid:)
+      Dor::Services::Client.object(druid).milestones.list
+    end
+
     # Fetches the workflow from the workflow service and checks to see if it's active
     # @return [Boolean] if the object has an active workflow
     def self.workflow_active?(druid:, version:, wf_name:)

@@ -1,0 +1,12 @@
+<%= render SdrViewComponents::Tables::RowComponent.new do |row| %>
+  <% row.with_cell do %><%= version %><% end %>
+  <% row.with_cell do %><%= description %><% end %>
+  <% if user_version_columns? %>
+    <% row.with_cell do %><%= user_version_label %><% end %>
+  <% end %>
+  <% row.with_cell do %><%= helpers.format_datetime(opened_at) %><% end %>
+  <% row.with_cell do %><%= helpers.format_datetime(accessioned_at) %><% end %>
+  <% if user_version_columns? %>
+    <% row.with_cell do %><%= purl_link %><% end %>
+  <% end %>
+<% end %>

@@ -163,6 +163,27 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '.inventory' do
+    let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, inventory: [version]) }
+    let(:version) { Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version') }
+
+    it 'returns the versions' do
+      expect(described_class.inventory(druid:)).to eq([version])
+    end
+
+    context 'when the version client fails' do
+      before do
+        allow(version_client).to receive(:inventory).and_raise(Dor::Services::Client::Error, 'Oops')
+      end
+
+      it 'raises a version service error' do
+        expect { described_class.inventory(druid:) }
+          .to raise_error(Sdr::VersionService::Error, 'Retrieving versions failed: Oops')
+      end
+    end
+  end
+
   describe '.statuses' do
     let(:druids) { ['druid:bc123df4567', 'druid:cd234fg5678', 'druid:df345gh6789'] }
     let(:objects_client) { instance_double(Dor::Services::Client::Objects) }
