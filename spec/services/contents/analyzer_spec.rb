@@ -9,7 +9,9 @@ RSpec.describe Contents::Analyzer do
 
   describe '#call' do
     context 'when the digests and mime type are not yet set' do
-      let(:content_file_binary) { create(:content_file_binary, file_location: 'attached') }
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'attached', filepath: 'dropzone_upload.txt')
+      end
 
       before do
         content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
@@ -70,51 +72,22 @@ RSpec.describe Contents::Analyzer do
       end
     end
 
-    context 'when the file location is attached and the blob has been analyzed' do
+    context 'when the file location is attached and the browser declared a different type' do
       let(:content_file_binary) do
-        create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',
-                                     sha1_digest: 'existing-sha1')
-      end
-
-      before do
-        # identify: false keeps the declared content type instead of letting ActiveStorage sniff it,
-        # so this test can prove the blob's content type (not the file contents) drives the result.
-        content_file_binary.file.attach(
-          io: Rails.root.join('spec/fixtures/files/dropzone_upload.txt').open,
-          filename: 'dropzone_upload.txt',
-          content_type: 'application/octet-stream',
-          identify: false
-        )
-        content_file_binary.file.blob.update!(metadata: { analyzed: true })
-      end
-
-      it "uses the attached blob's content type" do
-        call
-
-        expect(content_file_binary.mime_type).to eq('application/octet-stream')
-      end
-    end
-
-    context 'when the file location is attached but the blob has not been analyzed' do
-      let(:content_file_binary) do
-        create(:content_file_binary, file_location: 'attached', md5_digest: 'existing-md5',
-                                     sha1_digest: 'existing-sha1')
+        create(:content_file_binary, file_location: 'attached', filepath: 'catalog_record_id_and_barcode.csv',
+                                     md5_digest: 'existing-md5', sha1_digest: 'existing-sha1')
       end
 
       before do
         content_file_binary.file.attach(
-          io: Rails.root.join('spec/fixtures/files/catalog_record_id_and_barcode.xlsx').open,
-          filename: 'catalog_record_id_and_barcode.xlsx',
-          content_type: 'application/octet-stream',
-          identify: false
+          fixture_file_upload('catalog_record_id_and_barcode.csv', 'application/vnd.ms-excel')
         )
-        content_file_binary.file.blob.update!(metadata: { analyzed: false })
       end
 
-      it 'sniffs the mime type from the file contents on disk' do
+      it 'determines the mime type from the file contents and filepath' do
         call
 
-        expect(content_file_binary.mime_type).to eq('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        expect(content_file_binary.mime_type).to eq('text/csv')
       end
     end
 
@@ -223,7 +196,9 @@ RSpec.describe Contents::Analyzer do
 
     context 'when mime_type_only is true' do
       let(:mime_type_only) { true }
-      let(:content_file_binary) { create(:content_file_binary, file_location: 'attached') }
+      let(:content_file_binary) do
+        create(:content_file_binary, file_location: 'attached', filepath: 'dropzone_upload.txt')
+      end
 
       before do
         content_file_binary.file.attach(fixture_file_upload('dropzone_upload.txt', 'text/plain'))
