@@ -317,13 +317,13 @@ RSpec.describe 'Show item' do
 
     # Workflows tab
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item', count: 2)
-    expect(page).to have_css('.accordion-button.collapsed', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'In progress')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .workflow-in-progress', text: 'In progress')
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       expect(page).to have_table(count: 2)
       expect(page).to have_table_caption('accessionwf-2-table', 'accessionWF - Version 2')
       expect(page).to have_table_caption('accessionwf-1-table', 'accessionWF - Version 1')
@@ -332,23 +332,23 @@ RSpec.describe 'Show item' do
       expect(row).to have_css('th', text: 'descriptive-metadata')
       cells = row.all('td')
       expect(cells[0]).to have_text('described')
-      expect(cells[1]).to have_text('skipped')
-      expect(cells[2]).to have_text('2023-06-21 10:36:19 PT')
-      expect(cells[3]).to have_text('less than a minute')
-      expect(page).to have_css('td.text-success-emphasis', text: 'Note: No descMetadata.xml was provided')
+      expect(cells[1]).to have_text('Skipped')
+      expect(cells[2]).to have_text('Note: No descMetadata.xml was provided')
+      expect(cells[3]).to have_text('2023-06-21 10:36:19 PT')
+      expect(cells[4]).to have_text('less than a minute')
 
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
       expect(cells[0]).to have_text('deposited')
-      expect(cells[1]).to have_text('error')
-      expect(page).to have_css('td.text-danger', text: 'Error: Bag validation failed')
+      expect(cells[1]).to have_css('.text-danger', text: 'Error')
+      expect(cells[2]).to have_css('.text-danger', text: 'Bag validation failed')
     end
 
     # Collapse accessionWF and expand registrationWF.
     click_button 'accessionWF'
     expect(page).to have_no_css('#accessionwf-collapse')
     click_button 'registrationWF'
-    within('#registrationwf-collapse.accordion-collapse.show') do
+    within('#registrationwf-collapse.show') do
       expect(page).to have_table(count: 1)
     end
 
@@ -513,20 +513,19 @@ RSpec.describe 'Show item' do
     expect_cocina_json_title(updated_title)
 
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item',
-                             count: 2)
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'Complete')
-    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
 
     click_button 'accessionWF'
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
-      expect(cells[1]).to have_text('completed')
-      expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
+      expect(cells[1]).to have_text('Completed')
+      expect(page).to have_no_css('td .text-danger', text: 'Bag validation failed')
     end
 
     # Pinning and unpinning the object

@@ -27,7 +27,7 @@ RSpec.describe Show::WorkflowTableComponent, type: :component do
   end
   let(:processes) { [first_process, second_process] }
 
-  it 'renders the workflow table with process rows and details' do
+  it 'renders the workflow table with a row for each process' do
     render_inline(component)
 
     expect(page).to have_table(id: 'accessionwf-2-table')
@@ -35,13 +35,10 @@ RSpec.describe Show::WorkflowTableComponent, type: :component do
     expect(page).to have_css('th', text: 'Process')
     expect(page).to have_css('th', text: 'Lifecycle')
     expect(page).to have_css('th', text: 'Status')
+    expect(page).to have_css('th', text: 'Note')
     expect(page).to have_css('th', text: 'When')
     expect(page).to have_css('th', text: 'Elapsed')
-    expect(page).to have_css('tbody tr', text: 'accessioning-init')
-    expect(page).to have_css('tbody tr', text: 'completed')
-    expect(page).to have_text('2026-04-16 03:00:00 PT')
-    expect(page).to have_text('2 minutes')
-    expect(page).to have_css('td.text-danger', text: 'Error: Something went wrong')
-    expect(page).to have_css('td.text-success-emphasis', text: 'Note: Retry queued')
+    expect(page).to have_css('tbody tr th', text: 'accessioning-init')
+    expect(page).to have_css('tbody tr th', text: 'shelve')
   end
 end
