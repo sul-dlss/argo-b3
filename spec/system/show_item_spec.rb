@@ -316,13 +316,13 @@ RSpec.describe 'Show item' do
 
     # Workflows tab
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item', count: 2)
-    expect(page).to have_css('.accordion-button.collapsed', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button.collapsed .text-success', text: 'Complete')
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .workflow-in-progress', text: 'In progress')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .workflow-in-progress', text: 'In progress')
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       expect(page).to have_table(count: 2)
       expect(page).to have_table_caption('accessionwf-2-table', 'accessionWF - Version 2')
       expect(page).to have_table_caption('accessionwf-1-table', 'accessionWF - Version 1')
@@ -347,7 +347,7 @@ RSpec.describe 'Show item' do
     click_button 'accessionWF'
     expect(page).to have_no_css('#accessionwf-collapse')
     click_button 'registrationWF'
-    within('#registrationwf-collapse.accordion-collapse.show') do
+    within('#registrationwf-collapse.show') do
       expect(page).to have_table(count: 1)
     end
 
@@ -511,16 +511,15 @@ RSpec.describe 'Show item' do
     expect_cocina_json_title(updated_title)
 
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item',
-                             count: 2)
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .text-success', text: 'Complete')
-    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button.collapsed .text-success', text: 'Complete')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
 
     click_button 'accessionWF'
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
       expect(cells[1]).to have_text('Completed')

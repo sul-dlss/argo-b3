@@ -2,7 +2,7 @@
   <% row_component.with_cell do %><%= lifecycle %><% end %>
   <% row_component.with_cell do %>
     <% if error? %>
-      <span class="text-danger"><%= helpers.warning_icon(aria: { hidden: true }) %> <%= status.titleize %></span>
+      <span class="text-danger"><%= helpers.danger_icon(aria: { hidden: true }) %> <%= status.titleize %></span>
     <% else %>
       <%= status.titleize %>
     <% end %>
