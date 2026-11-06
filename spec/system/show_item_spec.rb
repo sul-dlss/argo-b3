@@ -361,6 +361,7 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('th', text: 'Public version')
       expect(page).to have_css('th', text: 'Registered / opened')
       expect(page).to have_css('th', text: 'Deposited')
+      expect(page).to have_css('th', text: 'Download')
       expect(page).to have_css('th', text: 'PURL')
     end
 
@@ -371,7 +372,10 @@ RSpec.describe 'Show item' do
     expect(cells[2]).to have_text('2')
     expect(cells[3]).to have_text('2021-03-31 13:23:30 PT')
     expect(cells[4]).to have_text('2021-03-31 14:02:03 PT')
-    expect(cells[5]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567')
+    expect(cells[5]).to have_link('Cocina')
+    expect(cells[5]).to have_link('Structural metadata')
+    expect(cells[5]).to have_link('Descriptive metadata')
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567')
 
     cells = rows[1].all('td')
     expect(cells[0]).to have_text('1')
@@ -379,7 +383,8 @@ RSpec.describe 'Show item' do
     expect(cells[2]).to have_text('1')
     expect(cells[3]).to have_text('2020-02-28 12:23:30 PT')
     expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
-    expect(cells[5]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567/version/1')
+    expect(cells[5]).to have_no_link
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567/version/1')
 
     # Events tab
     click_button 'Events'
