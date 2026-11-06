@@ -1,0 +1,80 @@
+// Numbered steps of a multi-step process (Elements::ProgressStepperComponent).
+.progress-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacer;
+  padding-left: 0;
+  list-style: none;
+
+  // Each status sets the colors of its circle, line, and status badge.
+  --progress-stepper-color: var(--stanford-30-black);
+  --progress-stepper-status-color: var(--stanford-70-black);
+  --progress-stepper-status-bg: var(--stanford-10-black);
+}
+
+.progress-stepper-step {
+  flex: 0 1 15rem;
+
+  &.progress-stepper-step-completed {
+    --progress-stepper-color: var(--stanford-digital-green);
+    --progress-stepper-status-color: rgb(var(--stanford-digital-green-dark-rgb));
+    --progress-stepper-status-bg: rgb(var(--stanford-digital-green-dark-rgb), 0.1);
+  }
+
+  &.progress-stepper-step-in-progress {
+    --progress-stepper-color: var(--stanford-digital-blue);
+    --progress-stepper-status-color: var(--stanford-digital-blue-dark);
+    --progress-stepper-status-bg: rgb(var(--stanford-digital-blue-rgb), 0.1);
+  }
+}
+
+.progress-stepper-marker {
+  display: flex;
+  align-items: center;
+  gap: $spacer * 0.25;
+  margin-bottom: $spacer * 0.5;
+}
+
+.progress-stepper-circle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  color: $white;
+  background-color: var(--progress-stepper-color);
+
+  // A ring around the circle marks the step in progress.
+  .progress-stepper-step-in-progress & {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.25rem;
+    box-shadow: 0 0 0 0.1875rem $white, 0 0 0 0.3125rem var(--progress-stepper-color);
+  }
+}
+
+.progress-stepper-line {
+  flex: 1;
+  height: 2px;
+  background-color: var(--progress-stepper-color);
+}
+
+.progress-stepper-number {
+  font-size: $font-size-sm;
+  color: var(--stanford-70-black);
+  text-transform: uppercase;
+}
+
+.progress-stepper-label {
+  margin-bottom: $spacer * 0.5;
+  font-weight: $font-weight-semibold;
+}
+
+.progress-stepper-status {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-normal;
+  color: var(--progress-stepper-status-color);
+  background-color: var(--progress-stepper-status-bg);
+}

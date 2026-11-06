@@ -1,0 +1,5 @@
+<%= tag.ol class: classes, 'aria-label': label do %>
+  <% steps.each.with_index(1) do |step, number| %>
+    <%= render Elements::ProgressStepperStepComponent.new(number:, label: step[:label], status: step[:status]) %>
+  <% end %>
+<% end %>

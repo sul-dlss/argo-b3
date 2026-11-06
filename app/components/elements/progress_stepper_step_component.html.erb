@@ -1,0 +1,13 @@
+<%= tag.li class: classes, 'aria-current': aria_current do %>
+  <div class="progress-stepper-marker" aria-hidden="true">
+    <span class="progress-stepper-circle">
+      <% if completed? %>
+        <i class="bi bi-check-lg"></i>
+      <% end %>
+    </span>
+    <span class="progress-stepper-line"></span>
+  </div>
+  <div class="progress-stepper-number"><%= t('progress_stepper.step_number', number:) %></div>
+  <div class="progress-stepper-label"><%= label %></div>
+  <span class="progress-stepper-status badge rounded-pill"><%= status_text %></span>
+<% end %>
