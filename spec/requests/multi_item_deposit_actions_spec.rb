@@ -144,8 +144,9 @@ RSpec.describe 'Multi-item deposit actions' do
                                                                 accessioning: false, closeable: false)
       end
       let(:open_status) do
-        Dor::Services::Client::ObjectVersion::VersionStatus.new(open: true, openable: false, assembling: false,
-                                                                accessioning: false, closeable: true)
+        Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 1, open: true, openable: false,
+                                                                assembling: false, accessioning: false,
+                                                                closeable: true)
       end
 
       before do
@@ -169,7 +170,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
         expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
-          .to eq([%w[bc123df4567 Deposited], ['cd234fg5678', 'Draft, not deposited']])
+          .to eq([%w[bc123df4567 Deposited], %w[cd234fg5678 Registered]])
         expect(rows[0]).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
 
         expect(Sdr::VersionService).to have_received(:statuses).with(druids: ['druid:bc123df4567', 'druid:cd234fg5678'])

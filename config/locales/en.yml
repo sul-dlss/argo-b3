@@ -89,10 +89,12 @@ en:
       deposited:
         heading: "Deposited"
       draft:
-        heading: "Draft, not deposited"
+        heading: "Deposited, in draft"
         unsaved_content_changes: "Files have unsaved changes. Deposit from Manage files."
       initiating:
         heading: "Initiating deposit..."
+      registered:
+        heading: "Registered"
       depositing:
         heading: "Depositing..."
         body: "Actions unavailable until deposit is complete."

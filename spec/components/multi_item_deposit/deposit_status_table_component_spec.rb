@@ -21,7 +21,7 @@ RSpec.describe MultiItemDeposit::DepositStatusTableComponent, type: :component d
 
     rows = table.all('tbody tr')
     expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
-      .to eq([%w[bc123df4567 Deposited], ['cd234fg5678', 'Draft, not deposited']])
+      .to eq([%w[bc123df4567 Deposited], %w[cd234fg5678 Registered]])
     expect(rows[0]).to have_css('td i.bi-check-circle-fill')
     expect(rows[0]).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
     expect(rows[1]).to have_link('cd234fg5678', href: '/objects/druid:cd234fg5678')

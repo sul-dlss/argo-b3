@@ -42,6 +42,8 @@ class ObjectStatusPresenter
     return :assembling if version_service.assembling?
     return :depositing if version_service.accessioning?
     return :deposited if version_service.closed?
+    # An open first version has never been deposited.
+    return :registered if version_service.version == 1
 
     :draft
   end
