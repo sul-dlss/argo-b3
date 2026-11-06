@@ -32,7 +32,7 @@ RSpec.shared_context 'with show page object client' do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                          closed?: false, openable?: false,
                                                                          closeable?: true, open?: true,
-                                                                         discardable?: true)
+                                                                         discardable?: true, version: 1)
   end
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
   let(:milestones_client) do
