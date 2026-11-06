@@ -7,6 +7,20 @@ class StagingSupport
     [Settings.staging_location, Settings.assembly_location]
   end
 
+  # The assembly of geo objects (gisAssemblyWF) and web archive seeds (wasSeedPreassemblyWF) reads staged files
+  # only from the assembly location.
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  # @return [Boolean] true if the object's files are always staged to the assembly location
+  def self.stages_to_assembly?(cocina_object)
+    CocinaSupport.geo?(cocina_object) || CocinaSupport.webarchive_seed?(cocina_object)
+  end
+
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  # @return [String] the staging location for the object's files when none are staged yet
+  def self.location_for(cocina_object:)
+    stages_to_assembly?(cocina_object) ? Settings.assembly_location : Settings.staging_location
+  end
+
   def self.staging_filepath(druid:, filepath:, staging_location: Settings.staging_location)
     File.join(staging_content_path(druid:, staging_location:), filepath)
   end
@@ -16,11 +30,14 @@ class StagingSupport
     File.join(druid_tree_folder, 'content')
   end
 
-  # Creates the staging content directory for the druid, unless some staging location already has the druid's folder.
-  def self.ensure_staging_folder(druid:)
+  # Creates the staging content directory for the object in the location it stages to, unless some staging location
+  # already has the druid's folder.
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  def self.ensure_staging_folder(cocina_object:)
+    druid = cocina_object.externalIdentifier
     return if locations.any? { |staging_location| File.directory?(DruidTools::Druid.new(druid, staging_location).path) }
 
-    FileUtils.mkdir_p(staging_content_path(druid:))
+    FileUtils.mkdir_p(staging_content_path(druid:, staging_location: location_for(cocina_object:)))
   end
 
   # Deletes the staging content directory for the druid in every staging location.
@@ -39,8 +56,8 @@ class StagingSupport
     locations.find { |staging_location| staged_files_in?(druid:, staging_location:) }
   end
 
-  # Moves the druid's staged files from the deposit staging location to the assembly location (where GIS assembly
-  # reads them), replacing any files already in the assembly location.
+  # Moves the druid's staged files from the deposit staging location to the assembly location (see
+  # stages_to_assembly?), replacing any files already in the assembly location.
   def self.move_to_assembly(druid:)
     return unless staged_files_in?(druid:, staging_location: Settings.staging_location)
 

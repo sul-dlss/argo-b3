@@ -38,11 +38,19 @@ class RegistrationCsvConverter
 
   def convert_row(row)
     request_cocina_object = Cocina::Models::RequestDRO.new(model_params(row))
+    if webarchive_seed_without_collection?(request_cocina_object)
+      return Failure(StandardError.new(I18n.t('edit.items.fields.collection_druids.validations.webarchive_seed')))
+    end
+
     Success(request_cocina_object:,
             workflow_name: params[:initial_workflow] || row.fetch('initial_workflow'),
             tags: tags(row) + ticket_tags(row))
   rescue Cocina::Models::ValidationError => e
     Failure(e)
+  end
+
+  def webarchive_seed_without_collection?(request_cocina_object)
+    CocinaSupport.webarchive_seed?(request_cocina_object) && request_cocina_object.structural.isMemberOf.empty?
   end
 
   def model_params(row) # rubocop:disable Metrics/AbcSize

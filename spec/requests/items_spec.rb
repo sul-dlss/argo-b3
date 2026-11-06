@@ -43,6 +43,16 @@ RSpec.describe 'Items' do
           .with(druids: %w[druid:bc123df4567 druid:xz987wv6543])
       end
 
+      it 'requires a web archive seed to be in a collection' do
+        post '/items', params: { item: { title: 'https://example.com',
+                                         content_type: Cocina::Models::ObjectType.webarchive_seed,
+                                         collection_druids: [''] } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body))
+          .to have_invalid_feedback('Collections', 'A web archive seed must be in a collection.')
+      end
+
       it 'cancels to the dashboard' do
         post '/items', params: { item: { title: '' } }
 
