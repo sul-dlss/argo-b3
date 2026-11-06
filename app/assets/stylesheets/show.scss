@@ -33,6 +33,10 @@
     height: 38px;
   }
 
+  .read-only-badge {
+    background-color: var(--stanford-fog-light);
+  }
+
   .use-access-copyright-section .card {
     background-color: rgb(var(--stanford-fog-light-rgb));
     border: 0;
