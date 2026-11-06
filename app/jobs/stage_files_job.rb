@@ -58,7 +58,7 @@ class StageFilesJob < ApplicationJob
     end
 
     StagingSupport.move_to_assembly(druid:)
-    Settings.assembly_location
+    StagingSupport.location_for(cocina_object:)
   end
 
   def check_lock!

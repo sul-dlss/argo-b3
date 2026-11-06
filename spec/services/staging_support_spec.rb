@@ -54,6 +54,15 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.location_for' do
+    it 'is the assembly location for objects that stage there, otherwise the deposit staging location' do
+      expect(described_class.location_for(cocina_object: build(:dro, type: Cocina::Models::ObjectType.geo)))
+        .to eq Settings.assembly_location
+      expect(described_class.location_for(cocina_object: build(:dro, type: Cocina::Models::ObjectType.image)))
+        .to eq Settings.staging_location
+    end
+  end
+
   describe '.ensure_staging_folder' do
     # A druid of its own, since its folders are deleted while other specs may stage files in parallel.
     let(:druid) { 'druid:zy987wx6543' }

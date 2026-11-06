@@ -15,6 +15,12 @@ class StagingSupport
     CocinaSupport.geo?(cocina_object) || CocinaSupport.webarchive_seed?(cocina_object)
   end
 
+  # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
+  # @return [String] the staging location for the object's files when none are staged yet
+  def self.location_for(cocina_object:)
+    stages_to_assembly?(cocina_object) ? Settings.assembly_location : Settings.staging_location
+  end
+
   def self.staging_filepath(druid:, filepath:, staging_location: Settings.staging_location)
     File.join(staging_content_path(druid:, staging_location:), filepath)
   end
@@ -31,8 +37,7 @@ class StagingSupport
     druid = cocina_object.externalIdentifier
     return if locations.any? { |staging_location| File.directory?(DruidTools::Druid.new(druid, staging_location).path) }
 
-    staging_location = stages_to_assembly?(cocina_object) ? Settings.assembly_location : Settings.staging_location
-    FileUtils.mkdir_p(staging_content_path(druid:, staging_location:))
+    FileUtils.mkdir_p(staging_content_path(druid:, staging_location: location_for(cocina_object:)))
   end
 
   # Deletes the staging content directory for the druid in every staging location.
