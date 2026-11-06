@@ -12,7 +12,7 @@ module MultiItemDeposit
     authorize :user
     authorize :permission_scope
 
-    # @param multi_witem_deposit_action [MultiItemDepositAction]
+    # @param multi_item_deposit_action [MultiItemDepositAction]
     # @param effective_groups [Array<String>] the requesting user's authorization workgroups
     def perform(multi_item_deposit_action:, effective_groups:)
       @multi_item_deposit_action = multi_item_deposit_action
