@@ -2,6 +2,8 @@
 
 # Controller for agreements
 class AgreementsController < ApplicationController
+  include RegisterCancelConcern
+
   # Values for submit buttons
   DRAFT_VALUE = 'draft'
   DRAFT_TO_ADD_FILES_VALUE = 'add_files'
@@ -10,8 +12,7 @@ class AgreementsController < ApplicationController
     authorize! with: AgreementPolicy
 
     @new_agreement_form = NewAgreementForm.new
-    @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_agreement_path)) ||
-                   root_path
+    @cancel_path = register_cancel_path
   end
 
   def create

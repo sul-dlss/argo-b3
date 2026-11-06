@@ -2,13 +2,15 @@
 
 # Controller for APOs
 class AposController < ApplicationController
+  include RegisterCancelConcern
+
   before_action :set_druid_and_cocina_object, only: %i[edit update]
 
   def new
     authorize! with: ApoPolicy
 
     @apo_form = ApoForm.new
-    @cancel_path = (request.referer if request.referer.present? && request.referer.exclude?(new_apo_path)) || root_path
+    @cancel_path = register_cancel_path
 
     set_agreement_options
   end
