@@ -169,17 +169,17 @@ RSpec.describe 'Show item' do
         <process version="1" note="preservationIngestWF completed on preservation-robots1-prod.stanford.edu" lifecycle="deposited" laneId="low" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="sdr-ingest-received"/>
         <process version="1" note="common-accessioning-prod-c.stanford.edu" lifecycle="" laneId="low" elapsed="0.37" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="reset-workspace"/>
         <process version="1" note="common-accessioning-prod-c.stanford.edu" lifecycle="accessioned" laneId="low" elapsed="1.454" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="end-accession"/>
-        <process version="2" note="" lifecycle="submitted" laneId="default" elapsed="" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="start-accession"/>
-        <process version="2" note="No descMetadata.xml was provided" lifecycle="described" laneId="default" elapsed="0.008" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="descriptive-metadata"/>
-        <process version="2" note="No contentMetadata.xml was provided" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="content-metadata"/>
-        <process version="2" note="change is metadata-only" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="technical-metadata"/>
-        <process version="2" note="Completed Job 21618100 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:20+00:00" context="" status="completed" name="shelve"/>
-        <process version="2" note="Completed Job 21618111 on dor-services-app" lifecycle="published" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:21+00:00" context="" status="completed" name="publish"/>
-        <process version="2" note="Object does not have a DOI" lifecycle="" laneId="default" elapsed="0.111" attempts="0" datetime="2023-06-21T17:36:22+00:00" context="" status="skipped" name="update-doi"/>
-        <process version="2" note="Completed Job 21618118 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:23+00:00" context="" status="completed" name="sdr-ingest-transfer"/>
-        <process version="2" note="" errorMessage="#{'Bag validation failed' unless complete}" lifecycle="deposited" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'error'}" name="sdr-ingest-received"/>
-        <process version="2" note="" lifecycle="" laneId="default" elapsed="0.197" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'started'}" name="reset-workspace"/>
-        <process version="2" note="" lifecycle="accessioned" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:28+00:00" context="" status="#{complete ? 'completed' : 'waiting'}" name="end-accession"/>
+        <process version="2" activeVersion="true" note="" lifecycle="submitted" laneId="default" elapsed="" attempts="0" datetime="2023-06-21T17:36:18+00:00" context="" status="completed" name="start-accession"/>
+        <process version="2" activeVersion="true" note="No descMetadata.xml was provided" lifecycle="described" laneId="default" elapsed="0.008" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="descriptive-metadata"/>
+        <process version="2" activeVersion="true" note="No contentMetadata.xml was provided" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="content-metadata"/>
+        <process version="2" activeVersion="true" note="change is metadata-only" lifecycle="" laneId="default" elapsed="0.102" attempts="0" datetime="2023-06-21T17:36:19+00:00" context="" status="skipped" name="technical-metadata"/>
+        <process version="2" activeVersion="true" note="Completed Job 21618100 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:20+00:00" context="" status="completed" name="shelve"/>
+        <process version="2" activeVersion="true" note="Completed Job 21618111 on dor-services-app" lifecycle="published" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:21+00:00" context="" status="completed" name="publish"/>
+        <process version="2" activeVersion="true" note="Object does not have a DOI" lifecycle="" laneId="default" elapsed="0.111" attempts="0" datetime="2023-06-21T17:36:22+00:00" context="" status="skipped" name="update-doi"/>
+        <process version="2" activeVersion="true" note="Completed Job 21618118 on dor-services-app" lifecycle="" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:23+00:00" context="" status="completed" name="sdr-ingest-transfer"/>
+        <process version="2" activeVersion="true" note="" errorMessage="#{'Bag validation failed' unless complete}" lifecycle="deposited" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'error'}" name="sdr-ingest-received"/>
+        <process version="2" activeVersion="true" note="" lifecycle="" laneId="default" elapsed="0.197" attempts="0" datetime="2023-06-21T17:36:27+00:00" context="" status="#{complete ? 'completed' : 'started'}" name="reset-workspace"/>
+        <process version="2" activeVersion="true" note="" lifecycle="accessioned" laneId="default" elapsed="1.0" attempts="0" datetime="2023-06-21T17:36:28+00:00" context="" status="#{complete ? 'completed' : 'waiting'}" name="end-accession"/>
       </workflow>
     XML
     Dor::Services::Response::Workflow.new(xml:)
@@ -336,12 +336,14 @@ RSpec.describe 'Show item' do
       expect(cells[2]).to have_text('Note: No descMetadata.xml was provided')
       expect(cells[3]).to have_text('2023-06-21 10:36:19 PT')
       expect(cells[4]).to have_text('less than a minute')
+      expect(cells[5]).to have_no_button
 
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
       expect(cells[0]).to have_text('deposited')
       expect(cells[1]).to have_css('.text-danger', text: 'Error')
       expect(cells[2]).to have_css('.text-danger', text: 'Bag validation failed')
+      expect(cells[5]).to have_button('Retry')
     end
 
     # Collapse accessionWF and expand registrationWF.
@@ -526,6 +528,7 @@ RSpec.describe 'Show item' do
       cells = row.all('td')
       expect(cells[1]).to have_text('Completed')
       expect(page).to have_no_css('td .text-danger', text: 'Bag validation failed')
+      expect(cells[5]).to have_no_button
     end
 
     # Pinning and unpinning the object
@@ -714,6 +717,38 @@ RSpec.describe 'Show item' do
       expect(page).to have_link('Constituent two', href: "/objects/#{second_constituent_druid}")
       expect(page).to have_css('td', text: 'jh330cm3013')
       expect(page).to have_css('td', text: 'mn667qr8901')
+    end
+  end
+
+  describe 'retrying a process in error' do
+    let(:process_client) { instance_double(Dor::Services::Client::Process) }
+    let(:workflow_client) { instance_double(Dor::Services::Client::ObjectWorkflow, process: process_client) }
+
+    before do
+      create(:permission, :edit, workgroup: 'sdr:argo-access', target_druid: druid)
+      allow(Sdr::Repository).to receive_messages(find_solr: build_solr_doc(title: original_title),
+                                                 find: build_cocina_object(title: original_title))
+      allow(object_client).to receive(:workflow).with('accessionWF').and_return(workflow_client)
+      retried = false
+      allow(process_client).to receive(:update) { retried = true }
+      allow(Sdr::WorkflowService).to receive(:workflows_for) do
+        [registration_workflow, build_accession_workflow(complete: retried)]
+      end
+    end
+
+    it 'retries the process and reloads only the workflows' do
+      visit "/objects/#{druid}"
+      click_button 'Workflows'
+      expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+In progress/)
+
+      within(find_table_row('accessionwf-2-table', 'sdr-ingest-received')) { click_button 'Retry' }
+
+      expect(page).to have_toast('Retrying process.')
+      expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+Complete/)
+      expect(process_client).to have_received(:update)
+        .with(status: 'waiting', note: nil, version: '2', current_status: 'error')
+      # The page itself was not refreshed.
+      expect(object_client).to have_received(:lock).once
     end
   end
 end

@@ -6,9 +6,10 @@
   <% component.with_header(label: 'Note') %>
   <% component.with_header(label: 'When') %>
   <% component.with_header(label: 'Elapsed') %>
+  <% component.with_header(label: 'Actions') if actions? %>
   <% processes.each do |process| %>
     <% component.with_row do %>
-      <%= render Show::WorkflowProcessRowComponent.new(process:) %>
+      <%= render Show::WorkflowProcessRowComponent.new(process:, solr_doc:, actions: actions?) %>
     <% end %>
   <% end %>
 <% end %>
