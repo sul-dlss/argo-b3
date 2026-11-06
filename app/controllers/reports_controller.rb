@@ -107,8 +107,8 @@ class ReportsController < ApplicationController
   end
 
   def generate_report_from_last_search(stream: nil)
-    form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
-    search_form = ResultsSearchForm.new(form_params).without(:page)
+    set_from_last_search_cookie
+    search_form = @last_search_form.without(:page)
 
     Searchers::Report.call(search_form:, fields: @report_form.fields, rows:, stream:,
                            user_scope: current_user_scope)

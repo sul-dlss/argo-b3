@@ -280,6 +280,7 @@ In addition to supporting discovery of items (DROs, collections, and admin polic
 A search is represented by a search form. `SearchForm` is an abstract base class holding the attributes that determine *which objects match* (the query and all of the facet fields). Each **view** of a search is a subclass:
 
 * `ResultsSearchForm` - the search results view (`/search`). Adds the attributes that only affect how matching objects are presented as a list: `page` and `sort`.
+* `AdvancedSearchForm` - a separate Boolean search page (`/advanced_search`). It uses eDisMax with explicit Boolean operators, while ordinary keyword searches retain DisMax. The entire expression is one current filter; field expressions do not select facet values.
 * `WorkflowGridSearchForm` - the workflow grid / workflow status view (`/workflow_grid`). See [Workflow grid](#workflow-grid).
 
 A form's **class** is what identifies its view; there is deliberately no `view` attribute, so there is only one source of truth. Views differ in behavior via capability predicates on the form (`pinnable?`, `sortable?`, `item_results?`) rather than via type checks in components.

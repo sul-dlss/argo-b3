@@ -25,7 +25,8 @@ module Search
         cookies.delete(:last_search)
       else
         cookies.signed[:last_search] =
-          { value: { form: @search_form.attributes, total_results: @results.total_results } }
+          { value: { form: @search_form.attributes, advanced: @search_form.is_a?(AdvancedSearchForm),
+                     total_results: @results.total_results } }
       end
     end
   end

@@ -2,6 +2,10 @@
 
 # Controller for searches
 class SearchController < SearchApplicationController
+  def advanced
+    @facet_labels = Search::CompositeFacetLabels.call(search_form: @search_form)
+  end
+
   def show
     @pinned = PinnedSearch.exists_by_search_form?(search_form: @search_form, user: current_user)
     @facet_labels = Search::CompositeFacetLabels.call(search_form: @search_form)

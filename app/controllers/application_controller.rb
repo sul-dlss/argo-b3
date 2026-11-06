@@ -35,6 +35,7 @@ class ApplicationController < ActionController::Base
 
     form_params, @total_results = cookies.signed[:last_search]&.values_at('form', 'total_results')
     # Slicing drops attributes from cookies written by older versions of the form.
-    @last_search_form = ResultsSearchForm.new(form_params.to_h.slice(*ResultsSearchForm.attribute_names))
+    search_form_class = cookies.signed[:last_search]['advanced'] ? AdvancedSearchForm : ResultsSearchForm
+    @last_search_form = search_form_class.new(form_params.to_h.slice(*search_form_class.attribute_names))
   end
 end

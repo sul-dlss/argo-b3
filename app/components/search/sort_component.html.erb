@@ -10,7 +10,7 @@
     <% sort_options.each do |sort| %>
       <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(
             label: label_for(sort),
-            link: search_path(search_form.with_attributes(sort:, page: nil)),
+            link: url_for(search_form.with(sort:, page: nil)),
             role: 'menuitem',
             data: { turbo_frame: '_top' }
           ) %>
