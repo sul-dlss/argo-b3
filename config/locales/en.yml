@@ -686,9 +686,11 @@ en:
       label: 'Summary'
       headers:
         druid: 'Druid'
+        folder: 'Folder'
         file_count: 'Number of files'
         content_type: 'Content type'
         deposit_type: 'Deposit type'
+        status: 'Status'
       deposit_types:
         new_item: 'new item'
         redeposit: 'redeposit'
