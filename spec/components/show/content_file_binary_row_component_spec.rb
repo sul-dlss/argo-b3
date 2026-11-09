@@ -20,9 +20,10 @@ RSpec.describe Show::ContentFileBinaryRowComponent, type: :component do
     it 'renders a row without a technical metadata toggle' do
       render_row
 
-      expect(page).to have_css('tr th', text: 'image1.tif')
+      expect(page).to have_css('tr th[scope="row"]', text: 'image1.tif')
       expect(page).to have_css('tr td', text: '1 KB')
       expect(page).to have_css('tr td', text: 'image/tiff')
+      expect(page).to have_no_button
       expect(page).to have_no_css('tr.toggle-row')
       expect(page).to have_no_css('tr.toggle-row-data')
       expect(page).to have_no_css('turbo-frame')
@@ -38,14 +39,18 @@ RSpec.describe Show::ContentFileBinaryRowComponent, type: :component do
       create(:content_file, content_file_set: create(:content_file_set, content:), content_file_binary:, preserve: true)
     end
 
-    it 'renders a toggle row and a collapsed row that lazily loads the technical metadata' do
+    it 'renders a row with a toggle button and a collapsed row that lazily loads the technical metadata' do
       render_row
 
       data_id = "content-file-binary-#{content_file_binary.id}-technical-metadata"
+      expect(page).to have_css('tr.toggle-row[data-controller="toggle-row"] > th[scope="row"]',
+                               text: 'folder1/image1.tif')
       expect(page).to have_css(
-        "tr.toggle-row.collapsed[data-bs-toggle='collapse'][data-bs-target='##{data_id}']" \
-        "[aria-expanded='false'][aria-controls='#{data_id}'] span.toggle-row-indicator"
+        "tr.toggle-row > td:first-child > button.toggle-row-button.collapsed[type='button']" \
+        "[data-bs-toggle='collapse'][data-bs-target='##{data_id}']" \
+        "[aria-expanded='false'][aria-controls='#{data_id}'] i.bi-chevron-down"
       )
+      expect(page).to have_button('Show technical metadata for folder1/image1.tif')
       expect(page).to have_css("tr##{data_id}.toggle-row-data.collapse td[colspan='4']")
       expect(page).to have_css(
         "tr##{data_id} turbo-frame##{data_id}-frame[loading='lazy'][data-turbo-permanent]" \
@@ -66,6 +71,7 @@ RSpec.describe Show::ContentFileBinaryRowComponent, type: :component do
       render_row
 
       expect(page).to have_css('tr')
+      expect(page).to have_no_button
       expect(page).to have_no_css('tr.toggle-row')
       expect(page).to have_no_css('turbo-frame')
     end
@@ -78,6 +84,7 @@ RSpec.describe Show::ContentFileBinaryRowComponent, type: :component do
       render_row
 
       expect(page).to have_css('tr')
+      expect(page).to have_no_button
       expect(page).to have_no_css('tr.toggle-row')
       expect(page).to have_no_css('turbo-frame')
     end

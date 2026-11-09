@@ -2,7 +2,7 @@
 
 module Show
   # Component for displaying a row for a file binary of a content.
-  # Rows for deposited files can be clicked to show / hide the technical metadata,
+  # Rows for deposited files have a button (or the row can be clicked) to show / hide the technical metadata,
   # which is lazily loaded when first shown.
   class ContentFileBinaryRowComponent < ApplicationComponent
     # @param content_file_binary [ContentFileBinary] with content_files preloaded
@@ -29,21 +29,17 @@ module Show
       "#{technical_metadata_id}-frame"
     end
 
-    # Chevron indicating whether the technical metadata is shown, styled like a Bootstrap accordion button.
-    def toggle_indicator
+    def toggle_button
       return unless technical_metadata?
 
-      tag.span(class: 'toggle-row-indicator')
+      render Show::ToggleRowButtonComponent.new(details_row_id: technical_metadata_id,
+                                                label: "Show technical metadata for #{content_file_binary.filepath}")
     end
 
     def toggle_row_options
       return {} unless technical_metadata?
 
-      {
-        data: { bs_toggle: 'collapse', bs_target: "##{technical_metadata_id}" },
-        aria: { expanded: false, controls: technical_metadata_id },
-        class: 'toggle-row collapsed'
-      }
+      Show::ToggleRowButtonComponent::ROW_OPTIONS
     end
   end
 end

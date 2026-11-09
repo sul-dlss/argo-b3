@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 
-const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'collapsible-section-toggle', 'toggle-row', 'toggle-row-data']
+const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'collapsible-section-toggle', 'toggle-row-button', 'toggle-row-data']
 // Elements without a class of their own to preserve, e.g., a collapsible section's content.
 const PRESERVED_SELECTORS = ['.collapsible-section > .collapse']
 
@@ -61,7 +61,7 @@ export default class extends Controller {
 
   // This preserves the active tab when the page is refreshed
   // by preventing Turbo from morphing the tab list, tab pane, collapsible section toggle
-  // and content, and toggle row / data attributes
+  // and content, and toggle row button / data attributes
   preserveTab = (event) => {
     if (PRESERVED_CLASSES.some((className) => event.target.classList.contains(className)) ||
         PRESERVED_SELECTORS.some((selector) => event.target.matches(selector))) {

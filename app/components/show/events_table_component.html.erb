@@ -1,10 +1,10 @@
 <%= render SdrViewComponents::Tables::RawTableComponent.new(id: 'events-table',
                                                             label: 'Events', show_label: false) do |component| %>
+  <% component.with_header(label: tag.span('Show details', class: 'visually-hidden'), classes: 'toggle-row-header') %>
   <% component.with_header(label: 'When') %>
   <% component.with_header(label: 'Event type') %>
   <% component.with_header(label: 'Who') %>
   <% component.with_header(label: 'Version') %>
-  <% component.with_header(label: tag.span('Show data', class: 'visually-hidden')) %>
   <% events.each do |event| %>
     <% component.with_row do %>
       <%= render Show::EventRowsComponent.new(event:) %>

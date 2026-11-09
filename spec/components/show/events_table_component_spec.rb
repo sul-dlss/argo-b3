@@ -31,7 +31,7 @@ RSpec.describe Show::EventsTableComponent, type: :component do
     expect(page).to have_css('th', text: 'Event type')
     expect(page).to have_css('th', text: 'Who')
     expect(page).to have_css('th', text: 'Version')
-    expect(page).to have_css('th .visually-hidden', text: 'Show data')
+    expect(page).to have_css('thead th.toggle-row-header:first-child .visually-hidden', text: 'Show details')
   end
 
   it 'renders the rows for each event' do
