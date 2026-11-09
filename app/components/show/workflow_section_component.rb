@@ -3,12 +3,14 @@
 module Show
   # Component for rendering a collapsible section for a workflow on the show page.
   class WorkflowSectionComponent < ApplicationComponent
-    def initialize(workflow:)
+    # @param solr_doc [SolrDocPresenter] the object, for authorizing process actions
+    def initialize(workflow:, solr_doc:)
       @workflow = workflow
+      @solr_doc = solr_doc
       super()
     end
 
-    attr_reader :workflow
+    attr_reader :workflow, :solr_doc
 
     delegate :complete?, :workflow_name, to: :workflow
 

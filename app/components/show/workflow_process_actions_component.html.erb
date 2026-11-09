@@ -1,0 +1,9 @@
+<div class="d-grid gap-1">
+  <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: path, label: 'Retry', variant: :'outline-primary', size: :sm, method: :patch, params: params_for('waiting'), disabled: !allowed?(:retry_process?)) %>
+  <% if allowed?(:skip_process?) %>
+    <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: path, label: 'Skip', variant: :'outline-primary', size: :sm, method: :patch, params: params_for('skipped')) %>
+  <% end %>
+  <% if allowed?(:complete_process?) %>
+    <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: path, label: 'Complete', variant: :'outline-primary', size: :sm, method: :patch, params: params_for('completed')) %>
+  <% end %>
+</div>

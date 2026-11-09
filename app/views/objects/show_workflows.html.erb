@@ -1,5 +1,5 @@
 <%= turbo_frame_tag(@druid, 'workflows') do %>
   <% @workflows.each do |workflow| %>
-    <%= render Show::WorkflowSectionComponent.new(workflow:) %>
+    <%= render Show::WorkflowSectionComponent.new(workflow:, solr_doc: @solr_doc) %>
   <% end %>
 <% end %>

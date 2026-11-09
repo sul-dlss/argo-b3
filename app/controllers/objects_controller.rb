@@ -84,6 +84,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   def show_workflows
     @druid = verified_druid
     @workflows = Sdr::WorkflowService.workflows_for(druid: @druid)
+    @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(@druid))
 
     render layout: false
   end
