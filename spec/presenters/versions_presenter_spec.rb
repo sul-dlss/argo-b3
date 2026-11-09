@@ -30,8 +30,10 @@ RSpec.describe VersionsPresenter do
     )
   end
 
-  it 'indicates whether each version is withdrawn' do
-    expect(versions.map(&:withdrawn?)).to eq([false, false, true])
+  it 'indicates whether each version is withdrawn, withdrawable, or restorable' do
+    expect(versions.map { |version| [version.withdrawn?, version.withdrawable?, version.restorable?] }).to eq(
+      [[false, false, false], [false, false, false], [true, false, true]]
+    )
   end
 
   context 'when a user version is withdrawable or permanently withdrawn' do
@@ -47,7 +49,9 @@ RSpec.describe VersionsPresenter do
     end
 
     it 'treats the permanently withdrawn user version as withdrawn' do
-      expect(versions.map(&:withdrawn?)).to eq([false, false, true])
+      expect(versions.map { |version| [version.withdrawn?, version.withdrawable?, version.restorable?] }).to eq(
+        [[false, false, false], [false, true, false], [true, false, false]]
+      )
     end
 
     it 'links an earlier public user version to its versioned PURL, but not a permanently withdrawn one' do
