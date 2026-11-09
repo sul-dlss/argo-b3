@@ -270,6 +270,8 @@ en:
           save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
         toasts:
           stale: "This item was changed since you opened it. Review your changes and resubmit."
+        warnings:
+          staging: "Files for this object are being staged. Try again when that has finished."
       globus:
         buttons:
           create: "Create Globus link"

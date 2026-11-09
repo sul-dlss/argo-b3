@@ -14,11 +14,12 @@ class ContentsController < ContentsApplicationController
     @content = Content.with_structural_associations.find(verified_content_id)
   end
 
-  def edit
+  def edit # rubocop:disable Metrics/AbcSize
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     authorize! cocina_object, with: ObjectPolicy
     return redirect_not_editable(druid:) unless version_service.editable?
+    return redirect_staging(druid:) if staging?(druid:)
 
     cache_cocina_hash(cocina_object:)
     @contents_item_form = build_prefilled_contents_item_form(cocina_object:)
@@ -27,11 +28,12 @@ class ContentsController < ContentsApplicationController
     set_edit_form(cocina_object:, content: @contents_item_form.content)
   end
 
-  def update
+  def update # rubocop:disable Metrics/AbcSize
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     authorize! cocina_object, with: ObjectPolicy
     return redirect_not_editable(druid:) unless version_service.editable?
+    return redirect_staging(druid:) if staging?(druid:)
 
     # The content was built for the lock when the edit page was loaded, so it is missing if the object has changed.
     content = Content.mutable_for(cocina_object)
@@ -53,6 +55,15 @@ class ContentsController < ContentsApplicationController
 
   def redirect_not_editable(druid:)
     redirect_to object_path(druid), flash: { warning: t('edit.items.edit.warnings.not_editable') }
+  end
+
+  # Staging may have moved the content to a new lock, so it is found by druid.
+  def staging?(druid:)
+    Content.latest_staging_activity(druid:)&.staging?
+  end
+
+  def redirect_staging(druid:)
+    redirect_to object_path(druid), flash: { warning: t('edit.contents.edit.warnings.staging') }
   end
 
   def redirect_staging_started(druid:)

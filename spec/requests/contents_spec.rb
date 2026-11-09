@@ -39,6 +39,19 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when the content is staging' do
+      # Staging moves the content to the saved object's lock, so it may no longer match the fetched object.
+      let!(:content) { create(:content, :mutable, druid:, lock: 'saved-lock', staging_state: 'staging') }
+
+      it 'redirects to the object page' do
+        get edit_content_path(druid)
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(flash[:warning]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
+        expect(Content.where(druid:)).to contain_exactly(content)
+      end
+    end
+
     context 'when the initial version' do
       it 'does not render the version description' do
         get edit_content_path(druid)
@@ -239,6 +252,20 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
         expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
+      end
+    end
+
+    context 'when the content is staging' do
+      let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging') }
+
+      it 'redirects to the object page without saving' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(flash[:warning]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(StageFilesJob).not_to have_received(:perform_later)
       end
     end
 
