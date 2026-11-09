@@ -74,13 +74,7 @@
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
                                                                           label: t('edit.items.edit.tabs.deposit.label'))) do |pane| %>
-        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
-              form:,
-              field_name: :version_description,
-              label_text: t('edit.items.fields.version_description.label'),
-              label_mark_required: true,
-              container_classes: 'mb-3'
-            ) %>
+        <%= render Edit::VersionDescriptionComponent.new(form:) %>
         <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form:, classes: 'mb-3') %>
 
         <% pane.with_footer do %>

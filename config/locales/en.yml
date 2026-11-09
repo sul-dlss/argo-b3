@@ -172,8 +172,6 @@ en:
           label: "Title"
         source_id:
           label: "Source ID"
-        version_description:
-          label: "Version description"
       tabs:
         deposit:
           label: "Register"
@@ -216,8 +214,6 @@ en:
           help_text: "The following defaults will apply to all newly registered objects."
         use_and_reproduction_statement:
           label: "Default use and reproduction"
-        version_description:
-          label: "Version description"
     collections:
       new:
         title: "Register and deposit collection"

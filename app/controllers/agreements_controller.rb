@@ -43,18 +43,19 @@ class AgreementsController < ApplicationController
     end
   end
 
-  def update
+  def update # rubocop:disable Metrics/AbcSize
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.editable?
     return redirect_stale if stale?
 
+    # The mutable Content must follow the object to its new lock.
+    @content = Content.mutable_for(@cocina_object)
+    return redirect_content_busy if @content&.staging_or_discovering?
+
     @edit_agreement_form = build_submitted_edit_agreement_form
-    return redirect_content_busy if @edit_agreement_form.content_busy?
+    return render_invalid_edit unless @edit_agreement_form.valid?(deposit? ? :deposit : nil)
 
-    accession = deposit?
-    return render_invalid_edit unless @edit_agreement_form.valid_to_save?(accession:)
-
-    @edit_agreement_form.save!(user_name: current_user.sunetid, accession:)
+    @edit_agreement_form.save!(user_name: current_user.sunetid, accession: deposit?)
     redirect_updated
   end
 
@@ -72,8 +73,7 @@ class AgreementsController < ApplicationController
     EditAgreementForm.build_from_cocina_object(@cocina_object).tap do |form|
       form.version_service = version_service
       form.update(edit_agreement_form_params)
-      # The mutable Content must follow the object to its new lock.
-      form.content = Content.mutable_for(@cocina_object)
+      form.content = @content
     end
   end
 

@@ -18,19 +18,6 @@ module ContentDepositFormConcern
     attr_accessor :content
   end
 
-  # @param accession [Boolean] whether the form is being deposited, which also requires the content to be valid
-  # @return [Boolean]
-  def valid_to_save?(accession:)
-    valid?(accession ? :deposit : nil)
-  end
-
-  # A background job may change the lock of a Content that is staging or discovering, so the form cannot be
-  # saved meanwhile.
-  # @return [Boolean]
-  def content_busy?
-    content&.staging_or_discovering? || false
-  end
-
   private
 
   # Keeps the content on the object's current lock, so that editing continues on it.
