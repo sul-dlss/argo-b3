@@ -12,6 +12,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 ## Conventions
 
 - Before writing or reviewing code or specs, read `CODING_STANDARDS.md`: the judgement calls linters don't enforce.
+- Before designing, writing, or reviewing UI (views, components, SCSS, UI JavaScript, user-facing copy), read `DESIGN_STANDARDS.md`; known deviations are in `docs/design-deviations.md`.
 - Before changing models, forms, presenters, or search, or adding a facet, search result field, sort option, or bulk action, read the matching `README.md` section; the "Adding ..." sections are step-by-step recipes.
 - Changes and additions to the README should be for high level architectural notes and design choices only and should not include code level implementation details (which can be added inline in the code if warranted).
 - When implementing an issue, its text is the spec, including its comments, with later comments taking precedence over earlier text. Where the text disagrees with the issue's screenshots or Figma design, follow the text; where the text is silent, follow the design. List each disagreement you resolved, and each design element you left out, as a provisional decision in the PR description.

@@ -23,6 +23,9 @@ Governs the administrative/access rules applied to the objects under it. "APO" a
 ### Governing APO
 The `hasAdminPolicy` relationship: every object (DRO, Collection, or APO) has exactly one governing APO. The relationship means the same thing regardless of the subject's type — including when the subject is itself an APO (an APO can be governed by another APO).
 
+### Druid
+The unique identifier of an SDR object (e.g., `druid:bc123df4567`). Shown without the `druid:` prefix (e.g., `bc123df4567`) where space is limited.
+
 ### Object Access
 The access (view, download, location) of a DRO as a whole. It applies now, during any embargo; an embargo's access replaces it when the embargo is released.
 
@@ -37,6 +40,9 @@ A numbered state of an object in SDR; a new version is opened for changes and cl
 
 ### User Version (AKA Public Version)
 A Version made publicly available on PURL, numbered separately from Versions. The latest User Version is shown at the object's PURL; earlier ones at `<purl>/<druid>/version/<user version>`. A User Version other than the latest can be withdrawn, removing it from PURL, and later restored. When an object is made dark, all User Versions other than the latest are permanently withdrawn and can't be restored.
+
+### PURL
+The public web page for an object, showing its latest User Version. Dark objects and objects never published have no PURL page.
 
 ### Draft
 The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version, and deletes the draft's Mutable Content and staged files. A first version cannot be discarded, but it can be purged.
@@ -65,11 +71,17 @@ A single user-run deposit of many Items whose files are on a mount, carried out 
 ### Item Deposit
 One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount.
 
+### Bulk Action
+An operation run in the background on many objects at once, chosen from a search or a list of druids, that produces a log of its results.
+
 ### Workgroup
 A named group of users (e.g., `sdr:map-staff`) managed outside Argo. Permissions are granted to workgroups, never to individual users.
 
 ### Impersonation
 An admin temporarily acting with the permissions of one or more chosen Workgroups instead of their own, to see what members of those Workgroups can see and do.
+
+### Pin
+A user's bookmark of an object, search, or Tag, listed on that user's dashboard for quick access. Pins are personal and not visible to other users.
 
 ## Structural Metadata Terms
 Structural metadata (file sets and files) is held in Active Record models rather than cocina models. See README "Structural metadata" for the full model and flows.

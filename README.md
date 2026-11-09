@@ -429,14 +429,4 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 7. Add a request spec. For bulk actions that use `BulkActions::BasicForm` without additional fields, use the `'a simple bulk action controller'` shared examples (see for example, `spec/requests/bulk_actions/purge_spec.rb`). Add a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
 ## Design
-Where ever possible design components from the [DLSS component style library](https://github.com/sul-dlss/component-library/) and view components from [SDR View Components](https://github.com/sul-dlss/sdr_view_components) should be re-used.
-
-### Responsive design
-In general, alternate viewports are supported for "show" pages (e.g., dashboard, object show page) not "form" pages (e.g., single item creation).
-
-All pages should use the default container: `<div class="container">`.
-
-Pages are designed for the following breakpoints / devices:
-* `xxl` and `xl`: Monitor
-* `lg` and `md`: Tablet
-* `sm` and `xs`: Phone
+Design standards (layout, components, typography, color, accessibility, copy) are in `DESIGN_STANDARDS.md`. Known deviations in existing code are listed in `docs/design-deviations.md`.
