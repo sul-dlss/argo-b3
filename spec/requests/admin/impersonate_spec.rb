@@ -20,6 +20,7 @@ RSpec.describe 'Admin impersonate' do
 
       it 'allows access and renders the listed workgroups in order, not the admin’s own groups' do
         expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_title('Impersonate | Argo B3', exact: true)
         expect(response.body).not_to include('sdr:not-listed')
 
         first_position = response.body.index('sdr:3d-staff')

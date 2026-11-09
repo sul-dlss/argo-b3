@@ -82,6 +82,14 @@ RSpec.describe 'Contents' do
       end
     end
 
+    it 'sets the page title with the object title' do
+      allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, druid:, title: 'Maps & charts'))
+
+      get edit_content_path(druid)
+
+      expect(Capybara.string(response.body)).to have_title('Manage files – Maps & charts | Argo B3', exact: true)
+    end
+
     context 'when the initial version' do
       it 'does not render the version description' do
         get edit_content_path(druid)

@@ -1,3 +1,5 @@
+<%= page_title('Impersonate') %>
+
 <%= render Layout::ContainerComponent.new(heading: 'Impersonate') do %>
 
   <%= form_with url: admin_impersonate_path, method: :patch, scope: :impersonation do |form| %>

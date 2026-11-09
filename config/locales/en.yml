@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 en:
+  layouts:
+    application:
+      product_name: "Argo B3"
   time:
     formats:
       date_only: "%Y-%m-%d"
@@ -598,6 +601,10 @@ en:
         description: "Your deposit has been submitted and is in progress. If you have errors below, go to the items' pages to address."
       edit:
         title: "Multi-item deposit"
+        page_titles:
+          discovery: "Multi-item deposit (Discovery)"
+          structure: "Multi-item deposit (Structure)"
+          deposit: "Multi-item deposit (Deposit)"
         buttons:
           build_structure: "Check files"
           cancel: "Cancel"

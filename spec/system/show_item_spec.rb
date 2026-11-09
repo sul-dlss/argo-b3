@@ -220,7 +220,7 @@ RSpec.describe 'Show item' do
 
     visit "/objects/#{druid}"
 
-    expect(page).to have_title(original_title, exact: true)
+    expect(page).to have_title("#{original_title} | Argo B3", exact: true)
     expect(page).to have_css('h1', text: original_title)
     expect(page).to have_css('.object-show.object-type-item .object-type-badge', text: 'ITEM')
     expect(page).to have_css('.embargo-banner.bg-black.text-white p.h2', text: 'Embargoed until 2040-06-15')
@@ -526,7 +526,7 @@ RSpec.describe 'Show item' do
                                                                        build_accession_workflow(complete: true)])
 
     expect(page).to have_css('h1', text: updated_title, wait: 15)
-    expect(page).to have_title(updated_title, exact: true)
+    expect(page).to have_title("#{updated_title} | Argo B3", exact: true)
 
     click_button 'Events'
     expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')

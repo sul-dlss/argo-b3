@@ -14,6 +14,7 @@ RSpec.describe 'New bulk actions' do
 
     expect(response).to have_http_status(:ok)
     expect(rendered_page).to have_css('h1', text: 'New bulk actions')
+    expect(rendered_page).to have_title('New bulk actions | Argo B3', exact: true)
 
     rendered_page.find('section#perform-actions-bulk-actions-section') do |section|
       expect(section).to have_css('h2', text: 'Perform actions')

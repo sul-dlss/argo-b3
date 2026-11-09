@@ -1,3 +1,5 @@
+<%= page_title(t('edit.apos.edit.title'), name: @title) %>
+
 <%= render Layout::ContainerComponent.new(heading: t('edit.apos.edit.title'), subtitle: @title) do %>
 
   <%= form_with(model: @edit_apo_form, url: apo_path(@druid), method: :patch, class: 'b3-form') do |form| %>

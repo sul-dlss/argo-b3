@@ -23,6 +23,7 @@ RSpec.describe 'Listing bulk actions history' do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(%(href="#{bulk_action_path(bulk_actions.last)}"))
       expect(response.body).not_to include(%(href="#{bulk_action_path(bulk_actions.first)}"))
+      expect(Capybara.string(response.body)).to have_title('Bulk actions | Argo B3', exact: true)
     end
 
     it 'paginates the second page' do

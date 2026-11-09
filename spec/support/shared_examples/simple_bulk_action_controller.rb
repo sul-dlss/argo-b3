@@ -27,6 +27,7 @@ RSpec.shared_examples 'a simple bulk action controller' do |new_path:, create_pa
       expect(response).to have_http_status(:ok)
       rendered_page = Capybara.string(response.body)
       expect(rendered_page).to have_css('h1', text: label)
+      expect(rendered_page).to have_title("#{label} | Argo B3", exact: true)
       expect(rendered_page).to have_css("form[action='#{send(create_path)}']")
       expect(rendered_page).to have_field('Enter druid list')
       expect(rendered_page).to have_field('Describe this bulk action')
