@@ -1,7 +1,7 @@
 <section
   aria-label="Current Filters"
   class="container d-flex align-items-center mb-3">
-  <%= render Elements::DivHeadingComponent.new(level: 2, label: 'Your selections:', class: 'fw-bold me-2 text-nowrap') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h6, text: 'Your selections', classes: 'fw-bold lh-base mb-0 me-2 text-nowrap') %>
 
   <ul class="list-unstyled d-flex flex-wrap mb-0">
     <% current_filters.each do |form_field, values| %>

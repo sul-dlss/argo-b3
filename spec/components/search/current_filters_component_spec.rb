@@ -17,7 +17,7 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
     it 'renders the current filters and the pin button' do
       render_inline(component)
 
-      expect(page).to have_css('section[aria-label="Current Filters"]')
+      expect(page).to have_css('section[aria-label="Current Filters"] h2.h6', exact_text: 'Your selections')
       expect(page).to have_css('li', text: 'test')
       expect(page).to have_css('li', text: /Object type\s+❯\s+item OR collection/)
       expect(page).to have_css('li', text: /Project\s+❯\s+Project 1/)

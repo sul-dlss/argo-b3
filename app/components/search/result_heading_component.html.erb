@@ -1,4 +1,4 @@
-<h4 class="d-flex align-items-center">
+<%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, variant: :h4, classes: 'd-flex align-items-center') do %>
   <span class="fw-light me-1"><%= index %>.</span>
   <%= link || helpers.link_to(label, path, data: { turbo_frame: '_top' }) %>
-</h4>
+<% end %>

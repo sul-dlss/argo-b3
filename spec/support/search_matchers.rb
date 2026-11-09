@@ -41,7 +41,7 @@ end
 
 RSpec::Matchers.define :have_result_count do |expected_count, args = {}|
   match do |actual|
-    actual.has_css?('h3', text: /.*\((#{expected_count}) found\)/, **args)
+    actual.has_css?('h2', text: /.*\((#{expected_count}) found\)/, **args)
   end
 end
 

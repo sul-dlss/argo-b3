@@ -11,7 +11,7 @@ RSpec.describe Search::FacetSectionComponent, type: :component do
     it 'renders collapsed accordion' do
       render_inline(component) { 'some content' }
 
-      expect(page).to have_css('section.accordion[aria-label="Object types"] h3 button[aria-expanded="false"]',
+      expect(page).to have_css('section.accordion[aria-label="Object types"] h3.h6 button[aria-expanded="false"]',
                                text: label)
       expect(page).to have_css('div.accordion-collapse.collapse:not(.show)', text: 'some content')
     end
@@ -23,7 +23,7 @@ RSpec.describe Search::FacetSectionComponent, type: :component do
     it 'renders expanded accordion' do
       render_inline(component) { 'some content' }
 
-      expect(page).to have_css('section.accordion[aria-label="Object types"] h3 button[aria-expanded="true"]',
+      expect(page).to have_css('section.accordion[aria-label="Object types"] h3.h6 button[aria-expanded="true"]',
                                text: label)
       expect(page).to have_css('div.accordion-collapse.collapse.show', text: 'some content')
     end

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Item search', :solr do
   before do
-    create(:solr_item)
+    create(:solr_item, title: 'Test map of the coast')
     sign_in(create(:user, :reader))
   end
 
@@ -14,6 +14,9 @@ RSpec.describe 'Item search', :solr do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('turbo-frame id="items-search"')
+      expect(heading_outline(response.body).drop_while { |level, _| level != 2 }.first(2))
+        .to match [[2, 'Item, collection, and APO results (1 found)'],
+                   [3, a_string_starting_with('1. Test map of the coast')]]
     end
   end
 

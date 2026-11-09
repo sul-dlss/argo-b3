@@ -1,5 +1,5 @@
 <%= tag.section 'aria-label': label, class: 'mb-5', data: { controller: 'show-more' } do %>
-  <h3><%= label %> (<%= number_with_delimiter(values.size) %> found)</h3>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3, text: "#{label} (#{number_with_delimiter(values.size)} found)") %>
 
   <ul class="list-unstyled">
     <%= render Search::FieldValueResultComponent.with_collection(values, form_field:, visible_limit: initial_limit) %>

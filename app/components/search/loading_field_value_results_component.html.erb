@@ -1,13 +1,13 @@
 <%= tag.section 'aria-label': "Loading #{label}", class: 'mb-5' do %>
-  <h3><%= label %> (Loading ...)</h3>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3, text: "#{label} (Loading ...)") %>
 
   <ul class="list-unstyled placeholder-glow">
     <% (1..number_of_placeholders).each do |index| %>
       <li>
-        <h4>
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, variant: :h4) do %>
           <span class="fw-light me-1"><%= index %>.</span>
           <span class="placeholder col-6"></span>
-        </h4>
+        <% end %>
       </li>
     <% end %>
   </ul>
