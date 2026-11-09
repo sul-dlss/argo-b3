@@ -363,9 +363,19 @@ RSpec.describe EditItemForm do
       end
     end
 
-    context 'when cleared with additional catalog record ids' do
+    context 'when cleared while Refresh on deposit is checked' do
       it 'is invalid' do
         edit_item_form.update(catalog_record_id: '')
+
+        expect(edit_item_form).not_to be_valid
+        expect(edit_item_form.errors[:catalog_record_id])
+          .to eq(['A FOLIO Instance HRID must be provided to allow Refresh on deposit.'])
+      end
+    end
+
+    context 'when cleared with additional catalog record ids' do
+      it 'is invalid' do
+        edit_item_form.update(catalog_record_id: '', catalog_link_refresh: false)
 
         expect(edit_item_form).not_to be_valid
         expect(edit_item_form.errors[:catalog_record_id]).to eq(['Enter a FOLIO Instance HRID.'])
@@ -375,7 +385,7 @@ RSpec.describe EditItemForm do
     context 'when cleared with the additional catalog record ids and part label' do
       it 'removes the Folio catalog links' do
         edit_item_form.update(version_description: 'Fixed the HRIDs', catalog_record_id: '',
-                              catalog_link_part_label: '',
+                              catalog_link_refresh: false, catalog_link_part_label: '',
                               additional_folio_catalog_links_attributes: [{ catalog_record_id: '' }])
 
         expect(edit_item_form).to be_valid
@@ -451,6 +461,18 @@ RSpec.describe EditItemForm do
 
         expect(edit_item_form).not_to be_valid
         expect(edit_item_form.errors[:catalog_record_id]).to eq(['Enter a FOLIO Instance HRID.'])
+      end
+    end
+
+    context 'when Refresh on deposit is checked without a catalog record id' do
+      let(:cocina_object) { unembargoed_cocina_object }
+
+      it 'is invalid' do
+        edit_item_form.update(version_description: 'Refreshing', catalog_link_refresh: true)
+
+        expect(edit_item_form).not_to be_valid
+        expect(edit_item_form.errors[:catalog_record_id])
+          .to eq(['A FOLIO Instance HRID must be provided to allow Refresh on deposit.'])
       end
     end
 

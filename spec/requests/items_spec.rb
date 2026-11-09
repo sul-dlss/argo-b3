@@ -172,7 +172,7 @@ RSpec.describe 'Items' do
 
         page = Capybara.string(response.body)
         expect(page).to have_field('Refresh on deposit', type: 'checkbox', checked: false)
-        expect(page).to have_css('.alert-info', text: 'If checked, this item will be refreshed every time')
+        expect(page).to have_css('.alert-info', text: 'If checked, this object will be refreshed every time')
       end
     end
 

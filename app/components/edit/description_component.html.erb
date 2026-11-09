@@ -21,12 +21,16 @@
                                                      add_button_label: t('edit.items.fields.additional_catalog_record_ids.add_button')) %>
   <% end %>
 
-  <%= render Edit::BarcodeComponent.new(form:, label_classes: 'fw-bold') %>
+  <% if item_fields? %>
+    <%= render Edit::BarcodeComponent.new(form:, label_classes: 'fw-bold') %>
 
-  <%= render Edit::SerialsComponent.new(form:) %>
+    <%= render Edit::SerialsComponent.new(form:) %>
+  <% end %>
 
   <%= render Edit::DescriptionCsvFileComponent.new(form:, druid_token:,
                                                    container_data: { disable_when_checked_target: 'dependent' }) %>
 </div>
 
-<p class="mt-4 mb-5">You can view a preview of your changes on the item page once you click "Save as draft."</p>
+<% if item_fields? %>
+  <p class="mt-4 mb-5">You can view a preview of your changes on the item page once you click "Save as draft."</p>
+<% end %>

@@ -9,6 +9,7 @@ class EditApoForm < CocinaModels::AdminPolicy
   include PermittedParamsConcern
   include TitleFormConcern
   include VersionDescriptionConcern
+  include LockFormConcern
 
   # Not permitted as params, since the APO form has no fields for them.
   # The description is derived from the title.
@@ -26,10 +27,6 @@ class EditApoForm < CocinaModels::AdminPolicy
 
   # Prefilled with the open version's description.
   validates :version_description, presence: true
-
-  # The lock of the Cocina object when the edit page was loaded, submitted back to detect that the object
-  # was changed by someone else in the meantime. It is not part of the Cocina object.
-  attribute :lock, :string
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
   FORM_ONLY_ATTRIBUTES = %w[version_description lock].freeze
@@ -60,7 +57,6 @@ class EditApoForm < CocinaModels::AdminPolicy
   end
 
   def model_attrs_for(cocina_object)
-    super.merge(lock: cocina_object.lock,
-                title: Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title))
+    super.merge(title: Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title))
   end
 end

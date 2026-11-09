@@ -30,16 +30,18 @@ module Show
       I18n.t("show.status.actions.#{edit_action}")
     end
 
-    # Only items, APOs, and agreements have an edit form so far.
+    # Only items, collections, APOs, and agreements have an edit form so far.
     def can_edit?
-      (item? || admin_policy? || agreement?) && editable?
+      edit_path.present? && editable?
     end
 
+    # @return [String, nil] the path of the object's edit form, or nil if its type has none
     def edit_path
       return edit_apo_path(druid) if admin_policy?
       return edit_agreement_path(druid) if agreement?
+      return edit_collection_path(druid) if collection?
 
-      edit_item_path(druid)
+      edit_item_path(druid) if item?
     end
 
     def manage_files_button

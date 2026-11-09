@@ -9,6 +9,7 @@ class EditAgreementForm < CocinaModels::Dro
   include PermittedParamsConcern
   include TitleFormConcern
   include VersionDescriptionConcern
+  include LockFormConcern
   include ContentDepositFormConcern
 
   # Only the fields of the agreement form, since an agreement's content type, governing APO (the ur APO),
@@ -24,10 +25,6 @@ class EditAgreementForm < CocinaModels::Dro
 
   # Prefilled with the open version's description.
   validates :version_description, presence: true
-
-  # The lock of the Cocina object when the edit page was loaded, submitted back to detect that the object
-  # was changed by someone else in the meantime. It is not part of the Cocina object.
-  attribute :lock, :string
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
   FORM_ONLY_ATTRIBUTES = %w[version_description lock].freeze
@@ -54,6 +51,6 @@ class EditAgreementForm < CocinaModels::Dro
   private
 
   def model_attrs_for(cocina_object)
-    super.merge(lock: cocina_object.lock, title: CocinaSupport.title(cocina_object))
+    super.merge(title: CocinaSupport.title(cocina_object))
   end
 end

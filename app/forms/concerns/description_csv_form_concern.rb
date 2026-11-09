@@ -28,6 +28,15 @@ module DescriptionCsvFormConcern
     errors.add(:description_csv_file, :invalid, message: e.message)
   end
 
+  # A refreshed description would replace the spreadsheet's description.
+  # Requires CocinaModels::CatalogLinksConcern.
+  # Does not display in the form since the spreadsheet field is disabled once Refresh on deposit is checked.
+  def description_csv_file_absent_when_refreshed
+    return unless description_csv_file.present? && catalog_link_refresh?
+
+    errors.add(:description_csv_file, I18n.t('edit.items.fields.description_csv_file.validations.refreshed'))
+  end
+
   # A single item is described by a single row.
   def description_csv_row_count_valid?(description_csv)
     return true if description_csv.size == 1

@@ -36,12 +36,16 @@ module FolioCatalogLinksFormConcern
     additional_folio_catalog_links.map(&:catalog_record_id)
   end
 
-  # Additional catalog record ids, part label, and sort key would otherwise be dropped without a catalog record id.
+  # Refresh, additional catalog record ids, part label, and sort key would otherwise be dropped without a catalog
+  # record id.
   def catalog_record_id_present_with_catalog_link_fields
     return if catalog_record_id.present?
-    return if [*additional_catalog_record_ids, catalog_link_part_label, catalog_link_sort_key].compact_blank.empty?
 
-    errors.add(:catalog_record_id, I18n.t('edit.items.fields.catalog_record_id.errors.blank'))
+    if catalog_link_refresh?
+      errors.add(:catalog_record_id, I18n.t('edit.items.fields.catalog_record_id.validations.required_for_refresh'))
+    elsif [*additional_catalog_record_ids, catalog_link_part_label, catalog_link_sort_key].compact_blank.any?
+      errors.add(:catalog_record_id, I18n.t('edit.items.fields.catalog_record_id.errors.blank'))
+    end
   end
 
   def model_attrs_for(cocina_object)

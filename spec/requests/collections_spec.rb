@@ -142,6 +142,252 @@ RSpec.describe 'Collections' do
     end
   end
 
+  describe 'edit' do
+    let(:druid) { 'druid:xz987wv6543' }
+    let(:cocina_object) do
+      build(:collection_with_metadata, id: druid, title: 'My collection', admin_policy_id: apo_druid).new(
+        access: { view: 'world', copyright: 'Copyright © Stanford.' },
+        identification: { catalogLinks: [{ catalog: 'folio', catalogRecordId: 'a12345', refresh: true }],
+                          sourceId: 'sulcollection:1234' }
+      )
+    end
+    let(:version_service) do
+      version_service_double(open?: open, editable?: editable, version_description: 'Refreshing from FOLIO')
+    end
+    let(:open) { true }
+    let(:editable) { true }
+
+    before do
+      allow(Sdr::Repository).to receive(:find).and_return(cocina_object)
+      allow(Sdr::VersionService).to receive(:new).and_return(version_service)
+    end
+
+    it 'renders the form with the current values' do
+      get "/collections/#{druid}/edit"
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      expect(page).to have_css('h1', text: 'Edit and deposit collection')
+      expect(page).to have_css('h1 + p', text: 'My collection')
+      expect(page).to have_field('FOLIO Instance HRID', with: 'a12345')
+      expect(page).to have_field('Refresh on deposit', checked: true)
+      expect(page).to have_css('.alert-info', text: 'If checked, this object will be refreshed every time')
+      expect(page).to have_field('collection[description_csv_file]', type: 'file')
+      expect(page).to have_no_field('Barcode')
+      expect(page).to have_no_text('Save as draft')
+      expect(page).to have_select('APO', selected: 'My APO')
+      expect(page).to have_button('Apply APO defaults')
+      expect(page).to have_select('View access', selected: 'world')
+      expect(page).to have_field('collection[copyright]', with: 'Copyright © Stanford.')
+      expect(page).to have_field('collection[lock]', type: :hidden, with: cocina_object.lock)
+    end
+
+    it 'prefills the required version description from the open version and renders the deposit button' do
+      get "/collections/#{druid}/edit"
+
+      page = Capybara.string(response.body)
+      expect(page).to have_field('Version description', with: 'Refreshing from FOLIO')
+      expect(page).to have_css('label', text: 'Version description') { |label| label.has_css?('span.required') }
+      expect(page).to have_link('Cancel', href: "/objects/#{druid}")
+      expect(page).to have_button('Deposit')
+      expect(page).to have_no_button('Save as draft')
+    end
+
+    context 'when the user cannot edit the current APO' do
+      let(:user) { create(:user, groups: ['sdr:collection-workgroup']) }
+
+      before do
+        create(:permission, :edit, workgroup: 'sdr:collection-workgroup', target_druid: druid)
+        allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My other APO', 'druid:cd234fg5678']])
+        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([['My APO', apo_druid]])
+      end
+
+      it 'adds the current APO as an option, so that saving does not change it' do
+        get "/collections/#{druid}/edit"
+
+        expect(Capybara.string(response.body))
+          .to have_select('APO', selected: 'My APO', options: ['My APO', 'My other APO'])
+      end
+    end
+
+    context 'when the version is not editable' do
+      let(:editable) { false }
+
+      it 'redirects to the object page with a warning' do
+        get "/collections/#{druid}/edit"
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(flash[:warning]).to eq('Collection is not editable.')
+      end
+    end
+
+    context 'when the user cannot edit the collection' do
+      let(:user) { create(:user, groups: ['sdr:other-workgroup']) }
+
+      it 'denies access' do
+        get "/collections/#{druid}/edit"
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      end
+    end
+  end
+
+  describe 'update' do
+    let(:druid) { 'druid:xz987wv6543' }
+    let(:cocina_object) do
+      build(:collection_with_metadata, id: druid, title: 'My collection', admin_policy_id: apo_druid)
+        .new(access: { view: 'world' })
+    end
+    let(:opened_cocina_object) { cocina_object.new(version: 2, lock: 'opened-lock') }
+    let(:version_service) { version_service_double(open?: false, openable?: true, closeable?: false, closed?: true) }
+    let(:collection_params) do
+      { apo_druid:, access_view: 'dark', copyright: 'My copyright', version_description: 'Made dark',
+        lock: cocina_object.lock }
+    end
+
+    before do
+      allow(Sdr::Repository).to receive(:find).and_return(cocina_object)
+      allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object }
+      allow(Sdr::Repository).to receive(:accession)
+      allow(Sdr::VersionService).to receive_messages(new: version_service, open: opened_cocina_object)
+    end
+
+    it 'opens a version, saves, and starts accessioning' do
+      patch "/collections/#{druid}", params: { collection: collection_params }
+
+      expect(response).to redirect_to("/objects/#{druid}")
+      expect(flash[:toast]).to eq('Collection updated and deposit started.')
+      expect(Sdr::VersionService).to have_received(:open)
+        .with(druid:, description: 'Made dark', opening_user_name: user.sunetid)
+      expect(Sdr::Repository).to have_received(:update) do |args|
+        updated_cocina_object = args[:cocina_object]
+        expect(updated_cocina_object.lock).to eq('opened-lock')
+        expect(updated_cocina_object.access.view).to eq('dark')
+        expect(updated_cocina_object.access.copyright).to eq('My copyright')
+        expect(args[:user_name]).to eq(user.sunetid)
+      end
+      expect(Sdr::Repository).to have_received(:accession)
+        .with(cocina_object: having_attributes(lock: 'opened-lock'), user_name: user.sunetid, context: {})
+    end
+
+    it 'does not change the source id or description from params' do
+      patch "/collections/#{druid}",
+            params: { collection: collection_params.merge(source_id: 'sul:other', description_hash: { title: [] }) }
+
+      expect(Sdr::Repository).to have_received(:update)
+        .with(hash_including(cocina_object: having_attributes(
+          identification: having_attributes(sourceId: cocina_object.identification.sourceId),
+          description: cocina_object.description
+        )))
+    end
+
+    context 'when nothing changed' do
+      let(:collection_params) do
+        { apo_druid:, access_view: 'world', version_description: 'Redeposit', lock: cocina_object.lock }
+      end
+
+      it 'opens a version and starts accessioning without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params }
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(Sdr::VersionService).to have_received(:open)
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(Sdr::Repository).to have_received(:accession)
+      end
+    end
+
+    context 'when the version description is missing' do
+      it 'renders the form with the error without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params.merge(version_description: '') }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        page = Capybara.string(response.body)
+        expect(page).to have_css('h1', text: 'Edit and deposit collection')
+        expect(page).to have_css('.invalid-feedback', text: "can't be blank")
+        expect(page).to have_select('View access', selected: 'dark')
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
+    context 'when Refresh on deposit is checked without a FOLIO Instance HRID' do
+      it 'renders the form with the error without saving' do
+        patch "/collections/#{druid}",
+              params: { collection: collection_params.merge(catalog_record_id: '', catalog_link_refresh: '1') }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body))
+          .to have_css('.invalid-feedback', text: 'A FOLIO Instance HRID must be provided to allow Refresh on deposit.')
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(Sdr::Repository).not_to have_received(:accession)
+      end
+    end
+
+    context 'when the collection was changed since the form was loaded' do
+      it 'redirects to the form with a warning without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params.merge(lock: 'other-lock') }
+
+        expect(response).to redirect_to("/collections/#{druid}/edit")
+        expect(flash[:warning]).to eq('This collection was changed since you opened it. ' \
+                                      'Review the current values and make your changes again.')
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when the version is not editable' do
+      let(:version_service) { version_service_double(open?: false, openable?: false, closeable?: false) }
+
+      it 'redirects to the object page with a warning without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params }
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(flash[:warning]).to eq('Collection is not editable.')
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when the user cannot edit the collection' do
+      let(:user) { create(:user, groups: ['sdr:other-workgroup']) }
+
+      it 'denies access without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params }
+
+        expect(response).to redirect_to(root_path)
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when the user can edit the collection but not the APO it is moved to' do
+      let(:other_apo_druid) { 'druid:cd234fg5678' }
+
+      before do
+        allow(Searchers::AdminPolicyList).to receive(:call)
+          .and_return([['My APO', apo_druid], ['My other APO', other_apo_druid]])
+      end
+
+      it 'denies moving the collection without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params.merge(apo_druid: other_apo_druid) }
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when the APO is not one the user may select' do
+      let(:user) { create(:user, :admin) }
+
+      it 'renders the form with the error without saving' do
+        patch "/collections/#{druid}", params: { collection: collection_params.merge(apo_druid: 'druid:cd234fg5678') }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body)).to have_css('.invalid-feedback', text: 'must be an APO you can edit')
+        expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+  end
+
   context 'when the user does not have edit permission' do
     let(:user) { create(:user, groups: ['sdr:other-workgroup']) }
 
