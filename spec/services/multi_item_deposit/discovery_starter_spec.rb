@@ -9,7 +9,7 @@ RSpec.describe MultiItemDeposit::DiscoveryStarter do
   end
   let(:attributes) do
     { description: 'My deposit', file_location: 'mount', mount_path: '/dor/staging/deposit', manifest_source: 'mount',
-      manifest_csv: "druid,folder_name\ndruid:bc123df4567,folder1\ndruid:cd234fg5678,folder2\n" }
+      manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\ndruid:cd234fg5678,folder2\n" }
   end
   let(:discovery_form) { instance_double(MultiItemDeposit::DiscoveryForm, multi_item_deposit_action_attributes: attributes) }
   let(:effective_groups) { ['sdr:test-workgroup'] }
@@ -37,7 +37,7 @@ RSpec.describe MultiItemDeposit::DiscoveryStarter do
 
     expect(multi_item_deposit_action.reload).to have_attributes(
       description: 'My deposit', mount_path: '/dor/staging/deposit', manifest_source: 'mount',
-      manifest_csv: "druid,folder_name\ndruid:bc123df4567,folder1\ndruid:cd234fg5678,folder2\n",
+      manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\ndruid:cd234fg5678,folder2\n",
       structuring_started_at: nil, structuring_completed_at: nil,
       discovery_state: 'discovering', discovery_started_at: be_within(1.second).of(Time.current),
       discovery_completed_at: nil

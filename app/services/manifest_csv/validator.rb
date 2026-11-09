@@ -4,7 +4,7 @@ module ManifestCsv
   # Validates a multi-item deposit manifest, which maps each druid to its folder in the file location.
   class Validator
     DRUID_COLUMN = 'druid'
-    FOLDER_NAME_COLUMN = 'folder_name'
+    FOLDER_NAME_COLUMN = 'folder'
     REQUIRED_COLUMNS = [DRUID_COLUMN, FOLDER_NAME_COLUMN].freeze
 
     # @return [Array<String>] error messages

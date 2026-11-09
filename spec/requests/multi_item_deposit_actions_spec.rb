@@ -297,7 +297,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
       before do
         multi_item_deposit_action.update!(discovery_completed_at: Time.current, manifest_source: 'mount',
-                                          manifest_csv: "druid,folder_name\ndruid:bc123df4567,folder1\n")
+                                          manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
       end
 
       it 'selects the saved manifest source' do
@@ -313,7 +313,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
       before do
         multi_item_deposit_action.update!(discovery_completed_at: Time.current, manifest_source: 'upload',
-                                          manifest_csv: "druid,folder_name\ndruid:bc123df4567,folder1\n")
+                                          manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
       end
 
       it 'notes the saved manifest without carrying it in the form' do
@@ -576,7 +576,7 @@ RSpec.describe 'Multi-item deposit actions' do
     let(:batch_class) { double('SolidQueue::Batch') } # rubocop:disable RSpec/VerifiedDoubles
 
     before do
-      File.write(File.join(mount_directory, 'manifest.csv'), "druid,folder_name\nbc123df4567,folder1\n")
+      File.write(File.join(mount_directory, 'manifest.csv'), "druid,folder\nbc123df4567,folder1\n")
       stub_const('SolidQueue::Batch', batch_class)
       allow(batch_class).to receive(:enqueue).and_yield
     end
@@ -601,7 +601,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(multi_item_deposit_action).to be_file_location_mount
         expect(multi_item_deposit_action.mount_path).to eq(mount_directory)
         expect(multi_item_deposit_action).to be_manifest_source_mount
-        expect(multi_item_deposit_action.manifest_csv).to eq("druid,folder_name\ndruid:bc123df4567,folder1\n")
+        expect(multi_item_deposit_action.manifest_csv).to eq("druid,folder\ndruid:bc123df4567,folder1\n")
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
     end
@@ -614,7 +614,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:manifest_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }
       let(:csv_tempfile) do
         Tempfile.new(['manifest', '.csv']).tap do |file|
-          file.write("druid,folder_name\ncd234fg5678,folder2\n") && file.flush
+          file.write("druid,folder\ncd234fg5678,folder2\n") && file.flush
         end
       end
 
@@ -624,7 +624,7 @@ RSpec.describe 'Multi-item deposit actions' do
         multi_item_deposit_action.reload
         expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid)).to eq(['druid:cd234fg5678'])
         expect(multi_item_deposit_action).to be_manifest_source_upload
-        expect(multi_item_deposit_action.manifest_csv).to eq("druid,folder_name\ndruid:cd234fg5678,folder2\n")
+        expect(multi_item_deposit_action.manifest_csv).to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
 
@@ -637,7 +637,7 @@ RSpec.describe 'Multi-item deposit actions' do
           expect(response).to have_http_status(:unprocessable_content)
           expect(rendered_page).to have_text('A manifest has been uploaded.')
           expect(rendered_page.find_field('multi_item_deposit_discovery[manifest_csv]', type: :hidden).value)
-            .to eq("druid,folder_name\ndruid:cd234fg5678,folder2\n")
+            .to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
         end
       end
     end
@@ -646,7 +646,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:params) do
         { multi_item_deposit_discovery: { manifest_source: 'upload',
-                                          manifest_csv: "druid,folder_name\r\ndruid:cd234fg5678,folder2\r\n",
+                                          manifest_csv: "druid,folder\r\ndruid:cd234fg5678,folder2\r\n",
                                           **mount_params } }
       end
 
@@ -663,7 +663,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:multi_item_deposit_action) do
         create(:multi_item_deposit_action, user: owner, manifest_source: 'upload',
-                                           manifest_csv: "druid,folder_name\ndruid:cd234fg5678,folder2\n")
+                                           manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n")
       end
       let(:params) { { multi_item_deposit_discovery: { manifest_source: 'upload', **mount_params } } }
 
@@ -680,7 +680,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:multi_item_deposit_action) do
         create(:multi_item_deposit_action, user: owner, manifest_source: 'mount',
-                                           manifest_csv: "druid,folder_name\ndruid:cd234fg5678,folder2\n")
+                                           manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n")
       end
       let(:params) { { multi_item_deposit_discovery: { manifest_source: 'upload', **mount_params } } }
 
@@ -709,14 +709,14 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
 
       before do
-        File.write(File.join(mount_directory, 'manifest.csv'), "druid,folder_name\nbc123df4567,\n")
+        File.write(File.join(mount_directory, 'manifest.csv'), "druid,folder\nbc123df4567,\n")
       end
 
       it 'does not save and renders the discovery page' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(rendered_page).to have_text('Blank folder_name in rows: 2.')
+        expect(rendered_page).to have_text('Blank folder in rows: 2.')
         expect(multi_item_deposit_action.reload.mount_path).to be_nil
         expect(multi_item_deposit_action.item_deposit_actions).to be_empty
         expect(batch_class).not_to have_received(:enqueue)
@@ -764,7 +764,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
       before do
         FileUtils.mkdir_p(globus_local_path)
-        File.write(File.join(globus_local_path, 'manifest.csv'), "druid,folder_name\ncd234fg5678,folder2\n")
+        File.write(File.join(globus_local_path, 'manifest.csv'), "druid,folder\ncd234fg5678,folder2\n")
       end
 
       after do
