@@ -17,6 +17,7 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
       expect(page).to have_link('Cancel', href: '/objects/druid:bc123df4567')
       expect(page).to have_button('Previous')
       expect(page).to have_button('Next')
+      expect(page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
       expect(page).to have_css('button[type="submit"][form="tabbed_form"][name="commit"][value="draft"]',
                                text: 'Save as draft')
       expect(page).to have_css('a[href="/objects/druid:bc123df4567/discard_draft"][data-turbo-method="delete"]' \

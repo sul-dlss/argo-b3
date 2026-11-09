@@ -110,7 +110,7 @@
       <% next_enabled = @multi_item_deposit_action.discovery_succeeded? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.discover'), variant: next_enabled ? :'outline-primary' : :primary) %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, classes: 'ms-2', disabled: !next_enabled) do %>
-        <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon %>
+        <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon(aria: { hidden: true }) %>
       <% end %>
     </div>
   <% end %>

@@ -65,7 +65,7 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
       expect(row).to have_css(
         "td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action.id}']" \
         "[data-turbo-confirm='Delete this bulk action from history? Its log and export files will also be deleted. " \
-        "This cannot be undone.'] button.btn-sm i.bi-trash"
+        "This cannot be undone.'] button.btn-sm i.bi-trash[aria-hidden=\"true\"]"
       )
       expect(row).to have_button('Clear')
     end
@@ -133,7 +133,7 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
 
         row = page.find("tr##{dom_id(bulk_action, 'row')}")
         expect(row).to have_css("td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action.id}/cancel'] " \
-                                'button.btn-sm i.bi-x-square')
+                                'button.btn-sm i.bi-x-square[aria-hidden="true"]')
         expect(row).to have_css("form[action='/bulk_actions/#{bulk_action.id}/cancel'][method='post']" \
                                 "[data-turbo-confirm='Cancel this bulk action? Changes already made to objects " \
                                 "will not be undone.']")

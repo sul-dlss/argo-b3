@@ -51,6 +51,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
 
       expect(page).to have_link('Remove collection', href: '/search', title: 'Remove collection')
       expect(page).to have_css('.visually-hidden', text: '[Remove collection]')
+      expect(page).to have_css('a.remove i.bi-x-lg[aria-hidden="true"]')
       expect(page).to have_css('a[data-turbo="false"]')
     end
   end
@@ -69,6 +70,8 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       expect(page).to have_link('Exclude dark',
                                 href: '/search?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection',
                                 title: 'Exclude dark')
+      expect(page).to have_css('a[title="Exclude dark"] i.bi-exclude[aria-hidden="true"]')
+      expect(page).to have_css('a[title="Exclude dark"] .visually-hidden', text: '[Exclude dark]')
     end
   end
 

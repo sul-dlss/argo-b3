@@ -30,7 +30,7 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
 
       table = page.find('table[aria-label="Pinned items"]')
       expect(table).to have_css('caption', text: 'Pinned items')
-      expect(table).to have_css('caption .bi-pin-fill')
+      expect(table).to have_css('caption .bi-pin-fill[aria-hidden="true"]')
       expect(table).to have_css('th', text: 'Title')
       expect(table).to have_css('th', text: 'Druid')
       expect(table).to have_css('th', text: 'Collection')

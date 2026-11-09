@@ -17,7 +17,7 @@
                                                                       method: :delete,
                                                                       confirm: t('bulk_actions.delete_confirm'),
                                                                       top: false) do %>
-        <%= helpers.delete_icon(classes: 'me-1') %><%= t('bulk_actions.clear') %>
+        <%= helpers.delete_icon(classes: 'me-1', aria: { hidden: true }) %><%= t('bulk_actions.clear') %>
       <% end %>
     <% end %>
     <% if cancellable_and_allowed? %>
@@ -28,7 +28,7 @@
                                                                       confirm: t('bulk_actions.cancel_confirm'),
                                                                       classes: 'mt-2',
                                                                       top: false) do %>
-        <%= helpers.cancel_icon(classes: 'me-1') %><%= t('bulk_actions.cancel') %>
+        <%= helpers.cancel_icon(classes: 'me-1', aria: { hidden: true }) %><%= t('bulk_actions.cancel') %>
       <% end %>
     <% end %>
   <% end %>

@@ -64,6 +64,14 @@ RSpec.describe 'Contents' do
         expect(page).to have_checked_field('Without embargo', visible: :all)
       end
 
+      it 'hides the dropzone icon from screen readers' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('#file-dropzone .dz-message i.bi-cloud-arrow-up-fill[aria-hidden="true"]',
+                                 visible: :all)
+      end
+
       it 'renders the navigation, save as draft, purge, and deposit buttons' do
         get edit_content_path(druid)
 

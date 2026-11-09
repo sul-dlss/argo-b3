@@ -6,7 +6,7 @@
     ) do |component| %>
   <% component.with_caption do %>
     <%= label %>
-    <%= helpers.pin_icon(classes: 'pinned') %>
+    <%= helpers.pin_icon(classes: 'pinned', aria: { hidden: true }) %>
   <% end %>
   <% component.with_header(label: 'Title') %>
   <% component.with_header(label: 'Druid') %>
