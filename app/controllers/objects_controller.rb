@@ -124,7 +124,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_purl_preview
     @cocina_hash = full_cocina_hash
-    @preview = fetch_purl_preview(@cocina_hash)
+    constituent_of = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid)).constituent_of
+    @preview = fetch_purl_preview(@cocina_hash, constituent_of)
     render layout: false
   end
 
@@ -400,10 +401,12 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     (Settings.reload_intervals.cocina_model / 1000.0).seconds - 1.second
   end
 
-  def fetch_purl_preview(cocina_hash)
-    body = Rails.cache.fetch("objects/purl-preview/#{cocina_hash[:externalIdentifier]}/#{cocina_hash[:lock]}",
-                             expires_in: 1.hour) do
-      PurlPreviewService.call(cocina_hash:)
+  # Keyed by constituent_of too, since virtual object membership can change without changing the lock.
+  def fetch_purl_preview(cocina_hash, constituent_of)
+    cache_key = ['objects/purl-preview', cocina_hash[:externalIdentifier], cocina_hash[:lock],
+                 Digest::SHA256.hexdigest(constituent_of.to_json)].join('/')
+    body = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
+      PurlPreviewService.call(cocina_hash:, constituent_of:)
     end
     Nokogiri::HTML(body).css('main').inner_html.html_safe # rubocop:disable Rails/OutputSafety
   rescue PurlPreviewService::Error => e

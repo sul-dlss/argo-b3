@@ -36,6 +36,11 @@ class SolrDocPresenter < SearchResults::Item
     object_type == 'item'
   end
 
+  # @return [Array<Array(String, String)>] [druid, title] of each virtual object this object is a constituent of
+  def constituent_of
+    Array(solr_doc[Search::Fields::CONSTITUENT_OF_TITLE_DRUIDS]).map { |value| Search::CompositeFacetValue.parse(value) }
+  end
+
   def dark?
     Array(access_rights).include?('dark')
   end

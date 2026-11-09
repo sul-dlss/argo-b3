@@ -19,6 +19,7 @@ module Search
     COLLECTION_DRUIDS = 'member_of_collection_ssim'
     COLLECTION_TITLES = 'collection_title_ssimdv'
     COLLECTION_TITLE_DRUIDS = 'collection_title_druid_ssimdv'
+    CONSTITUENT_OF_TITLE_DRUIDS = 'is_constituent_of_title_druid_ssimdv'
     CONSTITUENTS_COUNT = 'constituents_count_ips'
     CONTENT_TYPES = 'content_type_ssimdv'
     DISSERTATION_ID = 'dissertation_id_ss'
