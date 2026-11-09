@@ -87,6 +87,11 @@ $search-color: rgb(#{$search-color-rgb});
   background-color: var(--stanford-20-black);
 }
 
+// Removes Tom Select's caret margin so a chosen single value doesn't look like it has a trailing space.
+.ts-wrapper.single.has-items .ts-control > input {
+  margin: 0 !important;
+}
+
 .impersonation-banner {
   background-color: #EDEFE1;
   margin-top: -1rem; // remove margins from above/below so not whitespace gaps remain around impersonation banner
