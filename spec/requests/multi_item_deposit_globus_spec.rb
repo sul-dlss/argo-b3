@@ -75,8 +75,9 @@ RSpec.describe 'Multi-item deposit Globus' do
         post multi_item_deposit_action_globus_path(multi_item_deposit_action)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(response.body).to include('The Globus link could not be created.')
         expect(response.body).to include('Create Globus link')
+        page = Capybara.string(response.body)
+        expect(page).to have_css('.alert-danger[role="alert"]', text: 'The Globus link could not be created.')
         expect(multi_item_deposit_action.reload.globus_path).to be_nil
       end
     end

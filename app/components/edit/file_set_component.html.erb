@@ -21,7 +21,10 @@
         <%= form.fields_for :content_files do |content_file_form| %>
           <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
         <% end %>
-        <p class="text-danger" hidden data-content-files-target="allRemovedNote"><%= t('edit.content_file_sets.all_files_removed') %></p>
+        <%# The alert region stays in the page so that showing the note is announced. %>
+        <div role="alert">
+          <p class="text-danger" hidden data-content-files-target="allRemovedNote"><%= t('edit.content_file_sets.all_files_removed') %></p>
+        </div>
       </div>
 
         <div class="d-flex align-items-center mt-5">

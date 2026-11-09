@@ -319,10 +319,12 @@ RSpec.describe 'Manage files' do
       Content.find_by!(druid:).destroy!
 
       click_on 'Add files'
+      expect(page).to have_css('#file-dropzone [role="alert"]', visible: :all)
       attach_file(nil, Rails.root.join('spec/fixtures/files/dropzone_upload.txt'), class: 'dz-hidden-input',
                                                                                    make_visible: true)
 
-      expect(page).to have_css('li.text-danger, .text-danger li',
+      # The alert region is present before the error is added, so the error is announced.
+      expect(page).to have_css('#file-dropzone [role="alert"] li',
                                exact_text: 'dropzone_upload.txt: Upload failed (server error 404). Try again.')
     end
   end
@@ -764,7 +766,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_no_text('Saving will delete this resource.')
       click_button 'Remove dropzone_upload.txt'
       expect(page).to have_no_field('Role')
-      expect(page).to have_text('Saving will delete this resource.')
+      expect(page).to have_css('[role="alert"]', text: 'Saving will delete this resource.')
 
       click_button 'Save'
 
