@@ -11,6 +11,7 @@ class EditItemForm < CocinaModels::Dro
   include DescriptionCsvFormConcern
   include EmbargoFormConcern
   include FileAccessFormConcern
+  include ContentDepositFormConcern
   include CollectionFormConcern
   include CatalogRecordIdFormConcern
   include CatalogRecordIdExistsFormConcern
@@ -26,14 +27,6 @@ class EditItemForm < CocinaModels::Dro
   # A refreshed description would replace the spreadsheet's description.
   validate :description_csv_file_absent_when_refreshed
   validate :description_csv_must_be_valid, if: -> { description_csv_file.present? && !catalog_link_refresh? }
-
-  # Only depositing requires the structure to be valid for the content type.
-  validate :structure_valid_for_content_type, on: :deposit
-  # Depositing deposits the structure as last staged, so it would discard unsaved changes.
-  validate :content_is_saved, on: :deposit
-
-  # The object's mutable Content, if any; not an attribute so that setting it does not make the form dirty.
-  attr_accessor :content
 
   # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
   # catalog_record_id is not one, since changing it can move refresh and serials to another Folio catalog link.
@@ -62,29 +55,6 @@ class EditItemForm < CocinaModels::Dro
   end
 
   private
-
-  # Keeps the content on the object's current lock, so that editing continues on it.
-  def rebase_content_lock
-    content.update!(lock: previous_cocina_object.lock) if content&.persisted?
-  end
-
-  # Depositing deposits the cocina structure, not the mutable Content, so the immutable Content is validated
-  # against the object as edited (since the form may change its content type and access).
-  # Skipped when the edited object cannot be built, since the invalid fields have their own errors.
-  def structure_valid_for_content_type
-    immutable_content = Contents::Builder.find_or_create(cocina_object: previous_cocina_object)
-    return if Contents::Validator.call(content: immutable_content, cocina_object: mutated_cocina_object).valid?
-
-    errors.add(:content, I18n.t('edit.items.fields.content.validations.invalid'))
-  rescue Cocina::Models::ValidationError
-    nil
-  end
-
-  def content_is_saved
-    return unless Contents::UnsavedChanges.call(content:, cocina_object: previous_cocina_object)
-
-    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved'))
-  end
 
   def description_csv_file_absent_when_refreshed
     return unless description_csv_file.present? && catalog_link_refresh?

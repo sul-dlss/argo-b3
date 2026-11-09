@@ -136,6 +136,18 @@ en:
     label: "Workflow status"
   edit:
     agreements:
+      edit:
+        title: "Edit agreement"
+        tabs:
+          deposit:
+            label: "Deposit"
+        toasts:
+          deposited: "Agreement updated and deposit started."
+          updated: "Agreement updated."
+        warnings:
+          content_busy: "Files for this agreement are being staged or discovered. Try again when that has finished."
+          not_editable: "Agreement is not editable."
+          stale: "This agreement was changed since you opened it. Review the current values and make your changes again."
       new:
         title: "Register an agreement"
         buttons:
@@ -148,6 +160,8 @@ en:
           label: "Title"
         source_id:
           label: "Source ID"
+        version_description:
+          label: "Version description"
       tabs:
         deposit:
           label: "Register"

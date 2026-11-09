@@ -129,11 +129,29 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(user)
     end
 
-    it 'renders a disabled edit agreement link and an enabled manage files link' do
+    it 'renders enabled edit agreement and manage files links' do
+      render_inline(component)
+
+      expect(page).to have_link('Edit agreement', href: "/agreements/#{druid}/edit")
+      expect(page).to have_no_css('a.disabled', text: 'Edit agreement')
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+    end
+  end
+
+  context 'when the agreement version is editable but the user cannot edit' do
+    let(:object_type) { 'agreement' }
+    let(:closed) { true }
+    let(:editable) { true }
+
+    before do
+      allow(Current).to receive(:user).and_return(create(:user))
+    end
+
+    it 'renders a disabled edit agreement link' do
       render_inline(component)
 
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit agreement')
-      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+      expect(page).to have_no_link('Edit agreement')
     end
   end
 

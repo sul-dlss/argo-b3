@@ -1,0 +1,57 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.agreements.edit.title')) %>
+
+  <p class="mb-4"><%= @title %></p>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @edit_agreement_form, id: form_id, url: agreement_path(@druid),
+                                                                       hidden_fields: [:lock]) %>
+
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.agreements.tabs.details.label'), tab_name: :details, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.agreements.edit.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
+
+    <% form_with(model: @edit_agreement_form, url: agreement_path(@druid), html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
+                                                                          label: t('edit.agreements.tabs.details.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :title,
+                                                                    label_text: t('edit.agreements.fields.title.label'),
+                                                                    label_classes: 'fw-bold',
+                                                                    label_mark_required: true,
+                                                                    container_classes: 'mb-3') %>
+
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :source_id,
+                                                                    label_text: t('edit.agreements.fields.source_id.label'),
+                                                                    label_classes: 'fw-bold',
+                                                                    label_mark_required: true,
+                                                                    container_classes: 'mb-3') %>
+
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: false) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.agreements.edit.tabs.deposit.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+              form:,
+              field_name: :version_description,
+              label_text: t('edit.agreements.fields.version_description.label'),
+              label_mark_required: true,
+              container_classes: 'mb-3'
+            ) %>
+        <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form:, classes: 'mb-3') %>
+
+        <% pane.with_footer do %>
+          <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, discard_or_purge_presenter: @discard_or_purge_presenter, show_next: false, show_edit_files: true, show_deposit: true) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

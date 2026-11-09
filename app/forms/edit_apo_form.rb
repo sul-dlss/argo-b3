@@ -51,11 +51,6 @@ class EditApoForm < CocinaModels::AdminPolicy
 
   private
 
-  # Replaces only the title, so that the rest of the description is retained.
-  def populate_title_in_description_hash
-    self.description_hash = description_hash.merge(title: [{ value: title }])
-  end
-
   def access_location_applies?
     [access_view, access_download].include?('location-based')
   end

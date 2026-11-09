@@ -227,7 +227,7 @@ Rails.application.routes.draw do
   end
 
   resources :apos, only: %i[new create edit update]
-  resources :agreements, only: %i[new create]
+  resources :agreements, only: %i[new create edit update]
   resources :collections, only: %i[new create]
 
   resources :multiple_items, only: %i[new create show]
