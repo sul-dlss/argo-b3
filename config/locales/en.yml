@@ -156,6 +156,18 @@ en:
       waiting: "Retrying process."
   edit:
     agreements:
+      edit:
+        title: "Edit agreement"
+        tabs:
+          deposit:
+            label: "Deposit"
+        toasts:
+          deposited: "Agreement updated and deposit started."
+          updated: "Agreement updated."
+        warnings:
+          content_busy: "Files for this agreement are being staged or discovered. Try again when that has finished."
+          not_editable: "Agreement is not editable."
+          stale: "This agreement was changed since you opened it. Review the current values and make your changes again."
       new:
         title: "Register an agreement"
         buttons:
@@ -210,8 +222,6 @@ en:
           help_text: "The following defaults will apply to all newly registered objects."
         use_and_reproduction_statement:
           label: "Default use and reproduction"
-        version_description:
-          label: "Version description"
     collections:
       new:
         title: "Register and deposit collection"

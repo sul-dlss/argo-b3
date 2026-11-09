@@ -10,22 +10,15 @@
   <%= form_with model: @deposit_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
     <% if @multi_item_deposit_action.all_initial_versions? %>
       <%# When all are initial versions, the version description is fixed, so rendering a disabled text input. %>
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+      <%= render Edit::VersionDescriptionComponent.new(
             form:,
-            field_name: :version_description,
-            label_text: t('edit.items.fields.version_description.label'),
-            input_disabled: true,
-            container_classes: 'mb-3',
+            disabled: true,
             label_classes: 'fw-bold',
             help_text: t('edit.multi_item_deposits.fields.version_description.initial_version_help_text')
           ) %>
     <% else %>
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(
+      <%= render Edit::VersionDescriptionComponent.new(
             form:,
-            field_name: :version_description,
-            label_text: t('edit.items.fields.version_description.label'),
-            label_mark_required: true,
-            container_classes: 'mb-3',
             label_classes: 'fw-bold',
             help_text: t('edit.multi_item_deposits.fields.version_description.help_text')
           ) %>

@@ -14,4 +14,9 @@ module TitleFormConcern
   def populate_description_hash_from_title
     self.description_hash = { title: [{ value: title }] }
   end
+
+  # For editing an existing object: replaces only the title, so that the rest of the description is retained.
+  def populate_title_in_description_hash
+    self.description_hash = description_hash.merge(title: [{ value: title }])
+  end
 end
