@@ -27,6 +27,36 @@ RSpec.describe 'Contents' do
     sign_in(user)
   end
 
+  describe 'show' do
+    let(:content_token) { Rails.application.message_verifier(:argo).generate(content.id, purpose: 'contents') }
+
+    it 'does not mark the actions as busy' do
+      get content_path(content_token)
+
+      expect(response.body).not_to include('data-disable-actions-target="busy"')
+    end
+
+    context 'when discovering files' do
+      let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, mount_state: 'discovering') }
+
+      it 'marks the actions as busy' do
+        get content_path(content_token)
+
+        expect(response.body).to include('data-disable-actions-target="busy"')
+      end
+    end
+
+    context 'when staging' do
+      let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging') }
+
+      it 'marks the actions as busy' do
+        get content_path(content_token)
+
+        expect(response.body).to include('data-disable-actions-target="busy"')
+      end
+    end
+  end
+
   describe 'edit' do
     context 'when the version is not editable' do
       let(:editable) { false }
@@ -89,7 +119,8 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_link('Cancel', href: "/objects/#{druid}", count: 4)
+        expect(page).to have_css('a[href^="/contents/"][href$="/unsaved_changes"][data-turbo-method="delete"]',
+                                 text: 'Cancel', count: 4)
         expect(page).to have_button('Previous', count: 3)
         expect(page).to have_button('Next', count: 3)
         expect(page).to have_css('button[type="submit"][form="item_form"][value="draft"]', text: 'Save as draft',

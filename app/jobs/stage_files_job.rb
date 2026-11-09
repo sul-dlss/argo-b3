@@ -73,7 +73,10 @@ class StageFilesJob < ApplicationJob
     Sdr::Repository.update(
       cocina_object: CocinaObjectMutators::StructuralMutator.call(cocina_object:, content:),
       user_name: user.sunetid
-    ).tap { |updated_cocina_object| content.update!(lock: updated_cocina_object.lock) }
+    ).tap do |updated_cocina_object|
+      content.update!(lock: updated_cocina_object.lock)
+      delete_unreferenced_staged_files!
+    end
   end
 
   # The Content becomes immutable only once accessioning has started, so that it stays mutable if accessioning fails.
@@ -106,6 +109,12 @@ class StageFilesJob < ApplicationJob
       FileUtils.cp filepath, staging_filepath
       content_file_binary.file_location_stage!
     end
+  end
+
+  # Files deleted while managing files keep their staged copies until the cocina object no longer references them.
+  def delete_unreferenced_staged_files!
+    StagingSupport.delete_staged_files_except(druid:, staging_location:,
+                                              filepaths: content.content_file_binaries.pluck(:filepath))
   end
 
   def create_directory(filepath)

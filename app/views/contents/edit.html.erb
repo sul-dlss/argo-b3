@@ -35,7 +35,7 @@
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
                                                                             label: t('edit.contents.tabs.details.label'))) do |pane| %>
           <% pane.with_footer do %>
-            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid, content_token: @content_token,
                                                                discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: false) %>
           <% end %>
           <%= tag.div data: { controller: 'content-type-dependent ocr-options',
@@ -69,7 +69,7 @@
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :add_files,
                                                                             label: t('edit.contents.tabs.add_files.label'))) do |pane| %>
           <% pane.with_footer do %>
-            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid, content_token: @content_token,
                                                                discard_or_purge_presenter: @discard_or_purge_presenter, show_previous: show_details) %>
           <% end %>
 
@@ -156,7 +156,7 @@
         <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :structural,
                                                                             label: t('edit.contents.tabs.structural.label'))) do |pane| %>
           <% pane.with_footer do %>
-            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+            <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid, content_token: @content_token,
                                                                discard_or_purge_presenter: @discard_or_purge_presenter) %>
           <% end %>
           <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
@@ -172,7 +172,7 @@
                                                                           label: t('edit.contents.tabs.deposit.label'),
                                                                           mark_required: true)) do |pane| %>
         <% pane.with_footer do %>
-          <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid,
+          <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid, content_token: @content_token,
                                                              discard_or_purge_presenter: @discard_or_purge_presenter, show_next: false, show_deposit: true) %>
         <% end %>
         <% unless @contents_item_form.initial_version? %>

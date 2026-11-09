@@ -266,6 +266,7 @@ Rails.application.routes.draw do
       patch :move, on: :member
     end
     resources :content_file_binaries, only: %i[destroy]
+    resource :unsaved_changes, only: %i[destroy], controller: 'content_unsaved_changes'
   end
 
   resources :collection_options, only: %i[index], defaults: { format: :json }

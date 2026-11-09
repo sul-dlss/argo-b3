@@ -1,27 +1,45 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Disables the disableable targets while a form declaring the disable-actions actions is submitting
-// (see DisableActionsHelper) or while a dropzone is uploading (dropzone:upload-start / dropzone:upload-end).
+// (see DisableActionsHelper), while a dropzone is uploading (dropzone:upload-start / dropzone:upload-end), or while
+// a busy target is present (e.g., rendered while files are being discovered or staged).
 // Attach to a container that holds both the forms (or dropzone) and the targets. Note that Stimulus doesn't
 // deliver events from within a nested disable-actions controller to the outer one.
 // Targets are buttons, inputs, fieldsets of buttons, links, or other elements that handle
 // disable-actions:disable / disable-actions:enable events (e.g., a dropzone).
 export default class extends Controller {
-  static targets = ['disableable']
+  static targets = ['disableable', 'busy']
 
   disable () {
     this.disabled = true
-    this.disableableTargets.forEach(element => this.setDisabled(element, true))
+    this.update()
   }
 
   enable () {
     this.disabled = false
-    this.disableableTargets.forEach(element => this.setDisabled(element, false))
+    this.update()
+  }
+
+  busyTargetConnected () {
+    this.update()
+  }
+
+  busyTargetDisconnected () {
+    this.update()
   }
 
   // Targets rendered while disabled (e.g., a frame reloaded while uploading) are disabled too.
   disableableTargetConnected (element) {
-    if (this.disabled) this.setDisabled(element, true)
+    if (this.isDisabled) this.setDisabled(element, true)
+  }
+
+  get isDisabled () {
+    return this.disabled || this.hasBusyTarget
+  }
+
+  update () {
+    const disabled = this.isDisabled
+    this.disableableTargets.forEach(element => this.setDisabled(element, disabled))
   }
 
   setDisabled (element, disabled) {

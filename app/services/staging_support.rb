@@ -45,6 +45,19 @@ class StagingSupport
     locations.each { |staging_location| FileUtils.rm_rf(staging_content_path(druid:, staging_location:)) }
   end
 
+  # Deletes the druid's staged files in the staging location that are not among the given filepaths, then any
+  # directories left empty.
+  # @param filepaths [Array<String>] the filepaths (relative to the content directory) to keep
+  def self.delete_staged_files_except(druid:, filepaths:, staging_location:)
+    content_path = staging_content_path(druid:, staging_location:)
+    kept_filepaths = filepaths.to_set
+    Dir.glob('**/*', base: content_path).each do |path|
+      full_path = File.join(content_path, path)
+      FileUtils.rm_f(full_path) if File.file?(full_path) && kept_filepaths.exclude?(path)
+    end
+    delete_empty_directories(content_path)
+  end
+
   # @return [Boolean] true if the staging content directory for the druid in any staging location contains files
   #   (including in subdirectories)
   def self.staged_files?(druid:)
@@ -72,4 +85,13 @@ class StagingSupport
     Dir.glob('**/*', base: content_path).any? { |path| File.file?(File.join(content_path, path)) }
   end
   private_class_method :staged_files_in?
+
+  # Children before parents, so that a directory holding only empty directories is deleted too.
+  def self.delete_empty_directories(content_path)
+    Dir.glob('**/*/', base: content_path).reverse_each do |path|
+      full_path = File.join(content_path, path)
+      Dir.rmdir(full_path) if Dir.empty?(full_path)
+    end
+  end
+  private_class_method :delete_empty_directories
 end

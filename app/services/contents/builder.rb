@@ -42,14 +42,19 @@ module Contents
 
     # @return [Content] the persisted Content built from the Cocina object's structural metadata
     def call
-      # `insert_all` is being used for efficient DB updates (instead of many small updates)
       ActiveRecord::Base.transaction do
-        content = Content.create!(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable:)
-        file_set_pairs = build_content_file_sets(content:)
-        binary_ids_by_filepath = build_content_file_binaries(content:, file_set_pairs:)
-        build_content_files(file_set_pairs:, binary_ids_by_filepath:)
-        content
+        populate(Content.create!(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable:))
       end
+    end
+
+    # @param content [Content] a persisted Content with no file sets or binaries
+    # @return [Content] the Content, with file sets, files, and binaries from the Cocina object's structural metadata
+    def populate(content)
+      # `insert_all` is being used for efficient DB updates (instead of many small updates)
+      file_set_pairs = build_content_file_sets(content:)
+      binary_ids_by_filepath = build_content_file_binaries(content:, file_set_pairs:)
+      build_content_files(file_set_pairs:, binary_ids_by_filepath:)
+      content
     end
 
     # @return [Content] an unsaved, in-memory Content built from the Cocina object's structural metadata

@@ -277,6 +277,7 @@ en:
           label: 'Files'
         title: "Manage files"
         buttons:
+          cancel_confirm: "Discard unsaved changes to files?"
           discover_files: "Discover files"
         errors:
           save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
@@ -332,6 +333,12 @@ en:
           label: "Structure files"
         deposit:
           label: "Deposit"
+    content_unsaved_changes:
+      toasts:
+        discarded: "Unsaved changes to files discarded"
+      warnings:
+        busy: "Files are being discovered or staged, so unsaved changes to files were not discarded."
+        staging_failed: "Staging failed, so unsaved changes to files were not discarded. Retry staging, or contact SDR support if the problem continues."
     content_file_binaries:
       buttons:
         delete: 'Delete %{filepath}'
