@@ -1,8 +1,7 @@
 <%= tag.div class: 'container bulk-action-show object-type-bulk-action mb-4', data: do %>
   <%= render Structure::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: "← #{t('bulk_actions.label')}", classes: 'ps-0',
-                                                                      variant: :link, link: bulk_actions_path) %>
+      <%= render Elements::BreadcrumbComponent.new(label: t('bulk_actions.history'), link: bulk_actions_path) %>
 
       <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: name, classes: 'mb-0') %>

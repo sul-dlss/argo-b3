@@ -144,8 +144,9 @@ RSpec.describe 'Multi-item deposit actions' do
                                                                 accessioning: false, closeable: false)
       end
       let(:open_status) do
-        Dor::Services::Client::ObjectVersion::VersionStatus.new(open: true, openable: false, assembling: false,
-                                                                accessioning: false, closeable: true)
+        Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 1, open: true, openable: false,
+                                                                assembling: false, accessioning: false,
+                                                                closeable: true)
       end
 
       before do
@@ -169,7 +170,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
         expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
-          .to eq([%w[bc123df4567 Deposited], ['cd234fg5678', 'Draft, not deposited']])
+          .to eq([%w[bc123df4567 Deposited], %w[cd234fg5678 Registered]])
         expect(rows[0]).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
 
         expect(Sdr::VersionService).to have_received(:statuses).with(druids: ['druid:bc123df4567', 'druid:cd234fg5678'])
@@ -226,6 +227,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
         expect(rendered_page).to have_field('Describe this deposit', with: 'My deposit')
+        expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Discover files and check manifest')
         expect(rendered_page).to have_button('Discover files and check manifest', class: 'btn-primary')
         expect(rendered_page).to have_link('Cancel', href: root_path)
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
@@ -334,6 +336,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
         expect(rendered_page).to have_no_field('Mount path')
+        expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Configure deposit and check files')
         expect(rendered_page).to have_link(
           'Download structural metadata template CSV',
           href: structural_metadata_csv_template_multi_item_deposit_action_path(multi_item_deposit_action)
@@ -475,6 +478,7 @@ RSpec.describe 'Multi-item deposit actions' do
           get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
           expect(response).to have_http_status(:ok)
+          expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Deposit')
           expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
           expect(rendered_page).to have_field('Version description', with: 'Initial version', disabled: true)
           expect(rendered_page).to have_text('Version description is automatically set for initial deposits.')

@@ -5,9 +5,16 @@ module Sdr
   class Repository
     class Error < StandardError; end
     class NotFoundResponse < Error; end
+    # A version's stored cocina that is no longer valid against the current cocina models.
+    InvalidCocina = Struct.new(:cocina_hash)
 
     REGISTERED_BY_TAG_PREFIX = 'Registered By : '
     FIND_ALL_SLICE_SIZE = 25
+    # The assembly workflow for content types that do not use assemblyWF.
+    ASSEMBLY_WORKFLOWS = {
+      Cocina::Models::ObjectType.geo => 'gisAssemblyWF',
+      Cocina::Models::ObjectType.webarchive_seed => 'wasSeedPreassemblyWF'
+    }.freeze
 
     # @param [String] druid the druid of the object
     # @return [Cocina::Models::DROWithMetadata] the returned model
@@ -18,6 +25,20 @@ module Sdr
       Dor::Services::Client.object(druid).find(without_structural_contains:)
     rescue Dor::Services::Client::NotFoundResponse
       raise NotFoundResponse, "Object not found: #{druid}"
+    end
+
+    # @param [String] druid the druid of the object
+    # @param [Integer] version the version of the object
+    # @return [Cocina::Models::DROWithMetadata, InvalidCocina] the version's stored cocina,
+    #   or an InvalidCocina if it is no longer valid
+    # @raise [NotFoundResponse] if the object or version is not found
+    def self.find_version(druid:, version:)
+      cocina_object = Dor::Services::Client.object(druid).version.find(version)
+      return cocina_object unless cocina_object.is_a?(Dor::Services::Client::InvalidCocina)
+
+      InvalidCocina.new(cocina_hash: cocina_object.to_h.except(:error_message))
+    rescue Dor::Services::Client::NotFoundResponse
+      raise NotFoundResponse, "Object version not found: #{druid} version #{version}"
     end
 
     # Objects that are not found are omitted.
@@ -103,8 +124,9 @@ module Sdr
     end
 
     # DROs with files are assembled (e.g., to create derivatives) before accessioning; assembly closes the version.
-    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them,
-    # and their staged files are first moved to the assembly location, the only one gisAssemblyWF reads.
+    # Geo objects are assembled (gisAssemblyWF) only with staged files, since gisAssemblyWF rebuilds from them.
+    # Web archive seeds are always assembled (wasSeedPreassemblyWF), which decides what to generate or keep.
+    # Both first have their staged files moved to the assembly location, the only one their assembly reads.
     # Other objects skip assembly; closing the version starts accessioning.
     # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object
     # @param [String] user_name the sunetid of the user performing the action
@@ -115,11 +137,11 @@ module Sdr
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       druid = cocina_object.externalIdentifier
       object_client = Dor::Services::Client.object(druid)
-      # E.g., for an object that became geo after its files were staged.
-      StagingSupport.move_to_assembly(druid:) if CocinaSupport.geo?(cocina_object)
+      # E.g., files staged in the deposit staging location before the object became geo or a seed.
+      StagingSupport.move_to_assembly(druid:) if StagingSupport.stages_to_assembly?(cocina_object)
       if assemble?(cocina_object:)
         # Assembly requires the object's staging folder, even when nothing is staged.
-        StagingSupport.ensure_staging_folder(druid:)
+        StagingSupport.ensure_staging_folder(cocina_object:)
         object_client.workflow(assembly_workflow_name(cocina_object:))
                      .create(version: cocina_object.version, lane_id:, context: context.presence)
       else
@@ -131,6 +153,8 @@ module Sdr
 
     def self.assemble?(cocina_object:)
       return false unless cocina_object.dro?
+
+      return true if CocinaSupport.webarchive_seed?(cocina_object)
       return StagingSupport.staged_files?(druid: cocina_object.externalIdentifier) if CocinaSupport.geo?(cocina_object)
 
       cocina_object.structural.contains.any? { |file_set| file_set.structural.contains.any? }
@@ -138,7 +162,7 @@ module Sdr
     private_class_method :assemble?
 
     def self.assembly_workflow_name(cocina_object:)
-      CocinaSupport.geo?(cocina_object) ? 'gisAssemblyWF' : 'assemblyWF'
+      ASSEMBLY_WORKFLOWS.fetch(cocina_object.type, 'assemblyWF')
     end
     private_class_method :assembly_workflow_name
 

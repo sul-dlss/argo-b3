@@ -13,13 +13,16 @@ RSpec.describe NewItemForm do
       catalog_record_id:,
       description_csv_file:,
       apo_druid: 'druid:bc123df4567',
-      content_type: Cocina::Models::ObjectType.object,
+      content_type:,
+      collection_druids:,
       access_view: 'world',
       access_download: 'world'
     )
   end
 
   let(:title) { 'The Title' }
+  let(:content_type) { Cocina::Models::ObjectType.object }
+  let(:collection_druids) { [] }
   let(:description_choice) { NewItemForm::DESCRIPTION_TITLE_CHOICE }
   let(:catalog_record_id) { nil }
   let(:description_csv_file) { nil }
@@ -29,6 +32,50 @@ RSpec.describe NewItemForm do
 
   before do
     allow(Sdr::Repository).to receive(:source_id_exists?).and_return(false)
+  end
+
+  describe 'collection_druids' do
+    context 'when the multiple select submits a blank value' do
+      let(:collection_druids) { ['', 'druid:bc123df4567'] }
+
+      it 'removes the blank value' do
+        expect(new_item_form.collection_druids).to eq(['druid:bc123df4567'])
+      end
+    end
+
+    context 'when a web archive seed is in one collection' do
+      let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
+      let(:collection_druids) { ['druid:mn456pq7890'] }
+
+      it 'is valid' do
+        expect(new_item_form).to be_valid
+      end
+    end
+
+    context 'when a web archive seed is in no collection' do
+      let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
+
+      it 'is not valid' do
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:collection_druids])
+          .to eq(['A web archive seed must be in a collection.'])
+      end
+    end
+
+    context 'when a web archive seed is in more than one collection' do
+      let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
+      let(:collection_druids) { ['druid:mn456pq7890', 'druid:hj185xx2222'] }
+
+      it 'is valid' do
+        expect(new_item_form).to be_valid
+      end
+    end
+
+    context 'when another content type is in no collection' do
+      it 'is valid' do
+        expect(new_item_form).to be_valid
+      end
+    end
   end
 
   describe 'title' do
@@ -320,14 +367,6 @@ RSpec.describe NewItemForm do
       expect(described_class.permitted_params).to include(
         release_tags_attributes: %i[searchworks_target earthworks_target purl_sitemap_target]
       )
-    end
-  end
-
-  describe 'collection_druids' do
-    subject(:new_item_form) { described_class.new(collection_druids: ['', 'druid:bc123df4567']) }
-
-    it 'removes the blank value submitted by the multiple select' do
-      expect(new_item_form.collection_druids).to eq(['druid:bc123df4567'])
     end
   end
 

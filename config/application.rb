@@ -48,6 +48,8 @@ module ArgoB3
     config.generators.system_tests = nil
 
     config.active_storage.variant_processor = :disabled
+    # Mime types come from Contents::Analyzer, so Active Storage analysis is not needed.
+    config.active_storage.analyzers = []
 
     # Bootstrap form error handling
     ActionView::Base.field_error_proc = proc do |html_tag, _instance|

@@ -33,6 +33,52 @@ RSpec.describe Sdr::Repository do
     end
   end
 
+  describe '.find_version' do
+    let(:object_client) { instance_double(Dor::Services::Client::Object, version: version_client) }
+    let(:version_client) { instance_double(Dor::Services::Client::ObjectVersion, find: found) }
+
+    before do
+      allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+    end
+
+    context 'when the version is valid' do
+      let(:found) { instance_double(Cocina::Models::DROWithMetadata) }
+
+      it 'returns the cocina object' do
+        expect(described_class.find_version(druid:, version: 2)).to eq(found)
+        expect(Dor::Services::Client).to have_received(:object).with(druid)
+        expect(version_client).to have_received(:find).with(2)
+      end
+    end
+
+    context 'when the version is no longer valid' do
+      let(:found) do
+        Dor::Services::Client::InvalidCocina.new(externalIdentifier: druid, description: { title: 'not valid' },
+                                                 error_message: 'title is not an array')
+      end
+
+      it 'returns an InvalidCocina without the error message' do
+        expect(described_class.find_version(druid:, version: 2))
+          .to eq(Sdr::Repository::InvalidCocina.new(
+                   cocina_hash: { externalIdentifier: druid, description: { title: 'not valid' } }
+                 ))
+      end
+    end
+
+    context 'when the version is not found' do
+      let(:found) { nil }
+
+      before do
+        allow(version_client).to receive(:find).and_raise(Dor::Services::Client::NotFoundResponse)
+      end
+
+      it 'raises' do
+        expect { described_class.find_version(druid:, version: 2) }
+          .to raise_error(Sdr::Repository::NotFoundResponse)
+      end
+    end
+  end
+
   describe '#lock' do
     context 'when the object is found' do
       let(:object_client) { instance_double(Dor::Services::Client::Object, lock: 'abc123') }
@@ -279,7 +325,7 @@ RSpec.describe Sdr::Repository do
       it 'ensures the staging folder and creates an assemblyWF' do
         described_class.accession(cocina_object:, user_name:)
 
-        expect(StagingSupport).to have_received(:ensure_staging_folder).with(druid:)
+        expect(StagingSupport).to have_received(:ensure_staging_folder).with(cocina_object:)
         expect(StagingSupport).not_to have_received(:move_to_assembly)
         expect(object_client).to have_received(:workflow).with('assemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
@@ -327,6 +373,35 @@ RSpec.describe Sdr::Repository do
         expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
         expect(object_client).to have_received(:workflow).with('gisAssemblyWF')
         expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
+      end
+    end
+
+    context 'when the object is a web archive seed without files' do
+      let(:type) { Cocina::Models::ObjectType.webarchive_seed }
+      let(:file_sets) { [] }
+      let(:staged_files) { false }
+
+      it 'moves staged files to assembly, ensures the staging folder, and creates a wasSeedPreassemblyWF' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
+        expect(StagingSupport).to have_received(:ensure_staging_folder).with(cocina_object:)
+        expect(object_client).to have_received(:workflow).with('wasSeedPreassemblyWF')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
+        expect(version_client).not_to have_received(:close)
+      end
+    end
+
+    context 'when the object is a web archive seed with files but none staged' do
+      let(:type) { Cocina::Models::ObjectType.webarchive_seed }
+      let(:staged_files) { false }
+
+      it 'creates a wasSeedPreassemblyWF' do
+        described_class.accession(cocina_object:, user_name:)
+
+        expect(object_client).to have_received(:workflow).with('wasSeedPreassemblyWF')
+        expect(workflow_client).to have_received(:create).with(version: 2, lane_id: 'high', context: nil)
+        expect(version_client).not_to have_received(:close)
       end
     end
 

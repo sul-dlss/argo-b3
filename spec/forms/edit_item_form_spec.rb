@@ -69,6 +69,18 @@ RSpec.describe EditItemForm do
 
       expect(edit_item_form.collection_druids).to eq(['druid:bc123df4567'])
     end
+
+    context 'when an existing web archive seed is in no collection' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: 'druid:bc123df4567', type: Cocina::Models::ObjectType.webarchive_seed)
+      end
+
+      it 'has no collection error, since only registration requires one' do
+        edit_item_form.valid?
+
+        expect(edit_item_form.errors[:collection_druids]).to be_empty
+      end
+    end
   end
 
   describe 'version description validation' do

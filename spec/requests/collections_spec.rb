@@ -14,6 +14,12 @@ RSpec.describe 'Collections' do
   end
 
   describe 'new' do
+    it 'cancels to the dashboard when coming from another register form' do
+      get '/collections/new', headers: { 'HTTP_REFERER' => 'http://www.example.com/items/new' }
+
+      expect(Capybara.string(response.body)).to have_link('Cancel', href: '/')
+    end
+
     it 'renders the collection form with the APOs the user can edit' do
       get '/collections/new'
 

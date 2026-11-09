@@ -10,8 +10,10 @@ RSpec.describe ObjectStatusPresenter do
   let(:workflow_errors) { [] }
 
   let(:version_service) do
-    version_service_double(assembling?: assembling, accessioning?: accessioning, closed?: closed, editable?: editable)
+    version_service_double(assembling?: assembling, accessioning?: accessioning, closed?: closed, editable?: editable,
+                           version:)
   end
+  let(:version) { 1 }
   let(:closed) { false }
   let(:editable) { false }
   let(:assembling) { false }
@@ -20,7 +22,15 @@ RSpec.describe ObjectStatusPresenter do
   let(:initiating) { false }
 
   describe '#status' do
-    context 'when the version is open' do
+    context 'when the first version is open' do
+      it 'returns registered' do
+        expect(presenter.status).to eq(:registered)
+      end
+    end
+
+    context 'when a later version is open' do
+      let(:version) { 2 }
+
       it 'returns draft' do
         expect(presenter.status).to eq(:draft)
       end

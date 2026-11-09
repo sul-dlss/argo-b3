@@ -12,8 +12,10 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:object_type) { 'item' }
 
   let(:version_service) do
-    version_service_double(assembling?: assembling, accessioning?: accessioning, closed?: closed, editable?: editable)
+    version_service_double(assembling?: assembling, accessioning?: accessioning, closed?: closed, editable?: editable,
+                           version:)
   end
+  let(:version) { 1 }
   let(:closed) { false }
   let(:editable) { false }
   let(:accessioning) { false }
@@ -21,11 +23,24 @@ RSpec.describe Show::StatusComponent, type: :component do
   let(:content) { nil }
   let(:unsaved_content_changes) { false }
 
-  context 'when the version is open' do
+  context 'when the first version is open' do
+    it 'renders the registered status' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Registered')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
+      expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
+    end
+  end
+
+  context 'when a later version is open' do
+    let(:version) { 2 }
+
     it 'renders the draft status' do
       render_inline(component)
 
-      expect(page).to have_css('h2', text: 'Draft, not deposited')
+      expect(page).to have_css('h2', text: 'Deposited, in draft')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
       expect(page).to have_button('Deposit', class: 'disabled', disabled: true)

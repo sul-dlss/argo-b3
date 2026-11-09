@@ -54,6 +54,15 @@ module Sdr
         new(...).version
       end
 
+      # @param druid [String]
+      # @return [Array<Dor::Services::Client::ObjectVersion::Version>] the versions of the object
+      # @raise [Error] if retrieving the versions fails
+      def inventory(druid:)
+        Dor::Services::Client.object(druid).version.inventory
+      rescue Dor::Services::Client::Error => e
+        raise Error, "Retrieving versions failed: #{e.message}"
+      end
+
       # Objects that are not found are omitted.
       # @param druids [Array<String>]
       # @param slice_size [Integer] the number of druids per request

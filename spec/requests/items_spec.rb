@@ -19,6 +19,18 @@ RSpec.describe 'Items' do
       expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
                                                                       editable: true)
     end
+
+    it 'cancels to the referring page' do
+      get '/items/new', headers: { 'HTTP_REFERER' => 'http://www.example.com/search?q=maps' }
+
+      expect(Capybara.string(response.body)).to have_link('Cancel', href: 'http://www.example.com/search?q=maps')
+    end
+
+    it 'cancels to the dashboard when coming from another register form' do
+      get '/items/new', headers: { 'HTTP_REFERER' => 'http://www.example.com/collections/new' }
+
+      expect(Capybara.string(response.body)).to have_link('Cancel', href: '/')
+    end
   end
 
   describe 'create' do
@@ -41,6 +53,16 @@ RSpec.describe 'Items' do
         expect(page).to have_select('Collections', visible: :all, selected: ['Art History Slides', 'xz987wv6543'])
         expect(Searchers::CollectionListByDruid).to have_received(:call)
           .with(druids: %w[druid:bc123df4567 druid:xz987wv6543])
+      end
+
+      it 'requires a web archive seed to be in a collection' do
+        post '/items', params: { item: { title: 'https://example.com',
+                                         content_type: Cocina::Models::ObjectType.webarchive_seed,
+                                         collection_druids: [''] } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body))
+          .to have_invalid_feedback('Collections', 'A web archive seed must be in a collection.')
       end
 
       it 'cancels to the dashboard' do

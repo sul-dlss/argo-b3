@@ -27,15 +27,12 @@ module Contents
 
     attr_reader :content_file_binary, :mime_type_only
 
-    def update_mime_type # rubocop:disable Metrics/AbcSize
+    # The attached blob's content type is ignored since it is influenced by the browser.
+    def update_mime_type
       return if content_file_binary.mime_type.present?
 
-      content_file_binary.mime_type = if content_file_binary.file_location_attached? &&
-                                         content_file_binary.file.blob.analyzed?
-                                        content_file_binary.file.blob.content_type
-                                      else
-                                        Marcel::MimeType.for Pathname.new(content_file_binary.filepath_on_disk)
-                                      end
+      content_file_binary.mime_type = MimeTypeSupport.for(path: content_file_binary.filepath_on_disk,
+                                                          filepath: content_file_binary.filepath)
     end
 
     def update_digests # rubocop:disable Metrics/AbcSize

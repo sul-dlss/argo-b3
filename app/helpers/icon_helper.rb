@@ -38,7 +38,15 @@ module IconHelper
     icon(icon_classes: %w[bi bi-cloud-arrow-up-fill], **)
   end
 
+  def external_link_icon(**)
+    icon(icon_classes: %w[bi bi-box-arrow-up-right], **)
+  end
+
   def cancel_icon(**)
     icon(icon_classes: %w[bi bi-x-square], **)
+  end
+
+  def in_progress_icon(**)
+    icon(icon_classes: %w[bi bi-clock-history], **)
   end
 end

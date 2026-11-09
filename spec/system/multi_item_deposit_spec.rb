@@ -157,7 +157,8 @@ RSpec.describe 'Multi-item deposit' do
     expect(page).to have_css('h2', text: 'Results of checking files')
     summary_rows = page.find('table[aria-label="Summary"]').all('tbody tr')
     expect(summary_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
-      .to eq([%w[bc123df4567 1 object redeposit], %w[cd234fg5678 1 object redeposit]])
+      .to eq([['bc123df4567', 'folder1', '1', 'file', 'redeposit', ''],
+              ['cd234fg5678', 'folder2', '1', 'file', 'redeposit', '']])
     expect(page).to have_field('Publish and preserve all files', checked: true)
 
     # Returning to discovery discards nothing.
@@ -216,6 +217,7 @@ RSpec.describe 'Multi-item deposit' do
 
     # The wait page refreshes to the show page once the deposit is submitted.
     expect(page).to have_css('h2', text: 'Deposit status')
+    expect(page).to have_link('← Dashboard', href: '/')
     expect(page).to have_text('My multi-item deposit')
     deposit_status_rows = page.find('table[aria-label="Deposit status"]').all('tbody tr')
     expect(deposit_status_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })

@@ -40,14 +40,15 @@ RSpec.describe 'Show item' do
   end
   let(:version_inventory) do
     [
-      Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: true),
+      Dor::Services::Client::ObjectVersion::Version.new(versionId: 1, message: 'Initial version', cocina: false),
       Dor::Services::Client::ObjectVersion::Version.new(versionId: 2, message: 'Second version', cocina: true)
     ]
   end
 
   let(:user_version_inventory) do
     [
-      Dor::Services::Client::UserVersion::Version.new(version: 2, userVersion: 1)
+      Dor::Services::Client::UserVersion::Version.new(version: 1, userVersion: 1, head: false, withdrawable: true),
+      Dor::Services::Client::UserVersion::Version.new(version: 2, userVersion: 2, head: true)
     ]
   end
 
@@ -316,13 +317,13 @@ RSpec.describe 'Show item' do
 
     # Workflows tab
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item', count: 2)
-    expect(page).to have_css('.accordion-button.collapsed', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'In progress')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .workflow-in-progress', text: 'In progress')
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       expect(page).to have_table(count: 2)
       expect(page).to have_table_caption('accessionwf-2-table', 'accessionWF - Version 2')
       expect(page).to have_table_caption('accessionwf-1-table', 'accessionWF - Version 1')
@@ -331,23 +332,23 @@ RSpec.describe 'Show item' do
       expect(row).to have_css('th', text: 'descriptive-metadata')
       cells = row.all('td')
       expect(cells[0]).to have_text('described')
-      expect(cells[1]).to have_text('skipped')
-      expect(cells[2]).to have_text('2023-06-21 10:36:19 PT')
-      expect(cells[3]).to have_text('less than a minute')
-      expect(page).to have_css('td.text-success-emphasis', text: 'Note: No descMetadata.xml was provided')
+      expect(cells[1]).to have_text('Skipped')
+      expect(cells[2]).to have_text('Note: No descMetadata.xml was provided')
+      expect(cells[3]).to have_text('2023-06-21 10:36:19 PT')
+      expect(cells[4]).to have_text('less than a minute')
 
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
       expect(cells[0]).to have_text('deposited')
-      expect(cells[1]).to have_text('error')
-      expect(page).to have_css('td.text-danger', text: 'Error: Bag validation failed')
+      expect(cells[1]).to have_css('.text-danger', text: 'Error')
+      expect(cells[2]).to have_css('.text-danger', text: 'Bag validation failed')
     end
 
     # Collapse accessionWF and expand registrationWF.
     click_button 'accessionWF'
     expect(page).to have_no_css('#accessionwf-collapse')
     click_button 'registrationWF'
-    within('#registrationwf-collapse.accordion-collapse.show') do
+    within('#registrationwf-collapse.show') do
       expect(page).to have_table(count: 1)
     end
 
@@ -357,27 +358,34 @@ RSpec.describe 'Show item' do
     within(find_table('versions-table')) do
       expect(page).to have_css('th', text: 'Version')
       expect(page).to have_css('th', text: 'Description')
-      expect(page).to have_css('th', text: 'User Version')
+      expect(page).to have_css('th', text: 'Public version')
       expect(page).to have_css('th', text: 'Registered / opened')
-      expect(page).to have_css('th', text: 'Submitted')
-      expect(page).to have_css('th', text: 'Accessioned')
+      expect(page).to have_css('th', text: 'Deposited')
+      expect(page).to have_css('th', text: 'Download')
+      expect(page).to have_css('th', text: 'PURL')
     end
 
-    row = find_table_row('versions-table', '1')
-    cells = row.all('td')
-    expect(cells[0]).to have_text('Initial version')
-    expect(cells[1]).to have_text('')
-    expect(cells[2]).to have_text('2020-02-28 12:23:30 PT')
-    expect(cells[3]).to have_text('2020-02-28 12:23:35 PT')
-    expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
-
-    row = find_table_row('versions-table', '2')
-    cells = row.all('td')
-    expect(cells[0]).to have_text('Second version')
-    expect(cells[1]).to have_text('1')
-    expect(cells[2]).to have_text('2021-03-31 13:23:30 PT')
-    expect(cells[3]).to have_text('2021-03-31 13:23:35 PT')
+    rows = find_table('versions-table').all('tbody tr')
+    cells = rows[0].all('td')
+    expect(cells[0]).to have_text('2')
+    expect(cells[1]).to have_text('Second version')
+    expect(cells[2]).to have_text('2')
+    expect(cells[3]).to have_text('2021-03-31 13:23:30 PT')
     expect(cells[4]).to have_text('2021-03-31 14:02:03 PT')
+    expect(cells[5]).to have_link('Cocina')
+    expect(cells[5]).to have_link('Structural metadata')
+    expect(cells[5]).to have_link('Descriptive metadata')
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567')
+
+    cells = rows[1].all('td')
+    expect(cells[0]).to have_text('1')
+    expect(cells[1]).to have_text('Initial version')
+    expect(cells[2]).to have_text('1')
+    expect(cells[3]).to have_text('2020-02-28 12:23:30 PT')
+    expect(cells[4]).to have_text('2020-02-28 13:02:03 PT')
+    expect(cells[5]).to have_no_link
+    expect(cells[6]).to have_link('PURL', href: 'https://purl.stanford.edu/bb123cd4567/version/1')
+    expect(cells[2]).to have_button('Withdraw')
 
     # Events tab
     click_button 'Events'
@@ -439,7 +447,8 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('td', text: 'PURL sitemap')
       expect(page).to have_css('td', text: '2026-08-01 14:02:03 PT', count: 2)
     end
-    expect(release_tags_client).to have_received(:list).with(public: false)
+    # The releases frame is also reloaded on each page refresh, so may have been requested more than once.
+    expect(release_tags_client).to have_received(:list).with(public: false).at_least(:once)
 
     # Files tab
     click_button 'Files'
@@ -511,20 +520,19 @@ RSpec.describe 'Show item' do
     expect_cocina_json_title(updated_title)
 
     click_button 'Workflows'
-    expect(page).to have_css('.accordion-item',
-                             count: 2)
-    expect(page).to have_css('.accordion-button:not(.collapsed)', text: 'registrationWF')
-    expect(page).to have_css('.accordion-button:not(.collapsed) .badge', text: 'Complete')
-    expect(page).to have_css('.accordion-button.collapsed', text: 'accessionWF')
-    expect(page).to have_css('.accordion-button.collapsed .badge', text: 'Complete')
+    expect(page).to have_css('.workflow-section', count: 2)
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'registrationWF')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .text-success', text: 'Complete')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'accessionWF')
+    expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
 
     click_button 'accessionWF'
 
-    within('#accessionwf-collapse.accordion-collapse.show') do
+    within('#accessionwf-collapse.show') do
       row = find_table_row('accessionwf-2-table', 'sdr-ingest-received')
       cells = row.all('td')
-      expect(cells[1]).to have_text('completed')
-      expect(page).to have_no_css('td.text-danger', text: 'Error: Bag validation failed')
+      expect(cells[1]).to have_text('Completed')
+      expect(page).to have_no_css('td .text-danger', text: 'Bag validation failed')
     end
 
     # Pinning and unpinning the object

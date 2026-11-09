@@ -113,15 +113,35 @@ RSpec.describe BulkActions::BaseJobItem do
   end
 
   describe '.close_version_if_needed!' do
-    let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 2) }
+    let(:cocina_type) { Cocina::Models::ObjectType.image }
+    let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 2, type: cocina_type) }
 
     before do
       allow(job).to receive(:log)
       allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     end
 
+    context 'when the object is a web archive seed' do
+      let(:cocina_type) { Cocina::Models::ObjectType.webarchive_seed }
+
+      before do
+        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)
+        allow(Sdr::VersionService).to receive(:close)
+        allow(Sdr::Repository).to receive(:accession)
+      end
+
+      it 'accessions the object in the default lane instead of closing the version' do
+        bulk_action_item.close_version_if_needed!
+
+        expect(Sdr::Repository).to have_received(:accession)
+          .with(cocina_object:, user_name: 'a_user', lane_id: 'default')
+        expect(Sdr::VersionService).not_to have_received(:close)
+        expect(job).to have_received(:log).with('Started wasSeedPreassemblyWF, which will close the version')
+      end
+    end
+
     context 'when version is 1' do
-      let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 1) }
+      let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 1, type: cocina_type) }
 
       before do
         allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)

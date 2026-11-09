@@ -20,6 +20,7 @@ $search-color: rgb(#{$search-color-rgb});
 @import 'search';
 @import 'show';
 @import 'forms';
+@import 'progress_stepper';
 
 // Local custom properties for object-type colors without a matching Stanford palette entry.
 :root {

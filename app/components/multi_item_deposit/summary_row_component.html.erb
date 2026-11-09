@@ -3,6 +3,9 @@
     <%= bare_druid %>
   <% end %>
   <% row_component.with_cell do %>
+    <%= path %>
+  <% end %>
+  <% row_component.with_cell do %>
     <%= file_count %>
   <% end %>
   <% row_component.with_cell do %>
@@ -11,10 +14,8 @@
   <% row_component.with_cell do %>
     <%= deposit_type %>
   <% end %>
-<% end %>
-<% if structure_errors_or_warnings? %>
-  <%= render SdrViewComponents::Tables::RowComponent.new do |row_component| %>
-    <% row_component.with_cell(colspan: 4) do %>
+  <% row_component.with_cell do %>
+    <% if structure_errors_or_warnings? %>
       <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
         <%# Errors are styled like validation errors; warnings are not. %>
         <% structure_errors.each do |error| %>

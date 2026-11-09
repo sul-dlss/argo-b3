@@ -9,6 +9,7 @@
       controller: 'scheduled-refresh',
       scheduled_refresh_interval_value: Settings.reload_intervals.multi_item_deposit_show
     } do %>
+  <%= render Elements::BreadcrumbComponent.new(label: 'Dashboard', link: root_path) %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.show.title'), classes: 'mb-3') %>
 
   <p><%= @multi_item_deposit_action.name %></p>

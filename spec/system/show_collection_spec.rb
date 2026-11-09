@@ -66,7 +66,7 @@ RSpec.describe 'Show collection' do
     expect(page).to have_css('.object-show.object-type-collection .object-type-badge', text: 'COLLECTION')
 
     # Status box
-    expect(page).to have_css('h2', text: 'Draft, not deposited')
+    expect(page).to have_css('h2', text: 'Registered')
 
     # Released to box
     expect(page).to have_css('h2', text: 'Not released')

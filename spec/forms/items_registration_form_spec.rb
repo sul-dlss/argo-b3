@@ -32,6 +32,31 @@ RSpec.describe ItemsRegistrationForm do
     end
   end
 
+  describe 'validation of collection_druids' do
+    let(:form) { described_class.new(content_type:, collection_druids:) }
+    let(:content_type) { Cocina::Models::ObjectType.webarchive_seed }
+
+    context 'when web archive seeds are in one collection' do
+      let(:collection_druids) { ['druid:mn456pq7890'] }
+
+      it 'has no collection error' do
+        form.valid?
+
+        expect(form.errors[:collection_druids]).to be_empty
+      end
+    end
+
+    context 'when web archive seeds are in no collection' do
+      let(:collection_druids) { [] }
+
+      it 'has a collection error' do
+        form.valid?
+
+        expect(form.errors[:collection_druids]).to eq(['A web archive seed must be in a collection.'])
+      end
+    end
+  end
+
   describe 'validation of item_registrations' do
     context 'when some item registrations are blank and some are not' do
       let(:form) do

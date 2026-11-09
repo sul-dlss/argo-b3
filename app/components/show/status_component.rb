@@ -21,8 +21,9 @@ module Show
       render(Show::StatusLabelComponent.new(status:))
     end
 
+    # Registered is an open first version, so it is also a draft.
     def draft?
-      status == :draft
+      status.in?(%i[registered draft])
     end
 
     def edit_label

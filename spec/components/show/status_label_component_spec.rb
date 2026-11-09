@@ -24,10 +24,17 @@ RSpec.describe Show::StatusLabelComponent, type: :component do
     expect(page).to have_css('i.bi-exclamation-triangle-fill.text-danger')
   end
 
+  it 'renders the registered label without an icon' do
+    render_inline(described_class.new(status: :registered))
+
+    expect(page).to have_text('Registered')
+    expect(page).to have_no_css('i')
+  end
+
   it 'renders the draft label without an icon' do
     render_inline(described_class.new(status: :draft))
 
-    expect(page).to have_text('Draft, not deposited')
+    expect(page).to have_text('Deposited, in draft')
     expect(page).to have_no_css('i')
   end
 end

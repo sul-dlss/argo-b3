@@ -32,11 +32,17 @@ The access of an individual file. New files get the Object Access, with citation
 ### Overwrite File Access
 Applying the Object Access to every file when saving an item whose Object Access changed. It always happens when the object is dark, which also unpublishes the files; a file that is then neither preserved, shelved, nor published (e.g., a derivative) is removed, along with any Resource it empties.
 
+### Version
+A numbered state of an object in SDR; a new version is opened for changes and closed when deposited. DSA stores cocina for each version except legacy versions, and a version's stored cocina may no longer be valid against the current cocina models.
+
+### User Version (AKA Public Version)
+A Version made publicly available on PURL, numbered separately from Versions. The latest User Version is shown at the object's PURL; earlier ones at `<purl>/<druid>/version/<user version>`. A User Version other than the latest can be withdrawn, removing it from PURL, and later restored. When an object is made dark, all User Versions other than the latest are permanently withdrawn and can't be restored.
+
 ### Draft
 The changes in an object's open version that have not yet been deposited. Discarding a draft deletes the open version, returning the object to its last closed version, and deletes the draft's Mutable Content and staged files. A first version cannot be discarded, but it can be purged.
 
 ### Deposit
-Submitting a Draft for accessioning. If the object is a DRO with files, depositing starts an assembly workflow (e.g., to create derivatives, including for files deposited in earlier versions), which closes the version once assembly is done; otherwise it closes the version directly, which starts accessioning. A geo object goes through assembly only when it has staged files. Depositing from manage files stages the Mutable Content first; depositing from elsewhere (e.g., the edit item form or the status box) deposits the structure as last staged, so it is not possible while the Mutable Content has unsaved changes.
+Submitting a Draft for accessioning. If the object is a DRO with files, depositing starts an assembly workflow (e.g., to create derivatives, including for files deposited in earlier versions), which closes the version once assembly is done; otherwise it closes the version directly, which starts accessioning. A geo object goes through assembly only when it has staged files. A web archive seed always goes through assembly, with or without files, since its assembly generates its description and thumbnail (or keeps those it already has). Depositing from manage files stages the Mutable Content first; depositing from elsewhere (e.g., the edit item form or the status box) deposits the structure as last staged, so it is not possible while the Mutable Content has unsaved changes.
 
 ### Purge
 Permanently deleting an object from SDR, along with its Mutable Content and staged files. Only an object that has never been submitted for accessioning can be purged, which in practice means a first version. Unlike discarding a Draft, which returns the object to its last closed version, purging leaves no object behind.

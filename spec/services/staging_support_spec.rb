@@ -45,9 +45,28 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.stages_to_assembly?' do
+    it 'is true for geo objects and web archive seeds only' do
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.geo))).to be true
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.webarchive_seed)))
+        .to be true
+      expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.image))).to be false
+    end
+  end
+
+  describe '.location_for' do
+    it 'is the assembly location for objects that stage there, otherwise the deposit staging location' do
+      expect(described_class.location_for(cocina_object: build(:dro, type: Cocina::Models::ObjectType.geo)))
+        .to eq Settings.assembly_location
+      expect(described_class.location_for(cocina_object: build(:dro, type: Cocina::Models::ObjectType.image)))
+        .to eq Settings.staging_location
+    end
+  end
+
   describe '.ensure_staging_folder' do
     # A druid of its own, since its folders are deleted while other specs may stage files in parallel.
     let(:druid) { 'druid:zy987wx6543' }
+    let(:cocina_object) { build(:dro, id: druid) }
 
     def delete_druid_folders
       described_class.locations.each do |staging_location|
@@ -60,9 +79,22 @@ RSpec.describe StagingSupport do
 
     context 'when no staging location has the druid folder' do
       it 'creates the staging content directory' do
-        described_class.ensure_staging_folder(druid:)
+        described_class.ensure_staging_folder(cocina_object:)
 
         expect(File.directory?(described_class.staging_content_path(druid:))).to be true
+      end
+    end
+
+    context 'when the object is a web archive seed' do
+      let(:cocina_object) { build(:dro, id: druid, type: Cocina::Models::ObjectType.webarchive_seed) }
+
+      it 'creates the staging content directory in the assembly location' do
+        described_class.ensure_staging_folder(cocina_object:)
+
+        expect(File.directory?(described_class.staging_content_path(druid:,
+                                                                    staging_location: Settings.assembly_location)))
+          .to be true
+        expect(File.exist?(DruidTools::Druid.new(druid, Settings.staging_location).path)).to be false
       end
     end
 
@@ -70,7 +102,7 @@ RSpec.describe StagingSupport do
       before { stage_file(staging_location: Settings.assembly_location) }
 
       it 'does not create the staging content directory' do
-        described_class.ensure_staging_folder(druid:)
+        described_class.ensure_staging_folder(cocina_object:)
 
         expect(File.exist?(described_class.staging_content_path(druid:))).to be false
       end

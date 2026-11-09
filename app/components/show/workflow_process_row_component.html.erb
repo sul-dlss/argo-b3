@@ -1,0 +1,18 @@
+<%= render SdrViewComponents::Tables::RowComponent.new(label: name) do |row_component| %>
+  <% row_component.with_cell do %><%= lifecycle %><% end %>
+  <% row_component.with_cell do %>
+    <% if error? %>
+      <span class="text-danger"><%= helpers.danger_icon(aria: { hidden: true }) %> <%= status.titleize %></span>
+    <% else %>
+      <%= status.titleize %>
+    <% end %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
+      <% list_component.with_item { tag.span(error_message, class: 'text-danger') } if error_message.present? %>
+      <% list_component.with_item { "Note: #{note}" } if note.present? %>
+    <% end %>
+  <% end %>
+  <% row_component.with_cell do %><%= helpers.format_datetime(Time.zone.parse(datetime)) if datetime %><% end %>
+  <% row_component.with_cell do %><%= helpers.distance_of_time_in_words(0, elapsed.to_i) if elapsed %><% end %>
+<% end %>

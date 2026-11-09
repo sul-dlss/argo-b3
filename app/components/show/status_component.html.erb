@@ -1,6 +1,6 @@
 <%= render Show::BoxComponent.new(heading:) do %>
   <% case status %>
-  <% when :deposited, :draft %>
+  <% when :deposited, :registered, :draft %>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
       <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
                                                                       variant: :'outline-primary', size: :sm,
