@@ -535,8 +535,9 @@ RSpec.describe 'Show item' do
       expect(page).to have_no_css('td .text-danger', text: 'Bag validation failed')
     end
 
-    # Pinning and unpinning the object
-    within('h1') do
+    # Pinning and unpinning the object, beside a heading of only the title
+    expect(page).to have_css('h1', exact_text: updated_title)
+    within('.object-heading') do
       expect(page).to have_css('.bi-pin')
       expect(page).to have_no_css('.bi-pin-fill')
       expect(page).to have_button('Pin')
@@ -545,7 +546,7 @@ RSpec.describe 'Show item' do
     end
 
     expect(page).to have_toast('Pin added')
-    within('h1') do
+    within('.object-heading') do
       expect(page).to have_css('.bi-pin-fill')
       expect(page).to have_no_css('.bi-pin')
       expect(page).to have_button('Unpin')
@@ -554,7 +555,7 @@ RSpec.describe 'Show item' do
     end
 
     expect(page).to have_toast('Pin removed')
-    within('h1') do
+    within('.object-heading') do
       expect(page).to have_css('.bi-pin')
       expect(page).to have_no_css('.bi-pin-fill')
     end

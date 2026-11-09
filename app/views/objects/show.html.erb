@@ -21,13 +21,13 @@
           <%= @solr_doc.object_type_label %>
         </div>
 
-        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, classes: 'mb-xl-4 mb-3 d-flex order-1') do %>
-          <%= @solr_doc.title %>
+        <div class="object-heading mb-xl-4 mb-3 d-flex order-1">
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-0') %>
           <%= render Pin::PinnedObjectComponent.new(druid: @solr_doc.druid, pinned: @pinned) unless @solr_doc.agreement? %>
           <% unless allowed_to?(:update?, @solr_doc, with: ObjectPolicy) %>
             <span class="read-only-badge fw-semibold text-uppercase rounded-pill border border-dark px-3 fs-5 ms-3 align-self-center">Read only</span>
           <% end %>
-        <% end %>
+        </div>
       </div>
 
       <%= render Show::EmbargoBannerComponent.new(release_date: @solr_doc.formatted_embargo_release_date) %>

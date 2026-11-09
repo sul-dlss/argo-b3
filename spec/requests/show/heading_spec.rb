@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Show object read-only badge' do
+RSpec.describe 'Show object heading' do
   include_context 'with show page object client'
 
   let(:druid) { 'druid:bc123df4567' }
@@ -22,10 +22,11 @@ RSpec.describe 'Show object read-only badge' do
   context 'when the user can edit the object' do
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
 
-    it 'does not render the badge' do
+    it 'renders the pin button beside a heading of only the title, without the badge' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_css('h1', text: 'My object')
+      expect(rendered_page).to have_css('h1', exact_text: 'My object')
+      expect(rendered_page).to have_css('h1 ~ * button', text: 'Pin')
       expect(rendered_page).to have_no_css('.read-only-badge')
     end
   end
@@ -33,10 +34,11 @@ RSpec.describe 'Show object read-only badge' do
   context 'when the user can only read the object' do
     before { create(:permission, :read_restricted, workgroup: user.groups.first, target_druid: druid) }
 
-    it 'renders the badge in the heading' do
+    it 'renders the badge beside a heading of only the title' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_css('h1 .read-only-badge', text: 'Read only')
+      expect(rendered_page).to have_css('h1', exact_text: 'My object')
+      expect(rendered_page).to have_css('h1 ~ .read-only-badge', text: 'Read only')
     end
   end
 end
