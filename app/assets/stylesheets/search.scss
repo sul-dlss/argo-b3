@@ -41,19 +41,3 @@ a[aria-expanded="false"] {
 .object-type-pill {
   min-width: min-content;
 }
-
-// View toggle (search results / workflow status).
-// Search::ViewToggleComponent renders links styled by the component library's
-// .toggle-radio, with .active standing in for :checked. Bootstrap styles a hovered
-// radio label (.btn-check + .btn:hover) but not a hovered link, so these keep the
-// link's colors on hover and, like a checked option, leave the selected one un-underlined.
-.toggle-radio.view-toggle .btn-group {
-  .btn {
-    --bs-btn-hover-bg: var(--bs-btn-bg);
-    --bs-btn-hover-color: var(--bs-btn-color);
-  }
-
-  .btn.active:hover {
-    --btn-hover-decoration: none;
-  }
-}
