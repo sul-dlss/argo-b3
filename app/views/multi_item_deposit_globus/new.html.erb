@@ -4,7 +4,7 @@
   <% end %>
   <% if @multi_item_deposit_action.globus_directory %>
     <p><%= t('edit.multi_item_deposits.globus.instructions') %></p>
-    <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.contents.globus.buttons.open'),
+    <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: new_tab_label(t('edit.contents.globus.buttons.open')),
                                                                     link: @multi_item_deposit_action.globus_directory.url,
                                                                     target: '_blank', rel: 'noopener') %>
   <% else %>

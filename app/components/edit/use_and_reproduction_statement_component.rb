@@ -27,8 +27,9 @@ module Edit
     end
 
     def help_text
-      help_text = t('edit.items.fields.use_and_reproduction_statement.help_text_html',
-                    url: Settings.links.use_and_reproduction_statement)
+      link = helpers.link_to_new_tab(t('edit.items.fields.use_and_reproduction_statement.help_link'),
+                                     Settings.links.use_and_reproduction_statement)
+      help_text = t('edit.items.fields.use_and_reproduction_statement.help_text_html', link:)
       return help_text unless @apo_defaults
 
       safe_join([help_text, tag.span(data: { apo_defaults_target: 'useAndReproductionStatementText' })], tag.br)

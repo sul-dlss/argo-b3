@@ -20,20 +20,24 @@ RSpec.describe Show::VersionRowComponent, type: :component do
     expect(table).to have_css('tbody > tr', count: 1)
     expect(table.all('td').map { |cell| cell.text.squish }).to eq(
       ['2', 'Second version', '1', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT',
-       'Cocina Structural metadata Descriptive metadata', 'PURL']
+       'Cocina for version 2 Structural metadata for version 2 Descriptive metadata for version 2',
+       'PURL for version 2 (opens in new tab)']
     )
-    expect(table).to have_link('PURL', href: 'https://purl.stanford.edu/bc123df4567/version/1')
+    expect(table).to have_link('PURL for version 2 (opens in new tab)',
+                               href: 'https://purl.stanford.edu/bc123df4567/version/1')
+    expect(table.find_link('PURL for version 2')[:target]).to eq('_blank')
     expect(table).to have_no_button
   end
 
   it 'renders the download links in a list' do
     download_cell = table.all('td')[5]
     expect(download_cell).to have_css('ul.list-unstyled li', count: 3)
-    expect(download_cell).to have_link('Cocina', href: '/objects/token/versions/2/cocina')
-    expect(download_cell.find_link('Cocina')[:target]).to eq('_blank')
-    expect(download_cell).to have_css('a i.bi-box-arrow-up-right')
-    expect(download_cell).to have_link('Structural metadata', href: '/objects/token/versions/2/structural_csv')
-    expect(download_cell).to have_link('Descriptive metadata', href: '/objects/token/versions/2/descriptive_csv')
+    expect(download_cell).to have_link(exact_text: 'Cocina for version 2', href: '/objects/token/versions/2/cocina')
+    expect(download_cell.find_link('Cocina for version 2')[:target]).to be_nil
+    expect(download_cell).to have_link('Structural metadata for version 2',
+                                       href: '/objects/token/versions/2/structural_csv')
+    expect(download_cell).to have_link('Descriptive metadata for version 2',
+                                       href: '/objects/token/versions/2/descriptive_csv')
   end
 
   context 'when the user version is withdrawable' do
@@ -114,7 +118,8 @@ RSpec.describe Show::VersionRowComponent, type: :component do
 
     it 'renders only the cocina link and omits the user version and PURL cells' do
       expect(table.all('td').map { |cell| cell.text.squish }).to eq(
-        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT', 'Cocina']
+        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT',
+         'Cocina for version 2']
       )
       expect(table).to have_no_link('PURL')
     end
@@ -125,7 +130,8 @@ RSpec.describe Show::VersionRowComponent, type: :component do
 
     it 'omits the structural metadata link and the user version and PURL cells' do
       expect(table.all('td').map { |cell| cell.text.squish }).to eq(
-        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT', 'Cocina Descriptive metadata']
+        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT',
+         'Cocina for version 2 Descriptive metadata for version 2']
       )
       expect(table).to have_no_link('PURL')
     end
@@ -136,7 +142,8 @@ RSpec.describe Show::VersionRowComponent, type: :component do
 
     it 'renders only the cocina link and omits the user version and PURL cells' do
       expect(table.all('td').map { |cell| cell.text.squish }).to eq(
-        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT', 'Cocina']
+        ['2', 'Second version', '2021-03-31 13:23:30 PT', '2021-03-31 14:02:03 PT',
+         'Cocina for version 2']
       )
       expect(table).to have_no_link('PURL')
     end

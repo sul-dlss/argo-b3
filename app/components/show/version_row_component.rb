@@ -36,7 +36,7 @@ module Show
     def purl_link
       return if purl_url.blank?
 
-      helpers.link_to_new_tab('PURL', purl_url)
+      helpers.link_to_new_tab(with_version_context('PURL'), purl_url)
     end
 
     def download_links
@@ -56,27 +56,32 @@ module Show
                                                            disabled: !@manage_user_versions)
     end
 
+    # Names the version, since the links repeat on every row.
+    def with_version_context(text)
+      helpers.text_with_hidden_context(text, "for version #{version}")
+    end
+
     def path_params
       { object_druid: druid_token, version: }
     end
 
     def cocina_link
-      helpers.link_to_new_tab(cocina_object_version_path(**path_params)) do
-        safe_join(['Cocina ', helpers.external_link_icon(aria: { hidden: true })])
-      end
+      link_to(with_version_context('Cocina'), cocina_object_version_path(**path_params))
     end
 
     def structural_csv_link
       return unless CocinaSupport.item_or_virtual_object?(cocina_object)
 
-      link_to('Structural metadata', structural_csv_object_version_path(**path_params), data: { turbo: false })
+      link_to(with_version_context('Structural metadata'), structural_csv_object_version_path(**path_params),
+              data: { turbo: false })
     end
 
     # Items, virtual objects, and collections.
     def descriptive_csv_link
       return if cocina_object.admin_policy? || CocinaSupport.agreement?(cocina_object)
 
-      link_to('Descriptive metadata', descriptive_csv_object_version_path(**path_params), data: { turbo: false })
+      link_to(with_version_context('Descriptive metadata'), descriptive_csv_object_version_path(**path_params),
+              data: { turbo: false })
     end
   end
 end

@@ -52,9 +52,9 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(page).to have_css('h2', text: 'Completed')
 
       downloads_box = page.find('h2', text: 'Downloads').ancestor('.card')
-      expect(downloads_box).to have_link('Log file',
+      expect(downloads_box).to have_link("Log file for Bulk action #{bulk_action.id}",
                                          href: "/bulk_actions/#{bulk_action.id}/file?filename=log.txt")
-      expect(downloads_box).to have_link('Cocina JSON',
+      expect(downloads_box).to have_link("Cocina JSON for Bulk action #{bulk_action.id}",
                                          href: "/bulk_actions/#{bulk_action.id}/file?filename=cocina.jsonl.gz")
 
       expect(page).to have_no_css('[role="tablist"]')

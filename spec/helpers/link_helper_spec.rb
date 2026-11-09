@@ -13,6 +13,26 @@ RSpec.describe LinkHelper do
     end
   end
 
+  describe '#link_to_new_tab' do
+    it 'opens in a new tab and says so' do
+      link = Capybara.string(helper.link_to_new_tab('SearchWorks', 'https://searchworks.stanford.edu/view/bc123df4567'))
+
+      expect(link).to have_link('SearchWorks (opens in new tab)', href: 'https://searchworks.stanford.edu/view/bc123df4567')
+      expect(link).to have_css('a[target="_blank"][rel="noopener"]')
+      expect(link).to have_css('a i.bi-box-arrow-up-right[aria-hidden="true"]')
+      expect(link).to have_css('a span.visually-hidden', text: '(opens in new tab)')
+    end
+  end
+
+  describe '#link_to_purl' do
+    it 'opens the PURL in a new tab' do
+      link = Capybara.string(helper.link_to_purl('druid:bc123df4567'))
+
+      expect(link).to have_link('View PURL page (opens in new tab)', href: "#{Settings.purl.url}/bc123df4567")
+      expect(link).to have_css('a[target="_blank"] span.visually-hidden', text: '(opens in new tab)')
+    end
+  end
+
   describe '#searchworks_url' do
     let(:druid) { 'druid:bc123df4567' }
 

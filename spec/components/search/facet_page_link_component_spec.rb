@@ -17,7 +17,7 @@ RSpec.describe Search::FacetPageLinkComponent, type: :component do
     render_inline(component)
 
     turbo_frame = page.find('turbo-frame#mimetypes-facet-page2')
-    expect(turbo_frame).to have_link('More',
+    expect(turbo_frame).to have_link(exact_text: 'More MIME type',
                                      href: '/search/mimetype_facets?facet_page=2')
   end
 

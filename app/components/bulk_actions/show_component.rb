@@ -104,11 +104,17 @@ module BulkActions
     private
 
     def log_file_link
-      link_to('Log file', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
+      link_to(with_bulk_action_context('Log file'),
+              file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
+    end
+
+    def with_bulk_action_context(text)
+      helpers.text_with_hidden_context(text, "for #{name}")
     end
 
     def export_link(export)
-      link_to(export.label, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
+      link_to(with_bulk_action_context(export.label), file_bulk_action_path(bulk_action, filename: export.filename),
+              download: true)
     end
   end
 end

@@ -24,7 +24,7 @@ RSpec.describe Search::FieldValueResultsComponent, type: :component do
       expect(page).to have_css('section[aria-label="Project results"] h3', text: 'Project results (2 found)')
       expect(page).to have_css('li', count: 2)
       expect(page).to have_no_css('li.d-none')
-      expect(page).to have_no_button('More »')
+      expect(page).to have_no_button('More project results')
     end
   end
 
@@ -38,7 +38,7 @@ RSpec.describe Search::FieldValueResultsComponent, type: :component do
       expect(page).to have_css('li', count: 7)
       expect(page).to have_css('li.d-none[data-show-more-target="hidden"]', count: 2, visible: :all)
       expect(page).to have_css('li#projects-result-project-6.d-none', visible: :all)
-      expect(page).to have_button('More »')
+      expect(page).to have_button(exact_text: 'More project results')
     end
   end
 end

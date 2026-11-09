@@ -40,9 +40,11 @@ RSpec.describe 'Content globus' do
       it 'renders the Globus link and the discover button' do
         get new_content_globus_path(content_id: content_token)
 
-        expect(response.body).to include('Open Globus')
-        expect(response.body)
-          .to include('https://app.globus.org/file-manager?destination_id=endpoint_id&amp;destination_path=%2Fuploads%2Fjdoe%2Fobjects%2Fbc123df4567')
+        link = Capybara.string(response.body).find_link('Open Globus (opens in new tab)')
+        expect(link[:href])
+          .to eq('https://app.globus.org/file-manager?destination_id=endpoint_id&destination_path=%2Fuploads%2Fjdoe%2Fobjects%2Fbc123df4567')
+        expect(link[:target]).to eq('_blank')
+        expect(link).to have_css('i.bi-box-arrow-up-right[aria-hidden="true"]')
         expect(response.body).to include('Discover files')
         expect(response.body).not_to include('Create Globus link')
       end

@@ -26,7 +26,9 @@ RSpec.describe Show::ReleasedToComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('h2', text: 'Released to')
-      expect(page).to have_link('Searchworks', href: %r{\Ahttps://searchworks})
+      expect(page).to have_link('Searchworks (opens in new tab)', href: %r{\Ahttps://searchworks})
+      expect(page.find_link('Searchworks')[:target]).to eq('_blank')
+      expect(page).to have_css('a i.bi-box-arrow-up-right[aria-hidden="true"]', count: 2)
       expect(page).to have_link('Search engines', href: %r{/bc123df4567\z})
     end
   end

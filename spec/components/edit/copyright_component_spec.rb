@@ -22,8 +22,8 @@ RSpec.describe Edit::CopyrightComponent, type: :component do
   it 'renders the help link, opening in a new tab' do
     render_inline(component)
 
-    expect(page).to have_link('sample copyright statements', href: Settings.links.copyright)
-    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'sample copyright statements')
+    expect(page).to have_link('sample copyright statements (opens in new tab)', href: Settings.links.copyright)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"] i.bi-box-arrow-up-right[aria-hidden="true"]')
   end
 
   context 'with a label' do

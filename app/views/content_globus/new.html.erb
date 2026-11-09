@@ -9,7 +9,7 @@
   <% if @directory_writable %>
     <p><%= t('edit.contents.globus.instructions') %></p>
     <div class="d-flex gap-2">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.contents.globus.buttons.open'),
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: new_tab_label(t('edit.contents.globus.buttons.open')),
                                                                       link: @globus_directory.url,
                                                                       target: '_blank', rel: 'noopener') %>
 

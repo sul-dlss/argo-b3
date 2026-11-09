@@ -60,8 +60,10 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
       expect(row).to have_css('td:nth-of-type(4) i.bi-exclamation-triangle-fill.text-warning')
       expect(row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')
       expect(row).to have_css('td:nth-of-type(6) ul > li', count: 2)
-      expect(row).to have_css('td:nth-of-type(6) a', text: 'Log')
-      expect(row).to have_link('Cocina JSON')
+      expect(row).to have_link("Log file for Bulk action #{bulk_action.id}",
+                               href: "/bulk_actions/#{bulk_action.id}/file?filename=log.txt")
+      expect(row).to have_css('td:nth-of-type(6) a span.visually-hidden', text: "for Bulk action #{bulk_action.id}")
+      expect(row).to have_link("Cocina JSON for Bulk action #{bulk_action.id}")
       expect(row).to have_css(
         "td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action.id}']" \
         "[data-turbo-confirm='Delete this bulk action from history? Its log and export files will also be deleted. " \
@@ -97,9 +99,9 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
       row = page.find("tr##{dom_id(bulk_action, 'row')}")
       expect(row).to have_css('td:nth-of-type(6) ul > li', count: 2)
       expect(row).to have_css('td:nth-of-type(6) a', count: 2)
-      expect(row).to have_link('Registration report',
+      expect(row).to have_link("Registration report for Bulk action #{bulk_action.id}",
                                href: "/bulk_actions/#{bulk_action.id}/file?filename=registration_report.csv")
-      expect(row).to have_link('Tracking sheets',
+      expect(row).to have_link("Tracking sheets for Bulk action #{bulk_action.id}",
                                href: "/bulk_actions/#{bulk_action.id}/file?filename=tracking_sheets.pdf")
     end
   end
