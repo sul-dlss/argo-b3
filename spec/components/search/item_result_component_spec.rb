@@ -21,7 +21,7 @@ RSpec.describe Search::ItemResultComponent, type: :component do
       expect(caption).to have_button('Pin')
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'Druid', 'bb123cd4567')
-      expect(page).to have_css('.object-type-item .rounded-pill', text: 'Item')
+      expect(page).to have_css('.object-type-item .object-type-pill.rounded-pill.fs-5.fw-bold', text: 'Item')
       expect(find_table_value_cell('item-result-bb123cd4567', 'APO'))
         .to have_link('University Archives', href: "/objects/#{apo_druid}")
       expect(page).to have_table_value('item-result-bb123cd4567', 'Content type', 'Book')

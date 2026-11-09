@@ -1,6 +1,6 @@
 <%= tag.li class: 'mb-5' do %>
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-7 col-lg-8 col-xl-9 col-xxl-10">
       <%= render SdrViewComponents::Tables::TableComponent.new(id:) do |component| %>
         <% component.with_caption do %>
           <%= render Search::ResultHeadingComponent.new(index:) do |heading| %>
@@ -32,8 +32,8 @@
         <% component.with_row(label: 'Access rights', values: access_rights_values) if result.access_rights.present? %>
       <% end %>
     </div>
-    <%= tag.div class: ['col-md-2 mx-auto align-self-start pt-5', result.object_type_class] do %>
-      <div class="object-type-bg object-type-pill fw-bold text-center text-uppercase rounded-pill px-3 py-1 mb-3">
+    <%= tag.div class: ['col-md-5 col-lg-4 col-xl-3 col-xxl-2 mx-auto align-self-start pt-5', result.object_type_class] do %>
+      <div class="object-type-bg object-type-pill fs-5 fw-bold text-center text-uppercase rounded-pill px-2 py-1 mb-3">
         <%= result.object_type_label %>
       </div>
       <%= render ThumbnailComponent.new(result:) %>
