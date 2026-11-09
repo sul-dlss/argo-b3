@@ -147,9 +147,9 @@ RSpec.describe 'Dashboard' do
       end
 
       it 'displays objects only after their show pages have been visited' do
-        # visit the dashboard and ensure we don't have our fixture objects in the recent objects table
+        # visit the dashboard and ensure we don't have our fixture objects in the recently viewed table
         get root_path
-        recent_objects_table = response.parsed_body.at_css('table[aria-label="Recent objects"]')
+        recent_objects_table = response.parsed_body.at_css('table[aria-label="Recently viewed"]')
         recent_object_druids.each do |recent_object_druid|
           recent_object_title = "Title #{DruidSupport.bare_druid_from(recent_object_druid)}"
           expect(recent_objects_table.text).not_to include(recent_object_title)
@@ -158,9 +158,9 @@ RSpec.describe 'Dashboard' do
           get object_path(recent_object_druid)
         end
 
-        # Back to dashboard, check to see if objects we viewed are now in the recent objects table on the dashboard
+        # Back to dashboard, check to see if objects we viewed are now in the recently viewed table on the dashboard
         get root_path
-        recent_objects_table = response.parsed_body.at_css('table[aria-label="Recent objects"]')
+        recent_objects_table = response.parsed_body.at_css('table[aria-label="Recently viewed"]')
         recent_object_druids.each do |recent_object_druid|
           recent_object_title = "Title #{DruidSupport.bare_druid_from(recent_object_druid)}"
           expect(recent_objects_table.text).to include(recent_object_title)
@@ -190,7 +190,7 @@ RSpec.describe 'Dashboard' do
         expect(rendered_page).to have_css('a.disabled', exact_text: 'Register multiple items')
         expect(rendered_page).to have_css('.disabled', exact_text: 'Deposit multiple items')
 
-        expect(rendered_page).to have_css('table[aria-label="Recent objects"]')
+        expect(rendered_page).to have_css('table[aria-label="Recently viewed"]')
         expect(rendered_page).to have_css('table[aria-label="Pinned searches"]')
         expect(rendered_page).to have_css('table[aria-label="Pinned items"]')
         expect(rendered_page).to have_css('table[aria-label="Pinned collections"]')
