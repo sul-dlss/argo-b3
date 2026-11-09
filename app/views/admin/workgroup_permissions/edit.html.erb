@@ -35,7 +35,7 @@
     <%= table.with_header(label: 'Druid') %>
     <%= table.with_header(label: 'Object type') %>
     <%= table.with_header(label: 'Permission') %>
-    <%= table.with_header(label: '') %>
+    <%= table.with_header(label: tag.span('Actions', class: 'visually-hidden')) %>
     <% @additional_permissions.each do |permission| %>
       <% table.with_row do %>
         <%= render Admin::WorkgroupPermissionRowComponent.new(permission:, object_doc: @object_docs_by_druid[permission.target_druid]) %>

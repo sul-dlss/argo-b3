@@ -12,7 +12,8 @@ RSpec.describe Elements::SelectedItemComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('li .selected-item-label', text: 'Test Label')
-      expect(page).to have_link('', href: '/remove/path', title: 'Remove Test Label', class: 'btn-close')
+      expect(page).to have_css('a.btn-close[href="/remove/path"]:not([title]) .visually-hidden',
+                               text: 'Remove Test Label')
     end
   end
 
@@ -31,7 +32,8 @@ RSpec.describe Elements::SelectedItemComponent, type: :component do
       end
 
       expect(page).to have_css('li .selected-item-label', text: 'Custom Label Content')
-      expect(page).to have_link('', href: '/remove/path', title: 'Remove Test Label', class: 'btn-close')
+      expect(page).to have_css('a.btn-close[href="/remove/path"]:not([title]) .visually-hidden',
+                               text: 'Remove Test Label')
     end
   end
 end

@@ -49,7 +49,9 @@ RSpec.describe 'Admin object permissions' do
         expect(rendered_page).to have_button('Add')
 
         expect(rendered_page.all('#object-permissions thead th').map { |header| header.text.strip })
-          .to eq(['Workgroup', 'Permission', ''])
+          .to eq(%w[Workgroup Permission Actions])
+        expect(rendered_page).to have_css('#object-permissions thead th:nth-of-type(3) .visually-hidden',
+                                          text: 'Actions')
         rows = rendered_page.all('#object-permissions tbody tr')
         expect(rows.map { |row| row.all('td').first(2).map { |cell| cell.text.strip } })
           .to eq([%w[sdr:alpha Edit], %w[sdr:gamma Read]])

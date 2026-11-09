@@ -798,6 +798,7 @@ en:
     object_permissions:
       heading: 'Edit %{object_type} permissions'
       table_label: 'Permissions'
+      actions_header: 'Actions'
       empty: 'No permissions.'
       fields:
         workgroup:

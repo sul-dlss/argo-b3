@@ -6,7 +6,7 @@
   <% component.with_header(label: 'File name', style: 'width: 60%;') %>
   <% component.with_header(label: 'Size') %>
   <% component.with_header(label: 'Type') %>
-  <% component.with_header(label: '') %>
+  <% component.with_header(label: tag.span('Actions', class: 'visually-hidden')) %>
   <% content_file_binaries.each do |content_file_binary| %>
     <% component.with_row(label: content_file_binary.filepath) do |row_component| %>
       <% row_component.with_cell do %><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %><% end %>

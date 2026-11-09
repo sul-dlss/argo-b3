@@ -20,9 +20,9 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('li', text: /Project\s+❯\s+Project 1/)
-      expect(page).to have_link('', href: '/search?object_types%5B%5D=item&object_types%5B%5D=collection' \
-                                          '&projects%5B%5D=Project+2',
-                                    title: 'Remove Project > Project 1')
+      expect(page).to have_link('Remove Project > Project 1',
+                                href: '/search?object_types%5B%5D=item&object_types%5B%5D=collection' \
+                                      '&projects%5B%5D=Project+2')
     end
   end
 
@@ -40,9 +40,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('li', text: /Object type\s+❯\s+item OR collection/)
-      expect(page).to have_link('',
-                                href: '/search?projects%5B%5D=Project+1',
-                                title: 'Remove Object type > item OR collection')
+      expect(page).to have_link('Remove Object type > item OR collection', href: '/search?projects%5B%5D=Project+1')
     end
   end
 
