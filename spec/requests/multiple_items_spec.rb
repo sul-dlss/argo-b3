@@ -24,6 +24,18 @@ RSpec.describe 'Multiple items' do
       expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
                                                                       editable: true)
     end
+
+    it 'labels the Goobi choice with a visible legend' do
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
+
+      get new_multiple_item_path
+
+      fieldset = Capybara.string(response.body).find(:fieldset, 'Deposit with Goobi')
+      expect(fieldset).to have_css('legend', text: 'Deposit with Goobi')
+      expect(fieldset).to have_no_css('.visually-hidden, [aria-hidden]')
+      expect(fieldset).to have_field('Yes', type: 'radio')
+      expect(fieldset).to have_field('No', type: 'radio')
+    end
   end
 
   context 'when the user does not belong to a workgroup with edit permission' do

@@ -75,7 +75,12 @@ RSpec.describe 'Admin workgroup permissions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'sdr:alpha')
         expect(rendered_page).to have_link('← Workgroup permissions', href: '/admin/workgroup_permissions')
-        expect(rendered_page).to have_checked_field('Yes')
+        fieldset = rendered_page.find(:fieldset, 'Read unrestricted')
+        # The visible text is the legend rather than text hidden from screen readers.
+        expect(fieldset).to have_css('legend', text: 'Read unrestricted')
+        expect(fieldset).to have_no_css('.visually-hidden, [aria-hidden]')
+        expect(fieldset).to have_checked_field('Yes')
+        expect(fieldset).to have_field('No', type: 'radio')
 
         rows = rendered_page.all('#additional-permissions-table tbody tr')
         expect(rows.map { |row| row.all('td')[0..3].map { |cell| cell.text.strip } }).to eq(

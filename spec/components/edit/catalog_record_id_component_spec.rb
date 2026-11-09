@@ -37,6 +37,8 @@ RSpec.describe Edit::CatalogRecordIdComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('[data-catalog-title-target="titleRow"]:not([hidden])', text: 'Pride and prejudice')
+      label = page.find('label', text: 'FOLIO title statement')
+      expect(page).to have_css("output##{label[:for]}", text: 'Pride and prejudice')
       expect(page.find('input[data-catalog-title-target="title"]', visible: :hidden)[:value])
         .to eq('Pride and prejudice')
     end
