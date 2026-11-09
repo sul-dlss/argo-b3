@@ -6,8 +6,9 @@ module Search
   # Switching views is navigation, not data entry, so this renders links rather than a radio group.
   # The markup mirrors SdrViewComponents::Forms::ToggleComponent, but that component renders
   # form.radio_button and so requires the form to have a `view` attribute; a form's class is what
-  # identifies its view, so there is deliberately no such attribute. See .view-toggle in search.scss
-  # for the styling that stands in for the gem's :checked selectors.
+  # identifies its view, so there is deliberately no such attribute. The component library's
+  # .toggle-radio styles apply to the links, with .active in place of :checked; see .view-toggle in
+  # search.scss for what links need beyond that.
   class ViewToggleComponent < ViewComponent::Base
     VIEWS = [
       { form_class: ResultsSearchForm, label: 'Search results view' },
@@ -22,13 +23,12 @@ module Search
 
     attr_reader :search_form
 
-    # @return [Array<Hash>] one entry per view, with the label, path, position and selected state
+    # @return [Array<Hash>] one entry per view, with the label, path and selected state
     def views
-      VIEWS.each_with_index.map do |view, index|
+      VIEWS.map do |view|
         view.merge(
           path: url_for(search_form.as(view[:form_class])),
-          selected: search_form.instance_of?(view[:form_class]),
-          position_class: index.zero? ? 'rounded-start-pill' : 'rounded-end-pill'
+          selected: search_form.instance_of?(view[:form_class])
         )
       end
     end
