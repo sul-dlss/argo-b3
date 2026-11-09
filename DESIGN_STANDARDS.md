@@ -51,7 +51,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 ## Page structure
 
 - **PAGE-1 MUST** The document has `<html lang="en">`, exactly one `<main id="main-container">` containing the page content, and the gem's `SkipLinksComponent` as the first focusable element.
-- **PAGE-2 MUST** Every page sets a title that identifies it: `<h1 text> | Argo B3`, with the product name read from `en.yml`. The layout's fallback title is not acceptable for any page.
+- **PAGE-2 MUST** Every page sets a title that identifies it: `<h1 text> | Argo B3`, with the product name read from `en.yml`. A page about one object or named record whose h1 doesn't name it (e.g., "Manage files") adds the name: `<h1 text> – <name> | Argo B3`. The layout's fallback title is not acceptable for any page.
 - **PAGE-3 MUST** Every page has exactly one `<h1>`, describing the page (e.g., the object's title, "Register multiple items").
 - **PAGE-4 MUST** A page below a top-level page has a back link at the top (`Elements::BreadcrumbComponent`): "← " followed by the name of the parent page (e.g., "← Workgroup permissions"), never just "Back". A page with a Cancel action does not need one.
 - **PAGE-5 MUST** Landmarks are used for their purpose: navigation in `<nav>` (not `div role="navigation"`), and when a page has more than one `<nav>`, each has a distinct `aria-label`.
