@@ -10,5 +10,5 @@
   <% end %>
 <% else %>
   <%= render Show::FileSetComponent.with_collection(content_file_sets, content_file_set_total: content_file_sets.size,
-                                                                       classes: 'mb-2') %>
+                                                                       heading_level: :h3, classes: 'mb-2') %>
 <% end %>

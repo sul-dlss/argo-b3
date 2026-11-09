@@ -2,7 +2,7 @@
   <div class="card-body">
     <div class="card-title d-flex justify-content-between">
       <div>
-        <span class="h3">Resource (<%= index %>):</span> <%= file_set_type %>
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: heading_level, text: "Resource (#{index}):", variant: :h3, classes: 'd-inline') %> <%= file_set_type %>
                 <%= if editable?
                       render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :edit,
                                                                                       label: "Edit resource #{index}",
