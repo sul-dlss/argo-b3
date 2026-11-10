@@ -243,6 +243,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_field('Mount path')
         expect(rendered_page).to have_no_css('table[aria-label="Error details"]')
         expect(rendered_page).to have_button('Next', disabled: true)
+        expect(rendered_page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
       end
     end
 
@@ -342,6 +343,8 @@ RSpec.describe 'Multi-item deposit actions' do
           'Download structural metadata template CSV',
           href: structural_metadata_csv_template_multi_item_deposit_action_path(multi_item_deposit_action)
         )
+        expect(rendered_page).to have_css('button i.bi-arrow-left[aria-hidden="true"]')
+        expect(rendered_page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
       end
 
       it 'renders the OCR inputs when an Item Deposit can be OCRed' do
@@ -485,6 +488,7 @@ RSpec.describe 'Multi-item deposit actions' do
           expect(rendered_page).to have_text('Version description is automatically set for initial deposits.')
           expect(rendered_page).to have_link('Cancel', href: root_path)
           expect(rendered_page).to have_button('Previous')
+          expect(rendered_page).to have_css('button i.bi-arrow-left[aria-hidden="true"]')
           expect(rendered_page).to have_button('Check version status and deposit')
         end
       end

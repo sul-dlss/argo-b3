@@ -69,7 +69,7 @@
                                                                         variant: :link,
                                                                         classes: 'text-danger p-0',
                                                                         confirm: t('edit.contents.structure.buttons.delete_all_confirm')) do %>
-          <%= delete_icon(classes: 'me-2') %><%= t('edit.contents.structure.buttons.delete_all') %>
+          <%= delete_icon(classes: 'me-2', aria: { hidden: true }) %><%= t('edit.contents.structure.buttons.delete_all') %>
         <% end %>
       </fieldset>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>

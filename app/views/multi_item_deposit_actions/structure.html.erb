@@ -102,10 +102,10 @@
       <% next_enabled = @multi_item_deposit_action.structuring_succeeded? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.build_structure'), variant: next_enabled ? :'outline-primary' : :primary, classes: 'me-3') %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::PREVIOUS_VALUE, variant: :'outline-primary', classes: 'me-2') do %>
-        <%= left_arrow_icon %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
+        <%= left_arrow_icon(aria: { hidden: true }) %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
       <% end %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, disabled: !next_enabled) do %>
-        <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon %>
+        <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon(aria: { hidden: true }) %>
       <% end %>
     </div>
   <% end %>

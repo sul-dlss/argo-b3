@@ -5,5 +5,5 @@
       classes: 'ms-2',
       data: { turbo_method: :delete, turbo_confirm: discard_or_purge_presenter.confirm, **data }
     ) do %>
-  <%= helpers.delete_icon(classes: 'me-1') %><%= discard_or_purge_presenter.label %>
+  <%= helpers.delete_icon(classes: 'me-1', aria: { hidden: true }) %><%= discard_or_purge_presenter.label %>
 <% end %>

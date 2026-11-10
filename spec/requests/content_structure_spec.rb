@@ -55,7 +55,7 @@ RSpec.describe 'Content structure' do
       expect(form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
       button = form.at_css('button.btn-link.text-danger')
       expect(button.text.strip).to eq('Delete all files and resources')
-      expect(button.at_css('i.bi.bi-trash')).to be_present
+      expect(button.at_css('i.bi.bi-trash[aria-hidden="true"]')).to be_present
     end
 
     it 'renders the CSV upload with an unchecked allow files to be deleted checkbox' do

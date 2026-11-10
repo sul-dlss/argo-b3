@@ -29,6 +29,7 @@ RSpec.describe Item::DiscardOrPurgeButtonComponent, type: :component do
 
       expect(page).to have_css('a[href="/objects/druid:bc123df4567/discard_draft"][data-turbo-method="delete"]' \
                                '[data-turbo-confirm^="Discard this draft?"]', text: 'Discard draft')
+      expect(page).to have_css('a i.bi-trash[aria-hidden="true"]')
     end
   end
 
