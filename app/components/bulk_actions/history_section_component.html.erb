@@ -30,7 +30,7 @@
     <%= table.with_header(label: 'Status', style: 'width: 10%;') %>
     <%= table.with_header(label: 'Total / Success/ Failed', style: 'width: 15%;') %>
     <%= table.with_header(label: 'Downloads', style: 'width: 15%;') %>
-    <%= table.with_header(label: '', style: 'width: 10%;') %>
+    <%= table.with_header(label: tag.span('Actions', class: 'visually-hidden'), style: 'width: 10%;') %>
     <% bulk_actions.each do |bulk_action| %>
       <% table.with_row do %>
         <%= render BulkActions::HistoryRowComponent.new(bulk_action:, admin: admin?) %>

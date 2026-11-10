@@ -19,6 +19,7 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
 
     expect(page).to have_css("table.table-h3[aria-label='Files']")
     expect(page).to have_css('th', text: 'File name')
+    expect(page).to have_css('thead th:nth-of-type(4) .visually-hidden', text: 'Actions')
     expect(page).to have_css('tbody tr th', text: 'image1.tif')
     expect(page).to have_css('tbody tr td', text: '1 KB')
     expect(page).to have_css('tbody tr td', text: 'image/tiff')

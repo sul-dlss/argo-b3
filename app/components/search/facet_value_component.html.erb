@@ -14,10 +14,6 @@
   </span>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
   <% if with_exclude? %>
-    <%= link_to url_for(search_form.with({ exclude_form_field => [value], page: nil })), title: exclude_title, **link_args do %>
-      <%= helpers.exclude_icon(classes: 'ms-2', aria: { hidden: true }) %>
-
-      <span class="visually-hidden">[<%= exclude_title %>]</span>
-    <% end %>
+    <%= render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :exclude, label: exclude_label, link: exclude_path, classes: 'ms-2 p-0', **link_args) %>
   <% end %>
 <% end %>

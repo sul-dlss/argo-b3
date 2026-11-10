@@ -38,8 +38,12 @@ module Search
       "Remove #{label}"
     end
 
-    def exclude_title
+    def exclude_label
       "Exclude #{@label}"
+    end
+
+    def exclude_path
+      url_for(search_form.with({ exclude_form_field => [value], page: nil }))
     end
 
     def remove_path

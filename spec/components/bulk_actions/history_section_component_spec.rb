@@ -45,6 +45,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(table).to have_css('thead th:nth-of-type(2)', text: 'Action')
     expect(table).to have_css('thead th:nth-of-type(3)', text: 'Submitted')
     expect(table).to have_css('thead th', count: 7)
+    expect(table).to have_css('thead th:nth-of-type(7) .visually-hidden', text: 'Actions')
     expect(table).to have_no_css('thead th', text: 'User')
     expect(form).to have_no_select('Users')
     expect(table).to have_css('tbody tr', count: 2)

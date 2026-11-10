@@ -82,6 +82,11 @@ RSpec.describe 'Admin workgroup permissions' do
         expect(fieldset).to have_checked_field('Yes')
         expect(fieldset).to have_field('No', type: 'radio')
 
+        expect(rendered_page.all('#additional-permissions-table thead th').map { |header| header.text.strip })
+          .to eq(['Title', 'Druid', 'Object type', 'Permission', 'Actions'])
+        expect(rendered_page).to have_css('#additional-permissions-table thead th:nth-of-type(5) .visually-hidden',
+                                          text: 'Actions')
+
         rows = rendered_page.all('#additional-permissions-table tbody tr')
         expect(rows.map { |row| row.all('td')[0..3].map { |cell| cell.text.strip } }).to eq(
           [['Restricted collection', 'bc123df4567', 'Collection', 'Read restricted']]
