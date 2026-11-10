@@ -708,6 +708,7 @@ en:
       headers:
         druid: 'Druid'
         status: 'Status'
+      total: 'Total'
     error_details:
       label: 'Error details'
       headers:

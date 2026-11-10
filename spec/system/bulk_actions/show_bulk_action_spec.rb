@@ -25,6 +25,8 @@ RSpec.describe 'Show a bulk action' do
     expect(page).to have_css('h2', text: 'Total / Success / Failed')
     expect(page).to have_css('.show-box', text: '0 / 0 / 0')
     expect(page).to have_no_css('h2', text: 'Downloads')
+    # Marks the live region's node, to show below that refreshes morph it rather than replace it.
+    page.execute_script("document.querySelector('[role=\"status\"]').liveRegionMarker = true")
 
     File.write(bulk_action.log_filepath, 'Log content')
     File.write(bulk_action.export_filepath(:cocina_json), 'Export content')
@@ -32,7 +34,9 @@ RSpec.describe 'Show a bulk action' do
 
     # The page refreshes on an interval, so the completed bulk action is shown without reloading.
     expect(page).to have_css('h2', text: 'Completed with errors')
-    expect(page).to have_css('.show-box', text: '3 / 1 / 2')
+    expect(page).to have_css('[role="status"] .show-box', text: '3 / 1 / 2')
+    # The same node, so screen readers announce the change, and only parts that changed.
+    expect(page.evaluate_script("document.querySelector('[role=\"status\"]').liveRegionMarker")).to be true
 
     expect(page).to have_link('Log file')
     log_txt = with_download('log.txt') do

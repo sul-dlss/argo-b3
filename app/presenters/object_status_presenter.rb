@@ -2,6 +2,9 @@
 
 # Presenter for determining the deposit status of an object.
 class ObjectStatusPresenter
+  # Every status returned by #status, from in progress to done.
+  STATUSES = %i[initiating staging staging_failed error assembling depositing draft registered deposited].freeze
+
   # @param initiating [Boolean] true if the object's deposit is being initiated but has not yet started staging
   def initialize(solr_doc:, version_service:, content:, initiating: false)
     @solr_doc = solr_doc

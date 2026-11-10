@@ -7,8 +7,8 @@ RSpec.describe Elements::RosetteSpinnerComponent, type: :component do
     render_inline(described_class.new(size: :small, message: 'Structuring files...', classes: 'my-class'))
 
     expect(page).to have_css('div.my-class img[src$="/styles/Rosette.svg"]' \
-                             '[style="height: 32px; width: 32px; --bs-spinner-animation-speed: 2.0s;"]')
-    expect(page).to have_text('Structuring files...')
+                             '[alt=""][style="height: 32px; width: 32px; --bs-spinner-animation-speed: 2.0s;"]')
+    expect(page).to have_css('[role="status"]', exact_text: 'Structuring files...')
   end
 
   it 'renders a large rosette spinner' do

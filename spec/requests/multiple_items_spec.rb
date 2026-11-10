@@ -110,10 +110,11 @@ RSpec.describe 'Multiple items' do
     context 'when the form validation action belongs to the user' do
       let(:form_validation_action_user) { user }
 
-      it 'renders the show page' do
+      it 'renders the show page with the spinner message in a status region' do
         get multiple_item_path(form_validation_action)
 
         expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css('[role="status"]', exact_text: 'Validating...')
       end
     end
 
