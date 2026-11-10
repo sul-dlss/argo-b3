@@ -2,6 +2,7 @@
 
 # Controller for items (DRO)
 class ItemsController < ApplicationController
+  include ApoOptionsConcern
   include RegisterCancelConcern
   include TokenConcern
 
@@ -138,21 +139,6 @@ class ItemsController < ApplicationController
     druids = form.collection_druids
     titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
     @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
-  end
-
-  # The APOs the user can edit, plus an existing item's current APO (even if the user cannot edit it),
-  # so that saving an edit does not change it.
-  def apo_options(current_apo_druid:)
-    options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
-    return options if current_apo_druid.blank? || options.any? { |_title, druid| druid == current_apo_druid }
-
-    [[apo_title(apo_druid: current_apo_druid), current_apo_druid]] + options
-  end
-
-  # Falls back to the bare druid if the APO is not found.
-  def apo_title(apo_druid:)
-    titles = Searchers::AdminPolicyListByDruid.call(druids: [apo_druid]).to_h(&:reverse)
-    titles[apo_druid] || DruidSupport.bare_druid_from(apo_druid)
   end
 
   def create_redirect_path

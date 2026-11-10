@@ -223,6 +223,18 @@ en:
         use_and_reproduction_statement:
           label: "Default use and reproduction"
     collections:
+      edit:
+        title: "Edit and deposit collection"
+        buttons:
+          deposit: "Deposit"
+        tabs:
+          deposit:
+            label: "Deposit"
+        toasts:
+          deposited: "Collection updated and deposit started."
+        warnings:
+          not_editable: "Collection is not editable."
+          stale: "This collection was changed since you opened it. Review the current values and make your changes again."
       new:
         title: "Register and deposit collection"
         buttons:
@@ -459,7 +471,7 @@ en:
         catalog_link_refresh:
           label: "Refresh on deposit"
           help_text: >-
-            If checked, this item will be refreshed every time a new version is saved or deposited.
+            If checked, this object will be refreshed every time a new version is saved or deposited.
             If unchecked, it will not be refreshed.
         catalog_record_id:
           label: "FOLIO Instance HRID"
@@ -470,6 +482,7 @@ en:
             catalog_error: "Connection with FOLIO couldn't be established"
           validations:
             not_found: "was not found in FOLIO"
+            required_for_refresh: "A FOLIO Instance HRID must be provided to allow Refresh on deposit."
         collection_druids:
           label: "Collections"
           placeholder: "Start typing the collection name or druid..."

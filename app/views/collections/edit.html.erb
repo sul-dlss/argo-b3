@@ -1,0 +1,87 @@
+<div class="container py-2">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.collections.edit.title')) %>
+
+  <p class="mb-4"><%= @title %></p>
+
+  <% form_id = 'tabbed_form' %>
+
+  <%# enctype is necessary to support file upload. %>
+  <%# Rails normally handles magically, but doesn't because the file input isn't nested in the form. %>
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @edit_collection_form, id: form_id, url: collection_path(@druid),
+                                                                       hidden_fields: [:lock], html_options: { enctype: 'multipart/form-data' }) %>
+
+  <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
+      previous submission once the user edits the offending field. %>
+  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :description,
+                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.description.label'), tab_name: :description, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.collections.tabs.rights.label'), tab_name: :rights, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.collections.edit.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
+
+    <% form_with(model: @edit_collection_form, url: collection_path(@druid), html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
+                                                                          label: t('edit.collections.tabs.description.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render Edit::DescriptionComponent.new(form:, druid_token: @druid_token, item_fields: false) %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: object_path(@druid)) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
+                                                                          label: t('edit.collections.tabs.rights.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%# The selected APO's object defaults are shown with the rights fields, but are applied to them only when the
+            user clicks the apply defaults button, so that the collection's rights are not overwritten.
+            View access is not changed by the defaults, since an APO's default view may not apply to a collection. %>
+        <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: false } do %>
+          <%= render Edit::ApoComponent.new(form:, options: @apo_options, apo_defaults: true, apply_defaults_button: true) %>
+
+          <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
+                form:,
+                field_name: :access_view,
+                options: %w[world dark],
+                label_text: t('edit.collections.fields.access_view.label'),
+                label_mark_required: true,
+                label_classes: 'fw-bold',
+                input_classes: 'w-auto',
+                container_classes: 'my-field'
+              ) %>
+
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+          <%= render Edit::UseAndReproductionStatementComponent.new(form:, container_classes: 'my-fieldset',
+                                                                    apo_defaults: true) %>
+
+          <%= render Edit::CopyrightComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
+
+          <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+          <%= render Edit::LicenseComponent.new(form:, container_classes: 'my-fieldset', apo_defaults: true) %>
+        <% end %>
+
+        <% pane.with_footer do %>
+          <%= render Item::TabNavigationComponent.new(pane:, cancel_path: object_path(@druid)) %>
+        <% end %>
+      <% end %>
+
+      <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
+                                                                          label: t('edit.collections.edit.tabs.deposit.label'),
+                                                                          mark_required: true)) do |pane| %>
+        <%= render Edit::VersionDescriptionComponent.new(form:) %>
+
+        <% pane.with_footer do %>
+          <div class="d-flex">
+            <%= render Item::TabNavigationComponent.new(pane:, show_next: false, cancel_path: object_path(@druid)) %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(
+                  label: t('edit.collections.edit.buttons.deposit'),
+                  form_id: form.id,
+                  classes: 'ms-2'
+                ) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

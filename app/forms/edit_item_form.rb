@@ -8,6 +8,7 @@ class EditItemForm < CocinaModels::Dro
 
   include PermittedParamsConcern
   include VersionDescriptionConcern
+  include LockFormConcern
   include DescriptionCsvFormConcern
   include EmbargoFormConcern
   include FileAccessFormConcern
@@ -19,10 +20,6 @@ class EditItemForm < CocinaModels::Dro
 
   # Prefilled with the open version's description.
   validates :version_description, presence: true
-
-  # The lock of the Cocina object when the edit page was loaded, submitted back to detect that the object
-  # was changed by someone else in the meantime. It is not part of the Cocina object.
-  attribute :lock, :string
 
   # A refreshed description would replace the spreadsheet's description.
   validate :description_csv_file_absent_when_refreshed
@@ -52,17 +49,5 @@ class EditItemForm < CocinaModels::Dro
 
   def changed?
     (changed - FORM_ONLY_ATTRIBUTES).any? || tracked_associations_changed?
-  end
-
-  private
-
-  def description_csv_file_absent_when_refreshed
-    return unless description_csv_file.present? && catalog_link_refresh?
-
-    errors.add(:description_csv_file, I18n.t('edit.items.fields.description_csv_file.validations.refreshed'))
-  end
-
-  def model_attrs_for(cocina_object)
-    super.merge(lock: cocina_object.lock)
   end
 end

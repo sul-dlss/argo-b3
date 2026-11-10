@@ -114,11 +114,10 @@ RSpec.describe Show::StatusComponent, type: :component do
       allow(Current).to receive(:user).and_return(user)
     end
 
-    it 'renders a disabled edit collection link' do
+    it 'renders the edit collection link' do
       render_inline(component)
 
-      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit collection')
-      expect(page).to have_no_link('Edit collection')
+      expect(page).to have_link('Edit collection', href: "/collections/#{druid}/edit")
     end
   end
 

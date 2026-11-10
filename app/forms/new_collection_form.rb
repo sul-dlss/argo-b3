@@ -11,6 +11,7 @@ class NewCollectionForm < CocinaModels::Collection
   include TagsFormConcern
   include CatalogRecordIdFormConcern
   include DescriptionChoiceFormConcern
+  include SelectableApoFormConcern
 
   # Not permitted as params, since the collection form has no fields for them.
   # @return [Array<Symbol>]
@@ -21,13 +22,6 @@ class NewCollectionForm < CocinaModels::Collection
   attribute :access_view, :string, default: 'world'
   # The spreadsheet choice of the shared description choice UI is only for items.
   validates :description_choice, inclusion: { in: [DESCRIPTION_TITLE_CHOICE, DESCRIPTION_CATALOG_ID_CHOICE] }
-
-  # The druids of the APOs the user may select (i.e., can edit), set by the controller. Permissions do not
-  # distinguish APOs from collections, so this ensures that the governing APO is an APO.
-  # @return [Array<String>, nil] nil to skip the check
-  attr_accessor :selectable_apo_druids
-
-  validate :apo_druid_must_be_selectable, if: -> { selectable_apo_druids && apo_druid.present? }
 
   has_one :release_tags, class_name: 'CollectionReleaseTagsForm'
 
@@ -47,13 +41,5 @@ class NewCollectionForm < CocinaModels::Collection
 
     release_tags.create!(druid:, user_name:)
     Sdr::Repository.accession(cocina_object: previous_cocina_object, user_name:)
-  end
-
-  private
-
-  def apo_druid_must_be_selectable
-    return if selectable_apo_druids.include?(apo_druid)
-
-    errors.add(:apo_druid, I18n.t('edit.collections.fields.apo_druid.validations.not_selectable'))
   end
 end
