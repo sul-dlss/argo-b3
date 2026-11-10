@@ -10,8 +10,8 @@
 
   <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
       previous submission once the user edits the offending field. %>
-  <%= render SdrViewComponents::TabForm::TabListComponent.new(id: form_id, active_tab_name: :details,
-                                                              data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
+  <%= render Structure::TabListComponent.new(id: form_id, active_tab_name: :details,
+                                             data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
     <% tab_list.with_tab(label: t('edit.agreements.tabs.details.label'), tab_name: :details, mark_required: true) %>
     <% tab_list.with_tab(label: t('edit.agreements.edit.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
