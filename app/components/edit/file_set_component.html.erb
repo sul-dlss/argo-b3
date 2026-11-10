@@ -28,8 +28,8 @@
       </div>
 
         <div class="d-flex align-items-center mt-5">
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', classes: 'me-3', data: { disable_actions_target: 'disableable' }) %>
-          <%= link_to 'Cancel', path %>
+          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: path, variant: :link, classes: 'me-3') %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', data: { disable_actions_target: 'disableable' }) %>
         </div>
       <% end %>
     </div>

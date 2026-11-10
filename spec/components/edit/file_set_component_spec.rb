@@ -59,6 +59,13 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_css('button[data-disable-actions-target="disableable"]', text: 'Save')
   end
 
+  it 'renders Cancel before Save in the footer' do
+    render_inline(component)
+
+    expect(page).to have_css('.d-flex.align-items-center.mt-5 > a.btn.btn-link:first-child', text: 'Cancel')
+    expect(page).to have_css('.d-flex.align-items-center.mt-5 > a + button', text: 'Save')
+  end
+
   it 'renders a hidden note for when every file is removed in an alert region' do
     render_inline(component)
 
