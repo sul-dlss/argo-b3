@@ -41,9 +41,11 @@
       <legend>Select fields to include in report:</legend>
 
       <div class="mb-2">
-        <button type="button" class="btn btn-link p-0 align-baseline fw-bold" data-action="click->checkbox-select#checkAll">Select All</button>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Select all', variant: :link, classes: 'p-0 align-baseline fw-bold',
+                                                                    data: { action: 'click->checkbox-select#checkAll' }) %>
         |
-        <button type="button" class="btn btn-link p-0 align-baseline fw-bold" data-action="click->checkbox-select#checkNone">Deselect All</button>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Deselect all', variant: :link, classes: 'p-0 align-baseline fw-bold',
+                                                                    data: { action: 'click->checkbox-select#checkNone' }) %>
       </div>
 
       <div class="row">
