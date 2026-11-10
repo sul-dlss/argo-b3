@@ -45,7 +45,7 @@ RSpec.describe 'Technical metadata' do
                                                     headers: { 'Turbo-Frame' => 'techmd-frame' }
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include('No technical metadata')
+        expect(response.body).to include('No technical metadata.')
       end
     end
 
@@ -62,7 +62,7 @@ RSpec.describe 'Technical metadata' do
                                                     headers: { 'Turbo-Frame' => 'techmd-frame' }
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include('No technical metadata')
+        expect(response.body).to include('No technical metadata.')
         expect(Honeybadger).to have_received(:notify)
           .with(error, context: { druid:, filepath: 'folder1/image1.tif' })
       end

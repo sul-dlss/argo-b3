@@ -285,7 +285,7 @@ RSpec.describe 'Manage files' do
 
       find('.nav-link', text: 'Structure files').click
 
-      expect(page).to have_css('p', text: 'No files yet.')
+      expect(page).to have_css('p', text: 'No files.')
       expect(page).to have_no_css("turbo-frame[id^='edit-structure_'] button", text: 'Structure files')
       expect(page).to have_no_button('Append files to structure')
     end
@@ -750,7 +750,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Resource deleted')
       # The structure is reloaded and the deleted file's binary is gone.
-      expect(page).to have_css('p', text: 'No files yet.')
+      expect(page).to have_css('p', text: 'No files.')
       expect(content.content_file_sets).to be_empty
       expect(content.content_file_binaries).to be_empty
     end
@@ -791,7 +791,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Resource deleted')
       # The structure is reloaded and the deleted file's binary is gone.
-      expect(page).to have_css('p', text: 'No files yet.')
+      expect(page).to have_css('p', text: 'No files.')
       expect(content.content_file_sets).to be_empty
       expect(ContentFileBinary.exists?(content_file_binary.id)).to be false
     end
@@ -835,7 +835,7 @@ RSpec.describe 'Manage files' do
 
       # The structure is reloaded and no longer includes the resource.
       click_on 'Structure'
-      expect(page).to have_css('p', text: 'No files yet.')
+      expect(page).to have_css('p', text: 'No files.')
       expect(content.content_file_sets).to be_empty
       expect(content.content_file_binaries).to be_empty
     end

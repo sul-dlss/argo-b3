@@ -6,7 +6,7 @@
   <% end %>
 
   <% if @content.content_file_binaries.none? %>
-    <p>No files yet.</p>
+    <p>No files.</p>
   <% else %>
     <% unassociated_count = @content.content_file_binaries.unassociated.count %>
     <% if unassociated_count.positive? %>
