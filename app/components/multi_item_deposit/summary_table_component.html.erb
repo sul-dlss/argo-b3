@@ -2,9 +2,9 @@
   <% component.with_header(label: t('multi_item_deposit.summary.headers.druid')) %>
   <% component.with_header(label: t('multi_item_deposit.summary.headers.folder')) %>
   <% component.with_header(label: t('multi_item_deposit.summary.headers.file_count')) %>
+  <% component.with_header(label: t('multi_item_deposit.summary.headers.status')) %>
   <% component.with_header(label: t('multi_item_deposit.summary.headers.content_type')) %>
   <% component.with_header(label: t('multi_item_deposit.summary.headers.deposit_type')) %>
-  <% component.with_header(label: t('multi_item_deposit.summary.headers.status')) %>
   <% item_deposit_actions.each do |item_deposit_action| %>
     <% component.with_row do %>
       <%= render MultiItemDeposit::SummaryRowComponent.new(item_deposit_action:,

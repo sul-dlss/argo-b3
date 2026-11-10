@@ -9,18 +9,16 @@
     <%= file_count %>
   <% end %>
   <% row_component.with_cell do %>
-    <%= content_type %>
-  <% end %>
-  <% row_component.with_cell do %>
-    <%= deposit_type %>
-  <% end %>
-  <% row_component.with_cell do %>
     <% if structure_errors_or_warnings? %>
       <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
         <%# Errors are styled like validation errors; warnings are not. %>
         <% structure_errors.each do |error| %>
           <% list_component.with_item do %>
-            <%= tag.span(error, class: 'text-danger') %>
+            <%= tag.span(class: 'text-danger') do %>
+              <%= helpers.danger_icon(classes: 'me-1', aria: { hidden: true }) %>
+              <%= tag.span(t('multi_item_deposit.summary.error_label'), class: 'visually-hidden') %>
+              <%= error %>
+            <% end %>
           <% end %>
         <% end %>
         <% content_type_structure_warnings.each do |warning| %>
@@ -29,6 +27,14 @@
           <% end %>
         <% end %>
       <% end %>
+    <% else %>
+      <%= t('multi_item_deposit.summary.status_ok') %>
     <% end %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= content_type %>
+  <% end %>
+  <% row_component.with_cell do %>
+    <%= deposit_type %>
   <% end %>
 <% end %>

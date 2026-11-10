@@ -16,10 +16,10 @@ RSpec.describe MultiItemDeposit::SummaryRowComponent, type: :component do
                                   initial_version: true)
     end
 
-    it 'renders the row with an empty status' do
+    it 'renders the row with an OK status' do
       expect(rows.size).to eq(1)
       expect(rows.first.all('td').map { |cell| cell.text.strip })
-        .to eq(['bc123df4567', 'folder1', '2', 'book', 'new item', ''])
+        .to eq(['bc123df4567', 'folder1', '2', 'OK', 'book', 'new item'])
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe MultiItemDeposit::SummaryRowComponent, type: :component do
     end
 
     it 'renders the user-facing content type name' do
-      expect(rows.first.all('td')[3].text.strip).to eq('file')
+      expect(rows.first.all('td')[4].text.strip).to eq('file')
     end
   end
 
@@ -39,7 +39,7 @@ RSpec.describe MultiItemDeposit::SummaryRowComponent, type: :component do
     end
 
     it 'renders the stored content type' do
-      expect(rows.first.all('td')[3].text.strip).to eq('manuscript')
+      expect(rows.first.all('td')[4].text.strip).to eq('manuscript')
     end
   end
 
@@ -53,10 +53,11 @@ RSpec.describe MultiItemDeposit::SummaryRowComponent, type: :component do
 
     it 'lists them in the status cell' do
       expect(rows.size).to eq(1)
-      status_cell = rows.first.all('td').last
-      expect(status_cell.all('ul li span.text-danger').map(&:text))
-        .to eq(['Row 2: Missing filename', 'Page has more than one image'])
-      expect(status_cell).to have_css('ul li span:not(.text-danger)', text: 'No displayable image')
+      status_cell = rows.first.all('td')[3]
+      expect(status_cell.all('ul li > span.text-danger').map { |error| error.text.squish })
+        .to eq(['Error: Row 2: Missing filename', 'Error: Page has more than one image'])
+      expect(status_cell).to have_css('ul li > span.text-danger i.bi-exclamation-triangle-fill', count: 2)
+      expect(status_cell).to have_css('ul li > span:not(.text-danger)', text: 'No displayable image')
     end
   end
 end
