@@ -21,12 +21,12 @@ RSpec.describe 'APOs' do
       expect(Searchers::AgreementList).to have_received(:call).with(user_scope: an_instance_of(Permissions::UserScope))
     end
 
-    it 'renders the object defaults fieldset' do
+    it 'renders the object defaults section' do
       get '/apos/new'
 
       page = Capybara.string(response.body)
-      expect(page).to have_css('fieldset legend label.h3', text: 'Object defaults')
-      expect(page).to have_css('fieldset', text: 'The following defaults will apply to all newly registered objects.')
+      expect(page).to have_css('form h2', text: 'Object defaults')
+      expect(page).to have_css('h2 + p', text: 'The following defaults will apply to all newly registered objects.')
       expect(page).to have_css('fieldset select[name="apo[access_view]"]')
       expect(page).to have_css('fieldset select[name="apo[access_download]"]')
       expect(page).to have_css('fieldset select[name="apo[access_location]"]', visible: :all)
