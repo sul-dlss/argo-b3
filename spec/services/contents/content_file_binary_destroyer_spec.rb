@@ -70,34 +70,10 @@ RSpec.describe Contents::ContentFileBinaryDestroyer do
       FileUtils.rm_f(staging_filepath)
     end
 
-    it 'deletes the staged file' do
+    it 'keeps the staged file' do
       call
 
-      expect(File.exist?(staging_filepath)).to be false
-    end
-
-    context 'when the binary was staged to the assembly location' do
-      let(:staging_filepath) do
-        File.join(Settings.assembly_location, 'bc/123/df/4567/bc123df4567/content/image1.tif')
-      end
-
-      it 'deletes the staged file from that location' do
-        call
-
-        expect(File.exist?(staging_filepath)).to be false
-      end
-    end
-
-    context 'when the enclosing transaction is rolled back' do
-      it 'does not delete the staged file' do
-        ActiveRecord::Base.transaction do
-          call
-          raise ActiveRecord::Rollback
-        end
-
-        expect(File.exist?(staging_filepath)).to be true
-        expect(ContentFileBinary.exists?(content_file_binary.id)).to be true
-      end
+      expect(File.exist?(staging_filepath)).to be true
     end
   end
 end

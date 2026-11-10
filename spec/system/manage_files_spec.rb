@@ -202,6 +202,23 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'when canceling' do
+    it 'confirms, discards the unsaved changes, and returns to the object page' do
+      visit "/contents/#{druid}/edit"
+
+      upload_file('dropzone_upload.txt')
+
+      click_and_accept_confirm('Discard unsaved changes to files?', find_link('Cancel'))
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(page).to have_toast('Unsaved changes to files discarded')
+
+      visit "/contents/#{druid}/edit"
+
+      expect(page).to have_css("turbo-frame[id^='show_content_'] p", text: 'No files yet')
+    end
+  end
+
   it 'warns about embedded text when running OCR on a document' do
     warning = 'Do not run OCR for files that already have embedded text.'
 
@@ -425,11 +442,13 @@ RSpec.describe 'Manage files' do
       click_on 'Deposit'
       expect(page).to have_button('Deposit', disabled: true)
       expect(page).to have_button('Save as draft', disabled: true)
+      expect(page).to have_link('Cancel', class: 'disabled')
 
       dispatch_dropzone_event('upload-end')
 
       expect(page).to have_button('Deposit', disabled: false)
       expect(page).to have_button('Save as draft', disabled: false)
+      expect(page).to have_no_css('a.disabled', text: 'Cancel')
       click_on 'Structure'
       expect(page).to have_button('Clear and structure files again', disabled: false)
       expect(page).to have_button('Upload', disabled: false)
@@ -895,6 +914,24 @@ RSpec.describe 'Manage files' do
       expect(page).to have_toast('Completed discovering files')
       expect(page).to have_css('tbody th', text: 'folder/dropzone_upload.txt')
       expect(page).to have_no_button(class: 'disabled')
+    end
+
+    it 'disables the actions until discovery completes' do
+      visit "/contents/#{druid}/edit"
+
+      choose 'Use files from mount'
+      fill_in 'Mount path', with: mount_path
+      click_button 'Discover files'
+
+      expect(page).to have_text('Discovering files...')
+      expect(page).to have_link('Cancel', class: 'disabled')
+      expect(page).to have_link('Purge', class: 'disabled')
+
+      DiscoverFilesJob.perform_now(content: Content.find_by!(druid:), mount_path:)
+
+      expect(page).to have_toast('Completed discovering files')
+      expect(page).to have_no_css('a.disabled', text: 'Cancel')
+      expect(page).to have_no_css('a.disabled', text: 'Purge')
     end
   end
 

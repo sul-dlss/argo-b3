@@ -201,6 +201,7 @@ RSpec.describe StageFilesJob do
         let(:previously_staged_filepath) { staged_filepath('previous.jp2') }
 
         before do
+          create(:content_file_binary, content:, file_location: 'stage', filepath: 'previous.jp2')
           FileUtils.mkdir_p(File.dirname(previously_staged_filepath))
           FileUtils.touch(previously_staged_filepath)
         end
@@ -236,6 +237,7 @@ RSpec.describe StageFilesJob do
       let(:previously_staged_filepath) { staged_filepath('previous.tif') }
 
       before do
+        create(:content_file_binary, content:, file_location: 'stage', filepath: 'previous.tif')
         FileUtils.mkdir_p(File.dirname(previously_staged_filepath))
         FileUtils.touch(previously_staged_filepath)
       end
@@ -248,6 +250,37 @@ RSpec.describe StageFilesJob do
         expect(File.exist?(staged_filepath('previous.tif', staging_location: Settings.assembly_location))).to be true
         expect(File.exist?(previously_staged_filepath)).to be false
         expect(File.exist?(staging_filepath)).to be false
+      end
+    end
+
+    context 'when staged files are no longer referenced by the content' do
+      let(:kept_filepath) { staged_filepath('folder1/kept.jp2') }
+      let(:deleted_filepath) { staged_filepath('folder1/deleted.jp2') }
+
+      before do
+        create(:content_file_binary, content:, file_location: 'stage', filepath: 'folder1/kept.jp2')
+        FileUtils.mkdir_p(File.dirname(kept_filepath))
+        FileUtils.touch([kept_filepath, deleted_filepath])
+      end
+
+      it 'deletes only the unreferenced staged files' do
+        job.perform(content:, user:)
+
+        expect(File.exist?(deleted_filepath)).to be false
+        expect(File.exist?(kept_filepath)).to be true
+        expect(File.exist?(staging_filepath)).to be true
+      end
+
+      context 'when updating SDR fails' do
+        before do
+          allow(Sdr::Repository).to receive(:update).and_raise(Sdr::Repository::Error, 'Update failed')
+        end
+
+        it 'keeps the unreferenced staged files' do
+          job.perform(content:, user:)
+
+          expect(File.exist?(deleted_filepath)).to be true
+        end
       end
     end
 

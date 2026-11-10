@@ -1,5 +1,5 @@
 <div class="d-flex">
-  <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:) %>
+  <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:, cancel_data:) %>
   <%# A fieldset, so that disabling it (e.g., while uploading) doesn't conflict with disabling the submit buttons. %>
   <%= tag.fieldset class: 'd-flex ms-auto', data: actions_data do %>
     <% if show_edit_files %>

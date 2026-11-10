@@ -16,7 +16,7 @@ class ContentFileSetForm < ApplicationForm
     super
   end
 
-  # Saves the resource and its files. Deleting a file also deletes its binary (including any staged copy)
+  # Saves the resource and its files. Deleting a file also deletes its binary
   # when no other file references it. Deleting every file deletes the resource.
   # Note that this deliberately does not check changed?, since a save may only change the nested files.
   # @return [Boolean] true if saved, false if invalid
@@ -34,7 +34,7 @@ class ContentFileSetForm < ApplicationForm
     true
   end
 
-  # Deletes the resource and its files, as well as their binaries (including any staged copies)
+  # Deletes the resource and its files, as well as their binaries
   # when no other file references them. Unlike save, this also deletes a resource that has no files.
   def destroy
     ActiveRecord::Base.transaction do
@@ -103,7 +103,7 @@ class ContentFileSetForm < ApplicationForm
     content_file_set.content_files.where(id: content_file_ids).pluck(:content_file_binary_id)
   end
 
-  # Staged copies of the destroyed binaries are deleted by Contents::ContentFileBinaryDestroyer.
+  # Staged copies of the destroyed binaries are kept until the next staging (see Contents::ContentFileBinaryDestroyer).
   def destroy_unreferenced_content_file_binaries(content_file_binary_ids:)
     content_file_binaries = ContentFileBinary.unassociated
                                              .where(id: content_file_binary_ids)

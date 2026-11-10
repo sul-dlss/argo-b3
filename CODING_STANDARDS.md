@@ -21,7 +21,7 @@ For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also
 
 - Render dates and times with `format_datetime` (`ApplicationHelper`, `helpers.format_datetime` in components) and a format from `time.formats` in `config/locales/en.yml` (e.g., `format: :date_only`), not `strftime` or `to_fs`. It converts to Pacific time first, so every page shows the same zone and layout. Add a new format to `en.yml` if none fits.
   - The `PT` label is used year-round, though the time observes daylight saving. Exceptions: CSV report values, which arrive preformatted from Solr, and machine-readable values (Solr queries, repository API values, HTTP headers), which use their protocol's format.
-- Notify the user of an error with a danger alert (`flash[:danger]`), of a warning that doesn't stop them with a warning alert (`flash[:warning]`), and of informational messages (status updates, success) with a disappearing toast (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
+- Notify the user of an error with a danger alert (`flash[:danger]`), of a warning that doesn't stop them or a refused action (e.g., the object is not editable, its content is busy, or the page is stale) with a warning alert (`flash[:warning]`), and of informational messages (status updates, success) with a disappearing toast (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
 
 ## Naming and structure
 

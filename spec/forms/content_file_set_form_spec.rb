@@ -122,10 +122,10 @@ RSpec.describe ContentFileSetForm do
         FileUtils.rm_f(staging_filepath)
       end
 
-      it 'deletes the staged file' do
+      it 'keeps the staged file' do
         form.save
 
-        expect(File.exist?(staging_filepath)).to be false
+        expect(File.exist?(staging_filepath)).to be true
       end
     end
 
@@ -291,10 +291,10 @@ RSpec.describe ContentFileSetForm do
         FileUtils.rm_f(staging_filepath)
       end
 
-      it 'deletes the staged file' do
+      it 'keeps the staged file' do
         form.destroy
 
-        expect(File.exist?(staging_filepath)).to be false
+        expect(File.exist?(staging_filepath)).to be true
       end
     end
   end

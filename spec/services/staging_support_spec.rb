@@ -45,6 +45,26 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.delete_staged_files_except' do
+    let(:content_path) { described_class.staging_content_path(druid:) }
+
+    before do
+      %w[kept.tif folder1/kept.tif folder1/deleted.tif folder2/sub/deleted.tif].each do |filepath|
+        full_path = File.join(content_path, filepath)
+        FileUtils.mkdir_p(File.dirname(full_path))
+        FileUtils.touch(full_path)
+      end
+      FileUtils.mkdir_p(File.join(content_path, 'empty'))
+    end
+
+    it 'deletes the other staged files and the directories left empty' do
+      described_class.delete_staged_files_except(druid:, filepaths: %w[kept.tif folder1/kept.tif],
+                                                 staging_location: Settings.staging_location)
+
+      expect(Dir.glob('**/*', base: content_path)).to contain_exactly('kept.tif', 'folder1', 'folder1/kept.tif')
+    end
+  end
+
   describe '.stages_to_assembly?' do
     it 'is true for geo objects and web archive seeds only' do
       expect(described_class.stages_to_assembly?(build(:dro, type: Cocina::Models::ObjectType.geo))).to be true
