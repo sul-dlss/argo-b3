@@ -429,4 +429,4 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 7. Add a request spec. For bulk actions that use `BulkActions::BasicForm` without additional fields, use the `'a simple bulk action controller'` shared examples (see for example, `spec/requests/bulk_actions/purge_spec.rb`). Add a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
 ## Design
-Design standards (layout, components, typography, color, accessibility, copy) are in `DESIGN_STANDARDS.md`. Known deviations in existing code are listed in `docs/design-deviations.md`.
+Design standards (layout, components, typography, color, accessibility, copy) are in `DESIGN_STANDARDS.md`. Deliberate deviations are marked in the code with a `Design standard deviation:` comment.

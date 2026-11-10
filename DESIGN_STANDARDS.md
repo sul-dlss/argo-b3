@@ -4,7 +4,7 @@ Rules for how Argo B3 looks, reads, and behaves, used to review new designs (moc
 
 - **MUST** rules block a merge. **SHOULD** rules allow an exception when the reason is given in review.
 - Rules marked *(linted)* are enforced by `bin/rake lint` (herb); reviewers skip them. All other rules are checked in review.
-- Known deviations in existing code are listed in `docs/design-deviations.md`. When a change touches a line listed there, flag it in review as a judgement call (fix it while you're there), not a blocker.
+- New code that deliberately deviates from a rule has a comment beginning `Design standard deviation:` that names the rule and the reason. Existing code predates this standard and may deviate without a comment; when a change touches it, flag the deviation in review as a judgement call (fix it while you're there), not a blocker.
 
 ## Sources and precedence
 
@@ -23,7 +23,7 @@ When sources disagree, the higher one wins:
 
 - **CONS-1 SHOULD** A function similar to one Argo B3 already has uses the same UI: the same components, layout, element choices, and wording. Before designing, find the existing UI for the nearest function (e.g., a new bulk action follows the other bulk action forms; a new history list follows the bulk action and Multi-Item Deposit history lists; choosing items from the last search or a druid list reuses `BulkActions::SelectSourceComponent`). Explain any difference in review.
 - **CONS-2 SHOULD** Reuse the existing UI by sharing its component rather than copying its markup, so the two stay alike as they change.
-- **CONS-3** Consistency never overrides a written rule: if the existing UI breaks this standard, follow the standard (and fix or record the existing UI in `docs/design-deviations.md`). If a new design improves on an existing pattern, update the existing UI too, or record it as a deviation.
+- **CONS-3** Consistency never overrides a written rule: if the existing UI breaks this standard, follow the standard, and fix the existing UI where practical. If a new design improves on an existing pattern, update the existing UI too where practical.
 
 ## Accessibility
 
