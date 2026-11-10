@@ -2,7 +2,7 @@
 
 module Show
   # Component for rendering the rows for an event in the events table.
-  # For an event with data, the event row can be clicked to show / hide a row with the data.
+  # For an event with data, the event row has a button (or can be clicked) to show / hide a row with the data.
   class EventRowsComponent < ApplicationComponent
     # @param event [Dor::Services::Client::Events::Event]
     def initialize(event:)
@@ -57,22 +57,17 @@ module Show
       value.is_a?(Hash) || value.is_a?(Array)
     end
 
-    # Chevron indicating whether the data is shown, styled like a Bootstrap accordion button.
-    def toggle_indicator
+    def toggle_button
       return unless data?
 
-      tag.span(class: 'toggle-row-indicator')
+      render Show::ToggleRowButtonComponent.new(details_row_id: data_id,
+                                                label: "Show details for #{event_type_label} event")
     end
 
     def toggle_row_options
-      return { id: row_id } unless data?
+      return {} unless data?
 
-      {
-        id: row_id,
-        data: { bs_toggle: 'collapse', bs_target: "##{data_id}" },
-        aria: { expanded: false, controls: data_id },
-        class: 'toggle-row collapsed'
-      }
+      Show::ToggleRowButtonComponent::ROW_OPTIONS
     end
   end
 end

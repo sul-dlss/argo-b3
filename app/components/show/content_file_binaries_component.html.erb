@@ -3,10 +3,10 @@
                                                             show_label: false,
                                                             classes: 'table-sm',
                                                             empty_message: 'No files yet') do |component| %>
+  <% component.with_header(label: tag.span('Show technical metadata', class: 'visually-hidden'), classes: 'toggle-row-header') %>
   <% component.with_header(label: 'File name', style: 'width: 60%;') %>
   <% component.with_header(label: 'Size') %>
   <% component.with_header(label: 'Type') %>
-  <% component.with_header(label: tag.span('Show technical metadata', class: 'visually-hidden')) %>
   <% content_file_binaries.each do |content_file_binary| %>
     <% component.with_row do %>
       <%= render Show::ContentFileBinaryRowComponent.new(content_file_binary:, druid_token:) %>

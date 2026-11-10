@@ -30,6 +30,11 @@ module IconHelper
     icon(icon_classes: %w[bi bi-dash collapse-icon], **)
   end
 
+  # Rotated by show.scss when the toggled row is expanded.
+  def toggle_row_icon(**)
+    icon(icon_classes: %w[bi bi-chevron-down toggle-row-icon], **)
+  end
+
   def left_arrow_icon(**)
     icon(icon_classes: %w[bi bi-arrow-left], **)
   end

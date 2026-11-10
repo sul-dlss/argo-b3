@@ -189,6 +189,8 @@ RSpec.describe 'Show item' do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
 
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
+    allow(Sdr::TechnicalMetadata).to receive(:find)
+      .and_return({ 'druid' => druid, 'filename' => 'rr624wq8610_00_0001.jp2', 'mimetype' => 'image/jp2' })
 
     sign_in(create(:user))
     set_last_search_cookie
@@ -400,27 +402,38 @@ RSpec.describe 'Show item' do
     end
 
     row = find_table_row('events-table', '2021-03-31 14:01:20 PT')
+    expect(row).to have_no_button
     cells = row.all('td')
-    expect(cells[0]).to have_text('Publishing complete')
-    expect(cells[1]).to have_text('')
+    expect(cells[1]).to have_text('Publishing complete')
+    expect(cells[2]).to have_text('')
 
     row = find_table_row('events-table', '2021-03-31 13:23:30 PT')
     cells = row.all('td')
-    expect(cells[0]).to have_text('Version open')
-    expect(cells[1]).to have_text('jdoe')
-    expect(cells[2]).to have_text('2')
+    expect(cells[1]).to have_text('Version open')
+    expect(cells[2]).to have_text('jdoe')
+    expect(cells[3]).to have_text('2')
 
-    # Toggle the event data
+    # Toggle the event data with the keyboard
+    toggle_button = row.find_button('Show details for Version open event')
     expect(page).to have_no_css('#events-table dt', text: 'Description')
-    expect(page).to have_css('#events-table tr.toggle-row.collapsed .toggle-row-indicator')
-    row.click
-    expect(page).to have_css('#events-table tr.toggle-row:not(.collapsed) .toggle-row-indicator')
+    expect(toggle_button['aria-expanded']).to eq('false')
+    toggle_button.send_keys(:enter)
+    expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
+    expect(toggle_button['aria-expanded']).to eq('true')
     within('#events-table tr.collapse.show') do
-      expect(page).to have_css('dt', text: 'Description')
       expect(page).to have_css('dd', text: 'Fix title')
     end
-    row.click
+    toggle_button.send_keys(:space)
     expect(page).to have_no_css('#events-table dt', text: 'Description')
+    expect(toggle_button['aria-expanded']).to eq('false')
+
+    # Toggle the event data by clicking the row
+    row.find('td', text: 'jdoe').click
+    expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
+    expect(toggle_button['aria-expanded']).to eq('true')
+    row.find('td', text: 'jdoe').click
+    expect(page).to have_no_css('#events-table dt', text: 'Description')
+    expect(toggle_button['aria-expanded']).to eq('false')
 
     # Filter the events
     expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '2 selected')
@@ -457,6 +470,20 @@ RSpec.describe 'Show item' do
 
     expect(page).to have_css('h2', text: 'Files')
     expect(page).to have_css('tbody th', text: 'rr624wq8610_00_0001.jp2')
+
+    # Show the technical metadata with the keyboard, which lazily loads it
+    toggle_button = find_button('Show technical metadata for rr624wq8610_00_0001.jp2')
+    expect(toggle_button['aria-expanded']).to eq('false')
+    toggle_button.send_keys(:space)
+    within('tr.toggle-row-data.show turbo-frame') do
+      expect(page).to have_css('dt', text: 'Mimetype')
+      expect(page).to have_css('dd', text: 'image/jp2')
+    end
+    expect(toggle_button['aria-expanded']).to eq('true')
+    expect(Sdr::TechnicalMetadata).to have_received(:find).with(druid:, filepath: 'rr624wq8610_00_0001.jp2')
+    toggle_button.send_keys(:enter)
+    expect(page).to have_no_css('tr.toggle-row-data.show')
+    expect(toggle_button['aria-expanded']).to eq('false')
     expect(page).to have_no_css('h2', text: 'Structural metadata')
 
     # Structure tab
@@ -476,7 +503,7 @@ RSpec.describe 'Show item' do
 
     # Expand the event data, to check that it remains expanded after the page refreshes.
     click_button 'Events'
-    find_table_row('events-table', '2021-03-31 13:23:30 PT').click
+    click_button 'Show details for Version open event'
     expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
 
     # Update the object and look for changes.
@@ -501,6 +528,7 @@ RSpec.describe 'Show item' do
 
     click_button 'Events'
     expect(page).to have_css('#events-table tr.toggle-row-data.show dt', text: 'Description')
+    expect(find_button('Show details for Version open event')['aria-expanded']).to eq('true')
     # The filter is retained after the page refreshes.
     expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
     expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '1 selected')

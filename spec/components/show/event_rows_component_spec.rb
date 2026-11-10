@@ -17,16 +17,19 @@ RSpec.describe Show::EventRowsComponent, type: :component do
                                                timestamp: '2026-04-16T10:00:00Z')
     end
 
-    it 'renders a toggleable row and a row with the data' do
-      row = table.find("tr##{component.row_id}[data-bs-target='##{component.data_id}']")
-      expect(row['data-bs-toggle']).to eq('collapse')
-      expect(row[:class]).to include('collapsed')
-      expect(row).to have_css('td .toggle-row-indicator')
-      expect(row).to have_css('th', text: '2026-04-16 03:00:00 PT')
+    it 'renders a row with a toggle button and a row with the data' do
+      row = table.find("tr##{component.row_id}.toggle-row[data-controller='toggle-row']")
+      expect(row).to have_css(
+        "td:first-child > button.toggle-row-button.collapsed[type='button'][data-bs-toggle='collapse']" \
+        "[data-bs-target='#event-version_open-2026-04-16t10-00-00z-data'][aria-expanded='false']" \
+        "[aria-controls='event-version_open-2026-04-16t10-00-00z-data'] i.bi-chevron-down"
+      )
+      expect(row).to have_button('Show details for Version open event')
+      expect(row).to have_css('th[scope="row"]', text: '2026-04-16 03:00:00 PT')
       cells = row.all('td')
-      expect(cells[0]).to have_text('Version open')
-      expect(cells[1]).to have_text('jdoe')
-      expect(cells[2]).to have_text('2')
+      expect(cells[1]).to have_text('Version open')
+      expect(cells[2]).to have_text('jdoe')
+      expect(cells[3]).to have_text('2')
 
       data_row = table.find("tr##{component.data_id}.collapse")
       expect(data_row).to have_css('dt', text: 'Description')
@@ -71,11 +74,12 @@ RSpec.describe Show::EventRowsComponent, type: :component do
 
     it 'does not render a toggleable row' do
       row = table.find('tr', text: 'User version created')
-      expect(row['data-bs-toggle']).to be_nil
+      expect(row).to have_no_button
+      expect(row[:class]).to be_nil
       cells = row.all('td')
-      expect(cells[1]).to have_text('asmith')
-      expect(cells[2]).to have_text('3')
-      expect(row).to have_no_css('.toggle-row-indicator')
+      expect(cells[0].text).to be_empty
+      expect(cells[2]).to have_text('asmith')
+      expect(cells[3]).to have_text('3')
       expect(table).to have_no_css("tr##{component.data_id}")
     end
   end
@@ -88,8 +92,7 @@ RSpec.describe Show::EventRowsComponent, type: :component do
 
     it 'does not render a toggleable row' do
       row = table.find('tr', text: 'Publishing complete')
-      expect(row['data-bs-toggle']).to be_nil
-      expect(row).to have_no_css('.toggle-row-indicator')
+      expect(row).to have_no_button
       expect(table).to have_no_css("tr##{component.data_id}")
     end
   end

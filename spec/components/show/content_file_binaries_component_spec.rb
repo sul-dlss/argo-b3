@@ -21,7 +21,8 @@ RSpec.describe Show::ContentFileBinariesComponent, type: :component do
       expect(page).to have_css('th', text: 'File name')
       expect(page).to have_css('th', text: 'Size')
       expect(page).to have_css('th', text: 'Type')
-      expect(page).to have_css('th span.visually-hidden', text: 'Show technical metadata')
+      expect(page).to have_css('thead th.toggle-row-header:first-child span.visually-hidden',
+                               text: 'Show technical metadata')
       expect(page).to have_css('tbody tr:nth-child(1) th', text: 'image1.tif')
       expect(page).to have_css('tbody tr:nth-child(1) td', text: '1 KB')
       expect(page).to have_css('tbody tr:nth-child(1) td', text: 'image/tiff')
