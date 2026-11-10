@@ -5,6 +5,7 @@ module BulkActions
   class BulkActionApplicationController < ApplicationController
     skip_verify_authorized
     before_action :set_from_last_search_cookie
+    before_action :set_example_druids
     before_action :set_bulk_action_config
     before_action :set_form_options
 
@@ -60,6 +61,13 @@ module BulkActions
         Searchers::DruidList.call(search_form: @last_search_form.without(:page),
                                   user_scope: current_user_scope)
       end
+    end
+
+    def set_example_druids
+      return if @last_search_form.blank?
+
+      @example_druids = Searchers::DruidList.call(search_form: @last_search_form.without(:page),
+                                                  user_scope: current_user_scope, limit: 6)
     end
 
     def set_bulk_action_config

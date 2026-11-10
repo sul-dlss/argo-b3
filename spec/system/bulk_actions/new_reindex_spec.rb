@@ -55,6 +55,7 @@ RSpec.describe 'Create a new reindex bulk action' do
       visit new_bulk_actions_reindex_path
 
       expect(page).to have_css('h1', text: bulk_action_label)
+      expect(page).to have_link(DruidSupport.bare_druid_from(druids.first), href: object_path(druids.first))
 
       choose 'From last search'
 
@@ -72,7 +73,8 @@ RSpec.describe 'Create a new reindex bulk action' do
       expect(bulk_action.user).to eq(user)
       expect(bulk_action.queued?).to be true
 
-      expect(Searchers::DruidList).to have_received(:call).with(matching_form(search_form))
+      # Example druids on new and create, then all druids for the job.
+      expect(Searchers::DruidList).to have_received(:call).with(matching_form(search_form)).thrice
       expect(BulkActions::ReindexJob).to have_been_enqueued.with(druids:, bulk_action:)
     end
 
