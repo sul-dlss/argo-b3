@@ -17,4 +17,16 @@ RSpec.describe Show::BoxComponent, type: :component do
 
     expect(page).to have_css('.d-flex h2.card-title + a[href="/edit"]', text: 'Edit')
   end
+
+  context 'with a heading level and classes' do
+    let(:component) { described_class.new(heading: '# of errors', heading_level: :h4, classes: 'text-danger') }
+
+    it 'renders the heading at that level and adds the classes to the box' do
+      render_inline(component) { '3' }
+
+      expect(page).to have_css('.card.object-type-border.object-type-bg-light.text-danger h4.card-title',
+                               text: '# of errors')
+      expect(page).to have_no_css('h2')
+    end
+  end
 end

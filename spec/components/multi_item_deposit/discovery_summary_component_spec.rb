@@ -33,24 +33,25 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
     it 'renders the number of items' do
       render_inline(component)
 
-      expect(page).to have_css('.summary-box', text: '# of items') do |box|
-        box.has_css?('.summary-box-value', text: '4')
+      expect(page).to have_css('.object-type-multi-item-deposit .card', text: '# of items') do |box|
+        box.has_css?('h4.card-title', text: '# of items') && box.has_css?('.card-text', exact_text: '4')
       end
     end
 
-    it 'renders the number of errors as danger' do
+    it 'renders the number of Item Deposits with errors as danger' do
       render_inline(component)
 
-      expect(page).to have_css('.summary-box.text-danger', text: '# of errors') do |box|
-        box.has_css?('.summary-box-value', text: '3')
+      # Two Item Deposits have errors, one of them two errors.
+      expect(page).to have_css('.card.text-danger', text: '# of errors') do |box|
+        box.has_css?('h4.card-title', text: '# of errors') && box.has_css?('.card-text', exact_text: '2')
       end
     end
 
     it 'renders the content types in manifest order' do
       render_inline(component)
 
-      expect(page).to have_css('.summary-box', text: 'Content types') do |box|
-        box.has_css?('.summary-box-value', text: 'Book, file')
+      expect(page).to have_css('.card', text: 'Content types') do |box|
+        box.has_css?('h4.card-title', text: 'Content types') && box.has_css?('.card-text', exact_text: 'Book, file')
       end
     end
 
@@ -70,8 +71,8 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
     it 'renders the number of errors as success' do
       render_inline(component)
 
-      expect(page).to have_css('.summary-box.text-success', text: '# of errors') do |box|
-        box.has_css?('.summary-box-value', text: '0')
+      expect(page).to have_css('.card.text-success', text: '# of errors') do |box|
+        box.has_css?('.card-text', exact_text: '0')
       end
     end
   end

@@ -261,7 +261,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(rendered_page).to have_css('h2', text: 'Results of checking manifest')
         expect(rendered_page).to have_css('h3', text: 'Summary')
-        expect(rendered_page).to have_css('.summary-box.text-danger', text: '# of errors')
+        expect(rendered_page).to have_css('.card.text-danger', text: '# of errors')
         expect(rendered_page).to have_no_css('.alert-success')
         expect(rendered_page).to have_css('.alert-danger', text: 'We found errors with the manifest.')
         expect(rendered_page).to have_css(

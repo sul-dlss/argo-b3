@@ -69,7 +69,7 @@ One step of a workflow (e.g., `shelve` in `accessionWF`) for one version of an o
 A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit. The deposit step is initiated once a version is open and staging has started for every Item Deposit; staging and accessioning then proceed for each Item independently.
 
 ### Item Deposit
-One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount.
+One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount. Errors are recorded per Item Deposit and step, so a count of a step's errors is the number of Item Deposits with errors, not of error messages.
 
 ### Bulk Action
 An operation run in the background on many objects at once, chosen from a search or a list of druids, that produces a log of its results.

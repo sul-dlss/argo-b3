@@ -2,7 +2,7 @@
 
 module MultiItemDeposit
   # Renders the summary of the results of checking a Multi-Item Deposit's manifest (discovery): when it started,
-  # the number of Item Deposits and discovery errors, and the content types.
+  # the number of Item Deposits and of those with discovery errors, and the content types.
   class DiscoverySummaryComponent < ApplicationComponent
     def initialize(multi_item_deposit_action:)
       @multi_item_deposit_action = multi_item_deposit_action
@@ -17,13 +17,14 @@ module MultiItemDeposit
       item_deposit_actions.count
     end
 
-    # @return [Integer] the number of discovery errors, across all Item Deposits
-    def error_count
-      @error_count ||= item_deposit_actions.pluck(:discovery_errors).sum(&:size)
+    # The Item Deposits with discovery errors, as in MultiItemDepositAction#discovery_succeeded?
+    # @return [Integer]
+    def items_with_errors_count
+      @items_with_errors_count ||= item_deposit_actions.with_discovery_errors.count
     end
 
     def error_classes
-      error_count.positive? ? 'text-danger' : 'text-success'
+      items_with_errors_count.positive? ? 'text-danger' : 'text-success'
     end
 
     # @return [String, nil] the display names of the content types, in manifest order (e.g., "Book, image")
