@@ -26,6 +26,15 @@ RSpec.describe 'Dashboard' do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'labels each navigation landmark distinctly' do
+      get root_path
+
+      labels = rendered_page.all('nav', visible: :all).pluck(:'aria-label')
+      expect(labels).to include('Utility', 'browse')
+      expect(labels).to all(be_present)
+      expect(labels).to eq(labels.uniq)
+    end
+
     context 'when the user has Multi-Item Deposits' do
       let!(:multi_item_deposit_actions) do
         Array.new(6) { |index| create(:multi_item_deposit_action, user:, updated_at: index.days.ago) }

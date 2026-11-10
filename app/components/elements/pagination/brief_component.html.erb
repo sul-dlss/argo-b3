@@ -1,5 +1,5 @@
 <!-- Not prefetching because this changes the last search cookie even if the user never clicks the link. -->
-<nav class="pagination d-flex align-items-baseline" data-turbo-prefetch="false">
+<nav class="pagination d-flex align-items-baseline" aria-label="Previous and next page" data-turbo-prefetch="false">
   <%= link_to '« Previous', previous_path, rel: 'prev', class: previous_classes, 'aria-label': 'Go to previous page' %>
    <strong><%= first_result %></strong> -
   <strong><%= last_result %></strong>&nbsp;of&nbsp;

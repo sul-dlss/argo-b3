@@ -145,6 +145,21 @@ RSpec.describe 'Item search', :solr do
           expect(page).to have_button('Sort by Registered date (descending)')
         end
       end
+
+      it 'labels each navigation landmark distinctly' do
+        visit search_path(query: 'Item')
+
+        within('turbo-frame#items-search') do
+          expect(page).to have_css('nav[aria-label="Pagination and sorting controls"] ' \
+                                   'nav[aria-label="Previous and next page"]')
+          expect(page).to have_css('nav[aria-label="Pagination links"]')
+        end
+        expect(page).to have_no_css('[role="navigation"]')
+
+        labels = page.all('nav', visible: :all).pluck(:'aria-label')
+        expect(labels).to all(be_present)
+        expect(labels).to eq(labels.uniq)
+      end
     end
 
     context 'when query is blank' do

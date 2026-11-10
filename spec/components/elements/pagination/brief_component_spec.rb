@@ -27,7 +27,7 @@ RSpec.describe Elements::Pagination::BriefComponent, type: :component do
     it 'renders pagination' do
       render_inline(component)
 
-      expect(page).to have_css('nav.pagination')
+      expect(page).to have_css('nav.pagination[aria-label="Previous and next page"]')
 
       expect(page).to have_link('« Previous', href: '#', class: 'page-link me-2 disabled') do |link|
         expect(link[:rel]).to eq 'prev'
