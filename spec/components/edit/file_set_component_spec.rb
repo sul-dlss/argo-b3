@@ -18,7 +18,7 @@ RSpec.describe Edit::FileSetComponent, type: :component do
   it 'renders the resource heading' do
     render_inline(component)
 
-    expect(page).to have_css('.card-title h4.h3', exact_text: 'Resource (2):')
+    expect(page).to have_css('.card.file-set-card > .card-body > .card-title h4.h3', exact_text: 'Resource (2):')
   end
 
   it 'renders a required resource type select with the current type selected' do
@@ -34,7 +34,8 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('[data-controller="content-files"] [data-content-files-target="row"]', count: 1)
-    expect(page).to have_css('.card[data-content-files-target="row"] .card-title h5.h4', text: 'image1.tif')
+    expect(page).to have_css('.card.mb-3[data-content-files-target="row"] > .card-body > .card-title h5.h4',
+                             text: 'image1.tif')
     expect(page).to have_field('Role', with: 'transcription')
     expect(page).to have_css('fieldset legend', text: 'Administrative') { |legend| legend.has_css?('span.required') }
     expect(page).to have_checked_field('Publish and preserve')

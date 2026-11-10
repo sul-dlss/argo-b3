@@ -28,7 +28,7 @@ module Show
     end
 
     def classes
-      merge_classes('card file-set-card', @classes)
+      merge_classes('file-set-card', @classes)
     end
 
     def editable?
