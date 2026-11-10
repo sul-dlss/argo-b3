@@ -17,6 +17,8 @@ export default class extends Controller {
       // Show every matching option rather than tom-select's default of 50.
       maxOptions: null
     })
+    // A caret suggests a closed list of options, but any value can be entered.
+    this.tomSelect.wrapper.classList.add('no-caret')
     return this.tomSelect
   }
 
