@@ -18,5 +18,15 @@ RSpec.describe 'Reports' do
       expect(page.all('h2').map { |heading| heading.text.strip })
         .to eq(['Frequently used', 'Citation', 'History', 'Identifiers', 'Content'])
     end
+
+    it 'renders the source of items chooser' do
+      get report_path
+
+      page = Capybara.string(response.body)
+      expect(page).to have_css('fieldset legend', exact_text: 'Select source of items for report', normalize_ws: true)
+      expect(page).to have_field('From last search', type: 'radio', disabled: true)
+      expect(page).to have_field('From druid list', type: 'radio', checked: true)
+      expect(page).to have_field('Enter druid list', type: 'textarea')
+    end
   end
 end

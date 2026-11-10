@@ -1,14 +1,14 @@
 <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
       form:,
       field_name: :source,
-      label: 'Select source of items for bulk action',
+      label:,
       classes: 'my-fieldset',
       data: { controller: 'radio' }
     ) do |group| %>
 
   <% group.with_radio_button(label_text: 'From last search',
                              container_classes: 'my-field',
-                             input_value: 'results', input_disabled: !last_search?, input_data: { radio_target: 'radio', action: 'radio#toggle' }) do %>
+                             input_value: 'results', input_disabled: !last_search?, input_data: radio_data) do %>
     <% if last_search? %>
       <p class="choice-always-shown"><%= number_with_delimiter(total_results) %> items for: <%= search_form.to_s %></p>
     <% end %>
@@ -16,9 +16,10 @@
 
   <% group.with_radio_button(label_text: 'From druid list',
                              container_classes: 'my-field',
-                             input_value: 'druids', input_data: { radio_target: 'radio', action: 'radio#toggle' }) do %>
+                             input_value: 'druids', input_data: radio_data.merge(druids_radio_data)) do %>
     <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :druid_list,
                                                                label_text: 'Enter druid list', label_hidden: true,
-                                                               input_rows: 5, container_classes: 'my-field') %>
+                                                               input_rows: 5, container_classes: 'my-field',
+                                                               input_data: druid_list_data) %>
   <% end %>
 <% end %>
