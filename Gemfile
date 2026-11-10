@@ -64,7 +64,7 @@ gem 'roo' # work with newer Excel files and other types (xlsx, ods, csv).
 # Note that dropping roo-xls for older xls support since not updated for roo 3.x.
 gem 'rsolr'
 gem 'rubyzip'
-gem 'sdr_view_components', github: 'sul-dlss/sdr_view_components', branch: 'tab-list-column-classes' # TODO: use released version
+gem 'sdr_view_components'
 gem 'state_machines-activerecord'
 gem 'view_component'
 gem 'voids' # ActiveRecord-like form objects built on ActiveModel
