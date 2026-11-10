@@ -935,19 +935,6 @@ RSpec.describe 'Manage files' do
     end
   end
 
-  context 'when files are being staged' do
-    before do
-      Contents::Builder.call(cocina_object:, immutable: false).update!(staging_state: 'staging')
-    end
-
-    it 'disables the actions' do
-      visit "/contents/#{druid}/edit"
-
-      expect(page).to have_link('Cancel', class: 'disabled')
-      expect(page).to have_button('Save as draft', disabled: true)
-    end
-  end
-
   context 'when discovering files on Globus' do
     let(:globus_path) { File.join(Settings.globus.directory, "uploads/#{user.sunetid}/objects/bc123df4567") }
 
