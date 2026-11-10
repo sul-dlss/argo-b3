@@ -62,7 +62,7 @@
       </div>
     </fieldset>
 
-    <div class="d-flex gap-2 my-3">
+    <div class="d-flex align-items-center gap-2 mt-5 mb-3">
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Download', variant: :primary, formtarget: '_blank') %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Preview', variant: :primary, formaction: preview_report_path,
                                                                data: { turbo_frame: 'report-preview' }) %>
