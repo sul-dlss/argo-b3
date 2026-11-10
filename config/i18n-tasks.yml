@@ -13,6 +13,8 @@ data:
 search:
   paths:
     - app/
+  # Match dynamic keys such as t("access.locations.#{location}"); i18n-tasks 1.2 defaults to strict.
+  strict: false
 
 ignore_unused:
   # Looked up by I18n.l via format_datetime(format: :date_only / :date_time) in ApplicationHelper.
