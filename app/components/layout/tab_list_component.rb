@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Structure
+module Layout
   # Tabbed form navigation with columns matching TwoColumnWithHeaderComponent at xl.
   class TabListComponent < SdrViewComponents::TabForm::TabListComponent
     def initialize(**)

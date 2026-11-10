@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Structure::TwoColumnWithHeaderComponent, type: :component do
+RSpec.describe Layout::TwoColumnWithHeaderComponent, type: :component do
   it 'renders the top, left, and main content in their respective regions' do
     render_inline(described_class.new) do |component|
       component.with_top_content { '<p class="top">Top content</p>'.html_safe }

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Structure::TabListComponent, type: :component do
+RSpec.describe Layout::TabListComponent, type: :component do
   it 'renders the tabs and panes in columns matching the two column layout' do
     render_inline(described_class.new(id: 'tabbed_form', active_tab_name: :tab_one)) do |component|
       component.with_tab(label: 'Tab 1', tab_name: :tab_one)
