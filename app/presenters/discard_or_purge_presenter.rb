@@ -4,9 +4,11 @@
 class DiscardOrPurgePresenter
   # @param cocina_version [Integer] the version of the cocina object
   # @param version_service [Sdr::VersionService] the object's version service
-  def initialize(cocina_version:, version_service:)
+  # @param purge_label [String] the label of the purge button, for contexts that need something more specific
+  def initialize(cocina_version:, version_service:, purge_label: I18n.t('edit.items.edit.buttons.purge'))
     @cocina_version = cocina_version
     @version_service = version_service
+    @purge_label = purge_label
   end
 
   # @return [Boolean] true if the button purges the object, false if it discards the draft
@@ -27,7 +29,7 @@ class DiscardOrPurgePresenter
   end
 
   def label
-    purge? ? I18n.t('edit.items.edit.buttons.purge') : I18n.t('edit.items.edit.buttons.discard_draft')
+    purge? ? purge_label : I18n.t('edit.items.edit.buttons.discard_draft')
   end
 
   def confirm
@@ -41,7 +43,7 @@ class DiscardOrPurgePresenter
 
   private
 
-  attr_reader :cocina_version, :version_service
+  attr_reader :cocina_version, :version_service, :purge_label
 
   def druid
     version_service.druid

@@ -278,6 +278,7 @@ en:
         title: "Manage files"
         buttons:
           discover_files: "Discover files"
+          purge: "Purge item"
         errors:
           save_failed: "The item could not be saved. Try again, or contact SDR support if the problem continues."
         toasts:
