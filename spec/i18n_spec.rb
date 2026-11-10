@@ -5,7 +5,9 @@ require 'i18n/tasks'
 RSpec.describe I18n do
   let(:i18n) { I18n::Tasks::BaseTask.new }
   let(:missing_keys) { i18n.missing_keys }
-  let(:unused_keys) { i18n.unused_keys }
+  # `strict: false`: infer dynamic keys, e.g. t("access.locations.#{location}")
+  # see https://github.com/glebm/i18n-tasks/releases/tag/v1.2.0
+  let(:unused_keys) { i18n.unused_keys(strict: false) }
 
   it 'does not have missing keys' do
     expect(missing_keys).to be_empty,
