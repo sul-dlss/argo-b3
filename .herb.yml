@@ -9,6 +9,20 @@ linter:
   # Linted only by its spec, which passes --force.
   exclude:
     - 'spec/fixtures/herb/**/*'
+  # Off-by-default accessibility rules (design standards LINK-1, A11Y-6, PAGE-5, ICON-3), as errors so lint fails.
+  rules:
+    a11y-avoid-generic-link-text:
+      enabled: true
+      severity: error
+    a11y-nested-interactive-elements:
+      enabled: true
+      severity: error
+    html-navigation-has-label:
+      enabled: true
+      severity: error
+    html-no-title-attribute:
+      enabled: true
+      severity: error
 
 formatter:
   enabled: false
