@@ -1,7 +1,7 @@
 <%= tag.div class: 'card mb-3', data: { content_files_target: 'row' } do %>
   <div class="card-body">
     <div class="card-title d-flex justify-content-between align-items-start">
-      <div class="h4"><%= filepath %></div>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h5, text: filepath, variant: :h4) %>
       <%= render Elements::DeleteButtonComponent.new(label: t('edit.content_file_sets.buttons.remove_file', filepath:),
                                                      data: { action: 'content-files#remove' }) %>
     </div>
