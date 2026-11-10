@@ -727,6 +727,8 @@ en:
       deposit_types:
         new_item: 'new item'
         redeposit: 'redeposit'
+      status_ok: 'OK'
+      error_label: 'Error:'
     discover_files:
       errors:
         object_not_found: 'Object not found'

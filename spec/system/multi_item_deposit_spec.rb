@@ -157,8 +157,8 @@ RSpec.describe 'Multi-item deposit' do
     expect(page).to have_css('h2', text: 'Results of checking files')
     summary_rows = page.find('table[aria-label="Summary"]').all('tbody tr')
     expect(summary_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
-      .to eq([['bc123df4567', 'folder1', '1', 'file', 'redeposit', ''],
-              ['cd234fg5678', 'folder2', '1', 'file', 'redeposit', '']])
+      .to eq([%w[bc123df4567 folder1 1 OK file redeposit],
+              %w[cd234fg5678 folder2 1 OK file redeposit]])
     expect(page).to have_field('Publish and preserve all files', checked: true)
 
     # Returning to discovery discards nothing.
