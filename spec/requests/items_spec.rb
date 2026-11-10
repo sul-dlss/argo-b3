@@ -84,7 +84,7 @@ RSpec.describe 'Items' do
         post '/items', params: { item: { apo_druid: 'druid:hv992ry2431', title: 'My item' } }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(flash[:danger]).to eq 'You are not authorized to perform the requested action.'
         expect(Sdr::Repository).not_to have_received(:register)
       end
     end
@@ -352,7 +352,7 @@ RSpec.describe 'Items' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(flash[:danger]).to eq 'You are not authorized to perform the requested action.'
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -385,7 +385,7 @@ RSpec.describe 'Items' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+        expect(flash[:danger]).to eq 'You are not authorized to perform the requested action.'
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -720,12 +720,12 @@ RSpec.describe 'Items' do
         { content_type: Cocina::Models::ObjectType.image, version_description: 'Changed type', lock: 'stale-lock' }
       end
 
-      it 'redirects to the edit page with a warning without saving' do
+      it 'redirects to the edit page with an error without saving' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(edit_item_path(druid))
-        expect(flash[:warning]).to eq('This item was changed since you opened it. ' \
-                                      'Review the current values and make your changes again.')
+        expect(flash[:danger]).to eq('This item was changed since you opened it. ' \
+                                     'Review the current values and make your changes again.')
         expect(Sdr::VersionService).not_to have_received(:open)
         expect(Sdr::Repository).not_to have_received(:update)
       end
@@ -765,12 +765,12 @@ RSpec.describe 'Items' do
     context 'when the mutable content is staging' do
       before { create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging') }
 
-      it 'redirects to the edit page with a warning without saving' do
+      it 'redirects to the edit page with an error without saving' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(edit_item_path(druid))
-        expect(flash[:warning]).to eq('Files for this item are being staged or discovered. ' \
-                                      'Try again when that has finished.')
+        expect(flash[:danger]).to eq('Files for this item are being staged or discovered. ' \
+                                     'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -779,11 +779,11 @@ RSpec.describe 'Items' do
       let(:open) { false }
       let(:editable) { false }
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Item is not editable.')
+        expect(flash[:danger]).to eq('Item is not editable.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end

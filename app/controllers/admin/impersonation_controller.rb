@@ -16,7 +16,7 @@ module Admin
       authorize! to: :update_impersonation?, with: AdminPolicy
 
       if impersonated_workgroups.empty?
-        flash[:warning] = I18n.t('admin.impersonation.invalid')
+        flash[:danger] = I18n.t('admin.impersonation.invalid')
         redirect_to admin_impersonate_path
       else
         Impersonation::Workgroups.update_cookie(cookies:, groups: impersonated_workgroups)

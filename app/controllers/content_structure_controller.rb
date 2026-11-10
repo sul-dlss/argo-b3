@@ -37,7 +37,7 @@ class ContentStructureController < ContentsApplicationController
     # Deleting is disabled during discovery, since discovery may be adding files.
     if @content.discovering?
       return redirect_to edit_content_path(@content.druid),
-                         flash: { warning: t('edit.contents.structure.warnings.discovering') }
+                         flash: { danger: t('edit.contents.structure.warnings.discovering') }
     end
 
     ActiveRecord::Base.transaction do

@@ -81,7 +81,7 @@ RSpec.describe 'Admin impersonate' do
       patch admin_impersonate_path, params: { impersonation: { workgroups: [] } }
 
       expect(response).to redirect_to(admin_impersonate_path)
-      expect(flash[:warning]).to eq('You must select workgroups to enable impersonation.')
+      expect(flash[:danger]).to eq('You must select workgroups to enable impersonation.')
       expect(encrypted_impersonated_workgroups).to be_nil
     end
 

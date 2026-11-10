@@ -26,12 +26,12 @@ RSpec.describe 'Republish object' do
         allow(Sdr::Repository).to receive(:publish)
       end
 
-      it 'does not publish and shows a warning' do
+      it 'does not publish and shows an error' do
         post republish_object_path(druid)
 
         expect(Sdr::Repository).not_to have_received(:publish)
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Republish is not possible')
+        expect(flash[:danger]).to eq('Republish is not possible')
       end
     end
 

@@ -136,7 +136,7 @@ RSpec.describe 'Collections' do
         post '/collections', params: { collection: collection_params.merge(apo_druid: 'druid:bc123df4567') }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
         expect(Sdr::Repository).not_to have_received(:register)
       end
     end
@@ -213,11 +213,11 @@ RSpec.describe 'Collections' do
     context 'when the version is not editable' do
       let(:editable) { false }
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         get "/collections/#{druid}/edit"
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('Collection is not editable.')
+        expect(flash[:danger]).to eq('Collection is not editable.')
       end
     end
 
@@ -228,7 +228,7 @@ RSpec.describe 'Collections' do
         get "/collections/#{druid}/edit"
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
       end
     end
   end
@@ -325,12 +325,12 @@ RSpec.describe 'Collections' do
     end
 
     context 'when the collection was changed since the form was loaded' do
-      it 'redirects to the form with a warning without saving' do
+      it 'redirects to the form with an error without saving' do
         patch "/collections/#{druid}", params: { collection: collection_params.merge(lock: 'other-lock') }
 
         expect(response).to redirect_to("/collections/#{druid}/edit")
-        expect(flash[:warning]).to eq('This collection was changed since you opened it. ' \
-                                      'Review the current values and make your changes again.')
+        expect(flash[:danger]).to eq('This collection was changed since you opened it. ' \
+                                     'Review the current values and make your changes again.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -338,11 +338,11 @@ RSpec.describe 'Collections' do
     context 'when the version is not editable' do
       let(:version_service) { version_service_double(open?: false, openable?: false, closeable?: false) }
 
-      it 'redirects to the object page with a warning without saving' do
+      it 'redirects to the object page with an error without saving' do
         patch "/collections/#{druid}", params: { collection: collection_params }
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('Collection is not editable.')
+        expect(flash[:danger]).to eq('Collection is not editable.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -370,7 +370,7 @@ RSpec.describe 'Collections' do
         patch "/collections/#{druid}", params: { collection: collection_params.merge(apo_druid: other_apo_druid) }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -399,7 +399,7 @@ RSpec.describe 'Collections' do
       get '/collections/new'
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
 
     it 'denies creating a collection' do

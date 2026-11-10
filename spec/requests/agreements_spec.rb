@@ -139,11 +139,11 @@ RSpec.describe 'Agreements' do
     context 'when the version is not editable' do
       let(:editable) { false }
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         get "/agreements/#{druid}/edit"
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('Agreement is not editable.')
+        expect(flash[:danger]).to eq('Agreement is not editable.')
       end
     end
 
@@ -154,7 +154,7 @@ RSpec.describe 'Agreements' do
         get "/agreements/#{druid}/edit"
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
       end
     end
   end
@@ -276,12 +276,12 @@ RSpec.describe 'Agreements' do
     end
 
     context 'when the agreement was changed since the form was loaded' do
-      it 'redirects to the edit page with a warning without saving' do
+      it 'redirects to the edit page with an error without saving' do
         patch "/agreements/#{druid}", params: { agreement: agreement_params.merge(lock: 'stale-lock'), commit: }
 
         expect(response).to redirect_to("/agreements/#{druid}/edit")
-        expect(flash[:warning]).to eq('This agreement was changed since you opened it. ' \
-                                      'Review the current values and make your changes again.')
+        expect(flash[:danger]).to eq('This agreement was changed since you opened it. ' \
+                                     'Review the current values and make your changes again.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -289,12 +289,12 @@ RSpec.describe 'Agreements' do
     context 'when the mutable content is staging' do
       before { create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging') }
 
-      it 'redirects to the edit page with a warning without saving' do
+      it 'redirects to the edit page with an error without saving' do
         patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
 
         expect(response).to redirect_to("/agreements/#{druid}/edit")
-        expect(flash[:warning]).to eq('Files for this agreement are being staged or discovered. ' \
-                                      'Try again when that has finished.')
+        expect(flash[:danger]).to eq('Files for this agreement are being staged or discovered. ' \
+                                     'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -302,11 +302,11 @@ RSpec.describe 'Agreements' do
     context 'when the version is not editable' do
       let(:version_service) { version_service_double(open?: false, openable?: false, closeable?: false) }
 
-      it 'redirects to the object page with a warning without saving' do
+      it 'redirects to the object page with an error without saving' do
         patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('Agreement is not editable.')
+        expect(flash[:danger]).to eq('Agreement is not editable.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -334,7 +334,7 @@ RSpec.describe 'Agreements' do
       get '/agreements/new'
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
 
     it 'denies creating an agreement' do

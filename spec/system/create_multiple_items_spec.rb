@@ -517,8 +517,8 @@ RSpec.describe 'Create multiple items' do
 
       form_validation_action.status_failed!
 
-      expect(page).to have_css('.alert', text: 'An error occurred while validating your registrations. ' \
-                                               'Please try again.')
+      expect(page).to have_css('.alert-danger', text: 'An error occurred while validating your registrations. ' \
+                                                      'Please try again.')
       expect(page).to have_button('Register items')
 
       expect(BulkActions::RegisterFormJob).not_to have_been_enqueued

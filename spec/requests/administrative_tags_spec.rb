@@ -40,7 +40,7 @@ RSpec.describe 'Administrative tags' do
         get "/objects/#{druid}/tags/edit"
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq(I18n.t('errors.not_authorized'))
+        expect(flash[:danger]).to eq(I18n.t('errors.not_authorized'))
       end
     end
   end

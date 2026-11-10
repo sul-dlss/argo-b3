@@ -47,7 +47,7 @@ RSpec.describe 'Multiple items' do
       }
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:warning]).to eq 'You are not authorized to perform the requested action.'
+      expect(flash[:danger]).to eq 'You are not authorized to perform the requested action.'
       expect(FormValidationAction.count).to eq 0
     end
   end
@@ -145,6 +145,19 @@ RSpec.describe 'Multiple items' do
         page = Capybara.string(response.body)
         expect(page).to have_select('Collections', visible: :all, selected: ['Art History Slides'])
         expect(Searchers::CollectionListByDruid).to have_received(:call).with(druids: ['druid:bc123df4567'])
+      end
+    end
+
+    context 'when the form validation action failed' do
+      let(:form_validation_action) do
+        FormValidationAction.create!(user:, form: ItemsRegistrationForm.new, status: 'failed')
+      end
+
+      it 'renders the form with an error' do
+        get multiple_item_path(form_validation_action)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(flash[:danger]).to eq('An error occurred while validating your registrations. Please try again.')
       end
     end
   end

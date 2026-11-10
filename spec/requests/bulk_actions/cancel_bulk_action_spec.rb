@@ -42,7 +42,7 @@ RSpec.describe 'Cancelling a bulk action' do
       post cancel_bulk_action_path(bulk_action)
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
       expect(bulk_action.reload).to be_started
     end
   end

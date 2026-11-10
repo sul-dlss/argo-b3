@@ -187,7 +187,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     authorize! @solr_doc, to: :update?, with: ObjectPolicy
 
     unless republishable?
-      flash[:warning] = t('show.warnings.republish_failed')
+      flash[:danger] = t('show.warnings.republish_failed')
       return redirect_to object_path(druid:)
     end
 
@@ -222,11 +222,11 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Sdr::DepositDraftService.call(cocina_object:, user_name: current_user.sunetid)
     toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
   rescue Sdr::DepositDraftService::ContentBusyError
-    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.content_busy') }
+    redirect_to object_path(druid_param), flash: { danger: t('show.warnings.content_busy') }
   rescue Sdr::DepositDraftService::NotDepositableError
-    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.not_depositable') }
+    redirect_to object_path(druid_param), flash: { danger: t('show.warnings.not_depositable') }
   rescue Sdr::DepositDraftService::UnsavedChangesError
-    redirect_to edit_content_path(druid_param), flash: { warning: t('show.warnings.unsaved_content_changes') }
+    redirect_to edit_content_path(druid_param), flash: { danger: t('show.warnings.unsaved_content_changes') }
   rescue Sdr::DepositDraftService::InvalidContentError
     # Manage files shows the content errors.
     redirect_to edit_content_path(druid_param, deposit: true)
@@ -241,9 +241,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Sdr::DiscardDraftService.call(cocina_object:)
     redirect_to object_path(druid), flash: { toast: t('show.toasts.draft_discarded') }
   rescue Sdr::DiscardDraftService::ContentBusyError
-    redirect_to object_path(druid), flash: { warning: t('show.warnings.content_busy') }
+    redirect_to object_path(druid), flash: { danger: t('show.warnings.content_busy') }
   rescue Sdr::DiscardDraftService::NotDiscardableError
-    redirect_to object_path(druid), flash: { warning: t('show.warnings.not_discardable') }
+    redirect_to object_path(druid), flash: { danger: t('show.warnings.not_discardable') }
   rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: })
@@ -255,9 +255,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     # A purged object no longer has an object page.
     redirect_to root_path, flash: { toast: t('show.toasts.purged') }
   rescue Sdr::PurgeService::CannotPurgeError
-    redirect_to object_path(druid), flash: { warning: t('show.warnings.cannot_purge') }
+    redirect_to object_path(druid), flash: { danger: t('show.warnings.cannot_purge') }
   rescue Sdr::PurgeService::ContentBusyError
-    redirect_to object_path(druid), flash: { warning: t('show.warnings.content_busy') }
+    redirect_to object_path(druid), flash: { danger: t('show.warnings.content_busy') }
   rescue Sdr::PurgeService::Error => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: })

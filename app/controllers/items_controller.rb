@@ -103,7 +103,7 @@ class ItemsController < ApplicationController
   end
 
   def redirect_not_editable
-    redirect_to object_path(@druid), flash: { warning: t('edit.items.edit.warnings.not_editable') }
+    redirect_to object_path(@druid), flash: { danger: t('edit.items.edit.warnings.not_editable') }
   end
 
   # The lock changes whenever the object is updated, so a different (or missing) lock means that the object
@@ -113,11 +113,11 @@ class ItemsController < ApplicationController
   end
 
   def redirect_stale
-    redirect_to edit_item_path(@druid), flash: { warning: t('edit.items.edit.warnings.stale') }
+    redirect_to edit_item_path(@druid), flash: { danger: t('edit.items.edit.warnings.stale') }
   end
 
   def redirect_content_busy
-    redirect_to edit_item_path(@druid), flash: { warning: t('edit.items.edit.warnings.content_busy') }
+    redirect_to edit_item_path(@druid), flash: { danger: t('edit.items.edit.warnings.content_busy') }
   end
 
   def set_edit_view
