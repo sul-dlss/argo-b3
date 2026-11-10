@@ -40,6 +40,11 @@ $search-color: rgb(#{$search-color-rgb});
   --bs-nav-link-color: white;
 }
 
+// Elements::BadgeComponent status variant.
+.status-badge {
+  background-color: var(--stanford-fog-light);
+}
+
 .thumbnail {
   max-width: 240px;
   max-height: 240px;
