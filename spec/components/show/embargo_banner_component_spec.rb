@@ -7,12 +7,12 @@ RSpec.describe Show::EmbargoBannerComponent, type: :component do
 
   let(:release_date) { '2029-01-01 12:00:00 AM' }
 
-  it 'renders a full-width black banner with the release date and pencil icon' do
+  it 'renders a full-width black banner styled as an h2 but not a heading' do
     render_inline(component)
 
-    expect(page).to have_css('.embargo-banner.bg-black.text-white h2', text: 'Embargoed until 2029-01-01')
-    expect(page).to have_css('.embargo-banner h2 > i.bi-pencil')
-    expect(page).to have_no_link
+    expect(page).to have_css('.embargo-banner.bg-black.text-white p.h2', exact_text: 'Embargoed until 2029-01-01')
+    expect(page).to have_no_css('.embargo-banner h2, .embargo-banner [role="heading"]')
+    expect(page).to have_no_css('.embargo-banner i')
   end
 
   context 'without an embargo release date' do
