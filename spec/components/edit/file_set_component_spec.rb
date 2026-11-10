@@ -53,10 +53,10 @@ RSpec.describe Edit::FileSetComponent, type: :component do
     expect(page).to have_css('button[data-disable-actions-target="disableable"]', text: 'Save')
   end
 
-  it 'renders a hidden note for when every file is removed' do
+  it 'renders a hidden note for when every file is removed in an alert region' do
     render_inline(component)
 
-    expect(page).to have_css('p[data-content-files-target="allRemovedNote"]',
+    expect(page).to have_css('[role="alert"] p[data-content-files-target="allRemovedNote"]',
                              text: 'Saving will delete this resource.', visible: :hidden)
   end
 

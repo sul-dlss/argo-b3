@@ -80,8 +80,9 @@ RSpec.describe 'Content globus' do
         post content_globus_path(content_id: content_token)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(response.body).to include('The Globus link could not be created.')
         expect(response.body).to include('Create Globus link')
+        page = Capybara.string(response.body)
+        expect(page).to have_css('.alert-danger[role="alert"]', text: 'The Globus link could not be created.')
       end
     end
   end

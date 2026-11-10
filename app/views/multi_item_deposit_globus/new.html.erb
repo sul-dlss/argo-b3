@@ -1,7 +1,5 @@
 <%= turbo_frame_tag @multi_item_deposit_action, 'globus' do %>
-  <% if @error %>
-    <p class="text-danger"><%= @error %></p>
-  <% end %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, text: @error) %>
   <% if @multi_item_deposit_action.globus_directory %>
     <p><%= t('edit.multi_item_deposits.globus.instructions') %></p>
     <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.contents.globus.buttons.open'),
