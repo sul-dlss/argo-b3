@@ -317,7 +317,7 @@ en:
         add_files:
           label: "Add files"
         structural:
-          label: "Structure"
+          label: "Structure files"
         deposit:
           label: "Deposit"
     content_file_binaries:
