@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 // Colors for object types
 $item-color-rgb: var(--item-color-rgb);
 $item-color: rgb(#{$item-color-rgb});
@@ -90,6 +92,19 @@ $search-color: rgb(#{$search-color-rgb});
 // Removes Tom Select's caret margin so a chosen single value doesn't look like it has a trailing space.
 .ts-wrapper.single.has-items .ts-control > input {
   margin: 0 !important;
+}
+
+// Hides the form-select caret on a Tom Select, keeping any validation icon.
+.ts-wrapper.form-select.no-caret {
+  --bs-form-select-bg-img: none;
+
+  @each $state, $data in $form-validation-states {
+    &.single.is-#{$state} {
+      background-image: escape-svg(map.get($data, 'icon'));
+      background-position: right $input-height-inner-quarter center;
+      background-size: $form-select-feedback-icon-size;
+    }
+  }
 }
 
 .impersonation-banner {
