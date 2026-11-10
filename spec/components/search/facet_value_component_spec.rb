@@ -70,6 +70,7 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       expect(page).to have_link('Exclude dark',
                                 href: '/search?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection')
       expect(page).to have_css('a:not([title]) .visually-hidden', text: 'Exclude dark')
+      expect(page).to have_css('a .bi-exclude[aria-hidden="true"]')
     end
   end
 

@@ -14,6 +14,7 @@ RSpec.describe Elements::SelectedItemComponent, type: :component do
       expect(page).to have_css('li .selected-item-label', text: 'Test Label')
       expect(page).to have_css('a.btn-close[href="/remove/path"]:not([title]) .visually-hidden',
                                text: 'Remove Test Label')
+      expect(page).to have_no_css('a.btn-close .bi')
     end
   end
 
@@ -34,6 +35,7 @@ RSpec.describe Elements::SelectedItemComponent, type: :component do
       expect(page).to have_css('li .selected-item-label', text: 'Custom Label Content')
       expect(page).to have_css('a.btn-close[href="/remove/path"]:not([title]) .visually-hidden',
                                text: 'Remove Test Label')
+      expect(page).to have_no_css('a.btn-close .bi')
     end
   end
 end
