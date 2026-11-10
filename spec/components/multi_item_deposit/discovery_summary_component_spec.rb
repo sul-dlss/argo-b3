@@ -34,7 +34,7 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('.object-type-multi-item-deposit .card', text: '# of items') do |box|
-        box.has_css?('h4.card-title', text: '# of items') && box.has_css?('.card-text', exact_text: '4')
+        box.has_css?('h4.card-title', text: '# of items') && box.has_css?('.card-text p', exact_text: '4')
       end
     end
 
@@ -43,7 +43,7 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
 
       # Two Item Deposits have errors, one of them two errors.
       expect(page).to have_css('.card.text-danger', text: '# of errors') do |box|
-        box.has_css?('h4.card-title', text: '# of errors') && box.has_css?('.card-text', exact_text: '2')
+        box.has_css?('h4.card-title', text: '# of errors') && box.has_css?('.card-text p', exact_text: '2')
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('.card', text: 'Content types') do |box|
-        box.has_css?('h4.card-title', text: 'Content types') && box.has_css?('.card-text', exact_text: 'Book, file')
+        box.has_css?('h4.card-title', text: 'Content types') && box.has_css?('.card-text p', exact_text: 'Book, file')
       end
     end
 
@@ -72,7 +72,7 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('.card.text-success', text: '# of errors') do |box|
-        box.has_css?('.card-text', exact_text: '0')
+        box.has_css?('.card-text p', exact_text: '0')
       end
     end
   end
