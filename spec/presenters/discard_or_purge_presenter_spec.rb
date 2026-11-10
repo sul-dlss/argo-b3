@@ -28,6 +28,14 @@ RSpec.describe DiscardOrPurgePresenter do
       expect(Sdr::PurgeService).to have_received(:purgeable?).with(druid:, version: 1)
       expect(Sdr::DiscardDraftService).not_to have_received(:discardable?)
     end
+
+    context 'with a purge label' do
+      subject(:presenter) { described_class.new(cocina_version:, version_service:, purge_label: 'Purge item') }
+
+      it 'uses the purge label' do
+        expect(presenter.label).to eq('Purge item')
+      end
+    end
   end
 
   context 'with a later version' do

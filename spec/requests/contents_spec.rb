@@ -127,7 +127,7 @@ RSpec.describe 'Contents' do
                                                                                            count: 4)
         expect(page).to have_css('button[type="submit"][form="item_form"][value="deposit"]', text: 'Deposit',
                                                                                              count: 1)
-        expect(page).to have_link('Purge', href: "/objects/#{druid}/purge", count: 4)
+        expect(page).to have_link('Purge item', href: "/objects/#{druid}/purge", count: 4)
         expect(page).to have_no_link('Discard draft')
         expect(Sdr::PurgeService).to have_received(:purgeable?).with(druid:, version: 1).once
       end
