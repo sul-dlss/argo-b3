@@ -20,13 +20,15 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(page).to have_css('div[data-controller="scheduled-refresh"]' \
                                '[data-scheduled-refresh-interval-value="500"]')
 
-      status_box = page.first('.show-box')
+      # The status and counts are in one live region, so a refresh announces them only when they change.
+      status_region = page.find('[role="status"]')
+      status_box = status_region.first('.show-box')
       expect(status_box).to have_css('h2', text: 'Processing')
       expect(status_box).to have_no_css('i.bi')
       expect(status_box).to have_css('p', text: 'Reindex bulk action updated at 2026-04-16 03:00:00 PT')
 
-      expect(page).to have_css('h2', text: 'Total / Success / Failed')
-      expect(page).to have_css('.show-box', text: '0 / 0 / 0')
+      expect(status_region).to have_css('h2', text: 'Total / Success / Failed')
+      expect(status_region).to have_css('.show-box', text: '0 / 0 / 0')
 
       expect(page).to have_no_css('h2', text: 'Downloads')
       expect(page).to have_no_css('[role="tablist"]')
@@ -51,6 +53,8 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(page).to have_css('h2 i.bi-check-circle-fill.text-success')
       expect(page).to have_css('h2', text: 'Completed')
 
+      expect(page).to have_css('[role="status"] h2', text: 'Completed')
+      expect(page).to have_no_css('[role="status"] h2', text: 'Downloads')
       downloads_box = page.find('h2', text: 'Downloads').ancestor('.card')
       expect(downloads_box).to have_link('Log file',
                                          href: "/bulk_actions/#{bulk_action.id}/file?filename=log.txt")

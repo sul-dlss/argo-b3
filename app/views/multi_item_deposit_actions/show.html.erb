@@ -18,5 +18,7 @@
 
   <p><%= t('edit.multi_item_deposits.show.description') %></p>
 
+  <%= render MultiItemDeposit::DepositStatusCountsComponent.new(object_status_presenters: @object_status_presenters) %>
+
   <%= render MultiItemDeposit::DepositStatusTableComponent.new(object_status_presenters: @object_status_presenters) %>
 <% end %>

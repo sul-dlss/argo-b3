@@ -167,6 +167,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
         expect(rendered_page).to have_css('div[data-controller="scheduled-refresh"]')
+        expect(rendered_page).to have_css('[role="status"]', exact_text: 'Total: 2; Registered: 1; Deposited: 1')
 
         rows = rendered_page.all('table[aria-label="Deposit status"] tbody tr')
         expect(rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
@@ -535,8 +536,9 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(response).to have_http_status(:ok)
-        expect(rendered_page)
-          .to have_text("Processing Multi-item deposit #{multi_item_deposit_action.id}: My deposit...")
+        expect(rendered_page).to have_css(
+          '[role="status"]', exact_text: "Processing Multi-item deposit #{multi_item_deposit_action.id}: My deposit..."
+        )
         expect(rendered_page).to have_no_field('Describe this deposit')
       end
     end
