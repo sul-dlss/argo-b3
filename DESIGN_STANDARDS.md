@@ -50,8 +50,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 
 ## Page structure
 
-- **PAGE-1 MUST** The document has `<html lang="en">`, exactly one `<main id="main-container">` containing the page content, and the gem's `SkipLinksComponent` as the first focusable element.
-- **PAGE-2 MUST** Every page sets a title that identifies it: `<h1 text> | Argo B3`, with the product name read from `en.yml`. A page about one object or named record whose h1 doesn't name it (e.g., "Manage files") adds the name: `<h1 text> – <name> | Argo B3`. The layout's fallback title is not acceptable for any page.
+- **PAGE-2 MUST** Every page sets a title that identifies it, with `page_title`, matching its h1. A page about one object or named record whose h1 doesn't name it (e.g., "Manage files") passes the name: "Manage files – <title>". The layout adds "| Argo B3"; a page that relies on the layout's fallback "Argo B3" alone fails.
 - **PAGE-3 MUST** Every page has exactly one `<h1>`, describing the page (e.g., the object's title, "Register multiple items").
 - **PAGE-4 MUST** A page below a top-level page has a back link at the top (`Elements::BreadcrumbComponent`): "← " followed by the name of the parent page (e.g., "← Workgroup permissions"), never just "Back". A page with a Cancel action does not need one.
 - **PAGE-5 MUST** Landmarks are used for their purpose: navigation in `<nav>` (not `div role="navigation"`), and when a page has more than one `<nav>`, each has a distinct `aria-label`.
@@ -142,12 +141,12 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 - **TABLE-4 MUST** An empty table shows `empty_message:` worded "No <things>." (e.g., "No events."), not a hand-written paragraph.
 - **TABLE-5 SHOULD** Column headers are words, not symbols (e.g., "Items", not "# of items").
 - **TABLE-6 MUST** Column widths come from a CSS class, not inline styles (see LAY-3).
-- **TABLE-7 MUST** A row that expands to show details has a `<button>` in a cell that toggles it, with `aria-expanded` and `aria-controls` (see A11Y-1).
+- **TABLE-7 MUST** A row that expands to show details has a `<button>` in a cell that toggles it, with `aria-expanded` and `aria-controls` (see A11Y-1). *Use* `Show::ToggleRowButtonComponent`.
 
 ## Links
 
 - **LINK-1 MUST** Link text makes sense on its own. Repeated per-row links (e.g., "Log file") have visually hidden context (e.g., "Log file for <bulk action>"). No "click here", "here", "more", or "More »"; write "More <facet name>".
-- **LINK-2 MUST** Open a new tab only for pages outside Argo B3 (e.g., PURL, Globus, downloads), using `link_to_new_tab`. A new-tab link shows the external-link icon and visually hidden "(opens in new tab)".
+- **LINK-2 MUST** Open a new tab only for pages outside Argo B3 (e.g., PURL, Globus, downloads), using `link_to_new_tab` (or `new_tab_label` for a button with `target: '_blank'`), which announces the new tab.
 - **LINK-3 SHOULD** Link to objects with `link_to_object` (object title as link text) and display druids without the `druid:` prefix.
 - **LINK-4 MUST** Links have an `href`. *(linted)*
 
