@@ -709,6 +709,12 @@ en:
         druid: 'Druid'
         status: 'Status'
       total: 'Total'
+    discovery_summary:
+      content_types: 'Content types'
+      error_count: '# of errors'
+      heading: 'Summary'
+      item_count: '# of items'
+      started: 'Started %{started_at}'
     error_details:
       label: 'Error details'
       headers:

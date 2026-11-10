@@ -103,6 +103,8 @@
         <% end %>
       <% end %>
 
+      <%= render MultiItemDeposit::DiscoverySummaryComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
       <%= render MultiItemDeposit::DiscoveryErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
     <div class="mt-5">
