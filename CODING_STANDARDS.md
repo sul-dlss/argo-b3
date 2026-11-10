@@ -2,6 +2,8 @@
 
 Judgement calls checked during review. Mechanical rules are enforced by RuboCop, erb_lint, herb, and the JS / SCSS linters (`bin/rake lint`), so they are not repeated here. When reviewing, check each rule against every changed file it applies to.
 
+For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also apply `DESIGN_STANDARDS.md`.
+
 ## Forms
 
 - Searchable select widgets (tom-select, single or multi) commit the highlighted option, or create a new value, only on Enter or click. Tab always moves focus to the next field without selecting or creating anything, as with a native `<select>`, so keyboard users can move through a form without accidentally changing values. Don't enable tom-select's `selectOnTab`.
@@ -19,7 +21,7 @@ Judgement calls checked during review. Mechanical rules are enforced by RuboCop,
 
 - Render dates and times with `format_datetime` (`ApplicationHelper`, `helpers.format_datetime` in components) and a format from `time.formats` in `config/locales/en.yml` (e.g., `format: :date_only`), not `strftime` or `to_fs`. It converts to Pacific time first, so every page shows the same zone and layout. Add a new format to `en.yml` if none fits.
   - The `PT` label is used year-round, though the time observes daylight saving. Exceptions: CSV report values, which arrive preformatted from Solr, and machine-readable values (Solr queries, repository API values, HTTP headers), which use their protocol's format.
-- Notify the user of an error with a danger alert (`flash[:danger]`), and of informational messages (status updates, success) with a disappearing toast (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
+- Notify the user of an error with a danger alert (`flash[:danger]`), of a warning that doesn't stop them with a warning alert (`flash[:warning]`), and of informational messages (status updates, success) with a disappearing toast (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
 
 ## Naming and structure
 
