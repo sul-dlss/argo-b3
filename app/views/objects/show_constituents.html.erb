@@ -1,5 +1,5 @@
 <%= turbo_frame_tag(@druid, 'constituents') do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: "Items in this virtual object (#{@constituents.size})", classes: 'mb-3') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: "Items in this virtual object (#{number_with_delimiter(@constituents.size)})", classes: 'mb-3') %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(
         label: 'Items in this virtual object',
