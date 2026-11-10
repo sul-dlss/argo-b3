@@ -6,7 +6,7 @@
 <div class="container pb-3">
   <%= render Elements::BreadcrumbComponent.new(label: 'Workgroup permissions', link: admin_workgroup_permissions_path) %>
 
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @workgroup, classes: 'mb-4') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @workgroup, classes: 'mb-3') %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Permissions', classes: 'mb-4') %>
 
   <%= form_with model: @workgroup_permission_form, url: admin_workgroup_permission_path(@workgroup), method: :patch do |form| %>

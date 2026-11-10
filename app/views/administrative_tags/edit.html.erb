@@ -1,7 +1,7 @@
 <div class="container py-2">
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.administrative_tags.edit.title')) %>
 
-  <p class="mb-4"><%= @title %></p>
+  <p class="mb-3"><%= @title %></p>
 
   <%= form_with model: @administrative_tags_form, url: object_tags_path(@druid), method: :patch, class: 'b3-form' do |form| %>
     <%= render Edit::TagsComponent.new(form:) %>

@@ -8,7 +8,7 @@
 
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('admin.object_permissions.heading', object_type: @solr_doc.object_type),
                                                                classes: 'mb-2') %>
-  <p class="mb-4"><%= @solr_doc.title %> (<%= @solr_doc.bare_druid %>)</p>
+  <p class="mb-3"><%= @solr_doc.title %> (<%= @solr_doc.bare_druid %>)</p>
 
   <%# The stable id lets a morph keep the form, rather than moving its radios one at a time into a new form, which leaves no radio checked. %>
   <%= form_with model: @object_permission_form, url: admin_object_permissions_path(@druid), id: 'object-permission-form' do |form| %>
