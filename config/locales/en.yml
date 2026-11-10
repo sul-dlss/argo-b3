@@ -787,8 +787,13 @@ en:
       toasts:
         errors: 'Deposit check found errors'
         started: 'Deposit started'
+  dashboard:
+    heading: 'Argo dashboard'
+  reports:
+    title: 'Custom report'
   bulk_actions:
     label: 'Bulk action'
+    new_heading: 'New bulk actions'
     menu: 'Bulk actions menu'
     history: 'Bulk actions'
     cancel: 'Cancel'
@@ -805,10 +810,12 @@ en:
       empty: 'No multi-item deposits yet'
   admin:
     impersonation:
+      heading: 'Impersonate'
       start: "You are now impersonating the selected workgroups."
       stop: "You have stopped impersonating."
       invalid: "You must select workgroups to enable impersonation."
     workgroup_permissions:
+      heading: 'Workgroup permissions'
       buttons:
         delete: 'Delete permission for %{target}'
       toasts:

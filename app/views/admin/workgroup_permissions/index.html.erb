@@ -1,6 +1,6 @@
-<%= page_title('Workgroup permissions') %>
+<%= page_title(t('admin.workgroup_permissions.heading')) %>
 
-<%= render Layout::ContainerComponent.new(heading: 'Workgroup permissions') do %>
+<%= render Layout::ContainerComponent.new(heading: t('admin.workgroup_permissions.heading')) do %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(label: 'Workgroups', show_label: false, variant: :h3, id: 'workgroup-permissions-table', empty_message: 'No workgroup permissions.') do |table| %>
     <%= table.with_header(label: 'Workgroup') %>
