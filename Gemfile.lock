@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/sul-dlss/sdr_view_components.git
-  revision: 870ffe734c985b57f9721eee25c9d6f161de6672
+  revision: d5808a116a891fc616af4b26ec7771e84f90406f
   branch: tab-list-column-classes
   specs:
-    sdr_view_components (0.20.0)
+    sdr_view_components (0.19.1)
       rails (~> 8.0)
       view_component
       zeitwerk
