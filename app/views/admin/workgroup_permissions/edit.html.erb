@@ -3,7 +3,7 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<div class="container pb-3">
+<div class="container py-2">
   <%= render Elements::BreadcrumbComponent.new(label: 'Workgroup permissions', link: admin_workgroup_permissions_path) %>
 
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @workgroup, classes: 'mb-4') %>

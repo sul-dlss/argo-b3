@@ -1,4 +1,4 @@
-<%= tag.div class: 'container mt-3', data: do %>
+<%= tag.div class: 'container py-2', data: do %>
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: heading, classes: 'mb-4') %>
 
   <%= form_with model: filter_form, url: multi_item_deposit_actions_path, method: :get,
