@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # Controller for collection select options, e.g., for a Tom Select field that loads options as the user types.
+# A blank or missing query returns the first collections by title.
 class CollectionOptionsController < ApplicationController
   # The options are restricted to the collections the user can edit, i.e., add items to.
   skip_verify_authorized
@@ -12,7 +13,7 @@ class CollectionOptionsController < ApplicationController
   private
 
   def collections
-    query = params.require(:q).strip
+    query = params[:q].to_s.strip
     if druid_query?(query)
       Searchers::CollectionListByDruid.call(druids: [DruidSupport.prefixed_druid_from(query)],
                                             user_scope: current_user_scope, apo_druid: limit_apo_druid)

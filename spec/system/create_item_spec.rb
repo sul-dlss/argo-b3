@@ -17,9 +17,11 @@ RSpec.describe 'Create an item' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid]])
     # For applying the APO defaults when the APO is selected.
     allow(Sdr::Repository).to receive(:find).and_return(build(:admin_policy_with_metadata, id: apo_druid))
-    allow(Searchers::CollectionList).to receive(:call).and_return(
-      [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
-    )
+    # A blank query (on focus) returns fewer collections, so that the typed query's results can be awaited.
+    allow(Searchers::CollectionList).to receive(:call) do |query:, **|
+      collections = [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
+      query.blank? ? collections.last(1) : collections
+    end
     allow(Searchers::TagSuggestions).to receive(:call).and_return([])
   end
 
@@ -60,6 +62,11 @@ RSpec.describe 'Create an item' do
 
       check 'Only view collections in selected APO'
       collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
+      # The first collections are shown on focus, before typing.
+      collection_input.click
+      expect(page).to have_css('.ts-dropdown .option', text: 'Art Maps')
+      expect(Searchers::CollectionList).to have_received(:call)
+        .with(query: '', user_scope: an_instance_of(Permissions::UserScope), apo_druid:)
       collection_input.fill_in(with: 'Art')
       find('.ts-dropdown .option', text: 'Art History Slides').click
       # The input is cleared after selecting.
