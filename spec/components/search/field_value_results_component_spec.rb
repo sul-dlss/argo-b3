@@ -21,7 +21,7 @@ RSpec.describe Search::FieldValueResultsComponent, type: :component do
     it 'renders all of the results without a More link' do
       render_inline(component)
 
-      expect(page).to have_css('section[aria-label="Project results"] h3', text: 'Project results (2 found)')
+      expect(page).to have_css('section[aria-label="Project results"] h2.h3', text: 'Project results (2 found)')
       expect(page).to have_css('li', count: 2)
       expect(page).to have_no_css('li.d-none')
       expect(page).to have_no_button('More »')
@@ -34,7 +34,7 @@ RSpec.describe Search::FieldValueResultsComponent, type: :component do
     it 'hides the results past the initial limit and renders a More link' do
       render_inline(component)
 
-      expect(page).to have_css('section[aria-label="Project results"] h3', text: 'Project results (7 found)')
+      expect(page).to have_css('section[aria-label="Project results"] h2.h3', text: 'Project results (7 found)')
       expect(page).to have_css('li', count: 7)
       expect(page).to have_css('li.d-none[data-show-more-target="hidden"]', count: 2, visible: :all)
       expect(page).to have_css('li#projects-result-project-6.d-none', visible: :all)

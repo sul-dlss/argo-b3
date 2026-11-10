@@ -1,10 +1,10 @@
 <%= tag.section 'aria-label': label, class: 'accordion mb-1' do %>
   <div class="accordion-item facet-limit">
-    <h3 class="accordion-header p-0 facet-field-heading h6">
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, variant: :h6, classes: 'accordion-header p-0 facet-field-heading') do %>
       <%= tag.button class: button_classes, type: 'button', data: { bs_toggle: 'collapse', bs_target: "##{collapse_id}" }, aria: { expanded: show?, controls: collapse_id } do %>
         <%= label %>
       <% end %>
-    </h3>
+    <% end %>
 
     <%= tag.div id: collapse_id, class: collapse_classes do %>
       <div class="accordion-body"><%= content %></div>

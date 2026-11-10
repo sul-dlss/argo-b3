@@ -12,7 +12,7 @@ RSpec.describe Search::ResultHeadingComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('Test Label', href: '/test/path')
-      expect(page).to have_css('h4 span', text: '1.')
+      expect(page).to have_css('h3.h4 span', text: '1.')
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe Search::ResultHeadingComponent, type: :component do
       end
 
       expect(page).to have_link('Custom Link', href: '/custom/path')
-      expect(page).to have_css('h4 span', text: '2.')
+      expect(page).to have_css('h3.h4 span', text: '2.')
     end
   end
 end
