@@ -8,7 +8,8 @@
   <% component.with_header(label: 'Type') %>
   <% component.with_header(label: tag.span('Actions', class: 'visually-hidden')) %>
   <% content_file_binaries.each do |content_file_binary| %>
-    <% component.with_row(label: content_file_binary.filepath) do |row_component| %>
+    <% component.with_row do |row_component| %>
+      <% row_component.with_cell do %><%= content_file_binary.filepath %><% end %>
       <% row_component.with_cell do %><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %><% end %>
       <% row_component.with_cell do %><%= content_file_binary.mime_type %><% end %>
       <% row_component.with_cell do %>
