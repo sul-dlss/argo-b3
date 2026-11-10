@@ -19,11 +19,8 @@ module MultiItemDeposit
       DruidSupport.bare_druid_from(item_deposit_action.druid)
     end
 
-    # The user-facing name of the content type (e.g., file rather than object), falling back to the stored
-    # short name for content types that are not selectable on a registration form.
     def content_type
-      uri = Constants::CONTENT_TYPES[item_deposit_action.content_type]
-      Constants::REGISTRATION_CONTENT_TYPES.key(uri) || item_deposit_action.content_type
+      ContentTypeSupport.display_name(item_deposit_action.content_type)
     end
 
     def deposit_type

@@ -138,6 +138,17 @@
   @include object-type-colors($search-color, $search-color-rgb);
 }
 
+// Multi-Item Deposit summary boxes (issue #966). The colors are the design's; the Stanford palette has no match.
+.object-type-multi-item-deposit {
+  .object-type-bg-light {
+    background-color: #f8f7f6;
+  }
+
+  .border.object-type-border {
+    --bs-border-color: #c4bbb5;
+  }
+}
+
 // The when (row header) cells of the events table are not bold.
 #events-table tbody th {
   font-weight: normal;
