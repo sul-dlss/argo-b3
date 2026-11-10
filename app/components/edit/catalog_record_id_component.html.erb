@@ -34,8 +34,8 @@
       because it comes from the catalog rather than from the user, and is hidden until retrieved.
       The hidden field carries it through a submission so that title data is always passed with the form. %>
   <%= tag.div class: 'my-field', hidden: retrieved_title_hidden?, data: { catalog_title_target: 'titleRow' } do %>
-    <span class="form-label"><%= t('edit.items.fields.retrieved_title.label') %>: </span>
-    <%= tag.span form.object.retrieved_title, data: { catalog_title_target: 'titleText' } %>
+    <%= tag.label "#{t('edit.items.fields.retrieved_title.label')}:", for: retrieved_title_id, class: 'form-label mb-0' %>
+    <%= tag.output form.object.retrieved_title, id: retrieved_title_id, class: 'ms-3', data: { catalog_title_target: 'titleText' } %>
   <% end %>
   <%= form.hidden_field :retrieved_title, data: { catalog_title_target: 'title' } %>
 <% end %>

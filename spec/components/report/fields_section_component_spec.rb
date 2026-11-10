@@ -15,7 +15,8 @@ RSpec.describe Report::FieldsSectionComponent, type: :component do
 
     expect(page).to have_css("input.form-check-input[type=\"checkbox\"][value=\"#{Reports::Fields::DRUID.field}\"][checked]")
     expect(page).to have_css('label.form-check-label', text: 'Druid')
-    expect(page).to have_css('small.form-text.text-muted', text: 'For example: pj757vx3102')
+    help_text = page.find('p.form-text', text: 'For example: pj757vx3102')
+    expect(page.find_field('Druid', type: 'checkbox')['aria-describedby']).to eq(help_text[:id])
 
     expect(page).to have_css("input.form-check-input[type=\"checkbox\"][value=\"#{Reports::Fields::TITLE.field}\"]:not([checked])")
     expect(page).to have_css('label.form-check-label', text: 'Title')

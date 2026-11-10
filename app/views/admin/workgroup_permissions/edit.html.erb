@@ -10,9 +10,10 @@
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Permissions', classes: 'mb-4') %>
 
   <%= form_with model: @workgroup_permission_form, url: admin_workgroup_permission_path(@workgroup), method: :patch do |form| %>
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Read unrestricted', hidden_label: true) do %>
+    <%# The floated legend is a flex item, so it sits inline before the radios. %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Read unrestricted', label_classes: 'mb-0',
+                                                               classes: 'd-flex align-items-center gap-4 pt-2', legend_classes: 'w-auto mb-0 fs-6') do %>
       <div class="d-flex align-items-center gap-4">
-        <span class="form-label fw-bold mb-0" aria-hidden="true">Read unrestricted</span>
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :read_unrestricted, label_text: 'Yes', input_value: 'true',
                                                                       container_classes: 'd-flex align-items-center gap-2 ps-0', input_classes: 'order-first ms-0') %>
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :read_unrestricted, label_text: 'No', input_value: 'false',
