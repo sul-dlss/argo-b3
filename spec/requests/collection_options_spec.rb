@@ -80,10 +80,12 @@ RSpec.describe 'Collection options' do
   end
 
   context 'when the query is missing' do
-    it 'returns a bad request' do
+    it 'returns the first collections by title as JSON options' do
       get '/collection_options'
 
-      expect(response).to have_http_status(:bad_request)
+      expect(response.parsed_body).to eq([{ 'value' => 'druid:bc123df4567', 'text' => 'Art History Slides' }])
+      expect(Searchers::CollectionList).to have_received(:call)
+        .with(query: '', user_scope: an_instance_of(Permissions::UserScope), apo_druid: nil)
     end
   end
 end

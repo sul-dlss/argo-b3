@@ -2,7 +2,7 @@
 
 module Searchers
   # Searcher that returns the collections the user can edit (i.e., add items to) with titles matching a query,
-  # for populating select options.
+  # for populating select options. A blank query returns the first collections by title.
   class CollectionList
     include Search::Fields
 
@@ -19,7 +19,7 @@ module Searchers
       new(...).call
     end
 
-    # @param query [String] words from a title (the last may be partial)
+    # @param query [String] words from a title (the last may be partial), or blank for all collections
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
     def initialize(query:, user_scope:, apo_druid: nil)
@@ -28,7 +28,7 @@ module Searchers
       @apo_druid = apo_druid
     end
 
-    # @return [Array<Array(String, String)>] list of [title, druid] pairs, in relevance order
+    # @return [Array<Array(String, String)>] list of [title, druid] pairs, in relevance (or, if blank, title) order
     def call
       solr_docs.map { |doc| [doc[TITLE], doc[ID]] }
     end
@@ -42,15 +42,19 @@ module Searchers
     end
 
     def solr_request
-      {
-        q: solr_query,
-        defType: 'edismax',
-        qf: QUERY_FIELDS.join(' '),
-        mm: '100%', # every word in the query must match
+      request = {
         fq: ["#{OBJECT_TYPES}:collection", apo_filter, permission_filter].compact,
         fl: [ID, TITLE],
         rows: LIMIT
       }
+      return request.merge(q: '*:*', sort: Search::SortOptions::TITLE.sort_value) if query.blank?
+
+      request.merge(
+        q: solr_query,
+        defType: 'edismax',
+        qf: QUERY_FIELDS.join(' '),
+        mm: '100%' # every word in the query must match
+      )
     end
 
     # The last word is treated as a prefix, since the user may not have finished typing it.

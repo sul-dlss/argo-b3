@@ -38,6 +38,21 @@ RSpec.describe Searchers::CollectionList do
       end
     end
 
+    context 'with a blank query' do
+      it 'requests all collections sorted by title' do
+        described_class.call(query: '', user_scope:)
+
+        expect(Search::SolrService).to have_received(:post) do |args|
+          solr_query = args[:request].with_indifferent_access
+          expect(solr_query['q']).to eq('*:*')
+          expect(solr_query['sort']).to eq(Search::SortOptions::TITLE.sort_value)
+          expect(solr_query).not_to have_key('defType')
+          expect(solr_query['fq']).to eq(["#{Search::Fields::OBJECT_TYPES}:collection"])
+          expect(solr_query['rows']).to eq(25)
+        end
+      end
+    end
+
     context 'with a query containing Solr special characters' do
       it 'escapes the query' do
         described_class.call(query: 'maps: (1900)', user_scope:)
@@ -98,6 +113,14 @@ RSpec.describe Searchers::CollectionList do
     it 'returns only the collections the user can edit, by the collection or its APO' do
       expect(described_class.call(query: 'art', user_scope:).map(&:last))
         .to contain_exactly('druid:bc123df4567', 'druid:fr234ty5678')
+    end
+
+    context 'with a blank query' do
+      it 'returns the editable collections sorted by title' do
+        expect(described_class.call(query: '', user_scope:))
+          .to eq([['Art History Slides', 'druid:bc123df4567'], ['Art Prints', 'druid:fr234ty5678'],
+                  ['Maps of Palo Alto', 'druid:dm456jk7812']])
+      end
     end
 
     context 'with an APO' do

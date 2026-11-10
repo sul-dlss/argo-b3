@@ -120,6 +120,7 @@ FactoryBot.define do
     transient do
       druid { generate(:unique_druid) }
       sequence(:title) { |n| "Test Collection #{n}" }
+      sort_title { title.downcase }
       object_type { 'collection' }
       apo_druid { generate(:unique_druid) }
       projects { [] }
@@ -134,6 +135,7 @@ FactoryBot.define do
         Search::Fields::ID => druid,
         Search::Fields::BARE_DRUID => DruidSupport.bare_druid_from(druid),
         Search::Fields::TITLE => title,
+        Search::Fields::SORT_TITLE => sort_title,
         Search::Fields::OBJECT_TYPES => [object_type],
         Search::Fields::APO_DRUID => [apo_druid],
         Search::Fields::PROJECTS => projects,

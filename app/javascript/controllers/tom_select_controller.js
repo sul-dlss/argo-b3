@@ -2,8 +2,8 @@ import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
 import MorphableTomSelect from 'controllers/morphable_tom_select'
 
-// Connects a (multiple) select to Tom Select, loading options from a JSON endpoint as the user types.
-// The endpoint receives the typed text as the q param and returns a list of options,
+// Connects a (multiple) select to Tom Select, loading options from a JSON endpoint on focus and as the user types.
+// The endpoint receives the typed text (blank on focus) as the q param and returns a list of options,
 // e.g., [{ "value": "druid:bc123df4567", "text": "My collection" }].
 // The formParams value maps additional query params to the names of fields in the same form,
 // e.g., { "apo_druid": "item[apo_druid]" }. When those fields change, the loaded options are cleared
@@ -39,9 +39,14 @@ export default class extends Controller {
       closeAfterSelect: true,
       // The endpoint determines which options match and their order, so every loaded option is shown as is.
       score: () => () => 1,
-      shouldLoad: (query) => query.length >= this.minQueryLengthValue,
-      load: (query, callback) => this.load(query, callback)
+      // A blank query loads the endpoint's default options, e.g., on focus or after clearing the typed text.
+      shouldLoad: (query) => query.length === 0 || query.length >= this.minQueryLengthValue,
+      load: (query, callback) => this.load(query, callback),
+      // Reloads on every focus, since the default options depend on other fields (formParams).
+      onFocus: () => { if (this.tomSelect.inputValue() === '') this.tomSelect.load('') }
     })
+    // A caret suggests a fixed list, but the options are searched by typing.
+    this.tomSelect.wrapper.classList.add('no-caret')
     return this.tomSelect
   }
 
