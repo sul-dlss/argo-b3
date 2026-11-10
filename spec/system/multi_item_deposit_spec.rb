@@ -80,18 +80,18 @@ RSpec.describe 'Multi-item deposit' do
     fill_in 'Describe this deposit', with: 'My multi-item deposit'
     expect(page).to have_field('Upload from a computer', checked: true)
     attach_file 'Upload manifest file',
-                write_manifest('invalid.csv', "druid,folder_name\nbc123df4567,folder1\ncd234fg5678,\n")
+                write_manifest('invalid.csv', "druid,folder\nbc123df4567,folder1\ncd234fg5678,\n")
     fill_in 'Mount path', with: mount_path
     click_on 'Discover files and check manifest'
 
     # The manifest fails validation, so discovery does not start.
-    expect(page).to have_text('Blank folder_name in rows: 3.')
+    expect(page).to have_text('Blank folder in rows: 3.')
     expect(page).to have_field('Describe this deposit', with: 'My multi-item deposit')
     expect(page).to have_field('Mount path', with: mount_path)
     expect(multi_item_deposit_action.item_deposit_actions).to be_empty
 
     attach_file 'Upload manifest file',
-                write_manifest('manifest.csv', "druid,folder_name\nbc123df4567,folder1\ncd234fg5678,folder2\n")
+                write_manifest('manifest.csv', "druid,folder\nbc123df4567,folder1\ncd234fg5678,folder2\n")
     fill_in 'Mount path', with: File.join(mount_path, 'missing')
     click_on 'Discover files and check manifest'
 
@@ -261,7 +261,7 @@ RSpec.describe 'Multi-item deposit' do
       # The user transfers the manifest and folders to Globus.
       FileUtils.cp_r(Dir.glob(File.join(mount_path, '*')), globus_directory)
       File.write(File.join(globus_directory, 'manifest.csv'),
-                 "druid,folder_name\nbc123df4567,folder1\ncd234fg5678,folder2\n")
+                 "druid,folder\nbc123df4567,folder1\ncd234fg5678,folder2\n")
 
       choose 'Include with your files below'
       click_on 'Discover files and check manifest'
