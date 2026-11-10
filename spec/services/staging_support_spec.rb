@@ -32,6 +32,48 @@ RSpec.describe StagingSupport do
     end
   end
 
+  describe '.find_staged_filepath' do
+    context 'when the file is staged in the assembly location only' do
+      before { stage_file(staging_location: Settings.assembly_location) }
+
+      it 'returns the expanded path in the assembly location' do
+        expect(described_class.find_staged_filepath(druid:, filepath: 'images/image1.tif'))
+          .to eq(File.expand_path(File.join(Settings.assembly_location,
+                                            'bc/123/df/4567/bc123df4567/content/images/image1.tif')))
+      end
+    end
+
+    context 'when the file is staged in both locations' do
+      before { described_class.locations.each { |staging_location| stage_file(staging_location:) } }
+
+      it 'returns the expanded path in the deposit staging location' do
+        expect(described_class.find_staged_filepath(druid:, filepath: 'images/image1.tif'))
+          .to eq(File.expand_path(File.join(Settings.staging_location,
+                                            'bc/123/df/4567/bc123df4567/content/images/image1.tif')))
+      end
+    end
+
+    context 'when the file is not staged' do
+      it 'returns nil' do
+        expect(described_class.find_staged_filepath(druid:, filepath: 'images/image1.tif')).to be_nil
+      end
+    end
+
+    context 'when the filepath resolves outside the content directory' do
+      before do
+        stage_file(staging_location: Settings.staging_location)
+        FileUtils.touch(File.join(Settings.staging_location, 'bc/123/df/4567/bc123df4567/secret.txt'))
+      end
+
+      after { FileUtils.rm_f(File.join(Settings.staging_location, 'bc/123/df/4567/bc123df4567/secret.txt')) }
+
+      it 'returns nil' do
+        expect(described_class.find_staged_filepath(druid:, filepath: '../secret.txt')).to be_nil
+        expect(described_class.find_staged_filepath(druid:, filepath: 'images/../../secret.txt')).to be_nil
+      end
+    end
+  end
+
   describe '.delete_staged_files' do
     before do
       described_class.locations.each { |staging_location| stage_file(staging_location:) }

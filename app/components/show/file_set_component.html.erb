@@ -68,6 +68,13 @@
           <% component.with_row do |row_component| %>
             <%= row_component.with_cell do %>
               <%= content_file.filepath %>
+              <% if (download_link = download_link(content_file)) %>
+                <%= render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :download,
+                                                                                    label: t('show.file_sets.buttons.download', filepath: content_file.filepath),
+                                                                                    link: download_link,
+                                                                                    classes: 'ms-1',
+                                                                                    data: { turbo: false }) %>
+              <% end %>
               <div class="mt-2">
                 Size: <%= helpers.number_to_human_size(content_file.size) %><% if content_file.mime_type %>; Type: <%= content_file.mime_type %> <% end %>
               </div>

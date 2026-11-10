@@ -24,13 +24,15 @@ module Show
 
     # @param content_file_sets [Array<ContentFileSet>] the ordered resources of the content
     # @param content_type [String] the cocina object type URI
-    def initialize(content_file_sets:, content_type:)
+    # @param file_download_presenter [FileDownloadPresenter, nil] provide to render download links
+    def initialize(content_file_sets:, content_type:, file_download_presenter: nil)
       @content_file_sets = content_file_sets
       @content_type = content_type
+      @file_download_presenter = file_download_presenter
       super()
     end
 
-    attr_reader :content_file_sets
+    attr_reader :content_file_sets, :file_download_presenter
 
     def grouped?
       PRIMARY_GROUPS.key?(@content_type)

@@ -141,6 +141,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @content_file_sets = @content.content_file_sets.includes(content_files: :content_file_binary).to_a
     @content_type = cocina_hash[:type]
     @content_validation_result = fetch_content_validation_result(content: @content)
+    @file_download_presenter = FileDownloadPresenter.new(druid: verified_druid, druid_token: params[:druid],
+                                                         cocina_version: cocina_hash[:version])
 
     render layout: false
   end

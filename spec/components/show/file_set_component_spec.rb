@@ -99,6 +99,37 @@ RSpec.describe Show::FileSetComponent, type: :component do
     end
   end
 
+  it 'does not render download links' do
+    render_inline(component)
+
+    expect(page).to have_no_link('Download image1.tif')
+  end
+
+  context 'when a file download presenter is provided' do
+    let(:component) do
+      described_class.new(content_file_set:, content_file_set_counter: 1, content_file_set_total: 2,
+                          file_download_presenter:)
+    end
+    let(:file_download_presenter) { instance_double(FileDownloadPresenter, link: '/download/image1.tif') }
+
+    it 'renders a download link that is not handled by Turbo' do
+      render_inline(component)
+
+      expect(page).to have_css('a[href="/download/image1.tif"][data-turbo="false"]', text: 'Download image1.tif')
+      expect(file_download_presenter).to have_received(:link).with(content_file:)
+    end
+
+    context 'when the file is not available for download' do
+      let(:file_download_presenter) { instance_double(FileDownloadPresenter, link: nil) }
+
+      it 'does not render a download link' do
+        render_inline(component)
+
+        expect(page).to have_no_link('Download image1.tif')
+      end
+    end
+  end
+
   it 'does not render edit or delete buttons' do
     render_inline(component)
 

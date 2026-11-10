@@ -30,6 +30,18 @@ class StagingSupport
     File.join(druid_tree_folder, 'content')
   end
 
+  # @return [String, nil] the path of the staged file in the first staging location that has it
+  def self.find_staged_filepath(druid:, filepath:)
+    locations.each do |staging_location|
+      content_path = File.expand_path(staging_content_path(druid:, staging_location:))
+      staged_filepath = File.expand_path(filepath, content_path)
+      # Rejects filepaths (e.g., with ..) that resolve outside the content directory.
+      next unless staged_filepath.start_with?("#{content_path}/")
+      return staged_filepath if File.file?(staged_filepath)
+    end
+    nil
+  end
+
   # Creates the staging content directory for the object in the location it stages to, unless some staging location
   # already has the druid's folder.
   # @param [Cocina::Models::DRO, Cocina::Models::AdminPolicy, Cocina::Models::Collection] cocina_object

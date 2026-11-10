@@ -35,6 +35,12 @@ The access of an individual file. New files get the Object Access, with citation
 ### Overwrite File Access
 Applying the Object Access to every file when saving an item whose Object Access changed. It always happens when the object is dark, which also unpublishes the files; a file that is then neither preserved, shelved, nor published (e.g., a derivative) is removed, along with any Resource it empties.
 
+### Preservation
+SDR's archival store of every preserved file of each accessioned Version. It is not subject to File Access.
+
+### Stacks
+Where shelved files are served from (e.g., for PURL and file download), subject to their File Access.
+
 ### Version
 A numbered state of an object in SDR; a new version is opened for changes and closed when deposited. DSA stores cocina for each version except legacy versions, and a version's stored cocina may no longer be valid against the current cocina models.
 

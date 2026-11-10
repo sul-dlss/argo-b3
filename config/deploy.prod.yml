@@ -13,6 +13,7 @@ env:
     SETTINGS__DOR_SERVICES__URL: https://dor-services-prod-lb.stanford.edu
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-prod.stanford.edu
     SETTINGS__STACKS__URL: https://stacks.stanford.edu/image
+    SETTINGS__STACKS__FILE_URL: https://stacks.stanford.edu/file
     SETTINGS__PURL_FETCHER__URL: https://purl-fetcher-prod.stanford.edu
     SETTINGS__PURL__URL: https://purl.stanford.edu
     SETTINGS__SEARCHWORKS__URL: https://searchworks.stanford.edu
