@@ -37,7 +37,7 @@ RSpec.describe 'Manage files' do
   def upload_file(filename)
     click_on 'Add files'
     attach_file(nil, Rails.root.join("spec/fixtures/files/#{filename}"), class: 'dz-hidden-input', make_visible: true)
-    expect(page).to have_css('tbody th', text: filename)
+    expect(page).to have_css('tbody td', text: filename)
   end
 
   it 'displays the object title and all tabs' do
@@ -885,7 +885,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Completed discovering files')
       expect(page).to have_field('Mount path')
-      expect(page).to have_css('tbody th', text: 'folder/dropzone_upload.txt')
+      expect(page).to have_css('tbody td', text: 'folder/dropzone_upload.txt')
 
       click_on 'Structure'
 
@@ -912,7 +912,7 @@ RSpec.describe 'Manage files' do
       DiscoverFilesJob.perform_now(content: Content.find_by!(druid:), mount_path:)
 
       expect(page).to have_toast('Completed discovering files')
-      expect(page).to have_css('tbody th', text: 'folder/dropzone_upload.txt')
+      expect(page).to have_css('tbody td', text: 'folder/dropzone_upload.txt')
       expect(page).to have_no_button(class: 'disabled')
     end
 
@@ -978,7 +978,7 @@ RSpec.describe 'Manage files' do
       DiscoverFilesJob.perform_now(content:, mount_path: globus_path, file_location: :globus)
 
       expect(page).to have_toast('Completed discovering files')
-      expect(page).to have_css('tbody th', text: 'dropzone_upload.txt')
+      expect(page).to have_css('tbody td', text: 'dropzone_upload.txt')
       expect(content.content_file_binaries.sole)
         .to have_attributes(filepath: 'dropzone_upload.txt', file_location: 'globus', mount_path: globus_path)
     end
