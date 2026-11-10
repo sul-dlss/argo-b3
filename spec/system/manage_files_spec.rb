@@ -46,7 +46,7 @@ RSpec.describe 'Manage files' do
     expect(page).to have_css('p', text: title)
 
     expect(page).to have_css('.nav-link', text: 'Add files')
-    expect(page).to have_css('.nav-link', text: 'Structure')
+    expect(page).to have_css('.nav-link', text: 'Structure files')
     expect(page).to have_css('.nav-link', text: 'Deposit')
   end
 
@@ -154,7 +154,7 @@ RSpec.describe 'Manage files' do
     expect(page).to have_css('.nav-link.active', text: 'Add files')
 
     click_button 'Next'
-    expect(page).to have_css('.nav-link.active', text: 'Structure')
+    expect(page).to have_css('.nav-link.active', text: 'Structure files')
 
     click_button 'Previous'
     expect(page).to have_css('.nav-link.active', text: 'Add files')
@@ -266,10 +266,10 @@ RSpec.describe 'Manage files' do
         expect(page).to have_no_css('tbody tr')
       end
 
-      click_on 'Structure'
+      find('.nav-link', text: 'Structure files').click
 
       expect(page).to have_css('p', text: 'No files yet.')
-      expect(page).to have_no_button('Structure files')
+      expect(page).to have_no_css("turbo-frame[id^='edit-structure_'] button", text: 'Structure files')
       expect(page).to have_no_button('Append files to structure')
     end
   end
@@ -286,13 +286,13 @@ RSpec.describe 'Manage files' do
       expect(content_file_binary.file).to be_attached
       expect(content.content_file_sets).to be_empty
 
-      click_on 'Structure'
+      find('.nav-link', text: 'Structure files').click
 
       expect(page).to have_css('p', text: 'There is 1 file that has not been added to the structure.')
       expect(page).to have_css('p', text: 'Strategy for structuring: File (resource per file)')
       expect(page).to have_no_text('Reasons for not using')
 
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
       expect(page).to have_css('h3', text: 'Structural metadata')
@@ -343,7 +343,7 @@ RSpec.describe 'Manage files' do
       click_on 'Structure'
       # Waits for the structure frame to reload with the selected access.
       expect(page).to have_field('contents_item[access_view]', with: 'dark', type: :hidden)
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
       content_file = Content.find_by!(druid:).content_files.sole
@@ -382,7 +382,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_button('Save as draft', disabled: true)
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -405,7 +405,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
       expect(page).to have_toast('Structure built from files')
 
       click_on 'Add files'
@@ -444,7 +444,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
       expect(page).to have_toast('Structure built from files')
 
       dispatch_dropzone_event('upload-start')
@@ -471,7 +471,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
       expect(page).to have_toast('Structure built from files')
 
       # Simulating the submission, since structuring finishes too quickly to observe.
@@ -502,7 +502,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
       expect(page).to have_toast('Structure built from files')
 
       click_on 'Add files'
@@ -533,7 +533,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
       expect(page).to have_no_text('Reasons for not using')
 
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -563,7 +563,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
 
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
       expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
@@ -603,7 +603,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -635,7 +635,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -686,7 +686,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -721,7 +721,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
@@ -741,7 +741,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload2.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
       expect(page).to have_no_button('Move resource 1 up')
@@ -799,7 +799,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Structure'
-      click_button('Structure files')
+      within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
 
