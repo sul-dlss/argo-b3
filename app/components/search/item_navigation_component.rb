@@ -35,10 +35,14 @@ module Search
     end
 
     def previous_path
+      return if previous_druid.blank?
+
       track_object_path(druid: previous_druid, search_position: current_position - 1)
     end
 
     def next_path
+      return if next_druid.blank?
+
       track_object_path(druid: next_druid, search_position: current_position + 1)
     end
 
