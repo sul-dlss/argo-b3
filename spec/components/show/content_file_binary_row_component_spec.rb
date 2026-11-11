@@ -20,7 +20,7 @@ RSpec.describe Show::ContentFileBinaryRowComponent, type: :component do
     it 'renders a row without a technical metadata toggle' do
       render_row
 
-      expect(page).to have_css('tr th[scope="row"]', text: 'image1.tif')
+      expect(page).to have_css('tr th.fw-normal[scope="row"]', text: 'image1.tif')
       expect(page).to have_css('tr td', text: '1 KB')
       expect(page).to have_css('tr td', text: 'image/tiff')
       expect(page).to have_no_button
