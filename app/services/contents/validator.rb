@@ -48,12 +48,20 @@ module Contents
     def call
       validator.call(content:, dark: dark?).tap do |result|
         result.errors.concat(*shared_validators.map { |shared| shared.call(content:, dark: dark?).errors })
+        result.warnings.concat(dark_published_files_warnings)
       end
     end
 
     private
 
     attr_reader :content, :cocina_object, :content_type, :saved_access
+
+    # The agreement and dark files validators already report published files as errors.
+    def dark_published_files_warnings
+      return [] if content_type == Cocina::Models::ObjectType.agreement || validate_dark_files?
+
+      Contents::Validators::DarkPublishedFiles.call(content:, dark: dark?).warnings
+    end
 
     def validator
       VALIDATORS_FOR_CONTENT_TYPES.fetch(content_type, DEFAULT_VALIDATOR)
