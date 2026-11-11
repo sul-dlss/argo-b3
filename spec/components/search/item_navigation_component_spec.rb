@@ -26,22 +26,22 @@ RSpec.describe Search::ItemNavigationComponent, type: :component do
   context 'when there is no previous item' do
     let(:previous_druid) { nil }
 
-    it 'renders a semantically disabled previous control' do
+    it 'renders a disabled previous control without an href or tab stop' do
       render_inline(component)
 
-      expect(page).to have_css('span[aria-disabled="true"]', text: '« Previous')
-      expect(page).to have_no_link('« Previous')
+      expect(page).to have_css('a.btn.btn-link.disabled[aria-disabled="true"][tabindex="-1"]:not([href])',
+                               text: '« Previous')
     end
   end
 
   context 'when there is no next item' do
     let(:next_druid) { nil }
 
-    it 'renders a semantically disabled next control' do
+    it 'renders a disabled next control without an href or tab stop' do
       render_inline(component)
 
-      expect(page).to have_css('span[aria-disabled="true"]', text: 'Next »')
-      expect(page).to have_no_link('Next »')
+      expect(page).to have_css('a.btn.btn-link.disabled[aria-disabled="true"][tabindex="-1"]:not([href])',
+                               text: 'Next »')
     end
   end
 
