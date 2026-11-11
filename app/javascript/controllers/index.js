@@ -5,9 +5,11 @@ import { Autocomplete } from 'stimulus-autocomplete'
 import ToastController from 'sdr_view_components/toast_controller'
 import TabSelectController from 'sdr_view_components/tab_select_controller'
 import TabOverflowController from 'sdr_view_components/tab_overflow_controller'
+import TreegridController from 'sdr_view_components/treegrid_controller'
 
 eagerLoadControllersFrom('controllers', application)
 application.register('autocomplete', Autocomplete)
 application.register('sdr-toast', ToastController)
 application.register('sdr-tab-select', TabSelectController)
 application.register('sdr-tab-overflow', TabOverflowController)
+application.register('sdr-treegrid', TreegridController)

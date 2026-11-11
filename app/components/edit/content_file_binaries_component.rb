@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Edit
-  # Component for displaying a table of the file binaries of a content, with a button to delete each.
+  # Component for displaying a table of the file binaries of a content, within collapsible folders, with a button to
+  # delete each.
   class ContentFileBinariesComponent < ApplicationComponent
     # @param content_record [Content] (named to avoid ViewComponent's reserved content parameter)
     # @param content_token [String] signed content id
@@ -23,6 +24,11 @@ module Edit
 
     def disabled?
       @disabled
+    end
+
+    # Stable across reloads of the table, so that expanded folders stay expanded.
+    def table_id
+      "#{content_record.druid.delete_prefix('druid:')}-content-files"
     end
 
     # Confirm only when deleting would also delete resources.

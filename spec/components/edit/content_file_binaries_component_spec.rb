@@ -17,12 +17,15 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
   it 'renders a row for each file binary with a delete button without confirmation' do
     render_inline(component)
 
-    expect(page).to have_css("table.table-h3[aria-label='Files']")
-    expect(page).to have_css('th', text: 'File name')
+    expect(page).to have_css("table#bc123df4567-content-files.table-h3[aria-label='Files']" \
+                             "[data-sdr-treegrid-remember-expanded-value='true']")
+    expect(page).to have_css('thead th:nth-of-type(1)', text: 'File/folder name')
+    expect(page).to have_css('thead th:nth-of-type(2)', text: 'Type')
+    expect(page).to have_css('thead th:nth-of-type(3)', text: 'Size')
     expect(page).to have_css('thead th:nth-of-type(4) .visually-hidden', text: 'Actions')
     expect(page).to have_css('tbody tr th.fw-normal[scope="row"]', text: 'image1.tif')
-    expect(page).to have_css('tbody tr td', text: '1 KB')
-    expect(page).to have_css('tbody tr td', text: 'image/tiff')
+    expect(page).to have_css('tbody tr th + td', text: 'image/tiff')
+    expect(page).to have_css('tbody tr td + td', text: '1 KB')
     expect(page).to have_css(delete_form_selector)
     expect(page).to have_no_css('form[data-turbo-confirm]')
     expect(page).to have_css('input[name="_method"][value="delete"]', visible: :hidden)
@@ -94,6 +97,26 @@ RSpec.describe Edit::ContentFileBinariesComponent, type: :component do
 
       expect(page).to have_no_css('tbody tr')
       expect(page).to have_css('p', text: 'No files yet')
+    end
+  end
+
+  context 'when files are in folders' do
+    before do
+      create(:content_file_binary, content:, filepath: 'folder1/sub1/image3.tif')
+      create(:content_file_binary, content:, filepath: 'folder1/image2.tif')
+    end
+
+    it 'renders collapsed folder rows without actions, and files with their file names and delete buttons' do
+      render_inline(component)
+
+      rows = page.all('tbody tr[aria-level]', visible: :all).map do |row|
+        [row['aria-level'], row.find('th', visible: :all).text(:all).strip]
+      end
+      expect(rows).to eq [%w[1 image1.tif], %w[1 folder1], %w[2 image2.tif], %w[2 sub1], %w[3 image3.tif]]
+      expect(page).to have_css('tr[data-sdr-treegrid-role="folder"][aria-expanded="false"]', count: 2, visible: :all)
+      expect(page).to have_no_css('tr[data-sdr-treegrid-role="folder"] button', visible: :all)
+      expect(page).to have_button('Delete folder1/sub1/image3.tif', visible: :all)
+      expect(page).to have_button('Expand all')
     end
   end
 end

@@ -470,21 +470,22 @@ RSpec.describe 'Show item' do
     # Files tab
     click_button 'Files'
 
-    expect(page).to have_css('h2', text: 'Files')
+    expect(page).to have_css('h2', text: 'Files (1)')
     expect(page).to have_css('tbody th', text: 'rr624wq8610_00_0001.jp2')
 
     # Show the technical metadata with the keyboard, which lazily loads it
-    toggle_button = find_button('Show technical metadata for rr624wq8610_00_0001.jp2')
+    toggle_button = find_button('View technical metadata for rr624wq8610_00_0001.jp2')
     expect(toggle_button['aria-expanded']).to eq('false')
     toggle_button.send_keys(:space)
-    within('tr.toggle-row-data.show turbo-frame') do
+    within('tbody td .collapse.show turbo-frame') do
       expect(page).to have_css('dt', text: 'Mimetype')
       expect(page).to have_css('dd', text: 'image/jp2')
     end
     expect(toggle_button['aria-expanded']).to eq('true')
     expect(Sdr::TechnicalMetadata).to have_received(:find).with(druid:, filepath: 'rr624wq8610_00_0001.jp2')
-    toggle_button.send_keys(:enter)
-    expect(page).to have_no_css('tr.toggle-row-data.show')
+    # Enter on the file's row also toggles it.
+    find('tbody tr[data-sdr-treegrid-role="file"]', text: 'rr624wq8610_00_0001.jp2').send_keys(:enter)
+    expect(page).to have_no_css('tbody td .collapse.show')
     expect(toggle_button['aria-expanded']).to eq('false')
     expect(page).to have_no_css('h2', text: 'Structural metadata')
 

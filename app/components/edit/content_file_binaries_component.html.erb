@@ -1,28 +1,28 @@
-<%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Files',
-                                                            variant: :h3,
-                                                            show_label: false,
-                                                            classes: 'table-sm',
-                                                            empty_message: 'No files yet') do |component| %>
-  <% component.with_header(label: 'File name', style: 'width: 60%;') %>
-  <% component.with_header(label: 'Size') %>
+<%= render SdrViewComponents::Tables::TreegridTableComponent.new(label: 'Files',
+                                                                 id: table_id,
+                                                                 variant: :h3,
+                                                                 show_label: false,
+                                                                 classes: 'table-sm',
+                                                                 empty_message: 'No files yet',
+                                                                 collapsed: true,
+                                                                 remember_expanded: true) do |component| %>
+  <% component.with_header(label: 'File/folder name', classes: 'col-5') %>
   <% component.with_header(label: 'Type') %>
+  <% component.with_header(label: 'Size') %>
   <% component.with_header(label: tag.span('Actions', class: 'visually-hidden')) %>
   <% content_file_binaries.each do |content_file_binary| %>
-    <% component.with_row do %>
-      <tr>
-        <th class="col-3 fw-normal" scope="row"><%= content_file_binary.filepath %></th>
-        <td><%= helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size %></td>
-        <td><%= content_file_binary.mime_type %></td>
-        <td>
-          <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path(content_file_binary),
-                                                                              icon: :delete,
-                                                                              label: t('edit.content_file_binaries.buttons.delete', filepath: content_file_binary.filepath),
-                                                                              method: :delete,
-                                                                              confirm: confirm(content_file_binary),
-                                                                              disabled: disabled?,
-                                                                              top: false) %>
-        </td>
-      </tr>
+    <% component.with_file(path_parts: content_file_binary.path_parts, label: content_file_binary.filename) do |row| %>
+      <% row.with_cell(classes: 'text-nowrap') { content_file_binary.mime_type } %>
+      <% row.with_cell(classes: 'text-nowrap') { helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size } %>
+      <% row.with_cell do %>
+        <%= render SdrViewComponents::Elements::IconButtonFormComponent.new(link: delete_path(content_file_binary),
+                                                                            icon: :delete,
+                                                                            label: t('edit.content_file_binaries.buttons.delete', filepath: content_file_binary.filepath),
+                                                                            method: :delete,
+                                                                            confirm: confirm(content_file_binary),
+                                                                            disabled: disabled?,
+                                                                            top: false) %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

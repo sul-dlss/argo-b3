@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Show
-  # Component for displaying a table of the file binaries of a content.
+  # Component for displaying a table of the file binaries of a content, within collapsible folders.
   class ContentFileBinariesComponent < ApplicationComponent
     # @param content_record [Content] (named to avoid ViewComponent's reserved content parameter)
     # @param druid_token [String] signed druid token for the object, used for loading technical metadata
@@ -16,6 +16,11 @@ module Show
     def content_file_binaries
       # content_files are preloaded so that each row can determine whether its binary is preserved.
       @content_file_binaries ||= content_record.content_file_binaries.path_order.includes(:content_files).to_a
+    end
+
+    # Keyed by druid (not content) so that expanded folders stay expanded when the object's lock changes.
+    def table_id
+      "#{content_record.druid.delete_prefix('druid:')}-files"
     end
 
     private

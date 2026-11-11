@@ -19,5 +19,6 @@ pin 'sdr_view_components/tab_overflow_controller', to: 'sdr_view_components/tab_
 pin 'sdr_view_components/tab_error_controller', to: 'sdr_view_components/tab_error_controller.js'
 pin 'sdr_view_components/tab_link_controller', to: 'sdr_view_components/tab_link_controller.js'
 pin 'sdr_view_components/tab_nav_controller', to: 'sdr_view_components/tab_nav_controller.js'
+pin 'sdr_view_components/treegrid_controller', to: 'sdr_view_components/treegrid_controller.js'
 pin 'dropzone' # @6.0.0
 pin 'just-extend' # @5.1.1 (dropzone dependency)
