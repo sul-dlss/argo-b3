@@ -58,7 +58,8 @@ class ContentStructureController < ContentsApplicationController
   # which may contain resources that are being edited.
   def validation
     @content_validation_result = Contents::Validator.call(content: @content, cocina_object: @cocina_object,
-                                                          content_type: params[:content_type])
+                                                          content_type: params[:content_type],
+                                                          saved_access: @saved_cocina_object.access)
 
     render layout: false
   end
@@ -132,9 +133,8 @@ class ContentStructureController < ContentsApplicationController
     verified_content_id = verify_token(@content_token)
     @content = Content.with_structural_associations.find(verified_content_id)
     @selected_access = selected_access_params
-    @cocina_object = Contents::ApplySelectedAccess.call(cocina_object: fetch_cocina_object(druid: @content.druid,
-                                                                                           lock: @content.lock),
-                                                        params: @selected_access)
+    @saved_cocina_object = fetch_cocina_object(druid: @content.druid, lock: @content.lock)
+    @cocina_object = Contents::ApplySelectedAccess.call(cocina_object: @saved_cocina_object, params: @selected_access)
   end
 
   # The access selected on the item details, which may not have been saved yet.

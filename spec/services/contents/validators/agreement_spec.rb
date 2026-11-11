@@ -61,27 +61,11 @@ RSpec.describe Contents::Validators::Agreement do
     end
   end
 
-  context 'when a file is not dark' do
-    before { create_resource(view: 'world', download: 'world') }
-
-    it 'has an error' do
-      expect(result.errors).to eq(['Resource 1 file agreement.pdf is not dark.'])
-    end
-  end
-
-  context 'when a file is published' do
-    before { create_resource(publish: true) }
-
-    it 'has an error' do
-      expect(result.errors).to eq(['Resource 1 file agreement.pdf must be preserved and not published.'])
-    end
-  end
-
   context 'when a file is not preserved' do
     before { create_resource(preserve: false) }
 
     it 'has an error' do
-      expect(result.errors).to eq(['Resource 1 file agreement.pdf must be preserved and not published.'])
+      expect(result.errors).to eq(['Resource 1 file agreement.pdf must be preserved.'])
     end
   end
 

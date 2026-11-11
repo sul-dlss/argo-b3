@@ -86,7 +86,8 @@ class ContentsItemForm < CocinaModels::Dro
   # Validated against the object as edited, since the form may change its access.
   # Skipped when the edited object cannot be built, since the invalid fields have their own errors.
   def content_valid_for_content_type
-    return if Contents::Validator.call(content:, cocina_object: mutated_cocina_object, content_type:).valid?
+    return if Contents::Validator.call(content:, cocina_object: mutated_cocina_object, content_type:,
+                                       saved_access: previous_cocina_object.access).valid?
 
     errors.add(:content, I18n.t('edit.contents.fields.content.validations.invalid'))
   rescue Cocina::Models::ValidationError

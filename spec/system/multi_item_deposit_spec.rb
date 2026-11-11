@@ -26,8 +26,9 @@ RSpec.describe 'Multi-item deposit' do
       File.write(File.join(mount_path, folder_name, "#{folder_name}.txt"), folder_name)
     end
 
+    # Published files are an error for a dark object, so the objects are world.
     allow(Sdr::Repository).to receive(:find) do |druid:, **|
-      build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid)
+      build(:dro_with_metadata, id: druid, admin_policy_id: apo_druid).new(access: { view: 'world', download: 'world' })
     end
     allow(Sdr::VersionService).to receive(:new).and_return(version_service)
     allow(version_service).to receive(:open) { build(:dro_with_metadata).new(lock: 'opened-lock') }

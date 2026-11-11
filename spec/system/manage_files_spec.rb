@@ -606,7 +606,6 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
       expect(page).to have_text('Reasons for not using Book (resource per page)')
-      expect(page).to have_css('li', text: 'the object is dark')
       expect(page).to have_css('li', text: 'there are no image files')
     end
   end
@@ -642,6 +641,102 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('#structural-tab.active.is-invalid')
       expect(page).to have_css('.invalid-feedback', text: 'Content errors must be fixed.')
       expect(page).to have_css('.alert-danger', text: 'Content errors')
+      expect(StageFilesJob).not_to have_received(:perform_later)
+    end
+  end
+
+  context 'when a book is made dark on the item details' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+        .new(access: { view: 'world', download: 'world' })
+    end
+    let(:content) { Content.find_by!(druid:) }
+
+    before do
+      content = create(:content, :mutable, druid:, lock: cocina_object.lock)
+      # Published files in a file resource are an error for a book.
+      create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file',
+                                                                        label: 'File 1'),
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.jp2',
+                                                                              mime_type: 'image/jp2'),
+                            view: 'world', download: 'world', publish: true, shelve: true, preserve: true)
+    end
+
+    it 'shows the content errors as warnings and deposits with the files made dark' do
+      visit "/contents/#{druid}/edit"
+
+      click_on 'Structure'
+      expect(page).to have_css('.alert-danger', text: 'has published files but is not a page or object resource')
+
+      click_on 'Item details'
+      within_fieldset('Access settings without embargo') do
+        select 'Dark', from: 'View access'
+      end
+
+      click_on 'Structure'
+      expect(page).to have_field('contents_item[access_view]', with: 'dark', type: :hidden)
+      # The file is still published, which is not an error, since depositing makes it dark.
+      expect(page).to have_css('.alert-warning', text: 'has published files but is not a page or object resource')
+      expect(page).to have_no_css('.alert-danger')
+
+      click_on 'Deposit'
+      click_button('Deposit')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+      expect(content.content_files.sole).to have_attributes(view: 'dark', download: 'none', publish: false,
+                                                            shelve: false)
+      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+    end
+  end
+
+  context 'when a dark book has a published file' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book)
+        .new(access: { view: 'dark', download: 'none' })
+    end
+    let(:dark_file_error) do
+      'Resource 1 (Page 1) file page_0001.jp2 must not be published or shelved because the object is dark.'
+    end
+
+    before do
+      content = create(:content, :mutable, druid:, lock: cocina_object.lock)
+      create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'page',
+                                                                        label: 'Page 1'),
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.jp2',
+                                                                              mime_type: 'image/jp2'),
+                            view: 'dark', download: 'none', publish: true, shelve: false)
+    end
+
+    it 'shows the file as a content error unless another access is selected, and does not deposit' do
+      visit "/contents/#{druid}/edit"
+
+      click_on 'Structure'
+      expect(page).to have_css('.alert-danger li', text: dark_file_error)
+
+      click_on 'Item details'
+      within_fieldset('Access settings without embargo') do
+        select 'World', from: 'View access'
+        select 'World', from: 'Download access'
+      end
+
+      click_on 'Structure'
+      expect(page).to have_field('contents_item[access_view]', with: 'world', type: :hidden)
+      expect(page).to have_no_text(dark_file_error)
+
+      click_on 'Item details'
+      within_fieldset('Access settings without embargo') do
+        select 'Dark', from: 'View access'
+      end
+
+      click_on 'Structure'
+      expect(page).to have_field('contents_item[access_view]', with: 'dark', type: :hidden)
+      expect(page).to have_css('.alert-danger li', text: dark_file_error)
+
+      click_on 'Deposit'
+      click_button('Deposit')
+
+      expect(page).to have_css('#structural-tab.active.is-invalid')
+      expect(page).to have_css('.invalid-feedback', text: 'Content errors must be fixed.')
       expect(StageFilesJob).not_to have_received(:perform_later)
     end
   end
@@ -772,7 +867,8 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Resource moved')
       # The structure is reloaded with the resources in their new order.
-      expect(first('.file-set-card')).to have_css('td', text: 'dropzone_upload2.txt')
+      # Matched in one selector so that Capybara retries while the frame is replaced.
+      expect(page).to have_xpath("(//*[contains(@class, 'file-set-card')])[1]//td[contains(., 'dropzone_upload2.txt')]")
       expect(content.content_file_sets.map { |content_file_set| content_file_set.content_files.sole.filepath })
         .to eq(['dropzone_upload2.txt', 'dropzone_upload.txt'])
     end
