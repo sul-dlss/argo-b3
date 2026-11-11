@@ -40,4 +40,12 @@ RSpec.describe Show::EventsTableComponent, type: :component do
     expect(page).to have_css('tbody th', text: '2026-04-14 03:00:00 PT')
     expect(page).to have_css('tbody th', text: '2026-04-13 03:00:00 PT')
   end
+
+  context 'when there are no events' do
+    let(:events) { [] }
+
+    it 'renders the empty message' do
+      expect(page).to have_css('p', text: 'No events.')
+    end
+  end
 end

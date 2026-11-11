@@ -16,9 +16,5 @@
     </div>
   <% end %>
 
-  <% if @events.empty? %>
-    <p>No events.</p>
-  <% else %>
-    <%= render Show::EventsTableComponent.new(events: @events) %>
-  <% end %>
+  <%= render Show::EventsTableComponent.new(events: @events) %>
 <% end %>
