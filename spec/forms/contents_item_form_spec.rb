@@ -216,6 +216,24 @@ RSpec.describe ContentsItemForm do
     end
   end
 
+  context 'with a published file when the object is already dark' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, type: Cocina::Models::ObjectType.book).new(access: { view: 'dark', download: 'none' })
+    end
+    let(:content) { create(:content, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+    before do
+      create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'page'),
+                            view: 'dark', download: 'none', publish: true)
+      contents_item_form.content = content
+    end
+
+    it 'is not valid when depositing' do
+      expect(contents_item_form.valid?(:deposit)).to be false
+      expect(contents_item_form.errors[:content]).to eq(['Content errors must be fixed.'])
+    end
+  end
+
   describe 'version description' do
     context 'when the initial version' do
       it 'is not required' do

@@ -25,14 +25,14 @@ RSpec.describe Edit::StructurePopulatorDescriptionComponent, type: :component do
   context 'when the fallback populator is being used' do
     let(:populator_for_content_type) { Contents::Populators::Book }
     let(:actual_populator) { Contents::Populators::FileSetPerFile }
-    let(:reasons) { %i[dark no_images] }
+    let(:reasons) { %i[hierarchical_filepaths no_images] }
 
     it 'renders the fallback strategy and the reasons' do
       render_inline(component)
 
       expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
       expect(page).to have_css('p', text: 'Reasons for not using Book (resource per page)')
-      expect(page).to have_css('li', text: 'the object is dark')
+      expect(page).to have_css('li', text: 'the files are organized into folders')
       expect(page).to have_css('li', text: 'there are no image files')
     end
   end

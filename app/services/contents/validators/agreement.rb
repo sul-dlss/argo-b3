@@ -3,10 +3,11 @@
 module Contents
   module Validators
     # Validates that the structure of a Content is suitable for an agreement, in which each Resource
-    # (ContentFileSet) is a file Resource with one or more dark, preserved, unpublished files without a role
+    # (ContentFileSet) is a file Resource with one or more preserved files without a role
     # (e.g., PDF and DOCX versions of the same agreement).
+    # Agreements are always dark, so DarkFiles checks that the files are dark and unpublished.
     #
-    # Agreements are always dark, so violations are errors rather than warnings. Unlike the other validators,
+    # Violations are errors rather than warnings. Unlike the other validators,
     # this does not use Default#add_warning_or_error (or the dark: argument), which would make every violation
     # a warning and so never block depositing.
     class Agreement < Default
@@ -31,18 +32,8 @@ module Contents
 
       def validate_content_file(content_file:, name:)
         file_name = "#{name} file #{content_file.filepath}"
-        errors << "#{file_name} is not dark." unless dark_file?(content_file)
-        errors << "#{file_name} must be preserved and not published." unless preserved_unpublished?(content_file)
+        errors << "#{file_name} must be preserved." unless content_file.preserve
         errors << "#{file_name} must not have a role." if content_file.use.present?
-      end
-
-      def dark_file?(content_file)
-        AccessRightsSupport.dark?(view: content_file.view, download: content_file.download,
-                                  location: content_file.location)
-      end
-
-      def preserved_unpublished?(content_file)
-        content_file.preserve && !content_file.publish
       end
     end
   end

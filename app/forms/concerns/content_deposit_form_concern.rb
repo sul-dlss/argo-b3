@@ -30,7 +30,8 @@ module ContentDepositFormConcern
   # Skipped when the edited object cannot be built, since the invalid fields have their own errors.
   def structure_valid_for_content_type
     immutable_content = Contents::Builder.find_or_create(cocina_object: previous_cocina_object)
-    return if Contents::Validator.call(content: immutable_content, cocina_object: mutated_cocina_object).valid?
+    return if Contents::Validator.call(content: immutable_content, cocina_object: mutated_cocina_object,
+                                       saved_access: previous_cocina_object.access).valid?
 
     errors.add(:content, I18n.t('edit.items.fields.content.validations.invalid'))
   rescue Cocina::Models::ValidationError

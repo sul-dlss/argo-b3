@@ -320,7 +320,6 @@ en:
           three_dimensional: "3D (resource for model)"
           file_set_per_file: "Default (resource per file)"
         populator_reasons:
-          dark: "the object is dark"
           hierarchical_filepaths: "the files are organized into folders"
           no_images: "there are no image files"
           no_models: "there are no 3D model files"

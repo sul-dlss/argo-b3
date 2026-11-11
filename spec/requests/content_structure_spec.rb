@@ -143,12 +143,15 @@ RSpec.describe 'Content structure' do
     context 'when dark' do
       let(:access) { { view: 'dark', download: 'none' } }
 
-      it 'renders the violations as warnings' do
+      it 'renders the violations as warnings and the files that are not dark as errors' do
         get validation_content_structure_path(content_id: content_token)
 
-        expect(response.body).not_to include('Content errors')
         expect(response.body).to include('Content warnings')
         expect(response.body).to include('Resource 1 (Page 1) has more than one published JP2 file.')
+        expect(response.body).to include('Content errors')
+        expect(response.body)
+          .to include('Resource 1 (Page 1) file page_0001.jp2 must not be published or shelved ' \
+                      'because the object is dark.')
       end
     end
 
@@ -231,13 +234,12 @@ RSpec.describe 'Content structure' do
       create(:content_file_binary, content:, filepath: 'image_0001.tif', mime_type: 'image/tiff')
     end
 
-    it 'uses the selected access to select the populator and keeps it for structuring' do
+    it 'keeps the selected access for structuring' do
       get edit_content_structure_path(content_id: content_token,
                                       contents_item: { with_embargo: false, access_view: 'dark',
                                                        access_download: 'none' })
 
-      # A dark object is not structured as an image.
-      expect(response.body).to include('Strategy for structuring: Default (resource per file)')
+      expect(response.body).to include('Strategy for structuring: Image (resource per image)')
       form = response.parsed_body.at_css(%(form[action="#{content_structure_path(content_id: content_token)}"]))
       expect(form.at_css('input[name="contents_item[access_view]"]')['value']).to eq('dark')
     end

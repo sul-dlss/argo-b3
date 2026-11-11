@@ -10,15 +10,12 @@ module Contents
     class Image < Base
       # The mime types of the files that, when accompanying an image, indicate that a file set contains OCR.
       OCR_MIME_TYPES = [MimeTypes::XML, MimeTypes::PDF, MimeTypes::PLAIN_TEXT, MimeTypes::HTML].freeze
-      DARK_VIEW = 'dark'
 
       # Grouping the files of a image by filename only works when the files do not have hierarchical filepaths,
-      # and there are no pages to group the files into when there are no images. Structuring a dark object
-      # as a image is pointless, since none of its files are shelved or published.
+      # and there are no pages to group the files into when there are no images.
       # @return [Array<Symbol>] the reasons that the content cannot be structured as a book.
-      def self.disqualifying_reasons(content:, cocina_object:)
+      def self.disqualifying_reasons(content:, **)
         [].tap do |reasons|
-          reasons << :dark if cocina_object.access.view == DARK_VIEW
           reasons << :hierarchical_filepaths if content.hierarchical_filepaths?
           reasons << :no_images if content.content_file_binaries.none? { |binary| image?(binary.mime_type) }
         end

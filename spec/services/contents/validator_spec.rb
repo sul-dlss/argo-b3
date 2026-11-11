@@ -57,8 +57,11 @@ RSpec.describe Contents::Validator do
   context 'with the agreement content type' do
     let(:content_type) { Cocina::Models::ObjectType.agreement }
 
+    before { content.content_files.update_all(use: 'transcription') } # rubocop:disable Rails/SkipsModelValidations
+
     it 'validates agreement resources' do
-      expect(result.errors).to include(a_string_ending_with('must be preserved and not published.'))
+      file_name = "Resource 1 (File 1) file #{content.content_files.first.filepath}"
+      expect(result.errors).to eq(["#{file_name} must not have a role."])
     end
   end
 
@@ -168,16 +171,53 @@ RSpec.describe Contents::Validator do
       let(:access) { { view: 'dark', download: 'none' } }
 
       it 'has an error' do
-        expect(result.errors).to contain_exactly(hierarchy_error)
+        expect(result.errors).to include(hierarchy_error)
       end
     end
   end
 
   context 'when dark' do
     let(:access) { { view: 'dark', download: 'none' } }
+    let(:file_name) { "Resource 1 (File 1) file #{content.content_files.first.filepath}" }
 
-    it 'has warnings instead of errors' do
-      expect(result).to have_attributes(errors: [], warnings: include(error))
+    it 'has warnings instead of errors for the content type' do
+      expect(result.warnings).to include(error)
+      expect(result.errors).not_to include(error)
+    end
+
+    it 'has errors for the files that are not dark or are published' do
+      expect(result.errors).to eq(["#{file_name} must be dark because the object is dark.",
+                                   "#{file_name} must not be published or shelved because the object is dark."])
+    end
+
+    context 'when the files are dark and unpublished' do
+      before do
+        content.content_files.update_all(view: 'dark', download: 'none', publish: false, shelve: false) # rubocop:disable Rails/SkipsModelValidations
+      end
+
+      it 'has no errors' do
+        expect(result.errors).to eq([])
+      end
+    end
+
+    context 'when the saved access is not dark' do
+      subject(:result) do
+        described_class.call(content:, cocina_object:, content_type:,
+                             saved_access: Cocina::Models::DROAccess.new(view: 'world', download: 'world'))
+      end
+
+      it 'does not validate the files, since saving overwrites their access' do
+        expect(result.errors).to eq([])
+      end
+    end
+
+    context 'with the agreement content type' do
+      let(:content_type) { Cocina::Models::ObjectType.agreement }
+
+      it 'has errors for the files that are not dark or are published' do
+        expect(result.errors).to eq(["#{file_name} must be dark because the object is dark.",
+                                     "#{file_name} must not be published or shelved because the object is dark."])
+      end
     end
   end
 
@@ -195,8 +235,9 @@ RSpec.describe Contents::Validator do
         embargo: { releaseDate: 1.year.from_now.iso8601, view: 'world', download: 'world' } }
     end
 
-    it 'has warnings instead of errors' do
-      expect(result).to have_attributes(errors: [], warnings: include(error))
+    it 'has warnings instead of errors for the content type' do
+      expect(result.warnings).to include(error)
+      expect(result.errors).not_to include(error)
     end
   end
 end

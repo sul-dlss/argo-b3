@@ -56,12 +56,15 @@ RSpec.describe Contents::PopulatorSelector do
 
   context 'when the content type is image and the image populator cannot be used' do
     let(:cocina_type) { Cocina::Models::ObjectType.image }
-    let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'folder/image_0002.tif', mime_type: 'image/tiff')
+    end
 
     it 'falls back to the file set per file populator' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
                                         actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: [:dark])
+                                        reasons: [:hierarchical_filepaths])
     end
   end
 
@@ -178,10 +181,10 @@ RSpec.describe Contents::PopulatorSelector do
   context 'when the object is dark' do
     let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
 
-    it 'falls back to the file set per file populator' do
+    it 'selects the book populator without reasons' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Book,
-                                        actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: [:dark])
+                                        actual_populator: Contents::Populators::Book,
+                                        reasons: [])
     end
   end
 
@@ -239,8 +242,6 @@ RSpec.describe Contents::PopulatorSelector do
   end
 
   context 'when more than one reason applies' do
-    let(:cocina_access) { instance_double(Cocina::Models::DROAccess, view: 'dark') }
-
     before do
       content.content_file_binaries.destroy_all
       create(:content_file_binary, content:, filepath: 'folder/notes.pdf', mime_type: 'application/pdf')
@@ -248,7 +249,7 @@ RSpec.describe Contents::PopulatorSelector do
 
     it 'provides all of the reasons in order' do
       expect(result).to have_attributes(actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: %i[dark hierarchical_filepaths no_images])
+                                        reasons: %i[hierarchical_filepaths no_images])
     end
   end
 
