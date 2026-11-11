@@ -654,6 +654,18 @@ RSpec.describe 'Show item' do
       expect(page).to have_link('« Previous', href: "/objects/#{previous_druid}/track?search_position=2")
     end
 
+    it 'keeps the search results link but not item navigation when the item no longer matches the search' do
+      allow(Search::SolrService).to receive(:post)
+        .with(request: hash_including(start: 1, rows: 3))
+        .and_return('response' => { 'numFound' => 0, 'docs' => [] })
+
+      visit "/objects/#{druid}/track?search_position=3"
+
+      expect(page).to have_css('h1', text: original_title)
+      expect(page).to have_link('← Search results')
+      expect(page).to have_no_css('.item-search-navigation')
+    end
+
     it 'does not render item navigation for an invalid position' do
       visit "/objects/#{druid}/track?search_position=-1"
 
