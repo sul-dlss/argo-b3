@@ -17,8 +17,9 @@ module Report
 
     attr_reader :form, :label, :field_configs
 
+    # Styled as body text, not as a heading.
     def classes
-      merge_classes('fst-italic mb-1', @classes)
+      merge_classes('fs-6 fw-normal lh-base fst-italic mb-1', @classes)
     end
   end
 end

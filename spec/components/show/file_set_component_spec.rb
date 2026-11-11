@@ -26,8 +26,22 @@ RSpec.describe Show::FileSetComponent, type: :component do
   it 'renders the resource heading and label' do
     render_inline(component)
 
+    expect(page).to have_css('.card-title h4.h3', exact_text: 'Resource (2):')
     expect(page).to have_css('.card-title', text: 'Resource (2): file')
     expect(page).to have_css('.card-title', text: 'Label: Resource 2')
+  end
+
+  context 'with a heading level' do
+    let(:component) do
+      described_class.new(content_file_set:, content_file_set_counter: 1, content_file_set_total: 2, heading_level: :h3)
+    end
+
+    it 'renders the resource heading at that level' do
+      render_inline(component)
+
+      expect(page).to have_css('.card-title h3.h3', exact_text: 'Resource (2):')
+      expect(page).to have_no_css('h4')
+    end
   end
 
   it 'renders a row for each content file' do

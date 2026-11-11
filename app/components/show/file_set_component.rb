@@ -5,8 +5,9 @@ module Show
   class FileSetComponent < ApplicationComponent
     with_collection_parameter :content_file_set
 
-    def initialize(content_file_set:, content_file_set_counter:, content_file_set_total:, classes: [],
-                   content_token: nil)
+    # @param heading_level [Symbol] one level below the heading of the section containing the resources
+    def initialize(content_file_set:, content_file_set_counter:, content_file_set_total:, classes: [], # rubocop:disable Metrics/ParameterLists
+                   content_token: nil, heading_level: :h4)
       @content_file_set = content_file_set
       @counter = content_file_set_counter
       # The number of resources in the content, used to determine whether this resource can move down.
@@ -14,10 +15,11 @@ module Show
       @classes = classes
       # Provide content_token to make editable.
       @content_token = content_token
+      @heading_level = heading_level
       super()
     end
 
-    attr_reader :content_file_set, :counter
+    attr_reader :content_file_set, :counter, :heading_level
 
     delegate :file_set_type, :label, to: :content_file_set
 

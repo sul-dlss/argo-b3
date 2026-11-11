@@ -1,6 +1,4 @@
-<%= tag.div class: classes do %>
-  <%= label %>
-<% end %>
+<%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: label, classes:) %>
 
 <%= form.collection_check_boxes :fields, field_configs, :field, :label, include_hidden: false do |builder| %>
   <% help_text_id = form.field_id(:fields, builder.value, :help) if builder.object.help_text.present? %>

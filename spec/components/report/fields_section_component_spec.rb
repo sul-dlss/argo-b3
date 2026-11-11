@@ -11,7 +11,7 @@ RSpec.describe Report::FieldsSectionComponent, type: :component do
   it 'renders the section with checkboxes' do
     render_inline(component)
 
-    expect(page).to have_css('div.fst-italic.my-class', text: 'Frequently used')
+    expect(page).to have_css('h2.fst-italic.my-class', text: 'Frequently used')
 
     expect(page).to have_css("input.form-check-input[type=\"checkbox\"][value=\"#{Reports::Fields::DRUID.field}\"][checked]")
     expect(page).to have_css('label.form-check-label', text: 'Druid')

@@ -24,6 +24,8 @@ RSpec.describe Show::FileSetGroupsComponent, type: :component do
       expect(page).to have_css('#file-set-group-pages .card-title', text: 'Resource (2): page')
       expect(page).to have_css('#file-set-group-pages .card-title', text: 'Resource (3): page')
       expect(page).to have_css('#file-set-group-supplemental-files .card-title', text: 'Resource (1): object')
+      resource_headings = page.all('h4').map { |heading| heading.text.strip }
+      expect(resource_headings).to eq(['Resource (2):', 'Resource (3):', 'Resource (1):'])
     end
   end
 
@@ -68,10 +70,12 @@ RSpec.describe Show::FileSetGroupsComponent, type: :component do
     let(:content_type) { Cocina::Models::ObjectType.object }
     let(:content_file_sets) { [content_file_set('file', 'File 1'), content_file_set('file', 'File 2')] }
 
-    it 'renders the resources without groups' do
+    it 'renders the resources without groups, with each resource heading one level below the section' do
       render_inline(component)
 
-      expect(page).to have_no_css('h3')
+      expect(page).to have_no_css('button[aria-expanded]')
+      expect(page).to have_no_css('h4')
+      expect(page.all('h3').map { |heading| heading.text.strip }).to eq(['Resource (1):', 'Resource (2):'])
       expect(page).to have_css('.card-title', text: 'Resource (1): file')
       expect(page).to have_css('.card-title', text: 'Resource (2): file')
     end

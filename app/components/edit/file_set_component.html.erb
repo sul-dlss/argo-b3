@@ -1,7 +1,7 @@
 <%= tag.div class: classes do %>
   <div class="card-body">
     <div class="card-title">
-      <div class="h3">Resource (<%= index %>):</div>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h4, text: "Resource (#{index}):", variant: :h3) %>
     </div>
     <div class="card-body">
       <%= form_with model: content_file_set_form, url: path do |form| %>
