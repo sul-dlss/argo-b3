@@ -65,9 +65,9 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 
 ## Layout and spacing
 
-- **LAY-1 MUST** Page content is in `<div class="container py-2">`.
+- **LAY-1 MUST** Page content is in `Layout::ContainerComponent` (a `container py-2`), which also renders the page's breadcrumb, h1, and subtitle when given them. Two-column pages (LAY-5) render their own h1 inside it.
 - **LAY-2 SHOULD** Use these spacings so pages share a rhythm:
-  - h1: `mb-3`.
+  - h1: `mb-3` (`Layout::ContainerComponent` applies it; with a subtitle, the subtitle gets `mb-3`).
   - Between page sections: `mb-5`.
   - Form fields: `my-field`; fieldsets: `my-fieldset` (applied by `.b3-form` / `.tab-form`, see FORM-1).
   - Form footer: `mt-5`.

@@ -5,12 +5,12 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<div class="container mt-3">
+<%= render Layout::ContainerComponent.new do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
       <div class="row">
         <div class="col-xl-2 col-lg-12 pt-3">
-          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Argo dashboard') %>
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Argo dashboard', classes: 'mb-3') %>
         </div>
 
         <%= render Dashboard::BannerComponent.new(text: t('banner.dashboard_html')) %>
@@ -89,4 +89,4 @@
       <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
     <% end %>
   <% end %>
-</div>
+<% end %>

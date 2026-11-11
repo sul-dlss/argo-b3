@@ -1,0 +1,10 @@
+<%= tag.div class: classes, **options do %>
+  <%= breadcrumb %>
+  <% if heading %>
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: heading, classes: heading_classes) %>
+    <% if subtitle %>
+      <p class="mb-3"><%= subtitle %></p>
+    <% end %>
+  <% end %>
+  <%= content %>
+<% end %>

@@ -1,7 +1,4 @@
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.apos.edit.title')) %>
-
-  <p class="mb-4"><%= @title %></p>
+<%= render Layout::ContainerComponent.new(heading: t('edit.apos.edit.title'), subtitle: @title) do %>
 
   <%= form_with(model: @edit_apo_form, url: apo_path(@druid), method: :patch, class: 'b3-form') do |form| %>
     <%= form.hidden_field :lock %>
@@ -15,4 +12,4 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.edit.buttons.deposit')) %>
     </div>
   <% end %>
-</div>
+<% end %>

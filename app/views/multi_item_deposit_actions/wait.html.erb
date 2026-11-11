@@ -3,12 +3,10 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: 'container py-2', data: {
-      controller: 'scheduled-refresh',
-      scheduled_refresh_interval_value: Settings.reload_intervals.multiple_items
-    } do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
-
+<%= render Layout::ContainerComponent.new(heading: t('edit.multi_item_deposits.edit.title'), data: {
+                                            controller: 'scheduled-refresh',
+                                            scheduled_refresh_interval_value: Settings.reload_intervals.multiple_items
+                                          }) do %>
   <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
 
   <%= render Elements::RosetteSpinnerComponent.new(size: :large, message: t('edit.multi_item_deposits.wait.message', name: @multi_item_deposit_action.name), message_position: :bottom, classes: 'align-items-center') %>

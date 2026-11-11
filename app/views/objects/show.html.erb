@@ -7,10 +7,10 @@
 
 <%= turbo_stream_from 'objects', @solr_doc.druid %>
 
-<%= tag.div class: "container object-show #{@solr_doc.object_type_class} mb-4", data: {
-      controller: 'cocina-model-show',
-      cocina_model_show_interval_value: Settings.reload_intervals.cocina_model
-    } do %>
+<%= render Layout::ContainerComponent.new(classes: ['object-show', @solr_doc.object_type_class], data: {
+                                            controller: 'cocina-model-show',
+                                            cocina_model_show_interval_value: Settings.reload_intervals.cocina_model
+                                          }) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
       <%= render Search::ItemNavigationComponent.new(last_search_form: @last_search_form,
