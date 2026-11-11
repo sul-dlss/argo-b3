@@ -33,6 +33,12 @@ class ObjectStatusPresenter
     version_service.editable?
   end
 
+  # Only checked in error, since checking calls DSA.
+  # @return [Boolean] true if assembly stopped with a process in error (see Sdr::VersionService#assembly_stopped_with_error?)
+  def assembly_stopped_with_error?
+    status == :error && version_service.assembly_stopped_with_error?
+  end
+
   def workflow_error_messages
     workflow_errors.map { |workflow_error| format_workflow_error(workflow_error) }
   end

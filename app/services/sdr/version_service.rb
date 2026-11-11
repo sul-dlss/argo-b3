@@ -126,6 +126,21 @@ module Sdr
       openable? || closeable?
     end
 
+    # @return [Boolean] true if a draft can be saved: the object is editable or assembly stopped with an error
+    def draft_editable?
+      editable? || assembly_stopped_with_error?
+    end
+
+    # @return [Boolean] true if the open version's assembly stopped with a process in error; until it is retried,
+    #   the draft can be saved but not deposited
+    def assembly_stopped_with_error?
+      return @assembly_stopped_with_error if defined?(@assembly_stopped_with_error)
+
+      # A version that can close isn't assembling, so the workflows (another DSA request) aren't checked.
+      @assembly_stopped_with_error = open? && !closeable? &&
+                                     WorkflowService.assembly_stopped_with_error?(druid:, version:)
+    end
+
     private
 
     def version_client

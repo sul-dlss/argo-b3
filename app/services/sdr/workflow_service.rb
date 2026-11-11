@@ -8,6 +8,19 @@ module Sdr
       Dor::Services::Client.object(druid).workflows.workflows.sort_by(&:workflow_name)
     end
 
+    # The workflows whose incomplete processes keep a version from closing (DSA's Workflow::StateBatchService).
+    ASSEMBLY_WORKFLOW_NAMES = %w[assemblyWF gisAssemblyWF wasSeedPreassemblyWF wasCrawlPreassemblyWF ocrWF
+                                 speechToTextWF].freeze
+
+    # @return [Boolean] true if an assembly workflow has a process in error for the version and no process of any
+    #   workflow is queued or started for it, so nothing will run until a process is retried
+    def self.assembly_stopped_with_error?(druid:, version:)
+      processes = Dor::Services::Client.object(druid).workflows.workflows.flat_map(&:processes)
+                                       .select { |process| process.version == version }
+      processes.any? { |process| process.status == 'error' && process.workflow_name.in?(ASSEMBLY_WORKFLOW_NAMES) } &&
+        processes.none? { |process| process.status.in?(%w[queued started]) }
+    end
+
     PROCESS_NOTES = { 'skipped' => 'Skipped by', 'completed' => 'Completed by' }.freeze
 
     # Changes the status of a process in error, noting who skipped or completed it.

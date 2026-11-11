@@ -173,6 +173,7 @@ en:
           updated: "Agreement updated."
         warnings:
           content_busy: "Files for this agreement are being staged or discovered. Try again when that has finished."
+          assembly_stopped_with_error: "This agreement can't be deposited until the process in error is retried."
           not_editable: "Agreement is not editable."
           stale: "This agreement was changed since you opened it. Review the current values and make your changes again."
       new:
@@ -429,6 +430,7 @@ en:
           purge_confirm: "Purge this object? It will be permanently deleted. This cannot be undone."
         warnings:
           content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
+          assembly_stopped_with_error: "This item can't be deposited until the process in error is retried."
           not_editable: "Item is not editable."
           stale: "This item was changed since you opened it. Review the current values and make your changes again."
         tabs:
