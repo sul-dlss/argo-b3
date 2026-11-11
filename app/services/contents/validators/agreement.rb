@@ -3,7 +3,8 @@
 module Contents
   module Validators
     # Validates that the structure of a Content is suitable for an agreement, in which each Resource
-    # (ContentFileSet) is a file Resource with exactly one dark, preserved, unpublished file without a role.
+    # (ContentFileSet) is a file Resource with one or more dark, preserved, unpublished files without a role
+    # (e.g., PDF and DOCX versions of the same agreement).
     #
     # Agreements are always dark, so violations are errors rather than warnings. Unlike the other validators,
     # this does not use Default#add_warning_or_error (or the dark: argument), which would make every violation
@@ -21,7 +22,7 @@ module Contents
       private
 
       def validate_content_file_set(content_file_set:, name:)
-        errors << "#{name} must have exactly one file." unless content_file_set.content_files.one?
+        errors << "#{name} has no files." if content_file_set.content_files.empty?
         errors << "#{name} is not a file resource." unless content_file_set.file_set_type == FileSetTypes::FILE
         content_file_set.content_files.each do |content_file|
           validate_content_file(content_file:, name:)
