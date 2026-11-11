@@ -1,16 +1,16 @@
-<%= render SdrViewComponents::Tables::TableComponent.new(id:, variant: :data, body_classes: 'placeholder-glow') do |table| %>
+<%= render SdrViewComponents::Tables::TableComponent.new(id:, variant: :data, responsive: true, classes: 'workflow-grid-table', body_classes: 'placeholder-glow') do |table| %>
   <%= table.with_caption do %>
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3) do %>
       <%= link_to workflow_name, workflow_path, data: { turbo_frame: '_top' } %>
     <% end %>
   <% end %>
 
-  <%= table.with_header(label: 'Process', style: 'width: 225px;') %>
+  <%= table.with_header(label: 'Process', classes: 'workflow-grid-process-column') %>
   <%= table.with_header(label: 'Description') %>
-  <%= table.with_header(label: 'Waiting', style: 'width: 100px;') %>
-  <%= table.with_header(label: 'Started', style: 'width: 100px;') %>
-  <%= table.with_header(label: 'Error', style: 'width: 100px;') %>
-  <%= table.with_header(label: 'Completed', style: 'width: 100px;') %>
+  <%= table.with_header(label: 'Waiting', classes: 'workflow-grid-count-column') %>
+  <%= table.with_header(label: 'Started', classes: 'workflow-grid-count-column') %>
+  <%= table.with_header(label: 'Error', classes: 'workflow-grid-count-column') %>
+  <%= table.with_header(label: 'Completed', classes: 'workflow-grid-count-column') %>
 
   <% @template[:processes].each_with_index do |process, index| %>
     <%= table.with_row(values: [process[:label]]) do |row| %>
@@ -36,7 +36,7 @@
             <% if count.zero? %>
               0
             <% else %>
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex flex-wrap align-items-center gap-2">
                 <%= link_to number_with_delimiter(count), status_path_for(process[:name], status), data: { turbo_frame: '_top' } %>
                 <%= helpers.turbo_frame_tag "reset-#{workflow_name}-#{process[:name]}", class: 'ms-auto' do %>
                   <%= render WorkflowGrid::ResetButtonComponent.new(workflow_name:, process_name: process[:name], status:, search_form: @search_form) %>
