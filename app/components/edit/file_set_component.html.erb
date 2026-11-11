@@ -1,5 +1,5 @@
-<%= tag.div class: classes do %>
-  <div class="card-body">
+<%= render SdrViewComponents::Elements::CardComponent.new(classes:) do |card| %>
+  <% card.with_body do %>
     <div class="card-title">
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h4, text: "Resource (#{index}):", variant: :h3) %>
     </div>
@@ -33,5 +33,5 @@
         </div>
       <% end %>
     </div>
-  </div>
+  <% end %>
 <% end %>

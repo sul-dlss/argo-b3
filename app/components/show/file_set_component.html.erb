@@ -1,5 +1,5 @@
-<%= tag.div class: classes do %>
-  <div class="card-body">
+<%= render SdrViewComponents::Elements::CardComponent.new(classes:) do |card| %>
+  <% card.with_body do %>
     <div class="card-title d-flex justify-content-between">
       <div>
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: heading_level, text: "Resource (#{index}):", variant: :h3, classes: 'd-inline') %> <%= file_set_type %>
@@ -97,5 +97,5 @@
         <% end %>
       <% end %>
     </div>
-  </div>
+  <% end %>
 <% end %>
