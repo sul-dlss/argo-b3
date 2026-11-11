@@ -1,5 +1,4 @@
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multiple_items.new.title'), classes: 'mb-3') %>
+<%= render Layout::ContainerComponent.new(heading: t('edit.multiple_items.new.title')) do %>
   <%= form_with(model: @items_registration_form, url: multiple_items_path, class: 'b3-form',
                 data: { controller: 'content-type-dependent' }) do |form| %>
     <%= render Edit::ContentTypeComponent.new(form:, input_data: { content_type_dependent_target: 'contentType',
@@ -127,4 +126,4 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.register')) %>
     </div>
   <% end %>
-</div>
+<% end %>

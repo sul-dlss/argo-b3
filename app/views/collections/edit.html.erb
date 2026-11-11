@@ -1,7 +1,4 @@
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.collections.edit.title')) %>
-
-  <p class="mb-4"><%= @title %></p>
+<%= render Layout::ContainerComponent.new(heading: t('edit.collections.edit.title'), subtitle: @title) do %>
 
   <% form_id = 'tabbed_form' %>
 
@@ -84,4 +81,4 @@
       <% end %>
     <% end %>
   <% end %>
-</div>
+<% end %>

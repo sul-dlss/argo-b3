@@ -1,5 +1,4 @@
-<div class="container py-2" data-controller="report">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Custom report', classes: 'mb-4') %>
+<%= render Layout::ContainerComponent.new(heading: 'Custom report', data: { controller: 'report' }) do %>
   <%= form_with model: @report_form, url: download_report_path do |form| %>
     <fieldset data-controller="radio">
       <legend>Select source of items for report:</legend>
@@ -71,4 +70,4 @@
   <% end %>
 
   <%= turbo_frame_tag 'report-preview' %>
-</div>
+<% end %>

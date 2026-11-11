@@ -1,7 +1,6 @@
 <%= content_for :title, t('edit.multi_item_deposits.edit.title') %>
 
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
+<%= render Layout::ContainerComponent.new(heading: t('edit.multi_item_deposits.edit.title')) do %>
 
   <p><%= @multi_item_deposit_action.name %></p>
 
@@ -120,4 +119,4 @@
   <%= form_with url: multi_item_deposit_action_globus_path(@multi_item_deposit_action), method: :post, id: 'create-globus-link-form',
                 data: { turbo_frame: dom_id(@multi_item_deposit_action, :globus) } do %>
   <% end %>
-</div>
+<% end %>

@@ -1,5 +1,4 @@
-<div class="container b3-form my-3">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: label, classes: 'mb-5') %>
+<%= render Layout::ContainerComponent.new(heading: label, classes: 'b3-form') do %>
   <%= content %>
 
   <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
@@ -22,4 +21,4 @@
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
     <%= link_to 'Cancel', new_bulk_action_path %>
   </div>
-</div>
+<% end %>

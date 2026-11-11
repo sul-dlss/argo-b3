@@ -5,14 +5,13 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= tag.div class: 'container py-2', data: {
-      controller: 'scheduled-refresh',
-      scheduled_refresh_interval_value: Settings.reload_intervals.multi_item_deposit_show
-    } do %>
-  <%= render Elements::BreadcrumbComponent.new(label: 'Dashboard', link: root_path) %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.show.title'), classes: 'mb-3') %>
-
-  <p><%= @multi_item_deposit_action.name %></p>
+<%= render Layout::ContainerComponent.new(heading: t('edit.multi_item_deposits.show.title'), subtitle: @multi_item_deposit_action.name, data: {
+                                            controller: 'scheduled-refresh',
+                                            scheduled_refresh_interval_value: Settings.reload_intervals.multi_item_deposit_show
+                                          }) do |container| %>
+  <% container.with_breadcrumb do %>
+    <%= render Elements::BreadcrumbComponent.new(label: 'Dashboard', link: root_path) %>
+  <% end %>
 
   <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('multi_item_deposit.deposit_status.label'), classes: 'mb-2') %>
 

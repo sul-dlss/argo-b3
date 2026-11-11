@@ -1,4 +1,4 @@
-<%= tag.div class: 'container bulk-action-show object-type-bulk-action mb-4', data: do %>
+<%= render Layout::ContainerComponent.new(classes: 'bulk-action-show object-type-bulk-action', data:) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
       <%= render Elements::BreadcrumbComponent.new(label: t('bulk_actions.history'), link: bulk_actions_path) %>

@@ -1,7 +1,4 @@
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.item_releases.new.title')) %>
-
-  <p class="mb-4"><%= @title %></p>
+<%= render Layout::ContainerComponent.new(heading: t('edit.item_releases.new.title'), subtitle: @title) do %>
 
   <p>
     If the item is not already in a collection, "Follow collection settings" will not have any effect until the item is added to a
@@ -17,4 +14,4 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_releases.new.buttons.save')) %>
     </div>
   <% end %>
-</div>
+<% end %>

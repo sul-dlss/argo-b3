@@ -1,5 +1,4 @@
-<div class="container">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Impersonate') %>
+<%= render Layout::ContainerComponent.new(heading: 'Impersonate') do %>
 
   <%= form_with url: admin_impersonate_path, method: :patch, scope: :impersonation do |form| %>
     <%= render Admin::ImpersonationWorkgroupsComponent.new(form:, workgroup_columns: @workgroup_columns, selected_workgroups: @selected_workgroups) %>
@@ -8,4 +7,4 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Impersonate') %>
     </div>
   <% end %>
-</div>
+<% end %>

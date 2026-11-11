@@ -1,7 +1,6 @@
 <%= content_for :title, t('edit.multi_item_deposits.edit.title') %>
 
-<div class="container py-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('edit.multi_item_deposits.edit.title'), classes: 'mb-3') %>
+<%= render Layout::ContainerComponent.new(heading: t('edit.multi_item_deposits.edit.title')) do %>
 
   <p><%= @multi_item_deposit_action.name %></p>
 
@@ -38,4 +37,4 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.deposit')) %>
     </div>
   <% end %>
-</div>
+<% end %>
