@@ -110,8 +110,8 @@ class ContentsController < ContentsApplicationController
     @content_token = generate_token(@content.id)
     @content_form = ContentForm.new
     # Computed once, since every pane's footer renders the discard or purge button.
-    @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: cocina_object.version, version_service:,
-                                                              purge_label: t('edit.contents.edit.buttons.purge'))
+    @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: cocina_object.version, version_service:,
+                                                         purge_label: t('edit.contents.edit.buttons.purge'))
   end
 
   def build_prefilled_contents_item_form(cocina_object:)

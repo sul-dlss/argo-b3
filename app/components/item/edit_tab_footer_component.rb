@@ -9,7 +9,7 @@ module Item
     # @param form_id [String] The id of the form that the buttons submit
     # @param cancel_path [String] The URL for the cancel button
     # @param druid [String] The druid of the item
-    # @param discard_or_purge_presenter [DiscardOrPurgePresenter] The discard draft or purge button
+    # @param draft_actions_presenter [DraftActionsPresenter] The discard draft or purge button
     # @param show_next [Boolean] If next button is rendered (defaults to true)
     # @param show_previous [Boolean] If previous button is rendered (defaults to true)
     # @param show_edit_files [Boolean] If save draft and edit files button is rendered (defaults to false)
@@ -17,14 +17,14 @@ module Item
     # @param submit_data [Hash] Data attributes for the submit buttons
     # @param actions_data [Hash] Data attributes for the fieldset of action buttons and the discard or purge link
     # @param cancel_data [Hash] Data attributes for the cancel button
-    def initialize(pane:, form_id:, cancel_path:, druid:, discard_or_purge_presenter:, # rubocop:disable Metrics/ParameterLists
+    def initialize(pane:, form_id:, cancel_path:, druid:, draft_actions_presenter:, # rubocop:disable Metrics/ParameterLists
                    show_next: true, show_previous: true, show_edit_files: false, show_deposit: false,
                    submit_data: {}, actions_data: {}, cancel_data: {})
       @pane = pane
       @form_id = form_id
       @cancel_path = cancel_path
       @druid = druid
-      @discard_or_purge_presenter = discard_or_purge_presenter
+      @draft_actions_presenter = draft_actions_presenter
       @show_next = show_next
       @show_previous = show_previous
       @show_edit_files = show_edit_files
@@ -35,7 +35,7 @@ module Item
       super()
     end
 
-    attr_reader :pane, :form_id, :cancel_path, :druid, :discard_or_purge_presenter, :show_next, :show_previous,
+    attr_reader :pane, :form_id, :cancel_path, :druid, :draft_actions_presenter, :show_next, :show_previous,
                 :show_edit_files, :show_deposit, :submit_data, :actions_data, :cancel_data
   end
 end

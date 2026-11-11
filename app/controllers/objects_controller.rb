@@ -49,7 +49,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
-    @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: @cocina_object.version, version_service:)
+    @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set

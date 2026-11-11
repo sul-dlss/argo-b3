@@ -123,7 +123,7 @@ class ItemsController < ApplicationController
   def set_edit_view
     @title = CocinaSupport.title(@cocina_object)
     # Computed once, since every pane's footer renders the discard or purge button.
-    @discard_or_purge_presenter = DiscardOrPurgePresenter.new(cocina_version: @cocina_object.version, version_service:)
+    @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
     @druid_token = generate_token(@druid)
     set_apo_and_collection_options(form: @edit_item_form)
   end

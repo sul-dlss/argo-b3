@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Presenter for the purge (first version) or discard draft (later version) button of an object.
-class DiscardOrPurgePresenter
+# Presenter for the draft actions of an object: the purge (first version) or discard draft (later version) button.
+class DraftActionsPresenter
   # @param cocina_version [Integer] the version of the cocina object
   # @param version_service [Sdr::VersionService] the object's version service
   # @param purge_label [String] the label of the purge button, for contexts that need something more specific
