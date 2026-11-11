@@ -30,8 +30,6 @@
   }
 
   .read-only-badge {
-    background-color: var(--stanford-fog-light);
-
     // Keeps the badge's height from when it was inside the h1.
     line-height: $headings-line-height;
   }

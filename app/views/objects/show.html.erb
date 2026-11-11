@@ -17,15 +17,15 @@
                                                      current_position: @search_position, navigation: @navigation) %>
 
       <div class="d-flex flex-column d-xl-block">
-        <div class="object-type-badge object-type-bg fw-bold text-center text-uppercase rounded-pill fs-4 float-xl-end order-2 mb-4 mb-xl-0">
-          <%= @solr_doc.object_type_label %>
-        </div>
+        <%= render Elements::BadgeComponent.new(label: @solr_doc.object_type_label, variant: :object_type, size: :large, tag: :div,
+                                                classes: 'object-type-badge text-center float-xl-end order-2 mb-4 mb-xl-0') %>
 
         <div class="object-heading mb-xl-4 mb-3 d-flex order-1">
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-0') %>
           <%= render Pin::PinnedObjectComponent.new(druid: @solr_doc.druid, pinned: @pinned) unless @solr_doc.agreement? %>
           <% unless allowed_to?(:update?, @solr_doc, with: ObjectPolicy) %>
-            <span class="read-only-badge fw-semibold text-uppercase rounded-pill border border-dark px-3 fs-5 ms-3 align-self-center">Read only</span>
+            <%= render Elements::BadgeComponent.new(label: 'Read only', variant: :status, size: :medium,
+                                                    classes: 'read-only-badge px-3 ms-3 align-self-center') %>
           <% end %>
         </div>
       </div>
