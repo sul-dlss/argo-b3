@@ -27,7 +27,8 @@ RSpec.describe 'Show item' do
                                                                          openable?: true, closeable?: false)
   end
   let(:milestone_date) { true }
-  let(:event_types) { %w[publishing_complete version_open] }
+  # More event types than Tom Select lists by default (50), so that the last one is only listed if all are.
+  let(:event_types) { (1..50).map { |n| "other_event_#{n}" } + %w[publishing_complete version_open] }
   let(:events) do
     [
       Dor::Services::Client::Events::Event.new(event_type: 'publishing_complete', data: {},
@@ -440,8 +441,10 @@ RSpec.describe 'Show item' do
     click_button 'Select none'
     expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '0 selected')
     click_button 'Select all'
-    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '2 selected')
-    find('.ts-dropdown .option', text: 'Publishing complete').click
+    expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '52 selected')
+    click_button 'Select none'
+    # The last event type is listed without searching for it.
+    find('.ts-dropdown .option', text: 'Version open').click
     expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '1 selected')
     fill_in 'From', with: Time.zone.local(2021, 3, 31, 13, 0, 0)
     click_button 'Filter'

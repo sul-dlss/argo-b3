@@ -21,6 +21,8 @@ export default class extends Controller {
       plugins: ['checkbox_options', 'no_backspace_delete'],
       create: false,
       maxItems: null,
+      // List every option, rather than Tom Select's default of the first 50.
+      maxOptions: null,
       hideSelected: false,
       closeAfterSelect: false,
       // Selected options are summarized by the count, so the items are not displayed.
