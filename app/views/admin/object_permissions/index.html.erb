@@ -33,7 +33,7 @@
     <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('admin.object_permissions.buttons.add')) %>
   <% end %>
 
-  <hr class="my-4">
+  <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new(classes: 'my-4') %>
 
   <%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('admin.object_permissions.table_label'), variant: :h3, id: 'object-permissions',
                                                               empty_message: t('admin.object_permissions.empty')) do |table| %>

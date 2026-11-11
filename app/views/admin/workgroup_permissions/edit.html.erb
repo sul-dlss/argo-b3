@@ -27,7 +27,7 @@
     </div>
   <% end %>
 
-  <hr class="my-4">
+  <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new(classes: 'my-4') %>
 
   <%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Additional permissions', show_label: false, variant: :h3,
                                                               id: 'additional-permissions-table', empty_message: 'No additional permissions.') do |table| %>
