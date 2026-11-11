@@ -20,11 +20,13 @@ RSpec.describe Edit::ApoFieldsComponent, type: :component do
     expect(page).to have_css('label', text: 'Agreement') { |label| label.has_css?('span.required', text: '*') }
   end
 
-  it 'renders the object defaults fieldset' do
+  it 'renders the object defaults section' do
     render_inline(component)
 
-    expect(page).to have_css('fieldset legend label.h3', text: 'Object defaults')
-    expect(page).to have_css('fieldset', text: 'The following defaults will apply to all newly registered objects.')
+    expect(page).to have_css('h2.h3', text: 'Object defaults')
+    expect(page).to have_no_css('legend', text: 'Object defaults')
+    expect(page).to have_css('h2 + p', text: 'The following defaults will apply to all newly registered objects.')
+    expect(page).to have_css('h2 ~ fieldset legend', text: 'Default object rights')
     expect(page).to have_select('View access', selected: 'World')
     expect(page).to have_select('Download access', selected: 'World')
     expect(page).to have_field('Default use and reproduction', type: 'textarea', with: 'Use at will.')

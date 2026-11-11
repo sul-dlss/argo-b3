@@ -229,6 +229,8 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
         expect(rendered_page).to have_field('Describe this deposit', with: 'My deposit')
         expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Discover files and check manifest')
+        expect(rendered_page).to have_css('legend label.form-label:not(.h2)',
+                                          text: 'Discover files and check manifest')
         expect(rendered_page).to have_button('Discover files and check manifest', class: 'btn-primary')
         expect(rendered_page).to have_link('Cancel', href: root_path)
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
