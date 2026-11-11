@@ -95,7 +95,8 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 
 - **BTN-1 MUST** Button labels start with a verb and name the result (e.g., "Save", "Register items", "Deposit", "Start bulk action"). Don't use "Submit", "OK", or "Go".
 - **BTN-2 SHOULD** A form or action area has one primary button: the action that completes it. Other actions are `outline-primary`. Explain more than one primary in review.
-- **BTN-3 MUST** In a form footer, Cancel comes first, then other actions, then the primary action last, in `d-flex align-items-center mt-5`. Cancel may be a link or a button variant.
+- **BTN-3 MUST** In a form footer, Cancel comes first, then other actions, then the primary action last. *Use* `Elements::FormFooterComponent`.
+  - In a tabbed form's pane footer, Cancel and the tab navigation (Previous, Next) are on the left, and the save actions are on the right, with the primary action last.
 - **BTN-4 SHOULD** Use `size: :sm` only inside tables, cards, boxes, and facets.
 - **BTN-5** A button's variant may change with state (e.g., a step's action becoming primary once it can proceed).
 - **BTN-6 MUST** A control for a feature not yet built (a placeholder) is a disabled control (the gem's `disabled:`, which removes the `href` and the tab stop), not a link to `#` or `/`.

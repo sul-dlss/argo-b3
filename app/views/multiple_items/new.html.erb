@@ -120,10 +120,9 @@
     <% end %>
     </div>
 
-    <div class="d-flex align-items-center mt-5">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: root_path, variant: :link, classes: 'me-3') %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.clear'), variant: 'outline-primary', value: MultipleItemsController::CLEAR_VALUE, classes: 'me-3') if @items_registration_form.invalid_item_registrations.any? %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: root_path) do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.clear'), variant: 'outline-primary', value: MultipleItemsController::CLEAR_VALUE) if @items_registration_form.invalid_item_registrations.any? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.register')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

@@ -3,10 +3,8 @@
   <%= form_with model: @administrative_tags_form, url: object_tags_path(@druid), method: :patch, class: 'b3-form' do |form| %>
     <%= render Edit::TagsComponent.new(form:) %>
 
-    <div class="mt-4">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.administrative_tags.edit.buttons.cancel'), link: object_path(@druid),
-                                                                      variant: :link, classes: 'me-3') %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.administrative_tags.edit.buttons.save')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

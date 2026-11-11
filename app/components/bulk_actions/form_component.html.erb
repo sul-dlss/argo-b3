@@ -17,8 +17,7 @@
                                                                help_text: 'Uncheck this option if you want to make additional edits to these objects before depositing the version.') %>
   <% end %>
 
-  <div class="d-flex align-items-center mt-5">
-    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit', classes: 'me-3') %>
-    <%= link_to 'Cancel', new_bulk_action_path %>
-  </div>
+  <%= render Elements::FormFooterComponent.new(cancel_path: new_bulk_action_path) do %>
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Submit') %>
+  <% end %>
 <% end %>

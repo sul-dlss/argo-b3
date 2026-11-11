@@ -105,14 +105,13 @@
 
       <%= render MultiItemDeposit::DiscoveryErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
-    <div class="mt-5">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.multi_item_deposits.edit.buttons.cancel'), link: root_path, variant: :link, classes: 'me-3') %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: root_path) do %>
       <% next_enabled = @multi_item_deposit_action.discovery_succeeded? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.discover'), variant: next_enabled ? :'outline-primary' : :primary) %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, classes: 'ms-2', disabled: !next_enabled) do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, disabled: !next_enabled) do %>
         <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon(aria: { hidden: true }) %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
   <%# Submitted by the "Create Globus link" button in the Globus turbo frame. %>
   <%= form_with url: multi_item_deposit_action_globus_path(@multi_item_deposit_action), method: :post, id: 'create-globus-link-form',

@@ -36,13 +36,13 @@
       </div>
     </fieldset>
 
-    <div class="d-flex gap-2 my-3">
+    <%= render Elements::FormFooterComponent.new(classes: 'mb-3') do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: 'Download', variant: :primary, formtarget: '_blank') do %>
         <%= new_tab_label('Download') %>
       <% end %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Preview', variant: :primary, formaction: preview_report_path,
                                                                data: { turbo_frame: 'report-preview' }) %>
-    </div>
+    <% end %>
   <% end %>
 
   <%= turbo_frame_tag 'report-preview' %>

@@ -2,9 +2,8 @@
   <%= form_with(model: @apo_form, url: apos_path, class: 'b3-form') do |form| %>
     <%= render Edit::ApoFieldsComponent.new(form:, agreement_options: @agreement_options) %>
 
-    <div class="d-flex align-items-center mt-5">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: @cancel_path || root_path, variant: :link, classes: 'me-3') %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: @cancel_path || root_path) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.new.buttons.register')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

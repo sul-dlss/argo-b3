@@ -393,7 +393,6 @@ en:
       edit:
         title: 'Manage tags'
         buttons:
-          cancel: 'Cancel'
           save: 'Save'
       toasts:
         updated: 'Tags updated'
@@ -403,7 +402,6 @@ en:
       new:
         title: 'Manage release'
         buttons:
-          cancel: 'Cancel'
           save: 'Save'
       toasts:
         updated: 'Release updated'
@@ -601,7 +599,6 @@ en:
         title: "Multi-item deposit"
         buttons:
           build_structure: "Check files"
-          cancel: "Cancel"
           deposit: "Check version status and deposit"
           discover: "Discover files and check manifest"
           next: "Next"
