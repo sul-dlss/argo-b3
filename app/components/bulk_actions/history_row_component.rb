@@ -21,15 +21,22 @@ module BulkActions
     def log_file_link
       return unless bulk_action.log_file?
 
-      link_to('Log file', file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
+      link_to(with_bulk_action_context('Log file'),
+              file_bulk_action_path(bulk_action, filename: bulk_action.log_filename), download: true)
     end
 
     def export_links
       return unless bulk_action.existing_exports
 
       bulk_action.existing_exports.map do |export|
-        link_to(export.label, file_bulk_action_path(bulk_action, filename: export.filename), download: true)
+        link_to(with_bulk_action_context(export.label), file_bulk_action_path(bulk_action, filename: export.filename),
+                download: true)
       end
+    end
+
+    # Names the bulk action, since the download links repeat on every row.
+    def with_bulk_action_context(text)
+      helpers.text_with_hidden_context(text, "for #{bulk_action.name}")
     end
 
     def download_links

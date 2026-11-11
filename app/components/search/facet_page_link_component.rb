@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for displaying a "More" link to the next page of a search facet
+  # Component for displaying a "More <facet name>" link to the next page of a search facet
   class FacetPageLinkComponent < ViewComponent::Base
     def initialize(facet_counts:, search_form:, facet_path_helper:, form_field:)
       @facet_counts = facet_counts

@@ -6,7 +6,7 @@
   </ul>
 
   <% if more? %>
-    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'More »',
+    <%= render SdrViewComponents::Elements::ButtonComponent.new(label: "More #{label.downcase_first}",
                                                                 variant: :link,
                                                                 classes: 'px-0',
                                                                 data: { show_more_target: 'link',

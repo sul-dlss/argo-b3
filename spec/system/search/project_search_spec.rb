@@ -41,10 +41,10 @@ RSpec.describe 'Project search', :solr do
         expect(page).to have_result_count(7)
         expect(page).to have_css('li', count: 5)
 
-        click_button('More »')
+        click_button('More project results')
 
         expect(page).to have_css('li', count: 7)
-        expect(page).to have_no_button('More »')
+        expect(page).to have_no_button('More project results')
       end
     end
   end

@@ -23,8 +23,9 @@ RSpec.describe Edit::UseAndReproductionStatementComponent, type: :component do
   it 'renders the help link, opening in a new tab' do
     render_inline(component)
 
-    expect(page).to have_link('sample statements', href: Settings.links.use_and_reproduction_statement)
-    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'sample statements')
+    expect(page).to have_link('sample use and reproduction statements (opens in new tab)',
+                              href: Settings.links.use_and_reproduction_statement)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"] i.bi-box-arrow-up-right[aria-hidden="true"]')
   end
 
   context 'with a label' do

@@ -11,13 +11,13 @@
       <% component.with_row(label: '# of collections') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['collection']) %>
-          <%= link_to @object_counts.collection_count, url_for(search_form) %>
+          <%= link_to text_with_hidden_context(@object_counts.collection_count, "#{'collection'.pluralize(@object_counts.collection_count)} governed by #{@solr_doc.title}"), url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: '# of items') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['item']) %>
-          <%= link_to @object_counts.item_count, url_for(search_form) %>
+          <%= link_to text_with_hidden_context(@object_counts.item_count, "#{'item'.pluralize(@object_counts.item_count)} governed by #{@solr_doc.title}"), url_for(search_form) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>

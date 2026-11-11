@@ -16,7 +16,8 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_field('From last search', type: 'radio', disabled: true)
 
     expect(page).to have_field('From druid list', type: 'radio', checked: true)
-    expect(page).to have_button('Download', disabled: true)
+    expect(page).to have_button('Download (opens in new tab)', disabled: true)
+    expect(page).to have_css('button[formtarget="_blank"] i.bi-box-arrow-up-right[aria-hidden="true"]')
     expect(page).to have_button('Preview', disabled: true)
 
     # Various separators, whitespace, and druid forms

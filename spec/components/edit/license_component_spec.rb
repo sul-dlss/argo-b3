@@ -18,8 +18,8 @@ RSpec.describe Edit::LicenseComponent, type: :component do
   it 'renders the help link, opening in a new tab' do
     render_inline(component)
 
-    expect(page).to have_link('Get help selecting a license', href: Settings.links.license)
-    expect(page).to have_css('a[target="_blank"][rel="noopener"]', text: 'Get help selecting a license')
+    expect(page).to have_link('Get help selecting a license (opens in new tab)', href: Settings.links.license)
+    expect(page).to have_css('a[target="_blank"][rel="noopener"] i.bi-box-arrow-up-right[aria-hidden="true"]')
   end
 
   it 'renders the help text' do

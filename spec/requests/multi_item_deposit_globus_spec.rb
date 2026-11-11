@@ -31,9 +31,11 @@ RSpec.describe 'Multi-item deposit Globus' do
       it 'renders the Globus link' do
         get new_multi_item_deposit_action_globus_path(multi_item_deposit_action)
 
-        expect(response.body).to include('Open Globus')
-        expect(response.body)
-          .to include('https://app.globus.org/file-manager?destination_id=endpoint_id&amp;destination_path=%2Fuploads%2Fjdoe%2F2026-10-28-14-03-22-417')
+        link = Capybara.string(response.body).find_link('Open Globus (opens in new tab)')
+        expect(link[:href])
+          .to eq('https://app.globus.org/file-manager?destination_id=endpoint_id&destination_path=%2Fuploads%2Fjdoe%2F2026-10-28-14-03-22-417')
+        expect(link[:target]).to eq('_blank')
+        expect(link).to have_css('i.bi-box-arrow-up-right[aria-hidden="true"]')
         expect(response.body).not_to include('Create Globus link')
       end
     end

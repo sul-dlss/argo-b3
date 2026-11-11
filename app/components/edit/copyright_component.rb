@@ -27,7 +27,8 @@ module Edit
     end
 
     def help_text
-      help_text = t('edit.items.fields.copyright.help_text_html', url: Settings.links.copyright)
+      link = helpers.link_to_new_tab(t('edit.items.fields.copyright.help_link'), Settings.links.copyright)
+      help_text = t('edit.items.fields.copyright.help_text_html', link:)
       return help_text unless @apo_defaults
 
       safe_join([help_text, tag.span(data: { apo_defaults_target: 'copyrightText' })], tag.br)

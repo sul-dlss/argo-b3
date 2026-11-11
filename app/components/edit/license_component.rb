@@ -22,7 +22,7 @@ module Edit
     end
 
     def label_caption
-      t('edit.items.fields.license.label_caption_html', url: Settings.links.license)
+      helpers.link_to_new_tab(t('edit.items.fields.license.help_link'), Settings.links.license)
     end
 
     def container_classes

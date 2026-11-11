@@ -505,8 +505,8 @@ en:
           label: "Content type"
         copyright:
           label: "Copyright"
-          help_text_html: >-
-            See <a href="%{url}" target="_blank" rel="noopener">sample copyright statements</a>.
+          help_text_html: "See %{link}."
+          help_link: "sample copyright statements"
         description_choice:
           label: "How would you like to enter description?"
           catalog_id:
@@ -535,8 +535,7 @@ en:
           deposit: 'Deposit with Goobi'
         license:
           label: "License"
-          label_caption_html: >-
-            <a href="%{url}" target="_blank" rel="noopener">Get help selecting a license</a>
+          help_link: "Get help selecting a license"
           help_text: "Assigning a license may improve discovery of your work in web searches."
         mount_path:
           label: "Mount path"
@@ -585,8 +584,8 @@ en:
             required: "title is required if a FOLIO Instance HRID is not provided"
         use_and_reproduction_statement:
           label: "Use and reproduction"
-          help_text_html: >-
-            See <a href="%{url}" target="_blank" rel="noopener">sample statements</a>.
+          help_text_html: "See %{link}."
+          help_link: "sample use and reproduction statements"
         version_description:
           label: "Version description"
         viewing_direction:

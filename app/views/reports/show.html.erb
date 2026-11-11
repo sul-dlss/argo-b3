@@ -64,7 +64,9 @@
     </fieldset>
 
     <div class="d-flex gap-2 my-3">
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Download', variant: :primary, formtarget: '_blank') %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: 'Download', variant: :primary, formtarget: '_blank') do %>
+        <%= new_tab_label('Download') %>
+      <% end %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Preview', variant: :primary, formaction: preview_report_path,
                                                                data: { turbo_frame: 'report-preview' }) %>
     </div>
