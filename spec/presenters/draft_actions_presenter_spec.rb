@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe DiscardOrPurgePresenter do
+RSpec.describe DraftActionsPresenter do
   subject(:presenter) { described_class.new(cocina_version:, version_service:) }
 
   let(:druid) { 'druid:bc123df4567' }

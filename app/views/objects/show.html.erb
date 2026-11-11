@@ -74,9 +74,9 @@
 
       <%= render Elements::ButtonListComponent.new(title: 'Discard', classes: 'mt-4') do |component| %>
         <%# Permission is checked first, so that read-only users don't trigger the DSA requests of available?. %>
-        <% component.with_button(link: @discard_or_purge_presenter.path, method: :delete, label: @discard_or_purge_presenter.label,
-                                 confirm: @discard_or_purge_presenter.confirm, variant: 'outline-primary',
-                                 disabled: !(allowed_to?(:update?, @solr_doc, with: ObjectPolicy) && @discard_or_purge_presenter.available?)) %>
+        <% component.with_button(link: @draft_actions_presenter.path, method: :delete, label: @draft_actions_presenter.label,
+                                 confirm: @draft_actions_presenter.confirm, variant: 'outline-primary',
+                                 disabled: !(allowed_to?(:update?, @solr_doc, with: ObjectPolicy) && @draft_actions_presenter.available?)) %>
         <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary', disabled: true) %>
         <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary', disabled: true) %>
       <% end %>
