@@ -3,6 +3,6 @@
 
     <%= render Edit::AccessRightsComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-fieldset') %>
 
-    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results, example_druids: @example_druids) %>
   <% end %>
 <% end %>

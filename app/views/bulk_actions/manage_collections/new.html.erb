@@ -3,6 +3,6 @@
     <%= render Edit::CollectionsComponent.new(form:, options: @collection_options, show_limit_by_apo: false) %>
 
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form,
-                                                      total_results: @total_results) %>
+                                                      total_results: @total_results, example_druids: @example_druids) %>
   <% end %>
 <% end %>

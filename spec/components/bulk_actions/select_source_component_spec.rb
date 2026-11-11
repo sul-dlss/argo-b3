@@ -3,11 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe BulkActions::SelectSourceComponent, type: :component do
-  let(:component) { described_class.new(form:, search_form:, total_results:) }
+  let(:component) { described_class.new(form:, search_form:, total_results:, example_druids:) }
 
   let(:form) { ActionView::Helpers::FormBuilder.new(nil, bulk_action_form, vc_test_view_context, {}) }
   let(:search_form) { nil }
   let(:total_results) { nil }
+  let(:example_druids) { [] }
   let(:bulk_action_form) { BulkActions::BasicForm.new }
 
   context 'when no search form is provided' do
@@ -19,12 +20,14 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
 
       expect(page).to have_field('From druid list', type: 'radio', checked: true)
       expect(page).to have_field('Enter druid list', type: 'textarea')
+      expect(page).to have_no_text('including')
     end
   end
 
   context 'when last search form is provided' do
     let(:search_form) { ResultsSearchForm.new(query: 'test') }
     let(:total_results) { 12_345 }
+    let(:example_druids) { ['druid:bc123df4567', 'druid:fg890hj1234'] }
     let(:bulk_action_form) { BulkActions::BasicForm.new(source: 'results') }
 
     it 'renders the select source form with last search option' do
@@ -32,7 +35,9 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
 
       expect(page).to have_css('fieldset legend', text: 'Select source of items for bulk action')
       expect(page).to have_field('From last search', type: 'radio', checked: true)
-      expect(page).to have_css('p', text: '12,345 items for: "test"')
+      expect(page).to have_css('p', text: '12,345 items for: "test", including bc123df4567, fg890hj1234...')
+      expect(page).to have_link('bc123df4567', href: '/objects/druid:bc123df4567')
+      expect(page).to have_link('fg890hj1234', href: '/objects/druid:fg890hj1234')
 
       expect(page).to have_field('From druid list', type: 'radio', checked: false)
       expect(page).to have_field('Enter druid list', type: 'textarea')
@@ -55,6 +60,19 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
         'input[value="druids"][data-action="radio#toggle report#updateSubmit"][data-report-target="sourceRadio"]'
       )
       expect(page).to have_css('textarea[data-report-target="druidListInput"]')
+    end
+  end
+
+  context 'when the example druids are all of the results' do
+    let(:search_form) { ResultsSearchForm.new(query: 'test') }
+    let(:total_results) { 2 }
+    let(:example_druids) { ['druid:bc123df4567', 'druid:fg890hj1234'] }
+
+    it 'renders the example druids without an ellipsis' do
+      render_inline(component)
+
+      expect(page).to have_css('p', text: 'including bc123df4567, fg890hj1234')
+      expect(page).to have_no_text('...')
     end
   end
 

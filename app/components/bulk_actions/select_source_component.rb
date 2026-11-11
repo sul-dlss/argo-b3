@@ -3,14 +3,17 @@
 module BulkActions
   # Component for selecting the source of items for a bulk action or report.
   class SelectSourceComponent < ApplicationComponent
+    # @param example_druids [Array<String>] druids from the last search to show as examples
     # @param radio_action [String, nil] Stimulus action added to both radios after radio#toggle
     # @param druids_radio_data [Hash] extra data attributes for the druid list radio
     # @param druid_list_data [Hash] data attributes for the druid list textarea
-    def initialize(form:, search_form: nil, total_results: nil, label: 'Select source of items for bulk action', # rubocop:disable Metrics/ParameterLists
+    def initialize(form:, search_form: nil, total_results: nil, example_druids: [], # rubocop:disable Metrics/ParameterLists
+                   label: 'Select source of items for bulk action',
                    radio_action: nil, druids_radio_data: {}, druid_list_data: {})
       @form = form
       @search_form = search_form
       @total_results = total_results
+      @example_druids = example_druids
       @label = label
       @radio_action = radio_action
       @druids_radio_data = druids_radio_data
@@ -18,7 +21,7 @@ module BulkActions
       super()
     end
 
-    attr_reader :form, :search_form, :total_results, :label, :druids_radio_data, :druid_list_data
+    attr_reader :form, :search_form, :total_results, :example_druids, :label, :druids_radio_data, :druid_list_data
 
     def last_search?
       search_form.present?
@@ -26,6 +29,12 @@ module BulkActions
 
     def radio_data
       { radio_target: 'radio', action: ['radio#toggle', @radio_action].compact.join(' ') }
+    end
+
+    def example_druid_links
+      links = example_druids.map { |druid| link_to(DruidSupport.bare_druid_from(druid), object_path(druid)) }
+      ellipsis = total_results.to_i > example_druids.size ? '...' : ''
+      safe_join(links, ', ') + ellipsis
     end
   end
 end

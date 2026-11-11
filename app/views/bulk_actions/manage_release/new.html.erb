@@ -15,6 +15,6 @@
       <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :to, label_text: 'to',
                                                                     options: Constants::RELEASE_TARGETS) %>
     <% end %>
-    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results) %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results, example_druids: @example_druids) %>
   <% end %>
 <% end %>
