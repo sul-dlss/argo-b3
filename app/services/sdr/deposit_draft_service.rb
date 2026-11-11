@@ -3,14 +3,16 @@
 module Sdr
   # Deposits the draft of an object as last staged: starts accessioning, then deletes its mutable Content.
   class DepositDraftService
+    # Superclass of the reasons the draft cannot be deposited.
+    class Error < StandardError; end
     # Raised when the mutable Content is staging or discovering.
-    class ContentBusyError < StandardError; end
+    class ContentBusyError < Error; end
     # Raised when the version is not open or cannot be closed.
-    class NotDepositableError < StandardError; end
+    class NotDepositableError < Error; end
     # Raised when the mutable Content has unsaved changes, which depositing would discard.
-    class UnsavedChangesError < StandardError; end
+    class UnsavedChangesError < Error; end
     # Raised when the content is not valid for the object's content type.
-    class InvalidContentError < StandardError; end
+    class InvalidContentError < Error; end
 
     def self.call(...)
       new(...).call
@@ -19,9 +21,11 @@ module Sdr
     # @param cocina_object [Cocina::Models::DROWithMetadata, Cocina::Models::CollectionWithMetadata,
     #   Cocina::Models::AdminPolicyWithMetadata] the object, at the open version
     # @param user_name [String] the sunetid of the user performing the action
-    def initialize(cocina_object:, user_name:)
+    # @param lane_id [String] the lane for assembly / accessioning
+    def initialize(cocina_object:, user_name:, lane_id: 'high')
       @cocina_object = cocina_object
       @user_name = user_name
+      @lane_id = lane_id
     end
 
     # @raise [ContentBusyError] if the mutable Content is staging or discovering
@@ -29,19 +33,21 @@ module Sdr
     # @raise [UnsavedChangesError] if the mutable Content has unsaved changes
     # @raise [InvalidContentError] if the content is not valid for the content type
     # @raise [Sdr::Repository::Error] if starting accessioning fails
+    # @return [String, nil] the name of the assembly workflow started, or nil if the version was closed
     def call
       check_depositable!
       check_content! if CocinaSupport.object_type_with_content?(cocina_object)
 
       context = mutable_content&.workflow_context(content_type: cocina_object.type) || {}
-      Sdr::Repository.accession(cocina_object:, user_name:, context:)
-      # The mutable Content has no unsaved changes, so it matches what is deposited.
-      mutable_content&.destroy!
+      Sdr::Repository.accession(cocina_object:, user_name:, lane_id:, context:).tap do
+        # The mutable Content has no unsaved changes, so it matches what is deposited.
+        mutable_content&.destroy!
+      end
     end
 
     private
 
-    attr_reader :cocina_object, :user_name
+    attr_reader :cocina_object, :user_name, :lane_id
 
     def check_depositable!
       raise ContentBusyError, 'Files are being staged or discovered' if mutable_content&.staging_or_discovering?

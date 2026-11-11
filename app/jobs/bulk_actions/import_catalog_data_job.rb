@@ -31,7 +31,7 @@ module BulkActions
 
         cocina_model.save!(user_name: user_id, description: description_msg)
 
-        close_version_if_needed!
+        deposit_if_needed!
         success!(message: 'Catalog data updated')
       end
 

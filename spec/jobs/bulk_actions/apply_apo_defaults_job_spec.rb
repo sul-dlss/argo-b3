@@ -14,7 +14,7 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
   let(:job_item) do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
-      allow(job_item).to receive(:close_version_if_needed!)
+      allow(job_item).to receive(:deposit_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
     end
   end
@@ -36,7 +36,7 @@ RSpec.describe BulkActions::ApplyApoDefaultsJob do
     expect(job_item).to have_received(:check_update_ability?)
     expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Applied APO defaults')
     expect(object_client).to have_received(:apply_admin_policy_defaults)
-    expect(job_item).to have_received(:close_version_if_needed!)
+    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(log).to have_received(:puts).with(/druid:bb111cc2222\tSuccess: Successfully applied defaults/)
   end

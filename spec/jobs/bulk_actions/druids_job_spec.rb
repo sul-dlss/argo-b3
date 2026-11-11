@@ -129,6 +129,28 @@ RSpec.describe BulkActions::DruidsJob do
     end
   end
 
+  context 'when an object cannot be deposited' do
+    before do
+      allow(Honeybadger).to receive(:notify)
+
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
+        def perform
+          raise BulkActions::BaseJobItem::NotDepositedError, 'Saved, but not deposited: Files have unsaved changes'
+        end
+      end
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
+    end
+
+    it 'records the failure without notifying Honeybadger' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(log).to have_received(:puts)
+        .with(/#{druids.first}\tError: Saved, but not deposited: Files have unsaved changes$/o)
+      expect(bulk_action.reload.druid_count_fail).to eq(2)
+      expect(Honeybadger).not_to have_received(:notify)
+    end
+  end
+
   context 'when cancelled' do
     before do
       bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do

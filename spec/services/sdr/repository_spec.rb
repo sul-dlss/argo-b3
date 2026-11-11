@@ -322,8 +322,8 @@ RSpec.describe Sdr::Repository do
     end
 
     context 'when the object has files' do
-      it 'ensures the staging folder and creates an assemblyWF' do
-        described_class.accession(cocina_object:, user_name:)
+      it 'ensures the staging folder, creates an assemblyWF, and returns its name' do
+        expect(described_class.accession(cocina_object:, user_name:)).to eq 'assemblyWF'
 
         expect(StagingSupport).to have_received(:ensure_staging_folder).with(cocina_object:)
         expect(StagingSupport).not_to have_received(:move_to_assembly)
@@ -355,8 +355,8 @@ RSpec.describe Sdr::Repository do
     context 'when the object has no files' do
       let(:file_sets) { [] }
 
-      it 'closes the version to initiate accessioning' do
-        described_class.accession(cocina_object:, user_name:)
+      it 'closes the version to initiate accessioning and returns nil' do
+        expect(described_class.accession(cocina_object:, user_name:)).to be_nil
 
         expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
         expect(object_client).not_to have_received(:workflow)
@@ -368,7 +368,7 @@ RSpec.describe Sdr::Repository do
       let(:type) { Cocina::Models::ObjectType.geo }
 
       it 'moves the staged files to the assembly location and creates a gisAssemblyWF' do
-        described_class.accession(cocina_object:, user_name:)
+        expect(described_class.accession(cocina_object:, user_name:)).to eq 'gisAssemblyWF'
 
         expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
         expect(object_client).to have_received(:workflow).with('gisAssemblyWF')
@@ -382,7 +382,7 @@ RSpec.describe Sdr::Repository do
       let(:staged_files) { false }
 
       it 'moves staged files to assembly, ensures the staging folder, and creates a wasSeedPreassemblyWF' do
-        described_class.accession(cocina_object:, user_name:)
+        expect(described_class.accession(cocina_object:, user_name:)).to eq 'wasSeedPreassemblyWF'
 
         expect(StagingSupport).to have_received(:move_to_assembly).with(druid:)
         expect(StagingSupport).to have_received(:ensure_staging_folder).with(cocina_object:)

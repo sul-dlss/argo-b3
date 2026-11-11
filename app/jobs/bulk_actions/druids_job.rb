@@ -24,13 +24,7 @@ module BulkActions
       druids.each_with_index do |druid, index|
         break cancel! if cancelling?
 
-        perform_item_class.new(druid:, index:, job: self, **item_params).perform
-      rescue Sdr::Repository::NotFoundResponse
-        failure!(druid:, message: 'Error: Object not found')
-      rescue StandardError => e
-        failure!(druid:, message: "Error: #{e.class} #{e.message}")
-        Rails.logger.error(e.full_message)
-        Honeybadger.notify(e)
+        perform_item(druid:) { perform_item_class.new(druid:, index:, job: self, **item_params).perform }
       end
     end
 

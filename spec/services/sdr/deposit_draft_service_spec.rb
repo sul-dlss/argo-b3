@@ -28,7 +28,8 @@ RSpec.describe Sdr::DepositDraftService do
 
       expect(Sdr::VersionService).to have_received(:new).with(druid:)
       expect(Sdr::Repository).to have_received(:accession)
-        .with(cocina_object:, user_name: 'jdoe', context: { runOCR: true, ocrLanguages: ['English'] })
+        .with(cocina_object:, user_name: 'jdoe', lane_id: 'high',
+              context: { runOCR: true, ocrLanguages: ['English'] })
       expect(Content.exists?(content.id)).to be false
     end
   end
@@ -37,7 +38,22 @@ RSpec.describe Sdr::DepositDraftService do
     it 'accessions without a context' do
       deposit_draft
 
-      expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name: 'jdoe', context: {})
+      expect(Sdr::Repository).to have_received(:accession)
+        .with(cocina_object:, user_name: 'jdoe', lane_id: 'high', context: {})
+    end
+  end
+
+  context 'when a lane is given' do
+    subject(:deposit_draft) { described_class.call(cocina_object:, user_name: 'jdoe', lane_id: 'default') }
+
+    before do
+      allow(Sdr::Repository).to receive(:accession).and_return('assemblyWF')
+    end
+
+    it 'accessions in the lane and returns the assembly workflow name' do
+      expect(deposit_draft).to eq 'assemblyWF'
+      expect(Sdr::Repository).to have_received(:accession)
+        .with(cocina_object:, user_name: 'jdoe', lane_id: 'default', context: {})
     end
   end
 
@@ -110,7 +126,8 @@ RSpec.describe Sdr::DepositDraftService do
     it 'accessions without checking content' do
       deposit_draft
 
-      expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name: 'jdoe', context: {})
+      expect(Sdr::Repository).to have_received(:accession)
+        .with(cocina_object:, user_name: 'jdoe', lane_id: 'high', context: {})
       expect(Content.exists?(druid:)).to be false
     end
   end

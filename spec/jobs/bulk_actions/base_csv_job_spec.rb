@@ -92,6 +92,30 @@ RSpec.describe BulkActions::BaseCsvJob do
     end
   end
 
+  context 'when an object cannot be deposited' do
+    let(:csv_file) { "druid,test\n#{druids.first},test1" }
+
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseCsvJobItem) do
+        def perform
+          raise BulkActions::BaseJobItem::NotDepositedError, 'Saved, but not deposited: Files have unsaved changes'
+        end
+      end
+      stub_const('TestBulkActionCsvJob::JobItem', bulk_action_item_class)
+
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'records the failure without notifying Honeybadger' do
+      TestBulkActionCsvJob.perform_now(bulk_action:, csv_file:)
+
+      expect(log).to have_received(:puts)
+        .with(/line 2\t#{druids.first}\tError: Saved, but not deposited: Files have unsaved changes$/o)
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+      expect(Honeybadger).not_to have_received(:notify)
+    end
+  end
+
   context 'when an object is missing' do
     let(:druids) { %w[druid:bc123df4567 druid:gh123jk4589] }
     let(:cocina_object) { instance_double(Cocina::Models::DRO) }

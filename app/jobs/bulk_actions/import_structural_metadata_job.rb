@@ -49,13 +49,7 @@ module BulkActions
     # The druid's first row number is used as the index for logging.
     def perform_druid(druid:, rows:)
       index = rows.first.first
-      perform_item_class.new(druid:, index:, job: self, rows:).perform
-    rescue Sdr::Repository::NotFoundResponse
-      failure!(druid:, message: 'Error: Object not found', index:)
-    rescue StandardError => e
-      failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
-      Rails.logger.error(e.full_message)
-      Honeybadger.notify(e)
+      perform_item(druid:, index:) { perform_item_class.new(druid:, index:, job: self, rows:).perform }
     end
 
     def check_required_columns?
@@ -92,7 +86,7 @@ module BulkActions
         open_new_version_if_needed!(description: DESCRIPTION)
         # Rebuilt from the cocina object for the opened version.
         Sdr::Repository.update(cocina_object: updated_cocina_object, user_name: user_id, description: DESCRIPTION)
-        close_version_if_needed!
+        deposit_if_needed!
         success!(message: DESCRIPTION)
       ensure
         content&.destroy!

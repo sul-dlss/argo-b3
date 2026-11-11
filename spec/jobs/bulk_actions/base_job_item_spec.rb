@@ -112,51 +112,70 @@ RSpec.describe BulkActions::BaseJobItem do
     end
   end
 
-  describe '.close_version_if_needed!' do
-    let(:cocina_type) { Cocina::Models::ObjectType.image }
-    let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 2, type: cocina_type) }
+  describe '.deposit_if_needed!' do
+    let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 2) }
+    let(:refound_cocina_object) { instance_double(Cocina::Models::DRO, version: 2) }
+    let(:workflow_name) { nil }
 
     before do
       allow(job).to receive(:log)
-      allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
+      allow(Sdr::Repository).to receive(:find).and_return(cocina_object, refound_cocina_object)
+      allow(Sdr::VersionService).to receive(:closed?).and_return(false)
+      allow(Sdr::DepositDraftService).to receive(:call).and_return(workflow_name)
     end
 
-    context 'when the object is a web archive seed' do
-      let(:cocina_type) { Cocina::Models::ObjectType.webarchive_seed }
+    context 'when depositing closes the version' do
+      it 'deposits the re-found object in the default lane' do
+        bulk_action_item.deposit_if_needed!
 
+        expect(Sdr::Repository).to have_received(:find).with(druid:).twice
+        expect(Sdr::DepositDraftService).to have_received(:call)
+          .with(cocina_object: refound_cocina_object, user_name: 'a_user', lane_id: 'default')
+        expect(job).to have_received(:log).with('Closed version')
+      end
+    end
+
+    context 'when depositing starts an assembly workflow' do
+      let(:workflow_name) { 'assemblyWF' }
+
+      it 'logs the assembly workflow' do
+        bulk_action_item.deposit_if_needed!
+
+        expect(job).to have_received(:log).with('Started assemblyWF, which will close the version')
+      end
+    end
+
+    context 'when the object cannot be deposited' do
       before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)
-        allow(Sdr::VersionService).to receive(:close)
-        allow(Sdr::Repository).to receive(:accession)
+        allow(Sdr::DepositDraftService).to receive(:call)
+          .and_raise(Sdr::DepositDraftService::UnsavedChangesError, 'Files have unsaved changes')
       end
 
-      it 'accessions the object in the default lane instead of closing the version' do
-        bulk_action_item.close_version_if_needed!
+      it 'raises a not deposited error' do
+        expect { bulk_action_item.deposit_if_needed! }
+          .to raise_error(described_class::NotDepositedError, 'Saved, but not deposited: Files have unsaved changes')
+      end
 
-        expect(Sdr::Repository).to have_received(:accession)
-          .with(cocina_object:, user_name: 'a_user', lane_id: 'default')
-        expect(Sdr::VersionService).not_to have_received(:close)
-        expect(job).to have_received(:log).with('Started wasSeedPreassemblyWF, which will close the version')
+      context 'when forced' do
+        it 'raises a not deposited error that does not claim a save' do
+          expect { bulk_action_item.deposit_if_needed!(force: true) }
+            .to raise_error(described_class::NotDepositedError, 'Not deposited: Files have unsaved changes')
+        end
       end
     end
 
     context 'when version is 1' do
-      let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 1, type: cocina_type) }
+      let(:cocina_object) { instance_double(Cocina::Models::DRO, version: 1) }
 
-      before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)
-        allow(Sdr::VersionService).to receive(:close)
-      end
-
-      it 'does not close the version' do
-        bulk_action_item.close_version_if_needed!
-        expect(Sdr::VersionService).not_to have_received(:close)
+      it 'does not deposit' do
+        bulk_action_item.deposit_if_needed!
+        expect(Sdr::DepositDraftService).not_to have_received(:call)
       end
 
       context 'when forced' do
-        it 'closes the version' do
-          bulk_action_item.close_version_if_needed!(force: true)
-          expect(Sdr::VersionService).to have_received(:close).with(druid:)
+        it 'deposits' do
+          bulk_action_item.deposit_if_needed!(force: true)
+          expect(Sdr::DepositDraftService).to have_received(:call)
           expect(job).to have_received(:log).with('Closed version')
         end
       end
@@ -165,67 +184,31 @@ RSpec.describe BulkActions::BaseJobItem do
     context 'when already closed' do
       before do
         allow(Sdr::VersionService).to receive(:closed?).and_return(true)
-        allow(Sdr::VersionService).to receive(:close)
       end
 
-      it 'does not close the version' do
-        bulk_action_item.close_version_if_needed!
-        expect(Sdr::VersionService).not_to have_received(:close)
+      it 'does not deposit' do
+        bulk_action_item.deposit_if_needed!
+        expect(Sdr::DepositDraftService).not_to have_received(:call)
         expect(job).to have_received(:log).with('Version already closed')
-      end
-    end
-
-    context 'when closeable' do
-      before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)
-        allow(Sdr::VersionService).to receive(:close)
-      end
-
-      it 'closes the version' do
-        bulk_action_item.close_version_if_needed!
-        expect(Sdr::VersionService).to have_received(:close).with(druid:)
-        expect(job).to have_received(:log).with('Closed version')
-      end
-    end
-
-    context 'when not closeable' do
-      before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: false)
-        allow(Sdr::VersionService).to receive(:close)
-      end
-
-      it 'raises an error' do
-        expect { bulk_action_item.close_version_if_needed! }.to raise_error('Unable to close version')
-        expect(Sdr::VersionService).not_to have_received(:close)
       end
     end
 
     context 'when user did not request version be closed' do
       let(:close_version) { false }
 
-      before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false)
-      end
-
-      it 'does not close the version' do
-        bulk_action_item.close_version_if_needed!
+      it 'does not deposit' do
+        bulk_action_item.deposit_if_needed!
         expect(Sdr::VersionService).not_to have_received(:closed?)
+        expect(Sdr::DepositDraftService).not_to have_received(:call)
         expect(job).not_to have_received(:log)
       end
-    end
 
-    context 'when forced' do
-      let(:close_version) { false }
-
-      before do
-        allow(Sdr::VersionService).to receive_messages(closed?: false, closeable?: true)
-        allow(Sdr::VersionService).to receive(:close)
-      end
-
-      it 'closes the version' do
-        bulk_action_item.close_version_if_needed!(force: true)
-        expect(Sdr::VersionService).to have_received(:close).with(druid:)
-        expect(job).to have_received(:log).with('Closed version')
+      context 'when forced' do
+        it 'deposits' do
+          bulk_action_item.deposit_if_needed!(force: true)
+          expect(Sdr::DepositDraftService).to have_received(:call)
+          expect(job).to have_received(:log).with('Closed version')
+        end
       end
     end
   end

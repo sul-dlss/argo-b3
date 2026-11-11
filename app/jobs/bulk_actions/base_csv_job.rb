@@ -47,13 +47,7 @@ module BulkActions
 
     def perform_row(row:, index:)
       druid = druid_for(row)
-      perform_item_class.new(druid:, index:, job: self, row:).perform
-    rescue Sdr::Repository::NotFoundResponse
-      failure!(druid:, message: 'Error: Object not found', index:)
-    rescue StandardError => e
-      failure!(druid:, message: "Error: #{e.class} #{e.message}", index:)
-      Rails.logger.error(e.full_message)
-      Honeybadger.notify(e)
+      perform_item(druid:, index:) { perform_item_class.new(druid:, index:, job: self, row:).perform }
     end
 
     # The spreadsheet row number of the first row, for logging.

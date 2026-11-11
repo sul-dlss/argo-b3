@@ -28,7 +28,7 @@ module BulkActions
         @cocina_object = cocina_object.new(description:)
         Sdr::Repository.update(cocina_object:, user_name: user_id, description: description_msg)
 
-        close_version_if_needed!
+        deposit_if_needed!
         success!(message: 'Successfully updated')
       rescue Dor::Services::Client::UnprocessableContentError => e
         failure!(message: "indexing validation failed for #{cocina_object.externalIdentifier}: #{e.message}")

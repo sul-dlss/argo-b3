@@ -35,7 +35,7 @@ module BulkActions
 
         Sdr::Repository.update(cocina_object: build_updated_cocina_object,
                                user_name: user_id, description: 'Updated content type')
-        close_version_if_needed!
+        deposit_if_needed!
 
         success!(message: 'Successfully updated content type')
       end

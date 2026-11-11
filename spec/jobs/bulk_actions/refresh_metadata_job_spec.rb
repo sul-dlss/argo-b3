@@ -19,7 +19,7 @@ RSpec.describe BulkActions::RefreshMetadataJob do
   let(:job_item) do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
-      allow(job_item).to receive(:close_version_if_needed!)
+      allow(job_item).to receive(:deposit_if_needed!)
       allow(job_item).to receive_messages(check_update_ability?: true, cocina_object:)
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe BulkActions::RefreshMetadataJob do
     expect(job_item).to have_received(:check_update_ability?)
     expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Refreshed metadata from FOLIO')
     expect(object_client).to have_received(:refresh_descriptive_metadata_from_ils)
-    expect(job_item).to have_received(:close_version_if_needed!)
+    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)

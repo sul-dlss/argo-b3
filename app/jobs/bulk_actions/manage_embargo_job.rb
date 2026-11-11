@@ -24,7 +24,7 @@ module BulkActions
 
         open_new_version_if_needed!(description: 'Created or updated embargo')
         cocina_model.save!(user_name: user_id, description: 'Created or updated embargo')
-        close_version_if_needed!
+        deposit_if_needed!
         success!(message: 'Embargo updated')
       end
 
