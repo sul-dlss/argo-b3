@@ -162,11 +162,11 @@ RSpec.describe 'APOs' do
     context 'when the version is not editable' do
       let(:editable) { false }
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         get "/apos/#{druid}/edit"
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('APO is not editable.')
+        expect(flash[:danger]).to eq('APO is not editable.')
       end
     end
 
@@ -177,7 +177,7 @@ RSpec.describe 'APOs' do
         get "/apos/#{druid}/edit"
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+        expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
       end
     end
   end
@@ -248,12 +248,12 @@ RSpec.describe 'APOs' do
     end
 
     context 'when the APO was changed since the form was loaded' do
-      it 'redirects to the edit page with a warning without saving' do
+      it 'redirects to the edit page with an error without saving' do
         patch "/apos/#{druid}", params: { apo: apo_params.merge(lock: 'stale-lock') }
 
         expect(response).to redirect_to("/apos/#{druid}/edit")
-        expect(flash[:warning]).to eq('This APO was changed since you opened it. ' \
-                                      'Review the current values and make your changes again.')
+        expect(flash[:danger]).to eq('This APO was changed since you opened it. ' \
+                                     'Review the current values and make your changes again.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -261,11 +261,11 @@ RSpec.describe 'APOs' do
     context 'when the version is not editable' do
       let(:version_service) { version_service_double(open?: false, openable?: false, closeable?: false) }
 
-      it 'redirects to the object page with a warning without saving' do
+      it 'redirects to the object page with an error without saving' do
         patch "/apos/#{druid}", params: { apo: apo_params }
 
         expect(response).to redirect_to("/objects/#{druid}")
-        expect(flash[:warning]).to eq('APO is not editable.')
+        expect(flash[:danger]).to eq('APO is not editable.')
         expect(Sdr::Repository).not_to have_received(:update)
       end
     end
@@ -293,7 +293,7 @@ RSpec.describe 'APOs' do
       get '/apos/new'
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
 
     it 'denies creating an APO' do

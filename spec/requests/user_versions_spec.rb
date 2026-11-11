@@ -90,14 +90,14 @@ RSpec.describe 'User versions' do
       post "/objects/#{druid}/user_versions/1/withdraw"
 
       expect(user_version_client).not_to have_received(:update)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
 
     it 'does not restore the user version' do
       post "/objects/#{druid}/user_versions/1/restore"
 
       expect(user_version_client).not_to have_received(:update)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
   end
 end

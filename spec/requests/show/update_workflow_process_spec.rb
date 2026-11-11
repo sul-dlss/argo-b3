@@ -41,14 +41,14 @@ RSpec.describe 'Update workflow process' do
       patch path, params: { status: 'skipped', version: '2' }
 
       expect(process_client).not_to have_received(:update)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
 
     it 'does not allow completing the process' do
       patch path, params: { status: 'completed', version: '2' }
 
       expect(process_client).not_to have_received(:update)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe 'Update workflow process' do
       patch path, params: { status: 'waiting', version: '2' }
 
       expect(process_client).not_to have_received(:update)
-      expect(flash[:warning]).to eq('You are not authorized to perform the requested action.')
+      expect(flash[:danger]).to eq('You are not authorized to perform the requested action.')
     end
   end
 

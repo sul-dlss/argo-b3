@@ -31,11 +31,11 @@ RSpec.describe 'Discard draft' do
         allow(Sdr::DiscardDraftService).to receive(:call).and_raise(Sdr::DiscardDraftService::NotDiscardableError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         delete discard_draft_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('This draft cannot be discarded.')
+        expect(flash[:danger]).to eq('This draft cannot be discarded.')
       end
     end
 
@@ -44,12 +44,12 @@ RSpec.describe 'Discard draft' do
         allow(Sdr::DiscardDraftService).to receive(:call).and_raise(Sdr::DiscardDraftService::ContentBusyError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         delete discard_draft_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Files for this object are being staged or discovered. ' \
-                                      'Try again when that has finished.')
+        expect(flash[:danger]).to eq('Files for this object are being staged or discovered. ' \
+                                     'Try again when that has finished.')
       end
     end
 

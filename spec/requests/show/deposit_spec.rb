@@ -41,12 +41,12 @@ RSpec.describe 'Deposit' do
         allow(Sdr::DepositDraftService).to receive(:call).and_raise(Sdr::DepositDraftService::ContentBusyError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         post deposit_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Files for this object are being staged or discovered. ' \
-                                      'Try again when that has finished.')
+        expect(flash[:danger]).to eq('Files for this object are being staged or discovered. ' \
+                                     'Try again when that has finished.')
       end
     end
 
@@ -55,11 +55,11 @@ RSpec.describe 'Deposit' do
         allow(Sdr::DepositDraftService).to receive(:call).and_raise(Sdr::DepositDraftService::NotDepositableError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         post deposit_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('This draft cannot be deposited.')
+        expect(flash[:danger]).to eq('This draft cannot be deposited.')
       end
     end
 
@@ -68,11 +68,11 @@ RSpec.describe 'Deposit' do
         allow(Sdr::DepositDraftService).to receive(:call).and_raise(Sdr::DepositDraftService::UnsavedChangesError)
       end
 
-      it 'redirects to managing files with a warning' do
+      it 'redirects to managing files with an error' do
         post deposit_object_path(druid)
 
         expect(response).to redirect_to(edit_content_path(druid))
-        expect(flash[:warning]).to eq('Files have unsaved changes. Save or deposit them from Manage files.')
+        expect(flash[:danger]).to eq('Files have unsaved changes. Save or deposit them from Manage files.')
       end
     end
 

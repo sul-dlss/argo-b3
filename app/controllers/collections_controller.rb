@@ -113,7 +113,7 @@ class CollectionsController < ApplicationController
   end
 
   def redirect_not_editable
-    redirect_to object_path(@druid), flash: { warning: t('edit.collections.edit.warnings.not_editable') }
+    redirect_to object_path(@druid), flash: { danger: t('edit.collections.edit.warnings.not_editable') }
   end
 
   # The lock changes whenever the object is updated, so a different (or missing) lock means that the object
@@ -123,7 +123,7 @@ class CollectionsController < ApplicationController
   end
 
   def redirect_stale
-    redirect_to edit_collection_path(@druid), flash: { warning: t('edit.collections.edit.warnings.stale') }
+    redirect_to edit_collection_path(@druid), flash: { danger: t('edit.collections.edit.warnings.stale') }
   end
 
   def set_edit_view

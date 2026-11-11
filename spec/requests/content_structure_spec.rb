@@ -94,11 +94,11 @@ RSpec.describe 'Content structure' do
     context 'when discovering files' do
       let(:content) { create(:content, druid:, lock: cocina_object.lock, mount_state: 'discovering') }
 
-      it 'does not delete and returns to the edit page with a warning' do
+      it 'does not delete and returns to the edit page with an error' do
         delete content_structure_path(content_id: content_token)
 
         expect(response).to redirect_to(edit_content_path(druid))
-        expect(flash[:warning]).to eq('Files are being discovered. Try again when discovery has finished.')
+        expect(flash[:danger]).to eq('Files are being discovered. Try again when discovery has finished.')
         expect(content.content_file_binaries.count).to eq(2)
         expect(content.content_file_sets.count).to eq(2)
       end

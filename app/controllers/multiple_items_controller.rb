@@ -24,7 +24,7 @@ class MultipleItemsController < ApplicationController
       redirect_to bulk_action_path(bulk_action)
     when 'invalid', 'failed'
       set_form_options(apply_apo_defaults_on_connect: false)
-      flash.now[:warning] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
+      flash.now[:danger] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
       render :new, status: :unprocessable_content
     else
       render :show

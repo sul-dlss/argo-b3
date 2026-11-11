@@ -65,7 +65,7 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
+        expect(flash[:danger]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
       end
     end
 
@@ -77,7 +77,7 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
+        expect(flash[:danger]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
         expect(Content.where(druid:)).to contain_exactly(content)
       end
     end
@@ -243,7 +243,7 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq(I18n.t('errors.not_authorized'))
+        expect(flash[:danger]).to eq(I18n.t('errors.not_authorized'))
       end
     end
   end
@@ -302,7 +302,7 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
+        expect(flash[:danger]).to eq(I18n.t('edit.contents.edit.warnings.staging'))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(StageFilesJob).not_to have_received(:perform_later)
       end
@@ -553,7 +553,7 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
+        expect(flash[:danger]).to eq(I18n.t('edit.items.edit.warnings.not_editable'))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(StageFilesJob).not_to have_received(:perform_later)
       end

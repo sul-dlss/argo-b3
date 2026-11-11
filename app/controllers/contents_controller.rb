@@ -54,7 +54,7 @@ class ContentsController < ContentsApplicationController
   end
 
   def redirect_not_editable(druid:)
-    redirect_to object_path(druid), flash: { warning: t('edit.items.edit.warnings.not_editable') }
+    redirect_to object_path(druid), flash: { danger: t('edit.items.edit.warnings.not_editable') }
   end
 
   # Staging may have moved the content to a new lock, so it is found by druid.
@@ -63,7 +63,7 @@ class ContentsController < ContentsApplicationController
   end
 
   def redirect_staging(druid:)
-    redirect_to object_path(druid), flash: { warning: t('edit.contents.edit.warnings.staging') }
+    redirect_to object_path(druid), flash: { danger: t('edit.contents.edit.warnings.staging') }
   end
 
   def redirect_staging_started(druid:)

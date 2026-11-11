@@ -44,11 +44,11 @@ RSpec.describe 'Item releases' do
 
       before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         get "/items/#{druid}/releases/new"
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Dark objects cannot be released.')
+        expect(flash[:danger]).to eq('Dark objects cannot be released.')
       end
     end
 
@@ -57,7 +57,7 @@ RSpec.describe 'Item releases' do
         get "/items/#{druid}/releases/new"
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq(I18n.t('errors.not_authorized'))
+        expect(flash[:danger]).to eq(I18n.t('errors.not_authorized'))
       end
     end
   end
@@ -115,12 +115,12 @@ RSpec.describe 'Item releases' do
 
       before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
 
-      it 'redirects to the object page with a warning without creating release tags' do
+      it 'redirects to the object page with an error without creating release tags' do
         post "/items/#{druid}/releases", params: { item_release_tags: release_params }
 
         expect(Sdr::Repository).not_to have_received(:create_release_tag)
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Dark objects cannot be released.')
+        expect(flash[:danger]).to eq('Dark objects cannot be released.')
       end
     end
 
@@ -130,7 +130,7 @@ RSpec.describe 'Item releases' do
 
         expect(Sdr::Repository).not_to have_received(:create_release_tag)
         expect(response).to redirect_to(root_path)
-        expect(flash[:warning]).to eq(I18n.t('errors.not_authorized'))
+        expect(flash[:danger]).to eq(I18n.t('errors.not_authorized'))
       end
     end
   end

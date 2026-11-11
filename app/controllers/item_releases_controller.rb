@@ -53,7 +53,7 @@ class ItemReleasesController < ApplicationController
   end
 
   def redirect_dark
-    flash[:warning] = t('edit.item_releases.errors.dark')
+    flash[:danger] = t('edit.item_releases.errors.dark')
     redirect_to object_path(@druid)
   end
 end

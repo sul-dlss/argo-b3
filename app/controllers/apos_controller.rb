@@ -75,7 +75,7 @@ class AposController < ApplicationController
   end
 
   def redirect_not_editable
-    redirect_to object_path(@druid), flash: { warning: t('edit.apos.edit.warnings.not_editable') }
+    redirect_to object_path(@druid), flash: { danger: t('edit.apos.edit.warnings.not_editable') }
   end
 
   # The lock changes whenever the object is updated, so a different (or missing) lock means that the object
@@ -85,7 +85,7 @@ class AposController < ApplicationController
   end
 
   def redirect_stale
-    redirect_to edit_apo_path(@druid), flash: { warning: t('edit.apos.edit.warnings.stale') }
+    redirect_to edit_apo_path(@druid), flash: { danger: t('edit.apos.edit.warnings.stale') }
   end
 
   # The saved title is shown, so that it is not replaced by an invalid submitted title.

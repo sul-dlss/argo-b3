@@ -31,11 +31,11 @@ RSpec.describe 'Purge object' do
         allow(Sdr::PurgeService).to receive(:purge).and_raise(Sdr::PurgeService::CannotPurgeError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         delete purge_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('This object cannot be purged because it has been submitted.')
+        expect(flash[:danger]).to eq('This object cannot be purged because it has been submitted.')
       end
     end
 
@@ -44,12 +44,12 @@ RSpec.describe 'Purge object' do
         allow(Sdr::PurgeService).to receive(:purge).and_raise(Sdr::PurgeService::ContentBusyError)
       end
 
-      it 'redirects to the object page with a warning' do
+      it 'redirects to the object page with an error' do
         delete purge_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('Files for this object are being staged or discovered. ' \
-                                      'Try again when that has finished.')
+        expect(flash[:danger]).to eq('Files for this object are being staged or discovered. ' \
+                                     'Try again when that has finished.')
       end
     end
 
