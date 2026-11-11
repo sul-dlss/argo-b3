@@ -30,10 +30,10 @@ RSpec.describe Contents::Validators::Agreement do
   end
 
   context 'when a resource has more than one file' do
-    before { create_resource(filepaths: ['agreement.pdf', 'agreement2.pdf']) }
+    before { create_resource(filepaths: ['agreement.pdf', 'agreement.docx']) }
 
-    it 'has an error' do
-      expect(result.errors).to eq(['Resource 1 must have exactly one file.'])
+    it 'has no errors or warnings' do
+      expect(result).to have_attributes(errors: [], warnings: [])
     end
   end
 
@@ -41,7 +41,7 @@ RSpec.describe Contents::Validators::Agreement do
     before { create_resource(filepaths: []) }
 
     it 'has an error' do
-      expect(result.errors).to eq(['Resource 1 must have exactly one file.'])
+      expect(result.errors).to eq(['Resource 1 has no files.'])
     end
   end
 
