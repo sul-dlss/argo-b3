@@ -80,6 +80,13 @@
   }
 }
 
+// Long filenames and MIME types wrap (at about 25 characters) so the file table fits within its card.
+.file-set-filename {
+  min-width: 25ch;
+  overflow-wrap: anywhere;
+  width: 30%;
+}
+
 @mixin object-type-colors($color, $color-rgb) {
   .object-type-bg {
     background-color: $color;
