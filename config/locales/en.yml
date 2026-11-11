@@ -317,11 +317,13 @@ en:
           object_type: "File (resource per file)"
           geo: "Geo (single resource)"
           image: "Image (resource per image)"
+          media: "Media (resource per audio/video file)"
           three_dimensional: "3D (resource for model)"
           file_set_per_file: "Default (resource per file)"
         populator_reasons:
           hierarchical_filepaths: "the files are organized into folders"
           no_images: "there are no image files"
+          no_media: "there are no audio or video files"
           no_models: "there are no 3D model files"
           no_pdfs: "there are no PDF files"
       tabs:

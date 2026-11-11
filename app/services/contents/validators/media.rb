@@ -34,8 +34,10 @@ module Contents
         name = resource_name_for(content_file_set:, index:)
         case content_file_set.file_set_type
         when *MEDIA_FILE_SET_TYPES
+          # An unpublished MP4/M4A is also a source, since an access copy can be generated from it.
           validate_one_published(content_file_set:, name:, mime_types: MP4_MIME_TYPES, description: 'MP4/M4A',
-                                 source_mime_types: SOURCE_MIME_TYPES, source_description: 'MP3, MOV, MKV, or WAV')
+                                 source_mime_types: SOURCE_MIME_TYPES + MP4_MIME_TYPES,
+                                 source_description: 'MP3, MOV, MKV, WAV, or unpublished MP4/M4A')
         when FileSetTypes::IMAGE
           # An image Resource has one published JP2 (or a TIFF, PNG, or JPEG) and at most one TIFF, PNG, or JPEG.
           validate_image_resource(content_file_set:, name:)

@@ -79,6 +79,8 @@ A named group of users (e.g., `sdr:map-staff`) managed outside Argo. Permissions
 
 ### Impersonation
 An admin temporarily acting with the permissions of one or more chosen Workgroups instead of their own, to see what members of those Workgroups can see and do.
+### File Flag
+An underscore-separated token in an SMPL filename that describes the file rather than the content (e.g., `pm` preservation master, `sl` service low, `cap` caption, `script` transcript). Files of the same recording share a filename once role and processing flags (`pm`, `sh`, `sl`, `sp`) and the `thumb`, `cap`, and `script` flags are removed, along with a caption's language tag before `cap` (e.g., `_es_cap`); other flags (side, part, track, etc.) distinguish recordings.
 
 ### Pin
 A user's bookmark of an object, search, or Tag, listed on that user's dashboard for quick access. Pins are personal and not visible to other users.

@@ -64,16 +64,22 @@ module Contents
 
       # Labels are numbered per file set type, e.g., Page 1, Page 2, Object 1. When appending,
       # numbering continues from the file sets that already exist.
-      def label_for(file_set_type)
+      # @param [String] name the name to number, e.g., Video file; defaults to the file set type
+      def label_for(file_set_type, name: file_set_type.capitalize)
         file_set_type_counts[file_set_type] += 1
-        "#{file_set_type.capitalize} #{file_set_type_counts[file_set_type]}"
+        "#{name} #{file_set_type_counts[file_set_type]}"
       end
 
       def file_set_type_counts
-        @file_set_type_counts ||= content.content_file_sets.reorder(nil).group(:file_set_type).count
-                                         .tap do |counts|
+        @file_set_type_counts ||= numbered_content_file_sets.reorder(nil).group(:file_set_type).count
+                                                            .tap do |counts|
           counts.default = 0
         end
+      end
+
+      # @return [ActiveRecord::Relation<ContentFileSet>] the existing file sets that label numbering continues from
+      def numbered_content_file_sets
+        content.content_file_sets
       end
     end
   end

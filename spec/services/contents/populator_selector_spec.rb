@@ -17,7 +17,7 @@ RSpec.describe Contents::PopulatorSelector do
   end
 
   context 'when the content type has no populator of its own' do
-    let(:cocina_type) { Cocina::Models::ObjectType.media }
+    let(:cocina_type) { Cocina::Models::ObjectType.webarchive_seed }
 
     it 'selects the fallback populator without reasons' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::FileSetPerFile,
@@ -151,6 +151,30 @@ RSpec.describe Contents::PopulatorSelector do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Document,
                                         actual_populator: Contents::Populators::FileSetPerFile,
                                         reasons: [:no_pdfs])
+    end
+  end
+
+  context 'when the content type is media and there is an audio file' do
+    let(:cocina_type) { Cocina::Models::ObjectType.media }
+
+    before do
+      create(:content_file_binary, content:, filepath: 'audio.m4a', mime_type: 'audio/mp4')
+    end
+
+    it 'selects the media populator without reasons' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Media,
+                                        actual_populator: Contents::Populators::Media,
+                                        reasons: [])
+    end
+  end
+
+  context 'when the content type is media and there are no audio or video files' do
+    let(:cocina_type) { Cocina::Models::ObjectType.media }
+
+    it 'falls back to the file set per file populator' do
+      expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Media,
+                                        actual_populator: Contents::Populators::FileSetPerFile,
+                                        reasons: [:no_media])
     end
   end
 
