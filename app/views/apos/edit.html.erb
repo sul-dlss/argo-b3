@@ -9,9 +9,8 @@
 
     <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-field') %>
 
-    <div class="d-flex align-items-center mt-5">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: object_path(@druid), variant: :link, classes: 'me-3') %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.edit.buttons.deposit')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

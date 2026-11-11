@@ -10,10 +10,8 @@
   <%= form_with model: @item_release_tags_form, url: item_releases_path(@druid), class: 'b3-form' do |form| %>
     <%= render Edit::ReleaseTagsComponent.new(form:, follow_collection_disabled_fields: @follow_collection_disabled_fields) %>
 
-    <div class="mt-4">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.item_releases.new.buttons.cancel'), link: object_path(@druid),
-                                                                      variant: :link, classes: 'me-3') %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_releases.new.buttons.save')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

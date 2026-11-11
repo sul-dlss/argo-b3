@@ -15,6 +15,7 @@ RSpec.describe BulkActions::FormComponent, type: :component do
 
     expect(page).to have_button('Submit', type: 'submit')
     expect(page).to have_link('Cancel', href: '/bulk_actions/new')
+    expect(page).to have_css('a:first-child + button[type="submit"]:last-child', text: 'Submit')
   end
 
   it 'sets the page title' do

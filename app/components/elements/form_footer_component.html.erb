@@ -1,0 +1,4 @@
+<%= tag.div class: classes do %>
+  <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link) if cancel_path %>
+  <%= content %>
+<% end %>

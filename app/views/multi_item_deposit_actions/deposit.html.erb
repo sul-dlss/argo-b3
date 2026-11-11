@@ -29,12 +29,11 @@
       <%= render MultiItemDeposit::DepositErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
 
-    <div class="mt-5">
-      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: t('edit.multi_item_deposits.edit.buttons.cancel'), link: root_path, variant: :link, classes: 'me-3') %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::PREVIOUS_VALUE, variant: :'outline-primary', classes: 'me-2') do %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: root_path) do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::PREVIOUS_VALUE, variant: :'outline-primary') do %>
         <%= left_arrow_icon(aria: { hidden: true }) %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
       <% end %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.deposit')) %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>
