@@ -14,7 +14,7 @@
     <% component.with_file(path_parts: content_file_binary.path_parts, label: content_file_binary.filename) do |row| %>
       <% row.with_cell(classes: 'text-nowrap') { content_file_binary.mime_type } %>
       <% row.with_cell(classes: 'text-nowrap') { helpers.number_to_human_size(content_file_binary.size) if content_file_binary.size } %>
-      <% row.with_cell { render Show::TechnicalMetadataToggleComponent.new(content_file_binary:, druid_token:) } %>
+      <% row.with_cell { render Show::TechnicalMetadataToggleComponent.new(content_file_binary:, druid_token:, staged: staged?(content_file_binary)) } %>
     <% end %>
   <% end %>
 <% end %>

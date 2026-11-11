@@ -49,6 +49,31 @@ RSpec.describe Show::ContentFileBinariesComponent, type: :component do
     end
   end
 
+  context 'when a deposited file is staged in the open version' do
+    let(:staged_filepath) { StagingSupport.staging_filepath(druid: 'druid:bc123df4567', filepath: 'image2.tif') }
+
+    before do
+      content_file_set = create(:content_file_set, content:)
+      %w[image1.tif image2.tif].each do |filepath|
+        content_file_binary = create(:content_file_binary, content:, filepath:, file_location: 'deposited')
+        create(:content_file, content_file_set:, content_file_binary:, preserve: true)
+      end
+      FileUtils.mkdir_p(File.dirname(staged_filepath))
+      FileUtils.touch(staged_filepath)
+    end
+
+    after do
+      FileUtils.rm_rf(StagingSupport.staging_content_path(druid: 'druid:bc123df4567'))
+    end
+
+    it 'shows the technical metadata toggle only for the file that is not staged' do
+      render_inline(component)
+
+      expect(page).to have_button('View technical metadata for image1.tif')
+      expect(page).to have_no_button('View technical metadata for image2.tif')
+    end
+  end
+
   context 'when the content has no file binaries' do
     it 'renders the empty message' do
       render_inline(component)

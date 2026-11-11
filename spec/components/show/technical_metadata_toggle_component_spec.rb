@@ -18,6 +18,22 @@ RSpec.describe Show::TechnicalMetadataToggleComponent, type: :component do
     end
   end
 
+  context 'when the file binary is deposited and preserved but still staged' do
+    let(:component) { described_class.new(content_file_binary:, druid_token: 'abc123token', staged: true) }
+    let(:content_file_binary) { create(:content_file_binary, content:, file_location: 'deposited') }
+
+    before do
+      create(:content_file, content_file_set: create(:content_file_set, content:), content_file_binary:, preserve: true)
+    end
+
+    it 'does not render' do
+      render_inline(component)
+
+      expect(page).to have_no_button
+      expect(page).to have_no_css('turbo-frame')
+    end
+  end
+
   context 'when the file binary is deposited and preserved' do
     let(:content_file_binary) do
       create(:content_file_binary, content:, filepath: 'folder1/image1.tif', file_location: 'deposited')

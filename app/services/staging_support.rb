@@ -69,6 +69,16 @@ class StagingSupport
     locations.find { |staging_location| staged_files_in?(druid:, staging_location:) }
   end
 
+  # Files stay staged until accessioning completes, so a staged file has not yet been deposited.
+  # @param [Array<String>] filepaths the filepaths to check
+  # @return [Set<String>] those of the filepaths that are staged for the druid
+  def self.staged_filepaths(druid:, filepaths:)
+    staging_location = staged_location(druid:)
+    return Set.new if staging_location.nil?
+
+    filepaths.select { |filepath| File.file?(staging_filepath(druid:, filepath:, staging_location:)) }.to_set
+  end
+
   # Moves the druid's staged files from the deposit staging location to the assembly location (see
   # stages_to_assembly?), replacing any files already in the assembly location.
   def self.move_to_assembly(druid:)
