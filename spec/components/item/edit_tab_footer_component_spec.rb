@@ -39,6 +39,9 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
       expect(page).to have_button('Save as draft')
       expect(page).to have_css('button[type="submit"][form="tabbed_form"][name="commit"][value="deposit"]',
                                text: 'Deposit')
+      # Deposit is next to Previous, before the right-aligned draft buttons.
+      expect(page.all('button').map { |button| button.text.strip })
+        .to eq(['Previous', 'Deposit', 'Save draft and edit files', 'Save as draft'])
     end
   end
 
