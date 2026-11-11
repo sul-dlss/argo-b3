@@ -176,6 +176,24 @@ RSpec.describe Contents::Validator do
     end
   end
 
+  context 'when there are dark published files' do
+    let(:dark_published_warning) { a_string_starting_with('Files are dark but published') }
+
+    before { ContentFile.update_all(view: 'dark', download: 'none') } # rubocop:disable Rails/SkipsModelValidations
+
+    it 'has a warning' do
+      expect(result.warnings).to include(dark_published_warning)
+    end
+
+    context 'with the agreement content type' do
+      let(:content_type) { Cocina::Models::ObjectType.agreement }
+
+      it 'has no warning' do
+        expect(result.warnings).not_to include(dark_published_warning)
+      end
+    end
+  end
+
   context 'when dark' do
     let(:access) { { view: 'dark', download: 'none' } }
     let(:file_name) { "Resource 1 (File 1) file #{content.content_files.first.filepath}" }
