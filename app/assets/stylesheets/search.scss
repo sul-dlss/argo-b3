@@ -41,3 +41,24 @@ a[aria-expanded="false"] {
 .object-type-pill {
   min-width: min-content;
 }
+
+// Fixed layout so every workflow grid table has the same width, whatever its content.
+// .table-data outranks the gem's nowrap on table-data headers.
+.workflow-grid-table.table-data {
+  min-width: 46rem; // keeps room for the description column
+  table-layout: fixed;
+
+  tbody th,
+  td {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .workflow-grid-process-column {
+    width: 12rem;
+  }
+
+  .workflow-grid-count-column {
+    width: 6rem;
+  }
+}
