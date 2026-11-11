@@ -16,6 +16,8 @@ RSpec.describe 'Showing bulk action' do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('My bulk action')
+      expect(Capybara.string(response.body))
+        .to have_title("Bulk action #{bulk_action.id}: My bulk action | Argo B3", exact: true)
     end
   end
 

@@ -1,4 +1,6 @@
-<%= render Layout::ContainerComponent.new(heading: 'Impersonate') do %>
+<%= page_title(t('admin.impersonation.heading')) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('admin.impersonation.heading')) do %>
 
   <%= form_with url: admin_impersonate_path, method: :patch, scope: :impersonation do |form| %>
     <%= render Admin::ImpersonationWorkgroupsComponent.new(form:, workgroup_columns: @workgroup_columns, selected_workgroups: @selected_workgroups) %>

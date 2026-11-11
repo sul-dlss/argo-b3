@@ -38,6 +38,7 @@ RSpec.describe 'Admin object permissions' do
         expect(Sdr::Repository).to have_received(:find_solr).with(druid:)
 
         expect(rendered_page).to have_css('h1', text: 'Edit APO permissions')
+        expect(rendered_page).to have_title('Edit APO permissions – My APO | Argo B3', exact: true)
         expect(rendered_page).to have_link('← APO', exact: true, href: '/objects/druid:bc123df4567')
         expect(rendered_page).to have_text('My APO')
 

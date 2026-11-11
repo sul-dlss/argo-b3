@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # Sets the page title (the layout appends the product name); name identifies the object or record when the h1 doesn't.
+  def page_title(text, name: nil)
+    content_for(:title, [text, name.presence].compact.join(' – '))
+  end
+
+  def document_title
+    product_name = t('layouts.application.product_name')
+    content_for?(:title) ? safe_join([content_for(:title), product_name], ' | ') : product_name
+  end
+
   def facet_label(form_field)
     I18n.t("search.facets.#{form_field}", default: form_field.to_s.humanize.singularize)
   end

@@ -16,4 +16,12 @@ RSpec.describe BulkActions::FormComponent, type: :component do
     expect(page).to have_button('Submit', type: 'submit')
     expect(page).to have_link('Cancel', href: '/bulk_actions/new')
   end
+
+  it 'sets the page title' do
+    # render_inline discards its view context afterwards, so hold on to it.
+    view_context = vc_test_view_context
+    render_inline(component)
+
+    expect(view_context.content_for(:title)).to eq('Reindex')
+  end
 end

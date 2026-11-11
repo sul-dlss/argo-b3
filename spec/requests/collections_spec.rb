@@ -167,6 +167,7 @@ RSpec.describe 'Collections' do
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
+      expect(page).to have_title('Edit and deposit collection – My collection | Argo B3', exact: true)
       expect(page).to have_css('h1', text: 'Edit and deposit collection')
       expect(page).to have_css('h1 + p', text: 'My collection')
       expect(page).to have_field('FOLIO Instance HRID', with: 'a12345')

@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 en:
+  layouts:
+    application:
+      product_name: "Argo B3"
   time:
     formats:
       date_only: "%Y-%m-%d"
@@ -600,6 +603,10 @@ en:
         description: "Your deposit has been submitted and is in progress. If you have errors below, go to the items' pages to address."
       edit:
         title: "Multi-item deposit"
+        page_titles:
+          discovery: "Multi-item deposit (Discovery)"
+          structure: "Multi-item deposit (Structure)"
+          deposit: "Multi-item deposit (Deposit)"
         buttons:
           build_structure: "Check files"
           cancel: "Cancel"
@@ -782,8 +789,13 @@ en:
       toasts:
         errors: 'Deposit check found errors'
         started: 'Deposit started'
+  dashboard:
+    heading: 'Argo dashboard'
+  reports:
+    title: 'Custom report'
   bulk_actions:
     label: 'Bulk action'
+    new_heading: 'New bulk actions'
     menu: 'Bulk actions menu'
     history: 'Bulk actions'
     cancel: 'Cancel'
@@ -800,10 +812,12 @@ en:
       empty: 'No multi-item deposits yet'
   admin:
     impersonation:
+      heading: 'Impersonate'
       start: "You are now impersonating the selected workgroups."
       stop: "You have stopped impersonating."
       invalid: "You must select workgroups to enable impersonation."
     workgroup_permissions:
+      heading: 'Workgroup permissions'
       buttons:
         delete: 'Delete permission for %{target}'
       toasts:

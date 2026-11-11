@@ -1,3 +1,5 @@
+<%= page_title(t('edit.multiple_items.new.title')) %>
+
 <%= render Layout::ContainerComponent.new(heading: t('edit.multiple_items.new.title')) do %>
   <%= form_with(model: @items_registration_form, url: multiple_items_path, class: 'b3-form',
                 data: { controller: 'content-type-dependent' }) do |form| %>

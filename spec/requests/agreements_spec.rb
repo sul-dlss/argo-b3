@@ -96,6 +96,7 @@ RSpec.describe 'Agreements' do
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
+      expect(page).to have_title('Edit agreement – My agreement | Argo B3', exact: true)
       expect(page).to have_css('h1', text: 'Edit agreement')
       expect(page).to have_css('h1 + p', text: 'My agreement')
       expect(page).to have_css('[role="tab"]', text: 'Agreement details')

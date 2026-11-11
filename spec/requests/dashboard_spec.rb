@@ -24,6 +24,7 @@ RSpec.describe 'Dashboard' do
       get root_path
 
       expect(response).to have_http_status(:ok)
+      expect(rendered_page).to have_title('Argo dashboard | Argo B3', exact: true)
     end
 
     it 'labels each navigation landmark distinctly' do

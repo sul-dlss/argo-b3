@@ -1,4 +1,6 @@
-<%= render Layout::ContainerComponent.new(heading: 'Custom report', data: { controller: 'report' }) do %>
+<%= page_title(t('reports.title')) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('reports.title'), data: { controller: 'report' }) do %>
   <%= form_with model: @report_form, url: download_report_path do |form| %>
     <%= render BulkActions::SelectSourceComponent.new(
           form:, search_form: @last_search_form, total_results: @total_results,

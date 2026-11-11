@@ -14,6 +14,10 @@ module BulkActions
 
     delegate :label, to: :bulk_action_config
 
+    def before_render
+      helpers.page_title(label)
+    end
+
     def with_close_version?
       @with_close_version
     end

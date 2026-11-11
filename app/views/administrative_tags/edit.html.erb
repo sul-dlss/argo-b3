@@ -1,3 +1,5 @@
+<%= page_title(t('edit.administrative_tags.edit.title'), name: @title) %>
+
 <%= render Layout::ContainerComponent.new(heading: t('edit.administrative_tags.edit.title'), subtitle: @title) do %>
 
   <%= form_with model: @administrative_tags_form, url: object_tags_path(@druid), method: :patch, class: 'b3-form' do |form| %>

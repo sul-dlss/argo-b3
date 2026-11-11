@@ -1,4 +1,6 @@
-<%= render Layout::ContainerComponent.new(heading: 'New bulk actions') do %>
+<%= page_title(t('bulk_actions.new_heading')) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('bulk_actions.new_heading')) do %>
   <div class="row mt-2 gy-3">
     <%= render BulkActions::ListSectionComponent.new(
           label: 'Perform actions',

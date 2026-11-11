@@ -166,6 +166,9 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
+        expect(rendered_page).to have_title('Multi-item deposit – ' \
+                                            "Multi-item deposit #{multi_item_deposit_action.id}: My deposit | Argo B3",
+                                            exact: true)
         expect(rendered_page).to have_css('div[data-controller="scheduled-refresh"]')
         expect(rendered_page).to have_css('[role="status"]', exact_text: 'Total: 2; Registered: 1; Deposited: 1')
 
@@ -227,6 +230,9 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', text: "Multi-item deposit #{multi_item_deposit_action.id}: My deposit")
+        expect(rendered_page).to have_title('Multi-item deposit (Discovery) – ' \
+                                            "Multi-item deposit #{multi_item_deposit_action.id}: My deposit | Argo B3",
+                                            exact: true)
         expect(rendered_page).to have_field('Describe this deposit', with: 'My deposit')
         expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Discover files and check manifest')
         expect(rendered_page).to have_css('legend label.form-label:not(.h2)',
@@ -341,6 +347,8 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(rendered_page).to have_css('h1', text: 'Multi-item deposit')
         expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
+        expect(rendered_page).to have_title('Multi-item deposit (Structure) – ' \
+                                            "Multi-item deposit #{multi_item_deposit_action.id} | Argo B3", exact: true)
         expect(rendered_page).to have_no_field('Mount path')
         expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Configure deposit and check files')
         expect(rendered_page).to have_link(
@@ -488,6 +496,9 @@ RSpec.describe 'Multi-item deposit actions' do
           expect(response).to have_http_status(:ok)
           expect(rendered_page).to have_css('li[aria-current="step"]', text: 'Deposit')
           expect(rendered_page).to have_css('p', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
+          expect(rendered_page).to have_title('Multi-item deposit (Deposit) – ' \
+                                              "Multi-item deposit #{multi_item_deposit_action.id} | Argo B3",
+                                              exact: true)
           expect(rendered_page).to have_field('Version description', with: 'Initial version', disabled: true)
           expect(rendered_page).to have_text('Version description is automatically set for initial deposits.')
           expect(rendered_page).to have_link('Cancel', href: root_path)
@@ -547,6 +558,9 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css(
           '[role="status"]', exact_text: "Processing Multi-item deposit #{multi_item_deposit_action.id}: My deposit..."
         )
+        expect(rendered_page).to have_title('Multi-item deposit – ' \
+                                            "Multi-item deposit #{multi_item_deposit_action.id}: My deposit | Argo B3",
+                                            exact: true)
         expect(rendered_page).to have_no_field('Describe this deposit')
       end
     end

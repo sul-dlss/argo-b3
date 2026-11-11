@@ -1,3 +1,5 @@
+<%= page_title(t('edit.apos.new.title')) %>
+
 <%= render Layout::ContainerComponent.new(heading: t('edit.apos.new.title')) do %>
   <%= form_with(model: @apo_form, url: apos_path, class: 'b3-form') do |form| %>
     <%= render Edit::ApoFieldsComponent.new(form:, agreement_options: @agreement_options) %>
