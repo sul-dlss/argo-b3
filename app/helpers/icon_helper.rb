@@ -51,6 +51,10 @@ module IconHelper
     icon(icon_classes: %w[bi bi-x-square], **)
   end
 
+  def check_icon(**)
+    icon(icon_classes: %w[bi bi-check-lg], **)
+  end
+
   def in_progress_icon(**)
     icon(icon_classes: %w[bi bi-clock-history], **)
   end

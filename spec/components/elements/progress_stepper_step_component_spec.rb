@@ -12,7 +12,7 @@ RSpec.describe Elements::ProgressStepperStepComponent, type: :component do
       render_inline(component)
 
       step = page.find('li.progress-stepper-step-completed:not([aria-current])')
-      expect(step).to have_css('.progress-stepper-circle .bi-check-lg')
+      expect(step).to have_css('.progress-stepper-circle i.bi.bi-check-lg')
       expect(step).to have_css('.progress-stepper-status', exact_text: 'Completed')
     end
   end
