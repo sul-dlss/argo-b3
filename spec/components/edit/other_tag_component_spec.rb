@@ -10,7 +10,8 @@ RSpec.describe Edit::OtherTagComponent, type: :component do
   it 'renders a field for the tag that suggests other tags' do
     render_inline(component)
 
-    expect(page).to have_field('item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo')
+    expect(page).to have_field('item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo',
+                                                                      placeholder: 'Start typing a tag...')
     expect(page).to have_css('label.visually-hidden', text: 'Tag')
     expect(page).to have_css('input[name="item[other_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \

@@ -438,6 +438,29 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
+    it 'enqueues a register form bulk action with tags entered all at once but not added' do
+      visit_new_multiple_item
+
+      fill_in_registration_settings
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nTicket : ABC-123"
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_toast("#{bulk_action_label} submitted")
+
+      expect(BulkActions::RegisterFormJob).to have_been_enqueued.with(
+        bulk_action: BulkAction.last,
+        items_registration_form: an_object_having_attributes(
+          tags: ['Registered By : mjgiarlo', 'Ticket : ABC-123']
+        )
+      )
+    end
+
     it 'enqueues a register form bulk action with tags entered all at once' do
       visit_new_multiple_item
 

@@ -10,7 +10,8 @@ RSpec.describe Edit::TicketTagComponent, type: :component do
   it 'renders a field for the tag that suggests ticket tags' do
     render_inline(component)
 
-    expect(page).to have_field('item[ticket_tags_attributes][0][tag]', with: 'ARGO-123')
+    expect(page).to have_field('item[ticket_tags_attributes][0][tag]', with: 'ARGO-123',
+                                                                       placeholder: 'Start typing a ticket...')
     expect(page).to have_css('label.visually-hidden', text: 'Ticket')
     expect(page).to have_css('input[name="item[ticket_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \
