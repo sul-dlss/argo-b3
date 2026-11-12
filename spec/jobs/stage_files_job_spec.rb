@@ -45,6 +45,7 @@ RSpec.describe StageFilesJob do
 
     allow(Contents::ExternalIdentifierMinter).to receive(:call)
     allow(Contents::Analyzer).to receive(:call)
+    allow(Contents::StacksStager).to receive(:call)
     allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
     allow(CocinaObjectMutators::StructuralMutator).to receive(:call)
       .with(cocina_object:, content:).and_return(mutated_cocina_object)
@@ -103,6 +104,37 @@ RSpec.describe StageFilesJob do
       expect(mount_content_file_binary.reload.file_location).to eq('stage')
       expect(globus_content_file_binary.reload.file_location).to eq('stage')
       expect(deposited_content_file_binary.reload.file_location).to eq('deposited')
+    end
+
+    it 'stages deposited files that need preserving from Stacks' do
+      job.perform(content:, user:)
+
+      expect(Contents::StacksStager).to have_received(:call).with(content:, staging_location: Settings.staging_location)
+    end
+
+    context 'when staging from Stacks fails' do
+      before do
+        allow(Contents::StacksStager).to receive(:call)
+          .and_raise(Contents::StacksStager::Error.new(filepaths: ['image2.tif', 'image3.tif']))
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'does not update SDR and marks the content as failed staging' do
+        job.perform(content:, user:)
+
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.staging_state).to eq('staging_failed')
+      end
+
+      it 'broadcasts an error toast naming the files' do
+        job.perform(content:, user:)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+          .with('notifications', user, target: 'toast-container',
+                                       html: a_string_including('Staging failed',
+                                                                'Could not copy image2.tif, image3.tif from Stacks',
+                                                                Settings.support_email))
+      end
     end
 
     context 'when an attached content file binary is not associated with a content file' do

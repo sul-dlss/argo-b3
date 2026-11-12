@@ -94,7 +94,7 @@ module StructuralCsv
     end
 
     def content_file_binaries_by_filepath
-      @content_file_binaries_by_filepath ||= content.content_file_binaries.includes(:content_files).index_by(&:filepath)
+      @content_file_binaries_by_filepath ||= content.content_file_binaries.index_by(&:filepath)
     end
 
     # ContentFileSet errors are reported on the first row of the file set; ContentFile errors on the file's row.
