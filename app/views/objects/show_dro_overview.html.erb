@@ -56,8 +56,8 @@
     <% end %>
   <% end %>
 
-  <div class="use-access-copyright-section d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
-    <div class="flex-fill">
+  <%= render Show::BoxRowComponent.new(classes: 'use-access-copyright-section px-xl-5 mt-4 mb-5') do %>
+    <div>
       <%= render SdrViewComponents::Elements::CardComponent.new do |card| %>
         <% card.with_body do %>
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: 'Use and reproduction') %>
@@ -67,7 +67,7 @@
         <% end %>
       <% end %>
     </div>
-    <div class="show-details-box flex-fill">
+    <div>
       <%= render SdrViewComponents::Elements::CardComponent.new do |card| %>
         <% card.with_body do %>
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'card-title', text: 'Copyright') %>
@@ -77,5 +77,5 @@
         <% end %>
       <% end %>
     </div>
-  </div>
+  <% end %>
 <% end %>

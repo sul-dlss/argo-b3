@@ -21,7 +21,7 @@ When sources disagree, the higher one wins:
 
 ## Consistency
 
-- **CONS-1 SHOULD** A function similar to one Argo B3 already has uses the same UI: the same components, layout, element choices, and wording. Before designing, find the existing UI for the nearest function (e.g., a new bulk action follows the other bulk action forms; a new history list follows the bulk action and Multi-Item Deposit history lists; choosing items from the last search or a druid list reuses `BulkActions::SelectSourceComponent`; a row of counts or statuses reuses `Show::BoxComponent`, as on the object and bulk action show pages). Explain any difference in review.
+- **CONS-1 SHOULD** A function similar to one Argo B3 already has uses the same UI: the same components, layout, element choices, and wording. Before designing, find the existing UI for the nearest function (e.g., a new bulk action follows the other bulk action forms; a new history list follows the bulk action and Multi-Item Deposit history lists; choosing items from the last search or a druid list reuses `BulkActions::SelectSourceComponent`; a row of counts or statuses reuses `Show::BoxComponent` in a `Show::BoxRowComponent`, as on the object and bulk action show pages). Explain any difference in review.
 - **CONS-2 SHOULD** Reuse the existing UI by sharing its component rather than copying its markup, so the two stay alike as they change.
 - **CONS-3** Consistency never overrides a written rule: if the existing UI breaks this standard, follow the standard, and fix the existing UI where practical. If a new design improves on an existing pattern, update the existing UI too where practical.
 
