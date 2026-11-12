@@ -25,6 +25,7 @@
       <%= render SdrViewComponents::Elements::ButtonComponent.new(
             label: t('edit.items.fields.catalog_record_id.retrieve_title'),
             variant: :'outline-primary',
+            classes: 'text-nowrap flex-shrink-0',
             data: { catalog_title_target: 'button', action: 'catalog-title#retrieve' }
           ) %>
     </div>

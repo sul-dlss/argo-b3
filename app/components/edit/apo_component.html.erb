@@ -13,6 +13,7 @@
       <%= render SdrViewComponents::Elements::ButtonComponent.new(
             label: t('edit.items.fields.apo_druid.apply_defaults'),
             variant: :'outline-primary',
+            classes: 'text-nowrap flex-shrink-0',
             data: { action: 'apo-defaults#apply' }
           ) %>
     </div>
