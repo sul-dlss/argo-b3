@@ -727,11 +727,12 @@ en:
         status: 'Status'
       total: 'Total'
     discovery_summary:
+      completed: 'Completed %{completed_at}'
       content_types: 'Content types'
+      download_report: 'Download report'
       error_count: '# of errors'
       heading: 'Summary'
       item_count: '# of items'
-      started: 'Started %{started_at}'
     error_details:
       label: 'Error details'
       headers:

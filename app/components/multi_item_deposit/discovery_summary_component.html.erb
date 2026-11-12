@@ -2,7 +2,10 @@
 <div class="object-type-multi-item-deposit mb-4">
   <div class="d-flex flex-wrap align-items-baseline column-gap-4 mb-2">
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: t('multi_item_deposit.discovery_summary.heading'), classes: 'mb-0') %>
-    <span><%= t('multi_item_deposit.discovery_summary.started', started_at:) %></span>
+    <span><%= t('multi_item_deposit.discovery_summary.completed', completed_at:) %></span>
+    <%= link_to report_path, download: true do %>
+      <%= helpers.download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('multi_item_deposit.discovery_summary.download_report') %>
+    <% end %>
   </div>
   <%= render Show::BoxRowComponent.new do %>
     <div class="show-box">

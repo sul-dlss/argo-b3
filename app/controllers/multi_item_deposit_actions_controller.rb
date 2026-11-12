@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 # Controller for Multi-Item Deposits.
-class MultiItemDepositActionsController < ApplicationController
+# It drives the deposit's three steps and their downloads, which keeps it slightly over the class length limit.
+class MultiItemDepositActionsController < ApplicationController # rubocop:disable Metrics/ClassLength
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
   PER_PAGE = 20
 
-  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template]
+  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template discovery_report]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -83,6 +84,20 @@ class MultiItemDepositActionsController < ApplicationController
 
     send_data StructuralCsv::Template.as_csv(multi_item_deposit_action: @multi_item_deposit_action),
               type: 'text/csv', filename: MultiItemDepositAction::STRUCTURAL_METADATA_CSV_FILENAME
+  end
+
+  # The report of the results of checking the manifest (discovery).
+  def discovery_report
+    authorize! @multi_item_deposit_action, to: :edit?
+
+    # The page links to the report only once checking has completed, but a link in a stale tab may be followed
+    # while checking is rerunning, when the report would be incomplete. The edit page then shows checking in progress.
+    if @multi_item_deposit_action.discovery_completed_at.blank?
+      return redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    end
+
+    send_data DiscoveryReportCsv::Export.as_csv(multi_item_deposit_action: @multi_item_deposit_action),
+              type: 'text/csv', filename: "multi_item_deposit_#{@multi_item_deposit_action.id}_discovery_report.csv"
   end
 
   private

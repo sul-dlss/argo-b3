@@ -23,11 +23,20 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       create(:item_deposit_action, content_type: 'map', discovery_errors: ['Object not found'])
     end
 
-    it 'renders the heading and when checking the manifest started' do
+    it 'renders the heading and when checking the manifest completed' do
       render_inline(component)
 
       expect(page).to have_css('h3', text: 'Summary')
-      expect(page).to have_text('Started 2026-06-26 23:08:56 PT')
+      expect(page).to have_text('Completed 2026-06-26 23:10:00 PT')
+      expect(page).to have_no_text('Started')
+    end
+
+    it 'renders a link to download the report' do
+      render_inline(component)
+
+      expect(page).to have_link('Download report',
+                                href: "/multi_item_deposit_actions/#{multi_item_deposit_action.id}/discovery_report")
+      expect(page).to have_css('a[download] i[aria-hidden="true"]')
     end
 
     it 'renders the number of items' do
@@ -55,10 +64,9 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       end
     end
 
-    it 'does not render a report download or structural metadata' do
+    it 'does not render structural metadata' do
       render_inline(component)
 
-      expect(page).to have_no_link('Download report')
       expect(page).to have_no_text('Structural metadata')
     end
   end
@@ -74,6 +82,12 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       expect(page).to have_css('.card.text-success', text: '# of errors') do |box|
         box.has_css?('.card-text p', exact_text: '0')
       end
+    end
+
+    it 'renders a link to download the report' do
+      render_inline(component)
+
+      expect(page).to have_link('Download report')
     end
   end
 
