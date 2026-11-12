@@ -15,7 +15,7 @@ RSpec.describe Dashboard::MultiItemDepositsTableComponent, type: :component do
       render_inline(component)
 
       table = page.find("table#multi-item-deposits-table[aria-label='Multi-item deposits']")
-      expect(table).to have_css('caption', text: 'Multi-item deposits')
+      expect(page).to have_css('h2', text: 'Multi-item deposits')
       expect(table).to have_css('thead th', count: 5)
       expect(table).to have_no_css('thead th', text: 'User')
       expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(1) a",

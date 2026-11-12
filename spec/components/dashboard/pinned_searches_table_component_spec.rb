@@ -16,8 +16,8 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
       render_inline(component)
 
       table = page.find('table[aria-label="Pinned searches"]')
-      expect(table).to have_css('caption', text: 'Pinned searches')
-      expect(table).to have_css('caption .bi-pin-fill[aria-hidden="true"]')
+      expect(page).to have_css('h2', text: 'Pinned searches')
+      expect(page).to have_css('h2 .bi-pin-fill[aria-hidden="true"]')
       expect(table).to have_css('th', text: 'Search')
       expect(table).to have_css('th', text: 'Unpin')
 

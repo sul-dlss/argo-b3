@@ -1,22 +1,20 @@
-<%= render SdrViewComponents::Tables::TableComponent.new(
-      empty_message: 'No tags have been pinned.',
-      classes:,
-      label:,
-      responsive: true
-    ) do |component| %>
-  <% component.with_caption do %>
-    <%= label %>
-    <%= helpers.pin_icon(classes: 'pinned', aria: { hidden: true }) %>
-  <% end %>
-  <% component.with_header(label: 'Tag') %>
-  <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
-  <% pinned_tags.each do |pinned_tag| %>
-    <% component.with_row do |row_component| %>
-      <% row_component.with_cell do %>
-        <%= tag_link(pinned_tag) %>
-      <% end %>
-      <% row_component.with_cell(classes: 'pin-column') do %>
-        <%= render Pin::PinnedTagComponent.new(tag: pinned_tag.tag, pinned: true) %>
+<%= render Dashboard::SectionComponent.new(id: 'pinned-tags-section', label:, pinned: true, classes:) do %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(
+        empty_message: 'No tags have been pinned.',
+        label:,
+        show_label: false,
+        responsive: true
+      ) do |component| %>
+    <% component.with_header(label: 'Tag') %>
+    <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
+    <% pinned_tags.each do |pinned_tag| %>
+      <% component.with_row do |row_component| %>
+        <% row_component.with_cell do %>
+          <%= tag_link(pinned_tag) %>
+        <% end %>
+        <% row_component.with_cell(classes: 'pin-column') do %>
+          <%= render Pin::PinnedTagComponent.new(tag: pinned_tag.tag, pinned: true) %>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>

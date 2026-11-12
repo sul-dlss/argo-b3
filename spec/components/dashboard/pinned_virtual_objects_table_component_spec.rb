@@ -30,8 +30,8 @@ RSpec.describe Dashboard::PinnedVirtualObjectsTableComponent, type: :component d
       render_inline(component)
 
       table = page.find('table[aria-label="Pinned virtual objects"]')
-      expect(table).to have_css('caption', text: 'Pinned virtual objects')
-      expect(table).to have_css('caption .bi-pin-fill[aria-hidden="true"]')
+      expect(page).to have_css('h2', text: 'Pinned virtual objects')
+      expect(page).to have_css('h2 .bi-pin-fill[aria-hidden="true"]')
       expect(table).to have_css('th', text: 'Title')
       expect(table).to have_css('th', text: 'Druid')
       expect(table).to have_css('th', text: 'Collection')

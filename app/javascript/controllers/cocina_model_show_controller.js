@@ -1,9 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
+import { isCollapsibleSectionState } from 'controllers/collapsible_section_morph'
 
-const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'collapsible-section-toggle', 'toggle-row-button', 'toggle-row-data']
-// Elements without a class of their own to preserve, e.g., a collapsible section's content.
-const PRESERVED_SELECTORS = ['.collapsible-section > .collapse']
+const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'toggle-row-button', 'toggle-row-data']
 
 // Controller for the Cocina model show page.
 //
@@ -64,7 +63,7 @@ export default class extends Controller {
   // and content, and toggle row button / data attributes
   preserveTab = (event) => {
     if (PRESERVED_CLASSES.some((className) => event.target.classList.contains(className)) ||
-        PRESERVED_SELECTORS.some((selector) => event.target.matches(selector))) {
+        isCollapsibleSectionState(event.target)) {
       event.preventDefault()
     }
   }

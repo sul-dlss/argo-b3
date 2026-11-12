@@ -31,7 +31,7 @@ RSpec.describe Dashboard::RecentDraftsAndDepositsTableComponent, type: :componen
       render_inline(component)
 
       table = page.find('table#recent-drafts-and-deposits-table[aria-label="Recent drafts and deposits"]')
-      expect(table).to have_css('caption', text: 'Recent drafts and deposits')
+      expect(page).to have_css('h2', text: 'Recent drafts and deposits')
       expect(table.all('thead th').map { |header| header.text.strip })
         .to eq(['Title', 'Druid', 'Collection', 'Status', 'Last updated'])
 
