@@ -85,11 +85,11 @@ RSpec.describe 'Show structure' do
   end
 
   describe 'GET /objects/:druid/structure' do
-    it 'renders the structural metadata' do
+    it 'renders the resources' do
       get "/objects/#{token}/structure"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Structural metadata')
+      expect(response.body).to include('Resources (1)')
       expect(response.body).to include('Images (1)')
       expect(response.body).to include('Image 1')
       expect(response.body).to include('folder1/bc123df4567_0001.tiff')
@@ -108,7 +108,7 @@ RSpec.describe 'Show structure' do
         get "/objects/#{token}/structure"
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to match(/Structural metadata.*Content errors.*Resource 1 \(Image 1\) has published/m)
+        expect(response.body).to match(/Resources \(1\).*Content errors.*Resource 1 \(Image 1\) has published/m)
       end
     end
 

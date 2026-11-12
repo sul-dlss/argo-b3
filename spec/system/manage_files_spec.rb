@@ -312,7 +312,7 @@ RSpec.describe 'Manage files' do
       within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
-      expect(page).to have_css('h3', text: 'Structural metadata')
+      expect(page).to have_css('h3', text: 'Resources (1)')
 
       content_file_set = content.content_file_sets.sole
       expect(content_file_set).to have_attributes(file_set_type: 'file')
@@ -835,19 +835,21 @@ RSpec.describe 'Manage files' do
       visit "/contents/#{druid}/edit"
 
       upload_file('dropzone_upload.txt')
+      upload_file('dropzone_upload2.txt')
 
       click_on 'Structure'
       within("turbo-frame[id^='edit-structure_']") { click_button('Structure files') }
 
       expect(page).to have_toast('Structure built from files')
+      expect(page).to have_css('h3', text: 'Resources (2)')
 
       click_and_accept_confirm('Delete resource 1 and its files?', find_button('Delete resource 1'))
 
       expect(page).to have_toast('Resource deleted')
       # The structure is reloaded and the deleted file's binary is gone.
-      expect(page).to have_css('p', text: 'No files.')
-      expect(content.content_file_sets).to be_empty
-      expect(content.content_file_binaries).to be_empty
+      expect(page).to have_css('h3', text: 'Resources (1)')
+      expect(content.content_file_sets.size).to eq(1)
+      expect(content.content_file_binaries.sole.filepath).to eq('dropzone_upload2.txt')
     end
 
     it 'moves a resource' do
