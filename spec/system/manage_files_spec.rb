@@ -77,8 +77,11 @@ RSpec.describe 'Manage files' do
 
     expect(page).to have_current_path("/objects/#{druid}")
 
+    # The access settings, though collapsed, are submitted.
     expect(Sdr::Repository).to have_received(:update)
       .with(cocina_object: having_attributes(type: Cocina::Models::ObjectType.book,
+                                             access: having_attributes(view: cocina_object.access.view,
+                                                                       download: cocina_object.access.download),
                                              structural: having_attributes(
                                                hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')]
                                              )),
@@ -92,6 +95,12 @@ RSpec.describe 'Manage files' do
     visit "/contents/#{druid}/edit"
 
     click_on 'Item details'
+
+    # The access settings are collapsed until expanded.
+    expect(page).to have_css('button[aria-expanded="false"]', text: 'Access settings')
+    expect(page).to have_no_field('Without embargo', visible: :visible)
+    click_on 'Access settings'
+    expect(page).to have_css('button[aria-expanded="true"]', text: 'Access settings')
 
     expect(page).to have_field('Without embargo', type: 'radio', checked: true, visible: :all)
     expect(page).to have_no_css('legend', text: 'Access settings during embargo')
@@ -117,6 +126,20 @@ RSpec.describe 'Manage files' do
             user_name: user.sunetid, description: nil)
   end
 
+  it 'expands the access settings when redisplaying the form with an error in them' do
+    visit "/contents/#{druid}/edit"
+
+    click_on 'Item details'
+    click_on 'Access settings'
+    choose 'With embargo', allow_label_click: true
+
+    click_on 'Save as draft'
+
+    expect(page).to have_css('button[aria-expanded="true"]', text: 'Access settings')
+    expect(page).to have_css('.invalid-feedback', text: "can't be blank")
+    expect(Sdr::Repository).not_to have_received(:update)
+  end
+
   context 'with a structured file' do
     let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
     let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
@@ -126,6 +149,7 @@ RSpec.describe 'Manage files' do
       visit "/contents/#{druid}/edit"
 
       click_on 'Item details'
+      click_on 'Access settings'
 
       expect(page).to have_field('Overwrite file-level rights', checked: true, disabled: false)
 
@@ -355,6 +379,7 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload.txt')
 
       click_on 'Item details'
+      click_on 'Access settings'
       within_fieldset('Access settings without embargo') do
         select 'Dark', from: 'View access'
       end
@@ -669,6 +694,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('.alert-danger', text: 'has published files but is not a page or object resource')
 
       click_on 'Item details'
+      click_on 'Access settings'
       within_fieldset('Access settings without embargo') do
         select 'Dark', from: 'View access'
       end
@@ -714,6 +740,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('.alert-danger li', text: dark_file_error)
 
       click_on 'Item details'
+      click_on 'Access settings'
       within_fieldset('Access settings without embargo') do
         select 'World', from: 'View access'
         select 'World', from: 'Download access'

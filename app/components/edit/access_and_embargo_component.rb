@@ -5,13 +5,18 @@ module Edit
   # The form's object must include CocinaModels::AccessConcern, CocinaModels::EmbargoConcern, and EmbargoFormConcern,
   # and FileAccessFormConcern when showing the overwrite file access checkbox.
   class AccessAndEmbargoComponent < ApplicationComponent
+    # Attributes validated by the access, embargo, and embargo form concerns.
+    ERROR_ATTRIBUTES = %i[access embargo_access embargo_release_date].freeze
+
     # @param apo_defaults [Boolean] true to show (and apply) the selected APO's default access, using the
     #   apo-defaults Stimulus controller
     # @param overwrite_file_access [Boolean] true to show the checkbox for applying the access to the files
-    def initialize(form:, apo_defaults: false, overwrite_file_access: false)
+    # @param collapsible [Boolean] true to render the fields in a section that is collapsed unless they have errors
+    def initialize(form:, apo_defaults: false, overwrite_file_access: false, collapsible: false)
       @form = form
       @apo_defaults = apo_defaults
       @overwrite_file_access = overwrite_file_access
+      @collapsible = collapsible
       super()
     end
 
@@ -19,6 +24,15 @@ module Edit
 
     def overwrite_file_access?
       @overwrite_file_access
+    end
+
+    def collapsible?
+      @collapsible
+    end
+
+    # Expanded when a field has an error, so that the error is shown.
+    def expanded?
+      form.object.errors.attribute_names.intersect?(ERROR_ATTRIBUTES)
     end
 
     # @param group [String] the apo-defaults group of the access fields
