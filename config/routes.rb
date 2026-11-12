@@ -214,6 +214,7 @@ Rails.application.routes.draw do
       delete 'purge', to: 'objects#purge'
       get 'structural_csv', to: 'objects#show_structural_csv'
       get 'descriptive_csv', to: 'objects#show_descriptive_csv'
+      get 'virtual_object_csv', to: 'objects#show_virtual_object_csv'
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
     resource :file_download, only: %i[show]
