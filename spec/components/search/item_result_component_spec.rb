@@ -159,11 +159,25 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     let(:solr_doc) { build(:solr_item, druid:, workflow_errors:) }
     let(:workflow_errors) { ['Error 1', 'Error 2'] }
 
-    it 'renders the workflow errors' do
+    it 'renders the workflow errors without an error date' do
       render_inline(component)
 
       cell = find_table_value_cell('item-result-bb123cd4567', 'Errors')
       expect(cell).to have_css('span.text-danger', text: 'Error 1; Error 2')
+      expect(page).to have_no_css('th', text: 'Error date')
+    end
+
+    context 'with an error date' do
+      let(:solr_doc) { build(:solr_item, druid:, workflow_errors:, last_workflow_error_date:) }
+      let(:last_workflow_error_date) { Time.utc(2026, 11, 9, 18, 30, 5) }
+
+      it 'renders the error date in Pacific time after the errors' do
+        render_inline(component)
+
+        expect(page).to have_table_value('item-result-bb123cd4567', 'Error date', '2026-11-09 10:30:05 PT')
+        expect(find_table_row('item-result-bb123cd4567', 'Errors'))
+          .to have_xpath("following-sibling::tr[1][./th[normalize-space()='Error date']]")
+      end
     end
   end
 

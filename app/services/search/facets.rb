@@ -188,6 +188,21 @@ module Search
       }
     )
 
+    ERROR_DATE = Config.with_defaults(
+      form_field: :error_date,
+      loading: :secondary,
+      date_from_form_field: :error_date_from,
+      date_to_form_field: :error_date_to,
+      field: Search::Fields::LAST_WORKFLOW_ERROR_DATE,
+      dynamic_facet: {
+        today: "#{Search::Fields::LAST_WORKFLOW_ERROR_DATE}:#{Search::Queries::TODAY}",
+        last_7_days: "#{Search::Fields::LAST_WORKFLOW_ERROR_DATE}:#{Search::Queries::LAST_7_DAYS}",
+        last_30_days: "#{Search::Fields::LAST_WORKFLOW_ERROR_DATE}:#{Search::Queries::LAST_30_DAYS}",
+        year_to_date: "#{Search::Fields::LAST_WORKFLOW_ERROR_DATE}:#{Search::Queries::YEAR_TO_DATE}",
+        all: "#{Search::Fields::LAST_WORKFLOW_ERROR_DATE}:#{Search::Queries::ALL}"
+      }
+    )
+
     IDENTIFIERS = Config.with_defaults(
       form_field: :identifiers,
       loading: :secondary,
@@ -488,6 +503,7 @@ module Search
       LAST_OPENED_DATE,
       EMBARGO_RELEASE_DATE,
       WORKFLOWS,
+      ERROR_DATE,
       METADATA_SOURCES,
       VERSIONS,
       IDENTIFIERS,

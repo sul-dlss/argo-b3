@@ -70,6 +70,9 @@ class SearchForm < ApplicationForm
   attribute :embargo_release_date, array: true, default: -> { [] }
   attribute :embargo_release_date_from, :date, default: nil
   attribute :embargo_release_date_to, :date, default: nil
+  attribute :error_date, array: true, default: -> { [] }
+  attribute :error_date_from, :date, default: nil
+  attribute :error_date_to, :date, default: nil
   attribute :file_roles, array: true, default: -> { [] }
   attribute :formats, array: true, default: -> { [] }
   attribute :genres, array: true, default: -> { [] }

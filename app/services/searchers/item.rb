@@ -29,6 +29,7 @@ module Searchers
       Search::Fields::TICKETS,
       Search::Fields::TITLE,
       Search::Fields::WORKFLOW_ERRORS,
+      Search::Fields::LAST_WORKFLOW_ERROR_DATE,
       Search::Fields::FIRST_SHELVED_IMAGE,
       Search::Fields::LAST_UPDATED_DATE
     ].freeze

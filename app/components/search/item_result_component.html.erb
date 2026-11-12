@@ -29,6 +29,7 @@
         <% component.with_row(label: 'Ticket', values: ticket_values) if result.tickets.present? %>
         <% component.with_row(label: 'Status', values: [result.status]) if result.status.present? %>
         <% component.with_row(label: 'Errors', values: workflow_error_values) if result.workflow_errors.present? %>
+        <% component.with_row(label: 'Error date', values: error_date_values) if result.last_workflow_error_date.present? %>
         <% component.with_row(label: 'Access rights', values: access_rights_values) if result.access_rights.present? %>
       <% end %>
     </div>
