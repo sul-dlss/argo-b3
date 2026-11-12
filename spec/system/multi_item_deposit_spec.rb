@@ -250,7 +250,7 @@ RSpec.describe 'Multi-item deposit' do
       # Globus isn't called until the Globus radio is selected.
       expect(page).to have_no_button('Create Globus link')
 
-      choose 'Use files from Globus'
+      choose 'Globus'
       click_button 'Create Globus link'
 
       expect(page).to have_link('Open Globus')
@@ -280,7 +280,7 @@ RSpec.describe 'Multi-item deposit' do
 
       expect(page).to have_css('.alert-success', text: 'No errors with manifest')
       # The Globus directory is kept, so the user can return to it.
-      expect(page).to have_field('Use files from Globus', checked: true)
+      expect(page).to have_field('Globus', checked: true)
       expect(page).to have_link('Open Globus')
       expect(page).to have_field('Mount path', with: '', disabled: true, visible: :hidden)
       expect(ContentFileBinary.pluck(:file_location)).to eq(%w[globus globus])
