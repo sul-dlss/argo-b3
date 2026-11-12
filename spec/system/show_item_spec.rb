@@ -486,7 +486,7 @@ RSpec.describe 'Show item' do
     toggle_button.send_keys(:enter)
     expect(page).to have_no_css('tr.toggle-row-data.show')
     expect(toggle_button['aria-expanded']).to eq('false')
-    expect(page).to have_no_css('h2', text: 'Resources (1)')
+    expect(page).to have_no_css('h2', text: /Resources/)
 
     # Structure tab
     click_button 'Structure'

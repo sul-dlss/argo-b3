@@ -1,5 +1,5 @@
 <%= turbo_frame_tag(@content.druid, 'structure') do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: "Resources (#{@content_file_sets.size})", classes: 'mb-3') %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: "Resources (#{number_with_delimiter(@content_file_sets.size)})", classes: 'mb-3') %>
   <%= render Item::ContentValidationAlertsComponent.new(content_validation_result: @content_validation_result) %>
   <%= render Show::FileSetGroupsComponent.new(content_file_sets: @content_file_sets, content_type: @content_type,
                                               file_download_presenter: @file_download_presenter) %>
