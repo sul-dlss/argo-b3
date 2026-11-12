@@ -179,6 +179,30 @@ RSpec.describe TagsFormConcern do
     end
   end
 
+  describe 'multiple_tags' do
+    context 'when tags were entered but not added' do
+      before do
+        new_item_form.multiple_tags = "Registered By : mjgiarlo\nProject : Argo"
+      end
+
+      it 'is invalid' do
+        expect(new_item_form).not_to be_valid
+        expect(new_item_form.errors[:multiple_tags])
+          .to eq(['Click "Add tags" to add these tags, or clear this field.'])
+      end
+    end
+
+    context 'when only whitespace was entered' do
+      before do
+        new_item_form.multiple_tags = " \t\n"
+      end
+
+      it 'is valid' do
+        expect(new_item_form).to be_valid
+      end
+    end
+  end
+
   describe '.permitted_params' do
     it 'includes nested other_tags_attributes' do
       expect(NewItemForm.permitted_params).to include(

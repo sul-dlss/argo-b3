@@ -95,6 +95,18 @@ RSpec.describe 'Administrative tags' do
         end
       end
 
+      context 'when tags were entered but not added' do
+        let(:tag_params) { { multiple_tags: 'Registered By : mjgiarlo' } }
+
+        it 'renders the form with an error' do
+          patch "/objects/#{druid}/tags", params: { administrative_tags: tag_params }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(Sdr::AdministrativeTags).not_to have_received(:replace)
+          expect(response.body).to include('Click &quot;Add tags&quot; to add these tags, or clear this field.')
+        end
+      end
+
       context 'when saving fails' do
         before do
           allow(Sdr::AdministrativeTags).to receive(:replace).and_raise(Sdr::AdministrativeTags::Error)
