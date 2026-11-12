@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Searchers::ItemNavigation do
   let(:user) { create(:user, :admin) }
   let(:user_scope) { Permissions::UserScope.new(groups: user.groups) }
-  let(:navigation) { described_class.call(search_form:, position:, user_scope:) }
+  let(:navigation) { described_class.call(druid: current_druid, search_form:, position:, user_scope:) }
   let(:search_form) { ResultsSearchForm.new(query:) }
   let(:query) { 'test' }
   let(:position) { 3 }
@@ -77,6 +77,30 @@ RSpec.describe Searchers::ItemNavigation do
     end
   end
 
+  context 'when the item is no longer at its position in the results' do
+    let(:solr_response) do
+      {
+        'response' => {
+          'numFound' => 10,
+          'docs' => [{ 'id' => previous_druid }, { 'id' => next_druid }, { 'id' => 'druid:fg456hj7890' }]
+        }
+      }
+    end
+
+    it 'returns nil' do
+      expect(navigation).to be_nil
+    end
+  end
+
+  context 'when the item no longer matches a search with no other results' do
+    let(:position) { 1 }
+    let(:solr_response) { { 'response' => { 'numFound' => 0, 'docs' => [] } } }
+
+    it 'returns nil' do
+      expect(navigation).to be_nil
+    end
+  end
+
   context 'when a sort is specified' do
     let(:search_form) { ResultsSearchForm.new(query:, sort: 'druid') }
 
@@ -92,16 +116,18 @@ RSpec.describe Searchers::ItemNavigation do
   context 'with specific permission targets', :solr do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }
+    let(:readable_druid) { 'druid:hj456kl7890' }
 
     before do
       allow(Search::SolrService).to receive(:post).and_call_original
-      create(:solr_item)
+      create(:solr_item, druid: readable_druid)
       create(:solr_item, apo_druid: restricted_apo_druid)
       create(:permission, :read_restricted, workgroup: 'sdr:other-group', target_druid: restricted_apo_druid)
     end
 
     it 'uses only the allowed readable result set for previous and next navigation' do
-      navigation = described_class.call(search_form: ResultsSearchForm.new(query: 'Test'), position: 1, user_scope:)
+      navigation = described_class.call(druid: readable_druid, search_form: ResultsSearchForm.new(query: 'Test'),
+                                        position: 1, user_scope:)
 
       expect(navigation.total_results).to eq(1)
       expect(navigation.previous_druid).to be_nil

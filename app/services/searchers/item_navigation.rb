@@ -10,23 +10,27 @@ module Searchers
       new(...).call
     end
 
+    # @param druid [String] the item at position when the search was run
     # @param search_form [SearchForm]
     # @param position [Integer] 1-based absolute position within the result set
     # @param user_scope [Permissions::UserScope] the permission scope of the requesting user
-    def initialize(search_form:, position:, user_scope:)
+    def initialize(druid:, search_form:, position:, user_scope:)
+      @druid = druid
       @search_form = search_form
       @position = position
       @user_scope = user_scope
     end
 
-    # @return [Result] navigation details
+    # @return [Result, nil] navigation details, or nil if the item is no longer at position (e.g., it was edited)
     def call
+      return if druids[current_index] != druid
+
       Result.new(previous_druid:, next_druid:, total_results: response.fetch('numFound'))
     end
 
     private
 
-    attr_reader :search_form, :user_scope, :position
+    attr_reader :druid, :search_form, :user_scope, :position
 
     def previous_druid
       druids[current_index - 1] if current_index.positive?
