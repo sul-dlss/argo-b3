@@ -1,6 +1,7 @@
-<%= page_title(t('bulk_actions.new_heading')) %>
+<%= page_title(t('bulk_actions.menu')) %>
 
-<%= render Layout::ContainerComponent.new(heading: t('bulk_actions.new_heading')) do %>
+<%= render Layout::ContainerComponent.new(heading: t('bulk_actions.menu')) do %>
+  <%# Sections read row by row in the three-column layout. %>
   <div class="row mt-2 gy-3">
     <%= render BulkActions::ListSectionComponent.new(
           label: 'Perform actions',
@@ -12,27 +13,42 @@
           ]
         ) %>
     <%= render BulkActions::ListSectionComponent.new(
+          label: 'Register and deposit',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::REGISTER_CSV,
+            BulkActions::REDEPOSIT
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
+          label: 'Tags and reporting',
+          classes: 'col-lg-4 col-md-6',
+          bulk_action_configs: [
+            BulkActions::EXPORT_TAGS,
+            BulkActions::IMPORT_TAGS,
+            BulkActions::EXPORT_TRACKING_SHEETS,
+            BulkActions::EXPORT_CHECKSUM_REPORT,
+            BulkActions::EXPORT_COCINA_JSON
+          ]
+        ) %>
+    <%= render BulkActions::ListSectionComponent.new(
           label: 'Modify objects',
           classes: 'col-lg-4 col-md-6',
           bulk_action_configs: [
-            BulkActions::REDEPOSIT,
             BulkActions::ADD_WORKFLOW,
             BulkActions::TEXT_EXTRACTION,
-            BulkActions::REGISTER_CSV,
             BulkActions::PURGE
           ]
         ) %>
     <%= render BulkActions::ListSectionComponent.new(
-          label: 'Manage descriptive metadata',
+          label: 'Manage structural metadata',
           classes: 'col-lg-4 col-md-6',
           bulk_action_configs: [
-            BulkActions::REFRESH_METADATA,
-            BulkActions::EXPORT_DESCRIPTIVE_METADATA,
-            BulkActions::VALIDATE_DESCRIPTIVE_METADATA,
-            BulkActions::IMPORT_DESCRIPTIVE_METADATA,
-            BulkActions::EXPORT_CATALOG_DATA,
-            BulkActions::IMPORT_CATALOG_DATA,
-            BulkActions::EXPORT_MODS
+            BulkActions::MANAGE_CONTENT_TYPE,
+            BulkActions::EXPORT_STRUCTURAL_METADATA,
+            BulkActions::IMPORT_STRUCTURAL_METADATA,
+            BulkActions::MANAGE_COLLECTIONS,
+            BulkActions::CREATE_VIRTUAL_OBJECT
           ]
         ) %>
     <%= render BulkActions::ListSectionComponent.new(
@@ -48,14 +64,16 @@
           ]
         ) %>
     <%= render BulkActions::ListSectionComponent.new(
-          label: 'Manage structural metadata',
+          label: 'Manage descriptive metadata',
           classes: 'col-lg-4 col-md-6',
           bulk_action_configs: [
-            BulkActions::MANAGE_CONTENT_TYPE,
-            BulkActions::EXPORT_STRUCTURAL_METADATA,
-            BulkActions::IMPORT_STRUCTURAL_METADATA,
-            BulkActions::MANAGE_COLLECTIONS,
-            BulkActions::CREATE_VIRTUAL_OBJECT
+            BulkActions::REFRESH_METADATA,
+            BulkActions::EXPORT_DESCRIPTIVE_METADATA,
+            BulkActions::VALIDATE_DESCRIPTIVE_METADATA,
+            BulkActions::IMPORT_DESCRIPTIVE_METADATA,
+            BulkActions::EXPORT_CATALOG_DATA,
+            BulkActions::IMPORT_CATALOG_DATA,
+            BulkActions::EXPORT_MODS
           ]
         ) %>
     <% if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
@@ -68,16 +86,5 @@
             ]
           ) %>
     <% end %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Tags and reporting',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::EXPORT_TAGS,
-            BulkActions::IMPORT_TAGS,
-            BulkActions::EXPORT_TRACKING_SHEETS,
-            BulkActions::EXPORT_CHECKSUM_REPORT,
-            BulkActions::EXPORT_COCINA_JSON
-          ]
-        ) %>
   </div>
 <% end %>
