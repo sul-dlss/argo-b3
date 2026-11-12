@@ -27,6 +27,8 @@ RSpec.describe 'Collections' do
       page = Capybara.string(response.body)
       expect(page).to have_css('h1', text: 'Register and deposit collection')
       expect(page).to have_field('collection[title]')
+      expect(page).to have_field('Enter title and abstract myself', type: 'radio')
+      expect(page).to have_field('collection[abstract]', type: 'textarea')
       expect(page).to have_field('collection[catalog_record_id]')
       expect(page).to have_no_field('collection[description_csv_file]')
       expect(page).to have_no_field('collection[barcode]')
@@ -65,6 +67,7 @@ RSpec.describe 'Collections' do
         expect(Sdr::Repository).to have_received(:register) do |args|
           request_cocina_object = args[:request_cocina_object]
           expect(request_cocina_object.description.title.first.value).to eq('My collection')
+          expect(request_cocina_object.description.note).to be_empty
           expect(request_cocina_object.administrative.hasAdminPolicy).to eq(apo_druid)
           expect(request_cocina_object.access.view).to eq('dark')
           expect(request_cocina_object.access.useAndReproductionStatement).to eq('Use at will.')
@@ -78,12 +81,26 @@ RSpec.describe 'Collections' do
       end
     end
 
+    context 'with an abstract' do
+      it 'registers the collection with an abstract note' do
+        post '/collections', params: { collection: collection_params.merge(abstract: 'My abstract.') }
+
+        expect(response).to redirect_to('/objects/druid:xz987wv6543')
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:request_cocina_object].description.note.map { |note| [note.type, note.value] })
+            .to eq([['abstract', 'My abstract.']])
+        end
+      end
+    end
+
     context 'when invalid' do
-      it 'renders the form' do
-        post '/collections', params: { collection: collection_params.merge(title: '') }
+      it 'renders the form with the entered abstract' do
+        post '/collections', params: { collection: collection_params.merge(title: '', abstract: 'My abstract.') }
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(Capybara.string(response.body)).to have_css('.invalid-feedback', text: "can't be blank")
+        page = Capybara.string(response.body)
+        expect(page).to have_css('.invalid-feedback', text: "can't be blank")
+        expect(page).to have_field('collection[abstract]', with: 'My abstract.')
         expect(Sdr::Repository).not_to have_received(:register)
       end
     end

@@ -20,7 +20,7 @@
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
                                                                           label: t('edit.collections.tabs.description.label'),
                                                                           mark_required: true)) do |pane| %>
-        <%= render Edit::DescriptionChoiceComponent.new(form:, item_fields: false) %>
+        <%= render Edit::DescriptionChoiceComponent.new(form:, item_fields: false, abstract_field: true) %>
 
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>

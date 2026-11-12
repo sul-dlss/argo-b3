@@ -249,11 +249,17 @@ en:
         toasts:
           register: "Collection registered and deposit started."
       fields:
+        abstract:
+          label: "Abstract"
+          help_text: "Summarize the contents of the collection."
         access_view:
           label: "View access"
         apo_druid:
           validations:
             not_selectable: "must be an APO you can edit"
+        description_choice:
+          title:
+            label: "Enter title and abstract myself"
       tabs:
         deposit:
           label: "Register and deposit"

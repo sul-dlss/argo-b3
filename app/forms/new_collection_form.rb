@@ -19,6 +19,10 @@ class NewCollectionForm < CocinaModels::Collection
     %i[source_id description_hash catalog_link_refresh catalog_link_part_label catalog_link_sort_key]
   end
 
+  # Entered with the title; ignored when the description is retrieved from FOLIO.
+  attribute :abstract, :string
+  normalizes :abstract, with: ->(abstract) { abstract.strip }
+
   attribute :access_view, :string, default: 'world'
   # The spreadsheet choice of the shared description choice UI is only for items.
   validates :description_choice, inclusion: { in: [DESCRIPTION_TITLE_CHOICE, DESCRIPTION_CATALOG_ID_CHOICE] }
@@ -41,5 +45,15 @@ class NewCollectionForm < CocinaModels::Collection
 
     release_tags.create!(druid:, user_name:)
     Sdr::Repository.accession(cocina_object: previous_cocina_object, user_name:)
+  end
+
+  private
+
+  # Adds the abstract to the description built from the title.
+  def populate_description_hash_from_title
+    super
+    return if abstract.blank?
+
+    self.description_hash = description_hash.merge(note: [{ type: 'abstract', value: abstract }])
   end
 end

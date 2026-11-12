@@ -5,6 +5,7 @@ import { choiceContent } from 'controllers/dependent_fields'
 // the content of the others.
 // Borrowed from H3.
 // Mark the radio buttons with: <input data-radio-target="radio" data-action="radio#toggle" type="radio" ></input>
+// Mark optional inputs of a radio button's content with data-radio-optional.
 // If inputs are loaded later (e.g., in a turbo-frame), add data-action="turbo:frame-load->radio#refresh"
 // to the controller element so that the inputs are disabled/enabled once loaded.
 export default class extends Controller {
@@ -35,8 +36,8 @@ export default class extends Controller {
         input.disabled = disable
       }
       // If not disabled, an element is marked required because it must go with
-      // the selected radio button.
-      input.setAttribute('aria-required', !disable)
+      // the selected radio button, unless it is optional (data-radio-optional).
+      input.setAttribute('aria-required', !disable && !('radioOptional' in input.dataset))
     })
     // Hidden as well as disabled, since disabled inputs alone were not obviously unavailable.
     choiceContent(radioElem).forEach((element) => element.classList.toggle('d-none', disable))

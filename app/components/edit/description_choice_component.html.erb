@@ -7,7 +7,7 @@
     ) do |group| %>
 
   <% group.with_radio_button(
-       label_text: t('edit.items.fields.description_choice.title.label'),
+       label_text: title_choice_label,
        input_value: DescriptionChoiceFormConcern::DESCRIPTION_TITLE_CHOICE,
        input_data: { radio_target: 'radio', action: 'radio#toggle' },
        container_classes: 'my-fieldset'
@@ -16,6 +16,15 @@
                                                                 label_text: t('edit.items.fields.title.label'),
                                                                 label_mark_required: true,
                                                                 container_classes: 'my-field') %>
+
+    <% if abstract_field? %>
+      <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:, field_name: :abstract,
+                                                                 label_text: t('edit.collections.fields.abstract.label'),
+                                                                 help_text: t('edit.collections.fields.abstract.help_text'),
+                                                                 input_rows: 5,
+                                                                 input_data: { radio_optional: true },
+                                                                 container_classes: 'my-field') %>
+    <% end %>
   <% end %>
 
   <% group.with_radio_button(
