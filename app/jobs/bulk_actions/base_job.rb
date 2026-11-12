@@ -14,9 +14,11 @@ module BulkActions
     attr_reader :bulk_action, :druids
 
     # @param [BulkAction] bulk_action BulkAction object
+    # @param [Boolean] close_version whether to deposit each changed object
     # @param [Hash] params additional parameters
-    def perform(bulk_action:, **params) # rubocop:disable Metrics/AbcSize
+    def perform(bulk_action:, close_version: false, **params) # rubocop:disable Metrics/AbcSize
       @bulk_action = bulk_action
+      @close_version = close_version
       Honeybadger.context(bulk_action: bulk_action.id, params:)
 
       bulk_action.reset_druid_counts!
@@ -75,9 +77,8 @@ module BulkActions
       raise NotImplementedError
     end
 
-    # Subclasses may override if they support closing versions.
     def close_version?
-      false
+      @close_version
     end
 
     def perform_item_class

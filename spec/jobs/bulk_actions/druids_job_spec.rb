@@ -69,6 +69,29 @@ RSpec.describe BulkActions::DruidsJob do
     end
   end
 
+  context 'when closing versions' do
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
+        def perform
+          success!(message: "close version: #{close_version?}")
+        end
+      end
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
+    end
+
+    it 'tells each item to close versions' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:, close_version: true)
+
+      expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: close version: true/o)
+    end
+
+    it 'does not close versions unless asked' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(log).to have_received(:puts).with(/#{druids.first}\tSuccess: close version: false/o)
+    end
+  end
+
   context 'when an object is missing' do
     let(:druids) { %w[druid:bc123df4567 druid:gh123jk4589] }
     let(:cocina_object) { instance_double(Cocina::Models::DRO) }

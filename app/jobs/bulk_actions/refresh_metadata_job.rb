@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to refresh descriptive metadata from the ILS (FOLIO)
-  class RefreshMetadataJob < ClosingDruidsJob
+  class RefreshMetadataJob < DruidsJob
     # Refresh metadata for a single object
     class JobItem < BaseJobItem
       def perform

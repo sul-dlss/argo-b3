@@ -2,7 +2,7 @@
 
 module BulkActions
   # Job to import descriptive metadata from a CSV file
-  class ImportDescriptiveMetadataJob < ClosingCsvJob
+  class ImportDescriptiveMetadataJob < BaseCsvJob
     # Import descriptive metadata from single CSV row
     class JobItem < BaseCsvJobItem
       # Job to import descriptive metadata from single CSV row

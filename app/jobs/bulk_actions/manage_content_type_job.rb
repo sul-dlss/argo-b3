@@ -2,11 +2,11 @@
 
 module BulkActions
   # Job to update content type and optionally remap resource types
-  class ManageContentTypeJob < ClosingDruidsJob
-    def perform(bulk_action:, druids:, close_version: false, # rubocop:disable Metrics/ParameterLists
+  class ManageContentTypeJob < DruidsJob
+    def perform(bulk_action:, druids:, # rubocop:disable Metrics/ParameterLists
                 new_content_type: nil,
                 current_resource_type: nil, new_resource_type: nil,
-                viewing_direction: nil)
+                viewing_direction: nil, **)
       @current_resource_type = current_resource_type
       @new_content_type = new_content_type
       @new_resource_type = new_resource_type

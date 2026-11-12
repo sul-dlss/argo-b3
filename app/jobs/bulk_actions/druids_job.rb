@@ -3,10 +3,6 @@
 module BulkActions
   # Superclass of bulk action jobs that take druids as input
   class DruidsJob < BaseJob
-    include ActionPolicy::Behaviour
-
-    attr_reader :bulk_action, :druids
-
     # @param [BulkAction] bulk_action BulkAction object
     # @param [Array<String>] druids Array of druid strings
     # @param [Hash] params additional parameters

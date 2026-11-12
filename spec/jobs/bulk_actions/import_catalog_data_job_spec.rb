@@ -36,7 +36,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
-      allow(job_item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -55,8 +54,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
       .to have_received(:new).with(druid:, index: 2, job:, row:)
 
     expect(job_item).to have_received(:check_update_ability?)
-    expect(job_item).to have_received(:open_new_version_if_needed!)
-      .with(description: 'Updated FOLIO HRID, barcode, or serials metadata')
     expect(Sdr::Repository).to have_received(:update) do |args|
       identification = args[:cocina_object].identification
       folio_links = identification.catalogLinks.select { |l| l.catalog == 'folio' }
@@ -66,7 +63,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
       expect(args[:user_name]).to eq bulk_action.user.sunetid
       expect(args[:description]).to eq 'Updated FOLIO HRID, barcode, or serials metadata'
     end
-    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -138,7 +134,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     it 'does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('No changes to catalog data')
@@ -155,7 +150,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     it 'does not update the catalog data' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
     end
   end
@@ -166,7 +160,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     it 'records a failure' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(bulk_action.reload.druid_count_fail).to eq(1)
@@ -180,10 +173,9 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     it 'records a failure and does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
-      expect(log.string).to include('Barcode is not a valid barcode')
+      expect(log.string).to include('Error: Invalid catalog data: Barcode is not a valid barcode')
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(bulk_action.druid_count_success).to eq(0)
     end
@@ -240,7 +232,6 @@ RSpec.describe BulkActions::ImportCatalogDataJob do
     it 'records a failure and does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('Barcodes can only be added to DROs')

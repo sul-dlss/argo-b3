@@ -2,9 +2,8 @@
 
 module BulkActions
   # Job to update access
-  class ManageRightsJob < ClosingDruidsJob
-    def perform(bulk_action:, druids:, # rubocop:disable Metrics/ParameterLists
-                view:, download:, location:, close_version: false)
+  class ManageRightsJob < DruidsJob
+    def perform(bulk_action:, druids:, view:, download:, location:, **) # rubocop:disable Metrics/ParameterLists
       @view = view
       @download = download
       @location = location
@@ -17,7 +16,7 @@ module BulkActions
     class JobItem < BaseJobItem
       delegate :view, :download, :location, to: :job
 
-      def perform # rubocop:disable Metrics/AbcSize
+      def perform
         return unless check_update_ability?
 
         return unless check_object_type?(allow_admin_policy: false)
@@ -28,20 +27,10 @@ module BulkActions
           mutate_cocina_dro
         end
 
-        return success!(message: 'No changes made') unless cocina_model.changed?
-
-        open_new_version_if_needed!(description: description_msg)
-        cocina_model.save!(user_name: user_id, description: description_msg)
-        deposit_if_needed!
-
-        success!(message: 'Rights updated successfully')
+        save_model_and_deposit!(description: 'Updated rights', success_message: 'Rights updated successfully')
       end
 
       private
-
-      def description_msg
-        'Updated rights'
-      end
 
       def mutate_cocina_collection
         # Collection only allows setting view access to dark or world

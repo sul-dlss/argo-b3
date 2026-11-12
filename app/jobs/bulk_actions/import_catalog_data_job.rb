@@ -5,12 +5,12 @@ require 'csv'
 module BulkActions
   # Job to import catalog data (FOLIO Instance HRIDs, barcodes, and serials metadata)
   # from a CSV file and update objects accordingly.
-  class ImportCatalogDataJob < ClosingCsvJob
+  class ImportCatalogDataJob < BaseCsvJob
     FOLIO_HRID_COLUMN = 'folio_instance_hrid'
 
     # Imports catalog data for a single CSV row
     class JobItem < BaseCsvJobItem
-      def perform # rubocop:disable Metrics/AbcSize
+      def perform
         return unless check_update_ability?
         return unless check_object_type?(allow_admin_policy: false)
         return unless check_barcode_for_collection?
@@ -18,27 +18,18 @@ module BulkActions
         cocina_model.barcode = new_barcode if cocina_object.dro?
         replace_folio_catalog_links
 
-        unless cocina_model.valid?
-          return failure!(message: "Invalid catalog data: #{cocina_model.errors.full_messages.join(', ')}")
+        save_model_and_deposit!(description: 'Updated FOLIO HRID, barcode, or serials metadata',
+                                success_message: 'Catalog data updated',
+                                unchanged_message: 'No changes to catalog data') do
+          log_catalog_record_id_update
+          log_barcode_update
         end
-
-        return success!(message: 'No changes to catalog data') unless cocina_model.changed?
-
-        open_new_version_if_needed!(description: description_msg)
-
-        log_catalog_record_id_update
-        log_barcode_update
-
-        cocina_model.save!(user_name: user_id, description: description_msg)
-
-        deposit_if_needed!
-        success!(message: 'Catalog data updated')
       end
 
       private
 
-      def description_msg
-        'Updated FOLIO HRID, barcode, or serials metadata'
+      def invalid_model_message
+        "Invalid catalog data: #{super}"
       end
 
       def replace_folio_catalog_links # rubocop:disable Metrics/AbcSize

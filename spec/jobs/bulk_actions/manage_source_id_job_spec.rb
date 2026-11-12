@@ -18,7 +18,6 @@ RSpec.describe BulkActions::ManageSourceIdJob do
     described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
-      allow(job_item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -47,13 +46,11 @@ RSpec.describe BulkActions::ManageSourceIdJob do
       .to have_received(:new).with(druid:, index: 2, job:, row:)
 
     expect(job_item).to have_received(:check_update_ability?)
-    expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Updated source ID')
     expect(Sdr::Repository).to have_received(:update) do |args|
       expect(args[:cocina_object].identification.sourceId).to eq new_source_id
       expect(args[:user_name]).to eq bulk_action.user.sunetid
       expect(args[:description]).to eq 'Updated source ID'
     end
-    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -68,7 +65,6 @@ RSpec.describe BulkActions::ManageSourceIdJob do
     it 'does not update the source id' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
     end
   end
@@ -79,7 +75,6 @@ RSpec.describe BulkActions::ManageSourceIdJob do
     it 'does not update the source id' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include 'Source is invalid'
@@ -96,7 +91,6 @@ RSpec.describe BulkActions::ManageSourceIdJob do
     it 'does not update the source id' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include 'No changes to source ID'

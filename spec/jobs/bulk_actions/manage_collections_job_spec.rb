@@ -16,7 +16,6 @@ RSpec.describe BulkActions::ManageCollectionsJob do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |item|
       allow(item).to receive(:check_update_ability?).and_return(true)
       allow(item).to receive(:open_new_version_if_needed!)
-      allow(item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -34,13 +33,11 @@ RSpec.describe BulkActions::ManageCollectionsJob do
       job.perform_now
 
       expect(job_item).to have_received(:check_update_ability?)
-      expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Updated collection')
       expect(Sdr::Repository).to have_received(:update) do |args|
         expect(args[:cocina_object].structural.isMemberOf).to eq(collection_druids)
         expect(args[:user_name]).to eq(bulk_action.user.sunetid)
         expect(args[:description]).to eq('Updated collection')
       end
-      expect(job_item).to have_received(:deposit_if_needed!)
 
       expect(log.string).to include("#{druid}\tSuccess: Collection updated")
       expect(bulk_action.reload.druid_count_total).to eq(1)
@@ -104,7 +101,6 @@ RSpec.describe BulkActions::ManageCollectionsJob do
     it 'does not update the object and logs an error' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include('Not an item')
 
@@ -120,7 +116,6 @@ RSpec.describe BulkActions::ManageCollectionsJob do
     it 'does not update the object and logs an error' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include('Not an item')
 
@@ -140,7 +135,6 @@ RSpec.describe BulkActions::ManageCollectionsJob do
     it 'does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(bulk_action.reload.druid_count_success).to eq(0)
@@ -157,7 +151,6 @@ RSpec.describe BulkActions::ManageCollectionsJob do
     it 'does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include('No changes to collections')
 

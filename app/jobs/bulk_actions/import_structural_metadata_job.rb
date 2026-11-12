@@ -3,7 +3,7 @@
 module BulkActions
   # Job to import structural metadata from a CSV file (roughly equivalent to Argo's ImportStructuralJob).
   # Unlike other CSV jobs, an object may have multiple rows, so the job is performed per druid rather than per row.
-  class ImportStructuralMetadataJob < ClosingCsvJob
+  class ImportStructuralMetadataJob < BaseCsvJob
     def perform_bulk_action
       return unless check_druid_column? && check_required_columns?
 
