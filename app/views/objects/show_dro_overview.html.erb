@@ -44,6 +44,15 @@
     <% component.with_row(label: 'DOI', value: @solr_doc.doi) %>
   <% end %>
 
+  <%# Design standard deviation: FEED-5; per the issue, no section without parents (the table renders only with rows). %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'virtual-objects-table', classes: 'mb-5', head_classes: 'visually-hidden') do |component| %>
+    <% component.with_caption do %><%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-3', text: 'Virtual objects') %><% end %>
+    <% component.with_header(label: 'Title') %>
+    <% @solr_doc.constituent_of.each do |virtual_object_druid, virtual_object_title| %>
+      <% component.with_row(value: link_to_object(virtual_object_title, virtual_object_druid)) %>
+    <% end %>
+  <% end %>
+
   <%# NOTE: A Cocina object can have a partLabel without a sortKey. %>
   <%# A sortKey should always have a partLabel. %>
   <% if @cocina_model.catalog_link_part_label.present? %>
