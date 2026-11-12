@@ -53,6 +53,11 @@ RSpec.describe 'Create an item' do
       click_button 'Next'
       expect(page).to have_css('#description-tab.active')
 
+      click_button 'Previous'
+      expect(page).to have_css('#details-tab.active')
+      click_button 'Next'
+      expect(page).to have_css('#description-tab.active')
+
       # 'Enter title myself' is selected by default.
       fill_in 'Title', with: 'The Title'
 
