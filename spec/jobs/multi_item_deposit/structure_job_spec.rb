@@ -217,6 +217,33 @@ RSpec.describe MultiItemDeposit::StructureJob do
     end
   end
 
+  context 'when the Content was deposited from manage files since discovery' do
+    before do
+      create(:content_file_set, content:, label: 'Deposited')
+      content.update!(immutable: true)
+    end
+
+    it 'records an error and leaves the Content unchanged' do
+      expect(perform).to have_attributes(
+        structural_csv_errors: ['Object changed since discovery; re-run Discover files'],
+        content_type_structure_errors: [], content_type_structure_warnings: [], file_changes: {}
+      )
+      expect(content.reload.content_file_sets.pluck(:label)).to eq(['Deposited'])
+    end
+  end
+
+  context 'when the Content was discarded since discovery' do
+    before do
+      item_deposit_action
+      content.destroy!
+      item_deposit_action.reload
+    end
+
+    it 'records an error' do
+      expect(perform.structural_csv_errors).to eq(['Object changed since discovery; re-run Discover files'])
+    end
+  end
+
   context 'when an unexpected error occurs' do
     before do
       allow(Contents::Validator).to receive(:call).and_raise(StandardError, 'Boom')

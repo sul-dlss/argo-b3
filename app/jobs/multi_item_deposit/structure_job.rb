@@ -12,9 +12,13 @@ module MultiItemDeposit
       item_deposit_action.assign_attributes(structural_csv_errors: [], content_type_structure_errors: [],
                                             content_type_structure_warnings: [], file_changes: {})
 
-      content.content_file_sets.destroy_all
-      structure!
-      validate_and_record_changes if item_deposit_action.structural_csv_errors.empty?
+      if content_changed?
+        add_error(:object_changed)
+      else
+        content.content_file_sets.destroy_all
+        structure!
+        validate_and_record_changes if item_deposit_action.structural_csv_errors.empty?
+      end
       item_deposit_action.save!
     rescue StandardError => e
       handle_error(e)
@@ -26,6 +30,11 @@ module MultiItemDeposit
 
     delegate :druid, :content, :multi_item_deposit_action, to: :item_deposit_action
     delegate :structural_metadata_csv, to: :multi_item_deposit_action
+
+    # Manage files shares the mutable Content, so depositing or discarding there makes it immutable or destroys it.
+    def content_changed?
+      content.nil? || content.immutable?
+    end
 
     def structure!
       if structural_metadata_csv.present?
