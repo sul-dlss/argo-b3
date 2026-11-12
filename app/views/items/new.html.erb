@@ -26,7 +26,7 @@
                                                                           mark_required: true)) do |pane| %>
         <%= render Edit::SourceIdChoiceComponent.new(form:) %>
 
-        <%= render Edit::ContentTypeComponent.new(form:, container_classes: 'mb-3') %>
+        <%= render Edit::ContentTypeComponent.new(form:, container_classes: 'my-field') %>
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, show_previous: false, cancel_path: @cancel_path) %>
         <% end %>

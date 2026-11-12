@@ -1,9 +1,10 @@
+<%# mb-4 matches the 24px fieldset gap (my-fieldset); no top margin, which would add to the pane header's padding. %>
 <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
       form:,
       field_name: :source_id_choice,
       label: t('edit.items.fields.source_id.label'),
       mark_required: true,
-      classes: 'mb-3',
+      classes: 'mb-4',
       data: { controller: 'radio' }
     ) do |group| %>
 
