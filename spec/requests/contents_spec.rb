@@ -115,6 +115,15 @@ RSpec.describe 'Contents' do
         expect(page).to have_checked_field('Without embargo', visible: :all)
       end
 
+      it 'renders the file location choices in order' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        labels = page.all('input[type="radio"][name$="[file_location_choice]"]', visible: :all)
+                     .map { |radio| page.find("label[for='#{radio[:id]}']", visible: :all).text.strip }
+        expect(labels).to eq(['Select files from computer', 'Globus', 'Select files from mount'])
+      end
+
       it 'hides the dropzone icon from screen readers' do
         get edit_content_path(druid)
 

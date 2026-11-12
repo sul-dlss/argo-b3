@@ -433,7 +433,7 @@ RSpec.describe 'Manage files' do
       dispatch_dropzone_event('upload-start')
 
       expect(page).to have_button('Delete dropzone_upload.txt', disabled: true)
-      expect(page).to have_field('Use files from mount', type: 'radio', disabled: true)
+      expect(page).to have_field('Select files from mount', type: 'radio', disabled: true)
       click_on 'Structure'
       expect(page).to have_button('Clear and structure files again', disabled: true)
       expect(page).to have_button('Upload', disabled: true)
@@ -456,7 +456,7 @@ RSpec.describe 'Manage files' do
       expect(page).to have_no_css('a.disabled', text: 'Edit resource 1')
       click_on 'Add files'
       expect(page).to have_button('Delete dropzone_upload.txt', disabled: false)
-      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+      expect(page).to have_field('Select files from mount', type: 'radio', disabled: false)
     end
 
     it 'disables actions rendered while uploading' do
@@ -502,7 +502,7 @@ RSpec.describe 'Manage files' do
       click_on 'Add files'
       expect(page).to have_css('#file-dropzone.opacity-50')
       expect(page).to have_button('Delete dropzone_upload.txt', disabled: true)
-      expect(page).to have_field('Use files from mount', type: 'radio', disabled: true)
+      expect(page).to have_field('Select files from mount', type: 'radio', disabled: true)
       click_on 'Deposit'
       expect(page).to have_button('Deposit', disabled: true)
       expect(page).to have_button('Save as draft', disabled: true)
@@ -514,7 +514,7 @@ RSpec.describe 'Manage files' do
       click_on 'Add files'
       expect(page).to have_no_css('#file-dropzone.opacity-50')
       expect(page).to have_button('Delete dropzone_upload.txt', disabled: false)
-      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+      expect(page).to have_field('Select files from mount', type: 'radio', disabled: false)
     end
 
     it 'keeps the dropzone disabled when using files from the mount' do
@@ -527,13 +527,13 @@ RSpec.describe 'Manage files' do
       expect(page).to have_toast('Structure built from files')
 
       click_on 'Add files'
-      choose 'Use files from mount'
+      choose 'Select files from mount'
       expect(page).to have_css('#file-dropzone.opacity-50', visible: :hidden)
 
       dispatch_structure_event('submit-start')
       dispatch_structure_event('submit-end')
 
-      expect(page).to have_field('Use files from mount', type: 'radio', disabled: false)
+      expect(page).to have_field('Select files from mount', type: 'radio', disabled: false)
       expect(page).to have_css('#file-dropzone.opacity-50', visible: :hidden)
     end
   end
@@ -942,11 +942,11 @@ RSpec.describe 'Manage files' do
 
     expect(page).to have_css('#file-dropzone.dz-clickable:not(.opacity-50)')
 
-    choose 'Use files from mount'
+    choose 'Select files from mount'
 
     expect(page).to have_css('#file-dropzone.opacity-50:not(.dz-clickable)', visible: :hidden)
 
-    choose 'Upload files from computer'
+    choose 'Select files from computer'
 
     expect(page).to have_css('#file-dropzone.dz-clickable:not(.opacity-50)')
     expect(page).to have_button('Select files to upload', disabled: false)
@@ -968,7 +968,7 @@ RSpec.describe 'Manage files' do
     it 'discovers the files' do
       visit "/contents/#{druid}/edit"
 
-      choose 'Use files from mount'
+      choose 'Select files from mount'
       fill_in 'Mount path', with: mount_path
       click_button 'Discover files'
 
@@ -998,7 +998,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_button('Delete page_0001.png', disabled: false)
 
-      choose 'Use files from mount'
+      choose 'Select files from mount'
       fill_in 'Mount path', with: mount_path
       click_button 'Discover files'
 
@@ -1015,7 +1015,7 @@ RSpec.describe 'Manage files' do
     it 'disables the actions until discovery completes' do
       visit "/contents/#{druid}/edit"
 
-      choose 'Use files from mount'
+      choose 'Select files from mount'
       fill_in 'Mount path', with: mount_path
       click_button 'Discover files'
 
@@ -1048,21 +1048,21 @@ RSpec.describe 'Manage files' do
       visit "/contents/#{druid}/edit"
 
       # Globus isn't called until the Globus radio is selected.
-      expect(page).to have_field('Use files from mount')
+      expect(page).to have_field('Select files from mount')
       expect(page).to have_no_button('Create Globus link')
       expect(GlobusClient).not_to have_received(:writable?)
 
-      choose 'Select files from Globus'
+      choose 'Globus'
       click_button 'Create Globus link'
 
       expect(page).to have_link('Open Globus')
       expect(page).to have_no_css('a.disabled', text: 'Open Globus')
       expect(GlobusClient).to have_received(:mkdir)
 
-      choose 'Use files from mount'
+      choose 'Select files from mount'
       expect(page).to have_no_link('Open Globus')
 
-      choose 'Select files from Globus'
+      choose 'Globus'
       expect(page).to have_link('Open Globus')
 
       FileUtils.cp(file_fixture('dropzone_upload.txt'), File.join(globus_path, 'dropzone_upload.txt'))

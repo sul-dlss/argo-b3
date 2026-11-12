@@ -532,11 +532,11 @@ en:
         file_choice:
           label: 'Select how to upload files'
           upload:
-            label: 'Upload files from computer'
+            label: 'Select files from computer'
           mount:
-            label: 'Use files from mount'
+            label: 'Select files from mount'
           globus:
-            label: 'Select files from Globus'
+            label: 'Globus'
         goobi:
           deposit: 'Deposit with Goobi'
         license:
@@ -641,9 +641,9 @@ en:
         file_location:
           label: "Select how to upload files"
           globus:
-            label: "Use files from Globus"
+            label: "Globus"
           mount:
-            label: "Use files from mount"
+            label: "Select files from mount"
         globus_path:
           validations:
             blank: "Create a Globus link before discovering files"

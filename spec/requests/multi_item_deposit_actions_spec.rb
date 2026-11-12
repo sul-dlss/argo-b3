@@ -242,16 +242,24 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
         expect(rendered_page).to have_field('Include with your files below', type: 'radio')
         expect(rendered_page).to have_field('Upload manifest file', type: 'file')
-        expect(rendered_page).to have_field('Use files from Globus', type: 'radio', disabled: false)
+        expect(rendered_page).to have_field('Globus', type: 'radio', disabled: false)
         expect(rendered_page).to have_css('turbo-frame[data-radio-src=' \
                                           "'#{new_multi_item_deposit_action_globus_path(multi_item_deposit_action)}']")
         expect(rendered_page).to have_css("form#create-globus-link-form[action='" \
                                           "#{multi_item_deposit_action_globus_path(multi_item_deposit_action)}']")
-        expect(rendered_page).to have_field('Use files from mount', type: 'radio', checked: true)
+        expect(rendered_page).to have_field('Select files from mount', type: 'radio', checked: true)
         expect(rendered_page).to have_field('Mount path')
         expect(rendered_page).to have_no_css('table[aria-label="Error details"]')
         expect(rendered_page).to have_button('Next', disabled: true)
         expect(rendered_page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
+      end
+
+      it 'renders the file location choices in order' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        labels = rendered_page.all('input[type="radio"][name$="[file_location]"]')
+                              .map { |radio| rendered_page.find("label[for='#{radio[:id]}']").text.strip }
+        expect(labels).to eq(['Globus', 'Select files from mount'])
       end
     end
 
