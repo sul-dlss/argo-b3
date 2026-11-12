@@ -63,14 +63,14 @@ Done when each appears, with its alternative.
 
 ### Inline comments
 
-Choose the lines where a reviewer would ask "why this way?": a pattern chosen over an existing alternative, code moved or extracted (say whether it is a pure move), a deliberate deviation from the issue or design, security-relevant parameter handling, a spec workaround. Each comment explains the reasoning, which the diff can't show, in two to four sentences.
+Choose the lines where a reviewer would ask "why this way?": a pattern chosen over an existing alternative, code moved or extracted (say whether it is a pure move), a deliberate deviation from the issue or design, security-relevant parameter handling, a spec workaround. Each comment explains the reasoning, which the diff can't show, in two to four sentences. End each newly authored comment with "Created by <agent name>.", using the identity of the agent actually writing it (for example, Codex writes "Created by Codex."). Do not copy another agent's name from examples or earlier comments, or guess an unavailable model name or version. Preserve the attribution on quoted or reused comments.
 
 Comments must sit on a right-side line inside the diff: take line numbers from the head commit (`grep -n` on the pushed files). Post all of them as one review:
 
 ```shell
 gh api repos/{owner}/{repo}/pulls/<N>/reviews --input - <<'EOF'
 {"event": "COMMENT", "body": "Notes on implementation choices, to help with review.",
- "comments": [{"path": "app/forms/example_form.rb", "line": 17, "side": "RIGHT", "body": "..."}]}
+ "comments": [{"path": "app/forms/example_form.rb", "line": 17, "side": "RIGHT", "body": "<Reasoning for this choice>\n\nCreated by <agent name>."}]}
 EOF
 ```
 
