@@ -10,7 +10,7 @@
         <% end %>
       <% end %>
 
-      <%= render Search::FacetValueComponent.new(label:, count:, search_form:, form_field:, value:, selected: selected?, data: { turbo_frame: '_top' }) %>
+      <%= render Search::FacetValueComponent.new(label:, count:, search_form:, form_field:, value:, data: { turbo_frame: '_top' }) %>
     </div>
 
     <% if facet_count.branch? %>

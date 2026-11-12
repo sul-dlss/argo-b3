@@ -37,10 +37,6 @@ module Search
       value_parts.last
     end
 
-    def selected?
-      search_form.selected?(key: form_field, value:)
-    end
-
     def expanded?
       # Do any of the selected values start with this value?
       search_form.public_send(form_field).any? do |selected_value|

@@ -46,6 +46,7 @@ RSpec.describe Search::HierarchicalValueComponent, type: :component do
         expect(page).to have_link('Remove', href: '/search')
         expect(page).to have_no_css('a[data-bs-toggle="collapse"]')
         expect(page).to have_no_css('div.collapse')
+        expect(page).to have_no_css('[selected]')
       end
     end
   end
