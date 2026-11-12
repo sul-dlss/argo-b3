@@ -1,21 +1,17 @@
 <%= tag.section class: classes, id: do %>
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h5, text: label) %>
-  <ul class="list-unstyled">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: label) %>
+  <ul class="list-unstyled vstack gap-4">
     <% bulk_action_configs.each do |bulk_action_config| %>
       <li>
         <%# Only display the link when the bulk action has been implemented. %>
         <%# Once all bulk actions have been implemented, this conditional can be removed. %>
         <% if bulk_action_config.path_helper.present? %>
-          <%= link_to(bulk_action_config.label, bulk_action_config.path) %>
+          <%= link_to(bulk_action_config.label, bulk_action_config.path, class: 'fw-bold su-underline') %>
         <% else %>
-          <span style="font-weight: var(--sul-link-font-weight);"><%= bulk_action_config.label %></span>
+          <span class="fw-bold"><%= bulk_action_config.label %></span>
         <% end %>
         <% if bulk_action_config.help_text.present? %>
-          <p class="mb-2">
-            <small>
-              <%= bulk_action_config.help_text %>
-            </small>
-          </p>
+          <p class="mb-0"><%= bulk_action_config.help_text %></p>
         <% end %>
       </li>
     <% end %>

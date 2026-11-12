@@ -797,7 +797,6 @@ en:
     title: 'Custom report'
   bulk_actions:
     label: 'Bulk action'
-    new_heading: 'New bulk actions'
     menu: 'Bulk actions menu'
     history: 'Bulk actions'
     cancel: 'Cancel'

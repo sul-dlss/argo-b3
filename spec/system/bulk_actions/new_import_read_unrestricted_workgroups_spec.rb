@@ -61,7 +61,7 @@ RSpec.describe 'Create a new import read unrestricted workgroups bulk action' do
     it 'does not show the bulk action' do
       visit new_bulk_action_path
 
-      expect(page).to have_css('h1', text: 'New bulk actions')
+      expect(page).to have_css('h1', text: 'Bulk actions menu')
       expect(page).to have_no_css('#manage-permissions-bulk-actions-section')
       expect(page).to have_no_link(bulk_action_label)
     end
