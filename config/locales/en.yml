@@ -282,6 +282,7 @@ en:
       edit:
         files_section:
           label: 'Files'
+          heading: 'Files (%{file_count})'
         title: "Manage files"
         buttons:
           cancel_confirm: "Discard unsaved changes to files?"
