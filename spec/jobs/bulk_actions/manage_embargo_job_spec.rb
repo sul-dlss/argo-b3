@@ -28,7 +28,7 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
-      allow(job_item).to receive(:close_version_if_needed!)
+      allow(job_item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe BulkActions::ManageEmbargoJob do
       expect(args[:user_name]).to eq bulk_action.user.sunetid
       expect(args[:description]).to eq 'Created or updated embargo'
     end
-    expect(job_item).to have_received(:close_version_if_needed!)
+    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -192,7 +192,7 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     let(:job_item) do
       described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
         allow(job_item).to receive(:check_update_ability?).and_return(true)
-        allow(job_item).to receive(:close_version_if_needed!)
+        allow(job_item).to receive(:deposit_if_needed!)
       end
     end
     let(:opened_cocina_object) { Cocina::Models.with_metadata(build(:dro, id: druid, version: 2), 'lock-v2') }

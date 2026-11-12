@@ -12,7 +12,7 @@ module BulkActions
 
         Dor::Services::Client.object(druid).apply_admin_policy_defaults
 
-        close_version_if_needed!
+        deposit_if_needed!
         success!(message: 'Successfully applied defaults')
       end
     end

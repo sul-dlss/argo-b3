@@ -32,7 +32,7 @@ module BulkActions
 
         open_new_version_if_needed!(description: description_msg)
         cocina_model.save!(user_name: user_id, description: description_msg)
-        close_version_if_needed!
+        deposit_if_needed!
 
         success!(message: 'Rights updated successfully')
       end

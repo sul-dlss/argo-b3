@@ -6,6 +6,9 @@ module BulkActions
   class BaseJobItem
     include ActionPolicy::Behaviour
 
+    # Raised when an object was changed but cannot be deposited; a failure to log, not to notify.
+    class NotDepositedError < StandardError; end
+
     authorize :user
     authorize :permission_scope
 
@@ -56,7 +59,9 @@ module BulkActions
       log("Opened new version (#{description})")
     end
 
-    def close_version_if_needed!(force: false)
+    # Deposits the draft if the user asked the job to close versions, or if forced (e.g., redepositing).
+    # @raise [NotDepositedError] if the draft cannot be deposited (e.g., it has unsaved changes)
+    def deposit_if_needed!(force: false)
       # Note that force is set for the redeposit job, which doesn't use the close_version param.
       # Do not close version unless requested to by user (via a job parameter)
       return unless close_version? || force
@@ -66,21 +71,17 @@ module BulkActions
 
       return log('Version already closed') if Sdr::VersionService.closed?(druid:)
 
-      raise 'Unable to close version' unless Sdr::VersionService.closeable?(druid:)
-
-      close_or_accession!
+      # A forced deposit (redeposit) saves nothing first.
+      deposit!(failure_prefix: force ? 'Not deposited' : 'Saved, but not deposited')
     end
 
-    # Closes the version, except for a seed: accessioning it starts wasSeedPreassemblyWF, which closes the version
-    # once it is done.
-    def close_or_accession!
-      if CocinaSupport.webarchive_seed?(cocina_object)
-        Sdr::Repository.accession(cocina_object:, user_name: user_id, lane_id: 'default')
-        log('Started wasSeedPreassemblyWF, which will close the version')
-      else
-        Sdr::VersionService.close(druid:)
-        log('Closed version')
-      end
+    def deposit!(failure_prefix:)
+      # Re-found, since the item's change may have updated the object (e.g., its structure).
+      @cocina_object = Sdr::Repository.find(druid:)
+      workflow_name = Sdr::DepositDraftService.call(cocina_object:, user_name: user_id, lane_id: 'default')
+      log(workflow_name ? "Started #{workflow_name}, which will close the version" : 'Closed version')
+    rescue Sdr::DepositDraftService::Error => e
+      raise NotDepositedError, "#{failure_prefix}: #{e.message}"
     end
 
     def check_update_ability?

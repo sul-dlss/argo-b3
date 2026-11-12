@@ -133,6 +133,7 @@ module Sdr
     # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
     # @param [Hash] context the workflow context for the assembly workflow. Note that closing the
     #   version does not accept a context, so it is ignored when assembly is skipped.
+    # @return [String, nil] the name of the assembly workflow started, or nil if the version was closed
     # @raise [Error] if there is an error initiating accession
     def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
       druid = cocina_object.externalIdentifier
@@ -142,10 +143,13 @@ module Sdr
       if assemble?(cocina_object:)
         # Assembly requires the object's staging folder, even when nothing is staged.
         StagingSupport.ensure_staging_folder(cocina_object:)
-        object_client.workflow(assembly_workflow_name(cocina_object:))
-                     .create(version: cocina_object.version, lane_id:, context: context.presence)
+        assembly_workflow_name(cocina_object:).tap do |workflow_name|
+          object_client.workflow(workflow_name).create(version: cocina_object.version, lane_id:,
+                                                       context: context.presence)
+        end
       else
         object_client.version.close(user_name:, lane_id:)
+        nil
       end
     rescue Dor::Services::Client::Error => e
       raise Error, "Initiating accession failed: #{e.message}"

@@ -15,7 +15,7 @@ module BulkActions
         open_new_version_if_needed!(description: 'Refreshed metadata from FOLIO')
 
         Dor::Services::Client.object(druid).refresh_descriptive_metadata_from_ils
-        close_version_if_needed!
+        deposit_if_needed!
 
         success!(message: 'Successfully refreshed metadata')
       end

@@ -26,6 +26,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
   let(:csv_file) { exported_csv }
 
   let(:job_items) { [] }
+  let(:stub_deposit) { true }
 
   def file_set(label:, id:, filename:, access: { view: 'world', download: 'world' })
     {
@@ -63,7 +64,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
         allow(job_item).to receive(:open_new_version_if_needed!) do
           job_item.instance_variable_set(:@cocina_object, opened_cocina_object)
         end
-        allow(job_item).to receive(:close_version_if_needed!)
+        allow(job_item).to receive(:deposit_if_needed!) if stub_deposit
         job_items << job_item
       end
     end
@@ -95,7 +96,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
         expect(user_name).to eq(bulk_action.user.sunetid)
         expect(description).to eq('Updated structural metadata')
       end
-      expect(job_items.first).to have_received(:close_version_if_needed!)
+      expect(job_items.first).to have_received(:deposit_if_needed!)
 
       expect(log.string).to include("line 2\t#{druid}\tSuccess: Updated structural metadata")
       expect(bulk_action.reload.druid_count_total).to eq(1)
@@ -254,6 +255,33 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
       expect(log.string).to include("#{druid}\tError: StandardError Something bad happened")
       expect(Rails.logger).to have_received(:error).with(/Something bad happened/)
       expect(Honeybadger).to have_received(:notify).with(instance_of(StandardError))
+      expect(bulk_action.reload.druid_count_fail).to eq(1)
+    end
+  end
+
+  context 'when the object cannot be deposited' do
+    subject(:job) { described_class.new(bulk_action:, csv_file:, close_version: true) }
+
+    # Reverses the order of the file sets.
+    let(:csv_file) do
+      lines = exported_csv.lines
+      [lines[0], lines[2], lines[1]].join
+    end
+    let(:stub_deposit) { false }
+
+    before do
+      allow(Sdr::VersionService).to receive(:closed?).with(druid:).and_return(false)
+      allow(Sdr::DepositDraftService).to receive(:call)
+        .and_raise(Sdr::DepositDraftService::UnsavedChangesError, 'Files have unsaved changes')
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'records the failure without notifying Honeybadger' do
+      job.perform_now
+
+      expect(Sdr::Repository).to have_received(:update)
+      expect(log.string).to include("#{druid}\tError: Saved, but not deposited: Files have unsaved changes")
+      expect(Honeybadger).not_to have_received(:notify)
       expect(bulk_action.reload.druid_count_fail).to eq(1)
     end
   end

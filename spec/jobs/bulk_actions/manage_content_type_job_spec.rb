@@ -40,7 +40,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |item|
       allow(item).to receive(:check_update_ability?).and_return(true)
       allow(item).to receive(:open_new_version_if_needed!)
-      allow(item).to receive(:close_version_if_needed!)
+      allow(item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe BulkActions::ManageContentTypeJob do
         expect(args[:user_name]).to eq(bulk_action.user.sunetid)
         expect(args[:description]).to eq('Updated content type')
       end
-      expect(job_item).to have_received(:close_version_if_needed!)
+      expect(job_item).to have_received(:deposit_if_needed!)
 
       expect(log.string).to include("#{druid}\tSuccess: Successfully updated content type")
       expect(bulk_action.reload.druid_count_total).to eq(1)

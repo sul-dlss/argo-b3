@@ -85,6 +85,20 @@ module BulkActions
       self.class.const_get('JobItem')
     end
 
+    # Performs an item, logging any error as the item's failure.
+    # @param failure_args [Hash] additional arguments for failure! (e.g., index:)
+    def perform_item(druid:, **failure_args)
+      yield
+    rescue Sdr::Repository::NotFoundResponse
+      failure!(druid:, message: 'Error: Object not found', **failure_args)
+    rescue BaseJobItem::NotDepositedError => e
+      failure!(druid:, message: "Error: #{e.message}", **failure_args)
+    rescue StandardError => e
+      failure!(druid:, message: "Error: #{e.class} #{e.message}", **failure_args)
+      Rails.logger.error(e.full_message)
+      Honeybadger.notify(e)
+    end
+
     def cancelling?
       # Uncached since the job's query cache is not cleared when the status is changed elsewhere.
       BulkAction.uncached { BulkAction.cancelling.exists?(bulk_action.id) }

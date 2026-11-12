@@ -10,7 +10,7 @@ RSpec.describe BulkActions::RedepositJob do
 
   let(:job_item) do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |job_item|
-      allow(job_item).to receive(:close_version_if_needed!)
+      allow(job_item).to receive(:deposit_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
     end
   end
@@ -27,7 +27,7 @@ RSpec.describe BulkActions::RedepositJob do
     job.perform_now
 
     expect(job_item).to have_received(:check_update_ability?)
-    expect(job_item).to have_received(:close_version_if_needed!).with(force: true)
+    expect(job_item).to have_received(:deposit_if_needed!).with(force: true)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_fail).to eq(0)
@@ -42,7 +42,7 @@ RSpec.describe BulkActions::RedepositJob do
     it 'does not redeposit the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:close_version_if_needed!)
+      expect(job_item).not_to have_received(:deposit_if_needed!)
     end
   end
 end
