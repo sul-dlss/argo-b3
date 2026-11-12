@@ -35,7 +35,8 @@ For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also
 - Test behavior a refactor would preserve. Unless asked, leave out tests of memoization, caching, getters, and default values: they restate the implementation and break on refactors without catching regressions. Security-relevant behavior is not a "default" and should be tested (e.g., an attribute excluded from `permitted_params`, a field that cannot be changed).
 - Prefer request specs, which are much faster than system specs. Reserve system specs for behavior that requires a browser, such as JavaScript (Stimulus controllers, lazy Turbo frames, auto-refresh) or file downloads. If a system spec does not need JavaScript (e.g., a multi-page flow), mark it `:rack_test`.
 - Every `describe` / `context` / `it` description is backed by an assertion. For example, a "with errors" context asserts the error message (e.g., `have_invalid_feedback`), not just the absence of success.
-- Every change to a component's rendered output adds or updates its component spec (`spec/components/...`), even when a system spec also covers it.
+- Every change to a component's rendered output adds or updates its component spec (`spec/components/...`), even when a system spec also covers it. Layout-only changes are the exception (see below).
+- Don't test layout or spacing: no assertions on spacing, sizing, grid, flex, alignment, or visual-variant classes (e.g., `mt-1`, `gap-4`, `col-lg-3`, `text-end`, `h5`), nor on rendered sizes or positions. A layout-only change needs no new spec; show it in the PR screencast instead. Content order in the DOM (e.g., which button comes first) is behavior and may be tested.
 
 ### Expected values
 - Expected values are independent of the implementation. Do not compute them with the code under test or the helpers, constants, or expressions it uses (e.g., `DruidSupport.bare_druid_from`, `Form.permitted_params`, `File.size(filepath_on_disk)`); use literals instead (e.g., `'bc123df4567'`, `[:tag]`, `52`).
@@ -49,9 +50,8 @@ For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also
 - Stub at external boundaries (Solr, `Dor::Services::Client`), not the class under test (e.g., `allow(described_class).to receive(:new)`), and assert on what the code sends or returns.
 - Test arguments with `with` in the `expect(...).to have_received`, not in the `allow`; do not test them in both.
 
-### Layout
+### Spec file layout
 - Place `let` statements before `before` blocks.
-- CSS matchers do not test padding or margins (e.g., `ps-3`, `mt-1`).
 
 ## Ruby / Rails
 
