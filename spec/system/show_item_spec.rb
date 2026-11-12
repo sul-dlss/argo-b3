@@ -277,6 +277,9 @@ RSpec.describe 'Show item' do
     # PURL link in side nav
     expect(page).to have_link('View PURL page', href: "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}")
 
+    # Only APOs can register collections
+    expect(page).to have_no_button('Register & deposit collection')
+
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
     expect(page).to have_table_value('identification-table', 'Druid', druid)

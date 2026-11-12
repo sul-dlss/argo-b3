@@ -53,6 +53,7 @@ RSpec.describe 'Show agreement' do
     # Agreements are dark
     expect(rendered_page).to have_no_link('View PURL page')
     expect(rendered_page).to have_no_button('Republish')
+    expect(rendered_page).to have_no_button('Register & deposit collection')
     expect(rendered_page).to have_no_css('h2', text: 'Released to')
     expect(rendered_page).to have_no_css('h2', text: 'Not released')
 
