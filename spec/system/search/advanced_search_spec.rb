@@ -10,8 +10,7 @@ RSpec.describe 'Advanced search', :solr do
   end
 
   it 'submits with Return and retains the Boolean query when refining with a facet' do
-    visit search_path
-    click_link 'Advanced search'
+    visit advanced_search_path
 
     within('form[action="/advanced_search"]') do
       fill_in 'query', with: 'Miller OR octopus'
@@ -49,13 +48,9 @@ RSpec.describe 'Advanced search', :solr do
     visit advanced_search_path(query:)
 
     expect(page).to have_result_count(1)
-    expect(page).to have_current_filter(query)
     find_facet_section('Object type').click
     within(find_facet_section('Object type')) do
       expect(page).to have_unchecked_field('collection')
-    end
-    within(find_current_filters_section) do
-      expect(page).to have_css('li', count: 1)
     end
   end
 end

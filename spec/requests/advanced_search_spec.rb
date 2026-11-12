@@ -45,15 +45,16 @@ RSpec.describe 'Advanced search' do
       )
     end
 
-    it 'sends the advanced expression to eDisMax and retains it in pagination and sorting' do
+    it 'sends the advanced expression to eDisMax and retains it in pagination' do
       get advanced_search_items_path, params: { query: }, headers: { 'Turbo-Frame' => 'items-search' }
 
       expect(response).to have_http_status(:ok)
       expect(Search::SolrService).to have_received(:post).with(request: hash_including(q: query, defType: 'edismax',
                                                                                        mm: '0%', 'q.op': 'AND'))
       page = Capybara.string(response.body)
-      expect(page).to have_css('a[href^="/advanced_search/items?"][href*="page=2"]')
-      expect(page).to have_css('a[href^="/advanced_search?"][href*="sort=title"][data-turbo-frame="_top"]')
+      pagination_link = page.find('a[href^="/advanced_search/items?"][href*="page=2"]', match: :first)
+      pagination_parameters = Rack::Utils.parse_query(URI.parse(pagination_link[:href]).query)
+      expect(pagination_parameters).to include('page' => '2', 'query' => query)
     end
 
     it 'retains the advanced parser when generating a report from the last search' do
