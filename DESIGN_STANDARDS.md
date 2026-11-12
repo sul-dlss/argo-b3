@@ -77,6 +77,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
   - **SHOULD** Show pages (e.g., dashboard, object page, search) work at all three sizes. Form pages (e.g., registration, edit, bulk actions) are designed for monitors.
   - **MUST** Every page, including form pages, reflows at 400% zoom (320 CSS px wide) without horizontal scrolling, except content that needs two dimensions (tables, the workflow grid, the structure editor) (WCAG 1.4.10).
 - **LAY-5** The dashboard, object page, and bulk action page use `Structure::TwoColumnWithHeaderComponent` with left navigation; other pages are a single column.
+- **LAY-6 SHOULD** Build spacing and sizes given in pixels by a mockup or issue (e.g., "40px", "319px wide") with Bootstrap utilities (`m*-`, `p*-`, `gap-*`, grid columns), rounded to the nearest step of the spacer scale (`1`–`5`: 4, 8, 16, 24, 48px). Similar elements on different pages (titles, boxes, button rows, section gaps) use the same spacing and sizes: match the existing instance rather than the mockup's value, unless the issue asks for the change, and then change every instance (CONS-3). Use exact pixel values in app SCSS only when the layout can't be achieved otherwise, with a `Design standard deviation:` comment giving the reason.
 
 ## Typography
 
