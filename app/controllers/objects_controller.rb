@@ -56,7 +56,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @pinned = PinnedObject.exists?(druid:, user: current_user)
   end
 
-  def show_overview
+  def show_overview # rubocop:disable Metrics/AbcSize
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
     @cocina_model = CocinaModels::PresenterFactory.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
 
@@ -71,6 +71,10 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
       render :show_admin_policy_overview, layout: false
     else
       # This also includes agreements and virtual objects.
+      if @solr_doc.agreement?
+        @admin_policy_count = Searchers::AgreementAdminPolicyCount.call(agreement_druid: @solr_doc.druid,
+                                                                        user_scope: current_user_scope)
+      end
       render :show_dro_overview, layout: false
     end
   end
