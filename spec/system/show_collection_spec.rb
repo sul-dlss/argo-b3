@@ -41,6 +41,7 @@ RSpec.describe 'Show collection' do
 
   before do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+    create(:permission, :edit, workgroup: 'sdr:map-staff', target_druid: druid)
 
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(PurlPreviewService).to receive(:call).and_return('<html><body><main><p>preview</p></main></body></html>')
@@ -106,6 +107,12 @@ RSpec.describe 'Show collection' do
     expect(page).to have_table_value('access-table', 'Copyright', 'My copyright statement')
     expect(page).to have_table_value('access-table', 'License', 'CC Attribution 4.0 International')
     expect(page).to have_table_value('access-table', 'Use and reproduction', 'My use statement')
+
+    # Permissions table, visible to non-admins
+    within('#permissions-table tbody tr') do
+      expect(page).to have_css('td', text: 'sdr:map-staff')
+      expect(page).to have_css('td', text: 'Edit')
+    end
 
     # Tags card
     within('.card', text: 'Tags') do
