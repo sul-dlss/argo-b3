@@ -10,10 +10,6 @@ module BulkActions
       end
     end
 
-    def csv_download_path
-      File.join(bulk_action.output_directory, Settings.export_structural_job.csv_filename)
-    end
-
     # Exports structural metadata for a single object
     class JobItem < BaseJobItem
       def initialize(export_csv:, **)

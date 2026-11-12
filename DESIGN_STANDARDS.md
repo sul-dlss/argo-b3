@@ -58,7 +58,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 ## Headings
 
 - **HEAD-1 MUST** Heading levels are not skipped (h1 → h2 → h3), in DOM order.
-- **HEAD-2 MUST** Headings are real `<h1>`–`<h6>` elements, rendered through `HeadingComponent`. Use `Elements::DivHeadingComponent` (`role="heading"`) only where a heading element would be invalid HTML.
+- **HEAD-2 MUST** Headings are real `<h1>`–`<h6>` elements, rendered through `HeadingComponent`. Use a `role="heading"` element with `aria-level` only where a heading element would be invalid HTML.
 - **HEAD-3 MUST** Visual size is set with `HeadingComponent`'s `variant:` (e.g., an h2 styled as `h4`), never by choosing a different level. Conversely, text that is styled as a heading (`class="h3"`) and introduces a section is a heading element.
 - **HEAD-4 MUST** Headings contain only text. Controls (e.g., the pin button), badges (e.g., "Read only"), and icons that suggest an action go beside the heading, not inside it.
 - **HEAD-5 MUST NOT** have empty headings. *(linted)*
