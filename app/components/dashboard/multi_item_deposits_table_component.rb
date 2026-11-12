@@ -11,7 +11,7 @@ module Dashboard
     attr_reader :multi_item_deposit_actions
 
     def label
-      I18n.t('multi_item_deposit_actions.history.heading')
+      t('multi_item_deposit_actions.history.heading')
     end
 
     def render?

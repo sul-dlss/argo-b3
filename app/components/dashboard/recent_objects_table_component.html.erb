@@ -1,14 +1,14 @@
 <%= render Dashboard::SectionComponent.new(id: 'recent-objects-section', label:) do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(
-        empty_message: 'No objects have been viewed.',
+        empty_message: t('dashboard.recent_objects.empty'),
         label:,
         show_label: false,
         responsive: true
       ) do |component| %>
-    <% component.with_header(label: 'Title') %>
-    <% component.with_header(label: 'Druid') %>
-    <% component.with_header(label: 'Object type') %>
-    <% component.with_header(label: 'Tags') %>
+    <% component.with_header(label: t('dashboard.headers.title')) %>
+    <% component.with_header(label: t('dashboard.headers.druid')) %>
+    <% component.with_header(label: t('dashboard.headers.object_type')) %>
+    <% component.with_header(label: t('dashboard.headers.tags')) %>
     <% recent_object_docs.each do |object_doc| %>
       <% component.with_row do |row_component| %>
         <% row_component.with_cell do %>

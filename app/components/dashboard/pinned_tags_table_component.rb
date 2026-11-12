@@ -15,7 +15,7 @@ module Dashboard
     attr_reader :pinned_tags
 
     def label
-      'Pinned tags'
+      t('dashboard.pinned_tags.label')
     end
 
     def tag_link(pinned_tag)

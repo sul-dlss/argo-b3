@@ -11,7 +11,7 @@ module Dashboard
     attr_reader :recent_object_docs
 
     def label
-      'Recently viewed'
+      t('dashboard.recent_objects.label')
     end
 
     def title_link(object_doc)

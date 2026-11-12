@@ -13,7 +13,7 @@ module Dashboard
     attr_reader :pinned_searches
 
     def label
-      'Pinned searches'
+      t('dashboard.pinned_searches.label')
     end
 
     def search_link(search)

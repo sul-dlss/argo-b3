@@ -1,12 +1,12 @@
 <%= render Dashboard::SectionComponent.new(id: 'pinned-searches-section', label:, pinned: true, classes:) do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(
-        empty_message: 'No searches have been pinned.',
+        empty_message: t('dashboard.pinned_searches.empty'),
         label:,
         show_label: false,
         responsive: true
       ) do |component| %>
-    <% component.with_header(label: 'Search') %>
-    <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
+    <% component.with_header(label: t('dashboard.headers.search')) %>
+    <% component.with_header(label: t('dashboard.headers.unpin'), classes: 'pin-column') %>
     <% pinned_searches.each do |search| %>
       <% component.with_row do |row_component| %>
         <% row_component.with_cell do %>

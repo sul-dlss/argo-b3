@@ -1,12 +1,12 @@
 <%= render Dashboard::SectionComponent.new(id: 'pinned-tags-section', label:, pinned: true, classes:) do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(
-        empty_message: 'No tags have been pinned.',
+        empty_message: t('dashboard.pinned_tags.empty'),
         label:,
         show_label: false,
         responsive: true
       ) do |component| %>
-    <% component.with_header(label: 'Tag') %>
-    <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
+    <% component.with_header(label: t('dashboard.headers.tag')) %>
+    <% component.with_header(label: t('dashboard.headers.unpin'), classes: 'pin-column') %>
     <% pinned_tags.each do |pinned_tag| %>
       <% component.with_row do |row_component| %>
         <% row_component.with_cell do %>
