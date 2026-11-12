@@ -1,16 +1,21 @@
 # frozen_string_literal: true
 
 module MultiItemDeposit
-  # Renders the summary of the results of checking a Multi-Item Deposit's manifest (discovery): when it started,
-  # the number of Item Deposits and of those with discovery errors, and the content types.
+  # Renders the summary of the results of checking a Multi-Item Deposit's manifest (discovery): when it completed,
+  # a link to download the report, the number of Item Deposits and of those with discovery errors,
+  # and the content types.
   class DiscoverySummaryComponent < ApplicationComponent
     def initialize(multi_item_deposit_action:)
       @multi_item_deposit_action = multi_item_deposit_action
       super()
     end
 
-    def started_at
-      helpers.format_datetime(@multi_item_deposit_action.discovery_started_at)
+    def completed_at
+      helpers.format_datetime(@multi_item_deposit_action.discovery_completed_at)
+    end
+
+    def report_path
+      helpers.multi_item_deposit_action_discovery_report_path(@multi_item_deposit_action)
     end
 
     def item_count
