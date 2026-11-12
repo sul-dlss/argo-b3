@@ -4,11 +4,13 @@
                                                                             heading_classes: 'text-uppercase', classes: 'mb-3') do %>
       <% group.indexed_content_file_sets.each do |content_file_set, index| %>
         <%= render Show::FileSetComponent.new(content_file_set:, content_file_set_counter: index,
-                                              content_file_set_total: content_file_sets.size, classes: 'mb-2') %>
+                                              content_file_set_total: content_file_sets.size, classes: 'mb-2',
+                                              file_download_presenter:) %>
       <% end %>
     <% end %>
   <% end %>
 <% else %>
   <%= render Show::FileSetComponent.with_collection(content_file_sets, content_file_set_total: content_file_sets.size,
-                                                                       heading_level: :h3, classes: 'mb-2') %>
+                                                                       heading_level: :h3, classes: 'mb-2',
+                                                                       file_download_presenter:) %>
 <% end %>

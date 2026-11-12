@@ -17,6 +17,8 @@ def secrets = [
         [envVar: 'SETTINGS__FOLIO__OKAPI__PASSWORD', vaultKey: 'content']]],
     [path: 'application/argo-b3/stage/tech-md-service-token', secretValues: [
         [envVar: 'SETTINGS__TECH_MD_SERVICE__TOKEN', vaultKey: 'content']]],
+    [path: 'application/argo-b3/stage/stacks-token', secretValues: [
+        [envVar: 'SETTINGS__STACKS__TOKEN', vaultKey: 'content']]],
     [path: 'application/argo-b3/stage/globus-client-id', secretValues: [
         [envVar: 'SETTINGS__GLOBUS__CLIENT_ID', vaultKey: 'content']]],
     [path: 'application/argo-b3/stage/globus-client-secret', secretValues: [

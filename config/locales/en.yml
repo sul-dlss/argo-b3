@@ -116,6 +116,9 @@ en:
         edit_virtual_object: "Edit virtual object"
         manage_files: "Manage files"
         deposit: "Deposit"
+    file_sets:
+      buttons:
+        download: "Download %{filepath}"
     released_to:
       released:
         heading: "Released to"
@@ -123,6 +126,7 @@ en:
         heading: "Not released"
     errors:
       deposit_failed: "Depositing failed."
+      file_not_available: "%{filepath} is not available for download. If the object is being accessioned, try again when that has finished."
       discard_failed: "Discarding the draft failed."
       purge_failed: "Purging failed."
     toasts:

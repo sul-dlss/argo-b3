@@ -7,7 +7,7 @@ module Show
 
     # @param heading_level [Symbol] one level below the heading of the section containing the resources
     def initialize(content_file_set:, content_file_set_counter:, content_file_set_total:, classes: [], # rubocop:disable Metrics/ParameterLists
-                   content_token: nil, heading_level: :h4)
+                   content_token: nil, heading_level: :h4, file_download_presenter: nil)
       @content_file_set = content_file_set
       @counter = content_file_set_counter
       # The number of resources in the content, used to determine whether this resource can move down.
@@ -16,6 +16,8 @@ module Show
       # Provide content_token to make editable.
       @content_token = content_token
       @heading_level = heading_level
+      # Provide file_download_presenter to render download links.
+      @file_download_presenter = file_download_presenter
       super()
     end
 
@@ -49,6 +51,10 @@ module Show
 
     def move_down?
       editable? && index < @content_file_set_total
+    end
+
+    def download_link(content_file)
+      @file_download_presenter&.link(content_file:)
     end
 
     def move_path(direction)

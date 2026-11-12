@@ -81,6 +81,7 @@ RSpec.describe 'Show structure' do
     allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: true)
                                             .and_return(cocina_object_without_contains)
     allow(Sdr::Repository).to receive(:find).with(druid:, without_structural_contains: false).and_return(cocina_object)
+    allow(Sdr::WorkflowService).to receive(:accessioned?).and_return(true)
   end
 
   describe 'GET /objects/:druid/structure' do
@@ -92,6 +93,8 @@ RSpec.describe 'Show structure' do
       expect(response.body).to include('Images (1)')
       expect(response.body).to include('Image 1')
       expect(response.body).to include('folder1/bc123df4567_0001.tiff')
+      expect(response.body)
+        .to include("href=\"/objects/#{token}/file_download?filepath=folder1%2Fbc123df4567_0001.tiff\"")
     end
 
     context 'when the content is invalid for the content type' do

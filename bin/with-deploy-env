@@ -36,6 +36,7 @@ def vault_secret_path(key, destination)
   when 'SETTINGS__RABBITMQ__USERNAME' then "puppet/application/argo-b3/#{destination}/rabbitmq-username"
   when 'SETTINGS__RABBITMQ__PASSWORD' then "puppet/application/argo-b3/#{destination}/rabbitmq-password"
   when 'SETTINGS__TECH_MD_SERVICE__TOKEN' then "puppet/application/argo-b3/#{destination}/tech-md-service-token"
+  when 'SETTINGS__STACKS__TOKEN' then "puppet/application/argo-b3/#{destination}/stacks-token"
   when 'SETTINGS__GLOBUS__CLIENT_ID' then "puppet/application/argo-b3/#{destination}/globus-client-id"
   when 'SETTINGS__GLOBUS__CLIENT_SECRET' then "puppet/application/argo-b3/#{destination}/globus-client-secret"
   when 'SETTINGS__GLOBUS__ENDPOINT_ID' then "puppet/application/argo-b3/#{destination}/globus-endpoint-id"
