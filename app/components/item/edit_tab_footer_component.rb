@@ -2,8 +2,8 @@
 
 module Item
   # Component for rendering the footer of a pane of the item edit and manage files forms: the tab based navigation
-  # and the buttons for saving as a draft, (optionally) saving as a draft and editing files, discarding the draft
-  # or purging, and (optionally) depositing.
+  # followed by (optionally) the deposit button, and the buttons for (optionally) saving as a draft and editing files,
+  # saving as a draft, and discarding the draft or purging.
   class EditTabFooterComponent < ApplicationComponent
     # @param pane [SdrViewComponents::TabForm::PaneComponent] The pane component the footer is rendered in
     # @param form_id [String] The id of the form that the buttons submit

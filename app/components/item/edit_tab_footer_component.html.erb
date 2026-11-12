@@ -1,6 +1,17 @@
 <div class="d-flex">
   <%= render Item::TabNavigationComponent.new(pane:, cancel_path:, show_next:, show_previous:, cancel_data:) %>
-  <%# A fieldset, so that disabling it (e.g., while uploading) doesn't conflict with disabling the submit buttons. %>
+  <%# Fieldsets, so that disabling them (e.g., while uploading) doesn't conflict with disabling the submit buttons. %>
+  <% if show_deposit %>
+    <%= tag.fieldset class: 'd-flex', data: actions_data do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(
+            label: t('edit.items.edit.buttons.deposit'),
+            form_id:,
+            value: ItemsController::DEPOSIT_VALUE,
+            classes: 'ms-2',
+            data: submit_data
+          ) %>
+    <% end %>
+  <% end %>
   <%= tag.fieldset class: 'd-flex ms-auto', data: actions_data do %>
     <% if show_edit_files %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(
@@ -20,14 +31,5 @@
           data: submit_data
         ) %>
     <%= render Item::DiscardOrPurgeButtonComponent.new(draft_actions_presenter:, data: actions_data) %>
-    <% if show_deposit %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(
-            label: t('edit.items.edit.buttons.deposit'),
-            form_id:,
-            value: ItemsController::DEPOSIT_VALUE,
-            classes: 'ms-2',
-            data: submit_data
-          ) %>
-    <% end %>
   <% end %>
 </div>
