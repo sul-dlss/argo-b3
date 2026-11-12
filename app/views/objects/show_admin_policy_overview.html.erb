@@ -8,16 +8,26 @@
         <% end %>
       <% end %>
       <% component.with_row(label: 'Status', value: @solr_doc.status) %>
-      <% component.with_row(label: '# of collections') do |row_component| %>
+      <% component.with_row(label: 'Collections governed by APO') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['collection']) %>
-          <%= link_to text_with_hidden_context(number_with_delimiter(@object_counts.collection_count), "#{'collection'.pluralize(@object_counts.collection_count)} governed by #{@solr_doc.title}"), url_for(search_form) %>
+          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
+                label: "View #{pluralize(@object_counts.collection_count, 'collection')}",
+                variant: 'outline-primary',
+                link: url_for(search_form),
+                size: :sm
+              ) %>
         <% end %>
       <% end %>
-      <% component.with_row(label: '# of items') do |row_component| %>
+      <% component.with_row(label: 'Items governed by APO') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['item']) %>
-          <%= link_to text_with_hidden_context(number_with_delimiter(@object_counts.item_count), "#{'item'.pluralize(@object_counts.item_count)} governed by #{@solr_doc.title}"), url_for(search_form) %>
+          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
+                label: "View #{pluralize(@object_counts.item_count, 'item')}",
+                variant: 'outline-primary',
+                link: url_for(search_form),
+                size: :sm
+              ) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>
