@@ -12,7 +12,7 @@
   <% component.with_header(label: 'Druid') %>
   <% component.with_header(label: 'Collection') %>
   <% component.with_header(label: 'APO') %>
-  <% component.with_header(label: 'Unpin') %>
+  <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
   <% pinned_item_docs.each do |item_doc| %>
     <% component.with_row do |row_component| %>
       <% row_component.with_cell do %>
@@ -27,7 +27,7 @@
       <% row_component.with_cell do %>
         <%= apo_link(item_doc) %>
       <% end %>
-      <% row_component.with_cell do %>
+      <% row_component.with_cell(classes: 'pin-column') do %>
         <%= render Pin::PinnedObjectComponent.new(druid: item_doc.druid, pinned: true) %>
       <% end %>
     <% end %>

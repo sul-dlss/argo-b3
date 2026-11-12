@@ -9,13 +9,13 @@
     <%= helpers.pin_icon(classes: 'pinned', aria: { hidden: true }) %>
   <% end %>
   <% component.with_header(label: 'Search') %>
-  <% component.with_header(label: 'Unpin') %>
+  <% component.with_header(label: 'Unpin', classes: 'pin-column') %>
   <% pinned_searches.each do |search| %>
     <% component.with_row do |row_component| %>
       <% row_component.with_cell do %>
         <%= search_link(search) %>
       <% end %>
-      <% row_component.with_cell do %>
+      <% row_component.with_cell(classes: 'pin-column') do %>
         <%= render Pin::PinnedSearchComponent.new(search_form: search.to_search_form, pinned: true) %>
       <% end %>
     <% end %>

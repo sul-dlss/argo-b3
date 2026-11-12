@@ -1,0 +1,10 @@
+// The Unpin column of the dashboard's pinned tables hugs the right edge, so the pins line up across tables.
+.pin-column {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
+
+  .pin.btn {
+    --bs-btn-padding-x: 0;
+  }
+}
