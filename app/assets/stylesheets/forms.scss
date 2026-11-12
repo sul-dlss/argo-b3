@@ -15,8 +15,13 @@
 
   // Margin between form fields
   .my-field {
-    margin-top: $spacer; 
+    margin-top: $spacer;
     margin-bottom: $spacer;
+  }
+
+  // A pane's footer (following its content in the gem's pane layout) gets the form footer spacing (mt-5, LAY-2).
+  .tab-pane > .flex-column > :last-child:not(:first-child) {
+    margin-top: $spacer * 3;
   }
 
   // A radio group's error follows its last radio button, so keep the error next to that radio
