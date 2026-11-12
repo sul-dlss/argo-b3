@@ -486,12 +486,12 @@ RSpec.describe 'Show item' do
     toggle_button.send_keys(:enter)
     expect(page).to have_no_css('tr.toggle-row-data.show')
     expect(toggle_button['aria-expanded']).to eq('false')
-    expect(page).to have_no_css('h2', text: 'Structural metadata')
+    expect(page).to have_no_css('h2', text: 'Resources (1)')
 
     # Structure tab
     click_button 'Structure'
 
-    expect(page).to have_css('h2', text: 'Structural metadata')
+    expect(page).to have_css('h2', text: 'Resources (1)')
     within('.file-set-card', text: 'Resource (1): file') do
       expect(page).to have_css('.card-title', text: 'Label: Object 1')
       expect(page).to have_css('td', text: 'rr624wq8610_00_0001.jp2')

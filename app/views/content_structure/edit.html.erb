@@ -72,7 +72,7 @@
           <%= delete_icon(classes: 'me-2', aria: { hidden: true }) %><%= t('edit.contents.structure.buttons.delete_all') %>
         <% end %>
       </fieldset>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: 'Structural metadata', classes: 'mt-3') %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: "Resources (#{@content.content_file_sets.size})", classes: 'mt-3') %>
       <% @content.content_file_sets.each_with_index do |content_file_set, index| %>
         <div class="mb-2">
           <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>
