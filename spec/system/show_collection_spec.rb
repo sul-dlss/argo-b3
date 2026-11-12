@@ -90,8 +90,8 @@ RSpec.describe 'Show collection' do
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
     expect(page).to have_table_value('overview-table', 'Druid', 'bb123cd4567')
-    within(find_table_value_cell('overview-table', '# of items')) do
-      expect(page).to have_link('12 items in My collection title',
+    within(find_table_value_cell('overview-table', 'Items in collection')) do
+      expect(page).to have_link('View 12 items',
                                 href: search_path(collection_druids: [druid], object_types: ['item']))
     end
     within(find_table_value_cell('access-table', 'APO')) do
