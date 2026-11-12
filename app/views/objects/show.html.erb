@@ -46,6 +46,9 @@
         <% if @solr_doc.object_type?('item', 'virtual object', 'collection') %>
           <% component.with_button(link: descriptive_csv_object_path(druid: @druid_token), label: 'Download description', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
+        <% if @solr_doc.virtual_object? %>
+          <% component.with_button(link: virtual_object_csv_object_path(druid: @druid_token), label: 'Download virtual object CSV', variant: 'outline-primary', data: { turbo: false }) %>
+        <% end %>
         <% if @solr_doc.object_type_with_content? %>
           <% component.with_button(link: structural_csv_object_path(druid: @druid_token), label: 'Download structural metadata', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>

@@ -53,6 +53,12 @@ class CocinaSupport
     Array(cocina_object.structural&.hasMemberOrders).any? { |member_order| member_order.members.present? }
   end
 
+  # @param cocina_object [Cocina::Models::DRO] a Virtual Object
+  # @return [Array<String>] the constituent druids, in order
+  def self.constituent_druids(cocina_object)
+    Array(cocina_object.structural.hasMemberOrders.first&.members)
+  end
+
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
   # @return [Boolean] true if the object is an Item, i.e., a DRO that is not an Agreement or a Virtual Object
   def self.item?(cocina_object)

@@ -6,7 +6,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   skip_verify_authorized only: %i[show_json show_workflows show_overview show_versions show_events show_releases
                                   show_purl_preview show_solr_doc show_files show_structure show_constituents
-                                  show_structural_csv show_descriptive_csv track]
+                                  show_structural_csv show_descriptive_csv show_virtual_object_csv track]
 
   include TokenConcern
   include ToastAndRefreshConcern
@@ -149,7 +149,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def show_constituents
     @druid = verified_druid
-    @constituents = object_rows(Array(cocina_object.structural.hasMemberOrders.first&.members))
+    @constituents = object_rows(CocinaSupport.constituent_druids(cocina_object))
 
     render layout: false
   end
@@ -171,6 +171,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     descriptions = { verified_druid => description }
     send_data DescriptiveCsv::Export.as_csv(descriptions:),
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_description.csv"
+  end
+
+  def show_virtual_object_csv
+    return head :not_found unless CocinaSupport.virtual_object?(cocina_object)
+
+    send_data VirtualObjectCsv::Export.as_csv(cocina_object:),
+              type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(verified_druid)}_virtual_object.csv"
   end
 
   # Records the search_position (used for previous/next navigation between search results) for this
