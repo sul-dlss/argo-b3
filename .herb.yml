@@ -23,6 +23,9 @@ linter:
     html-no-title-attribute:
       enabled: true
       severity: error
+    # Flags rendering ViewComponent instances, which herb can't tell from models.
+    actionview-no-implicit-partial:
+      enabled: false
 
 formatter:
   enabled: false

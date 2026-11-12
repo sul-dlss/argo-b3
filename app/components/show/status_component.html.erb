@@ -22,7 +22,7 @@
     <p><%= staging_failed_body %></p>
     <%# Managing files again retries staging. %>
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-      <%= render manage_files_button %> <%# herb:disable actionview-no-implicit-partial %>
+      <%= render manage_files_button %>
     </div>
   <% when :error %>
     <% workflow_error_messages.each do |workflow_error_message| %>
