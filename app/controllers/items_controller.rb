@@ -3,13 +3,15 @@
 # Controller for items (DRO)
 class ItemsController < ApplicationController
   include ApoOptionsConcern
+  include EditCocinaObjectConcern
   include RegisterCancelConcern
   include TokenConcern
 
   # Matches ObjectsController so its descriptive CSV download accepts the druid token.
   self.token_purpose = 'show'
 
-  before_action :set_druid_and_cocina_object, only: %i[edit update]
+  edit_form EditItemForm
+
   # Values for submit buttons
   DRAFT_VALUE = 'draft'
   DRAFT_TO_ADD_FILES_VALUE = 'add_files'
@@ -28,9 +30,7 @@ class ItemsController < ApplicationController
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.draft_editable?
 
-    @edit_item_form = EditItemForm.build_from_cocina_object(@cocina_object)
-    @edit_item_form.version_service = version_service
-    @edit_item_form.prefill_version_description
+    @edit_item_form = prefilled_edit_form
     set_edit_view
   end
 
@@ -52,14 +52,15 @@ class ItemsController < ApplicationController
   def update # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.draft_editable?
-    return redirect_stale if stale?
+
+    @edit_item_form = submitted_edit_form
+    return redirect_stale if @edit_item_form.stale?
     return redirect_assembly_stopped_with_error if deposit? && version_service.assembly_stopped_with_error?
 
     # The mutable Content holds the OCR settings and must follow the object to its new lock.
-    @content = Content.mutable_for(@cocina_object)
-    return redirect_content_busy if @content&.staging_or_discovering?
+    @edit_item_form.content = Content.mutable_for(@cocina_object)
+    return redirect_content_busy if @edit_item_form.content&.staging_or_discovering?
 
-    @edit_item_form = build_submitted_edit_item_form
     authorize! @edit_item_form, to: :add_to_collections?, with: ItemPolicy
     authorize! @edit_item_form, to: :update_apo?, with: ItemPolicy
     return render_invalid_edit unless @edit_item_form.valid?(deposit? ? :deposit : nil)
@@ -72,22 +73,6 @@ class ItemsController < ApplicationController
 
   def new_item_form_params
     NewItemForm.params_from(params)
-  end
-
-  def build_submitted_edit_item_form
-    EditItemForm.build_from_cocina_object(@cocina_object).tap do |form|
-      form.version_service = version_service
-      form.update(edit_item_form_params)
-      form.content = @content
-    end
-  end
-
-  def edit_item_form_params
-    EditItemForm.params_from(params)
-  end
-
-  def version_service
-    @version_service ||= Sdr::VersionService.new(druid: @druid)
   end
 
   def deposit?
@@ -103,39 +88,12 @@ class ItemsController < ApplicationController
     params[:commit] == DRAFT_TO_ADD_FILES_VALUE ? edit_content_path(@druid) : object_path(@druid)
   end
 
-  def redirect_not_editable
-    redirect_to object_path(@druid), flash: { danger: t('edit.items.edit.warnings.not_editable') }
-  end
-
-  # The lock changes whenever the object is updated, so a different (or missing) lock means that the object
-  # was changed after the edit page was loaded.
-  def stale?
-    edit_item_form_params[:lock] != @cocina_object.lock
-  end
-
-  def redirect_assembly_stopped_with_error
-    redirect_to object_path(@druid), flash: { warning: t('edit.items.edit.warnings.assembly_stopped_with_error') }
-  end
-
-  def redirect_stale
-    redirect_to edit_item_path(@druid), flash: { danger: t('edit.items.edit.warnings.stale') }
-  end
-
-  def redirect_content_busy
-    redirect_to edit_item_path(@druid), flash: { danger: t('edit.items.edit.warnings.content_busy') }
-  end
-
   def set_edit_view
     @title = CocinaSupport.title(@cocina_object)
     # Computed once, since every pane's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
     @druid_token = generate_token(@druid)
     set_apo_and_collection_options(form: @edit_item_form)
-  end
-
-  def render_invalid_edit
-    set_edit_view
-    render :edit, status: :unprocessable_content
   end
 
   def set_apo_and_collection_options(form:)
@@ -152,10 +110,5 @@ class ItemsController < ApplicationController
     else
       object_path(@new_item_form.druid)
     end
-  end
-
-  def set_druid_and_cocina_object
-    @druid = params[:id]
-    @cocina_object = Sdr::Repository.find(druid: @druid)
   end
 end

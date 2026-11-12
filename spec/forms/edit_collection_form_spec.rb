@@ -16,10 +16,9 @@ RSpec.describe EditCollectionForm do
   end
 
   describe '.build_from_cocina_object' do
-    it 'sets the attributes and lock from the cocina object, without changes' do
+    it 'sets the attributes from the cocina object, without changes' do
       expect(edit_collection_form.apo_druid).to eq(apo_druid)
       expect(edit_collection_form.access_view).to eq('world')
-      expect(edit_collection_form.lock).to eq(cocina_object.lock)
       expect(edit_collection_form).not_to be_changed
     end
   end
@@ -35,13 +34,6 @@ RSpec.describe EditCollectionForm do
 
   describe 'validation' do
     before { edit_collection_form.update(version_description: 'Updated the description') }
-
-    it 'requires a version description' do
-      edit_collection_form.version_description = ''
-
-      expect(edit_collection_form).not_to be_valid
-      expect(edit_collection_form.errors[:version_description]).to eq(["can't be blank"])
-    end
 
     it 'requires a FOLIO Instance HRID when Refresh on deposit is checked' do
       edit_collection_form.update(catalog_record_id: '', catalog_link_refresh: true)

@@ -8,7 +8,7 @@ class EditApoForm < CocinaModels::AdminPolicy
 
   include PermittedParamsConcern
   include TitleFormConcern
-  include VersionDescriptionConcern
+  include EditCocinaObjectFormConcern
   include LockFormConcern
 
   # Not permitted as params, since the APO form has no fields for them.
@@ -24,27 +24,6 @@ class EditApoForm < CocinaModels::AdminPolicy
 
   # The location field is disabled (and so not submitted) when it does not apply, so it is cleared here.
   before_validation :clear_access_location, unless: :access_location_applies?
-
-  # Prefilled with the open version's description.
-  validates :version_description, presence: true
-
-  # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description lock].freeze
-
-  # Before saving, opens a new version if the version
-  # is closed and there is something to save or deposit; otherwise updates the open version's description if changed.
-  # @param [String] user_name the sunetid of the user performing the action
-  # @param [Boolean] accession whether to start accessioning after saving
-  # @raise [ActiveModel::ValidationError] if the form is invalid
-  def save!(user_name:, accession: false)
-    validate!
-    prepare_version!(user_name:, open_version: changed? || accession)
-    super
-  end
-
-  def changed?
-    (changed - FORM_ONLY_ATTRIBUTES).any?
-  end
 
   private
 

@@ -7,6 +7,7 @@
 # Requires previous_cocina_object and mutated_cocina_object, as provided by CocinaModels::Dro.
 module ContentDepositFormConcern
   extend ActiveSupport::Concern
+  include EditCocinaObjectFormConcern
 
   included do
     # Only depositing requires the structure to be valid for the content type.
@@ -19,6 +20,10 @@ module ContentDepositFormConcern
   end
 
   private
+
+  def workflow_context
+    content&.workflow_context(content_type:) || {}
+  end
 
   # Keeps the content on the object's current lock, so that editing continues on it.
   def rebase_content_lock

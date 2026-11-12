@@ -15,10 +15,6 @@ RSpec.describe EditItemForm do
   end
 
   describe '.build_from_cocina_object' do
-    it 'sets the lock from the cocina object' do
-      expect(edit_item_form.lock).to eq(cocina_object.lock)
-    end
-
     context 'without an embargo' do
       it 'is without embargo' do
         expect(edit_item_form.with_embargo).to be false
@@ -79,23 +75,6 @@ RSpec.describe EditItemForm do
         edit_item_form.valid?
 
         expect(edit_item_form.errors[:collection_druids]).to be_empty
-      end
-    end
-  end
-
-  describe 'version description validation' do
-    context 'without a version description' do
-      it 'is not valid' do
-        expect(edit_item_form).not_to be_valid
-        expect(edit_item_form.errors[:version_description]).to include("can't be blank")
-      end
-    end
-
-    context 'with a version description' do
-      before { edit_item_form.version_description = 'Fixed the content type' }
-
-      it 'is valid' do
-        expect(edit_item_form).to be_valid
       end
     end
   end
@@ -498,35 +477,11 @@ RSpec.describe EditItemForm do
   end
 
   describe '#changed?' do
-    context 'when only the version description changed' do
-      before { edit_item_form.update(version_description: 'Fixed the content type') }
-
-      it 'returns false' do
-        expect(edit_item_form).not_to be_changed
-      end
-    end
-
-    context 'when only the lock changed' do
-      before { edit_item_form.update(lock: 'other-lock') }
-
-      it 'returns false' do
-        expect(edit_item_form).not_to be_changed
-      end
-    end
-
     context 'when only the attributes that control the form changed' do
       before { edit_item_form.update(with_embargo: true, limit_collection_by_apo: true) }
 
       it 'returns false' do
         expect(edit_item_form).not_to be_changed
-      end
-    end
-
-    context 'when an attribute of the cocina object changed' do
-      before { edit_item_form.update(content_type: Cocina::Models::ObjectType.image) }
-
-      it 'returns true' do
-        expect(edit_item_form).to be_changed
       end
     end
   end
@@ -542,57 +497,6 @@ RSpec.describe EditItemForm do
       allow(Sdr::VersionService).to receive_messages(new: version_service, open: opened_cocina_object)
       allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object }
       allow(Sdr::Repository).to receive(:accession)
-    end
-
-    context 'when the version is open and the version description changed' do
-      let(:open) { true }
-
-      before { edit_item_form.update(version_description: 'Fixed the content type and title') }
-
-      it 'updates the version description without opening a version' do
-        edit_item_form.save!(user_name:)
-
-        expect(Sdr::VersionService).to have_received(:new).with(druid: 'druid:bc123df4567')
-        expect(version_service).to have_received(:update_description)
-          .with(description: 'Fixed the content type and title', user_name:)
-        expect(Sdr::VersionService).not_to have_received(:open)
-      end
-    end
-
-    context 'when the version is open and the version description did not change' do
-      let(:open) { true }
-
-      before do
-        edit_item_form.update(version_description: 'Fixed the content type',
-                              content_type: Cocina::Models::ObjectType.image)
-      end
-
-      it 'saves without updating the version description' do
-        edit_item_form.save!(user_name:)
-
-        expect(version_service).not_to have_received(:update_description)
-        expect(Sdr::VersionService).not_to have_received(:open)
-        expect(Sdr::Repository).to have_received(:update)
-      end
-    end
-
-    context 'when the version is closed and there are changes' do
-      let(:open) { false }
-
-      before do
-        edit_item_form.update(version_description: 'Changed type', content_type: Cocina::Models::ObjectType.image)
-      end
-
-      it 'opens a new version and saves against it' do
-        edit_item_form.save!(user_name:)
-
-        expect(Sdr::VersionService).to have_received(:open)
-          .with(druid: cocina_object.externalIdentifier, description: 'Changed type', opening_user_name: user_name)
-        expect(Sdr::Repository).to have_received(:update)
-          .with(cocina_object: having_attributes(version: 2, lock: 'opened-lock'), user_name:, description: nil)
-        expect(version_service).not_to have_received(:update_description)
-        expect(Sdr::Repository).not_to have_received(:accession)
-      end
     end
 
     context 'when a description spreadsheet is provided' do
@@ -755,35 +659,6 @@ RSpec.describe EditItemForm do
       end
     end
 
-    context 'when the version is closed and there are no changes' do
-      let(:open) { false }
-
-      before { edit_item_form.update(version_description: 'Nothing really') }
-
-      it 'neither opens a version nor saves' do
-        edit_item_form.save!(user_name:)
-
-        expect(Sdr::VersionService).not_to have_received(:open)
-        expect(Sdr::Repository).not_to have_received(:update)
-      end
-    end
-
-    context 'when accessioning with a closed version and no changes' do
-      let(:open) { false }
-
-      before { edit_item_form.update(version_description: 'Redeposit') }
-
-      it 'opens a new version and starts accessioning it' do
-        edit_item_form.save!(user_name:, accession: true)
-
-        expect(Sdr::VersionService).to have_received(:open)
-          .with(druid: cocina_object.externalIdentifier, description: 'Redeposit', opening_user_name: user_name)
-        expect(Sdr::Repository).not_to have_received(:update)
-        expect(Sdr::Repository).to have_received(:accession)
-          .with(cocina_object: opened_cocina_object, user_name:, context: {})
-      end
-    end
-
     context 'when accessioning with a content that has OCR settings' do
       let(:open) { true }
       let(:content) do
@@ -842,18 +717,6 @@ RSpec.describe EditItemForm do
       it 'rebases the content onto the opened version' do
         expect { edit_item_form.save!(user_name:) }.to raise_error(Sdr::Repository::Error)
         expect(content.reload.lock).to eq('opened-lock')
-      end
-    end
-
-    context 'without a version description' do
-      let(:open) { false }
-
-      before { edit_item_form.update(content_type: Cocina::Models::ObjectType.image) }
-
-      it 'raises without opening a version' do
-        expect { edit_item_form.save!(user_name:) }.to raise_error(ActiveModel::ValidationError)
-        expect(Sdr::VersionService).not_to have_received(:open)
-        expect(Sdr::Repository).not_to have_received(:update)
       end
     end
   end

@@ -2,9 +2,10 @@
 
 # Controller for agreements
 class AgreementsController < ApplicationController
+  include EditCocinaObjectConcern
   include RegisterCancelConcern
 
-  before_action :set_druid_and_cocina_object, only: %i[edit update]
+  edit_form EditAgreementForm
 
   # Values for submit buttons
   DRAFT_VALUE = 'draft'
@@ -22,9 +23,7 @@ class AgreementsController < ApplicationController
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.draft_editable?
 
-    @edit_agreement_form = EditAgreementForm.build_from_cocina_object(@cocina_object)
-    @edit_agreement_form.version_service = version_service
-    @edit_agreement_form.prefill_version_description
+    @edit_agreement_form = prefilled_edit_form
     set_edit_view
   end
 
@@ -46,14 +45,15 @@ class AgreementsController < ApplicationController
   def update # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     authorize! @cocina_object, with: ObjectPolicy
     return redirect_not_editable unless version_service.draft_editable?
-    return redirect_stale if stale?
+
+    @edit_agreement_form = submitted_edit_form
+    return redirect_stale if @edit_agreement_form.stale?
     return redirect_assembly_stopped_with_error if deposit? && version_service.assembly_stopped_with_error?
 
     # The mutable Content must follow the object to its new lock.
-    @content = Content.mutable_for(@cocina_object)
-    return redirect_content_busy if @content&.staging_or_discovering?
+    @edit_agreement_form.content = Content.mutable_for(@cocina_object)
+    return redirect_content_busy if @edit_agreement_form.content&.staging_or_discovering?
 
-    @edit_agreement_form = build_submitted_edit_agreement_form
     return render_invalid_edit unless @edit_agreement_form.valid?(deposit? ? :deposit : nil)
 
     @edit_agreement_form.save!(user_name: current_user.sunetid, accession: deposit?)
@@ -64,22 +64,6 @@ class AgreementsController < ApplicationController
 
   def new_agreement_form_params
     NewAgreementForm.params_from(params)
-  end
-
-  def edit_agreement_form_params
-    EditAgreementForm.params_from(params)
-  end
-
-  def build_submitted_edit_agreement_form
-    EditAgreementForm.build_from_cocina_object(@cocina_object).tap do |form|
-      form.version_service = version_service
-      form.update(edit_agreement_form_params)
-      form.content = @content
-    end
-  end
-
-  def version_service
-    @version_service ||= Sdr::VersionService.new(druid: @druid)
   end
 
   def deposit?
@@ -100,42 +84,10 @@ class AgreementsController < ApplicationController
                 flash: { toast: t("edit.agreements.edit.toasts.#{toast_key}") }
   end
 
-  def redirect_not_editable
-    redirect_to object_path(@druid), flash: { danger: t('edit.agreements.edit.warnings.not_editable') }
-  end
-
-  # The lock changes whenever the object is updated, so a different (or missing) lock means that the object
-  # was changed after the edit page was loaded.
-  def stale?
-    edit_agreement_form_params[:lock] != @cocina_object.lock
-  end
-
-  def redirect_assembly_stopped_with_error
-    redirect_to object_path(@druid), flash: { warning: t('edit.agreements.edit.warnings.assembly_stopped_with_error') }
-  end
-
-  def redirect_stale
-    redirect_to edit_agreement_path(@druid), flash: { danger: t('edit.agreements.edit.warnings.stale') }
-  end
-
-  def redirect_content_busy
-    redirect_to edit_agreement_path(@druid), flash: { danger: t('edit.agreements.edit.warnings.content_busy') }
-  end
-
   # The saved title is shown, so that it is not replaced by an invalid submitted title.
   def set_edit_view
     @title = CocinaSupport.title(@cocina_object)
     # Computed once, since every pane's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
-  end
-
-  def render_invalid_edit
-    set_edit_view
-    render :edit, status: :unprocessable_content
-  end
-
-  def set_druid_and_cocina_object
-    @druid = params[:id]
-    @cocina_object = Sdr::Repository.find(druid: @druid)
   end
 end

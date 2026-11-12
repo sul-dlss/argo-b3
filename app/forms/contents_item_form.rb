@@ -5,16 +5,11 @@
 class ContentsItemForm < CocinaModels::Dro
   include PermittedParamsConcern
   include TextExtractionConcern
-  include VersionDescriptionConcern
+  include EditCocinaObjectFormConcern
   include EmbargoFormConcern
   include FileAccessFormConcern
 
-  # The initial version's description is set at registration, so it is not entered.
-  validates :version_description, presence: true, unless: :initial_version?
-
-  # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description perform_ocr ocr_languages perform_speech_to_text with_embargo
-                            overwrite_file_access].freeze
+  form_only_attributes :perform_ocr, :ocr_languages, :perform_speech_to_text, :with_embargo, :overwrite_file_access
 
   # The Content being deposited, which is not an attribute so that setting it does not make the form dirty.
   attr_accessor :content
@@ -44,28 +39,25 @@ class ContentsItemForm < CocinaModels::Dro
      :overwrite_file_access, { ocr_languages: [] }, *ACCESS_PARAMS]
   end
 
-  # Saves the text extraction settings with the content. Then opens a new version if the version is closed (since
-  # staging always updates the structure); otherwise updates the description of the open version if it changed.
-  # Afterwards, applies a change to the access to the content's files, so that staging them saves it.
-  # @param [String] user_name the sunetid of the user performing the action
-  # @raise [ActiveModel::ValidationError] if the form is invalid
-  def save!(user_name:)
-    validate!
+  private
+
+  # Staging always updates the structure, so a closed version is always opened.
+  def open_version_on_save? = true
+
+  # The initial version's description is set at registration, so it is not entered.
+  def version_description_required? = !initial_version?
+
+  # Saves the text extraction settings with the content, and applies a change to the access to the content's files
+  # so that staging them saves it.
+  def around_content_save(**)
     content&.update!(text_extraction_settings_attributes)
-    prepare_version!(user_name:, open_version: true)
     overwrite = content_file_access_overwrite
-    super
+    yield
     overwrite_content_file_access!(overwrite)
   ensure
     # Keeps the content on the object's current lock, even if saving failed after opening a version.
     content&.update!(lock: previous_cocina_object.lock)
   end
-
-  def changed?
-    (changed - FORM_ONLY_ATTRIBUTES).any? || tracked_associations_changed?
-  end
-
-  private
 
   def clear_viewing_direction
     self.viewing_direction = nil

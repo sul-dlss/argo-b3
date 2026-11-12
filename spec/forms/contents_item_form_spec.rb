@@ -253,34 +253,6 @@ RSpec.describe ContentsItemForm do
         expect(contents_item_form.errors[:version_description]).to include("can't be blank")
       end
     end
-
-    it 'does not change the form' do
-      contents_item_form.update(version_description: 'Added files')
-
-      expect(contents_item_form).not_to be_changed
-    end
-  end
-
-  describe '#prefill_version_description' do
-    context 'when the version is open' do
-      it 'prefills the description of the open version' do
-        contents_item_form.prefill_version_description
-
-        expect(contents_item_form.version_description).to eq('Initial version')
-      end
-    end
-
-    context 'when the version is closed' do
-      let(:version_service) do
-        version_service_double(open?: false, version: 1, version_description: 'Initial version')
-      end
-
-      it 'leaves the description blank' do
-        contents_item_form.prefill_version_description
-
-        expect(contents_item_form.version_description).to be_nil
-      end
-    end
   end
 
   describe '#prefill_text_extraction_settings' do
@@ -385,33 +357,6 @@ RSpec.describe ContentsItemForm do
       it 'rebases the content onto the opened version' do
         expect { contents_item_form.save!(user_name:) }.to raise_error(Sdr::Repository::Error)
         expect(content.reload.lock).to eq('opened-lock')
-      end
-    end
-
-    context 'when the version is open and the version description changed' do
-      let(:open) { true }
-
-      before { contents_item_form.update(version_description: 'Added more files') }
-
-      it 'updates the version description without opening a version' do
-        contents_item_form.save!(user_name:)
-
-        expect(version_service).to have_received(:update_description)
-          .with(description: 'Added more files', user_name:)
-        expect(Sdr::VersionService).not_to have_received(:open)
-      end
-    end
-
-    context 'when the version is open and the version description did not change' do
-      let(:open) { true }
-
-      before { contents_item_form.update(version_description: 'Added files') }
-
-      it 'does not update the version description' do
-        contents_item_form.save!(user_name:)
-
-        expect(version_service).not_to have_received(:update_description)
-        expect(Sdr::VersionService).not_to have_received(:open)
       end
     end
 
