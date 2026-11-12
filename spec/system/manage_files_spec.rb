@@ -900,12 +900,14 @@ RSpec.describe 'Manage files' do
       visit "/contents/#{druid}/edit"
 
       upload_file('dropzone_upload.txt')
+      expect(page).to have_css('h2', exact_text: 'Files (1)')
 
       click_button 'Delete dropzone_upload.txt'
 
       expect(page).to have_toast('File deleted')
       within("turbo-frame[id^='show_content_']") do
         expect(page).to have_css('p', text: 'No files yet')
+        expect(page).to have_css('h2', exact_text: 'Files (0)')
       end
       expect(content.content_file_binaries).to be_empty
     end

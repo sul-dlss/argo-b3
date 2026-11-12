@@ -36,6 +36,25 @@ RSpec.describe 'Contents' do
       expect(response.body).not_to include('data-disable-actions-target="busy"')
     end
 
+    it 'shows the number of files in the heading' do
+      get content_path(content_token)
+
+      expect(Capybara.string(response.body)).to have_css('h2', exact_text: 'Files (0)')
+    end
+
+    context 'when the content has files' do
+      before do
+        create(:content_file_binary, content:, filepath: 'image1.tif')
+        create(:content_file_binary, content:, filepath: 'image2.tif')
+      end
+
+      it 'shows the number of files in the heading' do
+        get content_path(content_token)
+
+        expect(Capybara.string(response.body)).to have_css('h2', exact_text: 'Files (2)')
+      end
+    end
+
     context 'when discovering files' do
       let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, mount_state: 'discovering') }
 

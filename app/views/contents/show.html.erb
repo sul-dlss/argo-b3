@@ -1,4 +1,7 @@
 <%= turbo_frame_tag @content, 'show' do %>
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2,
+                                                               text: t('edit.contents.edit.files_section.heading',
+                                                                       file_count: number_with_delimiter(@content.content_file_binaries.count))) %>
   <%# Disables the actions (e.g., cancel, deposit) while discovering or staging (see disable-actions in contents/edit).
       The frame is reloaded when discovery starts and finishes. %>
   <% if @content.staging_or_discovering? %>

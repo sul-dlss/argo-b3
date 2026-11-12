@@ -144,9 +144,9 @@
 
           <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
-          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.edit.files_section.label')) %>
-
+          <%# The heading, with the number of files, is in the frame so that it updates when the frame reloads. %>
           <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'reloadable-frame' }, class: 'content-files-frame' do %>
+            <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.edit.files_section.label')) %>
             <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
           <% end %>
         <% end %>
