@@ -13,18 +13,20 @@
       previous submission once the user edits the offending field. %>
   <%= render Layout::TabListComponent.new(id: form_id, active_tab_name: :details,
                                           data: { action: 'change->sdr-tab-error#changed' }) do |tab_list| %>
-    <% tab_list.with_tab(label: t('edit.items.tabs.details.label'), tab_name: :details) %>
-    <% tab_list.with_tab(label: t('edit.items.tabs.description.label'), tab_name: :description) %>
-    <% tab_list.with_tab(label: t('edit.items.tabs.rights.label'), tab_name: :rights) %>
-    <% tab_list.with_tab(label: t('edit.items.edit.tabs.deposit.label'), tab_name: :deposit) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.details.label'), tab_name: :details, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.description.label'), tab_name: :description, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.tabs.rights.label'), tab_name: :rights, mark_required: true) %>
+    <% tab_list.with_tab(label: t('edit.items.edit.tabs.deposit.label'), tab_name: :deposit, mark_required: true) %>
 
     <% form_with(model: @edit_item_form, url: item_path(@edit_item_form.druid), html: { id: form_id }, builder: SdrViewComponents::TabForm::TabbedFormBuilder) do |form| %>
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details,
-                                                                          label: t('edit.items.tabs.details.label'))) do |pane| %>
+                                                                          label: t('edit.items.tabs.details.label'),
+                                                                          mark_required: true)) do |pane| %>
         <%= render SdrViewComponents::Forms::TextFieldComponent.new(
               form:,
               field_name: :source_id,
-              label_text: t('edit.items.fields.source_id.label')
+              label_text: t('edit.items.fields.source_id.label'),
+              label_mark_required: true
             ) %>
         <% pane.with_footer do %>
           <%= render Item::EditTabFooterComponent.new(pane:, form_id: form.id, cancel_path: object_path(@druid), druid: @druid, draft_actions_presenter: @draft_actions_presenter, show_previous: false) %>
@@ -32,7 +34,8 @@
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :description,
-                                                                          label: t('edit.items.tabs.description.label'))) do |pane| %>
+                                                                          label: t('edit.items.tabs.description.label'),
+                                                                          mark_required: true)) do |pane| %>
 
         <%= render Edit::DescriptionComponent.new(form:, druid_token: @druid_token) %>
 
@@ -42,7 +45,8 @@
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :rights,
-                                                                          label: t('edit.items.tabs.rights.label'))) do |pane| %>
+                                                                          label: t('edit.items.tabs.rights.label'),
+                                                                          mark_required: true)) do |pane| %>
         <%# The selected APO's object defaults are shown with the rights fields, but are applied to them only when the
             user clicks the apply defaults button, so that the item's rights are not overwritten. %>
         <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: false } do %>
@@ -72,7 +76,8 @@
       <% end %>
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
-                                                                          label: t('edit.items.edit.tabs.deposit.label'))) do |pane| %>
+                                                                          label: t('edit.items.edit.tabs.deposit.label'),
+                                                                          mark_required: true)) do |pane| %>
         <%= render Edit::VersionDescriptionComponent.new(form:) %>
         <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form:, classes: 'mb-3') %>
 
