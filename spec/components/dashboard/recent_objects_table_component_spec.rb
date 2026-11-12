@@ -23,7 +23,7 @@ RSpec.describe Dashboard::RecentObjectsTableComponent, type: :component do
       render_inline(component)
 
       table = page.find('table[aria-label="Recently viewed"]')
-      expect(table).to have_css('caption', text: 'Recently viewed')
+      expect(page).to have_css('h2', text: 'Recently viewed')
       expect(table).to have_css('th', text: 'Title')
       expect(table).to have_css('th', text: 'Druid')
       expect(table).to have_css('th', text: 'Object type')

@@ -5,7 +5,7 @@
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= render Layout::ContainerComponent.new do %>
+<%= render Layout::ContainerComponent.new(data: { controller: 'preserve-collapsed-sections' }) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
       <div class="row">
@@ -54,9 +54,7 @@
         <% end %>
       <% end %>
 
-      <div class="mb-5">
-        <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
-      </div>
+      <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
 
       <%= render Dashboard::MultiItemDepositsTableComponent.new(multi_item_deposit_actions: @recent_multi_item_deposit_actions) %>
 
@@ -66,25 +64,15 @@
             search_form: @recent_drafts_and_deposits_search_form
           ) %>
 
-      <div class="mb-5">
-        <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
-      </div>
+      <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
 
-      <div class="mb-5">
-        <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>
-      </div>
+      <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>
 
-      <div class="mb-5">
-        <%= render Dashboard::PinnedCollectionsTableComponent.new(pinned_collection_docs: @pinned_collection_docs) %>
-      </div>
+      <%= render Dashboard::PinnedCollectionsTableComponent.new(pinned_collection_docs: @pinned_collection_docs) %>
 
-      <div class="mb-5">
-        <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
-      </div>
+      <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
 
-      <div class="mb-5">
-        <%= render Dashboard::PinnedTagsTableComponent.new(pinned_tags: @pinned_tags) %>
-      </div>
+      <%= render Dashboard::PinnedTagsTableComponent.new(pinned_tags: @pinned_tags) %>
 
       <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
     <% end %>

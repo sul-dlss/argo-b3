@@ -1,12 +1,10 @@
-<div class="mb-5">
+<%= render Dashboard::SectionComponent.new(id: 'recent-drafts-and-deposits-section', label:) do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(
         label:,
+        show_label: false,
         id: 'recent-drafts-and-deposits-table',
         responsive: true
       ) do |component| %>
-    <% component.with_caption do %>
-      <%= label %>
-    <% end %>
     <% component.with_header(label: 'Title') %>
     <% component.with_header(label: 'Druid') %>
     <% component.with_header(label: 'Collection') %>
@@ -33,4 +31,4 @@
     <% end %>
   <% end %>
   <%= link_to 'View complete list of your recent drafts and deposits', search_path %>
-</div>
+<% end %>
