@@ -83,27 +83,27 @@
     <% end %>
 
     <% layout.with_main_content do %>
-      <div class="d-flex flex-column flex-xl-row gap-5 px-xl-5 mt-4 mb-5">
-        <div class="show-box flex-fill">
+      <%= render Show::BoxRowComponent.new(classes: 'px-xl-5 mt-4 mb-5') do %>
+        <div class="show-box">
           <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter, solr_doc: @solr_doc,
                                                unsaved_content_changes: @unsaved_content_changes) %>
         </div>
         <% if @solr_doc.releasable_type? %>
-          <div class="show-box flex-fill">
+          <div class="show-box">
             <%= render Show::ReleasedToComponent.new(object_released_presenter: @object_released_presenter) %>
           </div>
         <% end %>
         <% if @solr_doc.admin_policy? %>
-          <div class="show-box flex-fill">
+          <div class="show-box">
             <%= render Show::BoxComponent.new(heading: 'Agreement') do %>
               <%= link_to_object @solr_doc.agreement_title, @solr_doc.agreement_druid %>
             <% end %>
           </div>
         <% end %>
-        <div class="show-box flex-fill">
+        <div class="show-box">
           <%= render Show::TagComponent.new(solr_doc: @solr_doc, tags: Array(@solr_doc.all_tags), pinned_tags: @pinned_tags) %>
         </div>
-      </div>
+      <% end %>
 
       <%# Tabs that don't fit on one row overflow into a "More" dropdown (sdr_view_components' tab overflow controller), so adding or removing tabs changes which tabs end up there. spec/system/show_item_spec.rb clicks "More" to reach overflowed tabs. %>
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl, overflow_menu: true) do |component| %>

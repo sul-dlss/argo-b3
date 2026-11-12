@@ -17,26 +17,28 @@
     <% end %>
 
     <% layout.with_main_content do %>
-      <div class="d-flex flex-column flex-xl-row gap-4 mt-4 mb-4">
-        <%# One live region, so a refresh announces the status and counts only when they change. %>
-        <div id="bulk-action-status" class="d-flex flex-column flex-xl-row gap-4" role="status">
-          <div class="show-box flex-fill">
-            <%= render Show::BoxComponent.new(heading: status_heading) do %>
-              <p><%= action_label %> updated at <%= helpers.format_datetime(bulk_action.updated_at) %></p>
-            <% end %>
-          </div>
+      <%= render Show::BoxRowComponent.new(classes: 'mt-4 mb-4') do %>
+        <%# One live region, so a refresh announces the status and counts only when they change. Its nested row keeps the boxes a third of the outer row wide. %>
+        <div class="col-xl-8">
+          <%= render Show::BoxRowComponent.new(columns: 2, id: 'bulk-action-status', role: 'status') do %>
+            <div class="show-box">
+              <%= render Show::BoxComponent.new(heading: status_heading) do %>
+                <p><%= action_label %> updated at <%= helpers.format_datetime(bulk_action.updated_at) %></p>
+              <% end %>
+            </div>
 
-          <div class="show-box flex-fill">
-            <%= render Show::BoxComponent.new(heading: 'Total / Success / Failed') do %>
-              <p class="mb-0 text-center fs-4">
-                <%= bulk_action.druid_count_total %> / <%= bulk_action.druid_count_success %> / <%= bulk_action.druid_count_fail %>
-              </p>
-            <% end %>
-          </div>
+            <div class="show-box">
+              <%= render Show::BoxComponent.new(heading: 'Total / Success / Failed') do %>
+                <p class="mb-0 text-center fs-4">
+                  <%= bulk_action.druid_count_total %> / <%= bulk_action.druid_count_success %> / <%= bulk_action.druid_count_fail %>
+                </p>
+              <% end %>
+            </div>
+          <% end %>
         </div>
 
         <% if downloads.present? %>
-          <div class="show-box flex-fill">
+          <div class="show-box">
             <%= render Show::BoxComponent.new(heading: safe_join([helpers.download_icon(aria: { hidden: true }, classes: 'me-2'), 'Downloads'], ' ')) do %>
               <ul class="mb-0">
                 <% downloads.each do |download_link| %>
@@ -46,7 +48,7 @@
             <% end %>
           </div>
         <% end %>
-      </div>
+      <% end %>
 
       <% if tabs? %>
         <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(variant: :underline) do |tab_list| %>

@@ -4,23 +4,23 @@
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: t('multi_item_deposit.discovery_summary.heading'), classes: 'mb-0') %>
     <span><%= t('multi_item_deposit.discovery_summary.started', started_at:) %></span>
   </div>
-  <div class="d-flex flex-column flex-xl-row gap-4">
-    <div class="show-box flex-fill">
+  <%= render Show::BoxRowComponent.new do %>
+    <div class="show-box">
       <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.item_count'), heading_level: :h4) do %>
         <p class="mb-0 text-center fs-4"><%= item_count %></p>
       <% end %>
     </div>
-    <div class="show-box flex-fill">
+    <div class="show-box">
       <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.error_count'), heading_level: :h4, classes: error_classes) do %>
         <p class="mb-0 text-center fs-4"><%= items_with_errors_count %></p>
       <% end %>
     </div>
     <% if content_types %>
-      <div class="show-box flex-fill">
+      <div class="show-box">
         <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.content_types'), heading_level: :h4) do %>
           <p class="mb-0 text-center"><%= content_types %></p>
         <% end %>
       </div>
     <% end %>
-  </div>
+  <% end %>
 </div>
