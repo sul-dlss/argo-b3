@@ -16,7 +16,7 @@ module Dashboard
     attr_reader :object_docs
 
     def label
-      'Recent drafts and deposits'
+      t('dashboard.recent_drafts_and_deposits.label')
     end
 
     def render?

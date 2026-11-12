@@ -1,4 +1,4 @@
 <%= render Dashboard::SectionComponent.new(id: 'multi-item-deposits-section', label:) do %>
   <%= render MultiItemDeposit::TableComponent.new(multi_item_deposit_actions:, label:, id: 'multi-item-deposits-table') %>
-  <%= link_to 'View all multi-item deposits', multi_item_deposit_actions_path %>
+  <%= link_to t('dashboard.multi_item_deposits.view_all'), multi_item_deposit_actions_path %>
 <% end %>

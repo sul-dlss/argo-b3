@@ -793,6 +793,68 @@ en:
         started: 'Deposit started'
   dashboard:
     heading: 'Argo dashboard'
+    go_to_druid:
+      heading: 'Go to a druid'
+      submit: 'Go'
+    register_single:
+      heading: 'Register & deposit single object'
+      item: 'Item'
+      collection: 'Collection'
+      apo: 'APO'
+      agreement: 'Agreement'
+    register_multiple:
+      heading: 'Register or deposit multiple items'
+      register_items: 'Register multiple items'
+      register_csv: 'Register multiple items (via CSV)'
+      deposit_items: 'Deposit multiple items'
+    admin:
+      heading: 'Admin'
+      manage_permissions: 'Manage permissions'
+      impersonate: 'Impersonate'
+    development:
+      heading: 'Development environment connections'
+      connections: 'Solr: %{solr_url} | DSA: %{dsa_url}'
+    # Column headers shared by the dashboard tables
+    headers:
+      agreement: 'Agreement'
+      apo: 'APO'
+      collection: 'Collection'
+      constituents_count: '# of constituents'
+      druid: 'Druid'
+      last_updated: 'Last updated'
+      object_type: 'Object type'
+      search: 'Search'
+      status: 'Status'
+      tag: 'Tag'
+      tags: 'Tags'
+      title: 'Title'
+      unpin: 'Unpin'
+    recent_objects:
+      label: 'Recently viewed'
+      empty: 'No objects have been viewed.'
+    multi_item_deposits:
+      view_all: 'View all multi-item deposits'
+    recent_drafts_and_deposits:
+      label: 'Recent drafts and deposits'
+      view_all: 'View complete list of your recent drafts and deposits'
+    pinned_searches:
+      label: 'Pinned searches'
+      empty: 'No searches have been pinned.'
+    pinned_items:
+      label: 'Pinned items'
+      empty: 'No items have been pinned.'
+    pinned_collections:
+      label: 'Pinned collections'
+      empty: 'No collections have been pinned.'
+    pinned_apos:
+      label: 'Pinned APOs'
+      empty: 'No APOs have been pinned.'
+    pinned_tags:
+      label: 'Pinned tags'
+      empty: 'No tags have been pinned.'
+    pinned_virtual_objects:
+      label: 'Pinned virtual objects'
+      empty: 'No virtual objects have been pinned.'
   reports:
     title: 'Custom report'
   bulk_actions:

@@ -13,7 +13,7 @@ module Dashboard
     attr_reader :pinned_item_docs
 
     def label
-      'Pinned items'
+      t('dashboard.pinned_items.label')
     end
 
     def title_link(item_doc)

@@ -17,40 +17,40 @@
       </div>
     <% end %>
     <% layout.with_left_content do %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: 'Go to a druid') %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: t('dashboard.go_to_druid.heading')) %>
       <%= form_with model: @go_to_druid_form, url: go_to_druid_path, class: 'mb-5' do |form| %>
           <div class="d-flex">
             <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
                                                                         field_name: :druid,
                                                                         label_hidden: true) %>
-            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Go', classes: 'ms-2', style: 'width: fit-content;') %>
+            <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('dashboard.go_to_druid.submit'), classes: 'ms-2', style: 'width: fit-content;') %>
           </div>
       <% end %>
 
-      <%= render Elements::ButtonListComponent.new(title: 'Register & deposit single object') do |component| %>
-        <% component.with_button(link: new_item_path, label: 'Item', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
-        <% component.with_button(link: new_collection_path, label: 'Collection', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: CollectionPolicy)) %>
-        <% component.with_button(link: new_apo_path, label: 'APO', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ApoPolicy)) %>
-        <% component.with_button(link: new_agreement_path, label: 'Agreement', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: AgreementPolicy)) %>
+      <%= render Elements::ButtonListComponent.new(title: t('dashboard.register_single.heading')) do |component| %>
+        <% component.with_button(link: new_item_path, label: t('dashboard.register_single.item'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+        <% component.with_button(link: new_collection_path, label: t('dashboard.register_single.collection'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: CollectionPolicy)) %>
+        <% component.with_button(link: new_apo_path, label: t('dashboard.register_single.apo'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ApoPolicy)) %>
+        <% component.with_button(link: new_agreement_path, label: t('dashboard.register_single.agreement'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: AgreementPolicy)) %>
       <% end %>
 
-      <%= render Elements::ButtonListComponent.new(title: 'Register or deposit multiple items', classes: 'mt-4') do |component| %>
-        <% component.with_button(link: new_multiple_item_path, label: 'Register multiple items', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
-        <% component.with_button(link: new_bulk_actions_register_csv_path, label: 'Register multiple items (via CSV)', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
-        <% component.with_button(link: multi_item_deposit_actions_path, method: :post, label: 'Deposit multiple items', variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+      <%= render Elements::ButtonListComponent.new(title: t('dashboard.register_multiple.heading'), classes: 'mt-4') do |component| %>
+        <% component.with_button(link: new_multiple_item_path, label: t('dashboard.register_multiple.register_items'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+        <% component.with_button(link: new_bulk_actions_register_csv_path, label: t('dashboard.register_multiple.register_csv'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+        <% component.with_button(link: multi_item_deposit_actions_path, method: :post, label: t('dashboard.register_multiple.deposit_items'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
       <% end %>
 
       <% if allowed_to?(:admin?, nil, with: AdminPolicy) %>
-        <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
-          <% component.with_button(link: admin_workgroup_permissions_path, label: 'Manage permissions', variant: 'outline-primary') if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
-          <% component.with_button(link: admin_impersonate_path, label: 'Impersonate', variant: 'outline-primary', disabled: Current.impersonating?) %>
+        <%= render Elements::ButtonListComponent.new(title: t('dashboard.admin.heading'), classes: 'mt-4') do |component| %>
+          <% component.with_button(link: admin_workgroup_permissions_path, label: t('dashboard.admin.manage_permissions'), variant: 'outline-primary') if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
+          <% component.with_button(link: admin_impersonate_path, label: t('dashboard.admin.impersonate'), variant: 'outline-primary', disabled: Current.impersonating?) %>
         <% end %>
       <% end %>
     <% end %>
     <% layout.with_main_content do %>
       <% if Rails.env.development? %>
-        <%= render SdrViewComponents::Elements::AlertComponent.new(title: 'Development environment connections', dismissible: true, variant: :note, classes: 'mt-2') do %>
-          <p>Solr: <%= Settings.solr.url %> | DSA: <%= Settings.dor_services.url %></p>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(title: t('dashboard.development.heading'), dismissible: true, variant: :note, classes: 'mt-2') do %>
+          <p><%= t('dashboard.development.connections', solr_url: Settings.solr.url, dsa_url: Settings.dor_services.url) %></p>
         <% end %>
       <% end %>
 

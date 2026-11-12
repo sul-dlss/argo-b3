@@ -13,7 +13,7 @@ module Dashboard
     attr_reader :pinned_apo_docs
 
     def label
-      'Pinned APOs'
+      t('dashboard.pinned_apos.label')
     end
 
     def title_link(apo_doc)

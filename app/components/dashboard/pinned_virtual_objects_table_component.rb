@@ -13,7 +13,7 @@ module Dashboard
     attr_reader :pinned_virtual_object_docs
 
     def label
-      'Pinned virtual objects'
+      t('dashboard.pinned_virtual_objects.label')
     end
 
     def title_link(virtual_object_doc)

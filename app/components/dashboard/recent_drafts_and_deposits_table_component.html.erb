@@ -5,11 +5,11 @@
         id: 'recent-drafts-and-deposits-table',
         responsive: true
       ) do |component| %>
-    <% component.with_header(label: 'Title') %>
-    <% component.with_header(label: 'Druid') %>
-    <% component.with_header(label: 'Collection') %>
-    <% component.with_header(label: 'Status') %>
-    <% component.with_header(label: 'Last updated') %>
+    <% component.with_header(label: t('dashboard.headers.title')) %>
+    <% component.with_header(label: t('dashboard.headers.druid')) %>
+    <% component.with_header(label: t('dashboard.headers.collection')) %>
+    <% component.with_header(label: t('dashboard.headers.status')) %>
+    <% component.with_header(label: t('dashboard.headers.last_updated')) %>
     <% object_docs.each do |object_doc| %>
       <% component.with_row do |row_component| %>
         <% row_component.with_cell do %>
@@ -30,5 +30,5 @@
       <% end %>
     <% end %>
   <% end %>
-  <%= link_to 'View complete list of your recent drafts and deposits', search_path %>
+  <%= link_to t('dashboard.recent_drafts_and_deposits.view_all'), search_path %>
 <% end %>
