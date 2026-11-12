@@ -14,6 +14,11 @@ module Show
 
     delegate :complete?, :workflow_name, to: :workflow
 
+    # Only the latest version's processes count, as for complete?.
+    def error?
+      workflow.incomplete_processes.any? { |process| process.status == 'error' }
+    end
+
     def expanded?
       !complete?
     end

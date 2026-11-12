@@ -326,7 +326,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_css('.collapsible-section-toggle.collapsed', text: 'registrationWF')
     expect(page).to have_css('.collapsible-section-toggle.collapsed .text-success', text: 'Complete')
     expect(page).to have_css('.collapsible-section-toggle:not(.collapsed)', text: 'accessionWF')
-    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .workflow-in-progress', text: 'In progress')
+    expect(page).to have_css('.collapsible-section-toggle:not(.collapsed) .text-danger', text: 'Error')
 
     within('#accessionwf-collapse.show') do
       expect(page).to have_table(count: 2)
@@ -792,7 +792,7 @@ RSpec.describe 'Show item' do
     it 'retries the process and reloads only the workflows' do
       visit "/objects/#{druid}"
       click_button 'Workflows'
-      expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+In progress/)
+      expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+Error/)
 
       within(find_table_row('accessionwf-2-table', 'sdr-ingest-received')) { click_button 'Retry' }
 
