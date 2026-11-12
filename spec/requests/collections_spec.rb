@@ -39,6 +39,28 @@ RSpec.describe 'Collections' do
       expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
                                                                       editable: true)
     end
+
+    context 'with an apo_druid param' do
+      let(:other_apo_druid) { 'druid:zz111yy2222' }
+
+      before do
+        allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', apo_druid],
+                                                                        ['Other APO', other_apo_druid]])
+      end
+
+      it 'selects the APO' do
+        get '/collections/new', params: { apo_druid: other_apo_druid }
+
+        expect(Capybara.string(response.body)).to have_select('collection[apo_druid]', selected: 'Other APO')
+      end
+
+      it 'ignores an APO the user may not select' do
+        get '/collections/new', params: { apo_druid: 'druid:bb000bb0000' }
+
+        # No option is marked selected, so the browser selects the first one.
+        expect(Capybara.string(response.body)).to have_no_css('select[name="collection[apo_druid]"] option[selected]')
+      end
+    end
   end
 
   describe 'create' do

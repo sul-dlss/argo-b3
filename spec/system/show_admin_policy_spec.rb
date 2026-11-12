@@ -79,6 +79,12 @@ RSpec.describe 'Show APO' do
     # No PURL link for admin policies
     expect(page).to have_no_link('View PURL page')
 
+    # Register & deposit collection is disabled, since the user cannot edit the APO.
+    within('form[action="/collections/new"]') do
+      expect(page).to have_field('apo_druid', type: :hidden, with: druid)
+      expect(page).to have_button('Register & deposit collection', disabled: true)
+    end
+
     # No released to box for admin policies
     expect(page).to have_no_css('h2', text: 'Released to')
     expect(page).to have_no_css('h2', text: 'Not released')
@@ -132,5 +138,18 @@ RSpec.describe 'Show APO' do
 
     expect(page).to have_css('h1', text: updated_title)
     expect_cocina_json_title(updated_title)
+  end
+
+  context 'when the user can edit the APO' do
+    before { create(:permission, :edit, workgroup: 'sdr:argo-access', target_druid: druid) }
+
+    it 'enables Register & deposit collection' do
+      allow(Sdr::Repository).to receive_messages(find_solr: build_solr_doc(title: original_title),
+                                                 find: build_cocina_object(title: original_title))
+
+      visit "/objects/#{druid}"
+
+      expect(page).to have_button('Register & deposit collection', disabled: false)
+    end
   end
 end

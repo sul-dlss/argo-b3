@@ -67,6 +67,12 @@
         <% end %>
         <% component.with_button(link: edit_object_tags_path(@solr_doc.druid), label: 'Manage tags', variant: 'outline-primary',
                                  disabled: !allowed_to?(:tag?, @solr_doc, with: ObjectPolicy)) %>
+        <%# Opens collection registration with this APO selected; the user must be able to edit the APO itself. %>
+        <% if @solr_doc.admin_policy? %>
+          <% component.with_button(link: new_collection_path, params: { apo_druid: @solr_doc.druid }, label: 'Register & deposit collection',
+                                   variant: 'outline-primary',
+                                   disabled: !allowed_to?(:create?, @solr_doc.druid, with: CollectionPolicy)) %>
+        <% end %>
       <% end %>
 
       <% if @solr_doc.object_type?('APO', 'collection') && allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>

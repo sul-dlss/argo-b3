@@ -23,12 +23,13 @@ RSpec.describe 'Show object Admin section' do
   end
 
   context 'when an admin views an APO' do
-    it 'renders the Manage permissions button' do
+    it 'renders the Manage permissions button and deposit collection button' do
       get "/objects/#{druid}"
 
       expect(rendered_page).to have_css('h2', exact_text: 'Admin')
       expect(rendered_page).to have_css("form[action='/admin/objects/druid:bc123df4567/permissions'] button",
                                         text: 'Manage permissions')
+      expect(rendered_page).to have_button('Register & deposit collection', disabled: false)
     end
   end
 

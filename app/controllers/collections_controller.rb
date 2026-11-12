@@ -12,6 +12,7 @@ class CollectionsController < ApplicationController
   before_action :set_druid_and_cocina_object, only: %i[edit update]
 
   # Renders the form for registering and depositing a collection.
+  # An apo_druid param (e.g., from the APO show page) preselects that APO, if the user may select it.
   # @return [void]
   def new
     authorize! with: CollectionPolicy
@@ -19,6 +20,7 @@ class CollectionsController < ApplicationController
     @new_collection_form = NewCollectionForm.new
     @cancel_path = register_cancel_path
     set_new_apo_options(form: @new_collection_form)
+    preselect_apo(form: @new_collection_form)
   end
 
   # Renders the form for editing and depositing a collection.
@@ -89,6 +91,14 @@ class CollectionsController < ApplicationController
   def set_new_apo_options(form:)
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     form.selectable_apo_druids = @apo_options.map(&:last)
+  end
+
+  # An APO the user may not select is ignored, leaving the first option selected.
+  # @param form [NewCollectionForm]
+  # @return [void]
+  def preselect_apo(form:)
+    apo_druid = params[:apo_druid].presence
+    form.apo_druid = apo_druid if form.selectable_apo_druids.include?(apo_druid)
   end
 
   # The APOs the user can edit, plus the collection's current APO so that a user who can edit the collection
