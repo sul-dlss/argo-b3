@@ -91,7 +91,12 @@
     <% end %>
 
     <% if @multi_item_deposit_action.structuring_completed_at.present? %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.structure_results.heading'), classes: 'mb-3') %>
+      <div class="d-flex flex-wrap align-items-baseline column-gap-4 mb-3">
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.structure_results.heading'), classes: 'mb-0') %>
+        <%= link_to structure_report_multi_item_deposit_action_path(@multi_item_deposit_action), download: true do %>
+          <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('edit.multi_item_deposits.edit.structure_results.download_report') %>
+        <% end %>
+      </div>
 
       <%= render MultiItemDeposit::SummaryTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>

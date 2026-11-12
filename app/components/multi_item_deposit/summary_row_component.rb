@@ -24,8 +24,7 @@ module MultiItemDeposit
     end
 
     def deposit_type
-      deposit_type = item_deposit_action.initial_version? ? :new_item : :redeposit
-      t("multi_item_deposit.summary.deposit_types.#{deposit_type}")
+      t("multi_item_deposit.summary.deposit_types.#{item_deposit_action.deposit_type}")
     end
 
     def structure_errors_or_warnings?

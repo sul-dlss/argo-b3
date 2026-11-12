@@ -7,7 +7,8 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   PREVIOUS_VALUE = 'previous'
   PER_PAGE = 20
 
-  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template discovery_report]
+  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template discovery_report
+                                                         structure_report]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -98,6 +99,19 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
     send_data DiscoveryReportCsv::Export.as_csv(multi_item_deposit_action: @multi_item_deposit_action),
               type: 'text/csv', filename: "multi_item_deposit_#{@multi_item_deposit_action.id}_discovery_report.csv"
+  end
+
+  # The report of the results of checking files (structuring).
+  def structure_report
+    authorize! @multi_item_deposit_action, to: :edit?
+
+    # As for the discovery report, a stale tab may link to it while checking is rerunning.
+    if @multi_item_deposit_action.structuring_completed_at.blank?
+      return redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    end
+
+    send_data StructureReportCsv::Export.as_csv(multi_item_deposit_action: @multi_item_deposit_action),
+              type: 'text/csv', filename: "multi_item_deposit_#{@multi_item_deposit_action.id}_structure_report.csv"
   end
 
   private

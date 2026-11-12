@@ -18,4 +18,9 @@ class ItemDepositAction < ApplicationRecord
   def structure_errors
     structural_csv_errors + content_type_structure_errors
   end
+
+  # @return [Symbol] :new_item or :redeposit
+  def deposit_type
+    initial_version? ? :new_item : :redeposit
+  end
 end

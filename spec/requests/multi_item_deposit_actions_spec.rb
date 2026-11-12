@@ -393,6 +393,9 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_css('table[aria-label="Summary"] td', text: 'bc123df4567')
+        expect(rendered_page).to have_link(
+          'Download report', href: structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
+        )
       end
 
       it 'renders Previous and a disabled Next until structuring succeeds' do
@@ -1321,6 +1324,57 @@ RSpec.describe 'Multi-item deposit actions' do
 
       it 'denies access' do
         get discovery_report_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
+  describe 'structure_report' do
+    let(:multi_item_deposit_action) do
+      create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_completed_at: Time.current)
+    end
+
+    before do
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567', path: 'folder1',
+                                   content_type: 'image', initial_version: true,
+                                   structural_csv_errors: ['Row 2: Missing filename'])
+    end
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:owner) { user }
+
+      it 'downloads the report of the results of checking files' do
+        get structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq('text/csv')
+        filename = "multi_item_deposit_#{multi_item_deposit_action.id}_structure_report.csv"
+        expect(response.headers['Content-Disposition']).to include("attachment; filename=\"#{filename}\"")
+        expect(response.body.lines.second)
+          .to eq("bc123df4567,folder1,0,image,new item,error,Row 2: Missing filename\n")
+      end
+    end
+
+    context 'when checking files has not completed' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_state: 'structuring',
+                                           structuring_completed_at: nil)
+      end
+
+      it 'redirects to the Multi-Item Deposit' do
+        get structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:owner) { create(:user) }
+
+      it 'denies access' do
+        get structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(response).to redirect_to(root_path)
       end
