@@ -3,61 +3,26 @@
 require 'rails_helper'
 
 RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
-  let(:component) { described_class.new(facet_config:, facet_counts:, search_form:) }
+  let(:component) { described_class.new(facet_config: Search::Facets::OBJECT_TYPES, results:, search_form:) }
 
-  let(:facet_config) { Search::Facets::MIMETYPES }
-
-  let(:search_form) { ResultsSearchForm.new(mimetypes: ['application/pdf'], page: 2) }
-  let(:facet_counts) { instance_double(SearchResults::FacetCounts, page: 1, total_pages: 2) }
-  let(:facet_count) { SearchResults::FacetCount.new(value: 'application/pdf', count: 10) }
-
-  before do
-    allow(facet_counts).to receive(:each)
-      .and_yield(facet_count)
-    allow(facet_counts).to receive_messages(to_ary: [facet_count], any?: true)
+  let(:search_form) { ResultsSearchForm.new }
+  let(:results) { SearchResults::Items.new(solr_response:, per_page: 0) }
+  let(:solr_response) do
+    {
+      'responseHeader' => {
+        'params' => { 'json.facet' => { Search::Fields::OBJECT_TYPES => { limit: 100 } }.to_json }
+      },
+      'response' => { 'numFound' => 1, 'start' => 0, 'docs' => [] },
+      'facets' => { Search::Fields::OBJECT_TYPES => { 'numBuckets' => 1, 'buckets' => [{ 'val' => 'item', 'count' => 10 }] } }
+    }
   end
 
-  it 'renders the facet turbo stream replace component' do
+  it 'replaces the facet placeholder with the facet from the results' do
     results = render_inline(component)
 
-    expect(page).to have_css("turbo-stream[action='replace'][target='#{facet_config.form_field}-facet']")
-    # The content inside the template is not available to Capybara for some reason.
-    expect(results.to_html).to include('<section aria-label="MIME type"')
-  end
-
-  context 'when a checkbox facet component is specified' do
-    let(:component) do
-      described_class.new(facet_config:, facet_counts:, search_form:, facet_component: :checkbox)
-    end
-
-    it 'renders the checkbox facet component inside the turbo stream' do
-      results = render_inline(component)
-
-      expect(page).to have_css("turbo-stream[action='replace'][target='#{facet_config.form_field}-facet']")
-      # The content inside the template is not available to Capybara for some reason.
-      expect(results.to_html).to include('<section aria-label="MIME type"')
-      expect(results.to_html).to include('name="commit" value="Filter"')
-    end
-  end
-
-  context 'when an invalid facet component is specified' do
-    let(:component) do
-      described_class.new(facet_config:, facet_counts:, search_form:, facet_component: :invalid)
-    end
-
-    it 'raises an ArgumentError' do
-      expect { render_inline(component) }.to raise_error(ArgumentError, 'unexpected facet_component')
-    end
-  end
-
-  context 'with a provided facet component' do
-    it 'renders the provided facet component inside the turbo stream' do
-      results = render_inline(component) do |comp|
-        comp.with_facet { '<div class="custom-facet">Custom Facet Content</div>'.html_safe }
-      end
-
-      expect(page).to have_css("turbo-stream[action='replace'][target='#{facet_config.form_field}-facet']")
-      expect(results.to_html).to include('<div class="custom-facet">Custom Facet Content</div>')
-    end
+    expect(page).to have_css("turbo-stream[action='replace'][target='object-types-facet']")
+    # The content inside the template is not available to Capybara.
+    expect(results.to_html).to include('<section aria-label="Object type"')
+    expect(results.to_html).to include('value="item"')
   end
 end

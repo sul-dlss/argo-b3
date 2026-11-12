@@ -1,51 +1,28 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for rendering a turbo stream to replace a search facet
+  # Component for rendering a turbo stream to replace a search facet's placeholder with the facet
   class FacetTurboStreamReplaceComponent < ViewComponent::Base
-    FACET_COMPONENTS = %i[facet checkbox dynamic dynamic_with_date_range].freeze
-
-    # Override the facet component used to render the facet.
-    # Default is a Search::FacetComponent.
-    renders_one :facet
+    with_collection_parameter :facet_config
 
     # @param facet_config [Search::Facets::Config]
-    # @param facet_counts [SearchResults::FacetCounts]
+    # @param results [SearchResults::Items] the search results holding the facet's counts
     # @param search_form [SearchForm]
-    # @param facet_component [Symbol] type of facet component to render inside turbo stream
-    def initialize(facet_config:, facet_counts:, search_form:, facet_component: :facet)
+    def initialize(facet_config:, results:, search_form:)
       @facet_config = facet_config
-      @facet_counts = facet_counts
+      @results = results
       @search_form = search_form
-      @facet_component = facet_component
-      raise ArgumentError, 'unexpected facet_component' unless FACET_COMPONENTS.include?(facet_component)
-
       super()
     end
 
-    attr_reader :facet_config, :facet_counts, :search_form, :facet_component
-
-    delegate :form_field, :exclude_form_field, :date_from_form_field, :date_to_form_field,
-             to: :facet_config
-
-    def facet_search_path_helper
-      Search::FacetPathResolver.search_path_helper(facet_config:, search_form:)
-    end
+    attr_reader :facet_config, :results, :search_form
 
     def facet_id
-      helpers.facet_id(form_field)
+      helpers.facet_id(facet_config.form_field)
     end
 
-    def facet_page_path_helper
-      Search::FacetPathResolver.index_path_helper(facet_config:, search_form:)
-    end
-
-    def facet_search_path
-      facet_search_path_helper.call(search_form.with_attributes(page: nil))
-    end
-
-    def facet_search?
-      facet_search_path_helper.present?
+    def facet_counts
+      results.facet_counts_for(facet_config)
     end
   end
 end

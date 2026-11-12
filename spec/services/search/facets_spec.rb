@@ -13,6 +13,17 @@ RSpec.describe Search::Facets do
     end
   end
 
+  describe 'SIDEBAR' do
+    it 'includes every facet that declares how it loads' do
+      expect(described_class::SIDEBAR).to match_array(described_class::ALL.select(&:loading))
+    end
+
+    it 'gives each lazy facet an index endpoint to load from' do
+      expect(described_class::SIDEBAR.select(&:lazy?))
+        .to all(have_attributes(facet_resource: be_present, facet_index: true))
+    end
+  end
+
   describe '#missing_value?' do
     it 'returns true for the missing value' do
       expect(described_class.missing_value?('_missing_value')).to be true

@@ -3,43 +3,16 @@
 module Searchers
   # Searcher for secondary facets
   class SecondaryFacet
-    FACETS = [
-      Search::Facets::ACCESS_RIGHTS,
-      Search::Facets::ADMIN_POLICIES,
-      Search::Facets::COLLECTIONS,
-      Search::Facets::DATES,
-      Search::Facets::EARLIEST_ACCESSIONED_DATE,
-      Search::Facets::EMBARGO_RELEASE_DATE,
-      Search::Facets::FILE_ROLES,
-      Search::Facets::GENRES,
-      Search::Facets::IDENTIFIERS,
-      Search::Facets::LANGUAGES,
-      Search::Facets::LAST_ACCESSIONED_DATE,
-      Search::Facets::LAST_PUBLISHED_DATE,
-      Search::Facets::LAST_OPENED_DATE,
-      Search::Facets::LICENSES,
-      Search::Facets::METADATA_SOURCES,
-      Search::Facets::MIMETYPES,
-      Search::Facets::MODS_RESOURCE_TYPES,
-      Search::Facets::PROCESSING_STATUSES,
-      Search::Facets::REGIONS,
-      Search::Facets::REGISTERED_DATE,
-      Search::Facets::RELEASED_TO_EARTHWORKS,
-      Search::Facets::RELEASED_TO_PURL_SITEMAP,
-      Search::Facets::RELEASED_TO_SEARCHWORKS,
-      Search::Facets::FORMATS,
-      Search::Facets::TOPICS,
-      Search::Facets::VERSIONS
-    ].freeze
-
-    # Facets that the item search normally returns alongside the item results.
-    PRIMARY_FACETS = [
-      Search::Facets::OBJECT_TYPES,
-      Search::Facets::CONTENT_TYPES
-    ].freeze
-
     def self.call(...)
       new(...).call
+    end
+
+    # Views without item results also get the primary facets, which normally come with the items.
+    # @return [Array<Search::Facets::Config>]
+    def self.facet_configs_for(search_form)
+      return Search::Facets::SECONDARY if search_form.item_results?
+
+      Search::Facets::SECONDARY + Search::Facets::PRIMARY
     end
 
     # @param search_form [SearchForm]
@@ -72,13 +45,7 @@ module Searchers
     end
 
     def facet_json
-      Search::FacetsBuilder.call(facet_configs:).to_json
-    end
-
-    def facet_configs
-      return FACETS if search_form.item_results?
-
-      FACETS + PRIMARY_FACETS
+      Search::FacetsBuilder.call(facet_configs: self.class.facet_configs_for(search_form)).to_json
     end
   end
 end

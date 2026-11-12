@@ -37,31 +37,14 @@ module SearchResults
       to_a
     end
 
-    # Derive a getter method for facets, when the "[facet_config]_facet" method is called.
-    # For example, object_types_facet() is handled equivalent to defining:
-    # def object_types_facet
-    #   FacetCounts.new(solr_response:, field: Search::Fields::OBJECT_TYPES)
-    # end
-    def method_missing(method_name, *, &)
-      return super unless respond_to_missing?(method_name)
-
-      facet_config = Search::Facets.const_get(method_name_to_const_name(method_name))
-      # Different facet count classes are needed depending on the facet type.
+    # @param facet_config [Search::Facets::Config]
+    # @return [FacetCounts, DynamicFacetCounts] the counts for the facet from this response
+    def facet_counts_for(facet_config)
       clazz = facet_config.dynamic_facet.present? ? DynamicFacetCounts : FacetCounts
       clazz.new(solr_response:, facet_config:)
     end
 
-    def respond_to_missing?(method_name, include_private = false)
-      return false unless method_name.to_s.end_with?('_facet')
-
-      Search::Facets.const_defined?(method_name_to_const_name(method_name)) || super
-    end
-
     private
-
-    def method_name_to_const_name(method_name)
-      method_name.to_s.delete_suffix('_facet').upcase
-    end
 
     def start_result
       @solr_response['response']['start']

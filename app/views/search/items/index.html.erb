@@ -22,11 +22,5 @@
 
   <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
 
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::OBJECT_TYPES,
-                                                          facet_counts: @results.object_types_facet,
-                                                          search_form: @search_form, facet_component: :checkbox) %>
-
-  <%= render Search::FacetTurboStreamReplaceComponent.new(facet_config: Search::Facets::CONTENT_TYPES,
-                                                          facet_counts: @results.content_types_facet,
-                                                          search_form: @search_form, facet_component: :checkbox) %>
+  <%= render Search::FacetTurboStreamReplaceComponent.with_collection(Search::Facets::PRIMARY, results: @results, search_form: @search_form) %>
 <% end %>

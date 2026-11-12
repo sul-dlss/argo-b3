@@ -1,4 +1,0 @@
-<%= helpers.turbo_frame_tag id, target: '_top' do %>
-  <%= render Search::HierarchicalFacetComponent.new(facet_counts:, search_form:, form_field:, facet_children_path_helper:, facet_path_helper:, facet_search_path_helper:) %>
-  <%= render Search::DebugComponent.new(search_form:, results: facet_counts) %>
-<% end %>

@@ -304,7 +304,7 @@ The following will help illustrate the discovery system components involved for 
   * Turbo stream replace elements (`<turbo-stream action="replace">`) for the primary facets containing the facet content. When rendering the page, Turbo replaces the empty divs with the facet content.
 5. Concurrently, the secondary facets async turbo frame calls `Search::ItemsController.secondary_facets`. This invokes the secondary facets searcher (`Searchers::SecondaryFacet`) which queries Solr and returns `SearchResults::Items`. The rendered response includes turbo stream replace elements for the secondary facets containing the facet content.
 5. Concurrently, each of the async field value turbo frames calls the appropriate search controller (e.g., `Search::ProjectsController.index`). This invokes `Searchers::Tag` with the field being searched, which queries Solr and returns `SearchResults::FacetValues` (a wrapper around the Solr response). The rendered response includes the field value search results (e.g., a list of projects).
-6. Concurrently, each of the lazy facet async turbo frames calls the appropriate `Search::*FacetsController` (e.g., `Search::ProjectFacetsController` for the projects facet). This invokes the facets searcher (`Searchers::Facet`, or `Searchers::HierarchicalFacet` for hierarchical facets) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
+6. Concurrently, each of the lazy facet async turbo frames calls the facet's endpoint (e.g., `/search/project_facets` for the projects facet), served by `Search::FacetsController`. This invokes the facets searcher (`Searchers::Facet`, or `Searchers::HierarchicalFacet` for hierarchical facets) which queries Solr and returns `SearchResults::FacetCounts` (a wrapper around the Solr response). The rendered response includes the facet content.
 
 Notes:
 * On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
@@ -319,69 +319,37 @@ To view the Solr response for all Solr requests made to render a page, add `debu
 The Solr requests will be executed with `debugQuery=true`, so the response will include debugging informations
 including the amount of time to execute each part of the query / each facet.
 
-### Adding a lazy async facet
-The lazy async pattern should be used for slow facets. Each of these facets involves a separate query to Solr.
+### Facet configuration
+Each facet is a `Search::Facets::Config` constant, and that configuration is the single source for how the facet is queried, loaded, routed, and rendered:
+* `Search::Facets::SIDEBAR` lists the facets shown in the sidebar, in display order. Each one's `loading` says when it loads: `:primary` (with the item results), `:secondary` (with the secondary facets), or `:lazy` (its own turbo frame request, for slow facets). Placeholders, Solr facet requests, and turbo stream replacements are all derived from these.
+* Every config is used for filtering (`Search::ItemQueryBuilder`) and for describing a search (`Search::Serializer`), in the order the constants are defined.
+* A facet with a `facet_resource` gets its endpoints (`index`, and `children` / `search` if `facet_children` / `facet_search`) drawn in the `:search_endpoints` routing concern, served by `Search::FacetsController` for every search view.
+* The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a checkbox facet for `operator: :or`, a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured).
 
+### Adding a facet
 1. Add an attribute for the facet to `SearchForm`.
 2. Add any new solr fields to `Search::Fields`.
-3. Add a `Search::LoadingFacetFrameComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `turbo-frame` that will be replaced with the facet content.
-4. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`, providing the `index` route. See for example, `:tag_facets`.
-5. Add a new `Search::*FacetsController` and add a request spec. For simple (non-hierarchical) paged facets, call `serves_facet <Config>` — the `index` and `search` actions are inherited from `FacetsApplicationController`. For hierarchical facets, implement a custom `index` and `children` method. See for example, `Search::TagFacetsController`.
-6. Add a configuration constant to `Search::Facets`. This must include the `form_field` and `field` attributes, plus `facet_resource` (the routing resource added in step 4) and `facet_index: true`.
-7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
-8. Optionally, add a label for the facet to `en.yml`.
-
-Note:
-* Currently, the only lazy async facets that are supported are for hierarchical facets. However, additional types could be supported by provided alternatives to `Search::HierarchicalFacetFrameComponent` (which is rendered in `Search::*FacetsController.index`)
-
-### Adding a non-lazy sync facet
-The non-lazy sync pattern should be used for fast facets. The facet values are retrieved as part of the main query to Solr (i.e., the query that returns the search results).
-
-1. Add an attribute for the facet to `SearchForm`.
-2. Add any new solr fields to `Search::Fields`.
-3. Add a configuration constant to `Search::Facets`. This must include the `form_field` and `field` attributes.
-4. Add a `Search::LoadingFacetDivComponent` for the facet to `Search::FacetsSectionComponent`. This adds a placeholder `div` that will be replaced with the facet content.
-5. Add the facet to the Solr request in `Searchers::Item::FACETS` or `Searchers::SecondaryFacet::FACETS`.
-6. Add a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` or `views/search/items/secondary_facets.html.erb`. This allows specifying the type of facet component to use to render the facet (e.g., a `Search::CheckboxFacetComponent`).
-7. Add the facet to `Search::ItemQueryBuilder::FACETS`.
-8. Optionally, add a label for the facet to `en.yml`.
+3. Add a configuration constant to `Search::Facets`. This must include the `form_field`, `field`, and `loading` attributes. Use `loading: :lazy` for slow facets; a lazy facet also needs a `facet_resource` and `facet_index: true`.
+4. Add the facet to `Search::Facets::SIDEBAR` in display order.
+5. Optionally, add a label for the facet to `en.yml`.
 
 ### Adding paging to a facet
-1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:mimetype_facets`. This only needs to provide an `index` route.
-2. Add a new `Search::*FacetsController` that calls `serves_facet <Config>` and add a request spec using the `'a simple facet controller'` shared examples. See for example, `Search::MimetypeFacetsController`. The `index` action is inherited from `FacetsApplicationController`.
-3. Add `facet_resource` and `facet_index: true` to the configuration constant in `Search::Facets`.
-
-Note:
-* Some of these steps may already have been performed, e.g., for a lazy, async facet.
+Add a `facet_resource` (e.g., `:mimetype_facets`) and `facet_index: true` to the configuration constant in `Search::Facets`.
 
 ### Adding facet search to a facet
-1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:project_facets`. This should provide a `search` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::ProjectFacetsController`. The `search` action is inherited from `FacetsApplicationController`; no custom implementation is needed unless the controller also has a custom `index`.
-3. Add `facet_resource` and `facet_search: true` to the configuration constant in `Search::Facets`.
-
-Note:
-* Some of these steps may already have been performed, e.g., for a lazy, async facet.
+Add a `facet_resource` and `facet_search: true` to the configuration constant in `Search::Facets`.
 
 ### Composite (label + druid) facets
 Some facets need to filter on a unique identifier (a druid) but display a human-friendly, searchable label (a title) — e.g., the APO and Collections facets. A title isn't unique, so faceting directly on the display value of the facet (like most facets do) would be ambiguous. Instead, DSA indexes a composite Solr field whose values are `"<label>:<druid>"` (see`Indexing::CompositeFacetValue` in dor-services-app), and the APO and Collection facet (and links) are built using that composite field.
 
 ### Making a facet hierarchical
-1. Add a new `*_facets` resource to the `:search_endpoints` routing concern in `routes.rb`. See for example, `:tag_facets`. This should provide the `children` route.
-2. Add a new `Search::*FacetsController` and add a request spec. See for example, `Search::TagFacetsController`. This should implement the `children` method.
-3. Add `facet_children_path_helper` and `hierarchical_field` to the configuration constant in `Search::Facets`.
-4. Change the facet to be rendered with the hierarchical facet component. For a lazy async facet, render a `Search::HierarchicalFacetFrameComponent` in `Search::*FacetsController.index`. For a non-lazy sync facet, set the turbo stream replace element in `views/search/items/index.html.erb` to render a `Search::HierarchicalFacetComponent`.
+Add `hierarchical_field`, a `facet_resource`, and `facet_children: true` to the configuration constant in `Search::Facets`. Currently only lazy facets can be hierarchical.
 
 Note:
 * Hierarchical faceting requires 2 separate fields, each which has a specific format.
 
 ### Making a dynamic facet
-Dynamic facets have facet values that are the result of a specified query.
-
-1. Add `dynamic_facet` to the configuration constant in `Search::Facets`.
-2. When adding the facet to the Solr request in `Searchers::Item.facet_json` use a `Search::DynamicFacetBuilder`.
-3. When adding a method to `SearchResults::Items`, return a `SearchResults::DynamicFacetCounts` for the facet.
-4. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` use a `Search::DynamicFacetComponent`.
-5. When adding the facet to `Search::ItemQueryBuilder.filter_queries`, call `dynamic_facet_filter_query()`.
+Dynamic facets have facet values that are the result of a specified query. Add `dynamic_facet` to the configuration constant in `Search::Facets`.
 
 ### Making a dynamic facet support a user-supplied date range
 Dynamic facets may optionally have a date range filter (where the user specifies a date from and/or date to). See, for example, the "Earliest accessioned" facet.
@@ -392,7 +360,6 @@ Dynamic facets may optionally have a date range filter (where the user specifies
     attribute :earliest_accessioned_date_to, :date, default: nil
 ```
 2. Add `date_from_form_field`, `date_to_form_field`, and `field` to the configuration constant in `Search::Facets`.
-3. When adding a turbo stream replace element (`Search::FacetTurboStreamReplaceComponent`) for the facet to `views/search/items/index.html.erb` provide the `date_from_form_field` and `date_to_form_field` to `Search::DynamicFacetComponent`
 
 ### Adding exclude (query negation) to a facet
 Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
