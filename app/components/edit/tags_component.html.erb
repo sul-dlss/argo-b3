@@ -1,7 +1,8 @@
 <%= tag.div data: { controller: 'multiple-tags',
                     multiple_tags_has_many_outlet: tag_fields_selector,
                     multiple_tags_section_labels_value: section_labels } do %>
-  <div class="my-fieldset">
+  <%# No top margin, so the gap below the pane or page heading matches other forms. %>
+  <div class="mb-4">
     <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
                                                                field_name: :multiple_tags,
                                                                label_text: t('edit.items.fields.multiple_tags.label'),
