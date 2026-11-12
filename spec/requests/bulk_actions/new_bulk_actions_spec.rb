@@ -70,14 +70,22 @@ RSpec.describe 'Bulk actions menu' do
       expect(section).to have_link('Export tags')
       expect(section).to have_css('li', count: 5)
     end
+
+    expect(rendered_page).to have_no_css('section#manage-permissions-bulk-actions-section')
   end
 
-  context 'when the user is an admin' do
+  context 'when signed in as an admin user' do
     let(:user) { create(:user, :admin) }
 
-    it 'lists the manage permissions section last' do
+    it 'lists the permissions bulk actions' do
       get new_bulk_action_path
 
+      rendered_page.find('section#manage-permissions-bulk-actions-section') do |section|
+        expect(section).to have_css('h2', text: 'Manage permissions')
+        expect(section).to have_link('Import read unrestricted workgroups')
+        expect(section).to have_link('Import read restricted and edit permissions')
+        expect(section).to have_css('li', count: 2)
+      end
       expect(rendered_page.all('section h2').last.text).to eq('Manage permissions')
     end
   end

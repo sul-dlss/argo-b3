@@ -10,5 +10,14 @@ module BulkActions
     attribute :new_resource_type, :string
     attribute :change_viewing_direction, :boolean, default: false
     attribute :viewing_direction, :string
+
+    def job_params
+      {
+        current_resource_type: current_resource_type.presence,
+        new_content_type: new_content_type.presence,
+        new_resource_type: new_resource_type.presence,
+        viewing_direction: viewing_direction.presence
+      }
+    end
   end
 end

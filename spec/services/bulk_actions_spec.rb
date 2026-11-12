@@ -15,6 +15,14 @@ RSpec.describe BulkActions do
     end
   end
 
+  describe '.in_section' do
+    it 'returns the configs of the section in definition order' do
+      labels = described_class.in_section(:perform_actions).map(&:label)
+
+      expect(labels).to eq(['Manage release', 'Republish', 'Reindex'])
+    end
+  end
+
   describe BulkActions::Config do
     describe '#cancellable?' do
       it 'returns true by default' do

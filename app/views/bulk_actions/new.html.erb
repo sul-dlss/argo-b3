@@ -3,88 +3,13 @@
 <%= render Layout::ContainerComponent.new(heading: t('bulk_actions.menu')) do %>
   <%# Sections read row by row in the three-column layout. %>
   <div class="row mt-2 gy-3">
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Perform actions',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::MANAGE_RELEASE,
-            BulkActions::REPUBLISH,
-            BulkActions::REINDEX
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Register and deposit',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::REGISTER_CSV,
-            BulkActions::REDEPOSIT
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Tags and reporting',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::EXPORT_TAGS,
-            BulkActions::IMPORT_TAGS,
-            BulkActions::EXPORT_TRACKING_SHEETS,
-            BulkActions::EXPORT_CHECKSUM_REPORT,
-            BulkActions::EXPORT_COCINA_JSON
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Modify objects',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::ADD_WORKFLOW,
-            BulkActions::TEXT_EXTRACTION,
-            BulkActions::PURGE
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Manage structural metadata',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::MANAGE_CONTENT_TYPE,
-            BulkActions::EXPORT_STRUCTURAL_METADATA,
-            BulkActions::IMPORT_STRUCTURAL_METADATA,
-            BulkActions::MANAGE_COLLECTIONS,
-            BulkActions::CREATE_VIRTUAL_OBJECT
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Manage rights and administrative metadata',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::MANAGE_RIGHTS,
-            BulkActions::MANAGE_LICENSE_AND_RIGHTS_STATEMENTS,
-            BulkActions::MANAGE_EMBARGO,
-            BulkActions::UPDATE_GOVERNING_APO,
-            BulkActions::APPLY_APO_DEFAULTS,
-            BulkActions::MANAGE_SOURCE_ID
-          ]
-        ) %>
-    <%= render BulkActions::ListSectionComponent.new(
-          label: 'Manage descriptive metadata',
-          classes: 'col-lg-4 col-md-6',
-          bulk_action_configs: [
-            BulkActions::REFRESH_METADATA,
-            BulkActions::EXPORT_DESCRIPTIVE_METADATA,
-            BulkActions::VALIDATE_DESCRIPTIVE_METADATA,
-            BulkActions::IMPORT_DESCRIPTIVE_METADATA,
-            BulkActions::EXPORT_CATALOG_DATA,
-            BulkActions::IMPORT_CATALOG_DATA,
-            BulkActions::EXPORT_MODS
-          ]
-        ) %>
-    <% if allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
-      <%= render BulkActions::ListSectionComponent.new(
-            label: 'Manage permissions',
-            classes: 'col-lg-4 col-md-6',
-            bulk_action_configs: [
-              BulkActions::IMPORT_READ_UNRESTRICTED_WORKGROUPS,
-              BulkActions::IMPORT_READ_RESTRICTED_AND_EDIT_PERMISSIONS
-            ]
-          ) %>
+    <% BulkActions::SECTIONS.each do |section, section_label| %>
+      <% bulk_action_configs = BulkActions.in_section(section).select do |config|
+           config.admin_policy_rule.nil? || allowed_to?(config.admin_policy_rule, nil, with: AdminPolicy)
+         end %>
+      <% next if bulk_action_configs.empty? %>
+
+      <%= render BulkActions::ListSectionComponent.new(label: section_label, classes: 'col-lg-4 col-md-6', bulk_action_configs:) %>
     <% end %>
   </div>
 <% end %>

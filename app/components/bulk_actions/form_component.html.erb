@@ -8,7 +8,7 @@
                                                              label_classes: 'fw-bold',
                                                              input_rows: 3) %>
 
-  <% if with_close_version? %>
+  <% if close_version? %>
     <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:,
                                                                field_name: :close_version,
                                                                container_classes: 'my-fieldset',

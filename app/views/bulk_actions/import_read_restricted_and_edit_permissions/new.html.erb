@@ -1,4 +1,4 @@
-<%= form_with model: @bulk_action_form, url: bulk_actions_import_read_restricted_and_edit_permissions_path do |form| %>
+<%= form_with model: @bulk_action_form, url: @bulk_action_config.create_path do |form| %>
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
     <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                            field_name: :csv_file,

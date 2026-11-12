@@ -1,9 +1,9 @@
-<%= form_with model: @bulk_action_form, url: bulk_actions_add_workflow_path do |form| %>
-  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do %>
+<%= form_with model: @bulk_action_form, url: @bulk_action_config.create_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
     <%= render SdrViewComponents::Forms::SelectFieldComponent.new(
           form:,
           field_name: :workflow_name,
-          options: @workflow_options,
+          options: BulkActions::AddWorkflowForm::WORKFLOWS,
           label_text: 'Workflow',
           label_classes: 'fw-bold'
         ) %>

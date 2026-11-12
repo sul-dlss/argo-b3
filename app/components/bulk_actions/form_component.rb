@@ -3,23 +3,18 @@
 module BulkActions
   # Component for rendering common parts of the form for a bulk action.
   class FormComponent < ApplicationComponent
-    def initialize(form:, bulk_action_config:, with_close_version: false)
+    def initialize(form:, bulk_action_config:)
       @form = form
       @bulk_action_config = bulk_action_config
-      @with_close_version = with_close_version
       super()
     end
 
     attr_reader :form, :bulk_action_config
 
-    delegate :label, to: :bulk_action_config
+    delegate :label, :close_version?, to: :bulk_action_config
 
     def before_render
       helpers.page_title(label)
-    end
-
-    def with_close_version?
-      @with_close_version
     end
   end
 end

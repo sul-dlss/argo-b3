@@ -1,4 +1,4 @@
-<%= form_with model: @bulk_action_form, url: bulk_actions_manage_release_path do |form| %>
+<%= form_with model: @bulk_action_form, url: @bulk_action_config.create_path do |form| %>
   <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
     <p>For items, this overrides any collection release instructions; for a collection this releases the collection object itself, not its members.</p>
 

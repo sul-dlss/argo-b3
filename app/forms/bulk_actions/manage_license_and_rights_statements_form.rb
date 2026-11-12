@@ -11,5 +11,27 @@ module BulkActions
 
     attribute :license, :string
     attribute :license_action, :string, default: 'no_change'
+
+    def job_params
+      {
+        change_copyright: change?(:copyright),
+        copyright: updated_value(:copyright),
+        change_license: change?(:license),
+        license: updated_value(:license),
+        change_use_and_reproduction_statement: change?(:use_and_reproduction_statement),
+        use_and_reproduction_statement: updated_value(:use_and_reproduction_statement)
+      }
+    end
+
+    private
+
+    def change?(attribute_name)
+      %w[update remove].include?(public_send(:"#{attribute_name}_action"))
+    end
+
+    # @return [String, nil] the attribute's value when its action is update
+    def updated_value(attribute_name)
+      public_send(attribute_name) if public_send(:"#{attribute_name}_action") == 'update'
+    end
   end
 end

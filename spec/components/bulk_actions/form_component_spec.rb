@@ -12,10 +12,21 @@ RSpec.describe BulkActions::FormComponent, type: :component do
 
     expect(page).to have_css('h1', text: BulkActions::REINDEX.label)
     expect(page).to have_field('Describe this bulk action', type: 'textarea')
+    expect(page).to have_no_field('Deposit objects once action is complete')
 
     expect(page).to have_button('Submit', type: 'submit')
     expect(page).to have_link('Cancel', href: '/bulk_actions/new')
     expect(page).to have_css('a:first-child + button[type="submit"]:last-child', text: 'Submit')
+  end
+
+  context 'when the bulk action is configured with close version' do
+    let(:component) { described_class.new(form:, bulk_action_config: BulkActions::REFRESH_METADATA) }
+
+    it 'renders the close version checkbox' do
+      render_inline(component)
+
+      expect(page).to have_field('Deposit objects once action is complete', checked: true)
+    end
   end
 
   it 'sets the page title' do

@@ -1,5 +1,5 @@
-<%= form_with model: @bulk_action_form, url: bulk_actions_manage_rights_path do |form| %>
-  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:, with_close_version: true) do %>
+<%= form_with model: @bulk_action_form, url: @bulk_action_config.create_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
 
     <%= render Edit::AccessRightsComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-fieldset') %>
 
