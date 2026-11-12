@@ -15,7 +15,7 @@ module MultiItemDeposit
     end
 
     def report_path
-      helpers.multi_item_deposit_action_discovery_report_path(@multi_item_deposit_action)
+      helpers.discovery_report_multi_item_deposit_action_path(@multi_item_deposit_action)
     end
 
     def item_count

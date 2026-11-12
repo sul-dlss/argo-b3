@@ -249,8 +249,8 @@ Rails.application.routes.draw do
 
   resources :multi_item_deposit_actions, only: %i[index create show edit update] do
     get 'structural_metadata_csv_template', on: :member
+    get 'discovery_report', on: :member
     resource :globus, only: %i[new create], controller: 'multi_item_deposit_globus'
-    resource :discovery_report, only: %i[show], controller: 'multi_item_deposit_discovery_reports'
   end
 
   resources :contents, only: %i[edit show update] do
