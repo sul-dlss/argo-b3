@@ -64,6 +64,10 @@ module Search
       ]
     end
 
+    def error_date_values
+      [helpers.format_datetime(Time.zone.parse(result.last_workflow_error_date))]
+    end
+
     def access_rights_values
       [result.access_rights.map(&:capitalize).join(', ')]
     end

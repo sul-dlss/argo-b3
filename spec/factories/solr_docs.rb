@@ -46,6 +46,7 @@ FactoryBot.define do
       identifiers { [] }
       status { nil }
       workflow_errors { [] }
+      last_workflow_error_date { nil }
     end
 
     initialize_with do
@@ -99,6 +100,7 @@ FactoryBot.define do
         Search::Fields::IDENTIFIERS => identifiers,
         Search::Fields::STATUS => status,
         Search::Fields::WORKFLOW_ERRORS => workflow_errors,
+        Search::Fields::LAST_WORKFLOW_ERROR_DATE => last_workflow_error_date&.utc&.iso8601,
         FULL_TITLE_UNSTEMMED => title,
         FULL_TITLE => title
       }

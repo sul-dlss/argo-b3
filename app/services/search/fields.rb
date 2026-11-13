@@ -47,6 +47,8 @@ module Search
     LAST_PUBLISHED_DATE = 'published_latest_dtpsidv'
     LAST_UPDATED_BY = 'last_updated_by_ssidv'
     LAST_UPDATED_DATE = 'last_updated_at_dtpsidv'
+    # Time of the most recent error among the Processes currently in error.
+    LAST_WORKFLOW_ERROR_DATE = 'wf_error_latest_dtpsidv'
     LICENSE_LABEL = 'use_license_label_ss'
     LICENSE_LABEL_URI = 'use_license_label_uri_ssidv'
     LICENSE_URI = 'use_license_uri_ssidv'
