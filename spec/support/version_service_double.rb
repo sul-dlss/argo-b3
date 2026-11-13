@@ -5,12 +5,13 @@
 # override as needed.
 module VersionServiceDouble
   DEFAULTS = { druid: 'druid:bc123df4567', open?: true, openable?: false, closeable?: true, assembling?: false,
-               accessioning?: false, closed?: false, discardable?: false, version: 1,
-               version_description: 'Initial version', update_description: nil }.freeze
+               accessioning?: false, closed?: false, discardable?: false, assembly_stopped_with_error?: false,
+               version: 1, version_description: 'Initial version', update_description: nil }.freeze
 
   def version_service_double(**overrides)
     status = DEFAULTS.merge(overrides)
-    derived = { editable?: status[:openable?] || status[:closeable?],
+    editable = status.fetch(:editable?) { status[:openable?] || status[:closeable?] }
+    derived = { editable?: editable, draft_editable?: editable || status[:assembly_stopped_with_error?],
                 open_and_not_assembling?: status[:open?] && !status[:assembling?] }
     instance_double(Sdr::VersionService, **derived, **status)
   end

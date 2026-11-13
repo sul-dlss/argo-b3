@@ -76,6 +76,60 @@ RSpec.describe Sdr::WorkflowService do
     end
   end
 
+  describe '.assembly_stopped_with_error?' do
+    subject(:stopped) { described_class.assembly_stopped_with_error?(druid:, version: 2) }
+
+    let(:workflow_name) { 'gisAssemblyWF' }
+    let(:error_version) { 2 }
+    let(:other_status) { 'waiting' }
+    let(:xml) do
+      <<~XML
+        <workflows objectId="druid:bc123cd4567">
+          <workflow objectId="druid:bc123cd4567" id="#{workflow_name}">
+            <process version="1" status="completed" name="start-gis-assembly-workflow"/>
+            <process version="2" status="completed" name="start-gis-assembly-workflow"/>
+            <process version="#{error_version}" status="error" name="extract-boundingbox"/>
+          </workflow>
+          <workflow objectId="druid:bc123cd4567" id="ocrWF">
+            <process version="2" status="#{other_status}" name="end-ocr"/>
+          </workflow>
+        </workflows>
+      XML
+    end
+
+    before do
+      allow(object_client).to receive(:workflows).and_return(Dor::Services::Response::Workflows.new(xml: Nokogiri::XML(xml)))
+    end
+
+    context 'when an assembly workflow has a process in error and nothing is queued or started' do
+      it { is_expected.to be true }
+    end
+
+    context 'when another process is queued' do
+      let(:other_status) { 'queued' }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when another process is started' do
+      let(:other_status) { 'started' }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the process in error is not in an assembly workflow' do
+      let(:workflow_name) { 'accessionWF' }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the process in error is for another version' do
+      let(:error_version) { 1 }
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe '#accessioned?' do
     let(:milestones_client) { instance_double(Dor::Services::Client::Milestones) }
 

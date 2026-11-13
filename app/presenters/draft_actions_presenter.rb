@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Presenter for the draft actions of an object: the purge (first version) or discard draft (later version) button.
+# Presenter for the draft actions of an object: the purge (first version) or discard draft (later version) button
+# (purge?, available?, label, confirm, path), and whether depositing is stopped.
 class DraftActionsPresenter
   # @param cocina_version [Integer] the version of the cocina object
   # @param version_service [Sdr::VersionService] the object's version service
@@ -27,6 +28,9 @@ class DraftActionsPresenter
                    Sdr::DiscardDraftService.discardable?(version: cocina_version, version_service:)
                  end
   end
+
+  # @return [Boolean] true if assembly stopped with a process in error (see Sdr::VersionService#assembly_stopped_with_error?)
+  delegate :assembly_stopped_with_error?, to: :version_service
 
   def label
     purge? ? purge_label : I18n.t('edit.items.edit.buttons.discard_draft')

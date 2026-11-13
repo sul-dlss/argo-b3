@@ -148,6 +148,25 @@ RSpec.describe ObjectStatusPresenter do
     end
   end
 
+  describe '#assembly_stopped_with_error?' do
+    let(:version_service) { version_service_double(closeable?: false, assembly_stopped_with_error?: true) }
+
+    context 'when there are workflow errors and assembly stopped' do
+      let(:workflow_errors) { ['assemblyWF:jp2-create:Invalid image'] }
+
+      it 'returns true' do
+        expect(presenter.assembly_stopped_with_error?).to be true
+      end
+    end
+
+    context 'when there are no workflow errors' do
+      it 'returns false without checking the version' do
+        expect(presenter.assembly_stopped_with_error?).to be false
+        expect(version_service).not_to have_received(:assembly_stopped_with_error?)
+      end
+    end
+  end
+
   describe '#workflow_error_messages' do
     let(:workflow_errors) { ['accessionWF:end-accession:Object cannot be OCRd'] }
 

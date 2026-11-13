@@ -153,6 +153,70 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '#assembly_stopped_with_error? and #draft_editable?' do
+    let(:jp2_create_status) { 'error' }
+    let(:workflows_xml) do
+      <<~XML
+        <workflows objectId="#{druid}">
+          <workflow objectId="#{druid}" id="assemblyWF">
+            <process version="2" status="completed" name="start-assembly"/>
+            <process version="2" status="#{jp2_create_status}" name="jp2-create"/>
+            <process version="2" status="waiting" name="accessioning-initiate"/>
+          </workflow>
+        </workflows>
+      XML
+    end
+
+    before do
+      allow(status).to receive_messages(open?: open, openable?: false, closeable?: closeable, version: 2)
+      allow(object_client).to receive(:workflows)
+        .and_return(Dor::Services::Response::Workflows.new(xml: Nokogiri::XML(workflows_xml)))
+    end
+
+    context 'when the open version cannot be closed and its assembly stopped in error' do
+      let(:open) { true }
+      let(:closeable) { false }
+
+      it 'returns true' do
+        expect(service.assembly_stopped_with_error?).to be true
+        expect(service.draft_editable?).to be true
+        expect(service.editable?).to be false
+      end
+    end
+
+    context 'when the open version cannot be closed and its assembly is running' do
+      let(:open) { true }
+      let(:closeable) { false }
+      let(:jp2_create_status) { 'started' }
+
+      it 'returns false' do
+        expect(service.assembly_stopped_with_error?).to be false
+        expect(service.draft_editable?).to be false
+      end
+    end
+
+    context 'when the open version can be closed' do
+      let(:open) { true }
+      let(:closeable) { true }
+
+      it 'returns false without checking the workflows' do
+        expect(service.assembly_stopped_with_error?).to be false
+        expect(service.draft_editable?).to be true
+        expect(object_client).not_to have_received(:workflows)
+      end
+    end
+
+    context 'when the version is not open' do
+      let(:open) { false }
+      let(:closeable) { false }
+
+      it 'returns false without checking the workflows' do
+        expect(service.assembly_stopped_with_error?).to be false
+        expect(object_client).not_to have_received(:workflows)
+      end
+    end
+  end
+
   describe '.editable?' do
     before do
       allow(status).to receive_messages(openable?: false, closeable?: true)

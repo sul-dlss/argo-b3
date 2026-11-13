@@ -295,6 +295,22 @@ RSpec.describe 'Items' do
         expect(Capybara.string(response.body).find_field('Version description').value).to be_blank
       end
     end
+
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) do
+        version_service_double(editable?: false, assembly_stopped_with_error?: true,
+                               version_description: 'Fixing the title')
+      end
+
+      it 'renders the save as draft buttons without a deposit button' do
+        get "/items/#{druid}/edit"
+
+        expect(response).to have_http_status(:ok)
+        page = Capybara.string(response.body)
+        expect(page).to have_button('Save as draft', count: 4)
+        expect(page).to have_no_button('Deposit', type: 'submit')
+      end
+    end
   end
 
   describe 'update' do
@@ -772,6 +788,34 @@ RSpec.describe 'Items' do
         expect(flash[:danger]).to eq('Files for this item are being staged or discovered. ' \
                                      'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) do
+        version_service_double(editable?: false, assembly_stopped_with_error?: true,
+                               version_description: 'Changed type')
+      end
+
+      it 'saves the draft' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(flash[:toast]).to eq('Item updated.')
+        expect(Sdr::Repository).to have_received(:update)
+      end
+
+      context 'when depositing' do
+        let(:commit) { ItemsController::DEPOSIT_VALUE }
+
+        it 'redirects to the object page with a warning without saving' do
+          patch "/items/#{druid}", params: { item: item_params, commit: }
+
+          expect(response).to redirect_to(object_path(druid))
+          expect(flash[:warning]).to eq("This item can't be deposited until the process in error is retried.")
+          expect(Sdr::Repository).not_to have_received(:update)
+          expect(Sdr::Repository).not_to have_received(:accession)
+        end
       end
     end
 

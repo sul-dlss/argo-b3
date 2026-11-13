@@ -331,6 +331,60 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2 i.bi-exclamation-triangle-fill')
       expect(page).to have_text('end-accession : Object cannot be OCRd')
     end
+
+    it 'renders no actions' do
+      render_inline(component)
+
+      expect(page).to have_no_css('a', text: 'Edit item')
+      expect(page).to have_no_button('Deposit')
+    end
+  end
+
+  context 'when assembly stopped with a process in error and the user can edit' do
+    let(:workflow_errors) { ['assemblyWF:jp2-create:Invalid image'] }
+    let(:version_service) { version_service_double(closeable?: false, assembly_stopped_with_error?: true, version: 2) }
+
+    before do
+      user = create(:user)
+      create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    it 'renders the error with enabled edit and manage files links, without a deposit button' do
+      render_inline(component)
+
+      expect(page).to have_css('h2', text: 'Error')
+      expect(page).to have_text('jp2-create : Invalid image')
+      expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
+      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+      expect(page).to have_no_button('Deposit')
+    end
+
+    context 'when the object is an agreement' do
+      let(:object_type) { 'agreement' }
+
+      it 'renders an enabled edit agreement link' do
+        render_inline(component)
+
+        expect(page).to have_link('Edit agreement', href: "/agreements/#{druid}/edit")
+      end
+    end
+  end
+
+  context 'when assembly stopped with a process in error but the user cannot edit' do
+    let(:workflow_errors) { ['assemblyWF:jp2-create:Invalid image'] }
+    let(:version_service) { version_service_double(closeable?: false, assembly_stopped_with_error?: true, version: 2) }
+
+    before do
+      allow(Current).to receive(:user).and_return(create(:user))
+    end
+
+    it 'renders disabled edit and manage files links' do
+      render_inline(component)
+
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
+    end
   end
 
   context 'when there are workflow errors while the version is still accessioning' do

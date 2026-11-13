@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe Item::ManageFilesTabFooterComponent, type: :component do
   let(:pane) { SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit, label: 'Deposit') }
   let(:draft_actions_presenter) do
-    version_service = instance_double(Sdr::VersionService, druid: 'druid:bc123df4567', open?: true, discardable?: true)
+    version_service = instance_double(Sdr::VersionService, druid: 'druid:bc123df4567', open?: true, discardable?: true,
+                                                           assembly_stopped_with_error?: false)
     DraftActionsPresenter.new(cocina_version: 2, version_service:)
   end
 

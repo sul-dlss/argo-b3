@@ -75,7 +75,8 @@ class StageFilesJob < ApplicationJob
       user_name: user.sunetid
     ).tap do |updated_cocina_object|
       content.update!(lock: updated_cocina_object.lock)
-      delete_unreferenced_staged_files!
+      # A stopped assembly may have left files of its own (e.g., gisAssemblyWF's metadata) for its retried process.
+      delete_unreferenced_staged_files! unless Sdr::VersionService.new(druid:).assembly_stopped_with_error?
     end
   end
 

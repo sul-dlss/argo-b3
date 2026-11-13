@@ -26,7 +26,7 @@ class ItemsController < ApplicationController
 
   def edit
     authorize! @cocina_object, with: ObjectPolicy
-    return redirect_not_editable unless version_service.editable?
+    return redirect_not_editable unless version_service.draft_editable?
 
     @edit_item_form = EditItemForm.build_from_cocina_object(@cocina_object)
     @edit_item_form.version_service = version_service
@@ -49,10 +49,11 @@ class ItemsController < ApplicationController
     end
   end
 
-  def update # rubocop:disable Metrics/AbcSize
+  def update # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     authorize! @cocina_object, with: ObjectPolicy
-    return redirect_not_editable unless version_service.editable?
+    return redirect_not_editable unless version_service.draft_editable?
     return redirect_stale if stale?
+    return redirect_assembly_stopped_with_error if deposit? && version_service.assembly_stopped_with_error?
 
     # The mutable Content holds the OCR settings and must follow the object to its new lock.
     @content = Content.mutable_for(@cocina_object)
@@ -110,6 +111,10 @@ class ItemsController < ApplicationController
   # was changed after the edit page was loaded.
   def stale?
     edit_item_form_params[:lock] != @cocina_object.lock
+  end
+
+  def redirect_assembly_stopped_with_error
+    redirect_to object_path(@druid), flash: { warning: t('edit.items.edit.warnings.assembly_stopped_with_error') }
   end
 
   def redirect_stale

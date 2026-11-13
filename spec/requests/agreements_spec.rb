@@ -137,6 +137,22 @@ RSpec.describe 'Agreements' do
       end
     end
 
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) do
+        version_service_double(editable?: false, assembly_stopped_with_error?: true,
+                               version_description: 'Fixing the title')
+      end
+
+      it 'renders the save as draft buttons without a deposit button' do
+        get "/agreements/#{druid}/edit"
+
+        expect(response).to have_http_status(:ok)
+        page = Capybara.string(response.body)
+        expect(page).to have_button('Save as draft', count: 2)
+        expect(page).to have_no_button('Deposit', type: 'submit')
+      end
+    end
+
     context 'when the version is not editable' do
       let(:editable) { false }
 
@@ -297,6 +313,34 @@ RSpec.describe 'Agreements' do
         expect(flash[:danger]).to eq('Files for this agreement are being staged or discovered. ' \
                                      'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
+      end
+    end
+
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) do
+        version_service_double(closeable?: false, assembly_stopped_with_error?: true,
+                               version_description: 'Changed the title')
+      end
+
+      it 'saves the draft' do
+        patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
+
+        expect(response).to redirect_to("/objects/#{druid}")
+        expect(flash[:toast]).to eq('Agreement updated.')
+        expect(Sdr::Repository).to have_received(:update)
+      end
+
+      context 'when depositing' do
+        let(:commit) { AgreementsController::DEPOSIT_VALUE }
+
+        it 'redirects to the object page with a warning without saving' do
+          patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
+
+          expect(response).to redirect_to("/objects/#{druid}")
+          expect(flash[:warning]).to eq("This agreement can't be deposited until the process in error is retried.")
+          expect(Sdr::Repository).not_to have_received(:update)
+          expect(Sdr::Repository).not_to have_received(:accession)
+        end
       end
     end
 

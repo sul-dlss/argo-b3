@@ -280,6 +280,47 @@ RSpec.describe 'Manage files' do
     expect(find('select[name$="[ocr_languages][]"]', visible: :all)).to be_disabled
   end
 
+  context 'when depositing stopped with a process in error' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
+    let(:version_status) do
+      Dor::Services::Client::ObjectVersion::VersionStatus.new(versionId: 1, open: true, openable: false,
+                                                              closeable: false, assembling: true,
+                                                              accessioning: false, discardable: false,
+                                                              versionDescription: 'Initial version')
+    end
+    let(:workflows_xml) do
+      <<~XML
+        <workflows objectId="#{druid}">
+          <workflow objectId="#{druid}" id="assemblyWF">
+            <process version="1" status="error" name="jp2-create"/>
+            <process version="1" status="waiting" name="accessioning-initiate"/>
+          </workflow>
+        </workflows>
+      XML
+    end
+
+    before do
+      create(:content, :mutable, druid:, lock: cocina_object.lock, perform_ocr: true, ocr_languages: ['English'])
+      allow(object_client).to receive(:workflows)
+        .and_return(Dor::Services::Response::Workflows.new(xml: Nokogiri::XML(workflows_xml)))
+    end
+
+    it 'does not offer the text extraction settings or depositing' do
+      visit "/contents/#{druid}/edit"
+
+      click_on 'Item details'
+
+      expect(page).to have_field('Content type')
+      expect(page).to have_no_text(I18n.t('edit.items.fields.perform_ocr.label'))
+      expect(page).to have_no_text('Search for a language')
+
+      click_on 'Deposit', class: 'nav-link'
+
+      expect(page).to have_no_button('Deposit', type: 'submit')
+      expect(page).to have_button('Save as draft')
+    end
+  end
+
   it 'shows the speech to text question in place of the OCR question for media' do
     visit "/contents/#{druid}/edit"
 

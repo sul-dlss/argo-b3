@@ -12,6 +12,7 @@ RSpec.describe StageFilesJob do
   let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-1') }
   let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
+  let(:version_service) { version_service_double }
 
   let(:attached_content_file_binary) do
     create(:content_file_binary, content:, file_location: 'attached', filepath: 'image1.tif')
@@ -51,6 +52,7 @@ RSpec.describe StageFilesJob do
     allow(Sdr::Repository).to receive(:update)
       .with(cocina_object: mutated_cocina_object, user_name: user.sunetid).and_return(updated_cocina_object)
     allow(Sdr::Repository).to receive(:accession)
+    allow(Sdr::VersionService).to receive(:new).and_return(version_service)
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
     allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
   end
@@ -280,6 +282,19 @@ RSpec.describe StageFilesJob do
           job.perform(content:, user:)
 
           expect(File.exist?(deleted_filepath)).to be true
+        end
+      end
+
+      context 'when depositing stopped with a process in error' do
+        let(:version_service) { version_service_double(closeable?: false, assembly_stopped_with_error?: true) }
+
+        it 'keeps the unreferenced staged files' do
+          job.perform(content:, user:)
+
+          expect(File.exist?(deleted_filepath)).to be true
+          expect(File.exist?(staging_filepath)).to be true
+          expect(content.reload.lock).to eq('druid-version-2')
+          expect(Sdr::VersionService).to have_received(:new).with(druid:)
         end
       end
     end

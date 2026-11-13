@@ -88,6 +88,20 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) { version_service_double(editable?: false, assembly_stopped_with_error?: true, version:) }
+
+      it 'renders without text extraction settings or a deposit button' do
+        get edit_content_path(druid)
+
+        expect(response).to have_http_status(:ok)
+        page = Capybara.string(response.body)
+        expect(page).to have_no_field('contents_item[perform_ocr]', type: 'radio')
+        expect(page).to have_no_field('contents_item[perform_speech_to_text]', type: 'radio')
+        expect(page).to have_no_button('Deposit', type: 'submit')
+      end
+    end
+
     context 'when the content is staging' do
       # Staging moves the content to the saved object's lock, so it may no longer match the fetched object.
       let!(:content) { create(:content, :mutable, druid:, lock: 'saved-lock', staging_state: 'staging') }
@@ -578,6 +592,35 @@ RSpec.describe 'Contents' do
           .with(description: 'Added files', user_name: user.sunetid)
         expect(Sdr::VersionService).not_to have_received(:open)
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      end
+    end
+
+    context 'when depositing stopped with a process in error' do
+      let(:version_service) { version_service_double(editable?: false, assembly_stopped_with_error?: true, version:) }
+
+      before { content.update!(perform_ocr: true, ocr_languages: ['English']) }
+
+      it 'stages the draft, keeping the saved text extraction settings' do
+        # The disabled text extraction fields are not submitted.
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(response).to redirect_to(object_path(druid))
+        expect(Sdr::Repository).to have_received(:update)
+        expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
+        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+      end
+
+      context 'when depositing' do
+        it 'redirects to the object page with a warning without updating' do
+          patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                               contents_item: { viewing_direction: 'right-to-left' } }
+
+          expect(response).to redirect_to(object_path(druid))
+          expect(flash[:warning]).to eq("This item can't be deposited until the process in error is retried.")
+          expect(Sdr::Repository).not_to have_received(:update)
+          expect(StageFilesJob).not_to have_received(:perform_later)
+        end
       end
     end
 

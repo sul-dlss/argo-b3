@@ -9,11 +9,11 @@ module Item
     # @param form_id [String] The id of the form that the buttons submit
     # @param cancel_path [String] The URL for the cancel button
     # @param druid [String] The druid of the item
-    # @param draft_actions_presenter [DraftActionsPresenter] The discard draft or purge button
+    # @param draft_actions_presenter [DraftActionsPresenter] The discard or purge button, and if depositing stopped
     # @param show_next [Boolean] If next button is rendered (defaults to true)
     # @param show_previous [Boolean] If previous button is rendered (defaults to true)
     # @param show_edit_files [Boolean] If save draft and edit files button is rendered (defaults to false)
-    # @param show_deposit [Boolean] If deposit button is rendered (defaults to false)
+    # @param show_deposit [Boolean] If deposit button is rendered, unless depositing is stopped (defaults to false)
     # @param submit_data [Hash] Data attributes for the submit buttons
     # @param actions_data [Hash] Data attributes for the fieldset of action buttons and the discard or purge link
     # @param cancel_data [Hash] Data attributes for the cancel button
@@ -37,5 +37,11 @@ module Item
 
     attr_reader :pane, :form_id, :cancel_path, :druid, :draft_actions_presenter, :show_next, :show_previous,
                 :show_edit_files, :show_deposit, :submit_data, :actions_data, :cancel_data
+
+    # Design standard deviation: AVAIL-4. Deposit is hidden, not disabled, while depositing is stopped, since a
+    # stopped deposit resumes by retrying the process in error.
+    def deposit?
+      show_deposit && !draft_actions_presenter.assembly_stopped_with_error?
+    end
   end
 end

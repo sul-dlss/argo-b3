@@ -26,6 +26,21 @@ module Show
       status.in?(%i[registered draft])
     end
 
+    # Only objects with files are assembled, so only they can stop in error.
+    def assembly_stopped_with_error?
+      object_type_with_content? && object_status_presenter.assembly_stopped_with_error?
+    end
+
+    def actions?
+      status.in?(%i[deposited registered draft]) || assembly_stopped_with_error?
+    end
+
+    # Design standard deviation: AVAIL-4. Deposit is hidden, not disabled, while depositing is stopped, since a
+    # stopped deposit resumes by retrying the process in error.
+    def deposit_button?
+      draft?
+    end
+
     def edit_label
       I18n.t("show.status.actions.#{edit_action}")
     end
@@ -68,7 +83,11 @@ module Show
     end
 
     def editable?
-      version_editable? && helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)
+      (version_editable? || assembly_stopped_with_error?) && allowed_to_edit?
+    end
+
+    def allowed_to_edit?
+      helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)
     end
 
     def edit_action

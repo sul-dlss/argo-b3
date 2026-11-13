@@ -5,9 +5,11 @@ require 'rails_helper'
 RSpec.describe Item::EditTabFooterComponent, type: :component do
   let(:pane) { SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit, label: 'Deposit') }
   let(:draft_actions_presenter) do
-    version_service = instance_double(Sdr::VersionService, druid: 'druid:bc123df4567', open?: true, discardable?: true)
+    version_service = instance_double(Sdr::VersionService, druid: 'druid:bc123df4567', open?: true, discardable?: true,
+                                                           assembly_stopped_with_error?: assembly_stopped_with_error)
     DraftActionsPresenter.new(cocina_version: 2, version_service:)
   end
+  let(:assembly_stopped_with_error) { false }
 
   context 'without deposit' do
     it 'renders the navigation and the save as draft button' do
@@ -42,6 +44,19 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
       # Deposit is next to Previous, before the right-aligned draft buttons.
       expect(page.all('button').map { |button| button.text.strip })
         .to eq(['Previous', 'Deposit', 'Save draft and edit files', 'Save as draft'])
+    end
+  end
+
+  context 'with deposit when depositing is stopped' do
+    let(:assembly_stopped_with_error) { true }
+
+    it 'renders the save as draft button without the deposit button' do
+      render_inline(described_class.new(pane:, form_id: 'tabbed_form', cancel_path: '/objects/druid:bc123df4567',
+                                        druid: 'druid:bc123df4567', draft_actions_presenter:,
+                                        show_next: false, show_deposit: true))
+
+      expect(page).to have_button('Save as draft')
+      expect(page).to have_no_button('Deposit')
     end
   end
 

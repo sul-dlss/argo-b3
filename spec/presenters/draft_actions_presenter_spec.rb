@@ -6,7 +6,7 @@ RSpec.describe DraftActionsPresenter do
   subject(:presenter) { described_class.new(cocina_version:, version_service:) }
 
   let(:druid) { 'druid:bc123df4567' }
-  let(:version_service) { instance_double(Sdr::VersionService, druid:) }
+  let(:version_service) { instance_double(Sdr::VersionService, druid:, assembly_stopped_with_error?: true) }
 
   before do
     allow(Sdr::PurgeService).to receive(:purgeable?).and_return(true)
@@ -52,6 +52,14 @@ RSpec.describe DraftActionsPresenter do
       2.times { expect(presenter.available?).to be false }
       expect(Sdr::DiscardDraftService).to have_received(:discardable?).with(version: 2, version_service:).once
       expect(Sdr::PurgeService).not_to have_received(:purgeable?)
+    end
+  end
+
+  describe '#assembly_stopped_with_error?' do
+    let(:cocina_version) { 2 }
+
+    it 'is the version service\'s' do
+      expect(presenter.assembly_stopped_with_error?).to be true
     end
   end
 end

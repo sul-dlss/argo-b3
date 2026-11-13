@@ -18,7 +18,7 @@ class ContentsController < ContentsApplicationController
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     authorize! cocina_object, with: ObjectPolicy
-    return redirect_not_editable(druid:) unless version_service.editable?
+    return redirect_not_editable(druid:) unless version_service.draft_editable?
     return redirect_staging(druid:) if staging?(druid:)
 
     cache_cocina_hash(cocina_object:)
@@ -28,12 +28,13 @@ class ContentsController < ContentsApplicationController
     set_edit_form(cocina_object:, content: @contents_item_form.content)
   end
 
-  def update # rubocop:disable Metrics/AbcSize
+  def update # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     druid = params[:id]
     cocina_object = Sdr::Repository.find(druid:)
     authorize! cocina_object, with: ObjectPolicy
-    return redirect_not_editable(druid:) unless version_service.editable?
+    return redirect_not_editable(druid:) unless version_service.draft_editable?
     return redirect_staging(druid:) if staging?(druid:)
+    return redirect_assembly_stopped_with_error(druid:) if deposit? && version_service.assembly_stopped_with_error?
 
     # The content was built for the lock when the edit page was loaded, so it is missing if the object has changed.
     content = Content.mutable_for(cocina_object)
@@ -51,6 +52,14 @@ class ContentsController < ContentsApplicationController
 
   def version_service
     @version_service ||= Sdr::VersionService.new(druid: params[:id])
+  end
+
+  def deposit?
+    params[:commit] == DEPOSIT_VALUE
+  end
+
+  def redirect_assembly_stopped_with_error(druid:)
+    redirect_to object_path(druid), flash: { warning: t('edit.items.edit.warnings.assembly_stopped_with_error') }
   end
 
   def redirect_not_editable(druid:)
@@ -88,7 +97,7 @@ class ContentsController < ContentsApplicationController
 
   # Depositing additionally validates the content (see ContentsItemForm).
   def contents_item_form_valid?
-    @contents_item_form.valid?(params[:commit] == DEPOSIT_VALUE ? :deposit : nil)
+    @contents_item_form.valid?(deposit? ? :deposit : nil)
   end
 
   # @return [Boolean] false if saving to SDR failed
@@ -96,7 +105,7 @@ class ContentsController < ContentsApplicationController
     # Saving also saves the text extraction settings with the content and rebases it onto the saved object's lock.
     @contents_item_form.save!(user_name: current_user.sunetid)
 
-    content.start_staging!(user: current_user, accession: params[:commit] == ContentsController::DEPOSIT_VALUE)
+    content.start_staging!(user: current_user, accession: deposit?)
     true
   rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)
@@ -128,6 +137,8 @@ class ContentsController < ContentsApplicationController
       form.version_service = version_service
       form.update(contents_item_form_params)
       form.content = content
+      # The text extraction fields aren't shown, so keep the saved settings.
+      form.prefill_text_extraction_settings(content) if version_service.assembly_stopped_with_error?
     end
   end
 
