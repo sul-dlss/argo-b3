@@ -2,7 +2,10 @@
 
 ## Running the app
 
-Follow README "Development": `docker compose up -d` (Postgres, Redis, Solr, DSA, SURI), `bin/rails db:prepare`, then `bin/dev` (port 3000). If Docker isn't running, start it first.
+Follow README "Development": `docker compose up -d` (Postgres, Redis, Solr, DSA, SURI), `bin/rails db:prepare`, then `PORT=<free port> bin/dev` from this checkout. If Docker isn't running, start it first.
+
+- **Whose server is it?** Before trusting a server already on a port, confirm it runs from this checkout: `lsof -a -p "$(lsof -nP -iTCP:<port> -sTCP:LISTEN -t | head -1)" -d cwd -Fn` prints its directory.
+- **Stopping**: `bin/overmind quit`, run from the checkout that started it.
 
 `bin/dev` signs every request in as a development user (`USER_GROUPS`, `NAME`, `EMAIL`; defaults in `bin/dev`), an admin by default. The `User` record is created on the first request, so load a page before seeding records owned by it.
 
