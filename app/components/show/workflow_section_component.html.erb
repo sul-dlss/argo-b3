@@ -2,7 +2,9 @@
                                                                         classes: 'workflow-section', heading_classes: 'workflow-section-heading') do |component| %>
   <% component.with_heading_content do %>
     <%= workflow_name %>
-    <% if complete? %>
+    <% if error? %>
+      <span class="text-danger"><%= helpers.danger_icon(aria: { hidden: true }) %> Error</span>
+    <% elsif complete? %>
       <span class="text-success"><%= helpers.success_icon(aria: { hidden: true }) %> Complete</span>
     <% else %>
       <span class="workflow-in-progress"><%= helpers.in_progress_icon(aria: { hidden: true }) %> In progress</span>
