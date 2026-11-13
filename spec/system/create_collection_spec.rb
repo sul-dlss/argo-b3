@@ -51,7 +51,12 @@ RSpec.describe 'Create a collection' do
 
     expect(page).to have_css('h1', text: 'Register and deposit collection')
     expect(page).to have_no_field('Upload description spreadsheet')
+    expect(page).to have_field('Enter title and abstract myself', checked: true)
     fill_in 'Title', with: 'My collection'
+    fill_in 'Abstract', with: 'My abstract.'
+    # Unlike the title, the abstract is optional.
+    expect(page).to have_css('#collection_title[aria-required="true"]')
+    expect(page).to have_css('#collection_abstract[aria-required="false"]')
 
     click_button 'Next'
     expect(page).to have_css('#rights-tab.active')
@@ -89,6 +94,8 @@ RSpec.describe 'Create a collection' do
       expect(request_cocina_object.access.copyright).to eq('My copyright.')
       expect(request_cocina_object.access.license).to eq('https://creativecommons.org/licenses/by/4.0/legalcode')
       expect(request_cocina_object.description.title.first.value).to eq('My collection')
+      expect(request_cocina_object.description.note.map { |note| [note.type, note.value] })
+        .to eq([['abstract', 'My abstract.']])
       expect(args[:tags]).to include('Some : Tag')
     end
     expect(Sdr::Repository).to have_received(:create_release_tag)

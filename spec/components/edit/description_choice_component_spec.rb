@@ -14,6 +14,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
 
       expect(page).to have_field('Enter title myself', type: 'radio', checked: true)
       expect(page).to have_field('Title', type: 'text', with: 'The Title')
+      expect(page).to have_no_field('Abstract')
 
       expect(page).to have_field('Retrieve description from FOLIO', type: 'radio', checked: false)
       expect(page).to have_field('Upload description spreadsheet', type: 'radio', checked: false)
@@ -58,6 +59,22 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       expect(page).to have_no_field('Part label')
       expect(page).to have_no_field('Sort key')
       expect(page).to have_no_field('Upload description spreadsheet')
+    end
+  end
+
+  context 'with the abstract field' do
+    let(:component) { described_class.new(form:, item_fields: false, abstract_field: true) }
+    let(:form) { ActionView::Helpers::FormBuilder.new(:collection, new_collection_form, vc_test_view_context, {}) }
+    let(:new_collection_form) { NewCollectionForm.new(title: 'The Title', abstract: 'The abstract.') }
+
+    it 'renders the title and abstract choice' do
+      render_inline(component)
+
+      expect(page).to have_field('Enter title and abstract myself', type: 'radio', checked: true)
+      expect(page).to have_field('Title', type: 'text', with: 'The Title')
+      expect(page).to have_field('Abstract', type: 'textarea', with: 'The abstract.')
+      expect(page).to have_css('textarea[aria-describedby="collection_abstract_help"]')
+      expect(page).to have_css('#collection_abstract_help', text: 'Summarize the contents of the collection.')
     end
   end
 

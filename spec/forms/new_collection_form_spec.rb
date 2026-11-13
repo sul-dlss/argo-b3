@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe NewCollectionForm do
   subject(:new_collection_form) do
-    described_class.new(title:, description_choice:, catalog_record_id:, access_view:, apo_druid: 'druid:hv992ry2431',
+    described_class.new(title:, abstract:, description_choice:, catalog_record_id:, access_view:,
+                        apo_druid: 'druid:hv992ry2431',
                         use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
                         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
                         other_tags_attributes: { '0' => { tag: 'Some : Tag' } },
@@ -12,6 +13,7 @@ RSpec.describe NewCollectionForm do
   end
 
   let(:title) { 'My collection' }
+  let(:abstract) { nil }
   let(:description_choice) { 'title' }
   let(:catalog_record_id) { nil }
   let(:access_view) { 'world' }
@@ -118,6 +120,31 @@ RSpec.describe NewCollectionForm do
               release_what: 'collection').ordered
       expect(Sdr::Repository).to have_received(:accession)
         .with(cocina_object: registered_cocina_object, user_name: 'jcoyne').ordered
+    end
+
+    context 'when entering an abstract' do
+      let(:abstract) { "  A collection of curious cats.\n" }
+
+      it 'registers the collection with an abstract note' do
+        new_collection_form.create!(user_name: 'jcoyne')
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:request_cocina_object].description.note.map { |note| [note.type, note.value] })
+            .to eq([['abstract', 'A collection of curious cats.']])
+        end
+      end
+    end
+
+    context 'when leaving the abstract blank' do
+      let(:abstract) { '  ' }
+
+      it 'registers the collection without a note' do
+        new_collection_form.create!(user_name: 'jcoyne')
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:request_cocina_object].description.note).to be_empty
+        end
+      end
     end
 
     context 'when retrieving the description from FOLIO' do
