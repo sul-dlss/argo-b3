@@ -872,7 +872,7 @@ en:
       label: 'Pinned virtual objects'
       empty: 'No virtual objects have been pinned.'
   reports:
-    title: 'Custom report'
+    title: 'Druid report'
   bulk_actions:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
