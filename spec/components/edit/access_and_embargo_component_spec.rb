@@ -77,6 +77,47 @@ RSpec.describe Edit::AccessAndEmbargoComponent, type: :component do
     end
   end
 
+  it 'renders the toggle label visibly, outside of a collapsible section' do
+    render_inline(component)
+
+    expect(page).to have_css('label:not(.visually-hidden)', text: 'Access settings')
+    expect(page).to have_no_css('.collapsible-section')
+  end
+
+  context 'when collapsible' do
+    let(:component) { described_class.new(form:, collapsible: true) }
+
+    it 'renders the fields in a collapsed section headed Access settings, with the toggle label visually hidden' do
+      render_inline(component)
+
+      expect(page).to have_css('h3 button.collapsible-section-toggle.collapsed[aria-expanded="false"]',
+                               text: 'Access settings')
+      expect(page).to have_css('.collapse:not(.show) label.visually-hidden', text: 'Access settings', visible: :all)
+      expect(page).to have_field('Without embargo', type: 'radio', visible: :all)
+    end
+
+    context 'when an access field has an error' do
+      before { new_item_form.errors.add(:embargo_release_date, :blank) }
+
+      it 'renders the section expanded' do
+        render_inline(component)
+
+        expect(page).to have_css('h3 button.collapsible-section-toggle[aria-expanded="true"]', text: 'Access settings')
+        expect(page).to have_css('.collapse.show')
+      end
+    end
+
+    context 'when another field has an error' do
+      before { new_item_form.errors.add(:content_type, :blank) }
+
+      it 'renders the section collapsed' do
+        render_inline(component)
+
+        expect(page).to have_css('button.collapsible-section-toggle[aria-expanded="false"]')
+      end
+    end
+  end
+
   context 'when showing APO defaults' do
     let(:component) { described_class.new(form:, apo_defaults: true) }
 

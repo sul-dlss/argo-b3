@@ -1,57 +1,70 @@
-<div data-controller="toggle overwrite-file-access" data-action="change->overwrite-file-access#update">
-  <%= render SdrViewComponents::Forms::ToggleComponent.new(form:,
-                                                           field_name: :with_embargo,
-                                                           label_text: 'Access settings',
-                                                           label_classes: 'fw-bold') do |component| %>
-    <% component.with_left_toggle_option(form:, field_name: :with_embargo, label: 'Without embargo', value: false,
-                                         data: { toggle_target: 'radio', toggle_section: 'without-embargo',
-                                                 action: 'toggle#toggle' }) %>
-    <% component.with_right_toggle_option(form:, field_name: :with_embargo, label: 'With embargo', value: true,
-                                          data: { toggle_target: 'radio', toggle_section: 'with-embargo',
-                                                  action: 'toggle#toggle' }) %>
-  <% end %>
-
-  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings without embargo', hidden_label: true,
-                                                             data: { toggle_target: 'section',
-                                                                     toggle_section: 'without-embargo' }) do %>
-    <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field',
-                                               apo_defaults_group: apo_defaults_group('without_embargo')) %>
-  <% end %>
-
-  <div data-toggle-target="section" data-toggle-section="with-embargo">
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Embargo release date', hidden_label: true,
-                                                               classes: 'my-fieldset') do %>
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
-                                                                  field_name: :embargo_release_date,
-                                                                  label_text: 'When will this embargo end?',
-                                                                  label_classes: 'fw-bold',
-                                                                  label_mark_required: true,
-                                                                  container_classes: 'my-field',
-                                                                  input_type: 'date',
-                                                                  input_value: embargo_release_date_value) %>
+<% fields = capture do %>
+  <div data-controller="toggle overwrite-file-access" data-action="change->overwrite-file-access#update">
+    <%# When collapsible, the section heading shows the label, which stays as the toggle's label for assistive technology. %>
+    <%= render SdrViewComponents::Forms::ToggleComponent.new(form:,
+                                                             field_name: :with_embargo,
+                                                             label_text: 'Access settings',
+                                                             label_classes: 'fw-bold',
+                                                             label_hidden: collapsible?) do |component| %>
+      <% component.with_left_toggle_option(form:, field_name: :with_embargo, label: 'Without embargo', value: false,
+                                           data: { toggle_target: 'radio', toggle_section: 'without-embargo',
+                                                   action: 'toggle#toggle' }) %>
+      <% component.with_right_toggle_option(form:, field_name: :with_embargo, label: 'With embargo', value: true,
+                                            data: { toggle_target: 'radio', toggle_section: 'with-embargo',
+                                                    action: 'toggle#toggle' }) %>
     <% end %>
 
-    <%# The object's access applies during the embargo; the embargo's access replaces it when the embargo is released. %>
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings during embargo',
-                                                               classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings without embargo', hidden_label: true,
+                                                               data: { toggle_target: 'section',
+                                                                       toggle_section: 'without-embargo' }) do %>
+      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field',
+                                                 apo_defaults_group: apo_defaults_group('without_embargo')) %>
     <% end %>
 
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings once embargo ends',
-                                                               classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field',
-                                                 apo_defaults_group: apo_defaults_group('embargo_ends')) %>
+    <div data-toggle-target="section" data-toggle-section="with-embargo">
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Embargo release date', hidden_label: true,
+                                                                 classes: 'my-fieldset') do %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
+                                                                    field_name: :embargo_release_date,
+                                                                    label_text: 'When will this embargo end?',
+                                                                    label_classes: 'fw-bold',
+                                                                    label_mark_required: true,
+                                                                    container_classes: 'my-field',
+                                                                    input_type: 'date',
+                                                                    input_value: embargo_release_date_value) %>
+      <% end %>
+
+      <%# The object's access applies during the embargo; the embargo's access replaces it when the embargo is released. %>
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings during embargo',
+                                                                 classes: 'my-fieldset') do %>
+        <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'access_', container_classes: 'my-field') %>
+      <% end %>
+
+      <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Access settings once embargo ends',
+                                                                 classes: 'my-fieldset') do %>
+        <%= render Edit::AccessRightsComponent.new(form:, fieldname_prefix: 'embargo_', container_classes: 'my-field',
+                                                   apo_defaults_group: apo_defaults_group('embargo_ends')) %>
+      <% end %>
+    </div>
+
+    <% if overwrite_file_access? %>
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+            form:,
+            field_name: :overwrite_file_access,
+            label_text: t('edit.items.fields.overwrite_file_access.label'),
+            help_text: t('edit.items.fields.overwrite_file_access.help_text'),
+            container_classes: 'my-field',
+            input_data: { overwrite_file_access_target: 'checkbox' }
+          ) %>
     <% end %>
   </div>
+<% end %>
 
-  <% if overwrite_file_access? %>
-    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
-          form:,
-          field_name: :overwrite_file_access,
-          label_text: t('edit.items.fields.overwrite_file_access.label'),
-          help_text: t('edit.items.fields.overwrite_file_access.help_text'),
-          container_classes: 'my-field',
-          input_data: { overwrite_file_access_target: 'checkbox' }
-        ) %>
+<% if collapsible? %>
+  <%= render SdrViewComponents::Elements::CollapsibleSectionComponent.new(id: 'access-settings', heading: 'Access settings',
+                                                                          level: :h3, expanded: expanded?) do %>
+    <%= fields %>
   <% end %>
-</div>
+<% else %>
+  <%= fields %>
+<% end %>
