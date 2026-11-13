@@ -35,4 +35,8 @@ FileUtils.chdir APP_ROOT do
 
   puts "\n== Building assets =="
   system!('yarn build:css')
+
+  # RuboCop's cache is keyed by absolute path, so a new worktree starts cold; own pgroup so it outlives this script.
+  puts "\n== Warming the RuboCop cache in the background =="
+  Process.detach(Process.spawn('bin/rubocop', %i[out err] => File::NULL, pgroup: true))
 end
