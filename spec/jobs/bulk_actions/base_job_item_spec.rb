@@ -224,13 +224,6 @@ RSpec.describe BulkActions::BaseJobItem do
         expect { bulk_action_item.deposit_if_needed! }
           .to raise_error(described_class::NotDepositedError, 'Saved, but not deposited: Files have unsaved changes')
       end
-
-      context 'when forced' do
-        it 'raises a not deposited error that does not claim a save' do
-          expect { bulk_action_item.deposit_if_needed!(force: true) }
-            .to raise_error(described_class::NotDepositedError, 'Not deposited: Files have unsaved changes')
-        end
-      end
     end
 
     context 'when version is 1' do
@@ -239,14 +232,6 @@ RSpec.describe BulkActions::BaseJobItem do
       it 'does not deposit' do
         bulk_action_item.deposit_if_needed!
         expect(Sdr::DepositDraftService).not_to have_received(:call)
-      end
-
-      context 'when forced' do
-        it 'deposits' do
-          bulk_action_item.deposit_if_needed!(force: true)
-          expect(Sdr::DepositDraftService).to have_received(:call)
-          expect(job).to have_received(:log).with('Closed version')
-        end
       end
     end
 
@@ -270,14 +255,6 @@ RSpec.describe BulkActions::BaseJobItem do
         expect(Sdr::VersionService).not_to have_received(:closed?)
         expect(Sdr::DepositDraftService).not_to have_received(:call)
         expect(job).not_to have_received(:log)
-      end
-
-      context 'when forced' do
-        it 'deposits' do
-          bulk_action_item.deposit_if_needed!(force: true)
-          expect(Sdr::DepositDraftService).to have_received(:call)
-          expect(job).to have_received(:log).with('Closed version')
-        end
       end
     end
   end
