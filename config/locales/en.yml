@@ -779,6 +779,7 @@ en:
       errors:
         no_rows: 'No rows for this object in the structural metadata CSV'
         files_not_in_csv: 'Files not in structural metadata CSV: %{filepaths}'
+        object_changed: 'Object changed since discovery; re-run Discover files'
         unexpected: 'An unexpected error occurred while building the structure. Contact SDR support for assistance.'
       toasts:
         completed: 'Completed building structure'
