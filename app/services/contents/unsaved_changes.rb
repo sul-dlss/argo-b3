@@ -2,7 +2,8 @@
 
 module Contents
   # Determines whether a mutable Content has unsaved changes, i.e., changes not yet staged to the Cocina object.
-  # Only the attributes that a user can change when managing files are compared.
+  # Only the attributes that a user can change when managing files are compared, including the item details chosen
+  # while managing files (other than the text extraction settings, which are not part of the Cocina object).
   class UnsavedChanges
     FILE_SET_COLUMNS = %w[file_set_type label].freeze
     FILE_COLUMNS = %w[label use view download location language_tag corrected_for_accessibility sdr_generated_text
@@ -26,6 +27,7 @@ module Contents
       return false if content.nil?
       # New files (including those not yet added to a resource) are only saved by staging.
       return true if content.content_file_binaries.exists?(file_location: UNSTAGED_FILE_LOCATIONS)
+      return true if item_details_changed?
 
       content_structure != cocina_structure
     end
@@ -33,6 +35,13 @@ module Contents
     private
 
     attr_reader :content, :cocina_object
+
+    def item_details_changed?
+      return false if content.item_details_params.empty?
+
+      ContentsItemForm.build_from_cocina_object(cocina_object).tap { |form| form.update(content.item_details_params) }
+                      .changed?
+    end
 
     # Plucked rather than loaded, since a Content may have many files.
     # @return [Array<Array>] for each resource in order, its attributes and the attributes of its files in order

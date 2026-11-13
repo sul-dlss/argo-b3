@@ -10,7 +10,11 @@ class DiscoverFilesJob < ApplicationJob
   # @param [Symbol] file_location the file location of the binaries (:mount or :globus, which is also mounted)
   def perform(content:, mount_path:, file_location: :mount)
     Contents::MountDiscoverer.call(content:, mount_path:, file_location:)
-
+  rescue StandardError => e
+    # Completing discovery anyway lets the user leave the wait page and see the files that were discovered.
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: content.druid })
+  ensure
     content.discovery_completed!
   end
 end

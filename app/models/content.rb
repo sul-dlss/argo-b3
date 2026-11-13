@@ -13,6 +13,23 @@ class Content < ApplicationRecord
   has_many :content_file_binaries, inverse_of: :content, dependent: :destroy
 
   scope :with_structural_associations, -> { includes(content_file_sets: { content_files: :content_file_binary }) }
+  # The query for not busy?
+  scope :not_busy, lambda {
+    where.not(staging_state: 'staging').where.not(mount_state: 'discovering')
+         .where.not(structuring_state: 'structuring')
+  }
+
+  # The steps of managing files, in order. Agreements have no item details step.
+  enum :step, { details: 'details', files: 'files', structure: 'structure', deposit: 'deposit' }, suffix: true,
+                                                                                                  validate: true
+
+  # The message of errors refusing a change while busy?
+  BUSY_MESSAGE = 'Files are being staged, discovered, or structured'
+
+  # The item details chosen while managing files, which are saved to the object by saving or depositing.
+  ITEM_DETAILS_ATTRIBUTES = %w[content_type viewing_direction with_embargo embargo_release_date access_view
+                               access_download access_location embargo_view embargo_download embargo_location
+                               overwrite_file_access version_description].freeze
 
   # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object
   # @return [Content, nil] the mutable Content for the object's current lock
@@ -74,9 +91,57 @@ class Content < ApplicationRecord
     @hierarchical_filepaths = content_file_binaries.where('cardinality(path_parts) > 0').exists?
   end
 
-  # A background job may change the lock of a Content that is staging or discovering.
-  def staging_or_discovering?
-    staging? || discovering?
+  # A background job may change the lock or the structure of a Content that is busy, so changes are refused.
+  def busy?
+    staging? || discovering? || structuring?
+  end
+
+  # @param append [Boolean] whether to add the unassociated files to the existing resources rather than replacing them
+  def start_structuring!(append:)
+    structuring_started!
+    StructureFilesJob.perform_later(content: self, append:)
+  end
+
+  # @return [String, nil] 'structured' or 'structuring_failed' until the result is taken, otherwise nil
+  def structuring_result
+    structuring_state if structured? || structuring_failed?
+  end
+
+  # The result is shown once, so taking it clears it.
+  # @return [String, nil] the structuring_result
+  def take_structuring_result!
+    structuring_result.tap { |result| structuring_result_shown! if result }
+  end
+
+  # Item details are saved once a step is left, so none are saved before then.
+  # @return [Hash] the saved item details as ContentsItemForm params, or empty if none are saved
+  def item_details_params
+    return {} if content_type.nil?
+
+    attributes.slice(*ITEM_DETAILS_ATTRIBUTES).symbolize_keys
+  end
+
+  # Returns to the first step and clears the item details, e.g., once they are saved to the object.
+  def reset_manage_files_flow!
+    update!(step: :details, **clear_item_details_attributes)
+  end
+
+  # Clears the item details, e.g., when the object was edited elsewhere so that they would overwrite the edit.
+  def clear_item_details!
+    update!(clear_item_details_attributes)
+  end
+
+  # Structuring and validating the structure use the selected access, which may not have been saved yet.
+  # @param cocina_object [Cocina::Models::DROWithMetadata] the saved object
+  # @return [Cocina::Models::DROWithMetadata] the object with the selected access, if any
+  def with_selected_access(cocina_object)
+    Contents::ApplySelectedAccess.call(cocina_object:, params: item_details_params)
+  end
+
+  # @param cocina_object [Cocina::Models::DROWithMetadata] the saved object
+  # @return [String] the selected content type, which may not have been saved yet
+  def selected_content_type(cocina_object)
+    content_type || cocina_object.type
   end
 
   # Staging is retried by starting staging again from staging_failed.
@@ -108,7 +173,30 @@ class Content < ApplicationRecord
     end
   end
 
+  # Structured and structuring_failed are kept until the result has been shown (see structuring_result_shown).
+  state_machine :structuring_state, initial: :structuring_not_in_progress do
+    event :structuring_started do
+      transition %i[structuring_not_in_progress structured structuring_failed] => :structuring
+    end
+
+    event :structuring_completed do
+      transition structuring: :structured
+    end
+
+    event :structuring_errored do
+      transition structuring: :structuring_failed
+    end
+
+    event :structuring_result_shown do
+      transition %i[structured structuring_failed] => :structuring_not_in_progress
+    end
+  end
+
   private
+
+  def clear_item_details_attributes
+    ITEM_DETAILS_ATTRIBUTES.index_with(nil)
+  end
 
   def clear_other_staging_failures!
     Content.where(druid:).where.not(id:).with_staging_state(:staging_failed).find_each(&:staging_failure_cleared!)

@@ -2,17 +2,20 @@
 
 module MultiItemDeposit
   # Renders the steps of a Multi-Item Deposit (discovery, structure, and deposit) with their statuses.
-  class ProgressStepperComponent < Elements::ProgressStepperComponent
-    # The label and steps are translated, which can't happen until rendering, so they are provided by
-    # overriding the readers rather than passed to super.
+  class ProgressStepperComponent < ApplicationComponent
     def initialize(multi_item_deposit_action:)
       @multi_item_deposit_action = multi_item_deposit_action
-      super(label: nil, steps: nil, classes: 'mb-4')
+      super()
     end
 
-    def label
-      t('multi_item_deposit.progress.label')
+    def call
+      render Elements::ProgressStepperComponent.new(label: t('multi_item_deposit.progress.label'), steps:,
+                                                    classes: 'mb-4')
     end
+
+    private
+
+    attr_reader :multi_item_deposit_action
 
     def steps
       [
@@ -21,10 +24,6 @@ module MultiItemDeposit
         { label: t('multi_item_deposit.progress.steps.deposit'), status: deposit_status }
       ]
     end
-
-    private
-
-    attr_reader :multi_item_deposit_action
 
     # Discovery must succeed to leave the discovery step, so it is in progress until it does.
     def discovery_status

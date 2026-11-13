@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Contents
-  # Discards a mutable Content's unsaved changes by rebuilding its structure from the Cocina object.
-  # The Content itself (and so its text extraction settings) is kept.
+  # Discards a mutable Content's unsaved changes by rebuilding its structure from the Cocina object and clearing the
+  # item details chosen while managing files. The Content itself (and so its text extraction settings) is kept.
   class UnsavedChangesDiscarder
     # Raised when the Content is staging or discovering.
     class ContentBusyError < StandardError; end
@@ -32,6 +32,7 @@ module Contents
         delete_structure
         Contents::Builder.new(cocina_object:, immutable: false).populate(content)
         mark_staged_binaries
+        content.reset_manage_files_flow!
       end
       true
     end
@@ -47,7 +48,7 @@ module Contents
     end
 
     def check_staging_state!
-      raise ContentBusyError, 'Files are being staged or discovered' if content.staging_or_discovering?
+      raise ContentBusyError, Content::BUSY_MESSAGE if content.busy?
       raise StagingFailedError, 'Staging failed' if content.staging_failed?
     end
 

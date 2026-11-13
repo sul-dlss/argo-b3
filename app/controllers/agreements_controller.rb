@@ -52,7 +52,7 @@ class AgreementsController < ApplicationController
 
     # The mutable Content must follow the object to its new lock.
     @edit_agreement_form.content = Content.mutable_for(@cocina_object)
-    return redirect_content_busy if @edit_agreement_form.content&.staging_or_discovering?
+    return redirect_content_busy if @edit_agreement_form.content&.busy?
 
     return render_invalid_edit unless @edit_agreement_form.valid?(deposit? ? :deposit : nil)
 

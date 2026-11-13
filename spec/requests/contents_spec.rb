@@ -120,10 +120,13 @@ RSpec.describe 'Contents' do
 
       get edit_content_path(druid)
 
-      expect(Capybara.string(response.body)).to have_title('Manage files – Maps & charts | Argo B3', exact: true)
+      expect(Capybara.string(response.body))
+        .to have_title('Manage files and structure – Maps & charts | Argo B3', exact: true)
     end
 
     context 'when the initial version' do
+      before { content.update!(step: 'deposit') }
+
       it 'does not render the version description' do
         get edit_content_path(druid)
 
@@ -133,12 +136,14 @@ RSpec.describe 'Contents' do
     end
 
     context 'when an item' do
-      it 'renders the item details tab' do
+      it 'renders the item details step' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_css('[role="tab"]', text: 'Item details')
+        expect(page).to have_css('ol[aria-label="Manage files progress"] li', count: 4)
+        expect(page).to have_css('li[aria-current="step"]', text: 'Item details')
         expect(page).to have_select('Content type', visible: :all)
+        expect(page).to have_no_css('#file-dropzone', visible: :all)
       end
 
       it 'selects the embargo toggle from the object' do
@@ -149,6 +154,7 @@ RSpec.describe 'Contents' do
       end
 
       it 'renders the file location choices in order' do
+        content.update!(step: 'files')
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
@@ -158,6 +164,7 @@ RSpec.describe 'Contents' do
       end
 
       it 'hides the dropzone icon from screen readers' do
+        content.update!(step: 'files')
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
@@ -165,21 +172,115 @@ RSpec.describe 'Contents' do
                                  visible: :all)
       end
 
-      it 'renders the navigation, save as draft, purge, and deposit buttons' do
+      it 'renders the navigation, save as draft, and purge buttons on the first step' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
         expect(page).to have_css('a[href^="/contents/"][href$="/unsaved_changes"][data-turbo-method="delete"]',
-                                 text: 'Cancel', count: 4)
-        expect(page).to have_button('Previous', count: 3)
-        expect(page).to have_button('Next', count: 3)
-        expect(page).to have_css('button[type="submit"][form="item_form"][value="draft"]', text: 'Save as draft',
-                                                                                           count: 4)
-        expect(page).to have_css('button[type="submit"][form="item_form"][value="deposit"]', text: 'Deposit',
-                                                                                             count: 1)
-        expect(page).to have_link('Purge item', href: "/objects/#{druid}/purge", count: 4)
+                                 text: 'Cancel', count: 1)
+        expect(page).to have_no_button('Previous')
+        expect(page).to have_css('button[type="submit"][form="item_form"][value="next"]', text: 'Next')
+        expect(page).to have_css('button[type="submit"][form="item_form"][value="draft"]', text: 'Save as draft')
+        expect(page).to have_no_button('Deposit')
+        expect(page).to have_link('Purge item', href: "/objects/#{druid}/purge", count: 1)
         expect(page).to have_no_link('Discard draft')
         expect(Sdr::PurgeService).to have_received(:purgeable?).with(druid:, version: 1).once
+      end
+
+      it 'renders a Next that requires files on the add and edit files step' do
+        content.update!(step: 'files')
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('li[aria-current="step"]', text: 'Add and edit files')
+        expect(page).to have_button('Previous')
+        expect(page).to have_css('button[value="next"][data-files-required-target="submit"]', text: 'Next')
+        expect(page).to have_css('[data-files-required-target="reason"]', text: 'Add at least one file to continue.')
+      end
+
+      it 'renders the deposit button on the last step' do
+        content.update!(step: 'deposit')
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_button('Previous')
+        expect(page).to have_no_button('Next')
+        expect(page).to have_css('button[type="submit"][form="item_form"][value="deposit"]', text: 'Deposit')
+      end
+    end
+
+    context 'when item details were saved with the content' do
+      before { content.update!(content_type: Cocina::Models::ObjectType.image, access_view: 'world') }
+
+      it 'prefills them' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_select('Content type', selected: 'image', visible: :all)
+      end
+    end
+
+    context 'when structuring files' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'structure',
+                                   structuring_state: 'structuring')
+      end
+
+      it 'renders the wait page, which refreshes' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('[data-controller="scheduled-refresh"]')
+        expect(page).to have_css('[role="status"]', text: 'Structuring files...')
+        expect(page).to have_css('li[aria-current="step"]', text: 'Structure files')
+        expect(page).to have_no_button('Next')
+      end
+    end
+
+    context 'when discovering files' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'files', mount_state: 'discovering')
+      end
+
+      it 'renders the wait page' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_css('[role="status"]', text: 'Discovering files...')
+      end
+    end
+
+    context 'when files were just structured' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'structure', structuring_state: 'structured')
+      end
+
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'page'),
+                              content_file_binary: create(:content_file_binary, content:, mime_type: 'image/jpeg'))
+      end
+
+      it 'renders the model used once' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body))
+          .to have_css('.alert-info', text: 'Files were structured with the Book (resource per page) model.')
+        expect(content.reload).to be_structuring_not_in_progress
+
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_no_css('.alert-info')
+      end
+    end
+
+    context 'when structuring failed' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'structure',
+                                   structuring_state: 'structuring_failed')
+      end
+
+      it 'renders the failure' do
+        get edit_content_path(druid)
+
+        expect(Capybara.string(response.body)).to have_css('.alert-danger', text: 'Structuring files failed.')
       end
     end
 
@@ -190,27 +291,23 @@ RSpec.describe 'Contents' do
         allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, :agreement, druid:))
       end
 
-      it 'does not render the item details tab' do
+      it 'opens on the add and edit files step, without an item details step' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_css('[role="tab"]', text: 'Add files')
-        expect(page).to have_no_css('[role="tab"]', text: 'Item details')
+        expect(page).to have_css('ol[aria-label="Manage files progress"] li', count: 3)
+        expect(page).to have_css('li[aria-current="step"]', text: 'Add and edit files')
+        expect(page).to have_no_text('Item details')
         expect(page).to have_no_select('Content type', visible: :all)
-      end
-
-      it 'renders the navigation without previous on the first tab' do
-        get edit_content_path(druid)
-
-        page = Capybara.string(response.body)
-        expect(page).to have_button('Save as draft', count: 3)
-        expect(page).to have_button('Previous', count: 2)
-        expect(page).to have_button('Next', count: 2)
+        expect(page).to have_no_button('Previous')
+        expect(page).to have_button('Next')
       end
     end
 
     context 'when the version is open' do
       let(:version) { 2 }
+
+      before { content.update!(step: 'deposit') }
 
       it 'prefills the version description from the open version' do
         get edit_content_path(druid)
@@ -231,13 +328,15 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_link('Discard draft', href: "/objects/#{druid}/discard_draft", count: 4)
+        expect(page).to have_link('Discard draft', href: "/objects/#{druid}/discard_draft", count: 1)
         expect(page).to have_no_link('Purge')
       end
     end
 
     context 'when the version is closed' do
       let(:open) { false }
+
+      before { content.update!(step: 'deposit') }
 
       it 'renders an empty version description' do
         get edit_content_path(druid)
@@ -271,18 +370,20 @@ RSpec.describe 'Contents' do
                               publish: true)
       end
 
-      it 'renders the content error when depositing from elsewhere found it' do
+      it 'renders the content error on the structure step when depositing from elsewhere found it' do
         get edit_content_path(druid, deposit: true)
 
         expect(response).to have_http_status(:ok)
-        expect(Capybara.string(response.body))
-          .to have_css('#structural-pane .is-invalid', text: 'Content errors must be fixed.')
+        page = Capybara.string(response.body)
+        expect(page).to have_css('li[aria-current="step"]', text: 'Structure files')
+        expect(page).to have_css('.invalid-feedback', text: 'Content errors must be fixed.')
+        expect(content.reload.step).to eq('structure')
       end
 
       it 'does not render the content error otherwise' do
         get edit_content_path(druid)
 
-        expect(Capybara.string(response.body)).to have_no_css('#structural-pane .is-invalid')
+        expect(Capybara.string(response.body)).to have_no_text('Content errors must be fixed.')
       end
     end
 
@@ -482,9 +583,10 @@ RSpec.describe 'Contents' do
                                                contents_item: { content_type: Cocina::Models::ObjectType.book } }
 
           expect(response).to have_http_status(:unprocessable_content)
-          # Marked invalid so that the structure tab is shown (by the sdr-tab-error controller).
-          expect(Capybara.string(response.body))
-            .to have_css('#structural-pane .is-invalid', text: 'Content errors must be fixed.')
+          page = Capybara.string(response.body)
+          expect(page).to have_css('li[aria-current="step"]', text: 'Structure files')
+          expect(page).to have_css('.invalid-feedback', text: 'Content errors must be fixed.')
+          expect(content.reload.step).to eq('structure')
           expect(Sdr::Repository).not_to have_received(:update)
           expect(StageFilesJob).not_to have_received(:perform_later)
         end
@@ -662,6 +764,319 @@ RSpec.describe 'Contents' do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(StageFilesJob).not_to have_received(:perform_later)
         expect(content.reload.lock).to eq('stale-lock')
+      end
+    end
+  end
+
+  describe 'the structure step' do
+    let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'structure') }
+
+    before do
+      create(:content_file, content_file_set: create(:content_file_set, content:),
+                            content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
+    end
+
+    it 'renders the strategy, the validation frame, the restructure button, the CSV upload, and delete all' do
+      get edit_content_path(druid)
+
+      page = response.parsed_body
+      expect(page.text).to include('Strategy for structuring: Book (resource per page)')
+      frame = page.at_css("turbo-frame#structure-validation_content_#{content.id}")
+      # The selected content type and access are read from the content, so they are not params.
+      expect(frame['src']).to match(%r{\A/contents/[^/?]+/structure/validation\z})
+      restructure_form = page.css(%(form[action="/contents/#{druid}"]))
+                             .find { |form| form.at_css('input[name="commit"][value="restructure"]') }
+      expect(restructure_form.at_css('button').text.strip).to eq('Clear and structure files again')
+      checkbox = page.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
+      expect(checkbox['checked']).to be_nil
+      delete_form = page.css('form[action$="/structure"]')
+                        .find { |form| form.at_css('input[name="_method"][value="delete"]') }
+      expect(delete_form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
+      expect(page.text).not_to include('Append files to structure')
+    end
+
+    context 'when item details were saved with the content' do
+      before { content.update!(content_type: Cocina::Models::ObjectType.image) }
+
+      it 'renders the strategy for the saved content type' do
+        get edit_content_path(druid)
+
+        expect(response.body).to include('Strategy for structuring: Image (resource per image)')
+      end
+    end
+  end
+
+  describe 'moving between steps' do
+    before { allow(StructureFilesJob).to receive(:perform_later) }
+
+    context 'when leaving the item details step' do
+      it 'saves the item details with the content and moves to the next step without saving the object' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE,
+                                             contents_item: { content_type: Cocina::Models::ObjectType.image,
+                                                              perform_ocr: 'true', ocr_languages: ['', 'English'],
+                                                              with_embargo: 'false', access_view: 'dark',
+                                                              access_download: 'none' } }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload).to have_attributes(step: 'files', content_type: Cocina::Models::ObjectType.image,
+                                                  perform_ocr: true, ocr_languages: ['English'],
+                                                  access_view: 'dark', access_download: 'none')
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(StageFilesJob).not_to have_received(:perform_later)
+      end
+
+      context 'when the item details are invalid' do
+        it 'renders the item details step with the error' do
+          patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE,
+                                               contents_item: { perform_ocr: 'true' } }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(Capybara.string(response.body)).to have_css('li[aria-current="step"]', text: 'Item details')
+          expect(content.reload).to have_attributes(step: 'details', content_type: nil)
+        end
+      end
+    end
+
+    context 'when leaving the add and edit files step without resources' do
+      before do
+        content.update!(step: 'files')
+        create(:content_file_binary, content:)
+      end
+
+      it 'structures the files' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload).to have_attributes(step: 'structure', structuring_state: 'structuring')
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: false)
+      end
+    end
+
+    context 'when leaving the add and edit files step without files' do
+      before { content.update!(step: 'files') }
+
+      it 'renders the add and edit files step without structuring' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body)).to have_css('li[aria-current="step"]', text: 'Add and edit files')
+        expect(content.reload).to have_attributes(step: 'files', structuring_state: 'structuring_not_in_progress')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when leaving the add and edit files step with resources and unassociated files' do
+      before do
+        content.update!(step: 'files')
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+        create(:content_file_binary, content:, filepath: 'new.tif')
+      end
+
+      it 'appends the files' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE }
+
+        expect(content.reload).to have_attributes(step: 'structure', structuring_state: 'structuring')
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+      end
+    end
+
+    context 'when leaving the add and edit files step with every file in a resource' do
+      before do
+        content.update!(step: 'files')
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+      end
+
+      it 'moves to the structure step without structuring' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE }
+
+        expect(content.reload).to have_attributes(step: 'structure', structuring_state: 'structuring_not_in_progress')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when returning from the deposit step' do
+      let(:version) { 2 }
+
+      before { content.update!(step: 'deposit', content_type: Cocina::Models::ObjectType.image) }
+
+      it 'saves the version description and keeps the saved item details' do
+        patch content_path(druid), params: { commit: ContentsController::PREVIOUS_VALUE,
+                                             contents_item: { version_description: 'Added pages' } }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload).to have_attributes(step: 'structure', version_description: 'Added pages',
+                                                  content_type: Cocina::Models::ObjectType.image)
+      end
+    end
+
+    context 'when structuring again' do
+      before { content.update!(step: 'structure') }
+
+      it 'structures the files' do
+        patch content_path(druid), params: { commit: ContentsController::RESTRUCTURE_VALUE }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: false)
+      end
+    end
+
+    context 'when the content is busy' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'structure',
+                                   structuring_state: 'structuring')
+      end
+
+      it 'redirects to the edit page without changing anything' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE }
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(StructureFilesJob).not_to have_received(:perform_later)
+        expect(StageFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when saving as draft with saved item details' do
+      before do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+      end
+
+      it 'saves them to the object and starts again from the first step' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE }
+
+        expect(Sdr::Repository).to have_received(:update)
+          .with(cocina_object: having_attributes(
+            structural: having_attributes(hasMemberOrders: [having_attributes(viewingDirection: 'right-to-left')])
+          ), user_name: user.sunetid, description: nil)
+        expect(content.reload).to have_attributes(step: 'details', viewing_direction: nil)
+      end
+    end
+
+    context 'when depositing with invalid item details' do
+      before { content.update!(step: 'deposit') }
+
+      it 'renders the item details step' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'upside-down' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Capybara.string(response.body)).to have_css('li[aria-current="step"]', text: 'Item details')
+        expect(content.reload.step).to eq('details')
+      end
+    end
+  end
+
+  describe 'uploading a structural CSV' do
+    let(:content_file_set) { create(:content_file_set, content:, label: 'Page 1', file_set_type: 'page') }
+    let(:content_file_binary) do
+      create(:content_file_binary, content:, filepath: 'page_0001.tif', mime_type: 'image/tiff')
+    end
+    let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('Page 1', 'New label') }
+    let(:csv_file) do
+      Rack::Test::UploadedFile.new(StringIO.new(csv_string), 'text/csv', original_filename: 'structure.csv')
+    end
+
+    before do
+      content.update!(step: 'structure')
+      create(:content_file, content_file_set:, content_file_binary:)
+    end
+
+    def upload(params = { structural_csv: { csv_file: } })
+      patch content_path(druid), params: { commit: ContentsController::CSV_VALUE, **params }
+    end
+
+    def allow_file_deletion_checkbox
+      response.parsed_body.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
+    end
+
+    it 'updates the structure and returns to the structure step with a toast' do
+      upload
+
+      expect(response).to redirect_to(edit_content_path(druid))
+      expect(flash[:toast]).to eq('Structure updated from CSV')
+      expect(content.content_file_sets.reload.sole.label).to eq('New label')
+      expect(content.reload.step).to eq('structure')
+    end
+
+    context 'when no file is uploaded' do
+      it 'renders the error' do
+        upload({})
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('can&#39;t be blank')
+      end
+    end
+
+    context 'when a row has a different druid' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', 'xy987wv6543') }
+
+      it 'renders the error without changing the structure' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: Druid druid:xy987wv6543 does not match this object')
+        expect(content.content_file_sets.reload.sole.label).to eq('Page 1')
+      end
+    end
+
+    context 'when a row has a missing druid' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', '') }
+
+      it 'renders the error' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: Missing druid')
+      end
+    end
+
+    context 'when the import fails' do
+      let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('page_0001.tif', 'page_0002.tif') }
+
+      it 'renders the errors without changing the structure' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: page_0002.tif is not an existing file (files cannot be added)')
+        expect(content.content_file_sets.reload.sole.content_files.sole.content_file_binary).to eq(content_file_binary)
+      end
+    end
+
+    context 'when a file would be deleted' do
+      let!(:omitted_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'page_0002.tif', mime_type: 'image/tiff')
+      end
+
+      it 'renders the error without deleting the file, keeping the checkbox unchecked' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Files would be deleted: page_0002.tif. ' \
+                                         'Select &quot;Allow files to be deleted&quot; to delete them.')
+        expect(ContentFileBinary.exists?(omitted_content_file_binary.id)).to be true
+        expect(allow_file_deletion_checkbox['checked']).to be_nil
+      end
+
+      context 'when deletion is allowed' do
+        it 'deletes the file' do
+          upload({ structural_csv: { csv_file:, allow_file_deletion: '1' } })
+
+          expect(response).to have_http_status(:redirect)
+          expect(ContentFileBinary.exists?(omitted_content_file_binary.id)).to be false
+          expect(content.content_file_sets.reload.sole.label).to eq('New label')
+        end
+      end
+
+      context 'when deletion is allowed but the CSV has other errors' do
+        let(:csv_string) { StructuralCsv::Export.as_csv(content:).sub('bc123df4567', '') }
+
+        it 'renders the errors, keeping the checkbox checked' do
+          upload({ structural_csv: { csv_file:, allow_file_deletion: '1' } })
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include('Row 2: Missing druid')
+          expect(allow_file_deletion_checkbox['checked']).to eq('checked')
+        end
       end
     end
   end

@@ -104,6 +104,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 - **BTN-7 MUST** Use a link for navigation and a button for actions. A control that changes data (delete, reset, purge) is a button, even when rendered as a link-styled button (`ButtonFormComponent`).
 - **BTN-8 MUST** Destructive actions (discard, purge, delete, reset) ask for confirmation (`turbo_confirm` / the gem's `confirm:`). The message names the object and the consequence (e.g., "Discard the draft of <title>? This cannot be undone.").
 - **BTN-9 MUST NOT** use modals. Use a separate page or an inline expanding section (`CollapsibleSectionComponent`) instead.
+- **BTN-10 MUST** Previous and Next buttons that move between tabs or steps have a decorative arrow: `left_arrow_icon` before Previous and `right_arrow_icon` after Next, with `aria: { hidden: true }`.
 
 ## Unavailable actions
 

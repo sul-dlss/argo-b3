@@ -1,48 +1,23 @@
 # frozen_string_literal: true
 
-# Controller for editing the structure of a content
+# Controller for the structure of a content: deleting it, exporting it, and validating it.
+# Structuring files and uploading a structural CSV are steps of managing files (see ContentsController).
 class ContentStructureController < ContentsApplicationController
-  STRUCTURE_VALUE = 'structure'
-  APPEND_VALUE = 'append'
-  CSV_VALUE = 'csv'
+  skip_verify_authorized only: %i[destroy csv validation]
+  before_action :set_content
 
-  skip_verify_authorized only: %i[edit update destroy csv validation]
-  before_action :set_content_and_cocina_object
-
-  def edit
-    @structure_changed = params[:structure_changed] == 'true' # Triggers a reload of the files section.
-    set_populator_selection
-    @structural_csv_form = StructuralCsvForm.new
-
-    render layout: false
-  end
-
-  def update
-    return upload_csv if params[:commit] == CSV_VALUE
-
-    populator = find_populator
-    if params[:commit] == APPEND_VALUE
-      populator.append(content: @content, cocina_object: @cocina_object)
-      flash[:toast] = t('edit.contents.structure.toasts.append')
-    else
-      populator.structure(content: @content, cocina_object: @cocina_object)
-      flash[:toast] = t('edit.contents.structure.toasts.structure')
-    end
-
-    redirect_to_edit_with_structure_changed
-  end
-
-  # Deletes all of the files and resources, then reloads the page, which opens on the Add files tab.
+  # Deletes all of the files and resources, then reloads the page on the add and edit files step.
   def destroy
-    # Deleting is disabled during discovery, since discovery may be adding files.
-    if @content.discovering?
+    # Deleting is disabled while busy (e.g., discovering may be adding files), so this is from a stale page.
+    if @content.busy?
       return redirect_to edit_content_path(@content.druid),
-                         flash: { danger: t('edit.contents.structure.warnings.discovering') }
+                         flash: { warning: t('edit.contents.structure.warnings.busy') }
     end
 
     ActiveRecord::Base.transaction do
       ContentFileSet.where(content: @content).destroy_all
       Contents::ContentFileBinaryDestroyer.call(content_file_binaries: ContentFileBinary.where(content: @content).to_a)
+      @content.update!(step: :files)
     end
     redirect_to edit_content_path(@content.druid), flash: { toast: t('edit.contents.structure.toasts.delete_all') }
   end
@@ -57,90 +32,23 @@ class ContentStructureController < ContentsApplicationController
   # This is a separate frame so that it can be reloaded when a resource changes without reloading the structure,
   # which may contain resources that are being edited.
   def validation
-    @content_validation_result = Contents::Validator.call(content: @content, cocina_object: @cocina_object,
-                                                          content_type: params[:content_type],
-                                                          saved_access: @saved_cocina_object.access)
+    saved_cocina_object = fetch_cocina_object(druid: @content.druid, lock: @content.lock)
+    @content_validation_result = Contents::Validator.call(
+      content: @content,
+      cocina_object: @content.with_selected_access(saved_cocina_object),
+      content_type: @content.selected_content_type(saved_cocina_object),
+      saved_access: saved_cocina_object.access
+    )
 
     render layout: false
   end
 
   private
 
-  # The selected content type, which may not have been saved yet.
-  def set_populator_selection
-    @content_type = params[:content_type]
-    @populator_selection = Contents::PopulatorSelector.call(content: @content, cocina_object: @cocina_object,
-                                                            content_type: @content_type)
-  end
-
-  def redirect_to_edit_with_structure_changed
-    redirect_to edit_content_structure_path(@content_token,
-                                            structure_changed: true,
-                                            content_type: params[:content_type].presence,
-                                            ContentsItemForm.model_name.param_key => @selected_access.presence)
-  end
-
-  # Replaces the structure with the uploaded CSV. Nothing is changed unless the CSV is entirely valid.
-  def upload_csv
-    @structural_csv_form = StructuralCsvForm.new(structural_csv_params)
-    return render_csv_errors unless @structural_csv_form.valid?
-
-    druid_errors = csv_druid_errors
-    return render_csv_errors(druid_errors) if druid_errors.any?
-
-    import_result = @structural_csv_form.import(content: @content)
-    return render_csv_errors(import_result.failure) if import_result.failure?
-
-    flash[:toast] = t('edit.contents.structure.toasts.csv')
-    redirect_to_edit_with_structure_changed
-  end
-
-  def structural_csv_params
-    StructuralCsvForm.params_from(params)
-  end
-
-  # Since the CSV is for this object only, every row must have its druid (rather than being grouped by druid, as by
-  # the bulk action). The druids have already been prefixed by CsvUpload::Normalizer.
-  # A missing druid column is reported by StructuralCsv::Import.
-  # @return [Array<StructuralCsv::ValidationError>]
-  def csv_druid_errors
-    @structural_csv_form.numbered_rows.filter_map do |row_number, row|
-      next unless row.headers.include?('druid')
-
-      druid = row['druid'].to_s.strip
-      next if druid == @content.druid
-
-      reason = druid.empty? ? 'Missing druid' : "Druid #{druid} does not match this object"
-      StructuralCsv::ValidationError.new(row_number, reason)
-    end
-  end
-
-  # @param validation_errors [Array<StructuralCsv::ValidationError>]
-  def render_csv_errors(validation_errors = [])
-    @structural_csv_form.add_validation_errors(validation_errors)
-    set_populator_selection
-    render :edit, layout: false, status: :unprocessable_content
-  end
-
-  def find_populator
-    Contents::PopulatorSelector::POPULATORS_BY_NAME.fetch(params[:populator]) do
-      raise ActionController::BadRequest, "Unknown populator: #{params[:populator]}"
-    end
-  end
-
-  def set_content_and_cocina_object
+  def set_content
     @content_token = params[:content_id]
     verified_content_id = verify_token(@content_token)
     @content = Content.with_structural_associations.find(verified_content_id)
-    @selected_access = selected_access_params
-    @saved_cocina_object = fetch_cocina_object(druid: @content.druid, lock: @content.lock)
-    @cocina_object = Contents::ApplySelectedAccess.call(cocina_object: @saved_cocina_object, params: @selected_access)
-  end
-
-  # The access selected on the item details, which may not have been saved yet.
-  # @return [Hash] empty when no access was selected
-  def selected_access_params
-    params.fetch(ContentsItemForm.model_name.param_key, {}).permit(*ContentsItemForm::ACCESS_PARAMS).to_h
   end
 
   def fetch_cocina_object(druid:, lock:)

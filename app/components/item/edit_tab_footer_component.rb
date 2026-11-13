@@ -5,7 +5,11 @@ module Item
   # followed by (optionally) the deposit button, and the buttons for (optionally) saving as a draft and editing files,
   # saving as a draft, and discarding the draft or purging.
   class EditTabFooterComponent < ApplicationComponent
-    # @param pane [SdrViewComponents::TabForm::PaneComponent] The pane component the footer is rendered in
+    # Replaces the tab based navigation (e.g., with buttons that submit to move between steps).
+    renders_one :navigation
+
+    # @param pane [SdrViewComponents::TabForm::PaneComponent, nil] The pane component the footer is rendered in,
+    #   unless the navigation is provided
     # @param form_id [String] The id of the form that the buttons submit
     # @param cancel_path [String] The URL for the cancel button
     # @param druid [String] The druid of the item
@@ -17,7 +21,7 @@ module Item
     # @param submit_data [Hash] Data attributes for the submit buttons
     # @param actions_data [Hash] Data attributes for the fieldset of action buttons and the discard or purge link
     # @param cancel_data [Hash] Data attributes for the cancel button
-    def initialize(pane:, form_id:, cancel_path:, druid:, draft_actions_presenter:, # rubocop:disable Metrics/ParameterLists
+    def initialize(form_id:, cancel_path:, druid:, draft_actions_presenter:, pane: nil, # rubocop:disable Metrics/ParameterLists
                    show_next: true, show_previous: true, show_edit_files: false, show_deposit: false,
                    submit_data: {}, actions_data: {}, cancel_data: {})
       @pane = pane

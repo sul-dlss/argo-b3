@@ -164,6 +164,20 @@ RSpec.describe EditItemForm do
       end
     end
 
+    context 'when item details were chosen while managing files' do
+      before do
+        content.update!(step: 'structure', content_type: Cocina::Models::ObjectType.image, access_view: 'dark')
+        edit_item_form.update(access_view: 'stanford', access_download: 'stanford')
+      end
+
+      it 'clears them, since they would overwrite this edit, keeping the step' do
+        edit_item_form.save!(user_name: 'jlittman')
+
+        expect(content.reload).to have_attributes(lock: 'updated-lock', step: 'structure', content_type: nil,
+                                                  access_view: nil)
+      end
+    end
+
     context 'when the access changed without overwriting file access' do
       before do
         edit_item_form.update(access_view: 'stanford', access_download: 'stanford', overwrite_file_access: false)

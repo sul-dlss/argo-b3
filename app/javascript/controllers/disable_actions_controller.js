@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Disables the disableable targets while a form declaring the disable-actions actions is submitting
 // (see DisableActionsHelper), while a dropzone is uploading (dropzone:upload-start / dropzone:upload-end), or while
-// a busy target is present (e.g., rendered while files are being discovered or staged).
+// a busy target is present (e.g., rendered while files are being staged, discovered, or structured).
 // Attach to a container that holds both the forms (or dropzone) and the targets. Note that Stimulus doesn't
 // deliver events from within a nested disable-actions controller to the outer one.
 // Targets are buttons, inputs, fieldsets of buttons, links, or other elements that handle

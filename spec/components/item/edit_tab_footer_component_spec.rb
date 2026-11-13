@@ -76,4 +76,17 @@ RSpec.describe Item::EditTabFooterComponent, type: :component do
                                text: 'Discard draft')
     end
   end
+
+  context 'with navigation' do
+    it 'renders the navigation instead of the tab navigation' do
+      render_inline(described_class.new(form_id: 'item_form', cancel_path: '/objects/druid:bc123df4567',
+                                        druid: 'druid:bc123df4567', draft_actions_presenter:)) do |component|
+        component.with_navigation { '<button>Step navigation</button>'.html_safe }
+      end
+
+      expect(page).to have_button('Step navigation')
+      expect(page).to have_no_link('Cancel')
+      expect(page).to have_button('Save as draft')
+    end
+  end
 end

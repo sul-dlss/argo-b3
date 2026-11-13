@@ -38,7 +38,7 @@ module Sdr
     # @raise [Error] if purging fails
     def purge(user_name:)
       raise CannotPurgeError, 'Cannot purge an object after it is submitted' unless purgeable?
-      raise ContentBusyError, 'Files are being staged or discovered' if content_busy?
+      raise ContentBusyError, Content::BUSY_MESSAGE if content_busy?
 
       Dor::Services::Client.object(druid).destroy(user_name:)
       Content.delete_mutable_and_staged_files(druid:)
@@ -52,7 +52,7 @@ module Sdr
 
     # Staging changes the lock and immutability of a Content, so every Content for the druid is checked.
     def content_busy?
-      Content.where(druid:).any?(&:staging_or_discovering?)
+      Content.where(druid:).any?(&:busy?)
     end
   end
 end

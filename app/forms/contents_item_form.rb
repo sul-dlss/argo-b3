@@ -39,6 +39,35 @@ class ContentsItemForm < CocinaModels::Dro
      :overwrite_file_access, { ocr_languages: [] }, *ACCESS_PARAMS]
   end
 
+  # @param cocina_object [Cocina::Models::DROWithMetadata]
+  # @param version_service [Sdr::VersionService]
+  # @param content [Content] the mutable Content, whose saved item details are applied to the form
+  # @param params [ActionController::Parameters, Hash] the submitted params, applied after the saved item details
+  # @return [ContentsItemForm] the form for managing files
+  def self.for_manage_files(cocina_object, version_service:, content:, params: {})
+    for_edit(cocina_object, version_service:).tap do |form|
+      form.content = content
+      form.prefill_text_extraction_settings(content)
+      form.update(content.item_details_params)
+      form.update(params)
+    end
+  end
+
+  # @return [Boolean] true if the fields of the item details step are valid
+  def item_details_valid?
+    valid?
+    # The version description is entered on the deposit step.
+    errors.delete(:version_description)
+    errors.empty?
+  end
+
+  # Saves the item details with the content, without saving them to the object, e.g., when moving to another step.
+  # @param attributes [Hash] other attributes of the content to update, e.g., the step
+  def save_item_details!(**attributes)
+    content.update!(**self.attributes.slice(*Content::ITEM_DETAILS_ATTRIBUTES), **text_extraction_settings_attributes,
+                    **attributes)
+  end
+
   private
 
   # Staging always updates the structure, so a closed version is always opened.
@@ -48,12 +77,13 @@ class ContentsItemForm < CocinaModels::Dro
   def version_description_required? = !initial_version?
 
   # Saves the text extraction settings with the content, and applies a change to the access to the content's files
-  # so that staging them saves it.
+  # so that staging them saves it. The item details are then saved to the object, so the flow starts over.
   def around_content_save(**)
     content&.update!(text_extraction_settings_attributes)
     overwrite = content_file_access_overwrite
     yield
     overwrite_content_file_access!(overwrite)
+    content&.reset_manage_files_flow!
   ensure
     # Keeps the content on the object's current lock, even if saving failed after opening a version.
     content&.update!(lock: previous_cocina_object.lock)

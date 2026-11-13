@@ -25,9 +25,13 @@ module ContentDepositFormConcern
     content&.workflow_context(content_type:) || {}
   end
 
-  # Keeps the content on the object's current lock, so that editing continues on it.
+  # Keeps the content on the object's current lock, so that editing continues on it. Any item details chosen while
+  # managing files are cleared once the object has changed, so that saving them would not overwrite this edit.
   def rebase_content_lock
-    content.update!(lock: previous_cocina_object.lock) if content&.persisted?
+    return unless content&.persisted?
+
+    content.clear_item_details! if content.lock != previous_cocina_object.lock
+    content.update!(lock: previous_cocina_object.lock)
   end
 
   # Depositing deposits the cocina structure, not the mutable Content, so the immutable Content is validated

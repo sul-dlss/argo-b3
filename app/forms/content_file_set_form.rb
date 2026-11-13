@@ -48,11 +48,6 @@ class ContentFileSetForm < ApplicationForm
   # @return [Boolean] true if the save deleted the resource
   delegate :destroyed?, to: :content_file_set, prefix: true
 
-  # @return [Boolean] true if the save deleted any binaries (only set after a successful save)
-  def content_file_binaries_destroyed?
-    @content_file_binaries_destroyed
-  end
-
   private
 
   # Using ActiveRecord nested attributes (rather than looking up each ContentFile by id)
@@ -109,7 +104,6 @@ class ContentFileSetForm < ApplicationForm
                                              .where(id: content_file_binary_ids)
                                              .includes(:content)
                                              .to_a
-    @content_file_binaries_destroyed = content_file_binaries.any?
     Contents::ContentFileBinaryDestroyer.call(content_file_binaries:)
   end
 end
