@@ -883,7 +883,7 @@ en:
       note: 'If objects are not already in draft state, a new draft will be opened before depositing.'
       fields:
         version_description:
-          help_text: 'The version description will be applied to new versions and to drafts that do not already have one.'
+          help_text: 'The version description will be applied to objects that are not drafts (drafts keep current version description).'
   multi_item_deposit_actions:
     history:
       heading: 'Multi-item deposits'

@@ -144,7 +144,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
 
   REDEPOSIT = register(
     label: 'Redeposit',
-    help_text: 'Deposit drafts, or open and deposit a new version of objects that are not in draft state.',
+    help_text: 'Deposit drafts, or open and deposit a new version of objects that are not drafts.',
     job: BulkActions::RedepositJob,
     form: BulkActions::RedepositForm,
     section: :register_and_deposit

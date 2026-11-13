@@ -18,8 +18,8 @@ RSpec.describe 'Redeposit bulk action' do
                                               'opened before depositing.')
       expect(rendered_page).to have_field('Version description')
       expect(rendered_page.find('label', text: 'Version description')).to have_css('span.required')
-      expect(rendered_page).to have_text('The version description will be applied to new versions and to drafts ' \
-                                         'that do not already have one.')
+      expect(rendered_page).to have_text('The version description will be applied to objects that are not drafts ' \
+                                         '(drafts keep current version description).')
     end
   end
 

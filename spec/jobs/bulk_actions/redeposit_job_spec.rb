@@ -12,8 +12,7 @@ RSpec.describe BulkActions::RedepositJob do
   let(:edit_target_druid) { druid }
 
   let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
-  let(:version_service) { version_service_double(druid:, open?: true, version: 2, version_description:) }
-  let(:version_description) { 'Fixed title' }
+  let(:version_service) { version_service_double(druid:, open?: true, version: 2, version_description: 'Fixed title') }
   let(:workflow_name) { 'assemblyWF' }
 
   before do
@@ -31,7 +30,7 @@ RSpec.describe BulkActions::RedepositJob do
   end
 
   context 'when the version is closed' do
-    let(:version_service) { version_service_double(druid:, open?: false, openable?: true, closed?: true) }
+    let(:version_service) { version_service_double(druid:, open?: false, openable?: true) }
 
     it 'opens a new version with the version description and deposits it' do
       job.perform_now
@@ -49,7 +48,7 @@ RSpec.describe BulkActions::RedepositJob do
     end
   end
 
-  context 'when the version is open with a version description' do
+  context 'when the version is open' do
     it 'keeps the version description and deposits the draft' do
       job.perform_now
 
@@ -61,23 +60,8 @@ RSpec.describe BulkActions::RedepositJob do
     end
   end
 
-  context 'when the version is open without a version description' do
-    let(:version_description) { nil }
-
-    it 'sets the version description and deposits the draft' do
-      job.perform_now
-
-      expect(version_service).to have_received(:update_description).with(description: 'Reaccession',
-                                                                         user_name: user.sunetid)
-      expect(Sdr::DepositDraftService).to have_received(:call)
-
-      expect(bulk_action.reload.druid_count_success).to eq(1)
-      expect(log.string).to include('Updated version description (Reaccession)')
-    end
-  end
-
   context 'when the version is closed and cannot be opened' do
-    let(:version_service) { version_service_double(druid:, open?: false, openable?: false, closed?: true) }
+    let(:version_service) { version_service_double(druid:, open?: false, openable?: false) }
 
     it 'does not deposit the object' do
       job.perform_now
