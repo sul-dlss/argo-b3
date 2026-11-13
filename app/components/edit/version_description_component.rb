@@ -2,7 +2,7 @@
 
 module Edit
   # Component for rendering the version description field of a form that saves or deposits a version.
-  # The form's object must have a version_description attribute (e.g., by including VersionDescriptionConcern).
+  # The form's object must have a version_description attribute (e.g., by including EditCocinaObjectFormConcern).
   class VersionDescriptionComponent < ApplicationComponent
     # @param help_text [String, nil] help text shown with the field
     # @param disabled [Boolean] true if the version description is fixed (e.g., set automatically for initial

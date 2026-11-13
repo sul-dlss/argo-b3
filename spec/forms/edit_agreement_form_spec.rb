@@ -17,9 +17,8 @@ RSpec.describe EditAgreementForm do
   end
 
   describe '.build_from_cocina_object' do
-    it 'sets the title, source id, and lock from the cocina object, without changes' do
-      expect(edit_agreement_form).to have_attributes(title: 'My agreement', source_id: 'sul:agreement-1',
-                                                     lock: cocina_object.lock)
+    it 'sets the title and source id from the cocina object, without changes' do
+      expect(edit_agreement_form).to have_attributes(title: 'My agreement', source_id: 'sul:agreement-1')
       expect(edit_agreement_form).not_to be_changed
     end
   end
@@ -38,15 +37,6 @@ RSpec.describe EditAgreementForm do
 
     it 'is valid with a title, source id, and version description' do
       expect(edit_agreement_form).to be_valid
-    end
-
-    context 'without a version description' do
-      before { edit_agreement_form.version_description = '' }
-
-      it 'is not valid' do
-        expect(edit_agreement_form).not_to be_valid
-        expect(edit_agreement_form.errors[:version_description]).to include("can't be blank")
-      end
     end
 
     context 'without a title' do
@@ -120,34 +110,6 @@ RSpec.describe EditAgreementForm do
         expect(updated_cocina_object.access).to have_attributes(view: 'dark', download: 'none')
       end
       expect(Sdr::Repository).not_to have_received(:accession)
-    end
-
-    context 'when the version is open and the version description changed' do
-      let(:version_service) { version_service_double(open?: true, version_description: 'Initial version') }
-
-      it 'updates the version description and saves without opening a version' do
-        edit_agreement_form.save!(user_name:)
-
-        expect(Sdr::VersionService).not_to have_received(:open)
-        expect(version_service).to have_received(:update_description)
-          .with(description: 'Changed the title', user_name:)
-        expect(Sdr::Repository).to have_received(:update)
-      end
-    end
-
-    context 'when depositing with a closed version and nothing changed' do
-      before do
-        edit_agreement_form.update(title: 'My agreement', source_id: 'sul:agreement-1')
-      end
-
-      it 'opens a version and accessions it without saving' do
-        edit_agreement_form.save!(user_name:, accession: true)
-
-        expect(Sdr::VersionService).to have_received(:open)
-        expect(Sdr::Repository).not_to have_received(:update)
-        expect(Sdr::Repository).to have_received(:accession)
-          .with(cocina_object: opened_cocina_object, user_name:, context: {})
-      end
     end
 
     context 'when depositing with content' do

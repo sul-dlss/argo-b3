@@ -8,7 +8,7 @@ class EditAgreementForm < CocinaModels::Dro
 
   include PermittedParamsConcern
   include TitleFormConcern
-  include VersionDescriptionConcern
+  include EditCocinaObjectFormConcern
   include LockFormConcern
   include ContentDepositFormConcern
 
@@ -23,32 +23,15 @@ class EditAgreementForm < CocinaModels::Dro
   # Only a changed title replaces the title in the description, so that an unchanged structured title is retained.
   before_validation :populate_title_in_description_hash, if: -> { title_changed? && title.present? }
 
-  # Prefilled with the open version's description.
-  validates :version_description, presence: true
+  private
 
-  # Attributes of the form that are not part of the Cocina object, so changing only them is not a change to save.
-  FORM_ONLY_ATTRIBUTES = %w[version_description lock].freeze
-
-  # Before saving, opens a new version if the version
-  # is closed and there is something to save or deposit; otherwise updates the open version's description if changed.
-  # @param [String] user_name the sunetid of the user performing the action
-  # @param [Boolean] accession whether to start accessioning after saving
-  # @raise [ActiveModel::ValidationError] if the form is invalid
-  def save!(user_name:, accession: false)
-    validate!
-    prepare_version!(user_name:, open_version: changed? || accession)
-    super(user_name:, accession:, workflow_context: content&.workflow_context(content_type:) || {})
+  def around_content_save(accession:)
+    yield
     # The content has no unsaved changes, so it matches what is deposited.
     content&.destroy! if accession
   ensure
     rebase_content_lock
   end
-
-  def changed?
-    (changed - FORM_ONLY_ATTRIBUTES).any?
-  end
-
-  private
 
   def model_attrs_for(cocina_object)
     super.merge(title: CocinaSupport.title(cocina_object))

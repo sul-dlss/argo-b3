@@ -124,26 +124,19 @@ class ContentsController < ContentsApplicationController
   end
 
   def build_prefilled_contents_item_form(cocina_object:)
-    ContentsItemForm.build_from_cocina_object(cocina_object).tap do |form|
-      form.version_service = version_service
-      form.prefill_version_description
+    ContentsItemForm.for_edit(cocina_object, version_service:).tap do |form|
       form.content = find_or_create_content(cocina_object:)
       form.prefill_text_extraction_settings(form.content)
     end
   end
 
   def build_submitted_contents_item_form(cocina_object:, content:)
-    ContentsItemForm.build_from_cocina_object(cocina_object).tap do |form|
-      form.version_service = version_service
-      form.update(contents_item_form_params)
-      form.content = content
-      # The text extraction fields aren't shown, so keep the saved settings.
-      form.prefill_text_extraction_settings(content) if version_service.assembly_stopped_with_error?
-    end
-  end
-
-  def contents_item_form_params
-    ContentsItemForm.params_from(params)
+    ContentsItemForm.from_submission(cocina_object, version_service:, params: ContentsItemForm.params_from(params))
+                    .tap do |form|
+                      form.content = content
+                      # The text extraction fields aren't shown, so keep the saved settings.
+                      form.prefill_text_extraction_settings(content) if version_service.assembly_stopped_with_error?
+                    end
   end
 
   def find_or_create_content(cocina_object:)

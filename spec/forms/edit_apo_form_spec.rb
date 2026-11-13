@@ -17,9 +17,8 @@ RSpec.describe EditApoForm do
   end
 
   describe '.build_from_cocina_object' do
-    it 'sets the title and lock from the cocina object, without changes' do
+    it 'sets the title from the cocina object, without changes' do
       expect(edit_apo_form.title).to eq('My APO')
-      expect(edit_apo_form.lock).to eq(cocina_object.lock)
       expect(edit_apo_form).not_to be_changed
     end
   end
@@ -72,15 +71,6 @@ RSpec.describe EditApoForm do
       expect(edit_apo_form).to be_valid
     end
 
-    context 'without a version description' do
-      before { edit_apo_form.version_description = '' }
-
-      it 'is not valid' do
-        expect(edit_apo_form).not_to be_valid
-        expect(edit_apo_form.errors[:version_description]).to include("can't be blank")
-      end
-    end
-
     context 'without a title' do
       before { edit_apo_form.title = '' }
 
@@ -118,24 +108,6 @@ RSpec.describe EditApoForm do
       end
       expect(Sdr::Repository).to have_received(:accession)
         .with(cocina_object: having_attributes(version: 2), user_name:, context: {})
-    end
-
-    context 'when the version is open and nothing changed' do
-      let(:version_service) do
-        version_service_double(open?: true, version_description: 'Changed the title')
-      end
-
-      before do
-        edit_apo_form.update(title: 'My APO')
-      end
-
-      it 'accessions without opening a version or saving' do
-        edit_apo_form.save!(user_name:, accession: true)
-
-        expect(Sdr::VersionService).not_to have_received(:open)
-        expect(Sdr::Repository).not_to have_received(:update)
-        expect(Sdr::Repository).to have_received(:accession).with(cocina_object:, user_name:, context: {})
-      end
     end
   end
 end
