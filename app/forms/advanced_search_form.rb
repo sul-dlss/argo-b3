@@ -14,4 +14,8 @@ class AdvancedSearchForm < ResultsSearchForm
   def pinnable?
     false
   end
+
+  def advanced?
+    true
+  end
 end

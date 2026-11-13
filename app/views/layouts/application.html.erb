@@ -41,7 +41,7 @@
     <%# An id keeps morph refreshes from adding duplicate subscriptions (and so duplicate toasts). %>
     <%= turbo_stream_from 'notifications', current_user, id: 'notifications-stream', data: { turbo_permanent: true } %>
     <%= render HeaderComponent.new %>
-    <%= render_search_bar(current_search_form: @search_form, last_search_form: @last_search_form) %>
+    <%= render Search::FormComponent.new(current_search_form: @search_form, last_search_form: @last_search_form) %>
     <%= render ImpersonationBannerComponent.new %>
 
     <%# Toasts can be rendered into this container. %>

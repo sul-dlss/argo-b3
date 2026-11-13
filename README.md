@@ -283,8 +283,10 @@ In addition to supporting discovery of items (DROs, collections, and admin polic
 A search is represented by a search form. `SearchForm` is an abstract base class holding the attributes that determine *which objects match* (the query and all of the facet fields). Each **view** of a search is a subclass:
 
 * `ResultsSearchForm` - the search results view (`/search`). Adds the attributes that only affect how matching objects are presented as a list: `page` and `sort`.
-* `AdvancedSearchForm` - a separate Boolean search page (`/advanced_search`). It uses eDisMax with explicit Boolean operators, while ordinary keyword searches retain DisMax. The entire expression is one current filter; field expressions do not select facet values.
+* `AdvancedSearchForm` - a separate Boolean search page (`/advanced_search`). The entire expression is one current filter; field expressions do not select facet values.
 * `WorkflowGridSearchForm` - the workflow grid / workflow status view (`/workflow_grid`). See [Workflow grid](#workflow-grid).
+
+Ordinary keyword searches use Solr's [DisMax query parser](https://solr.apache.org/guide/solr/9_10/query-guide/dismax-query-parser.html), which searches across multiple fields with a simpler syntax. Advanced searches use [Extended DisMax (eDisMax)](https://solr.apache.org/guide/solr/9_10/query-guide/edismax-query-parser.html), which adds richer query syntax, including Boolean operators, parentheses, and field expressions. Keeping advanced search on its own page lets users write these expressions without changing how existing keyword searches are interpreted or ranked.
 
 A form's **class** is what identifies its view; there is deliberately no `view` attribute, so there is only one source of truth. Views differ in behavior via capability predicates on the form (`pinnable?`, `sortable?`, `item_results?`) rather than via type checks in components.
 

@@ -14,7 +14,9 @@ RSpec.describe 'Advanced search' do
 
     expect(response).to have_http_status(:ok)
     page = Capybara.string(response.body)
-    expect(page).to have_field('query', type: :text)
+    expect(page).to have_title('Advanced search | Argo B3')
+    expect(page).to have_css('h1', text: 'Advanced search', count: 1)
+    expect(page).to have_field('Advanced query', type: :text)
     expect(page).to have_no_css('turbo-frame#items-search')
     expect(page).to have_css('form[action="/search"]')
   end

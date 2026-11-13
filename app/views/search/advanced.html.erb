@@ -1,12 +1,11 @@
-<%= content_for :title, 'Advanced search' %>
+<%= page_title('Advanced search') %>
 
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<div class="container my-2">
-  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: 'Advanced search', classes: 'mb-4') %>
+<%= render Layout::ContainerComponent.new(heading: 'Advanced search') do %>
   <%= render Search::AdvancedFormComponent.new(search_form: @search_form) %>
   <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: false, facet_labels: @facet_labels) %>
 
@@ -25,4 +24,4 @@
       <% end %>
     <% end %>
   <% end %>
-</div>
+<% end %>

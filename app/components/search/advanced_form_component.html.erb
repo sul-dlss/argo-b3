@@ -1,8 +1,8 @@
-<%= helpers.form_with model: search_form, scope: '', url: advanced_search_path, method: :get, class: 'mb-4' do |form| %>
+<%= helpers.form_with model: search_form, scope: '', namespace: 'advanced_search', url: advanced_search_path, method: :get, class: 'b3-form mb-5' do |form| %>
   <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_fields: %i[query page]) %>
   <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :query,
-                                                              label_text: 'Advanced query',
+                                                              container_classes: 'my-field', label_text: 'Advanced query',
                                                               label_hidden: true,
                                                               help_text: 'Use uppercase AND, OR, NOT, quotes for phrases, and parentheses to group terms. Words without an operator are joined with AND.') %>
-  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Advanced Search', variant: :primary, type: 'submit', classes: 'mt-3') %>
+  <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Run advanced search', classes: 'mt-3') %>
 <% end %>

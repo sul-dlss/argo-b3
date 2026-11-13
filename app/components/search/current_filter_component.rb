@@ -42,7 +42,7 @@ module Search
     private
 
     def advanced_query?
-      query? && search_form.is_a?(AdvancedSearchForm)
+      query? && search_form.advanced?
     end
 
     def values_label
