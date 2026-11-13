@@ -629,6 +629,7 @@ en:
         discovery_results:
           heading: "Results of checking manifest"
         structure_results:
+          download_report: "Download report"
           heading: "Results of checking files"
         text_extraction:
           ocr_heading: "For book, image, or document/PDF content types"
@@ -757,11 +758,16 @@ en:
         content_type: 'Content type'
         deposit_type: 'Deposit type'
         status: 'Status'
+        message: 'Message'
       deposit_types:
         new_item: 'new item'
         redeposit: 'redeposit'
       status_ok: 'OK'
       error_label: 'Error:'
+      report_statuses:
+        error: 'error'
+        warning: 'warning'
+        ok: 'OK'
     discover_files:
       errors:
         object_not_found: 'Object not found'
