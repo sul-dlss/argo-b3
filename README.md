@@ -50,7 +50,7 @@ Note that this only updates workflow step statuses; the work of the robots (e.g.
 
 ### Linters
 
-To run all configured linters, run `bin/rake lint`.
+To run all configured linters, run `bin/rake lint`; `bin/rake lint:changed` lints only the files changed from `origin/main`. Both end with a summary of every offense.
 
 To run linters individually, run which ones you need:
 

@@ -10,49 +10,6 @@ begin
   require 'rubocop/rake_task'
   RuboCop::RakeTask.new
 
-  desc 'Run erblint against ERB files'
-  task erblint: :environment do
-    puts 'Running ERB linter...'
-    sh('bin/erb_lint --lint-all --format compact')
-  end
-
-  desc 'Run linter against JS files'
-  task eslint: :environment do
-    puts 'Running JS linter...'
-    sh('yarn run lint')
-  end
-
-  desc 'Run linter against style files'
-  task stylelint: :environment do
-    puts 'Running style linter...'
-    sh('yarn run stylelint')
-  end
-
-  desc 'Run herb linter against ERB files'
-  task herb: :environment do
-    puts 'Running herb linter...'
-    sh('yarn run herb-lint app')
-  end
-
-  desc 'Check for missing and unused i18n keys'
-  task i18n: :environment do
-    puts 'Running i18n-tasks...'
-    sh('bundle exec i18n-tasks missing')
-    sh('bundle exec i18n-tasks unused')
-  end
-
-  desc 'Run all configured linters, reporting every failing linter'
-  task lint: :environment do
-    # sh raises RuntimeError and RuboCop aborts (SystemExit) on failure; keep going so every linter reports.
-    failed_linters = %w[rubocop erblint eslint stylelint herb i18n].filter_map do |linter|
-      Rake::Task[linter].invoke
-      nil
-    rescue RuntimeError, SystemExit
-      linter
-    end
-    abort("Linters failed: #{failed_linters.join(', ')}") if failed_linters.any?
-  end
-
   # clear the default task injected by rspec
   task(:default).clear
 
