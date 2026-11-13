@@ -1,0 +1,17 @@
+<%# The sdr-treegrid target lets Enter on the file's row toggle it. %>
+<%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :link,
+                                                            classes: 'technical-metadata-toggle collapsed p-0',
+                                                            data: { bs_toggle: 'collapse', bs_target: "##{technical_metadata_id}",
+                                                                    sdr_treegrid_target: 'fileAction' },
+                                                            aria: { expanded: false, controls: technical_metadata_id }) do %>
+  View<span class="visually-hidden"> technical metadata for <%= content_file_binary.filepath %></span>
+  <%= helpers.toggle_cell_icon(aria: { hidden: true }) %>
+<% end %>
+<%= tag.div id: technical_metadata_id, class: 'collapse' do %>
+  <%= helpers.turbo_frame_tag(technical_metadata_frame_id,
+                              src: object_technical_metadata_path(druid_token, filepath: content_file_binary.filepath),
+                              loading: :lazy,
+                              data: { turbo_permanent: true }) do %>
+    <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
+  <% end %>
+<% end %>

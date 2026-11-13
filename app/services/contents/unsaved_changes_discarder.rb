@@ -61,13 +61,10 @@ module Contents
 
     # The Builder assumes every file has been deposited, but files staged in the open version have not.
     def mark_staged_binaries
-      staging_location = StagingSupport.staged_location(druid:)
-      return if staging_location.nil?
+      staged_filepaths = StagingSupport.staged_filepaths(druid:, filepaths: binaries.pluck(:filepath))
+      return if staged_filepaths.empty?
 
-      staged_filepaths = binaries.pluck(:filepath).select do |filepath|
-        File.file?(StagingSupport.staging_filepath(druid:, filepath:, staging_location:))
-      end
-      binaries.where(filepath: staged_filepaths).update_all(file_location: 'stage') # rubocop:disable Rails/SkipsModelValidations
+      binaries.where(filepath: staged_filepaths.to_a).update_all(file_location: 'stage') # rubocop:disable Rails/SkipsModelValidations
     end
 
     # Not content.content_file_binaries, whose delete_all would destroy each binary (dependent: :destroy).

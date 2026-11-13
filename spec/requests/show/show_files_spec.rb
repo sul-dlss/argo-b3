@@ -84,11 +84,14 @@ RSpec.describe 'Show files' do
   end
 
   describe 'GET /objects/:druid/files' do
-    it 'renders the list of file paths' do
+    it 'renders the files within their folders' do
       get "/objects/#{token}/files"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('folder1/bc123df4567_0001.tiff')
+      page = Capybara.string(response.body)
+      expect(page).to have_css('h2', text: 'Files (1)')
+      expect(page).to have_css('tr[data-sdr-treegrid-key="folder1"][aria-expanded="false"] th', text: 'folder1')
+      expect(page).to have_css('tr[aria-level="2"][hidden] th', text: 'bc123df4567_0001.tiff', visible: :all)
       expect(Sdr::Repository).to have_received(:find).with(druid:, without_structural_contains: false)
     end
 
@@ -102,7 +105,7 @@ RSpec.describe 'Show files' do
         get "/objects/#{token}/files"
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include('folder1/bc123df4567_0001.tiff')
+        expect(response.body).to include('bc123df4567_0001.tiff')
         expect(Contents::Builder).not_to have_received(:find_or_create)
         expect(Sdr::Repository).not_to have_received(:find).with(druid:, without_structural_contains: false)
       end

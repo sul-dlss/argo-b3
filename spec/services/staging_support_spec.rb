@@ -266,4 +266,21 @@ RSpec.describe StagingSupport do
       end
     end
   end
+
+  describe '.staged_filepaths' do
+    context 'when no files are staged' do
+      it 'returns none' do
+        expect(described_class.staged_filepaths(druid:, filepaths: ['images/image1.tif'])).to be_empty
+      end
+    end
+
+    context 'when files are staged' do
+      before { stage_file(staging_location: Settings.staging_location) }
+
+      it 'returns the filepaths that are staged' do
+        expect(described_class.staged_filepaths(druid:, filepaths: ['images/image1.tif', 'images/image2.tif']))
+          .to contain_exactly('images/image1.tif')
+      end
+    end
+  end
 end

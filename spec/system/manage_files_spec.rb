@@ -37,7 +37,7 @@ RSpec.describe 'Manage files' do
   def upload_file(filename)
     click_on 'Add files'
     attach_file(nil, Rails.root.join("spec/fixtures/files/#{filename}"), class: 'dz-hidden-input', make_visible: true)
-    expect(page).to have_css('tbody td', text: filename)
+    expect(page).to have_css('tbody th', exact_text: File.basename(filename))
   end
 
   it 'displays the object title and all tabs' do
@@ -963,6 +963,65 @@ RSpec.describe 'Manage files' do
     end
   end
 
+  context 'with files in folders' do
+    let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock) }
+
+    before do
+      ['root.txt', 'folder1/file1.txt', 'folder1/sub1/file2.txt', 'folder1/sub1/file3.txt'].each do |filepath|
+        create(:content_file_binary, content:, filepath:, mime_type: 'text/plain')
+      end
+    end
+
+    def file_row(filename)
+      find('tbody tr[data-sdr-treegrid-role="file"]', text: filename)
+    end
+
+    def folder_row(folder_name)
+      find('tbody tr[data-sdr-treegrid-role="folder"]', text: folder_name)
+    end
+
+    it 'expands and collapses the folders, keeping them expanded when the files are reloaded' do
+      visit "/contents/#{druid}/edit"
+
+      # Folders are collapsed, and only the first row is in the tab order.
+      expect(page).to have_css('tbody th', exact_text: 'root.txt')
+      expect(page).to have_css('tbody tr[tabindex="0"]', count: 1, text: 'root.txt')
+      expect(folder_row('folder1')['aria-expanded']).to eq('false')
+      expect(page).to have_no_css('tbody th', exact_text: 'file1.txt')
+
+      folder_row('folder1').click
+      expect(page).to have_css('tbody th', exact_text: 'file1.txt')
+      expect(folder_row('sub1')['aria-expanded']).to eq('false')
+      expect(page).to have_no_css('tbody th', exact_text: 'file2.txt')
+
+      # Keyboard: down to sub1, right to expand it, right to its first file, left to sub1, left to collapse it.
+      file_row('file1.txt').send_keys(:down)
+      page.send_keys(:right)
+      expect(page).to have_css('tbody th', exact_text: 'file2.txt')
+      page.send_keys(:right)
+      expect(page).to have_css('tbody tr[data-sdr-treegrid-role="file"]:focus', text: 'file2.txt')
+      page.send_keys(:left)
+      expect(page).to have_css('tbody tr[data-sdr-treegrid-role="folder"]:focus', text: 'sub1')
+      page.send_keys(:left)
+      expect(page).to have_no_css('tbody th', exact_text: 'file2.txt')
+
+      click_button 'Expand all'
+      expect(page).to have_css('tbody th', exact_text: 'file3.txt')
+      click_button 'Collapse all'
+      expect(page).to have_no_css('tbody th', exact_text: 'file1.txt')
+
+      # Deleting a file reloads the files, with the expanded folders still expanded.
+      folder_row('folder1').click
+      folder_row('sub1').click
+      click_button 'Delete folder1/sub1/file2.txt'
+
+      expect(page).to have_toast('File deleted')
+      expect(page).to have_no_css('tbody th', exact_text: 'file2.txt')
+      expect(page).to have_css('tbody th', exact_text: 'file3.txt')
+      expect(page).to have_css('tbody th', exact_text: 'file1.txt')
+    end
+  end
+
   context 'when deleting a file' do
     let(:content) { Content.find_by!(druid:) }
 
@@ -1053,7 +1112,9 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_toast('Completed discovering files')
       expect(page).to have_field('Mount path')
-      expect(page).to have_css('tbody td', text: 'folder/dropzone_upload.txt')
+      expect(page).to have_css('tbody tr[data-sdr-treegrid-role="folder"]', text: 'folder')
+      click_button 'Expand all'
+      expect(page).to have_css('tbody th', exact_text: 'dropzone_upload.txt')
 
       click_on 'Structure'
 
@@ -1080,7 +1141,7 @@ RSpec.describe 'Manage files' do
       DiscoverFilesJob.perform_now(content: Content.find_by!(druid:), mount_path:)
 
       expect(page).to have_toast('Completed discovering files')
-      expect(page).to have_css('tbody td', text: 'folder/dropzone_upload.txt')
+      expect(page).to have_css('tbody tr[data-sdr-treegrid-role="folder"]', text: 'folder')
       expect(page).to have_no_button(class: 'disabled')
     end
 
@@ -1146,7 +1207,7 @@ RSpec.describe 'Manage files' do
       DiscoverFilesJob.perform_now(content:, mount_path: globus_path, file_location: :globus)
 
       expect(page).to have_toast('Completed discovering files')
-      expect(page).to have_css('tbody td', text: 'dropzone_upload.txt')
+      expect(page).to have_css('tbody th', exact_text: 'dropzone_upload.txt')
       expect(content.content_file_binaries.sole)
         .to have_attributes(filepath: 'dropzone_upload.txt', file_location: 'globus', mount_path: globus_path)
     end

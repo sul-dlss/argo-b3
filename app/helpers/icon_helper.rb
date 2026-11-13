@@ -35,6 +35,11 @@ module IconHelper
     icon(icon_classes: %w[bi bi-chevron-down toggle-row-icon], **)
   end
 
+  # Rotated by show.scss when the toggled content is expanded.
+  def toggle_cell_icon(**)
+    icon(icon_classes: %w[bi bi-chevron-right toggle-cell-icon], **)
+  end
+
   def left_arrow_icon(**)
     icon(icon_classes: %w[bi bi-arrow-left], **)
   end
