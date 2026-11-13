@@ -236,7 +236,7 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
       job.perform_now
 
       expect(Sdr::Repository).not_to have_received(:update)
-      expect(log.string).to include('Error: Files are being staged or discovered for this object')
+      expect(log.string).to include('Error: Files are being staged, discovered, or structured for this object')
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(Content.count).to eq(1)
     end

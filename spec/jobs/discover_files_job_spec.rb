@@ -36,5 +36,20 @@ RSpec.describe DiscoverFilesJob do
 
       expect(content.reload.mount_state).to eq('discovery_not_in_progress')
     end
+
+    context 'when discovering fails' do
+      before do
+        allow(Contents::MountDiscoverer).to receive(:call).and_raise(StandardError, 'Discovering failed')
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'notifies and transitions the content out of the discovering state' do
+        job.perform(content:, mount_path:)
+
+        expect(Honeybadger).to have_received(:notify).with(an_instance_of(StandardError),
+                                                           context: { druid: 'druid:bc123df4567' })
+        expect(content.reload.mount_state).to eq('discovery_not_in_progress')
+      end
+    end
   end
 end

@@ -211,11 +211,60 @@ RSpec.describe Content do
     end
   end
 
-  describe '#staging_or_discovering?' do
-    it 'is true only while staging or discovering' do
-      expect(build(:content, staging_state: 'staging')).to be_staging_or_discovering
-      expect(build(:content, mount_state: 'discovering')).to be_staging_or_discovering
-      expect(build(:content, staging_state: 'staging_failed')).not_to be_staging_or_discovering
+  describe '#busy?' do
+    it 'is true only while staging, discovering, or structuring' do
+      expect(build(:content, staging_state: 'staging')).to be_busy
+      expect(build(:content, mount_state: 'discovering')).to be_busy
+      expect(build(:content, structuring_state: 'structuring')).to be_busy
+      expect(build(:content, staging_state: 'staging_failed')).not_to be_busy
+      expect(build(:content, structuring_state: 'structuring_failed')).not_to be_busy
+    end
+  end
+
+  describe '.not_busy' do
+    it 'excludes the contents that are staging, discovering, or structuring' do
+      not_busy_contents = [create(:content, druid: 'druid:bc123df4567', staging_state: 'staging_failed'),
+                           create(:content, druid: 'druid:cd234fg5678', structuring_state: 'structured')]
+      create(:content, druid: 'druid:df345gh6789', staging_state: 'staging')
+      create(:content, druid: 'druid:fg456hj7891', mount_state: 'discovering')
+      create(:content, druid: 'druid:gh567jk8912', structuring_state: 'structuring')
+
+      expect(described_class.not_busy).to match_array(not_busy_contents)
+    end
+  end
+
+  describe '#start_structuring!' do
+    subject(:content) { create(:content, druid:, structuring_state: 'structured') }
+
+    before do
+      allow(StructureFilesJob).to receive(:perform_later)
+    end
+
+    it 'starts structuring the content' do
+      content.start_structuring!(append: true)
+
+      expect(content.reload.structuring_state).to eq('structuring')
+      expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+    end
+  end
+
+  describe 'structuring state' do
+    subject(:content) { create(:content, druid:) }
+
+    it 'keeps the result until it has been shown' do
+      content.structuring_started!
+      content.structuring_completed!
+      expect(content).to be_structured
+
+      content.structuring_result_shown!
+      expect(content).to be_structuring_not_in_progress
+    end
+
+    it 'records a failure' do
+      content.structuring_started!
+      content.structuring_errored!
+
+      expect(content).to be_structuring_failed
     end
   end
 

@@ -7,6 +7,9 @@ class ContentDropzoneController < ContentsApplicationController
   def update
     verified_content_id = verify_token(params[:content_id])
     content = Content.find(verified_content_id)
+    # Uploading is disabled while busy, so this is from a stale page.
+    return head :conflict if content.busy?
+
     build_content_file_binaries(content:)
 
     head :ok

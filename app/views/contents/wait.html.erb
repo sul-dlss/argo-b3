@@ -1,0 +1,4 @@
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow, data: { controller: 'scheduled-refresh', scheduled_refresh_interval_value: Settings.reload_intervals.mount_discovery } } do %>
+  <% message = @content.structuring? ? t('edit.contents.structure.spinner') : t('edit.contents.discovery.spinner') %>
+  <%= render Elements::RosetteSpinnerComponent.new(size: :large, message:, message_position: :bottom, classes: 'align-items-center') %>
+<% end %>

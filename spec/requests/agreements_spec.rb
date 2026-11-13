@@ -310,7 +310,7 @@ RSpec.describe 'Agreements' do
         patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
 
         expect(response).to redirect_to("/agreements/#{druid}/edit")
-        expect(flash[:danger]).to eq('Files for this agreement are being staged or discovered. ' \
+        expect(flash[:danger]).to eq('Files for this agreement are being staged, discovered, or structured. ' \
                                      'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
       end

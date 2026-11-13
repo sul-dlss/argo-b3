@@ -8,7 +8,6 @@ class ContentFileSetsController < ContentsApplicationController
   before_action :set_counter, except: %i[destroy move]
 
   def show
-    @files_deleted = params[:files_deleted] == 'true' # Triggers a reload of files sections.
     @structure_changed = params[:structure_changed] == 'true' # Triggers a reload of the structure validation.
   end
 
@@ -17,45 +16,47 @@ class ContentFileSetsController < ContentsApplicationController
   end
 
   def update
+    return if refused_while_busy?(@content_file_set.content)
+
     @content_file_set_form = ContentFileSetForm.from_model(@content_file_set)
     @content_file_set_form.assign_attributes(content_file_set_params)
     if !@content_file_set_form.save
       render :edit, status: :unprocessable_content
     elsif @content_file_set_form.content_file_set_destroyed?
-      render_destroyed
+      # Other resources are renumbered, so the page is refreshed.
+      render_page_refresh(toast: t('edit.content_file_sets.toasts.deleted'))
     else
       redirect_to_show
     end
   end
 
   def destroy
+    return if refused_while_busy?(@content_file_set.content)
+
     ContentFileSetForm.from_model(@content_file_set).destroy
-    render_destroyed
+    redirect_to_structure(toast: t('edit.content_file_sets.toasts.deleted'))
   end
 
   def move
+    return if refused_while_busy?(@content_file_set.content)
+
     direction = params.expect(:direction)
     return head :bad_request unless ContentFileSet::MOVE_DIRECTIONS.include?(direction)
 
     @content_file_set.move(direction)
-    # Every resource's index (and arrows) may change, so the files sections (including the structure) are reloaded.
-    flash.now[:toast] = t('edit.content_file_sets.toasts.moved')
-    render :moved, formats: :turbo_stream
+    redirect_to_structure(toast: t('edit.content_file_sets.toasts.moved'))
   end
 
   private
 
-  # The resource no longer exists, so the files sections (including the structure) are reloaded.
-  def render_destroyed
-    flash.now[:toast] = t('edit.content_file_sets.toasts.deleted')
-    render :destroyed, formats: :turbo_stream
+  # Other resources are renumbered, so the whole structure step is morphed.
+  def redirect_to_structure(toast:)
+    redirect_to edit_content_path(@content_file_set.content.druid), status: :see_other, flash: { toast: }
   end
 
   def redirect_to_show
     flash[:toast] = t('edit.content_file_sets.toasts.updated')
-    # Deleted binaries are no longer in the files sections, so tell show to reload the files section.
-    files_deleted = @content_file_set_form.content_file_binaries_destroyed?.presence
-    redirect_to content_content_file_set_path(@content_token, @content_file_set, counter: @counter, files_deleted:,
+    redirect_to content_content_file_set_path(@content_token, @content_file_set, counter: @counter,
                                                                                  structure_changed: true)
   end
 

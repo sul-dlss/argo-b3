@@ -1,0 +1,19 @@
+<% if failed? %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, dismissible: true) do %>
+    <p class="mb-0"><%= t('edit.contents.structure.results.failed') %></p>
+  <% end %>
+<% elsif fallback? %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :warning, dismissible: true) do %>
+    <p class="mb-1"><%= structured_message %></p>
+    <p class="mb-1"><%= t('edit.contents.structure.results.not_used', populator: label_for(populator_selection.populator_for_content_type)) %></p>
+    <ul class="mb-0">
+      <% populator_selection.reasons.each do |reason| %>
+        <li><%= t("edit.contents.structure.populator_reasons.#{reason}") %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% else %>
+  <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, dismissible: true) do %>
+    <p class="mb-0"><%= structured_message %></p>
+  <% end %>
+<% end %>

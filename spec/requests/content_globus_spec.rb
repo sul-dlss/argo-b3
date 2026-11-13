@@ -49,14 +49,6 @@ RSpec.describe 'Content globus' do
         expect(response.body).not_to include('Create Globus link')
       end
     end
-
-    context 'when files have just been discovered' do
-      it 'renders the reload of the files sections' do
-        get new_content_globus_path(content_id: content_token, files_discovered: true)
-
-        expect(response.body).to include('data-controller="frame-reloader"')
-      end
-    end
   end
 
   describe 'create' do
@@ -90,35 +82,12 @@ RSpec.describe 'Content globus' do
   end
 
   describe 'discover' do
-    it 'starts discovery of the Globus directory and redirects to show' do
+    it 'starts discovery of the Globus directory and refreshes the page' do
       post discover_content_globus_path(content_id: content_token)
 
-      expect(response).to redirect_to(content_globus_path(content_id: content_token, discovery_started: true))
+      expect(response.body).to include('<turbo-stream action="refresh"')
       expect(content.reload.mount_state).to eq('discovering')
       expect(DiscoverFilesJob).to have_been_enqueued.with(content:, mount_path: local_path, file_location: :globus)
-    end
-  end
-
-  describe 'show' do
-    context 'when discovery is in progress' do
-      let(:content) { create(:content, druid: 'druid:bc123df4567', mount_state: 'discovering') }
-
-      it 'renders the spinner, which reloads the frame' do
-        get content_globus_path(content_id: content_token)
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include('Discovering files...')
-        expect(response.body).to include(%(data-frame-reload-url-value="/contents/#{content_token}/globus"))
-      end
-    end
-
-    context 'when discovery is not in progress' do
-      it 'redirects to new with a toast' do
-        get content_globus_path(content_id: content_token)
-
-        expect(response).to redirect_to(new_content_globus_path(content_id: content_token, files_discovered: true))
-        expect(flash[:toast]).to eq('Completed discovering files')
-      end
     end
   end
 end
