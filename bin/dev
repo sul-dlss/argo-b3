@@ -7,5 +7,15 @@ if [ -e .overmind.sock ] && ! lsof -a -c overmind -d cwd -Fn 2>/dev/null | grep 
   rm -f .overmind.sock
 fi
 
+# PORT (default 3000) lets several checkouts run at once. Refuse a port that another checkout's server holds.
+PORT="${PORT:-3000}"
+holder=$(lsof -nP -iTCP:"$PORT" -sTCP:LISTEN -t 2>/dev/null | head -1)
+if [ -n "$holder" ]; then
+  holder_dir=$(lsof -a -p "$holder" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')
+  echo "Port $PORT is in use by a server running from ${holder_dir:-an unknown directory}." >&2
+  echo "Start this checkout on a free port instead, e.g. PORT=3001 bin/dev" >&2
+  exit 1
+fi
+
 # USER_GROUPS should be semicolon-separated (no spaces).
-USER_GROUPS="${USER_GROUPS:=sdr:argo-access;sdr:argo_administrators}" NAME="${NAME:=A. User}" EMAIL="${EMAIL:=a.user@stanford.edu}" bin/overmind start
+USER_GROUPS="${USER_GROUPS:=sdr:argo-access;sdr:argo_administrators}" NAME="${NAME:=A. User}" EMAIL="${EMAIL:=a.user@stanford.edu}" bin/overmind start --port "$PORT"

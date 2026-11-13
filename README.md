@@ -19,6 +19,8 @@ Note that `bin/setup` will create the database, run yarn, and perform other setu
 
 The roles, email address, and name of the test user can be provided in environment variables. Defaults are set in `bin/dev`.
 
+To run several checkouts at once (e.g., git worktrees), give each its own port: `PORT=3001 bin/dev`. `bin/dev` refuses a port that another checkout's server holds.
+
 ### Development script for running locally connecting to remote services
 
 For running code in localhost pointing to real data on a server environment but talking to your local database, `bin/dev-server` will facilitate the setup described above.

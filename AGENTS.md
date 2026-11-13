@@ -19,7 +19,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 
 ## Testing notes
 
-- In a new git worktree, run `bin/setup-worktree` before specs or linters (it copies gitignored local files, installs JS dependencies, and builds CSS).
+- In a new git worktree, run `bin/setup-worktree` before specs or linters (it copies gitignored local files, installs JS dependencies, and builds CSS). Run its dev server with `PORT=<free port> bin/dev`.
 - Run only the specs relevant to the change (`bin/rspec <files>`); for broad or full runs use `bin/parallel_rspec`. Set `COVERAGE=false` to drop SimpleCov output.
 
 ## Integration tests
