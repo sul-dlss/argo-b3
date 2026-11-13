@@ -262,7 +262,8 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
     it 'records an error and keeps the existing Content' do
       perform
 
-      expect(item_deposit_action.discovery_errors).to eq(['Files are being staged or discovered for this object'])
+      expect(item_deposit_action.discovery_errors)
+        .to eq(['Files are being staged, discovered, or structured for this object'])
       expect(Content.exists?(existing_content.id)).to be true
     end
   end

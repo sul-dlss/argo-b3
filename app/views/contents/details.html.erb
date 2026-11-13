@@ -1,0 +1,32 @@
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow } do %>
+  <%= form_with(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: 'item_form', class: 'b3-form') do |item_form| %>
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.steps.details'), classes: 'mb-3') %>
+
+    <%# Text extraction choices aren't shown while depositing is stopped, since retrying a process doesn't pass new settings. %>
+    <%= tag.div data: { controller: @draft_actions_presenter.assembly_stopped_with_error? ? 'content-type-dependent' : 'content-type-dependent ocr-options',
+                        ocr_options_allowed_content_types_value: Sdr::TextExtraction::OCR_TYPES } do %>
+      <%= render Edit::ContentTypeComponent.new(form: item_form, input_data: { content_type_dependent_target: 'contentType',
+                                                                               ocr_options_target: 'contentType',
+                                                                               action: 'content-type-dependent#toggle ocr-options#toggle' }) %>
+
+      <%= render Edit::ViewingDirectionComponent.new(form: item_form, container_classes: 'my-fieldset', label_classes: 'fw-bold',
+                                                     container_data: { content_type_dependent_target: 'dependent',
+                                                                       content_type_dependent_allowed: Constants::CONTENT_TYPES_WITH_VIEWING_DIRECTIONS }) %>
+      <%= render Edit::OcrComponent.new(form: item_form) unless @draft_actions_presenter.assembly_stopped_with_error? %>
+      <% if !@draft_actions_presenter.assembly_stopped_with_error? && Sdr::TextExtraction.speech_to_text_types.any? %>
+        <%= render Edit::SpeechToTextComponent.new(form: item_form,
+                                                   data: { content_type_dependent_target: 'dependent',
+                                                           content_type_dependent_allowed: Sdr::TextExtraction.speech_to_text_types }) %>
+      <% end %>
+    <% end %>
+
+    <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+
+    <%= render Edit::AccessAndEmbargoComponent.new(form: item_form, overwrite_file_access: true, collapsible: true) %>
+
+    <div class="mt-5">
+      <%= render Item::ManageFilesStepFooterComponent.new(manage_files_flow: @manage_files_flow, form_id: 'item_form', druid: @contents_item_form.druid,
+                                                          content_token: @content_token, draft_actions_presenter: @draft_actions_presenter) %>
+    </div>
+  <% end %>
+<% end %>

@@ -106,13 +106,13 @@ module BulkActions
 
       # A mutable Content for the object (e.g., left by the Contents edit page) would conflict with the Content built
       # by this job (since there is a unique index on druid, lock, and immutable). It is destroyed, since the import
-      # will make it stale anyway, unless files are being staged or discovered.
+      # will make it stale anyway, unless files are being staged, discovered, or structured.
       def check_existing_content?
         existing_content = Content.mutable_for(cocina_object)
         return true if existing_content.nil?
 
-        if existing_content.staging? || existing_content.discovering?
-          failure!(message: 'Files are being staged or discovered for this object')
+        if existing_content.busy?
+          failure!(message: "#{Content::BUSY_MESSAGE} for this object")
           return false
         end
 

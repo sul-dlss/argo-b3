@@ -211,11 +211,131 @@ RSpec.describe Content do
     end
   end
 
-  describe '#staging_or_discovering?' do
-    it 'is true only while staging or discovering' do
-      expect(build(:content, staging_state: 'staging')).to be_staging_or_discovering
-      expect(build(:content, mount_state: 'discovering')).to be_staging_or_discovering
-      expect(build(:content, staging_state: 'staging_failed')).not_to be_staging_or_discovering
+  describe '#busy?' do
+    it 'is true only while staging, discovering, or structuring' do
+      expect(build(:content, staging_state: 'staging')).to be_busy
+      expect(build(:content, mount_state: 'discovering')).to be_busy
+      expect(build(:content, structuring_state: 'structuring')).to be_busy
+      expect(build(:content, staging_state: 'staging_failed')).not_to be_busy
+      expect(build(:content, structuring_state: 'structuring_failed')).not_to be_busy
+    end
+  end
+
+  describe '.not_busy' do
+    it 'excludes the contents that are staging, discovering, or structuring' do
+      not_busy_contents = [create(:content, druid: 'druid:bc123df4567', staging_state: 'staging_failed'),
+                           create(:content, druid: 'druid:cd234fg5678', structuring_state: 'structured')]
+      create(:content, druid: 'druid:df345gh6789', staging_state: 'staging')
+      create(:content, druid: 'druid:fg456hj7891', mount_state: 'discovering')
+      create(:content, druid: 'druid:gh567jk8912', structuring_state: 'structuring')
+
+      expect(described_class.not_busy).to match_array(not_busy_contents)
+    end
+  end
+
+  describe '#take_structuring_result!' do
+    it 'returns the result of structuring once' do
+      content = create(:content, druid:, structuring_state: 'structuring_failed')
+
+      expect(content.take_structuring_result!).to eq('structuring_failed')
+      expect(content.reload.take_structuring_result!).to be_nil
+    end
+
+    it 'is nil while structuring' do
+      content = create(:content, druid:, structuring_state: 'structuring')
+
+      expect(content.take_structuring_result!).to be_nil
+      expect(content.reload).to be_structuring
+    end
+  end
+
+  describe '#start_structuring!' do
+    subject(:content) { create(:content, druid:, structuring_state: 'structured') }
+
+    before do
+      allow(StructureFilesJob).to receive(:perform_later)
+    end
+
+    it 'starts structuring the content' do
+      content.start_structuring!(append: true)
+
+      expect(content.reload.structuring_state).to eq('structuring')
+      expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+    end
+  end
+
+  describe '#item_details_params' do
+    it 'is empty until item details are saved' do
+      expect(build(:content, access_view: 'world').item_details_params).to eq({})
+    end
+
+    it 'includes the saved item details, including the blank ones' do
+      content = build(:content, content_type: 'https://cocina.sul.stanford.edu/models/book', access_view: 'world',
+                                version_description: 'Added pages')
+
+      expect(content.item_details_params).to include(content_type: 'https://cocina.sul.stanford.edu/models/book',
+                                                     access_view: 'world', access_location: nil,
+                                                     version_description: 'Added pages')
+    end
+  end
+
+  describe '#reset_manage_files_flow!' do
+    subject(:content) do
+      create(:content, druid:, step: 'deposit', content_type: 'https://cocina.sul.stanford.edu/models/book',
+                       access_view: 'world', version_description: 'Added pages', perform_ocr: true)
+    end
+
+    it 'returns to the first step and clears the item details, keeping the text extraction settings' do
+      content.reset_manage_files_flow!
+
+      expect(content.reload).to have_attributes(step: 'details', content_type: nil, access_view: nil,
+                                                version_description: nil, perform_ocr: true)
+    end
+  end
+
+  describe '#clear_item_details!' do
+    subject(:content) do
+      create(:content, druid:, step: 'deposit', content_type: 'https://cocina.sul.stanford.edu/models/book')
+    end
+
+    it 'clears the item details, keeping the step' do
+      content.clear_item_details!
+
+      expect(content.reload).to have_attributes(step: 'deposit', content_type: nil)
+    end
+  end
+
+  describe '#with_selected_access' do
+    let(:cocina_object) { build(:dro_with_metadata, id: druid).new(access: { view: 'world', download: 'world' }) }
+
+    it 'applies the saved access' do
+      content = build(:content, content_type: cocina_object.type, access_view: 'dark', access_download: 'none')
+
+      expect(content.with_selected_access(cocina_object).access).to have_attributes(view: 'dark', download: 'none')
+    end
+
+    it 'keeps the object access when no item details are saved' do
+      expect(build(:content).with_selected_access(cocina_object).access).to have_attributes(view: 'world')
+    end
+  end
+
+  describe 'structuring state' do
+    subject(:content) { create(:content, druid:) }
+
+    it 'keeps the result until it has been shown' do
+      content.structuring_started!
+      content.structuring_completed!
+      expect(content).to be_structured
+
+      content.structuring_result_shown!
+      expect(content).to be_structuring_not_in_progress
+    end
+
+    it 'records a failure' do
+      content.structuring_started!
+      content.structuring_errored!
+
+      expect(content).to be_structuring_failed
     end
   end
 

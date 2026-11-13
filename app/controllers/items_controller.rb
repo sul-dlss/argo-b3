@@ -59,7 +59,7 @@ class ItemsController < ApplicationController
 
     # The mutable Content holds the OCR settings and must follow the object to its new lock.
     @edit_item_form.content = Content.mutable_for(@cocina_object)
-    return redirect_content_busy if @edit_item_form.content&.staging_or_discovering?
+    return redirect_content_busy if @edit_item_form.content&.busy?
 
     authorize! @edit_item_form, to: :add_to_collections?, with: ItemPolicy
     authorize! @edit_item_form, to: :update_apo?, with: ItemPolicy

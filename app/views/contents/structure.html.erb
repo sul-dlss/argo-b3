@@ -1,0 +1,90 @@
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow } do %>
+  <%# The item form has no fields on this step; the footer's buttons submit it. %>
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: 'item_form') %>
+
+  <div class="b3-form">
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.steps.structure'), classes: 'mb-3') %>
+
+    <%= render Edit::StructuringResultAlertComponent.new(structuring_result: @structuring_result, populator_selection: @populator_selection) %>
+
+    <%= fields_for :contents_item_form, @contents_item_form do |item_form| %>
+      <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
+    <% end %>
+
+    <% if @content.content_file_binaries.none? %>
+      <p>No files.</p>
+    <% else %>
+      <% unassociated_count = @content.content_file_binaries.unassociated.count %>
+      <% if unassociated_count.positive? %>
+        <p data-unassociated-files-target="unassociated"><%= t('edit.contents.structure.unassociated_files', count: unassociated_count) %></p>
+      <% end %>
+      <%= render Edit::StructurePopulatorDescriptionComponent.new(populator_selection: @populator_selection) %>
+      <%# The structure button and the CSV upload are in fieldsets so that they are disabled while uploading a CSV. %>
+      <fieldset data-disable-actions-target="disableable">
+        <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_path(@content.druid),
+                                                                        label: @content.content_file_sets.none? ? t('edit.contents.structure.buttons.structure') : t('edit.contents.structure.buttons.restructure'),
+                                                                        params: { commit: ContentsController::RESTRUCTURE_VALUE },
+                                                                        top: false,
+                                                                        method: :patch,
+                                                                        variant: :'outline-primary') %>
+      </fieldset>
+      <% if @content.content_file_sets.any? %>
+        <%# Reloaded when a resource changes (see content_file_sets/show). %>
+        <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
+
+        <%# While uploading a CSV, actions (e.g., the resources' actions) are disabled. %>
+        <fieldset data-disable-actions-target="disableable">
+          <%= form_with model: @structural_csv_form, url: content_path(@content.druid), method: :patch, class: 'mt-3',
+                        data: disable_actions_form_data do |form| %>
+            <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
+            <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                   field_name: :csv_file,
+                                                                   label_text: 'Upload structural CSV',
+                                                                   label_classes: 'fw-bold',
+                                                                   label_default_class: 'col-form-label text-nowrap',
+                                                                   container_classes: 'inline-upload-field',
+                                                                   input_classes: 'form-control-sm',
+                                                                   input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(','),
+                                                                   error_classes: 'order-last') do |component| %>
+              <% component.with_additional_container_content do %>
+                <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload', variant: :'outline-primary', classes: 'btn-sm', value: ContentsController::CSV_VALUE) %>
+                <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
+                                                                           label_text: 'Allow files to be deleted',
+                                                                           container_classes: 'inline-upload-option') %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </fieldset>
+
+        <div class="text-end">
+          <%= link_to 'Download structural metadata', csv_content_structure_path(content_id: @content_token), data: { turbo: false } %>
+        </div>
+        <%# Reloads the page on the add and edit files step. %>
+        <fieldset class="text-end" data-disable-actions-target="disableable">
+          <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                          method: :delete,
+                                                                          variant: :link,
+                                                                          classes: 'text-danger p-0',
+                                                                          confirm: t('edit.contents.structure.buttons.delete_all_confirm')) do %>
+            <%= delete_icon(classes: 'me-2', aria: { hidden: true }) %><%= t('edit.contents.structure.buttons.delete_all') %>
+          <% end %>
+        </fieldset>
+        <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: "Resources (#{number_with_delimiter(content_file_sets.size)})", classes: 'mt-3') %>
+        <% content_file_sets.each_with_index do |content_file_set, index| %>
+          <div class="mb-2">
+            <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>
+              <%= render Show::FileSetComponent.new(content_file_set:, content_token: @content_token, content_file_set_counter: index,
+                                                    content_file_set_total: content_file_sets.size) %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <div class="mt-5">
+      <%= render Item::ManageFilesStepFooterComponent.new(manage_files_flow: @manage_files_flow, form_id: 'item_form', druid: @contents_item_form.druid,
+                                                          content_token: @content_token, draft_actions_presenter: @draft_actions_presenter) %>
+    </div>
+  </div>
+<% end %>

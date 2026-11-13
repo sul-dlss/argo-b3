@@ -57,8 +57,8 @@ RSpec.describe 'Content unsaved changes' do
         delete content_unsaved_changes_path(content_token)
 
         expect(response).to redirect_to('/objects/druid:bc123df4567')
-        expect(flash[:warning]).to eq('Files are being discovered or staged, so unsaved changes to files ' \
-                                      'were not discarded.')
+        expect(flash[:warning]).to eq('Files are being staged, discovered, or structured, so unsaved changes ' \
+                                      'to files were not discarded.')
         expect(ContentFileBinary.exists?(uploaded_binary.id)).to be true
       end
     end
@@ -69,8 +69,8 @@ RSpec.describe 'Content unsaved changes' do
       it 'redirects to the object page with a warning without discarding' do
         delete content_unsaved_changes_path(content_token)
 
-        expect(flash[:warning]).to eq('Files are being discovered or staged, so unsaved changes to files ' \
-                                      'were not discarded.')
+        expect(flash[:warning]).to eq('Files are being staged, discovered, or structured, so unsaved changes ' \
+                                      'to files were not discarded.')
         expect(ContentFileBinary.exists?(uploaded_binary.id)).to be true
       end
     end

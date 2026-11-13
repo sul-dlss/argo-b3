@@ -33,7 +33,7 @@ module Sdr
     # @raise [NotDiscardableError] if the draft cannot be discarded
     # @raise [Sdr::Repository::Error] if discarding fails
     def call
-      raise ContentBusyError, 'Files are being staged or discovered' if mutable_content&.staging_or_discovering?
+      raise ContentBusyError, Content::BUSY_MESSAGE if mutable_content&.busy?
       raise NotDiscardableError, 'Draft cannot be discarded' unless discardable?
 
       version_service.discard

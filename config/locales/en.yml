@@ -136,7 +136,7 @@ en:
       republish_started: "Republishing started"
     warnings:
       cannot_purge: "This object cannot be purged because it has been submitted."
-      content_busy: "Files for this object are being staged or discovered. Try again when that has finished."
+      content_busy: "Files for this object are being staged, discovered, or structured. Try again when that has finished."
       not_depositable: "This draft cannot be deposited."
       not_discardable: "This draft cannot be discarded."
       republish_failed: "Republish is not possible"
@@ -172,7 +172,7 @@ en:
           deposited: "Agreement updated and deposit started."
           updated: "Agreement updated."
         warnings:
-          content_busy: "Files for this agreement are being staged or discovered. Try again when that has finished."
+          content_busy: "Files for this agreement are being staged, discovered, or structured. Try again when that has finished."
           assembly_stopped_with_error: "This agreement can't be deposited until the process in error is retried."
           not_editable: "Agreement is not editable."
           stale: "This agreement was changed since you opened it. Review the current values and make your changes again."
@@ -284,13 +284,12 @@ en:
             invalid: "Content errors must be fixed."
       discovery:
         spinner: "Discovering files..."
-        toasts:
-          completed: "Completed discovering files"
       edit:
         files_section:
           label: 'Files'
           heading: 'Files (%{file_count})'
-        title: "Manage files"
+        title: "Manage files and structure"
+        files_required: "Add at least one file to continue."
         buttons:
           cancel_confirm: "Discard unsaved changes to files?"
           discover_files: "Discover files"
@@ -316,15 +315,19 @@ en:
           one: "There is 1 file that has not been added to the structure."
           other: "There are %{count} files that have not been added to the structure."
         toasts:
-          structure: "Structure built from files"
-          append: "Files appended to structure"
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"
         buttons:
+          structure: "Structure files"
+          restructure: "Clear and structure files again"
           delete_all: "Delete all files and resources"
           delete_all_confirm: "Are you sure you want to delete all files and resources?"
         warnings:
-          discovering: "Files are being discovered. Try again when discovery has finished."
+          busy: "Files are being staged, discovered, or structured. Try again when that has finished."
+        results:
+          structured: "Files were structured with the %{populator} model."
+          not_used: "The %{populator} model was not used because:"
+          failed: "Structuring files failed. Try again, or contact SDR support if the problem continues."
         populators:
           agreement: 'Agreement (resource per file)'
           book: "Book (resource per page)"
@@ -341,20 +344,17 @@ en:
           no_media: "there are no audio or video files"
           no_models: "there are no 3D model files"
           no_pdfs: "there are no PDF files"
-      tabs:
-        details:
-          label: "Item details"
-        add_files:
-          label: "Add files"
-        structural:
-          label: "Structure files"
-        deposit:
-          label: "Deposit"
+      steps:
+        label: "Manage files progress"
+        details: "Item details"
+        files: "Add and edit files"
+        structure: "Structure files"
+        deposit: "Deposit"
     content_unsaved_changes:
       toasts:
         discarded: "Unsaved changes to files discarded"
       warnings:
-        busy: "Files are being discovered or staged, so unsaved changes to files were not discarded."
+        busy: "Files are being staged, discovered, or structured, so unsaved changes to files were not discarded."
         staging_failed: "Staging failed, so unsaved changes to files were not discarded. Retry staging, or contact SDR support if the problem continues."
     content_file_binaries:
       buttons:
@@ -436,7 +436,7 @@ en:
           purge: "Purge"
           purge_confirm: "Purge this object? It will be permanently deleted. This cannot be undone."
         warnings:
-          content_busy: "Files for this item are being staged or discovered. Try again when that has finished."
+          content_busy: "Files for this item are being staged, discovered, or structured. Try again when that has finished."
           assembly_stopped_with_error: "This item can't be deposited until the process in error is retried."
           not_editable: "Item is not editable."
           stale: "This item was changed since you opened it. Review the current values and make your changes again."
@@ -767,7 +767,7 @@ en:
         object_not_found: 'Object not found'
         not_item: 'Not an Item'
         not_authorized: 'Not authorized to update'
-        content_in_progress: 'Files are being staged or discovered for this object'
+        content_in_progress: 'Files are being staged, discovered, or structured for this object'
         folder_not_found: 'Folder not found: %{path}'
         folder_permission_denied: 'Permission denied: %{path}'
         no_files: 'No files found in folder: %{path}'

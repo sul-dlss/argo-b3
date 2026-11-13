@@ -50,7 +50,7 @@ module Sdr
     attr_reader :cocina_object, :user_name, :lane_id
 
     def check_depositable!
-      raise ContentBusyError, 'Files are being staged or discovered' if mutable_content&.staging_or_discovering?
+      raise ContentBusyError, Content::BUSY_MESSAGE if mutable_content&.busy?
       raise NotDepositableError, 'Draft cannot be deposited' unless version_service.open? && version_service.closeable?
     end
 

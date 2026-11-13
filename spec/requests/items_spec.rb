@@ -785,7 +785,7 @@ RSpec.describe 'Items' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
         expect(response).to redirect_to(edit_item_path(druid))
-        expect(flash[:danger]).to eq('Files for this item are being staged or discovered. ' \
+        expect(flash[:danger]).to eq('Files for this item are being staged, discovered, or structured. ' \
                                      'Try again when that has finished.')
         expect(Sdr::Repository).not_to have_received(:update)
       end

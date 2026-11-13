@@ -113,10 +113,13 @@ A directory in Hierarchical Filepaths (e.g., `folder1` in `folder1/image1.tif`),
 A Content that exactly reflects the cocina object's structural metadata at its lock. Use it for anything that shows or exports what was deposited (e.g., the Files tab, structural CSV download from the object page).
 
 ### Mutable Content
-A Content being edited (uploads, discovery, reordering, structural CSV import); it may deviate from the cocina object. It reaches the cocina object only through **staging**. While the version is open, it moves to each new lock of the object (e.g., after a draft save or an item edit), and it holds the OCR settings (whether to run OCR and in which languages) used when depositing.
+A Content being edited (uploads, discovery, reordering, structural CSV import); it may deviate from the cocina object. It reaches the cocina object only through **staging**. While the version is open, it moves to each new lock of the object (e.g., after a draft save or an item edit), and it holds the item details chosen while managing files (e.g., content type, access, OCR settings) until they are saved, and which step of managing files the user is on.
 
 ### Unsaved Changes
-Changes to a Mutable Content that have not been staged to the cocina object, such as new files or edited resources. Saving as a draft or depositing from manage files stages them; canceling manage files or discarding the Draft deletes them.
+Changes to a Mutable Content that have not been staged to the cocina object, such as new files, edited resources, or item details chosen while managing files. Saving as a draft or depositing from manage files stages them; canceling manage files or discarding the Draft deletes them.
+
+### Structuring
+Building the Resources of a Mutable Content from its files with a model chosen by content type (e.g., the Book model makes a Resource per page). When the content type's model can't be used (e.g., a book whose files are in folders), the Default model (a Resource per file) is used. **Re-structuring** replaces the existing Resources; **appending** adds only the files not yet in a Resource. Use "model" rather than "populator" with users.
 
 ### Staging
 Saving a mutable Content to the cocina object (`StageFilesJob`): `CocinaObjectMutators::StructuralMutator` rebuilds the cocina structural metadata from the Content and `Sdr::Repository.update` saves it. When depositing, the Content becomes immutable for the new lock and accessioning starts; when saving as a draft, the Content stays mutable and moves to the new lock.

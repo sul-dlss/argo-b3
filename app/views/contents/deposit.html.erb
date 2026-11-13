@@ -1,0 +1,14 @@
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow } do %>
+  <%= form_with(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: 'item_form', class: 'b3-form') do |item_form| %>
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.steps.deposit'), classes: 'mb-3') %>
+
+    <% unless @contents_item_form.initial_version? %>
+      <%= render Edit::VersionDescriptionComponent.new(form: item_form) %>
+    <% end %>
+
+    <div class="mt-5">
+      <%= render Item::ManageFilesStepFooterComponent.new(manage_files_flow: @manage_files_flow, form_id: 'item_form', druid: @contents_item_form.druid,
+                                                          content_token: @content_token, draft_actions_presenter: @draft_actions_presenter) %>
+    </div>
+  <% end %>
+<% end %>

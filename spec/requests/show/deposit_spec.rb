@@ -45,7 +45,7 @@ RSpec.describe 'Deposit' do
         post deposit_object_path(druid)
 
         expect(response).to redirect_to(object_path(druid))
-        expect(flash[:danger]).to eq('Files for this object are being staged or discovered. ' \
+        expect(flash[:danger]).to eq('Files for this object are being staged, discovered, or structured. ' \
                                      'Try again when that has finished.')
       end
     end

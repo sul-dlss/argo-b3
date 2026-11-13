@@ -1,8 +1,10 @@
 <div class="d-flex">
     <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link, data: cancel_data) %>
     <% if show_previous %>
-        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Previous', variant: :'outline-primary', classes: 'ms-2',
-                                                                    data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) %>
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :'outline-primary', classes: 'ms-2',
+                                                                    data: { controller: 'sdr-tab-nav', sdr_tab_nav_tab_id_value: pane.tab_id, action: 'click->sdr-tab-nav#showPrevious' }) do %>
+            <%= helpers.left_arrow_icon(aria: { hidden: true }) %> Previous
+        <% end %>
     <% end %>
     <% if show_next %>
         <%= render SdrViewComponents::Elements::ButtonComponent.new(variant: :primary, classes: 'ms-2',

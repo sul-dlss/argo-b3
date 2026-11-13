@@ -30,6 +30,62 @@ RSpec.describe ContentsItemForm do
     end
   end
 
+  describe '.for_manage_files' do
+    let(:content) do
+      create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock,
+                                 content_type: Cocina::Models::ObjectType.image, access_view: 'stanford',
+                                 access_download: 'stanford', with_embargo: false, overwrite_file_access: true,
+                                 perform_ocr: true, ocr_languages: ['English'])
+    end
+
+    it 'applies the saved item details and then the submitted params' do
+      form = described_class.for_manage_files(cocina_object, version_service:, content:,
+                                                             params: { access_view: 'world', access_download: 'world' })
+
+      expect(form).to have_attributes(content:, content_type: Cocina::Models::ObjectType.image, access_view: 'world',
+                                      perform_ocr: true, ocr_languages: ['English'])
+      expect(form).to be_changed
+    end
+  end
+
+  describe '#item_details_valid?' do
+    let(:version_service) { version_service_double(open?: true, version: 2, version_description: nil) }
+
+    before { contents_item_form.version_service = version_service }
+
+    it 'ignores the version description, which is entered on the deposit step' do
+      expect(contents_item_form.item_details_valid?).to be true
+    end
+
+    it 'is false with invalid item details' do
+      contents_item_form.update(perform_ocr: true, ocr_languages: [])
+
+      expect(contents_item_form.item_details_valid?).to be false
+      expect(contents_item_form.errors.attribute_names).to eq([:ocr_languages])
+    end
+  end
+
+  describe '#save_item_details!' do
+    let(:content) { create(:content, :mutable, druid: cocina_object.externalIdentifier, lock: cocina_object.lock) }
+
+    before do
+      contents_item_form.content = content
+      contents_item_form.update(content_type: Cocina::Models::ObjectType.image, perform_speech_to_text: false,
+                                version_description: 'Added pages')
+    end
+
+    it 'saves the item details and text extraction settings with the content, without saving the object' do
+      allow(Sdr::Repository).to receive(:update)
+
+      contents_item_form.save_item_details!(step: 'files')
+
+      expect(content.reload).to have_attributes(step: 'files', content_type: Cocina::Models::ObjectType.image,
+                                                viewing_direction: 'right-to-left', version_description: 'Added pages',
+                                                perform_ocr: false)
+      expect(Sdr::Repository).not_to have_received(:update)
+    end
+  end
+
   describe 'with_embargo' do
     context 'without an embargo' do
       it 'is without embargo' do
@@ -342,6 +398,14 @@ RSpec.describe ContentsItemForm do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq('opened-lock')
       end
+
+      it 'returns the content to the first step, clearing the item details' do
+        content.update!(step: 'deposit', content_type: Cocina::Models::ObjectType.image)
+
+        contents_item_form.save!(user_name:)
+
+        expect(content.reload).to have_attributes(step: 'details', content_type: nil)
+      end
     end
 
     context 'when saving fails after opening a version' do
@@ -354,9 +418,11 @@ RSpec.describe ContentsItemForm do
         contents_item_form.content = content
       end
 
-      it 'rebases the content onto the opened version' do
+      it 'rebases the content onto the opened version, keeping its step' do
+        content.update!(step: 'deposit')
+
         expect { contents_item_form.save!(user_name:) }.to raise_error(Sdr::Repository::Error)
-        expect(content.reload.lock).to eq('opened-lock')
+        expect(content.reload).to have_attributes(lock: 'opened-lock', step: 'deposit')
       end
     end
 

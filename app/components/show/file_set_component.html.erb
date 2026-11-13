@@ -28,7 +28,6 @@
                                                                                       icon: :move_up,
                                                                                       label: t('edit.content_file_sets.buttons.move_up', index:),
                                                                                       method: :patch,
-                                                                                      top: false,
                                                                                       classes: 'px-1') %>
                 <% end %>
                 <% if move_down? %>
@@ -36,7 +35,6 @@
                                                                                       icon: :move_down,
                                                                                       label: t('edit.content_file_sets.buttons.move_down', index:),
                                                                                       method: :patch,
-                                                                                      top: false,
                                                                                       classes: 'px-1') %>
                 <% end %>
               </div>
@@ -46,7 +44,6 @@
                                                                                 label: t('edit.content_file_sets.buttons.delete', index:),
                                                                                 method: :delete,
                                                                                 confirm: t('edit.content_file_sets.buttons.delete_confirm', index:),
-                                                                                top: false,
                                                                                 classes: 'ms-2') %>
           </fieldset>
         <% end %>
