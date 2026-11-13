@@ -14,7 +14,7 @@ Everything this skill produces is visible to others under the user's name. Draft
 1. **Screencast**: for a user-facing change, record one with the `screencast` skill. Backend-only changes and refactors skip it.
 2. **Commit, then push, then create**: run them one after another. `gh pr create` fails with "No commits between main and …" when it runs before the push lands.
 3. **Write the body** from the template below, in a file (e.g., `/tmp/<feature>/pr-body.md`) next to the video.
-4. **Create the PR**: `gh pr create --draft --base main --head <branch> --title "<title>" --body-file pr-body.md --attach ./<video>.webm`, run from the directory holding both files. Reference the video in the body as `![<alt>](./<video>.webm)` so `gh` (2.99 or later) places it inline. Confirm with `gh pr view <N> --json isDraft,body` that it is a draft and the body has a `user-attachments` URL.
+4. **Create the PR**: `test -s pr-body.md && gh pr create -R sul-dlss/argo-b3 --draft --base main --head <branch> --title "<title>" --body-file pr-body.md --attach ./<video>.webm`, run from the directory holding both files. `-R` is needed because that directory is outside the repo, and `test -s` stops an empty body file from replacing the description. Reference the video in the body as `![<alt>](./<video>.webm)` so `gh` (2.99 or later) places it inline. Confirm with `gh pr view <N> -R sul-dlss/argo-b3 --json isDraft,body` that it is a draft and the body has a `user-attachments` URL. To add or replace a video later, use `gh pr edit <N> -R sul-dlss/argo-b3 --attach ./<video>.webm`, with the same `--body-file` check.
 5. **Inline comments**: post them as one review (below).
 6. **Report**: the PR link, the decisions flagged, and what the inline comments cover.
 

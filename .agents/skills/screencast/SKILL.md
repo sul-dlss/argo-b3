@@ -7,7 +7,14 @@ description: Record a short captioned screencast of a web app feature with playw
 
 A screencast shows a reviewer the feature working without a checkout: 30–50 seconds, under 10 MB (GitHub's video limit on free plans), every **beat** visible.
 
-**Prerequisites**: `playwright-cli` (run through the repo's tool manager, e.g. `mise exec -- playwright-cli`), a browser it can drive (`open --browser=firefox` works where Chrome isn't installed), `ffmpeg`/`ffprobe`, a way to view images, and the app running locally with demo data. For argo-b3's local stack and demo data, read [references/argo-b3.md](references/argo-b3.md).
+**Prerequisites** (macOS or Linux):
+
+- `playwright-cli` on the PATH; if `command -v playwright-cli` finds nothing, `npm install -g @playwright/cli`.
+- Google Chrome, driven with `--browser=chrome`; if missing, `playwright-cli install-browser chrome` (on Linux, add `--with-deps`).
+- `ffmpeg` and `ffprobe`; if missing, `brew install ffmpeg` (macOS) or the distro's package (e.g., `sudo apt install ffmpeg`).
+- The app running locally from this checkout, with demo data. For argo-b3's local stack, port, and demo data, read [references/argo-b3.md](references/argo-b3.md).
+
+**Isolation**: other sessions may be recording at the same time, each from its own checkout. Name the browser session after this checkout (`SESSION=$(basename "$PWD")`, then `playwright-cli -s="$SESSION" ...` in every command), and point the script at this checkout's server (`<app url>` below, e.g. `http://localhost:3001`).
 
 ## 1. Plan the beats
 
@@ -26,7 +33,7 @@ Create fresh records so every beat can run. A beat that saves or deposits change
 
 ## 3. Rehearse the locators
 
-Open a session (`playwright-cli -s=demo open --browser=firefox <url>`) and use `snapshot`, `find`, and `eval` to settle each locator. Common traps:
+Open a session (`playwright-cli -s="$SESSION" open --browser=chrome <url>`) and use `snapshot`, `find`, and `eval` to settle each locator. Common traps:
 
 - **Name collisions**: a tab, a nav menu, and a submit button can all be named "Deposit". Use `{ exact: true }` and scope with `.and(page.locator('[type=submit]'))`.
 - **Submits that navigate**: wait with `page.waitForURL(...)` alongside the click (`Promise.all`), not `waitForLoadState('networkidle')`.
@@ -35,12 +42,12 @@ Open a session (`playwright-cli -s=demo open --browser=firefox <url>`) and use `
 
 ## 4. Record
 
-Write the script to a file and run it with `playwright-cli -s=demo run-code --filename=script.js`. Navigate before starting the recording so it opens on a loaded page; pace with pauses long enough to read each caption.
+Write the script to a file and run it with `playwright-cli -s="$SESSION" run-code --filename=script.js`. Navigate before starting the recording so it opens on a loaded page; pace with pauses long enough to read each caption.
 
 ```js
 async page => {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('http://localhost:3000/<entry page>');
+  await page.goto('<app url>/<entry page>');
   await page.waitForLoadState('networkidle');
 
   try { await page.screencast.stop(); } catch (e) {}
@@ -68,11 +75,11 @@ To point at an element, draw a box from its `boundingBox()` with `showOverlay` (
 ## 5. Verify
 
 1. `ffprobe -v error -show_entries format=duration -of csv=p=0 <video>` for the length; check the file size.
-2. Extract frames: `ffmpeg -v error -i <video> -vf "fps=1/2.5,scale=960:-1" frames/f%02d.png`.
-3. Inspect every frame: what's shown, the caption, and anything mid-load, cut off, or covered by a caption. If a frame can't be viewed, say so rather than assume.
+2. Build contact sheets, nine frames each: `ffmpeg -v error -i <video> -vf "fps=1/2.5,scale=640:-1,tile=3x3" frames/sheet%02d.png`. For a detail too small to read, extract that one frame at full size: `ffmpeg -v error -ss <seconds> -i <video> -frames:v 1 frames/at<seconds>.png`.
+3. Inspect every frame on every sheet: what's shown, the caption, and anything mid-load, cut off, left over from an earlier step, or covered by a caption. If a frame can't be viewed, say so rather than assume.
 
 Re-record until every beat appears in at least one frame and nothing obscures it. Done when that holds, the video is 30–50 seconds, and it is under 10 MB.
 
 ## 6. Clean up and report
 
-Close the browser session (`playwright-cli -s=demo close`) and stop servers you started. Report the video's path and length, and every record you created that remains.
+Close the browser session (`playwright-cli -s="$SESSION" close`) and stop the servers you started (for argo-b3, see the reference). Report the video's path and length, and every record you created that remains.

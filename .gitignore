@@ -47,3 +47,6 @@ config/environments/*.local.yml
 /coverage
 
 .ruby-version
+
+# playwright-cli session snapshots and logs
+.playwright-cli/
