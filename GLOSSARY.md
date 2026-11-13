@@ -56,6 +56,21 @@ The changes in an object's open version that have not yet been deposited. Discar
 ### Deposit
 Submitting a Draft for accessioning. If the object is a DRO with files, depositing starts an assembly workflow (e.g., to create derivatives, including for files deposited in earlier versions), which closes the version once assembly is done; otherwise it closes the version directly, which starts accessioning. A geo object goes through assembly only when it has staged files. A web archive seed always goes through assembly, with or without files, since its assembly generates its description and thumbnail (or keeps those it already has). Depositing from manage files stages the Mutable Content first; depositing from elsewhere (e.g., the edit item form or the status box) deposits the structure as last staged, so it is not possible while the Mutable Content has unsaved changes. A Bulk Action that closes versions deposits each object it changed, in the same way. If assembly stops with a Process in error, the Draft can be edited and saved, but not deposited; depositing resumes when the Process is retried.
 
+### Single-Object Deposit
+A Deposit a user starts for one object, from manage files, the edit item form, or the status box. Depositing a MID Item Deposit's object again from manage files is a Single-Object Deposit.
+
+### Bulk Action Object Deposit
+The Deposit of one object made by a Bulk Action, either Redeposit or a Bulk Action that closes versions. Use "Bulk Action Object Deposit" rather than "Bulk Action Deposit", which reads as the name of a Bulk Action.
+
+### Deposit Lifecycle
+The stages a Deposit passes through: **Initiating** (MID Item Deposits only, while Deposit Initiation runs), **Staging**, **Assembling** (an assembly workflow, e.g., `assemblyWF`, `gisAssemblyWF`, `ocrWF`, is active and the Version is still open), **Accessioning** (the Version is closed and `accessionWF` is active), and **Complete** (`accessionWF` has finished for the Version). Use "Accessioning" even though the UI labels that stage "Depositing", and "Complete" for what the UI shows as "Deposited".
+
+### In Error
+A Deposit is in error when Staging failed (fixed by saving or depositing again from manage files), an assembly workflow has a Process in error (an **Assembly error**), or `accessionWF` has a Process in error (an **Accessioning error**); the latter two are fixed by retrying the Process. A MID Item Deposit is also in error after a **Deposit start failure**, when its version could not be opened or its staging could not be started.
+
+### Tracked Deposit
+A Deposit started in Argo-B3, remembered with who deposited it from when it starts until it is Complete, so its outcome can be reported to that user.
+
 ### Purge
 Permanently deleting an object from SDR, along with its Mutable Content and staged files. Only an object that has never been submitted for accessioning can be purged, which in practice means a first version. Unlike discarding a Draft, which returns the object to its last closed version, purging leaves no object behind.
 
@@ -72,10 +87,19 @@ An administrative label on an object, made of two or more terms separated by ` :
 One step of a workflow (e.g., `shelve` in `accessionWF`) for one version of an object, performed by a robot. A process in error can be retried (set back to waiting, so it is queued again) by users who can edit the object; admins can also skip or complete it. Use "process" rather than "workflow step".
 
 ### Multi-Item Deposit
-A single user-run deposit of many Items whose files are on a mount, carried out in steps: discovery, structure, and deposit. The deposit step is initiated once a version is open and staging has started for every Item Deposit; staging and accessioning then proceed for each Item independently.
+A single user-run deposit of many Items whose files are on a mount, carried out in steps: Discovery, File Check, and Deposit Initiation. It is **not submitted** until Deposit Initiation has started every MID Item Deposit, and **Submitted** from then on. A Submitted Multi-Item Deposit is **in progress** until it **settles**, when every MID Item Deposit is Complete or In Error: either **complete** (all Complete) or **with errors**. Do not shorten it to "MID" on its own; "MID" appears only in "MID Item Deposit".
 
-### Item Deposit
-One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount. Errors are recorded per Item Deposit and step, so a count of a step's errors is the number of Item Deposits with errors, not of error messages.
+### MID Item Deposit
+One Item within a Multi-Item Deposit, identified by its druid and its folder on the mount. Once Deposit Initiation starts it, it is that Item's Deposit, and its outcome is reported only through the Multi-Item Deposit. Errors are recorded per MID Item Deposit and step, so a count of a step's errors is the number of MID Item Deposits with errors, not of error messages. Use "MID Item Deposit" rather than "Item Deposit".
+
+### Discovery
+The first step of a Multi-Item Deposit: checking each manifest row's folder on the mount and its object, and recording the folder's files. A **Discovery error** blocks File Check; a warning does not.
+
+### File Check
+The second step of a Multi-Item Deposit: configuring the deposit (e.g., OCR) and building and validating each MID Item Deposit's structure, from a structural metadata CSV or else by content type. A **File Check error** blocks Deposit Initiation; a warning does not. Use "File Check" rather than "structure step".
+
+### Deposit Initiation
+The last step of a Multi-Item Deposit: checking that every object can be deposited and, only if all can (a **Deposit Initiation error** on any stops all), starting each MID Item Deposit. Use "Deposit Initiation" rather than "deposit step".
 
 ### Bulk Action
 An operation run in the background on many objects at once, chosen from a search or a list of druids, that produces a log of its results.
