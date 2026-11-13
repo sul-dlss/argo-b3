@@ -389,13 +389,13 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 
 ### Adding a bulk action
 
+A bulk action is defined by its configuration in `services/bulk_actions.rb`. Each configuration with a form gets `new` and `create` routes (generated in `routes.rb`) handled by `BulkActions::FormsController`, and is listed in its section of the new bulk actions page.
+
 1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object (see `CODING_STANDARDS.md`).
-2. Add a new resource to `routes.rb` under the `bulk_actions` namespace.
-3. Add configuration to `services/bulk_actions.rb`.
-4. Add the bulk action to the list of bulk actions in `views/bulk_actions/new.html.erb`.
-5. Add a controller for the bulk action that is a subclass of `BulkActionApplicationController`.
-6. Add a `new.html.erb` view.
-7. Add a request spec. For bulk actions that use `BulkActions::BasicForm` without additional fields, use the `'a simple bulk action controller'` shared examples (see for example, `spec/requests/bulk_actions/purge_spec.rb`). Add a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
+2. Add configuration to `services/bulk_actions.rb`, in the order it is listed within its section. Set `close_version` if the form offers depositing once the action is complete, and `admin_policy_rule` if only some users may run it.
+3. If the job needs parameters beyond the druids (or CSV) and the form's attributes, add a form (a subclass of `BulkActions::BasicForm` or `BulkActions::BasicCsvForm`) and override `job_params` where its attributes don't map directly to the job's parameters.
+4. If the form has fields beyond the druid list (or CSV upload), add a `views/bulk_actions/<bulk action>/new.html.erb` view; otherwise the default view is used. Add a controller (a subclass of `BulkActions::FormsController`, named by the configuration's `controller`) only when rendering the form needs something the form can't provide, such as options limited to what the user may edit.
+5. The bulk action forms request spec covers rendering every form and submitting those that use `BulkActions::BasicForm`. For other forms, add a request spec, or a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
 ## Design
 Design standards (layout, components, typography, color, accessibility, copy) are in `DESIGN_STANDARDS.md`. Deliberate deviations are marked in the code with a `Design standard deviation:` comment.

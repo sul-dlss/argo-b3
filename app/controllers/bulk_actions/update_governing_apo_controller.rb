@@ -2,20 +2,8 @@
 
 module BulkActions
   # Controller for update governing APO bulk action.
-  class UpdateGoverningApoController < BulkActionApplicationController
+  class UpdateGoverningApoController < FormsController
     private
-
-    def bulk_action_config
-      BulkActions::UPDATE_GOVERNING_APO
-    end
-
-    def job_params
-      {
-        druids: druids_from_form,
-        close_version: @bulk_action_form.close_version,
-        new_apo_id: @bulk_action_form.new_apo_id
-      }
-    end
 
     # Moving an item requires edit permission on the new APO, which the job also checks.
     def set_form_options

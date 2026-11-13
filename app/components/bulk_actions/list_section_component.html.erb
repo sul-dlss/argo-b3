@@ -3,13 +3,7 @@
   <ul class="list-unstyled vstack gap-4">
     <% bulk_action_configs.each do |bulk_action_config| %>
       <li>
-        <%# Only display the link when the bulk action has been implemented. %>
-        <%# Once all bulk actions have been implemented, this conditional can be removed. %>
-        <% if bulk_action_config.path_helper.present? %>
-          <%= link_to(bulk_action_config.label, bulk_action_config.path, class: 'fw-bold su-underline') %>
-        <% else %>
-          <span class="fw-bold"><%= bulk_action_config.label %></span>
-        <% end %>
+        <%= link_to(bulk_action_config.label, bulk_action_config.new_path, class: 'fw-bold su-underline') %>
         <% if bulk_action_config.help_text.present? %>
           <p class="mb-0"><%= bulk_action_config.help_text %></p>
         <% end %>

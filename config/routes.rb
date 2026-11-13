@@ -90,42 +90,10 @@ Rails.application.routes.draw do
   end
 
   namespace :bulk_actions do
-    resource :add_workflow, only: %i[new create], controller: 'add_workflow'
-    resource :apply_apo_defaults, only: %i[new create], controller: 'apply_apo_defaults'
-    resource :redeposit, only: %i[new create], controller: 'redeposit'
-    resource :create_virtual_object, only: %i[new create], controller: 'create_virtual_object'
-    resource :export_catalog_data, only: %i[new create], controller: 'export_catalog_data'
-    resource :export_checksum_report, only: %i[new create], controller: 'export_checksum_report'
-    resource :export_cocina_json, only: %i[new create], controller: 'export_cocina_json'
-    resource :export_descriptive_metadata, only: %i[new create], controller: 'export_descriptive_metadata'
-    resource :export_mods, only: %i[new create], controller: 'export_mods'
-    resource :export_structural_metadata, only: %i[new create], controller: 'export_structural_metadata'
-    resource :export_tags, only: %i[new create], controller: 'export_tags'
-    resource :export_tracking_sheets, only: %i[new create], controller: 'export_tracking_sheets'
-    resource :import_catalog_data, only: %i[new create], controller: 'import_catalog_data'
-    resource :import_descriptive_metadata, only: %i[new create], controller: 'import_descriptive_metadata'
-    resource :import_read_restricted_and_edit_permissions, only: %i[new create],
-                                                           controller: 'import_read_restricted_and_edit_permissions'
-    resource :import_read_unrestricted_workgroups, only: %i[new create],
-                                                   controller: 'import_read_unrestricted_workgroups'
-    resource :import_structural_metadata, only: %i[new create], controller: 'import_structural_metadata'
-    resource :import_tags, only: %i[new create], controller: 'import_tags'
-    resource :manage_collections, only: %i[new create], controller: 'manage_collections'
-    resource :manage_embargo, only: %i[new create], controller: 'manage_embargo'
-    resource :manage_content_type, only: %i[new create], controller: 'manage_content_type'
-    resource :manage_license_and_rights_statements, only: %i[new create],
-                                                    controller: 'manage_license_and_rights_statements'
-    resource :manage_release, only: %i[new create], controller: 'manage_release'
-    resource :manage_rights, only: %i[new create], controller: 'manage_rights'
-    resource :manage_source_id, only: %i[new create], controller: 'manage_source_id'
-    resource :purge, only: %i[new create], controller: 'purge'
-    resource :reindex, only: %i[new create], controller: 'reindex'
-    resource :refresh_metadata, only: %i[new create], controller: 'refresh_metadata'
-    resource :register_csv, only: %i[new create], controller: 'register_csv'
-    resource :republish, only: %i[new create], controller: 'republish'
-    resource :text_extraction, only: %i[new create], controller: 'text_extraction'
-    resource :update_governing_apo, only: %i[new create], controller: 'update_governing_apo'
-    resource :validate_descriptive_metadata, only: %i[new create], controller: 'validate_descriptive_metadata'
+    BulkActions.all.select(&:routable?).each do |config|
+      resource config.key, only: %i[new create], controller: config.controller,
+                           defaults: { bulk_action_type: config.key }
+    end
   end
 
   # Redirect legacy route for object show page
