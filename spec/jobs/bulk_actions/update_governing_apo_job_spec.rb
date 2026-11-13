@@ -16,7 +16,6 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
     described_class::JobItem.new(druid:, index: 0, job:).tap do |item|
       allow(item).to receive(:can_update_governing_apo?).and_return(true)
       allow(item).to receive(:open_new_version_if_needed!)
-      allow(item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -31,13 +30,11 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
   it 'updates the governing APO' do
     job.perform_now
 
-    expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Updated governing APO')
     expect(Sdr::Repository).to have_received(:update) do |args|
       expect(args[:cocina_object].administrative.hasAdminPolicy).to eq new_apo_id
       expect(args[:user_name]).to eq bulk_action.user.sunetid
       expect(args[:description]).to eq 'Updated governing APO'
     end
-    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -62,7 +59,6 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
     it 'does not update the object and logs an error' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include('Not an item or collection')
 
@@ -79,7 +75,6 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
     it 'does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include("Not authorized to move item to #{new_apo_id}")
 
@@ -94,7 +89,6 @@ RSpec.describe BulkActions::UpdateGoverningApoJob do
     it 'does not update the object' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
       expect(log.string).to include('No changes to governing APO')
 

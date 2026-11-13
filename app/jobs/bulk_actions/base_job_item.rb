@@ -48,11 +48,25 @@ module BulkActions
       @cocina_model ||= CocinaModels::Factory.build(cocina_object)
     end
 
-    def open_new_version_if_needed!(description:)
-      return if Sdr::VersionService.open?(druid:)
-      raise 'Unable to open new version' unless Sdr::VersionService.openable?(druid:)
+    # Saves the changed cocina model in an open version and deposits it if needed, recording the item's outcome.
+    # @yield after opening the version, before saving (e.g., to log the changes)
+    def save_model_and_deposit!(description:, success_message:, unchanged_message: 'No changes made')
+      return failure!(message: invalid_model_message) unless cocina_model.valid?
+      return success!(message: unchanged_message) unless cocina_model.changed?
 
-      @cocina_object = Sdr::VersionService.open(druid:, description:, opening_user_name: user_id)
+      open_new_version_if_needed!(description:)
+      yield if block_given?
+      cocina_model.save!(user_name: user_id, description:)
+      deposit_if_needed!
+      success!(message: success_message)
+    end
+
+    def open_new_version_if_needed!(description:)
+      version_service = Sdr::VersionService.new(druid:)
+      return if version_service.open?
+      raise 'Unable to open new version' unless version_service.openable?
+
+      @cocina_object = version_service.open(description:, opening_user_name: user_id)
       # If the cocina model was already built from the previous cocina object, rebase it on the opened
       # cocina object so that saving does not report a version mismatch.
       @cocina_model&.refresh_cocina_object(@cocina_object)
@@ -110,6 +124,11 @@ module BulkActions
     end
 
     private
+
+    # Subclasses may override to add context.
+    def invalid_model_message
+      cocina_model.errors.full_messages.join('; ')
+    end
 
     def object_type_failure_message(allow_dro: true, allow_collection: true, allow_admin_policy: true)
       allowed_types = [].tap do |types|

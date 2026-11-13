@@ -2,8 +2,8 @@
 
 module BulkActions
   # Job to add a workflow to an object
-  class AddWorkflowJob < ClosingDruidsJob
-    def perform(bulk_action:, druids:, close_version:, workflow_name:)
+  class AddWorkflowJob < DruidsJob
+    def perform(bulk_action:, druids:, workflow_name:, **)
       @workflow_name = workflow_name
       super
     end

@@ -391,7 +391,7 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 
 A bulk action is defined by its configuration in `services/bulk_actions.rb`. Each configuration with a form gets `new` and `create` routes (generated in `routes.rb`) handled by `BulkActions::FormsController`, and is listed in its section of the new bulk actions page.
 
-1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object (see `CODING_STANDARDS.md`).
+1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object (see `CODING_STANDARDS.md`). A job item that changes a cocina model saves it with `BaseJobItem#save_model_and_deposit!`, which opens a version if needed and deposits when the user chose to close versions.
 2. Add configuration to `services/bulk_actions.rb`, in the order it is listed within its section. Set `close_version` if the form offers depositing once the action is complete, and `admin_policy_rule` if only some users may run it.
 3. If the job needs parameters beyond the druids (or CSV) and the form's attributes, add a form (a subclass of `BulkActions::BasicForm` or `BulkActions::BasicCsvForm`) and override `job_params` where its attributes don't map directly to the job's parameters.
 4. If the form has fields beyond the druid list (or CSV upload), add a `views/bulk_actions/<bulk action>/new.html.erb` view; otherwise the default view is used. Add a controller (a subclass of `BulkActions::FormsController`, named by the configuration's `controller`) only when rendering the form needs something the form can't provide, such as options limited to what the user may edit.

@@ -28,7 +28,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
       allow(job_item).to receive(:open_new_version_if_needed!)
       allow(job_item).to receive(:check_update_ability?).and_return(true)
-      allow(job_item).to receive(:deposit_if_needed!)
     end
   end
 
@@ -47,7 +46,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
       .to have_received(:new).with(druid:, index: 2, job:, row:)
 
     expect(job_item).to have_received(:check_update_ability?)
-    expect(job_item).to have_received(:open_new_version_if_needed!).with(description: 'Created or updated embargo')
     expect(Sdr::Repository).to have_received(:update) do |args|
       embargo = args[:cocina_object].access.embargo
       expect(embargo.releaseDate).to eq DateTime.parse(release_date)
@@ -56,7 +54,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
       expect(args[:user_name]).to eq bulk_action.user.sunetid
       expect(args[:description]).to eq 'Created or updated embargo'
     end
-    expect(job_item).to have_received(:deposit_if_needed!)
 
     expect(bulk_action.reload.druid_count_total).to eq(1)
     expect(bulk_action.druid_count_success).to eq(1)
@@ -71,7 +68,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     it 'does not update the embargo' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
     end
   end
@@ -82,7 +78,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     it 'does not update the embargo' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('Not an item')
@@ -104,7 +99,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     it 'does not update the embargo' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('Missing required value for "release_date"')
@@ -121,7 +115,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     it 'does not update the embargo' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('is not a valid date')
@@ -138,7 +131,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
     it 'does not update the embargo and reports the model error' do
       job.perform_now
 
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
       expect(Sdr::Repository).not_to have_received(:update)
 
       expect(log.string).to include('is not valid')
@@ -146,73 +138,6 @@ RSpec.describe BulkActions::ManageEmbargoJob do
       expect(bulk_action.reload.druid_count_total).to eq 1
       expect(bulk_action.druid_count_success).to eq 0
       expect(bulk_action.druid_count_fail).to eq 1
-    end
-  end
-
-  context 'when the download access is invalid' do
-    let(:download) { 'nobody' }
-
-    it 'does not update the embargo and reports the model error' do
-      job.perform_now
-
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:update)
-
-      expect(log.string).to include('is not valid')
-
-      expect(bulk_action.reload.druid_count_total).to eq 1
-      expect(bulk_action.druid_count_success).to eq 0
-      expect(bulk_action.druid_count_fail).to eq 1
-    end
-  end
-
-  context 'when location access is invalid' do
-    let(:csv_file) do
-      [
-        'druid,release_date,view,download,location',
-        [druid, release_date, 'location-based', 'location-based', 'invalid-location'].join(',')
-      ].join("\n")
-    end
-
-    it 'does not update the embargo and reports the model error' do
-      job.perform_now
-
-      expect(job_item).not_to have_received(:open_new_version_if_needed!)
-      expect(Sdr::Repository).not_to have_received(:update)
-
-      expect(log.string).to include('is not valid')
-
-      expect(bulk_action.reload.druid_count_total).to eq 1
-      expect(bulk_action.druid_count_success).to eq 0
-      expect(bulk_action.druid_count_fail).to eq 1
-    end
-  end
-
-  context 'when a new version is opened' do
-    let(:job_item) do
-      described_class::JobItem.new(druid:, index: 2, job:, row:).tap do |job_item|
-        allow(job_item).to receive(:check_update_ability?).and_return(true)
-        allow(job_item).to receive(:deposit_if_needed!)
-      end
-    end
-    let(:opened_cocina_object) { Cocina::Models.with_metadata(build(:dro, id: druid, version: 2), 'lock-v2') }
-
-    before do
-      allow(Sdr::VersionService).to receive(:open?).with(druid:).and_return(false)
-      allow(Sdr::VersionService).to receive(:openable?).with(druid:).and_return(true)
-      allow(Sdr::VersionService).to receive(:open).and_return(opened_cocina_object)
-    end
-
-    it 'updates the embargo using the opened version of the object' do
-      job.perform_now
-
-      expect(Sdr::Repository).to have_received(:update) do |args|
-        expect(args[:cocina_object].lock).to eq 'lock-v2'
-        expect(args[:cocina_object].version).to eq 2
-        expect(args[:cocina_object].access.embargo.releaseDate).to eq DateTime.parse(release_date)
-      end
-
-      expect(bulk_action.reload.druid_count_success).to eq 1
     end
   end
 

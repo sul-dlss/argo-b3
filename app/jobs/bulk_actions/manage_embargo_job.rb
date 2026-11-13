@@ -2,10 +2,10 @@
 
 module BulkActions
   # Job to update/add embargoes to objects
-  class ManageEmbargoJob < ClosingCsvJob
+  class ManageEmbargoJob < BaseCsvJob
     # Update or create an embargo for a single CSV row
     class JobItem < BaseCsvJobItem
-      def perform # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      def perform # rubocop:disable Metrics/AbcSize
         return unless check_update_ability?
         return unless check_object_type?(allow_collection: false, allow_admin_policy: false)
         return unless check_release_date?
@@ -15,17 +15,7 @@ module BulkActions
         cocina_model.embargo_download = row['download'].presence
         cocina_model.embargo_location = row['location'].presence
 
-        unless cocina_model.valid?
-          failure!(message: cocina_model.errors.full_messages.join('; '))
-          return
-        end
-
-        return success!(message: 'No changes made') unless cocina_model.changed?
-
-        open_new_version_if_needed!(description: 'Created or updated embargo')
-        cocina_model.save!(user_name: user_id, description: 'Created or updated embargo')
-        deposit_if_needed!
-        success!(message: 'Embargo updated')
+        save_model_and_deposit!(description: 'Created or updated embargo', success_message: 'Embargo updated')
       end
 
       private

@@ -2,11 +2,11 @@
 
 module BulkActions
   # Job to update license and rights statements
-  class ManageLicenseAndRightsStatementsJob < ClosingDruidsJob
-    def perform(bulk_action:, druids:, close_version: false, # rubocop:disable Metrics/ParameterLists
+  class ManageLicenseAndRightsStatementsJob < DruidsJob
+    def perform(bulk_action:, druids:, # rubocop:disable Metrics/ParameterLists
                 change_copyright: false, copyright: nil,
                 change_license: false, license: nil,
-                change_use_and_reproduction_statement: false, use_and_reproduction_statement: nil)
+                change_use_and_reproduction_statement: false, use_and_reproduction_statement: nil, **)
       @change_copyright = change_copyright
       @copyright = copyright
       @change_license = change_license
@@ -31,20 +31,13 @@ module BulkActions
 
         mutate_cocina_model
 
-        return success!(message: 'No changes made') unless cocina_model.changed?
-
-        open_new_version_if_needed!(description: description_msg)
-        cocina_model.save!(user_name: user_id, description: description_msg)
-        deposit_if_needed!
-
-        success!(message: 'License/copyright/use statement(s) updated successfully')
+        save_model_and_deposit!(
+          description: 'Updated license, copyright statement, and/or use and reproduction statement',
+          success_message: 'License/copyright/use statement(s) updated successfully'
+        )
       end
 
       private
-
-      def description_msg
-        'Updated license, copyright statement, and/or use and reproduction statement'
-      end
 
       def mutate_cocina_model
         if change_use_and_reproduction_statement
