@@ -125,15 +125,15 @@ RSpec.describe SearchResults::Items do
     end
   end
 
-  describe 'facet methods (method missing)' do
+  describe '#facet_counts_for' do
     it 'returns facet counts for non-dynamic facets' do
-      facet_counts = items.access_rights_facet
+      facet_counts = items.facet_counts_for(Search::Facets::ACCESS_RIGHTS)
       expect(facet_counts).to be_a(SearchResults::FacetCounts)
       expect(facet_counts.total_facets).to eq(2)
     end
 
     it 'returns facet counts for dynamic facets' do
-      facet_counts = items.released_to_earthworks_facet
+      facet_counts = items.facet_counts_for(Search::Facets::RELEASED_TO_EARTHWORKS)
       expect(facet_counts).to be_a(SearchResults::DynamicFacetCounts)
     end
   end

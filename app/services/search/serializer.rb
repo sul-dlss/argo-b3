@@ -31,7 +31,7 @@ module Search
 
     def facet_parts
       [].tap do |parts|
-        Search::ItemQueryBuilder::FACETS.each do |facet_config|
+        Search::Facets::ALL.each do |facet_config|
           if facet_config.dynamic_facet.present?
             parts << dynamic_facet_part_for(facet_config:)
           else

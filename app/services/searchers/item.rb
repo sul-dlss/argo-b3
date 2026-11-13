@@ -33,12 +33,6 @@ module Searchers
       Search::Fields::LAST_UPDATED_DATE
     ].freeze
 
-    # Primary facets that are included in the main item search request
-    FACETS = [
-      Search::Facets::CONTENT_TYPES,
-      Search::Facets::OBJECT_TYPES
-    ].freeze
-
     def self.call(...)
       new(...).call
     end
@@ -78,7 +72,7 @@ module Searchers
     end
 
     def facet_json
-      Search::FacetsBuilder.call(facet_configs: FACETS).to_json
+      Search::FacetsBuilder.call(facet_configs: Search::Facets::PRIMARY).to_json
     end
 
     # @return [String] Solr sort value

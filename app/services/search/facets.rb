@@ -4,11 +4,7 @@ module Search
   # Constants for facet configuration
   module Facets # rubocop:disable Metrics/ModuleLength
     def self.find_config_by_form_field(form_field)
-      Search::Facets.constants.each do |const_name|
-        config = Search::Facets.const_get(const_name)
-        return config if config.is_a?(Config) && config.form_field == form_field.to_sym
-      end
-      nil
+      ALL.find { |config| config.form_field == form_field.to_sym }
     end
 
     def self.missing_value?(value)
@@ -17,6 +13,8 @@ module Search
 
     Config = Struct.new('FacetConfig',
                         :form_field,
+                        # How the sidebar loads the facet (see SIDEBAR): :primary, :secondary, :lazy, or nil.
+                        :loading,
                         # Provide if this facet supports excluding values.
                         :exclude_form_field,
                         # True to sort alphabetically, otherwise sort by count.
@@ -30,6 +28,7 @@ module Search
                         :date_from_form_field,
                         :date_to_form_field,
                         # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
+                        # Routes are drawn from this (see ROUTED) and served by Search::FacetsController.
                         # Path helpers are resolved from this plus the search form's route scope.
                         # See Search::FacetPathResolver.
                         :facet_resource,
@@ -63,6 +62,15 @@ module Search
       def facet_field
         composite_facet_field || field
       end
+
+      # Loaded by its own turbo frame request rather than with a search request.
+      def lazy?
+        loading == :lazy
+      end
+
+      def hierarchical?
+        hierarchical_field.present?
+      end
     end
 
     # Facet value for selecting objects without a value for the field (see Config#missing_value).
@@ -76,6 +84,7 @@ module Search
 
     ACCESS_RIGHTS = Config.with_defaults(
       form_field: :access_rights,
+      loading: :secondary,
       field: Search::Fields::ACCESS_RIGHTS,
       exclude_form_field: :access_rights_exclude,
       limit: 50,
@@ -87,6 +96,7 @@ module Search
     # governed by the APO.
     ADMIN_POLICIES = Config.with_defaults(
       form_field: :admin_policy_druids,
+      loading: :secondary,
       field: Search::Fields::APO_DRUID,
       composite_facet_field: Search::Fields::APO_TITLE_DRUID,
       limit: 25,
@@ -101,6 +111,7 @@ module Search
     # in the collection.
     COLLECTIONS = Config.with_defaults(
       form_field: :collection_druids,
+      loading: :secondary,
       field: Search::Fields::COLLECTION_DRUIDS,
       composite_facet_field: Search::Fields::COLLECTION_TITLE_DRUIDS,
       limit: 25,
@@ -110,8 +121,17 @@ module Search
       alpha_sort: true
     )
 
+    CONTENT_TYPES = Config.with_defaults(
+      form_field: :content_types,
+      loading: :primary,
+      field: Search::Fields::CONTENT_TYPES,
+      limit: 25,
+      operator: :or
+    )
+
     DATES = Config.with_defaults(
       form_field: :dates,
+      loading: :secondary,
       field: Search::Fields::PUBLICATION_DATE,
       limit: 25,
       facet_resource: :date_facets,
@@ -120,8 +140,28 @@ module Search
       missing_value: true
     )
 
+    FILE_ROLES = Config.with_defaults(
+      form_field: :file_roles,
+      loading: :secondary,
+      field: Search::Fields::FILE_ROLES,
+      limit: 20,
+      operator: :or
+    )
+
+    GENRES = Config.with_defaults(
+      form_field: :genres,
+      loading: :secondary,
+      field: Search::Fields::GENRES,
+      limit: 25,
+      facet_resource: :genre_facets,
+      facet_index: true,
+      facet_search: true,
+      missing_value: true
+    )
+
     EARLIEST_ACCESSIONED_DATE = Config.with_defaults(
       form_field: :earliest_accessioned_date,
+      loading: :secondary,
       date_from_form_field: :earliest_accessioned_date_from,
       date_to_form_field: :earliest_accessioned_date_to,
       field: Search::Fields::EARLIEST_ACCESSIONED_DATE,
@@ -136,6 +176,7 @@ module Search
 
     EMBARGO_RELEASE_DATE = Config.with_defaults(
       form_field: :embargo_release_date,
+      loading: :secondary,
       date_from_form_field: :embargo_release_date_from,
       date_to_form_field: :embargo_release_date_to,
       field: Search::Fields::EMBARGO_RELEASE_DATE,
@@ -149,6 +190,7 @@ module Search
 
     IDENTIFIERS = Config.with_defaults(
       form_field: :identifiers,
+      loading: :secondary,
       dynamic_facet: {
         has_orcids: "+#{Search::Fields::ORCIDS}:*",
         has_doi: "+#{Search::Fields::DOI}:*",
@@ -156,8 +198,20 @@ module Search
       }
     )
 
+    LANGUAGES = Config.with_defaults(
+      form_field: :languages,
+      loading: :secondary,
+      field: Search::Fields::LANGUAGES,
+      limit: 25,
+      facet_resource: :language_facets,
+      facet_index: true,
+      facet_search: true,
+      missing_value: true
+    )
+
     LAST_ACCESSIONED_DATE = Config.with_defaults(
       form_field: :last_accessioned_date,
+      loading: :secondary,
       date_from_form_field: :last_accessioned_date_from,
       date_to_form_field: :last_accessioned_date_to,
       field: Search::Fields::LAST_ACCESSIONED_DATE,
@@ -172,6 +226,7 @@ module Search
 
     LAST_OPENED_DATE = Config.with_defaults(
       form_field: :last_opened_date,
+      loading: :secondary,
       date_from_form_field: :last_opened_date_from,
       date_to_form_field: :last_opened_date_to,
       field: Search::Fields::LAST_OPENED_DATE,
@@ -186,6 +241,7 @@ module Search
 
     LAST_PUBLISHED_DATE = Config.with_defaults(
       form_field: :last_published_date,
+      loading: :secondary,
       date_from_form_field: :last_published_date_from,
       date_to_form_field: :last_published_date_to,
       field: Search::Fields::LAST_PUBLISHED_DATE,
@@ -206,6 +262,7 @@ module Search
 
     LICENSES = Config.with_defaults(
       form_field: :licenses,
+      loading: :secondary,
       field: Search::Fields::LICENSE_URI,
       composite_facet_field: Search::Fields::LICENSE_LABEL_URI,
       limit: 50,
@@ -213,8 +270,16 @@ module Search
       missing_value: true
     )
 
+    METADATA_SOURCES = Config.with_defaults(
+      form_field: :metadata_sources,
+      loading: :secondary,
+      field: Search::Fields::METADATA_SOURCE,
+      limit: 2
+    )
+
     MIMETYPES = Config.with_defaults(
       form_field: :mimetypes,
+      loading: :secondary,
       field: Search::Fields::MIMETYPES,
       limit: 10,
       facet_resource: :mimetype_facets,
@@ -222,56 +287,9 @@ module Search
       facet_search: true
     )
 
-    CONTENT_TYPES = Config.with_defaults(
-      form_field: :content_types,
-      field: Search::Fields::CONTENT_TYPES,
-      limit: 25,
-      operator: :or
-    )
-
-    FILE_ROLES = Config.with_defaults(
-      form_field: :file_roles,
-      field: Search::Fields::FILE_ROLES,
-      limit: 20,
-      operator: :or
-    )
-
-    FORMATS = Config.with_defaults(
-      form_field: :formats,
-      field: Search::Fields::FORMATS,
-      limit: 100,
-      alpha_sort: true,
-      missing_value: true
-    )
-
-    GENRES = Config.with_defaults(
-      form_field: :genres,
-      field: Search::Fields::GENRES,
-      limit: 25,
-      facet_resource: :genre_facets,
-      facet_index: true,
-      facet_search: true,
-      missing_value: true
-    )
-
-    LANGUAGES = Config.with_defaults(
-      form_field: :languages,
-      field: Search::Fields::LANGUAGES,
-      limit: 25,
-      facet_resource: :language_facets,
-      facet_index: true,
-      facet_search: true,
-      missing_value: true
-    )
-
-    METADATA_SOURCES = Config.with_defaults(
-      form_field: :metadata_sources,
-      field: Search::Fields::METADATA_SOURCE,
-      limit: 2
-    )
-
     MODS_RESOURCE_TYPES = Config.with_defaults(
       form_field: :mods_resource_types,
+      loading: :secondary,
       field: Search::Fields::MODS_RESOURCE_TYPES,
       limit: 100,
       missing_value: true
@@ -279,12 +297,14 @@ module Search
 
     OBJECT_TYPES = Config.with_defaults(
       form_field: :object_types,
+      loading: :primary,
       field: Search::Fields::OBJECT_TYPES,
       operator: :or
     )
 
     PROCESSING_STATUSES = Config.with_defaults(
       form_field: :processing_statuses,
+      loading: :secondary,
       field: Search::Fields::PROCESSING_STATUS,
       limit: 10,
       operator: :or
@@ -292,6 +312,7 @@ module Search
 
     PROJECTS = Config.with_defaults(
       form_field: :projects,
+      loading: :lazy,
       field: Search::Fields::PROJECTS_EXPLODED,
       hierarchical_field: Search::Fields::PROJECTS_HIERARCHICAL,
       alpha_sort: true,
@@ -304,6 +325,7 @@ module Search
 
     REGIONS = Config.with_defaults(
       form_field: :regions,
+      loading: :secondary,
       field: Search::Fields::REGIONS,
       limit: 25,
       facet_resource: :region_facets,
@@ -314,6 +336,7 @@ module Search
 
     REGISTERED_DATE = Config.with_defaults(
       form_field: :registered_date,
+      loading: :secondary,
       date_from_form_field: :registered_date_from,
       date_to_form_field: :registered_date_to,
       field: Search::Fields::REGISTERED_DATE,
@@ -326,8 +349,44 @@ module Search
       }
     )
 
+    TAGS = Config.with_defaults(
+      form_field: :tags,
+      loading: :lazy,
+      field: Search::Fields::OTHER_TAGS_EXPLODED,
+      hierarchical_field: Search::Fields::OTHER_HIERARCHICAL_TAGS,
+      alpha_sort: true,
+      limit: 25,
+      facet_resource: :tag_facets,
+      facet_index: true,
+      facet_children: true,
+      facet_search: true
+    )
+
+    TICKETS = Config.with_defaults(
+      form_field: :tickets,
+      loading: :lazy,
+      field: Search::Fields::TICKETS,
+      alpha_sort: true,
+      limit: 25,
+      facet_resource: :ticket_facets,
+      facet_index: true,
+      facet_search: true
+    )
+
+    TOPICS = Config.with_defaults(
+      form_field: :topics,
+      loading: :secondary,
+      field: Search::Fields::TOPICS,
+      limit: 25,
+      facet_resource: :topic_facets,
+      facet_index: true,
+      facet_search: true,
+      missing_value: true
+    )
+
     RELEASED_TO_EARTHWORKS = Config.with_defaults(
       form_field: :released_to_earthworks,
+      loading: :secondary,
       date_from_form_field: :released_to_earthworks_date_from,
       date_to_form_field: :released_to_earthworks_date_to,
       field: Search::Fields::RELEASED_TO_EARTHWORKS,
@@ -343,6 +402,7 @@ module Search
 
     RELEASED_TO_PURL_SITEMAP = Config.with_defaults(
       form_field: :released_to_purl_sitemap,
+      loading: :secondary,
       date_from_form_field: :released_to_purl_sitemap_date_from,
       date_to_form_field: :released_to_purl_sitemap_date_to,
       field: Search::Fields::RELEASED_TO_PURL_SITEMAP,
@@ -358,6 +418,7 @@ module Search
 
     RELEASED_TO_SEARCHWORKS = Config.with_defaults(
       form_field: :released_to_searchworks,
+      loading: :secondary,
       date_from_form_field: :released_to_searchworks_date_from,
       date_to_form_field: :released_to_searchworks_date_to,
       field: Search::Fields::RELEASED_TO_SEARCHWORKS,
@@ -371,40 +432,18 @@ module Search
       }
     )
 
-    TAGS = Config.with_defaults(
-      form_field: :tags,
-      field: Search::Fields::OTHER_TAGS_EXPLODED,
-      hierarchical_field: Search::Fields::OTHER_HIERARCHICAL_TAGS,
+    FORMATS = Config.with_defaults(
+      form_field: :formats,
+      loading: :secondary,
+      field: Search::Fields::FORMATS,
+      limit: 100,
       alpha_sort: true,
-      limit: 25,
-      facet_resource: :tag_facets,
-      facet_index: true,
-      facet_children: true,
-      facet_search: true
-    )
-
-    TICKETS = Config.with_defaults(
-      form_field: :tickets,
-      field: Search::Fields::TICKETS,
-      alpha_sort: true,
-      limit: 25,
-      facet_resource: :ticket_facets,
-      facet_index: true,
-      facet_search: true
-    )
-
-    TOPICS = Config.with_defaults(
-      form_field: :topics,
-      field: Search::Fields::TOPICS,
-      limit: 25,
-      facet_resource: :topic_facets,
-      facet_index: true,
-      facet_search: true,
       missing_value: true
     )
 
     VERSIONS = Config.with_defaults(
       form_field: :versions,
+      loading: :secondary,
       field: Search::Fields::VERSION,
       limit: 100,
       alpha_sort: true
@@ -412,6 +451,7 @@ module Search
 
     WORKFLOWS = Config.with_defaults(
       form_field: :wps_workflows,
+      loading: :lazy,
       field: Search::Fields::WPS_WORKFLOWS,
       hierarchical_field: Search::Fields::WPS_HIERARCHICAL_WORKFLOWS,
       alpha_sort: false,
@@ -420,5 +460,52 @@ module Search
       facet_index: true,
       facet_children: true
     )
+
+    # Every facet in source order (Module#constants is unordered), the order filters are queried and serialized.
+    ALL = constants.sort_by { |const_name| const_source_location(const_name).last }
+                   .map { |const_name| const_get(const_name) }.grep(Config).freeze
+
+    # The facets shown in the search sidebar, in display order.
+    SIDEBAR = [
+      PROJECTS,
+      TAGS,
+      TICKETS,
+      OBJECT_TYPES,
+      CONTENT_TYPES,
+      COLLECTIONS,
+      ADMIN_POLICIES,
+      MIMETYPES,
+      FILE_ROLES,
+      ACCESS_RIGHTS,
+      PROCESSING_STATUSES,
+      RELEASED_TO_SEARCHWORKS,
+      RELEASED_TO_EARTHWORKS,
+      RELEASED_TO_PURL_SITEMAP,
+      REGISTERED_DATE,
+      LAST_ACCESSIONED_DATE,
+      EARLIEST_ACCESSIONED_DATE,
+      LAST_PUBLISHED_DATE,
+      LAST_OPENED_DATE,
+      EMBARGO_RELEASE_DATE,
+      WORKFLOWS,
+      METADATA_SOURCES,
+      VERSIONS,
+      IDENTIFIERS,
+      LANGUAGES,
+      LICENSES,
+      FORMATS,
+      MODS_RESOURCE_TYPES,
+      DATES,
+      TOPICS,
+      GENRES,
+      REGIONS
+    ].freeze
+
+    # Returned with the item results (Searchers::Item).
+    PRIMARY = SIDEBAR.select { |config| config.loading == :primary }.freeze
+    # Returned by the secondary facets request (Searchers::SecondaryFacet).
+    SECONDARY = SIDEBAR.select { |config| config.loading == :secondary }.freeze
+    # Facets with their own endpoints, drawn as routes in config/routes.rb.
+    ROUTED = ALL.select(&:facet_resource).freeze
   end
 end

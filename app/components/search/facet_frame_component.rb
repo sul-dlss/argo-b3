@@ -1,23 +1,22 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for displaying a facet in a turbo frame
+  # Component for displaying a lazy facet in the turbo frame that replaces its loading frame
   class FacetFrameComponent < ViewComponent::Base
-    def initialize(facet_counts:, search_form:, form_field:,
-                   facet_search_path_helper: nil, facet_path_helper: nil)
+    # @param facet_config [Search::Facets::Config]
+    # @param facet_counts [SearchResults::FacetCounts]
+    # @param search_form [SearchForm]
+    def initialize(facet_config:, facet_counts:, search_form:)
+      @facet_config = facet_config
       @facet_counts = facet_counts
       @search_form = search_form
-      @form_field = form_field
-      @facet_search_path_helper = facet_search_path_helper
-      @facet_path_helper = facet_path_helper
       super()
     end
 
-    attr_reader :facet_counts, :search_form, :form_field, :facet_search_path_helper,
-                :facet_path_helper
+    attr_reader :facet_config, :facet_counts, :search_form
 
     def id
-      helpers.facet_id(form_field)
+      helpers.facet_id(facet_config.form_field)
     end
   end
 end

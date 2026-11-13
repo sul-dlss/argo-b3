@@ -40,6 +40,17 @@ RSpec.describe Searchers::SecondaryFacet do
     end
   end
 
+  describe '.facet_configs_for' do
+    it 'leaves out the primary facets for a view with item results' do
+      expect(described_class.facet_configs_for(ResultsSearchForm.new)).not_to include(Search::Facets::OBJECT_TYPES)
+    end
+
+    it 'adds the primary facets for a view without item results' do
+      expect(described_class.facet_configs_for(WorkflowGridSearchForm.new))
+        .to include(Search::Facets::ACCESS_RIGHTS, Search::Facets::OBJECT_TYPES, Search::Facets::CONTENT_TYPES)
+    end
+  end
+
   context 'with specific permission targets', :solr do
     let(:user) { create(:user, :reader) }
     let(:restricted_apo_druid) { 'druid:bc123df4567' }

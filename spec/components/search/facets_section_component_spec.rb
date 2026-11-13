@@ -18,6 +18,15 @@ RSpec.describe Search::FacetsSectionComponent, type: :component do
       expect(page).to have_css('turbo-frame#projects-facet[src="/search/project_facets"]', text: 'Loading')
       expect(page).to have_css('turbo-frame#tags-facet[src="/search/tag_facets"]', text: 'Loading')
       expect(page).to have_css('turbo-frame#tickets-facet[src="/search/ticket_facets"]', text: 'Loading')
+      expect(page).to have_css('turbo-frame#wps-workflows-facet[src="/search/workflow_facets"]', text: 'Loading')
+    end
+
+    it 'renders the facets in display order' do
+      render_inline(component)
+
+      ids = page.all('turbo-frame, div').pluck(:id).compact_blank
+      expect(ids.first(5)).to eq(%w[projects-facet tags-facet tickets-facet object-types-facet content-types-facet])
+      expect(ids.last).to eq('regions-facet')
     end
   end
 

@@ -38,77 +38,14 @@ Rails.application.routes.draw do
 
       resources :tickets, only: [:index]
 
-      resources :tag_facets, only: [:index] do
-        collection do
-          get 'children'
-          get 'search'
-        end
-      end
-
-      resources :project_facets, only: [:index] do
-        collection do
-          get 'children'
-          get 'search'
-        end
-      end
-
-      resources :ticket_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :collection_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :admin_policy_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :workflow_facets, only: [:index] do
-        collection do
-          get 'children'
-        end
-      end
-
-      resources :mimetype_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :date_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :topic_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :region_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :genre_facets, only: [:index] do
-        collection do
-          get 'search'
-        end
-      end
-
-      resources :language_facets, only: [:index] do
-        collection do
-          get 'search'
+      # One resource per routed facet, keeping its *_facets path helpers; the default tells the controller which facet.
+      Search::Facets::ROUTED.each do |facet_config|
+        resources facet_config.facet_resource, only: facet_config.facet_index ? [:index] : [], controller: 'facets',
+                                               defaults: { facet_form_field: facet_config.form_field.to_s } do
+          collection do
+            get 'children' if facet_config.facet_children
+            get 'search' if facet_config.facet_search
+          end
         end
       end
     end
