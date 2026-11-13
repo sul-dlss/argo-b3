@@ -73,22 +73,23 @@ module BulkActions
       log("Opened new version (#{description})")
     end
 
-    # Deposits the draft if the user asked the job to close versions, or if forced (e.g., redepositing).
+    # Deposits the draft if the user asked the job to close versions.
     # @raise [NotDepositedError] if the draft cannot be deposited (e.g., it has unsaved changes)
-    def deposit_if_needed!(force: false)
-      # Note that force is set for the redeposit job, which doesn't use the close_version param.
+    def deposit_if_needed!
       # Do not close version unless requested to by user (via a job parameter)
-      return unless close_version? || force
+      return unless close_version?
 
       # Do not close the initial version of an object
-      return if cocina_object.version == 1 && !force
+      return if cocina_object.version == 1
 
       return log('Version already closed') if Sdr::VersionService.closed?(druid:)
 
-      # A forced deposit (redeposit) saves nothing first.
-      deposit!(failure_prefix: force ? 'Not deposited' : 'Saved, but not deposited')
+      deposit!(failure_prefix: 'Saved, but not deposited')
     end
 
+    # Deposits the draft, re-finding the object first.
+    # @param failure_prefix [String] begins the error message if the draft cannot be deposited
+    # @raise [NotDepositedError] if the draft cannot be deposited (e.g., it has unsaved changes)
     def deposit!(failure_prefix:)
       # Re-found, since the item's change may have updated the object (e.g., its structure).
       @cocina_object = Sdr::Repository.find(druid:)

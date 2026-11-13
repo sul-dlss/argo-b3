@@ -1,0 +1,16 @@
+<%= form_with model: @bulk_action_form, url: @bulk_action_config.create_path do |form| %>
+  <%= render BulkActions::FormComponent.new(bulk_action_config: @bulk_action_config, form:) do %>
+    <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form, total_results: @total_results, example_druids: @example_druids) %>
+
+    <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :info, classes: 'mt-2') do %>
+      <%= t('bulk_actions.redeposit.note') %>
+    <% end %>
+
+    <%= render Edit::VersionDescriptionComponent.new(
+          form:,
+          container_classes: 'my-field',
+          label_classes: 'fw-bold',
+          help_text: t('bulk_actions.redeposit.fields.version_description.help_text')
+        ) %>
+  <% end %>
+<% end %>

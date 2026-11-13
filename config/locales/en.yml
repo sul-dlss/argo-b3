@@ -879,6 +879,11 @@ en:
     delete_failed: 'Bulk action could not be cleared.'
     delete_success: 'Bulk action successfully deleted.'
     delete_confirm: 'Delete this bulk action from history? Its log and export files will also be deleted. This cannot be undone.'
+    redeposit:
+      note: 'If objects are not already in draft state, a new draft will be opened before depositing.'
+      fields:
+        version_description:
+          help_text: 'The version description will be applied to new versions and to drafts that do not already have one.'
   multi_item_deposit_actions:
     history:
       heading: 'Multi-item deposits'
