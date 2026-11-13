@@ -32,7 +32,7 @@ module Search
 
     # Multi-Item Deposit names already say what they are, so the field label would repeat it.
     def field_label?
-      !query? && !multi_item_deposit?
+      advanced_query? || (!query? && !multi_item_deposit?)
     end
 
     def multi_item_deposit?
@@ -41,11 +41,17 @@ module Search
 
     private
 
+    def advanced_query?
+      query? && search_form.advanced?
+    end
+
     def values_label
       values.map { |value| value_label(value) }.join(' OR ')
     end
 
     def field_label
+      return 'Advanced search' if advanced_query?
+
       helpers.facet_label(form_field)
     end
 

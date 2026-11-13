@@ -36,6 +36,15 @@ class SearchForm < ApplicationForm
 
   delegate :route_scope, to: :class
 
+  def solr_query_parameters
+    { defType: 'dismax' }
+  end
+
+  # Whether the query uses advanced syntax and needs its own input and filter label.
+  def advanced?
+    false
+  end
+
   # @return [Boolean] whether this search can be pinned
   def pinnable?
     false

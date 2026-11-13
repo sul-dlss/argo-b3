@@ -59,6 +59,13 @@ Rails.application.routes.draw do
     end
   end
 
+  scope defaults: { view_form: 'advanced' } do
+    get 'advanced_search', to: 'search#advanced', as: :advanced_search
+    resource :advanced_search, only: [] do
+      concerns :search_endpoints
+    end
+  end
+
   scope defaults: { view_form: 'workflow_grid' } do
     resource :workflow_grid, only: %i[show], controller: 'workflow_grid' do
       concerns :search_endpoints
@@ -71,6 +78,7 @@ Rails.application.routes.draw do
   # Note that the mapping is keyed by model_name, which Blanks derives by stripping the "Form"
   # suffix, so these are named via model_name rather than spelled out.
   resolve(ResultsSearchForm.model_name.name) { |form, options| [:search, form.attributes.merge(options)] }
+  resolve(AdvancedSearchForm.model_name.name) { |form, options| [:advanced_search, form.attributes.merge(options)] }
   resolve(WorkflowGridSearchForm.model_name.name) do |form, options|
     [:workflow_grid, form.attributes.merge(options)]
   end

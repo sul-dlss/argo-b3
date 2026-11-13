@@ -1,0 +1,27 @@
+<%= page_title('Advanced search') %>
+
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
+<%= render Layout::ContainerComponent.new(heading: 'Advanced search') do %>
+  <%= render Search::AdvancedFormComponent.new(search_form: @search_form) %>
+  <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: false, facet_labels: @facet_labels) %>
+
+  <% if @search_form.present? %>
+    <%= render Search::LayoutComponent.new do |layout| %>
+      <%= layout.with_main_content do %>
+        <%= turbo_frame_tag 'items-search', src: advanced_search_items_path(@search_form.attributes),
+                                            data: { controller: 'frame-url',
+                                                    action: 'turbo:frame-load->frame-url#updateURL' } do %>
+          <%= render Search::LoadingItemResultsComponent.new %>
+        <% end %>
+        <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_advanced_search_items_path(@search_form.attributes) %>
+      <% end %>
+      <%= layout.with_sidebar do %>
+        <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
