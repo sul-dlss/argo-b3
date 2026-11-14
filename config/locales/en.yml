@@ -58,6 +58,7 @@ en:
     # If not provided, will use humanized field name
     facets:
       admin_policy_druids: "APO"
+      agreement_druids: "Agreement"
       collection_druids: "Collection"
       earliest_accessioned_date: "First deposited date"
       last_accessioned_date: "Last deposited date"

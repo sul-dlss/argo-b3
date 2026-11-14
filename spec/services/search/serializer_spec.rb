@@ -44,6 +44,14 @@ RSpec.describe Search::Serializer do
     end
   end
 
+  context 'with an agreement' do
+    let(:search_form) { ResultsSearchForm.new(agreement_druids: ['druid:bc123df4567']) }
+
+    it 'includes the agreement' do
+      expect(serialized_query).to eq('Agreement: "druid:bc123df4567"')
+    end
+  end
+
   context 'with Multi-Item Deposits' do
     let(:search_form) { WorkflowGridSearchForm.new(query: 'maps', multi_item_deposit_action_ids: %w[12 13]) }
 

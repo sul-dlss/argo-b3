@@ -33,6 +33,19 @@
     <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
     <% component.with_row(label: 'Embargo', value: @cocina_model.embargo) %>
     <% component.with_row(label: 'License', value: @solr_doc.license_label) %>
+    <% if @solr_doc.agreement? %>
+      <% component.with_row(label: 'APOs with agreement') do |row_component| %>
+        <% row_component.with_cell do %>
+          <% search_form = ResultsSearchForm.new(agreement_druids: [@solr_doc.druid]) %>
+          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
+                label: "View #{pluralize(@admin_policy_count, 'APO')}",
+                variant: 'outline-primary',
+                link: url_for(search_form),
+                size: :sm
+              ) %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 
   <%= render SdrViewComponents::Tables::TableComponent.new(id: 'identification-table', classes: 'mb-5') do |component| %>

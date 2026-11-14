@@ -129,6 +129,15 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with agreement druids (filter query)' do
+    let(:search_form) { ResultsSearchForm.new(agreement_druids: ['druid:bc123df4567']) }
+
+    it 'builds the correct filter query for agreement druids' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include('agreement_ssi:("druid\\:bc123df4567")')
+    end
+  end
+
   context 'with licenses (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(licenses: ['https://creativecommons.org/publicdomain/zero/1.0/legalcode']) }
 
