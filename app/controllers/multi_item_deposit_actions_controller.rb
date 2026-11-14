@@ -7,8 +7,8 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   PREVIOUS_VALUE = 'previous'
   PER_PAGE = 20
 
-  before_action :set_multi_item_deposit_action, only: %i[edit update structural_metadata_csv_template discovery_report
-                                                         structure_report]
+  before_action :set_multi_item_deposit_action, only: %i[edit update destroy structural_metadata_csv_template
+                                                         discovery_report structure_report]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -78,6 +78,19 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
     # Otherwise, deposit step.
     update_deposit
+  end
+
+  # A stale tab may discard a deposit that has since started a step or been submitted; the edit page then shows it.
+  def destroy
+    authorize! @multi_item_deposit_action
+
+    unless @multi_item_deposit_action.discardable?
+      return redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action),
+                         flash: { warning: t('edit.multi_item_deposits.warnings.not_discardable') }
+    end
+
+    @multi_item_deposit_action.discard!
+    redirect_to root_path, status: :see_other, flash: { toast: t('edit.multi_item_deposits.toasts.discarded') }
   end
 
   def structural_metadata_csv_template

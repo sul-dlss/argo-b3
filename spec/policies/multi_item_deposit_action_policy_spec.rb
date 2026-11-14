@@ -48,4 +48,20 @@ RSpec.describe MultiItemDepositActionPolicy, type: :policy do
       it { is_expected.to be false }
     end
   end
+
+  describe '#destroy?' do
+    subject { policy.apply(:destroy?) }
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:user) { owner }
+
+      it { is_expected.to be true }
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:user) { create(:user) }
+
+      it { is_expected.to be false }
+    end
+  end
 end
