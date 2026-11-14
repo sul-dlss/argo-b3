@@ -39,10 +39,13 @@ RSpec.describe Edit::TagsComponent, type: :component do
     expect(page).to have_css('div[role="status"]')
   end
 
-  it 'wires the multiple tags controller to each tag section' do
+  it 'wires the multiple tags controller to each tag section and to submit and tab change' do
     render_inline(component)
 
     expect(page).to have_css('[data-controller="multiple-tags"][data-multiple-tags-has-many-outlet=".tag-fields"]')
+    expect(page).to have_css('[data-controller="multiple-tags"]' \
+                             '[data-action="submit@document->multiple-tags#addPending:capture ' \
+                             'hide.bs.tab@document->multiple-tags#addPending"]')
     expect(page).to have_css('.tag-fields[data-has-many-field-name-value="other_tags"]')
     expect(page).to have_css('.tag-fields[data-has-many-field-name-value="project_tags"]')
     expect(page).to have_css('.tag-fields[data-has-many-field-name-value="ticket_tags"]')

@@ -3,6 +3,7 @@ import { Controller } from '@hotwired/stimulus'
 // Distributes a tab- or newline-delimited list of tags entered in a single text area into the
 // other, project, and ticket has-many sections rendered alongside it.
 //   <div data-controller="multiple-tags"
+//        data-action="submit@document->multiple-tags#addPending:capture hide.bs.tab@document->multiple-tags#addPending"
 //        data-multiple-tags-has-many-outlet=".tag-fields"
 //        data-multiple-tags-section-labels-value='{"other_tags":"Tags", ...}'>
 //     <textarea data-multiple-tags-target="input"></textarea>
@@ -29,7 +30,16 @@ export default class extends Controller {
 
   add (event) {
     event.preventDefault()
+    this.addTags()
+  }
 
+  // Adds typed tags that the user did not add, so that they are not lost on submit or tab change.
+  addPending (event) {
+    if (event.type === 'submit' && event.target !== this.inputTarget.form) return
+    if (this.tags.length > 0) this.addTags()
+  }
+
+  addTags () {
     const counts = new Map()
     this.tags.forEach((tag) => {
       const section = SECTIONS.find(({ pattern }) => pattern.test(tag))

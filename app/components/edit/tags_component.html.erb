@@ -1,4 +1,7 @@
+<%# On the document: a tabbed form's fields are outside its form element; capture adds tags before Turbo reads the form. %>
 <%= tag.div data: { controller: 'multiple-tags',
+                    action: 'submit@document->multiple-tags#addPending:capture ' \
+                            'hide.bs.tab@document->multiple-tags#addPending',
                     multiple_tags_has_many_outlet: tag_fields_selector,
                     multiple_tags_section_labels_value: section_labels } do %>
   <%# No top margin, so the gap below the pane or page heading matches other forms. %>

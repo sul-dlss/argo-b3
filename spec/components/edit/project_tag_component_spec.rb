@@ -10,7 +10,8 @@ RSpec.describe Edit::ProjectTagComponent, type: :component do
   it 'renders a field for the tag that suggests project tags' do
     render_inline(component)
 
-    expect(page).to have_field('item[project_tags_attributes][0][tag]', with: 'Argo : Phase 1')
+    expect(page).to have_field('item[project_tags_attributes][0][tag]', with: 'Argo : Phase 1',
+                                                                        placeholder: 'Start typing a project...')
     expect(page).to have_css('label.visually-hidden', text: 'Project name')
     expect(page).to have_css('input[name="item[project_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \

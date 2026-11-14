@@ -473,6 +473,37 @@ RSpec.describe 'Create an item' do
       end
     end
 
+    it 'adds tags entered at once but not added when the user moves to another tab' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo"
+
+      find_by_id('release-tab').click
+      find_by_id('tags-tab').click
+
+      expect(find_tag_select_item('item[other_tags_attributes][0][tag]')).to have_text('Registered By : mjgiarlo')
+      expect(find_tag_select_item('item[project_tags_attributes][0][tag]')).to have_text('Argo')
+      expect(page).to have_field('Enter multiple tags', with: '')
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_current_path("/objects/#{druid}")
+
+      expect(Sdr::Repository).to have_received(:register) do |args|
+        expect(args[:tags]).to eq(['Registered By : mjgiarlo', 'Project : Argo'])
+      end
+    end
+
     it 'registers a valid cocina object with suggested tags' do
       allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'other'))
                                                         .and_return(['Remediated By : 5.0.0'])
