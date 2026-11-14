@@ -49,6 +49,7 @@ RSpec.describe 'Show APO' do
 
   before do
     create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+    create(:permission, :edit, workgroup: 'sdr:map-staff', target_druid: druid)
 
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([]) # Workflows are tested in show_dro_spec.
     allow(Searchers::AdminPolicyObjectCounts).to receive(:call).and_return(object_counts)
@@ -116,6 +117,12 @@ RSpec.describe 'Show APO' do
     within(find_table_value_cell('overview-table', 'Items governed by APO')) do
       expect(page).to have_link('View 12 items',
                                 href: search_path(admin_policy_druids: [druid], object_types: ['item']))
+    end
+
+    # Permissions table, visible to non-admins
+    within('#permissions-table tbody tr') do
+      expect(page).to have_css('td', text: 'sdr:map-staff')
+      expect(page).to have_css('td', text: 'Edit')
     end
 
     # Tags card

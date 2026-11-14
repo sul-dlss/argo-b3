@@ -62,13 +62,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
     case @solr_doc.object_type
     when 'collection'
-      @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid,
-                                                        user_scope: current_user_scope)
-      render :show_collection_overview, layout: false
+      render_collection_overview
     when 'APO'
-      @object_counts = Searchers::AdminPolicyObjectCounts.call(admin_policy_druid: @solr_doc.druid,
-                                                               user_scope: current_user_scope)
-      render :show_admin_policy_overview, layout: false
+      render_admin_policy_overview
     else
       # This also includes agreements and virtual objects.
       render :show_dro_overview, layout: false
@@ -226,6 +222,24 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  def render_collection_overview
+    @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid,
+                                                      user_scope: current_user_scope)
+    @permission_types_by_workgroup = permission_types_by_workgroup
+    render :show_collection_overview, layout: false
+  end
+
+  def render_admin_policy_overview
+    @object_counts = Searchers::AdminPolicyObjectCounts.call(admin_policy_druid: @solr_doc.druid,
+                                                             user_scope: current_user_scope)
+    @permission_types_by_workgroup = permission_types_by_workgroup
+    render :show_admin_policy_overview, layout: false
+  end
+
+  def permission_types_by_workgroup
+    Permission.highest_permission_type_by_workgroup(target_druid: @solr_doc.druid)
+  end
 
   def deposit_and_respond(cocina_object:) # rubocop:disable Metrics/AbcSize
     Sdr::DepositDraftService.call(cocina_object:, user_name: current_user.sunetid)

@@ -1,0 +1,11 @@
+<div class="mb-5">
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: 'Permissions', classes: 'mb-3') %>
+  <%= render SdrViewComponents::Tables::TableComponent.new(id: 'permissions-table', label: 'Permissions', show_label: false,
+                                                           empty_message: 'No permissions.') do |component| %>
+    <% component.with_header(label: 'Workgroup') %>
+    <% component.with_header(label: 'Permission') %>
+    <% rows.each do |workgroup, permission| %>
+      <% component.with_row(values: [workgroup, permission]) %>
+    <% end %>
+  <% end %>
+</div>

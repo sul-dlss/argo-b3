@@ -43,6 +43,12 @@ en:
       not_found: "does not exist"
       not_in_mount_location: "must be within a mount location"
       permission_denied: "Permission denied"
+  permissions:
+    permission_types:
+      admin: 'Admin'
+      read_restricted: 'Read'
+      read_unrestricted: 'Read unrestricted'
+      edit: 'Edit'
   release_tags:
     earthworks: "EarthWorks (requires geo coordinates or release will not be successful)"
     purl_sitemap: "Search engines"
@@ -918,8 +924,6 @@ en:
           prompt: 'Select or enter a workgroup'
         permission_type:
           label: 'Permission'
-          read_restricted: 'Read'
-          edit: 'Edit'
       buttons:
         add: 'Add'
         delete: 'Delete %{permission} permission for %{workgroup}'
