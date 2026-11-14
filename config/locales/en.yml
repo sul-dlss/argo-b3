@@ -457,6 +457,7 @@ en:
           staging_completed: 'Staging completed'
           staging_failed: 'Staging failed'
           staging_failed_text: 'Contact SDR support at %{email} for assistance.'
+          stacks_staging_failed_text: 'Could not copy %{filepaths} from Stacks into preservation. Upload the files again, or contact SDR support at %{email} for assistance.'
       tabs:
         deposit:
           label: "Register"

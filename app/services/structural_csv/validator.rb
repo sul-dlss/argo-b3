@@ -11,8 +11,7 @@ module StructuralCsv
     end
 
     # @param rows [Array<Row>] the rows for a single object
-    # @param content_file_binaries_by_filepath [Hash<String, ContentFileBinary>] the Content's binaries, with their
-    #   ContentFiles loaded
+    # @param content_file_binaries_by_filepath [Hash<String, ContentFileBinary>] the Content's binaries
     # @param allow_file_deletion [Boolean] whether files omitted from the rows may be deleted
     def initialize(rows:, content_file_binaries_by_filepath:, allow_file_deletion: true)
       @all_rows = rows
@@ -119,26 +118,12 @@ module StructuralCsv
       "Value for \"#{column}\" (\"#{row.value(column)}\") must be yes, no, true, or false"
     end
 
-    # Validates that the filename matches an existing ContentFileBinary (since files cannot be added), and if so,
-    # that its preserve value is allowed.
+    # Validates that the filename matches an existing ContentFileBinary (since files cannot be added).
     def validate_content_file_binary(row)
       return if row.blank?('filename')
+      return if content_file_binaries_by_filepath.key?(row.filename)
 
-      content_file_binary = content_file_binaries_by_filepath[row.filename]
-      if content_file_binary.nil?
-        add_error(row, "#{row.filename} is not an existing file (files cannot be added)")
-      else
-        validate_preserve(row:, content_file_binary:)
-      end
-    end
-
-    # Validates that a deposited file that is not preserved is not changed to preserved, based on the binary's first
-    # existing ContentFile.
-    def validate_preserve(row:, content_file_binary:)
-      return unless row.boolean('preserve') && content_file_binary.file_location_deposited?
-      return unless content_file_binary.content_files.min_by(&:id)&.preserve == false
-
-      add_error(row, "#{row.filename} cannot be changed from preserve=no to preserve=yes")
+      add_error(row, "#{row.filename} is not an existing file (files cannot be added)")
     end
 
     # Validates that no file would be deleted (by being omitted from every row) unless deletion is allowed.

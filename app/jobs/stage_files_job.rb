@@ -110,6 +110,8 @@ class StageFilesJob < ApplicationJob
       FileUtils.cp filepath, staging_filepath
       content_file_binary.file_location_stage!
     end
+    # Before SDR is updated, so that a failure leaves the cocina object unchanged.
+    Contents::StacksStager.call(content:, staging_location:)
   end
 
   # Files deleted while managing files keep their staged copies until the cocina object no longer references them.
@@ -140,9 +142,17 @@ class StageFilesJob < ApplicationJob
     Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
     return unless notify
 
-    broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'),
-                    text: I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email),
+    broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'), text: staging_failed_text(error:),
                     user:, disappearing: false, variant: :red)
+  end
+
+  def staging_failed_text(error:)
+    if error.is_a?(Contents::StacksStager::Error)
+      return I18n.t('edit.items.new.toasts.stacks_staging_failed_text', filepaths: error.filepaths.join(', '),
+                                                                        email: Settings.support_email)
+    end
+
+    I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email)
   end
 
   def set_hb_context
