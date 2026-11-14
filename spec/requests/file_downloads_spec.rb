@@ -33,24 +33,32 @@ RSpec.describe 'File downloads' do
         expect(response.body).to eq('staged content')
         expect(response.headers['Content-Type']).to eq('application/octet-stream')
         expect(response.headers['Content-Disposition']).to start_with('attachment; filename="image1.tif"')
+        expect(controller.response.headers['Content-Length']).to eq('14')
         expect(objects_client).not_to have_received(:content)
       end
     end
 
     context 'when the file is not staged' do
       before do
+        old_content = create(:content, druid:, lock: 'druid-version-1')
+        create(:content_file_binary, content: old_content, filepath: 'folder1/image1.tif', size: 5)
+        content = create(:content, druid:, lock: 'druid-version-2')
+        create(:content_file_binary, content:, filepath: 'folder1/image1.tif', size: 17)
+        create(:content_file_binary, content: create(:content, :mutable, druid:, lock: 'druid-version-2'),
+                                     filepath: 'folder1/image1.tif', size: 9)
         allow(objects_client).to receive(:content) do |on_data:, **|
           on_data.call('preserved ', 10)
           on_data.call('content', 7)
         end
       end
 
-      it 'streams the latest preserved file' do
+      it 'streams the latest preserved file with the size from the newest immutable Content' do
         get "/objects/#{token}/file_download", params: { filepath: 'folder1/image1.tif' }
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to eq('preserved content')
         expect(response.headers['Content-Disposition']).to start_with('attachment; filename="image1.tif"')
+        expect(controller.response.headers['Content-Length']).to eq('17')
         expect(objects_client).to have_received(:content).with(druid:, filepath: 'folder1/image1.tif',
                                                                on_data: an_instance_of(Proc))
       end
@@ -77,17 +85,18 @@ RSpec.describe 'File downloads' do
       let(:stacks_url) { "#{Settings.stacks.file_url}/druid:bc123df4567/folder1/image1.tif" }
 
       before do
+        create(:content_file_binary, content: create(:content, druid:), filepath: 'folder1/image1.tif', size: 17)
         allow(objects_client).to receive(:content).and_raise(Preservation::Client::NotFoundError, 'Not found')
         stub_request(:get, stacks_url).to_return(status: 403, body: 'Forbidden')
       end
 
-      it 'redirects to the object page with an error' do
+      # The browser fails the download, since it ends short of its Content-Length.
+      it 'sends no content' do
         get "/objects/#{token}/file_download", params: { filepath: 'folder1/image1.tif' }
 
-        expect(response).to redirect_to("/objects/#{druid}")
-        expect(response.headers['Content-Disposition']).to be_nil
-        expect(flash[:danger]).to eq('folder1/image1.tif is not available for download. ' \
-                                     'If the object is being accessioned, try again when that has finished.')
+        expect(response).to have_http_status(:ok)
+        expect(controller.response.headers['Content-Length']).to eq('17')
+        expect(response.body).to eq('')
       end
     end
 
