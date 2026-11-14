@@ -108,6 +108,24 @@ class MultiItemDepositAction < ApplicationRecord
     !item_deposit_actions.exists?(initial_version: [false, nil])
   end
 
+  # A deposit can be discarded until it is submitted, but not while a step's jobs are running, since they would fail
+  # once it is gone. Nothing has been changed in SDR before it is submitted.
+  # @return [Boolean] whether the deposit can be discarded
+  def discardable?
+    !submitted_step? && !discovering? && !structuring? && !initiating_depositing?
+  end
+
+  # Destroys the deposit and its Item Deposits, along with their Contents (the files discovered for each item).
+  # A Content that is staging or discovering is kept, since it has been taken up by managing the item's files.
+  def discard!
+    transaction do
+      Content.where(id: item_deposit_actions.select(:content_id))
+             .reject(&:staging_or_discovering?)
+             .each(&:destroy!)
+      destroy!
+    end
+  end
+
   # @return [String, nil] the directory the files are in: the mount path, or the Globus directory on the local
   #   Globus mount
   def files_path

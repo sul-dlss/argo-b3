@@ -397,4 +397,45 @@ RSpec.describe MultiItemDepositAction do
       expect(Content.exists?(content.id)).to be true
     end
   end
+
+  describe '#discardable?' do
+    it 'is true in the discovery, structure, and deposit steps' do
+      expect(described_class.new(step: :discovery)).to be_discardable
+      expect(described_class.new(step: :structure)).to be_discardable
+      expect(described_class.new(step: :deposit)).to be_discardable
+    end
+
+    it 'is false when submitted' do
+      expect(described_class.new(step: :submitted)).not_to be_discardable
+    end
+
+    it 'is false while discovering, structuring, or initiating the deposit' do
+      expect(described_class.new(discovery_state: 'discovering')).not_to be_discardable
+      expect(described_class.new(step: :structure, structuring_state: 'structuring')).not_to be_discardable
+      expect(described_class.new(step: :deposit, initiating_deposit_state: 'initiating_depositing'))
+        .not_to be_discardable
+    end
+  end
+
+  describe '#discard!' do
+    let(:content) { create(:content, :mutable) }
+    let(:staging_content) { create(:content, :mutable, staging_state: 'staging') }
+    let(:other_content) { create(:content, :mutable) }
+
+    before do
+      create(:item_deposit_action, multi_item_deposit_action:, content:)
+      create(:item_deposit_action, multi_item_deposit_action:, content: staging_content)
+      create(:item_deposit_action, multi_item_deposit_action:, content: nil)
+      # Another Multi-Item Deposit's Item Deposit.
+      create(:item_deposit_action, content: other_content)
+    end
+
+    it 'destroys the deposit, its item deposit actions, and their contents that are not staging or discovering' do
+      expect { multi_item_deposit_action.discard! }.to change(ItemDepositAction, :count).by(-3)
+      expect(described_class.exists?(multi_item_deposit_action.id)).to be false
+      expect(Content.exists?(content.id)).to be false
+      expect(Content.exists?(staging_content.id)).to be true
+      expect(Content.exists?(other_content.id)).to be true
+    end
+  end
 end

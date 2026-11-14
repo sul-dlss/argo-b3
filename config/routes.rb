@@ -161,7 +161,7 @@ Rails.application.routes.draw do
 
   resources :multiple_items, only: %i[new create show]
 
-  resources :multi_item_deposit_actions, only: %i[index create show edit update] do
+  resources :multi_item_deposit_actions, only: %i[index create show edit update destroy] do
     get 'structural_metadata_csv_template', on: :member
     get 'discovery_report', on: :member
     get 'structure_report', on: :member
