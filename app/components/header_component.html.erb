@@ -47,7 +47,7 @@
 
     <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Reports') do |dropdown| %>
       <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Custom report', link: report_path) %>
+        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('reports.title'), link: report_path) %>
       <% end %>
       <% dropdown.with_item do %>
         <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Aggregate report', link: '#', disabled: true) %>

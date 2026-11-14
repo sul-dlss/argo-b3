@@ -127,10 +127,10 @@ RSpec.describe HeaderComponent, type: :component do
   end
 
   describe 'reports dropdown' do
-    it 'renders a link to the custom report' do
+    it 'renders a link to the druid report' do
       render_inline(component)
 
-      expect(page).to have_link('Custom report', href: '/report')
+      expect(page).to have_link('Druid report', href: '/report')
     end
 
     it 'renders a disabled link for the aggregate report' do

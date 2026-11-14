@@ -3,7 +3,7 @@
 <%= render Layout::ContainerComponent.new(heading: t('reports.title'), data: { controller: 'report' }) do %>
   <%= form_with model: @report_form, url: download_report_path do |form| %>
     <%= render BulkActions::SelectSourceComponent.new(
-          form:, search_form: @last_search_form, total_results: @total_results,
+          form:, search_form: @last_search_form, total_results: @total_results, example_druids: @example_druids,
           label: 'Select source of items for report',
           radio_action: 'report#updateSubmit',
           druids_radio_data: { report_target: 'sourceRadio' },

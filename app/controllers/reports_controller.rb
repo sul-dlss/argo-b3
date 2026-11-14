@@ -68,7 +68,11 @@ class ReportsController < ApplicationController
   def show
     @report_form = ReportForm.new(fields: FREQUENTLY_USED_FIELDS.map(&:field))
     set_from_last_search_cookie
-    @report_form.source = 'results' if @last_search_form.present?
+    return if @last_search_form.blank?
+
+    @report_form.source = 'results'
+    @example_druids = Searchers::DruidList.call(search_form: @last_search_form.without(:page),
+                                                user_scope: current_user_scope, limit: 6)
   end
 
   def download
