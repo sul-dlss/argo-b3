@@ -37,6 +37,26 @@ class Permission < ApplicationRecord
   after_create_commit :create_created_event
   after_destroy_commit :create_deleted_event
 
+  # @param permission_type [String, Symbol]
+  # @return [String] the label shown to users for the permission type
+  def self.permission_type_label(permission_type)
+    I18n.t("permissions.permission_types.#{permission_type}")
+  end
+
+  # @return [Hash{String => String}] each workgroup's highest permission type (edit over read_restricted)
+  #   targeting the object, ordered by workgroup
+  def self.highest_permission_type_by_workgroup(target_druid:)
+    where(target_druid:, permission_type: %w[read_restricted edit])
+      .order(:workgroup)
+      .pluck(:workgroup, :permission_type)
+      .group_by(&:first)
+      .transform_values { |pairs| pairs.map(&:last).include?('edit') ? 'edit' : 'read_restricted' }
+  end
+
+  def permission_type_label
+    self.class.permission_type_label(permission_type)
+  end
+
   private
 
   def target_druid_present_for_restricted_permission_types

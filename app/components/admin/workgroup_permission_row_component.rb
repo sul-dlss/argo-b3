@@ -18,7 +18,7 @@ module Admin
     end
 
     def permission_label
-      permission.permission_type.humanize
+      permission.permission_type_label
     end
 
     def delete_label

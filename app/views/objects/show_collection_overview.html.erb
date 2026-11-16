@@ -35,4 +35,6 @@
     <% component.with_row(label: 'Copyright', value: @cocina_model.copyright) %>
     <% component.with_row(label: 'Use and reproduction', value: @cocina_model.use_and_reproduction_statement) %>
   <% end %>
+
+  <%= render Show::PermissionsTableComponent.new(permission_types_by_workgroup: @permission_types_by_workgroup) %>
 <% end %>

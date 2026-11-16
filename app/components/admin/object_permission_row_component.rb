@@ -11,7 +11,7 @@ module Admin
     attr_reader :permission
 
     def permission_label
-      t("admin.object_permissions.fields.permission_type.#{permission.permission_type}")
+      permission.permission_type_label
     end
 
     def delete_label

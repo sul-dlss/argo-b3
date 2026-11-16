@@ -39,6 +39,33 @@ RSpec.describe Permission do
     end
   end
 
+  describe '#permission_type_label' do
+    it 'returns a label for every permission type' do
+      labels = described_class.permission_types.keys.map do |permission_type|
+        described_class.new(permission_type:).permission_type_label
+      end
+      expect(labels).to eq(['Admin', 'Read', 'Read unrestricted', 'Edit'])
+    end
+  end
+
+  describe '.highest_permission_type_by_workgroup' do
+    let(:target_druid) { 'druid:bc123df4567' }
+
+    before do
+      create(:permission, :read_restricted, workgroup: 'sdr:smpl-staff', target_druid:)
+      create(:permission, :edit, workgroup: 'sdr:map-staff', target_druid:)
+      create(:permission, :read_restricted, workgroup: 'sdr:map-staff', target_druid:)
+      create(:permission, :edit, workgroup: 'sdr:developer', target_druid:)
+      create(:permission, :edit, workgroup: 'sdr:other-staff', target_druid: 'druid:xy987zw6543')
+      create(:permission, :read_unrestricted, workgroup: 'sdr:argo-access')
+    end
+
+    it 'returns the highest permission type of each workgroup targeting the object, ordered by workgroup' do
+      expect(described_class.highest_permission_type_by_workgroup(target_druid:).to_a)
+        .to eq([%w[sdr:developer edit], %w[sdr:map-staff edit], %w[sdr:smpl-staff read_restricted]])
+    end
+  end
+
   describe 'events' do
     let(:user) { build_stubbed(:user, email_address: 'jdoe@stanford.edu') }
     let(:target_druid) { 'druid:bc123df4567' }

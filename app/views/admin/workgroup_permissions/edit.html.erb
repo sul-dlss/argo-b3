@@ -13,7 +13,7 @@
 
   <%= form_with model: @workgroup_permission_form, url: admin_workgroup_permission_path(@workgroup), method: :patch do |form| %>
     <%# The floated legend is a flex item, so it sits inline before the radios. %>
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: 'Read unrestricted', label_classes: 'mb-0',
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: Permission.permission_type_label(:read_unrestricted), label_classes: 'mb-0',
                                                                classes: 'd-flex align-items-center gap-4 pt-2', legend_classes: 'w-auto mb-0 fs-6') do %>
       <div class="d-flex align-items-center gap-4">
         <%= render SdrViewComponents::Forms::RadioButtonComponent.new(form:, field_name: :read_unrestricted, label_text: 'Yes', input_value: 'true',
