@@ -50,7 +50,7 @@ module Search
     end
 
     def field_label
-      return 'Advanced search' if advanced_query?
+      return t('search.advanced') if advanced_query?
 
       helpers.facet_label(form_field)
     end

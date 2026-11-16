@@ -1,11 +1,11 @@
-<%= page_title('Advanced search') %>
+<%= page_title(t('search.advanced')) %>
 
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
   <meta name="turbo-refresh-scroll" content="preserve">
 <% end %>
 
-<%= render Layout::ContainerComponent.new(heading: 'Advanced search') do %>
+<%= render Layout::ContainerComponent.new(heading: t('search.advanced')) do %>
   <%= render Search::AdvancedFormComponent.new(search_form: @search_form) %>
   <%= render Search::CurrentFiltersComponent.new(search_form: @search_form, pinned: @pinned, facet_labels: @facet_labels) %>
 

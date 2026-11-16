@@ -5,8 +5,6 @@ module Search
   class Serializer
     include ApplicationHelper
 
-    ADVANCED_LABEL = 'Advanced search ❯'
-
     def self.call(...)
       new(...).call
     end
@@ -28,7 +26,8 @@ module Search
       return [] if search_form.query.blank?
 
       # The query has its own quotes, and is grouped so that its operators don't mix with the facets'.
-      ["#{ADVANCED_LABEL} #{search_form.facets_selected? ? "(#{search_form.query})" : search_form.query}"]
+      query = search_form.facets_selected? ? "(#{search_form.query})" : search_form.query
+      ["#{I18n.t('search.advanced')} ❯ #{query}"]
     end
 
     def multi_item_deposit_parts
