@@ -1,9 +1,0 @@
-<div class="toggle-radio mb-3">
-  <div class="btn-group" role="group" aria-label="Select view">
-    <% views.each do |view| %>
-      <%= link_to view[:label], view[:path],
-                  class: class_names('btn rounded-pill', 'active' => view[:selected]),
-                  'aria-current': view[:selected] ? 'page' : nil %>
-    <% end %>
-  </div>
-</div>
