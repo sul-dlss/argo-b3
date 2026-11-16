@@ -38,6 +38,15 @@ RSpec.describe 'PinnedSearches' do
       end
     end
 
+    it 'pins an advanced search separately from the same keyword search' do
+      PinnedSearch.create_from_search_form(search_form:, user:)
+
+      expect do
+        post pinned_searches_path, params: { advanced: true, query: 'test' }
+      end.to change(PinnedSearch, :count).by(1)
+      expect(PinnedSearch.last.to_search_form).to have_attributes(advanced?: true, query: 'test')
+    end
+
     it 'is idempotent when the search is already pinned' do
       PinnedSearch.create_from_search_form(search_form:, user:)
 

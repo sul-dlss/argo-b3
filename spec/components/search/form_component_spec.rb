@@ -15,6 +15,7 @@ RSpec.describe Search::FormComponent, type: :component do
       expect(page).to have_field('Search for', type: :search, with: 'test')
       expect(page).to have_select('Select object type', with_options: ['All object types', 'Item', 'Collection'])
       expect(page).to have_button('Search')
+      expect(page).to have_link('Advanced search', href: '/advanced_search')
     end
   end
 
@@ -53,15 +54,35 @@ RSpec.describe Search::FormComponent, type: :component do
   end
 
   it 'starts a fresh keyword search when the current query is advanced' do
-    render_inline(described_class.new(current_search_form: AdvancedSearchForm.new(query: 'Miller OR octopus'),
+    advanced_search_form = ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus')
+    render_inline(described_class.new(current_search_form: advanced_search_form,
                                       last_search_form: ResultsSearchForm.new(query: 'Miller')))
 
     expect(URI.parse(page.find('form')[:action]).path).to eq('/search')
     expect(page.find_field('Search for').value).to be_blank
   end
 
+  it 'starts a fresh keyword search without facets from an advanced workflow status view' do
+    render_inline(described_class.new(current_search_form: WorkflowGridSearchForm.new(advanced: true,
+                                                                                      query: 'Miller OR octopus',
+                                                                                      projects: ['Google Books'])))
+
+    expect(URI.parse(page.find('form')[:action]).path).to eq('/search')
+    expect(page.find_field('Search for').value).to be_blank
+    expect(page).to have_no_field('projects[]', type: :hidden)
+    expect(page).to have_no_field('advanced', type: :hidden)
+  end
+
+  it 'opens an empty advanced search page from an advanced search' do
+    advanced_search_form = ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Google Books'])
+    render_inline(described_class.new(current_search_form: advanced_search_form))
+
+    expect(page).to have_link('Advanced search', href: '/advanced_search')
+  end
+
   it 'starts a fresh keyword search when the last query was advanced' do
-    render_inline(described_class.new(last_search_form: AdvancedSearchForm.new(query: 'Miller OR octopus')))
+    render_inline(described_class.new(last_search_form: ResultsSearchForm.new(advanced: true,
+                                                                              query: 'Miller OR octopus')))
 
     expect(URI.parse(page.find('form')[:action]).path).to eq('/search')
     expect(page.find_field('Search for').value).to be_blank

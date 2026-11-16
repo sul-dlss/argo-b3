@@ -28,6 +28,19 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
     end
   end
 
+  context 'when an advanced search is pinned' do
+    let(:pinned_searches) do
+      [build(:pinned_search, search_form_attributes: { 'advanced' => true, 'query' => 'Miller OR octopus' })]
+    end
+
+    it 'labels the pin as an advanced search and reopens the Advanced search page' do
+      render_inline(component)
+
+      expect(page).to have_link('Advanced search ❯ Miller OR octopus',
+                                href: '/advanced_search?advanced=true&query=Miller+OR+octopus')
+    end
+  end
+
   context 'when there are no pinned searches' do
     let(:pinned_searches) { [] }
 

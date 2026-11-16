@@ -28,6 +28,16 @@ RSpec.describe Search::CheckboxFacetComponent, type: :component do
     expect(check_section).to have_css('.facet-count', text: '10')
   end
 
+  context 'when the search is advanced' do
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus') }
+
+    it 'filters within the advanced search' do
+      render_inline(component)
+
+      expect(page).to have_css('form[action="/advanced_search?advanced=true"][method="get"]')
+    end
+  end
+
   context 'when there are no facet counts' do
     let(:facet_counts) { [] }
 

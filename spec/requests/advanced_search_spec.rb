@@ -31,12 +31,13 @@ RSpec.describe 'Advanced search' do
     expect(page).to have_css('turbo-frame[src^="/advanced_search/tag_facets?"]')
     expect(page).to have_no_css('turbo-frame#projects-search, turbo-frame#tags-search, turbo-frame#tickets-search')
     expect(page).to have_no_field('object_types[]', type: :hidden)
+    expect(page).to have_link('Workflow status view', href: "/workflow_grid?advanced=true&query=#{CGI.escape(query)}")
   end
 
   it 'redirects direct result requests back to the advanced page' do
     get advanced_search_items_path, params: { query:, page: 2 }
 
-    expect(response).to redirect_to(advanced_search_path(query:, page: 2))
+    expect(response).to redirect_to("/advanced_search?advanced=true&page=2&query=#{CGI.escape(query)}")
   end
 
   context 'with results' do
@@ -51,8 +52,9 @@ RSpec.describe 'Advanced search' do
       get advanced_search_items_path, params: { query: }, headers: { 'Turbo-Frame' => 'items-search' }
 
       expect(response).to have_http_status(:ok)
-      expect(Search::SolrService).to have_received(:post).with(request: hash_including(q: query, defType: 'edismax',
-                                                                                       mm: '0%', 'q.op': 'AND'))
+      expect(Search::SolrService).to have_received(:post)
+        .with(request: hash_including(q: query, defType: 'edismax', mm: '0%', 'q.op': 'AND',
+                                      lowercaseOperators: 'false'))
       page = Capybara.string(response.body)
       pagination_link = page.find('a[href^="/advanced_search/items?"][href*="page=2"]', match: :first)
       pagination_parameters = Rack::Utils.parse_query(URI.parse(pagination_link[:href]).query)

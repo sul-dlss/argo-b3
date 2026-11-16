@@ -22,7 +22,12 @@ module Search
     attr_reader :search_form
 
     def query_parts
-      [quote(search_form.query)].compact_blank
+      return [quote(search_form.query)].compact_blank unless search_form.advanced?
+      return [] if search_form.query.blank?
+
+      # The query has its own quotes, and is grouped so that its operators don't mix with the facets'.
+      query = search_form.facets_selected? ? "(#{search_form.query})" : search_form.query
+      ["#{I18n.t('search.advanced')} ❯ #{query}"]
     end
 
     def multi_item_deposit_parts

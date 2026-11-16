@@ -1,8 +1,8 @@
 <div class="search-bar">
   <nav aria-label="Search form" class="container py-2 mb-3">
     <!-- From component library: https://sul-dlss.github.io/component-library/forms/ -->
-    <search class="search-card d-flex position-relative flex-column py-2 rounded">
-      <%= helpers.form_with model: search_form, scope: '', url:, method: :get, class: 'search-query-form col-md-12 col-lg-8' do |form| %>
+    <search class="search-card d-flex position-relative flex-wrap align-items-center column-gap-3 row-gap-2 py-2 rounded">
+      <%= helpers.form_with model: search_form, scope: '', url:, method: :get, class: 'search-query-form' do |form| %>
         <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_fields: :query) %>
         <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
                                                                 field_name: :object_types,
@@ -32,6 +32,7 @@
           <% end %>
         </div>
       <% end %>
+      <%= link_to t('search.advanced'), advanced_search_path, class: 'text-black text-decoration-underline' %>
     </search>
   </nav>
 </div>

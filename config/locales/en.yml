@@ -92,6 +92,7 @@ en:
       has_doi: 'Has DOI'
       _missing_value: 'No value'
     label: "Search results"
+    advanced: "Advanced search"
   show:
     status:
       assembling:

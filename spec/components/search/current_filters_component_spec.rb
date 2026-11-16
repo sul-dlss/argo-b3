@@ -26,6 +26,18 @@ RSpec.describe Search::CurrentFiltersComponent, type: :component do
     end
   end
 
+  context 'when the search is advanced' do
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Project 1']) }
+
+    it 'pins the advanced search and clears all to an empty advanced search' do
+      render_inline(component)
+
+      expect(page).to have_field('advanced', type: :hidden, with: 'true')
+      expect(page).to have_button('Pin')
+      expect(page).to have_link('Clear all', href: '/advanced_search?advanced=true')
+    end
+  end
+
   context 'when there are no current filters' do
     let(:search_form) { ResultsSearchForm.new }
 

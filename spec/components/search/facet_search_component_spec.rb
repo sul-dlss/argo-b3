@@ -19,6 +19,33 @@ RSpec.describe Search::FacetSearchComponent, type: :component do
     expect(page).to have_field('tags[]', with: 'test : tag', type: 'hidden')
   end
 
+  context 'when the search is advanced' do
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', tags: ['test : tag']) }
+
+    it 'submits facet selections within the advanced search and retains the query and existing selections' do
+      render_inline(component)
+
+      within('form[action="/advanced_search?advanced=true"][method="get"]') do
+        expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+        expect(page).to have_field('tags[]', with: 'test : tag', type: 'hidden')
+      end
+    end
+  end
+
+  context 'when an advanced search is in the workflow status view' do
+    let(:search_form) { WorkflowGridSearchForm.new(advanced: true, query: 'Miller OR octopus', tags: ['test : tag']) }
+
+    it 'submits facet selections to the workflow view with the advanced query and existing selections' do
+      render_inline(component)
+
+      within('form[action="/workflow_grid"][method="get"]') do
+        expect(page).to have_field('advanced', with: 'true', type: 'hidden')
+        expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+        expect(page).to have_field('tags[]', with: 'test : tag', type: 'hidden')
+      end
+    end
+  end
+
   context 'when no facet_search_path_helper is provided' do
     let(:facet_search_path_helper) { nil }
 

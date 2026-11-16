@@ -13,6 +13,32 @@ RSpec.describe Search::FormHiddenFieldsComponent, type: :component do
   end
   let(:form_fields) { :object_types }
 
+  context 'when the search is advanced' do
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Project 1']) }
+
+    it 'retains the advanced query mode along with the query and facets' do
+      render_inline(component)
+
+      expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+      expect(page).to have_field('projects[]', with: 'Project 1', type: 'hidden')
+      expect(page).to have_field('advanced', with: 'true', type: 'hidden')
+    end
+  end
+
+  context 'when an advanced search is in the workflow status view' do
+    let(:search_form) do
+      WorkflowGridSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Project 1'])
+    end
+
+    it 'retains the advanced query mode along with the query and facets' do
+      render_inline(component)
+
+      expect(page).to have_field('advanced', with: 'true', type: 'hidden')
+      expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+      expect(page).to have_field('projects[]', with: 'Project 1', type: 'hidden')
+    end
+  end
+
   context 'when rendering hidden fields for a facet field' do
     it 'renders hidden fields for other search form attributes' do
       render_inline(component)

@@ -36,13 +36,20 @@ class SearchForm < ApplicationForm
 
   delegate :route_scope, to: :class
 
+  # Keyword searches use DisMax, so AND, OR and NOT are ordinary words. Advanced searches use eDisMax
+  # for Boolean operators, parentheses and field expressions.
   def solr_query_parameters
-    { defType: 'dismax' }
+    return { defType: 'dismax' } unless advanced?
+
+    # For advanced search: the server's minimum-should-match (mm) default would require both sides of a
+    # short OR query, so set to 0.  Also set default operator to AND to match requirements and require uppercase.
+    { defType: 'edismax', mm: '0%', 'q.op': 'AND', lowercaseOperators: 'false' }
   end
 
-  # Whether the query uses advanced syntax and needs its own input and filter label.
+  # Whether the query uses advanced (Boolean) syntax. This is a query attribute rather than a view:
+  # it changes which objects match, and it is kept when the search changes views (see #as).
   def advanced?
-    false
+    advanced.present?
   end
 
   # @return [Boolean] whether this search can be pinned
@@ -64,6 +71,7 @@ class SearchForm < ApplicationForm
   end
 
   attribute :query, :string
+  attribute :advanced, :boolean, default: false
   attribute :debug, :boolean, default: false
 
   # Facet fields
@@ -130,7 +138,7 @@ class SearchForm < ApplicationForm
   attribute :wps_workflows, array: true, default: -> { [] }
 
   def blank?
-    attributes.except(*self.class.non_query_attributes).values.all?(&:blank?)
+    attributes.except(*self.class.non_query_attributes, 'advanced').values.all?(&:blank?)
   end
 
   # @return [hash] this form's attributes merged with new_attrs
@@ -174,6 +182,11 @@ class SearchForm < ApplicationForm
     build(self.class, without_attributes(without_attrs))
   end
 
+  # @return [SearchForm] an empty search in the same view, keeping whether it is advanced
+  def cleared
+    self.class.new(advanced: advanced?)
+  end
+
   # Converts this form to another view's form, keeping only attributes that the target class
   # declares. This is how the view toggle crosses form classes; nothing else should need it.
   # @param klass [Class] the target form class
@@ -203,7 +216,7 @@ class SearchForm < ApplicationForm
   end
 
   def facet_attributes
-    attributes.except(*self.class.non_query_attributes, 'query')
+    attributes.except(*self.class.non_query_attributes, 'query', 'advanced')
   end
 
   # The values of a facet whose values are ORed are grouped into a single filter;

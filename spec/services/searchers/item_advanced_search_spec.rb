@@ -23,10 +23,11 @@ RSpec.describe Searchers::Item, :solr do
     'Miller AND NOT ("Miller Library" AND octopus)' =>
       %w[druid:df234gh5678 druid:gh345jk6789 druid:mn567pq8901 druid:pq678rs9012],
     '"Miller Library"' => %w[druid:bc123df4567 druid:df234gh5678 druid:mn567pq8901],
-    'Miller octopus' => %w[druid:bc123df4567 druid:pq678rs9012]
+    'Miller octopus' => %w[druid:bc123df4567 druid:pq678rs9012],
+    'octopus or Harold' => %w[]
   }.each do |query, expected_druids|
     it "matches the Boolean expression #{query}" do
-      results = described_class.call(search_form: AdvancedSearchForm.new(query:), user_scope:)
+      results = described_class.call(search_form: ResultsSearchForm.new(query:, advanced: true), user_scope:)
 
       expect(results.map(&:druid)).to match_array(expected_druids)
     end

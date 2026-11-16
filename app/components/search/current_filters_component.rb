@@ -14,9 +14,9 @@ module Search
 
     delegate :current_filters, :pinnable?, to: :search_form
 
-    # Clearing the filters keeps the user in the view they are currently in.
+    # Clearing the filters keeps the user in the view (and advanced search) they are currently in.
     def clear_all_path
-      url_for(search_form.class.new)
+      url_for(search_form.cleared)
     end
 
     def render?

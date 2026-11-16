@@ -50,12 +50,13 @@ RSpec.describe Search::SortComponent, type: :component do
   end
 
   context 'with an advanced search' do
-    let(:search_form) { AdvancedSearchForm.new(query: 'Miller OR octopus', page: 2) }
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', page: 2) }
 
     it 'visits the full advanced search page and resets pagination when sorting' do
       render_inline(component)
 
-      expect(page).to have_link('Relevance', href: '/advanced_search?query=Miller+OR+octopus&sort=relevance')
+      expect(page).to have_link('Relevance',
+                                href: '/advanced_search?advanced=true&query=Miller+OR+octopus&sort=relevance')
       expect(page.find_link('Relevance')['data-turbo-frame']).to eq('_top')
     end
   end
