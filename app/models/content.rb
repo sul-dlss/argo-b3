@@ -19,6 +19,10 @@ class Content < ApplicationRecord
          .where.not(structuring_state: 'structuring')
   }
 
+  # The steps of managing files, in order. Agreements have no item details step.
+  enum :step, { details: 'details', files: 'files', structure: 'structure', deposit: 'deposit' }, suffix: true,
+                                                                                                  validate: true
+
   # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object
   # @return [Content, nil] the mutable Content for the object's current lock
   def self.mutable_for(cocina_object)

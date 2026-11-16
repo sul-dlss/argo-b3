@@ -82,42 +82,15 @@ class ContentStructureController < ContentsApplicationController
 
   # Replaces the structure with the uploaded CSV. Nothing is changed unless the CSV is entirely valid.
   def upload_csv
-    @structural_csv_form = StructuralCsvForm.new(structural_csv_params)
-    return render_csv_errors unless @structural_csv_form.valid?
-
-    druid_errors = csv_druid_errors
-    return render_csv_errors(druid_errors) if druid_errors.any?
-
-    import_result = @structural_csv_form.import(content: @content)
-    return render_csv_errors(import_result.failure) if import_result.failure?
+    @structural_csv_form = StructuralCsvForm.new(StructuralCsvForm.params_from(params))
+    @structural_csv_form.replace_structure(content: @content)
+    return render_csv_errors if @structural_csv_form.errors.any?
 
     flash[:toast] = t('edit.contents.structure.toasts.csv')
     redirect_to_edit_with_structure_changed
   end
 
-  def structural_csv_params
-    StructuralCsvForm.params_from(params)
-  end
-
-  # Since the CSV is for this object only, every row must have its druid (rather than being grouped by druid, as by
-  # the bulk action). The druids have already been prefixed by CsvUpload::Normalizer.
-  # A missing druid column is reported by StructuralCsv::Import.
-  # @return [Array<StructuralCsv::ValidationError>]
-  def csv_druid_errors
-    @structural_csv_form.numbered_rows.filter_map do |row_number, row|
-      next unless row.headers.include?('druid')
-
-      druid = row['druid'].to_s.strip
-      next if druid == @content.druid
-
-      reason = druid.empty? ? 'Missing druid' : "Druid #{druid} does not match this object"
-      StructuralCsv::ValidationError.new(row_number, reason)
-    end
-  end
-
-  # @param validation_errors [Array<StructuralCsv::ValidationError>]
-  def render_csv_errors(validation_errors = [])
-    @structural_csv_form.add_validation_errors(validation_errors)
+  def render_csv_errors
     set_populator_selection
     render :edit, layout: false, status: :unprocessable_content
   end
