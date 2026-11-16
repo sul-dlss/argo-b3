@@ -38,7 +38,7 @@ RUN apt-get update -qq && \
 # Install JS runtime and package manager needed by cssbundling-rails (sass/postcss via yarn).
 # Build stage only: CSS is compiled during assets:precompile, so the runtime image doesn't need Node.
 # Make sure NODE_VERSION matches the Node version in .node-version
-ARG NODE_VERSION=22.12.0
+ARG NODE_VERSION=22.22.2
 ARG YARN_VERSION=1.22.22
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
