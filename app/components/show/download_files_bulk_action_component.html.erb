@@ -1,0 +1,10 @@
+<div class="mb-3">
+  <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: object_download_files_bulk_action_path(druid_token),
+                                                                  method: :post,
+                                                                  label: t('show.file_sets.buttons.download_files_bulk_action'),
+                                                                  variant: :'outline-primary',
+                                                                  disabled: unavailable_reason.present?) %>
+  <% if unavailable_reason %>
+    <p class="mt-2 mb-0"><%= unavailable_reason %></p>
+  <% end %>
+</div>

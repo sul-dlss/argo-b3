@@ -19,3 +19,6 @@ production:
   content_cleanup:
     class: ContentCleanupJob
     schedule: every day at 3am
+  expired_bulk_actions_cleanup:
+    class: ExpiredBulkActionsCleanupJob
+    schedule: every day at 3:30am

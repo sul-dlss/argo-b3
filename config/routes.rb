@@ -133,6 +133,7 @@ Rails.application.routes.draw do
     end
     resource :technical_metadata, only: %i[show], controller: 'technical_metadata'
     resource :file_download, only: %i[show]
+    resource :download_files_bulk_action, only: %i[create]
     resources :user_versions, only: [], param: :user_version do
       member do
         post 'withdraw'

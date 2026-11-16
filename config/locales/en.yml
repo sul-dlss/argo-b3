@@ -128,6 +128,9 @@ en:
     file_sets:
       buttons:
         download: "Download %{filepath}"
+        download_files_bulk_action: "Start download files bulk action"
+      files_too_large: "The files total %{total_size}, more than the %{max_size} that can be downloaded."
+      no_files_available: "No files are available to download."
     released_to:
       released:
         heading: "Released to"
@@ -154,6 +157,10 @@ en:
       not_goobi_type: "Only image and book items can be redeposited with Goobi."
       republish_failed: "Republish is not possible"
       unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
+  download_files_bulk_actions:
+    create:
+      title: "Download files bulk action created"
+      view_bulk_actions: "View bulk actions"
   user_versions:
     errors:
       update_failed: "Updating the public version failed."

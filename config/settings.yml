@@ -36,6 +36,8 @@ tech_md_service:
 
 bulk_actions:
   directory: "tmp/bulk_jobs"
+  # Bytes; objects whose files total more cannot be downloaded with a Download files bulk action.
+  download_files_max_size: 10737418240 # 10 GB
 
 stacks:
   url: "http://stacks.stanford.edu/image"

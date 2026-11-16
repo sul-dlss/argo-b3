@@ -54,7 +54,9 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                       :controller,
                       # Array of Export for the files created by this bulk action, if any.
                       :exports,
-                      :cancellable) do
+                      :cancellable,
+                      # Duration after creation when the bulk action is destroyed (by ExpiredBulkActionsCleanupJob).
+                      :expires_after) do
                         def initialize(cancellable: true, close_version: false, controller: 'forms', **)
                           super
                         end
@@ -99,7 +101,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
                         end
                       end
 
-  # A file created by a bulk action.
+  # A file created by a bulk action; its filename may be a glob (e.g., '*.zip') when the name varies.
   # When show is true and the file is a CSV, the CSV is displayed as a table on the bulk action show page.
   Export = Struct.new('BulkActionExport', :key, :filename, :label, :show)
 
@@ -408,6 +410,15 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     job: BulkActions::ExportCocinaJsonJob,
     form: BulkActions::BasicForm,
     section: :tags_and_reporting
+  )
+
+  # Started from an object's Files or Structure tab.
+  DOWNLOAD_FILES = register(
+    label: 'Download files',
+    help_text: 'Download a zip of the files of an object.',
+    exports: [Export.new(key: :files, filename: '*.zip', label: 'Files')],
+    job: BulkActions::DownloadFilesJob,
+    expires_after: 7.days
   )
 
   REGISTER_FORM = register(

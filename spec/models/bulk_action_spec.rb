@@ -205,22 +205,60 @@ RSpec.describe BulkAction do
         expect(bulk_action.existing_exports).to be_empty
       end
     end
+
+    context 'when the export filename is a glob' do
+      subject(:bulk_action) { described_class.create!(action_type: :download_files, user:) }
+
+      before do
+        File.write(bulk_action.filepath_for(filename: 'bc123df4567.zip'), 'zip')
+        File.write(bulk_action.filepath_for(filename: 'bc123df4567.zip.part'), 'partial zip')
+      end
+
+      it 'returns an export for each matching file' do
+        expect(bulk_action.existing_exports.map(&:filename)).to eq(['bc123df4567.zip'])
+        expect(bulk_action.existing_exports.map(&:label)).to eq(['Files'])
+      end
+    end
   end
 
   describe '.downloadable_filename?' do
     subject(:bulk_action) { described_class.create!(action_type: :export_cocina_json, user:) }
 
+    before do
+      File.write(bulk_action.export_filepath(:cocina_json), 'Report content')
+    end
+
     it 'allows the log file' do
       expect(bulk_action.downloadable_filename?('log.txt')).to be true
     end
 
-    it 'allows a configured export file' do
+    it 'allows an existing export file' do
       expect(bulk_action.downloadable_filename?('cocina.jsonl.gz')).to be true
     end
 
     it 'does not allow other files' do
       expect(bulk_action.downloadable_filename?('tags.csv')).to be false
       expect(bulk_action.downloadable_filename?('../../secrets.yml')).to be false
+    end
+  end
+
+  describe '#expires_at' do
+    context 'when the bulk action expires' do
+      subject(:bulk_action) do
+        described_class.create!(action_type: :download_files, user:, created_at: Time.zone.parse('2026-11-16 10:00'))
+      end
+
+      it 'returns when it expires' do
+        expect(bulk_action.expires_at).to eq(Time.zone.parse('2026-11-23 10:00'))
+      end
+    end
+
+    context 'when the bulk action does not expire' do
+      subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
+
+      it 'returns nil' do
+        expect(bulk_action.expires_at).to be_nil
+      end
     end
   end
 

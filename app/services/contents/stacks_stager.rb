@@ -86,7 +86,7 @@ module Contents
       download(content_file_binary:, staging_filepath:)
       content_file_binary.file_location_stage!
       true
-    rescue Sdr::StacksFile::NotFoundError, Faraday::Error, IntegrityError => e
+    rescue Sdr::StacksFile::Error, Faraday::Error, IntegrityError => e
       Honeybadger.notify(e, context: { druid:, filepath: content_file_binary.filepath })
       false
     end

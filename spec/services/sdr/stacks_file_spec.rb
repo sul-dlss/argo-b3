@@ -84,6 +84,19 @@ RSpec.describe Sdr::StacksFile do
       end
     end
 
+    context 'when stacks fails' do
+      before do
+        stub_request(:get, url).to_return(status: 500)
+      end
+
+      it 'raises a stacks error without yielding' do
+        expect { stream }.to raise_error(described_class::Error, /Stacks returned 500/) { |error|
+          expect(error).to be_an_instance_of(described_class::Error)
+        }
+        expect(chunks).to be_empty
+      end
+    end
+
     context 'when stacks does not provide the file' do
       before do
         stub_request(:get, url).to_return(status: 403, body: 'Forbidden')
@@ -92,6 +105,108 @@ RSpec.describe Sdr::StacksFile do
       it 'raises without yielding' do
         expect { stream }.to raise_error(described_class::NotFoundError)
         expect(chunks).to be_empty
+      end
+    end
+  end
+
+  describe '.to_file' do
+    let(:url) { "#{Settings.stacks.file_url}/druid:bc123df4567/folder%201/image%201.tif" }
+    let(:destination) { Rails.root.join('tmp/stacks_file_spec.tif').to_s }
+
+    def to_file
+      described_class.to_file(druid: 'druid:bc123df4567', filepath: 'folder 1/image 1.tif', destination:)
+    end
+
+    before do
+      stub_const('Sdr::StacksFile::RETRY_OPTIONS', described_class::RETRY_OPTIONS.merge(interval: 0))
+    end
+
+    after { FileUtils.rm_f(destination) }
+
+    context 'when stacks returns the file' do
+      before do
+        stub_request(:get, url).to_return(status: 200, body: 'stacks content')
+      end
+
+      it 'writes the file' do
+        to_file
+
+        expect(File.read(destination)).to eq('stacks content')
+      end
+    end
+
+    context 'when stacks fails and then returns the file' do
+      before do
+        stub_request(:get, url).to_return({ status: 503 }, { status: 200, body: 'stacks content' })
+      end
+
+      it 'retries' do
+        to_file
+
+        expect(File.read(destination)).to eq('stacks content')
+        expect(a_request(:get, url)).to have_been_made.twice
+      end
+    end
+
+    context 'when the connection fails and then stacks returns the file' do
+      before do
+        stub_request(:get, url).to_raise(Faraday::ConnectionFailed.new('reset'))
+                               .then.to_return(status: 200, body: 'stacks content')
+      end
+
+      it 'retries' do
+        to_file
+
+        expect(File.read(destination)).to eq('stacks content')
+      end
+    end
+
+    context 'when a retried download fails after writing part of the file' do
+      before do
+        attempts = 0
+        stub_request(:get, url).to_return do
+          attempts += 1
+          raise Faraday::ConnectionFailed, 'reset' if attempts == 1
+
+          { status: 200, body: 'stacks content' }
+        end
+        # Simulates a connection dropped after the first chunk was written.
+        allow(File).to receive(:open).and_wrap_original do |original, *args, &block|
+          original.call(*args) do |file|
+            file.write('partial')
+            block.call(file)
+          end
+        end
+      end
+
+      it 'discards the partly written file' do
+        to_file
+
+        expect(File.read(destination)).to eq('stacks content')
+      end
+    end
+
+    context 'when stacks keeps failing' do
+      before do
+        stub_request(:get, url).to_return(status: 503)
+      end
+
+      it 'raises after retrying' do
+        expect { to_file }.to raise_error(described_class::Error) { |error|
+          expect(error).to be_an_instance_of(described_class::Error)
+        }
+        expect(a_request(:get, url)).to have_been_made.times(3)
+      end
+    end
+
+    context 'when stacks does not provide the file' do
+      before do
+        stub_request(:get, url).to_return(status: 404)
+      end
+
+      it 'raises without retrying' do
+        expect { to_file }.to raise_error(described_class::NotFoundError)
+        expect(a_request(:get, url)).to have_been_made.once
       end
     end
   end

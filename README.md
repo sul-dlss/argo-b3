@@ -398,7 +398,7 @@ The workflow grid (labeled "Workflow status") is a view of the current search. I
 
 ### Adding a bulk action
 
-A bulk action is defined by its configuration in `services/bulk_actions.rb`. Each configuration with a form gets `new` and `create` routes (generated in `routes.rb`) handled by `BulkActions::FormsController`, and is listed in its section of the new bulk actions page.
+A bulk action is defined by its configuration in `services/bulk_actions.rb`. Each configuration with a form gets `new` and `create` routes (generated in `routes.rb`) handled by `BulkActions::FormsController`, and is listed in its section of the new bulk actions page. A configuration with `expires_after` is destroyed, with its files, by a recurring job once it has expired.
 
 1. Add a job that is a subclass of `DruidsJob` (or other bulk action superclasses) and a test. Each job item checks the user's permission for its object (see `CODING_STANDARDS.md`). A job item that changes a cocina model saves it with `BaseJobItem#save_model_and_deposit!`, which opens a version if needed and deposits when the user chose to close versions.
 2. Add configuration to `services/bulk_actions.rb`, in the order it is listed within its section. Set `close_version` if the form offers depositing once the action is complete, and `admin_policy_rule` if only some users may run it.
