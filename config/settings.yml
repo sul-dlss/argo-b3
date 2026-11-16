@@ -40,7 +40,8 @@ bulk_actions:
 stacks:
   url: "http://stacks.stanford.edu/image"
   file_url: "https://stacks.stanford.edu/file"
-  # A stacks service token, which downloads with the access of a Stanford user.
+  # A stacks service token. With the download_all claim, it downloads every file (needed to preserve shelved files);
+  # otherwise, it downloads with the access of a Stanford user.
   token: ~
 
 purl:

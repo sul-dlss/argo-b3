@@ -124,8 +124,8 @@ RSpec.describe StructuralCsv::Validator do
       CSV
     end
 
-    it 'returns an error' do
-      expect(reasons).to eq([[2, 'image1.tif cannot be changed from preserve=no to preserve=yes']])
+    it 'returns no errors' do
+      expect(reasons).to be_empty
     end
   end
 
