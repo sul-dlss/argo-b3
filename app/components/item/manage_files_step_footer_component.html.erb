@@ -1,0 +1,26 @@
+<%= render Item::EditTabFooterComponent.new(form_id:, cancel_path:, druid:, draft_actions_presenter:,
+                                            show_deposit: show_deposit?, cancel_data:,
+                                            submit_data: { unassociated_files_target: 'submit' },
+                                            actions_data: { disable_actions_target: 'disableable' }) do |footer| %>
+  <% footer.with_navigation do %>
+    <div class="d-flex align-items-center">
+      <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(label: 'Cancel', link: cancel_path, variant: :link, data: cancel_data) %>
+      <%# A fieldset, so that disabling it (e.g., while uploading) doesn't conflict with disabling Next until there are files. %>
+      <%= tag.fieldset class: 'd-flex', data: { disable_actions_target: 'disableable' } do %>
+        <% if show_previous? %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(form_id:, value: ContentsController::PREVIOUS_VALUE, variant: :'outline-primary', classes: 'ms-2') do %>
+            <%= helpers.left_arrow_icon(aria: { hidden: true }) %> Previous
+          <% end %>
+        <% end %>
+        <% if show_next? %>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(form_id:, value: ContentsController::NEXT_VALUE, classes: 'ms-2', data: next_data) do %>
+            Next <%= helpers.right_arrow_icon(aria: { hidden: true }) %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if files_required %>
+        <span class="ms-2" data-files-required-target="reason"><%= t('edit.contents.edit.files_required') %></span>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

@@ -18,7 +18,12 @@ module Contents
     # @!attribute reasons
     #   @return [Array<Symbol>] the reasons that the populator for the content type is not being used;
     #     empty when it is being used
-    Result = Struct.new(:populator_for_content_type, :actual_populator, :reasons)
+    Result = Struct.new(:populator_for_content_type, :actual_populator, :reasons) do
+      # @return [Boolean] true when the populator for the content type cannot be used
+      def fallback_to_default_model?
+        actual_populator != populator_for_content_type
+      end
+    end
 
     # The populator for content types without a populator of their own, and for when the populator for
     # the content type cannot handle the content.

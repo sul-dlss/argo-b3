@@ -9,6 +9,12 @@ RSpec.describe Contents::Populators::Book do
     build(:dro_with_metadata, id: content.druid).new(access: { view: 'world', download: 'world' })
   end
 
+  describe '.label' do
+    it 'returns the label' do
+      expect(described_class.label).to eq 'Book (resource per page)'
+    end
+  end
+
   describe '.structure' do
     subject(:structure) { described_class.structure(content:, cocina_object:) }
 

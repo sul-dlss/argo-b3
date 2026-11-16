@@ -7,8 +7,8 @@ class ContentFileBinariesController < ContentsApplicationController
   before_action :set_content_file_binary_and_content
 
   def destroy
-    # Deleting is disabled during discovery, so this is a stale page, which the reload of the files sections updates.
-    return render formats: :turbo_stream, status: :conflict if @content.discovering?
+    # Deleting is disabled while busy (e.g., discovery may be adding files), so this is from a stale page.
+    return if refused_while_busy?(@content)
 
     Contents::ContentFileBinaryDestroyer.call(content_file_binaries: [@content_file_binary])
     flash.now[:toast] = t('edit.content_file_binaries.toasts.deleted')

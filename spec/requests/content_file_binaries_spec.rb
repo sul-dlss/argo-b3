@@ -39,12 +39,12 @@ RSpec.describe 'Content file binaries' do
     context 'when discovering files' do
       let(:content) { create(:content, druid: 'druid:bc123df4567', mount_state: 'discovering') }
 
-      it 'does not delete the binary and reloads the files sections without a toast' do
+      it 'does not delete the binary and refreshes the page without a toast' do
         delete(content_content_file_binary_path(content_token, content_file_binary), headers:)
 
         expect(response).to have_http_status(:conflict)
         expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-        expect(response.body).to include('data-controller="frame-reloader"')
+        expect(response.body).to include('<turbo-stream action="refresh"')
         expect(response.body).not_to include('File deleted')
         expect(ContentFileBinary.exists?(content_file_binary.id)).to be true
       end

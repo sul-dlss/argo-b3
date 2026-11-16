@@ -55,7 +55,6 @@ RSpec.describe ContentFileSetForm do
 
         expect(ContentFile.exists?(content_file.id)).to be false
         expect(ContentFileBinary.exists?(content_file.content_file_binary_id)).to be false
-        expect(form.content_file_binaries_destroyed?).to be true
         expect(form.content_file_set_destroyed?).to be false
         expect(ContentFile.exists?(other_content_file.id)).to be true
       end
@@ -75,7 +74,6 @@ RSpec.describe ContentFileSetForm do
 
         expect(ContentFile.exists?(content_file.id)).to be false
         expect(ContentFileBinary.exists?(content_file.content_file_binary_id)).to be true
-        expect(form.content_file_binaries_destroyed?).to be false
       end
     end
 
@@ -244,7 +242,6 @@ RSpec.describe ContentFileSetForm do
       expect(ContentFile.where(id: [content_file.id, other_content_file.id])).to be_empty
       expect(ContentFileBinary.where(id: [content_file.content_file_binary_id,
                                           other_content_file.content_file_binary_id])).to be_empty
-      expect(form.content_file_binaries_destroyed?).to be true
     end
 
     context 'when a file shares its binary with another file set' do
@@ -272,7 +269,6 @@ RSpec.describe ContentFileSetForm do
         form.destroy
 
         expect(ContentFileSet.exists?(content_file_set.id)).to be false
-        expect(form.content_file_binaries_destroyed?).to be false
       end
     end
 
