@@ -13,6 +13,11 @@ class Content < ApplicationRecord
   has_many :content_file_binaries, inverse_of: :content, dependent: :destroy
 
   scope :with_structural_associations, -> { includes(content_file_sets: { content_files: :content_file_binary }) }
+  # The query for not busy?
+  scope :not_busy, lambda {
+    where.not(staging_state: 'staging').where.not(mount_state: 'discovering')
+         .where.not(structuring_state: 'structuring')
+  }
 
   # @param cocina_object [Cocina::Models::DROWithMetadata] the Cocina object
   # @return [Content, nil] the mutable Content for the object's current lock
@@ -74,9 +79,15 @@ class Content < ApplicationRecord
     @hierarchical_filepaths = content_file_binaries.where('cardinality(path_parts) > 0').exists?
   end
 
-  # A background job may change the lock of a Content that is staging or discovering.
-  def staging_or_discovering?
-    staging? || discovering?
+  # A background job may change the lock or the structure of a Content that is busy, so changes are refused.
+  def busy?
+    staging? || discovering? || structuring?
+  end
+
+  # @param append [Boolean] whether to add the unassociated files to the existing resources rather than replacing them
+  def start_structuring!(append:)
+    structuring_started!
+    StructureFilesJob.perform_later(content: self, append:)
   end
 
   # Staging is retried by starting staging again from staging_failed.
@@ -105,6 +116,25 @@ class Content < ApplicationRecord
 
     event :discovery_completed do
       transition discovering: :discovery_not_in_progress
+    end
+  end
+
+  # Structured and structuring_failed are kept until the result has been shown (see structuring_result_shown).
+  state_machine :structuring_state, initial: :structuring_not_in_progress do
+    event :structuring_started do
+      transition %i[structuring_not_in_progress structured structuring_failed] => :structuring
+    end
+
+    event :structuring_completed do
+      transition structuring: :structured
+    end
+
+    event :structuring_errored do
+      transition structuring: :structuring_failed
+    end
+
+    event :structuring_result_shown do
+      transition %i[structured structuring_failed] => :structuring_not_in_progress
     end
   end
 

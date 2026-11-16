@@ -16,7 +16,7 @@ module BulkActions
 
         success!(message: 'Purge successful')
       rescue Sdr::PurgeService::ContentBusyError
-        failure!(message: 'Cannot purge item because its files are being staged or discovered')
+        failure!(message: 'Cannot purge item because its files are being staged, discovered, or structured')
       end
 
       def purge_service

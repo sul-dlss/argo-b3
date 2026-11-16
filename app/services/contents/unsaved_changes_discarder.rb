@@ -47,7 +47,7 @@ module Contents
     end
 
     def check_staging_state!
-      raise ContentBusyError, 'Files are being staged or discovered' if content.staging_or_discovering?
+      raise ContentBusyError, I18n.t('errors.content_busy') if content.busy?
       raise StagingFailedError, 'Staging failed' if content.staging_failed?
     end
 

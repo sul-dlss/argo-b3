@@ -116,12 +116,10 @@ class MultiItemDepositAction < ApplicationRecord
   end
 
   # Destroys the deposit and its Item Deposits, along with their Contents (the files discovered for each item).
-  # A Content that is staging or discovering is kept, since it has been taken up by managing the item's files.
+  # A Content that is busy is kept, since it has been taken up by managing the item's files.
   def discard!
     transaction do
-      Content.where(id: item_deposit_actions.select(:content_id))
-             .reject(&:staging_or_discovering?)
-             .each(&:destroy!)
+      Content.not_busy.where(id: item_deposit_actions.select(:content_id)).find_each(&:destroy!)
       destroy!
     end
   end

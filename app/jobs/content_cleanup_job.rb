@@ -22,11 +22,9 @@ class ContentCleanupJob < ApplicationJob
 
   private
 
-  # Contents that are staging or discovering are skipped, since their lock may be in the process of changing.
+  # Busy Contents are skipped, since their lock may be changing, as are failed stagings, whose files weren't staged.
   def candidate_contents
-    Content.where(created_at: ...MINIMUM_AGE.ago,
-                  staging_state: 'staging_not_in_progress',
-                  mount_state: 'discovery_not_in_progress')
+    Content.not_busy.where(created_at: ...MINIMUM_AGE.ago, staging_state: 'staging_not_in_progress')
   end
 
   # @return [String, nil] the current lock or nil if the object no longer exists
