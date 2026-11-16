@@ -152,6 +152,10 @@ class StageFilesJob < ApplicationJob
                                                                         email: Settings.support_email)
     end
 
+    if error.is_a?(Contents::StacksStager::PreservationNotFoundError)
+      return I18n.t('edit.items.new.toasts.preservation_not_found_text', email: Settings.support_email)
+    end
+
     I18n.t('edit.items.new.toasts.staging_failed_text', email: Settings.support_email)
   end
 

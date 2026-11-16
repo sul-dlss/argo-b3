@@ -139,6 +139,26 @@ RSpec.describe StageFilesJob do
       end
     end
 
+    context 'when Preservation does not have the object' do
+      before do
+        allow(Contents::StacksStager).to receive(:call)
+          .and_raise(Contents::StacksStager::PreservationNotFoundError, 'Preservation does not have the object')
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'does not update SDR and broadcasts an error toast to try again' do
+        job.perform(content:, user:)
+
+        expect(Sdr::Repository).not_to have_received(:update)
+        expect(content.reload.staging_state).to eq('staging_failed')
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+          .with('notifications', user, target: 'toast-container',
+                                       html: a_string_including('Staging failed',
+                                                                'Could not check which files are already preserved',
+                                                                Settings.support_email))
+      end
+    end
+
     context 'when an attached content file binary is not associated with a content file' do
       let!(:unassociated_content_file_binary) do
         create(:content_file_binary, content:, file_location: 'attached', filepath: 'image3.tif')
