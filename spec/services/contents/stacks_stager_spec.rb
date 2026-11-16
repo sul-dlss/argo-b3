@@ -67,14 +67,42 @@ RSpec.describe Contents::StacksStager do
   end
 
   context 'when the object is not in preservation' do
+    let(:stager) { described_class.new(content:, staging_location:) }
+
     before do
       allow(objects_client).to receive(:signature_catalog).and_raise(Preservation::Client::NotFoundError)
+      allow(stager).to receive(:sleep)
     end
 
-    it 'stages the file from Stacks' do
-      stage
+    it 'retries, then raises without trying Stacks' do
+      expect { stager.call }.to raise_error(described_class::PreservationNotFoundError, /#{druid}/)
 
-      expect(File.read(staged_filepath)).to eq('stacks content')
+      expect(objects_client).to have_received(:signature_catalog).exactly(5).times
+      expect(stager).to have_received(:sleep).exactly(4).times
+      expect(a_request(:get, stacks_url)).not_to have_been_made
+      expect(content_file_binary.reload.file_location).to eq('deposited')
+    end
+  end
+
+  context 'when Preservation has the object only on retry' do
+    let(:stager) { described_class.new(content:, staging_location:) }
+    let(:catalog_md5) { stacks_md5 }
+
+    before do
+      responses = [:not_found, signature_catalog]
+      allow(objects_client).to receive(:signature_catalog) do
+        response = responses.shift
+        response == :not_found ? raise(Preservation::Client::NotFoundError) : response
+      end
+      allow(stager).to receive(:sleep)
+    end
+
+    it 'uses the retried signature catalog' do
+      stager.call
+
+      expect(stager).to have_received(:sleep).once
+      expect(a_request(:get, stacks_url)).not_to have_been_made
+      expect(content_file_binary.reload.file_location).to eq('deposited')
     end
   end
 

@@ -17,6 +17,12 @@ module Contents
     # Raised when a file from Stacks does not match the deposited file's MD5.
     class IntegrityError < StandardError; end
 
+    # Raised when Preservation does not have the object, though its deposited files mean it was accessioned.
+    class PreservationNotFoundError < StandardError; end
+
+    # Seconds to wait before each retry of a missing signature catalog (about 90 seconds in all).
+    CATALOG_RETRY_DELAYS = [10, 20, 30, 30].freeze
+
     def self.call(...)
       new(...).call
     end
@@ -29,6 +35,7 @@ module Contents
     end
 
     # @raise [Error] if any file could not be staged
+    # @raise [PreservationNotFoundError] if Preservation does not have the object
     def call
       content_file_binaries = unpreserved_content_file_binaries
       return if content_file_binaries.empty?
@@ -54,11 +61,22 @@ module Contents
 
     # Preservation de-duplicates by signature, so a file is preserved if any preserved content file has its MD5.
     def preserved_md5s
-      @preserved_md5s ||= Preservation::Client.objects.signature_catalog(druid).entries
-                                              .select { |entry| entry.group_id == 'content' }
-                                              .to_set { |entry| entry.signature.md5 }
-    rescue Preservation::Client::NotFoundError
-      Set.new
+      @preserved_md5s ||= signature_catalog.entries
+                                           .select { |entry| entry.group_id == 'content' }
+                                           .to_set { |entry| entry.signature.md5 }
+    end
+
+    # A Preservation web host can cache a new object's Moab as missing for about a minute (NFS), so 404s are retried.
+    def signature_catalog
+      CATALOG_RETRY_DELAYS.each do |delay|
+        return Preservation::Client.objects.signature_catalog(druid)
+      rescue Preservation::Client::NotFoundError
+        sleep(delay)
+      end
+      Preservation::Client.objects.signature_catalog(druid)
+    rescue Preservation::Client::NotFoundError => e
+      # Treating this as nothing preserved would try Stacks for every file, failing for the unshelved ones.
+      raise PreservationNotFoundError, "Preservation does not have #{druid}: #{e.message}"
     end
 
     # @return [Boolean] true if staged
