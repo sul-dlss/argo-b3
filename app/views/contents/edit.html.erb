@@ -172,6 +172,7 @@
 
       <% tab_list.with_pane(SdrViewComponents::TabForm::PaneComponent.new(tab_name: :deposit,
                                                                           label: t('edit.contents.tabs.deposit.label'),
+                                                                          help_text: t('edit.contents.tabs.deposit.help_text'),
                                                                           mark_required: true)) do |pane| %>
         <% pane.with_footer do %>
           <%= render Item::ManageFilesTabFooterComponent.new(pane:, form_id: item_form_id, druid: @contents_item_form.druid, content_token: @content_token,
