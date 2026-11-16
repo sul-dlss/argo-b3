@@ -438,6 +438,26 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
+    it 'shows a validation error for tags entered all at once but not added' do
+      visit_new_multiple_item
+
+      fill_in_registration_settings
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nTicket : ABC-123"
+      fill_in_two_items
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_invalid_feedback('Enter multiple tags',
+                                            'Click "Add tags" to add these tags, or clear this field.')
+      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nTicket : ABC-123")
+
+      expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
+    end
+
     it 'enqueues a register form bulk action with tags entered all at once' do
       visit_new_multiple_item
 

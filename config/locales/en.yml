@@ -567,10 +567,12 @@ en:
         multiple_tags:
           label: 'Enter multiple tags'
           button: 'Add tags'
+          not_added: 'Click "Add tags" to add these tags, or clear this field.'
           help_text: >-
             Enter a list of tags separated by tabs or new lines. You can add Project and Ticket tags here as well.
         other_tag:
           label: 'Tag'
+          placeholder: 'Start typing a tag...'
         overwrite_file_access:
           label: 'Overwrite file-level rights'
           help_text: >-
@@ -584,6 +586,7 @@ en:
           label: 'Do you want to auto-generate captions or transcripts for the media?'
         project_tag:
           label: 'Project name'
+          placeholder: 'Start typing a project...'
         retrieved_title:
           label: 'FOLIO title statement'
         serials:
@@ -603,6 +606,7 @@ en:
             label: "Enter prefix to autogenerate source ID"
         ticket_tag:
           label: 'Ticket'
+          placeholder: 'Start typing a ticket...'
         title:
           label: "Title"
           validations:

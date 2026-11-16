@@ -11,13 +11,21 @@ module TagsFormConcern
     has_many :other_tags
     has_many :project_tags
     has_many :ticket_tags
-    # only used for text entry; text is parsed and added to the tag fields above
+    # Only used for text entry; "Add tags" moves the text into the tag fields above in the browser.
     attribute :multiple_tags, :string
+    validate :multiple_tags_added
 
     after_validation :populate_tags
   end
 
   private
+
+  # Translated when validating, since a symbol or proc message option won't survive FormErrorsSerializer.
+  def multiple_tags_added
+    return if multiple_tags.blank?
+
+    errors.add(:multiple_tags, :present, message: I18n.t('edit.items.fields.multiple_tags.not_added'))
+  end
 
   def populate_tags
     self.tags = (raw_other_tags + raw_project_tags + raw_ticket_tags).compact_blank.uniq

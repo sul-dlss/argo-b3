@@ -473,6 +473,32 @@ RSpec.describe 'Create an item' do
       end
     end
 
+    it 'shows a validation error for tags entered at once but not added' do
+      visit new_item_path
+
+      fill_in 'Source ID', with: 'new:source-id'
+
+      find_by_id('description-tab').click
+      fill_in 'Title', with: 'The Title'
+
+      find_by_id('rights-tab').click
+      select apo_title, from: 'APO'
+
+      find_by_id('tags-tab').click
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo"
+
+      find_by_id('deposit-tab').click
+      click_button('Register only')
+
+      expect(page).to have_css('#tags-tab.is-invalid')
+      find_by_id('tags-tab').click
+      expect(page).to have_invalid_feedback('Enter multiple tags',
+                                            'Click "Add tags" to add these tags, or clear this field.')
+      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo")
+
+      expect(Sdr::Repository).not_to have_received(:register)
+    end
+
     it 'registers a valid cocina object with suggested tags' do
       allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'other'))
                                                         .and_return(['Remediated By : 5.0.0'])
