@@ -75,6 +75,13 @@
         <% end %>
       <% end %>
 
+      <% if @goobi_redeposit_presenter.show? %>
+        <%= render Elements::ButtonListComponent.new(title: 'Update', classes: 'mt-4') do |component| %>
+          <% component.with_button(link: @goobi_redeposit_presenter.path, method: :post, label: 'Redeposit with Goobi',
+                                   variant: 'outline-primary', disabled: !@goobi_redeposit_presenter.available?) %>
+        <% end %>
+      <% end %>
+
       <% if @solr_doc.object_type?('APO', 'collection') && allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
         <%= render Elements::ButtonListComponent.new(title: 'Admin', classes: 'mt-4') do |component| %>
           <% component.with_button(link: admin_object_permissions_path(@solr_doc.druid), label: 'Manage permissions', variant: 'outline-primary') %>

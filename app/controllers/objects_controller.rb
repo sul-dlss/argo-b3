@@ -50,6 +50,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
+    @goobi_redeposit_presenter = GoobiRedepositPresenter.new(cocina_object: @cocina_object,
+                                                             available: goobi_redeposit_available?(version_service))
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
@@ -204,6 +206,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     toast_and_refresh(t('show.toasts.republish_started'), fallback_location: object_path(druid:))
   end
 
+  def redeposit_with_goobi
+    cocina_object = Sdr::Repository.find(druid: druid_param)
+    authorize! cocina_object, to: :update?, with: ObjectPolicy
+
+    redeposit_with_goobi_and_respond(cocina_object:)
+  end
+
   def deposit
     cocina_object = Sdr::Repository.find(druid: druid_param)
     authorize! cocina_object, to: :update?, with: ObjectPolicy
@@ -263,6 +272,21 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     redirect_to object_path(druid_param), flash: { danger: t('show.errors.deposit_failed') }
   end
 
+  def redeposit_with_goobi_and_respond(cocina_object:) # rubocop:disable Metrics/AbcSize
+    Sdr::GoobiRedepositService.call(cocina_object:, user_name: current_user.sunetid)
+    toast_and_refresh(t('show.toasts.goobi_redeposit_started'), fallback_location: object_path(druid_param))
+  rescue Sdr::GoobiRedepositService::NotGoobiTypeError
+    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.not_goobi_type') }
+  rescue Sdr::GoobiRedepositService::GoobiProcessingError
+    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.goobi_processing') }
+  rescue Sdr::GoobiRedepositService::ActiveWorkflowError
+    redirect_to object_path(druid_param), flash: { warning: t('show.warnings.active_workflow') }
+  rescue Sdr::Repository::Error => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: druid_param })
+    redirect_to object_path(druid_param), flash: { danger: t('show.errors.goobi_redeposit_failed') }
+  end
+
   def discard_draft_and_redirect(cocina_object:) # rubocop:disable Metrics/AbcSize
     druid = cocina_object.externalIdentifier
     Sdr::DiscardDraftService.call(cocina_object:)
@@ -311,6 +335,14 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
     full_cocina_object = CocinaSupport.build_from_cocina_hash(fetch_full_cocina_hash(druid).dup)
     Contents::UnsavedChanges.call(content:, cocina_object: full_cocina_object)
+  end
+
+  # Type and permission are checked first, so that only image and book Items the user can update trigger the DSA
+  # workflows request.
+  def goobi_redeposit_available?(version_service)
+    Sdr::GoobiRedepositService.goobi_type?(@cocina_object) &&
+      allowed_to?(:update?, @solr_doc, with: ObjectPolicy) &&
+      Sdr::GoobiRedepositService.available?(version_service:)
   end
 
   def republishable?

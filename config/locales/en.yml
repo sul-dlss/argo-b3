@@ -137,17 +137,22 @@ en:
       deposit_failed: "Depositing failed."
       file_not_available: "%{filepath} is not available for download. If the object is being accessioned, try again when that has finished."
       discard_failed: "Discarding the draft failed."
+      goobi_redeposit_failed: "The Goobi workflow could not be started. Try again, or contact SDR support if the problem continues."
       purge_failed: "Purging failed."
     toasts:
       deposit_started: "Deposit started."
       draft_discarded: "Draft discarded."
+      goobi_redeposit_started: "Goobi workflow started."
       purged: "Object purged."
       republish_started: "Republishing started"
     warnings:
+      active_workflow: "This object has an active workflow. Try again when it has finished."
       cannot_purge: "This object cannot be purged because it has been submitted."
       content_busy: "Files for this object are being staged, discovered, or structured. Try again when that has finished."
+      goobi_processing: "Goobi is already processing this version. Try again after Goobi has deposited it."
       not_depositable: "This draft cannot be deposited."
       not_discardable: "This draft cannot be discarded."
+      not_goobi_type: "Only image and book items can be redeposited with Goobi."
       republish_failed: "Republish is not possible"
       unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
   user_versions:
