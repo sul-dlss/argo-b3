@@ -420,21 +420,24 @@ RSpec.describe MultiItemDepositAction do
   describe '#discard!' do
     let(:content) { create(:content, :mutable) }
     let(:staging_content) { create(:content, :mutable, staging_state: 'staging') }
+    let(:structuring_content) { create(:content, :mutable, structuring_state: 'structuring') }
     let(:other_content) { create(:content, :mutable) }
 
     before do
       create(:item_deposit_action, multi_item_deposit_action:, content:)
       create(:item_deposit_action, multi_item_deposit_action:, content: staging_content)
+      create(:item_deposit_action, multi_item_deposit_action:, content: structuring_content)
       create(:item_deposit_action, multi_item_deposit_action:, content: nil)
       # Another Multi-Item Deposit's Item Deposit.
       create(:item_deposit_action, content: other_content)
     end
 
-    it 'destroys the deposit, its item deposit actions, and their contents that are not staging or discovering' do
-      expect { multi_item_deposit_action.discard! }.to change(ItemDepositAction, :count).by(-3)
+    it 'destroys the deposit, its item deposit actions, and their contents that are not busy' do
+      expect { multi_item_deposit_action.discard! }.to change(ItemDepositAction, :count).by(-4)
       expect(described_class.exists?(multi_item_deposit_action.id)).to be false
       expect(Content.exists?(content.id)).to be false
       expect(Content.exists?(staging_content.id)).to be true
+      expect(Content.exists?(structuring_content.id)).to be true
       expect(Content.exists?(other_content.id)).to be true
     end
   end

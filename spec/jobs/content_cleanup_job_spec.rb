@@ -86,16 +86,19 @@ RSpec.describe ContentCleanupJob do
     end
   end
 
-  context 'when old contents with stale locks are staging or discovering' do
+  context 'when old contents with stale locks are staging, discovering, or structuring' do
     let!(:staging_content) { create_old_content(druid:, lock: stale_lock, staging_state: 'staging') }
     let!(:discovering_content) do
       create_old_content(druid: other_druid, lock: stale_lock, mount_state: 'discovering')
+    end
+    let!(:structuring_content) do
+      create_old_content(druid: 'druid:df789gh1234', lock: stale_lock, structuring_state: 'structuring')
     end
 
     it 'keeps the contents' do
       job.perform
 
-      expect(Content.all).to contain_exactly(staging_content, discovering_content)
+      expect(Content.all).to contain_exactly(staging_content, discovering_content, structuring_content)
     end
   end
 

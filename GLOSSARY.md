@@ -142,5 +142,8 @@ A Content being edited (uploads, discovery, reordering, structural CSV import); 
 ### Unsaved Changes
 Changes to a Mutable Content that have not been staged to the cocina object, such as new files or edited resources. Saving as a draft or depositing from manage files stages them; canceling manage files or discarding the Draft deletes them.
 
+### Structuring
+Building the Resources of a Mutable Content from its files with a model chosen by content type (e.g., the Book model makes a Resource per page). When the content type's model can't be used (e.g., a book whose files are in folders), the Default model (a Resource per file) is used. **Re-structuring** replaces the existing Resources; **appending** adds only the files not yet in a Resource. Use "model" rather than "populator" with users.
+
 ### Staging
 Saving a mutable Content to the cocina object (`StageFilesJob`): `CocinaObjectMutators::StructuralMutator` rebuilds the cocina structural metadata from the Content and `Sdr::Repository.update` saves it. When depositing, the Content becomes immutable for the new lock and accessioning starts; when saving as a draft, the Content stays mutable and moves to the new lock.

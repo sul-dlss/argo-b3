@@ -306,7 +306,8 @@ CREATE TABLE public.contents (
     mount_state character varying DEFAULT 'discovery_not_in_progress'::character varying NOT NULL,
     perform_ocr boolean DEFAULT false NOT NULL,
     ocr_languages jsonb DEFAULT '[]'::jsonb NOT NULL,
-    perform_speech_to_text boolean DEFAULT false NOT NULL
+    perform_speech_to_text boolean DEFAULT false NOT NULL,
+    structuring_state character varying DEFAULT 'structuring_not_in_progress'::character varying NOT NULL
 );
 
 
@@ -1198,6 +1199,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261113120000'),
 ('20261103120000'),
 ('20261029120000'),
 ('20261028120000'),

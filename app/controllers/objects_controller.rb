@@ -56,7 +56,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @pinned = PinnedObject.exists?(druid:, user: current_user)
   end
 
-  def show_overview # rubocop:disable Metrics/AbcSize
+  def show_overview
     @solr_doc = SolrDocPresenter.new(solr_doc: fetch_solr_doc(verified_druid))
     @cocina_model = CocinaModels::PresenterFactory.build_from_cocina_hash(fetch_cocina_hash(verified_druid))
 

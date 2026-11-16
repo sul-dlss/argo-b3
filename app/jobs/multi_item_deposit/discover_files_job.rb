@@ -73,7 +73,7 @@ module MultiItemDeposit
 
     # An existing mutable Content would conflict with the new one (unique index on druid, lock, and immutable).
     def check_existing_content
-      add_error(:content_in_progress) if existing_content&.staging? || existing_content&.discovering?
+      add_error(:content_in_progress) if existing_content&.busy?
     end
 
     def discover!
