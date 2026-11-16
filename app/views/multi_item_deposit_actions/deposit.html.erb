@@ -34,6 +34,7 @@
         <%= left_arrow_icon(aria: { hidden: true }) %> <%= t('edit.multi_item_deposits.edit.buttons.previous') %>
       <% end %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.deposit')) %>
+      <%= render MultiItemDeposit::DiscardButtonComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
   <% end %>
 <% end %>

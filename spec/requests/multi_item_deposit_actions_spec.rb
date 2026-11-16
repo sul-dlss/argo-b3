@@ -252,6 +252,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_no_css('table[aria-label="Error details"]')
         expect(rendered_page).to have_button('Next', disabled: true)
         expect(rendered_page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
+        expect(rendered_page).to have_link('Discard', href: multi_item_deposit_action_path(multi_item_deposit_action))
       end
 
       it 'renders the file location choices in order' do
@@ -368,6 +369,7 @@ RSpec.describe 'Multi-item deposit actions' do
         )
         expect(rendered_page).to have_css('button i.bi-arrow-left[aria-hidden="true"]')
         expect(rendered_page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')
+        expect(rendered_page).to have_link('Discard', href: multi_item_deposit_action_path(multi_item_deposit_action))
       end
 
       it 'renders the OCR inputs when an Item Deposit can be OCRed' do
@@ -519,6 +521,8 @@ RSpec.describe 'Multi-item deposit actions' do
           expect(rendered_page).to have_button('Previous')
           expect(rendered_page).to have_css('button i.bi-arrow-left[aria-hidden="true"]')
           expect(rendered_page).to have_button('Check version status and deposit')
+          expect(rendered_page).to have_link('Discard',
+                                             href: multi_item_deposit_action_path(multi_item_deposit_action))
         end
       end
 
@@ -1244,6 +1248,70 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(multi_item_deposit_action.reload.description).to eq('My deposit')
         expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
+  describe 'destroy' do
+    let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'structure') }
+    let(:content) { create(:content, :mutable) }
+    let!(:item_deposit_action) { create(:item_deposit_action, multi_item_deposit_action:, content:) }
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:owner) { user }
+
+      it 'discards the deposit and its contents and redirects to the dashboard' do
+        delete multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(root_path)
+        expect(response).to have_http_status(:see_other)
+        expect(flash[:toast]).to eq('Multi-item deposit discarded.')
+        expect(MultiItemDepositAction.exists?(multi_item_deposit_action.id)).to be false
+        expect(ItemDepositAction.exists?(item_deposit_action.id)).to be false
+        expect(Content.exists?(content.id)).to be false
+      end
+    end
+
+    context 'when discovery is in progress' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, discovery_state: 'discovering')
+      end
+
+      it 'does not discard the deposit and redirects to the edit page with a warning' do
+        delete multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+        expect(flash[:warning]).to eq("This multi-item deposit can't be discarded while it is being processed " \
+                                      'or after it has been submitted.')
+        expect(MultiItemDepositAction.exists?(multi_item_deposit_action.id)).to be true
+        expect(Content.exists?(content.id)).to be true
+      end
+    end
+
+    context 'when the multi-item deposit action has been submitted' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) { create(:multi_item_deposit_action, user: owner, step: 'submitted') }
+
+      it 'does not discard the deposit and redirects to the edit page with a warning' do
+        delete multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+        expect(flash[:warning]).to eq("This multi-item deposit can't be discarded while it is being processed " \
+                                      'or after it has been submitted.')
+        expect(MultiItemDepositAction.exists?(multi_item_deposit_action.id)).to be true
+      end
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:owner) { create(:user) }
+
+      it 'denies access and does not discard the deposit' do
+        delete multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:toast]).to be_nil
+        expect(MultiItemDepositAction.exists?(multi_item_deposit_action.id)).to be true
       end
     end
   end

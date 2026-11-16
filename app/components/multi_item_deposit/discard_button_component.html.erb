@@ -1,0 +1,10 @@
+<%# A link rather than a form, since the button is inside the step's form. %>
+<%# Design standard deviation: BTN-3 (primary action last). As in the issue's design and the item edit footer's Discard draft, Discard is set apart at the right of the footer. %>
+<%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
+      link: path,
+      variant: :'outline-primary',
+      classes: 'ms-auto',
+      data: { turbo_method: :delete, turbo_confirm: confirm }
+    ) do %>
+  <%= helpers.delete_icon(classes: 'me-1', aria: { hidden: true }) %><%= t('edit.multi_item_deposits.edit.buttons.discard') %>
+<% end %>

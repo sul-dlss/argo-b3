@@ -110,6 +110,7 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, disabled: !next_enabled) do %>
         <%= t('edit.multi_item_deposits.edit.buttons.next') %> <%= right_arrow_icon(aria: { hidden: true }) %>
       <% end %>
+      <%= render MultiItemDeposit::DiscardButtonComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
   <% end %>
 

@@ -621,6 +621,10 @@ en:
         buttons:
           build_structure: "Check files"
           deposit: "Check version status and deposit"
+          discard: "Discard"
+          discard_confirm: >-
+            Discard %{name}? Its results and the files discovered for its items will be deleted from Argo;
+            files on the mount or in Globus are not deleted. This cannot be undone.
           discover: "Discover files and check manifest"
           next: "Next"
           previous: "Previous"
@@ -694,8 +698,12 @@ en:
         version_description:
           help_text: "The version description will only be applied to items that do not already have one."
           initial_version_help_text: "Version description is automatically set for initial deposits."
+      toasts:
+        discarded: "Multi-item deposit discarded."
       wait:
         message: "Processing %{name}..."
+      warnings:
+        not_discardable: "This multi-item deposit can't be discarded while it is being processed or after it has been submitted."
     multiple_items:
       errors:
         failed: "An error occurred while validating your registrations. Please try again."
