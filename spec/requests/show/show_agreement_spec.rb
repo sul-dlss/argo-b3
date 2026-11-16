@@ -76,4 +76,26 @@ RSpec.describe 'Show agreement' do
     expect(rendered_page).to have_css('.nav-link', text: 'Events')
     expect(rendered_page).to have_css('#events-pane turbo-frame[src*="/events"]')
   end
+
+  describe 'GET /objects/:druid/overview' do
+    let(:admin_policy_count) { 1234 }
+    let(:token) do
+      Rails.application.message_verifier(:argo).generate(druid, purpose: 'show', expires_at: 1.week.from_now.end_of_day)
+    end
+
+    before do
+      allow(Search::SolrService).to receive(:post).and_return({ 'response' => { 'numFound' => admin_policy_count } })
+    end
+
+    it 'links to a search for the APOs with the agreement' do
+      get "/objects/#{token}/overview"
+
+      expect(response).to have_http_status(:ok)
+      rendered_page = Capybara.string(response.body)
+      apo_count_row = rendered_page.find('#apo-collection-rights-table tr', text: 'APOs with agreement')
+      expect(apo_count_row).to have_link('View 1234 APOs', href: '/search?agreement_druids%5B%5D=druid%3Abb123cd4567')
+      expect(Search::SolrService).to have_received(:post)
+        .with(request: hash_including(q: 'agreement_ssi:"druid:bb123cd4567"', rows: 0))
+    end
+  end
 end

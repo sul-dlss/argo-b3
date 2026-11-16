@@ -11,23 +11,13 @@
       <% component.with_row(label: 'Collections governed by APO') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['collection']) %>
-          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
-                label: "View #{pluralize(@object_counts.collection_count, 'collection')}",
-                variant: 'outline-primary',
-                link: url_for(search_form),
-                size: :sm
-              ) %>
+          <%= render Show::SearchCountComponent.new(count: @object_counts.collection_count, noun: 'collection', search_form:) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Items governed by APO') do |row_component| %>
         <% row_component.with_cell do %>
           <% search_form = ResultsSearchForm.new(admin_policy_druids: [@solr_doc.druid], object_types: ['item']) %>
-          <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(
-                label: "View #{pluralize(@object_counts.item_count, 'item')}",
-                variant: 'outline-primary',
-                link: url_for(search_form),
-                size: :sm
-              ) %>
+          <%= render Show::SearchCountComponent.new(count: @object_counts.item_count, noun: 'item', search_form:) %>
         <% end %>
       <% end %>
       <% component.with_row(label: 'Registered', value: format_datetime(@solr_doc.formatted_registered_earliest_date, format: :date_time)) %>

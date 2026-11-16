@@ -106,6 +106,12 @@ module Search
       alpha_sort: true
     )
 
+    # A filter only, not shown as a facet: used for links from the agreement show page to its APOs.
+    AGREEMENTS = Config.with_defaults(
+      form_field: :agreement_druids,
+      field: Search::Fields::AGREEMENT_DRUID
+    )
+
     # Facets and filters on the druid (a title is not a unique identifier), but displays the title
     # via the composite field. Also used for direct links from the Collection show page for items
     # in the collection.

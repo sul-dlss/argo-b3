@@ -270,6 +270,8 @@ RSpec.describe 'Show item' do
       expect(page).to have_link('All objects with this collection',
                                 href: search_path(collection_druids: ['druid:dd123cd4589']))
     end
+    # Only agreements count the APOs with them
+    expect(find_table('apo-collection-rights-table')).to have_no_css('th', text: 'APOs with agreement')
 
     # Thumbnail
     expect(page).to have_css('img.thumbnail', visible: :all)
