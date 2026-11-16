@@ -43,6 +43,17 @@ RSpec.describe WorkflowGrid::WorkflowTableComponent, type: :component do
     }
   end
 
+  context 'when the search is advanced' do
+    let(:search_form) { WorkflowGridSearchForm.new(advanced: true, query: 'Miller OR octopus') }
+
+    it 'links the counts to the Advanced search page' do
+      render_inline(component)
+
+      expect(page).to have_link('accessionWF', href: '/advanced_search?advanced=true&query=Miller+OR+octopus' \
+                                                     '&wps_workflows%5B%5D=accessionWF')
+    end
+  end
+
   context 'when workflow_process_counts is nil' do
     it 'renders placeholders' do
       render_inline(component)

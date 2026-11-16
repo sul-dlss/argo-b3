@@ -8,7 +8,8 @@ class PinnedSearch < ApplicationRecord
 
   validates :search_form_attributes, presence: true
 
-  # Pinned searches are a saved query, so they always reopen as search results.
+  # Pinned searches are a saved query, so they always reopen as search results (advanced ones on the
+  # Advanced search page).
   def to_search_form
     ResultsSearchForm.new(**search_form_attributes)
   end

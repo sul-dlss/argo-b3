@@ -18,6 +18,17 @@ RSpec.describe WorkflowGrid::ResetButtonComponent, type: :component do
     expect(page).to have_button('Retry', type: 'submit')
   end
 
+  context 'when the search is advanced' do
+    let(:search_form) { WorkflowGridSearchForm.new(advanced: true, query: 'Miller OR octopus') }
+
+    it 'resets for the advanced search' do
+      render_inline(component)
+
+      expect(page).to have_field('advanced', with: 'true', type: 'hidden')
+      expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+    end
+  end
+
   context 'when status is not error' do
     let(:status) { 'completed' }
 

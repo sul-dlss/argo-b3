@@ -57,5 +57,38 @@ RSpec.describe Search::DynamicFacetComponent, type: :component do
       expect(page).to have_field('From', type: 'date')
       expect(page).to have_field('To', type: 'date')
     end
+
+    context 'when the search is advanced' do
+      let(:search_form) { ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Project 1']) }
+
+      it 'submits the date range within the advanced search and retains the query and other facets' do
+        render_inline(component)
+
+        within('form[action="/advanced_search?advanced=true"][method="get"]') do
+          expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+          expect(page).to have_field('projects[]', with: 'Project 1', type: 'hidden')
+          expect(page).to have_field('From', type: 'date')
+          expect(page).to have_field('To', type: 'date')
+        end
+      end
+    end
+
+    context 'when an advanced search is in the workflow status view' do
+      let(:search_form) do
+        WorkflowGridSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Project 1'])
+      end
+
+      it 'submits the date range to the workflow view with the advanced query and other facets' do
+        render_inline(component)
+
+        within('form[action="/workflow_grid"][method="get"]') do
+          expect(page).to have_field('advanced', with: 'true', type: 'hidden')
+          expect(page).to have_field('query', with: 'Miller OR octopus', type: 'hidden')
+          expect(page).to have_field('projects[]', with: 'Project 1', type: 'hidden')
+          expect(page).to have_field('From', type: 'date')
+          expect(page).to have_field('To', type: 'date')
+        end
+      end
+    end
   end
 end

@@ -27,6 +27,11 @@ class ResultsSearchForm < SearchForm
     'search'
   end
 
+  # Advanced searches have their own page.
+  def route_scope
+    advanced? ? 'advanced_search' : 'search'
+  end
+
   def pinnable?
     true
   end

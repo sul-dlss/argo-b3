@@ -83,4 +83,29 @@ RSpec.describe 'Workflow grid as a view of the current search', :solr do
       expect(args[:search_form].attributes).to match({ 'query' => 'twain' })
     end
   end
+
+  it 'keeps an advanced search in the grid, when resetting, and when toggling back' do
+    visit advanced_search_path(query: 'twain AND adventures')
+
+    expect(page).to have_result_count(1)
+
+    click_link('Workflow status view')
+
+    expect(page).to have_link('Workflow status view', class: 'active')
+    expect(page).to have_current_filter('Advanced search', 'twain AND adventures')
+
+    within('table#workflow-table-accessionWF tbody tr:nth-of-type(7) td:nth-of-type(4)') do
+      click_button 'Retry'
+    end
+
+    expect(page).to have_toast('Retrying errors for accessionWF - update-doi.')
+    expect(ResetWorkflowErrorsJob).to have_received(:perform_later) do |args|
+      expect(args[:search_form].attributes).to match({ 'advanced' => true, 'query' => 'twain AND adventures' })
+    end
+
+    click_link('Search results view')
+
+    expect(page).to have_css('h1', text: 'Advanced search')
+    expect(page).to have_result_count(1)
+  end
 end

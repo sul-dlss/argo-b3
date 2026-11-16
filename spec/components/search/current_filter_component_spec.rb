@@ -20,14 +20,16 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     end
 
     context 'when the query is advanced' do
-      let(:search_form) { AdvancedSearchForm.new(query: 'Miller OR octopus', projects: ['Google Books'], page: 2) }
+      let(:search_form) do
+        ResultsSearchForm.new(advanced: true, query: 'Miller OR octopus', projects: ['Google Books'], page: 2)
+      end
 
       it 'prefixes the expression and removes it while preserving other selections' do
         render_inline(component)
 
         expect(page).to have_css('li', text: /Advanced search\s+❯\s+Miller OR octopus/)
         expect(page).to have_link('Remove Advanced search > Miller OR octopus',
-                                  href: '/advanced_search?projects%5B%5D=Google+Books')
+                                  href: '/advanced_search?advanced=true&projects%5B%5D=Google+Books')
       end
     end
   end

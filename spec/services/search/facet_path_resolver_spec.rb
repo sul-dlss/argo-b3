@@ -79,6 +79,22 @@ RSpec.describe Search::FacetPathResolver do
       expect(helper.call(query: 'twain')).to eq('/workflow_grid/tag_facets?query=twain')
     end
 
+    it 'builds paths under the advanced search page' do
+      search_form = ResultsSearchForm.new(advanced: true, query: 'twain OR clemens')
+      helper = described_class.index_path_helper(facet_config: Search::Facets::TAGS, search_form:)
+
+      expect(helper.call(search_form.with_attributes(page: nil)))
+        .to eq('/advanced_search/tag_facets?advanced=true&query=twain+OR+clemens')
+    end
+
+    it 'keeps advanced in paths under an advanced workflow grid' do
+      search_form = WorkflowGridSearchForm.new(advanced: true, query: 'twain OR clemens')
+      helper = described_class.index_path_helper(facet_config: Search::Facets::TAGS, search_form:)
+
+      expect(helper.call(search_form.with_attributes(page: nil)))
+        .to eq('/workflow_grid/tag_facets?advanced=true&query=twain+OR+clemens')
+    end
+
     it 'builds children paths for hierarchical facets' do
       helper = described_class.children_path_helper(facet_config: Search::Facets::TAGS,
                                                     search_form: WorkflowGridSearchForm.new)

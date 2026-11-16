@@ -95,6 +95,17 @@ $search-color: rgb(#{$search-color-rgb});
   background-color: var(--stanford-20-black);
 }
 
+// The search bar shares its row with the Advanced search link, which wraps below it on phones.
+// This overrides the component library's full width for the bar.
+.search-card .search-query-form {
+  flex: 1 1 100%;
+  width: auto;
+
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+  }
+}
+
 // Removes Tom Select's caret margin so a chosen single value doesn't look like it has a trailing space.
 .ts-wrapper.single.has-items .ts-control > input {
   margin: 0 !important;

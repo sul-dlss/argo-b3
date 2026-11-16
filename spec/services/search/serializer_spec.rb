@@ -52,6 +52,24 @@ RSpec.describe Search::Serializer do
     end
   end
 
+  context 'with an advanced search' do
+    let(:search_form) { ResultsSearchForm.new(advanced: true, query: '"Miller Library" OR octopus') }
+
+    it 'labels the query as an advanced search' do
+      expect(serialized_query).to eq('Advanced search ❯ "Miller Library" OR octopus')
+    end
+  end
+
+  context 'with an advanced search and facets' do
+    let(:search_form) do
+      ResultsSearchForm.new(advanced: true, query: '"Miller Library" OR octopus', content_types: ['image'])
+    end
+
+    it 'groups the query so that its operators are kept apart from the facets' do
+      expect(serialized_query).to eq('Advanced search ❯ ("Miller Library" OR octopus) AND Content type: "image"')
+    end
+  end
+
   context 'with Multi-Item Deposits' do
     let(:search_form) { WorkflowGridSearchForm.new(query: 'maps', multi_item_deposit_action_ids: %w[12 13]) }
 
