@@ -50,11 +50,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
-    # Type and permission are checked first, so that only image and book Items the user can redeposit trigger the DSA
-    # workflows request.
-    @goobi_redepositable = Sdr::GoobiRedepositService.goobi_content_type?(@cocina_object) &&
-                           allowed_to?(:redeposit_with_goobi?, @solr_doc, with: ObjectPolicy) &&
-                           Sdr::GoobiRedepositService.redepositable?(version_service:)
+    @goobi_redepositable = goobi_redeposit_enabled?(version_service)
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
@@ -334,6 +330,14 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
     full_cocina_object = CocinaSupport.build_from_cocina_hash(fetch_full_cocina_hash(druid).dup)
     Contents::UnsavedChanges.call(content:, cocina_object: full_cocina_object)
+  end
+
+  # Whether the Redeposit with Goobi button is enabled. Type and permission are checked first, so that only image and
+  # book items the user can redeposit trigger the DSA workflows request.
+  def goobi_redeposit_enabled?(version_service)
+    Sdr::GoobiRedepositService.goobi_content_type?(@cocina_object) &&
+      allowed_to?(:redeposit_with_goobi?, @solr_doc, with: ObjectPolicy) &&
+      Sdr::GoobiRedepositService.redepositable?(version_service:)
   end
 
   def republishable?
