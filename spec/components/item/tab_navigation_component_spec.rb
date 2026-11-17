@@ -4,11 +4,13 @@ require 'rails_helper'
 
 RSpec.describe Item::TabNavigationComponent, type: :component do
   let(:pane) { SdrViewComponents::TabForm::PaneComponent.new(tab_name: :details, label: 'Details') }
+  let(:cancel_confirm) { I18n.t('edit.cancel_confirm') }
 
   it 'renders the cancel, previous, and next buttons with a decorative next icon' do
     render_inline(described_class.new(pane:, cancel_path: '/objects/druid:bc123df4567'))
 
     expect(page).to have_link('Cancel', href: '/objects/druid:bc123df4567')
+    expect(page).to have_css("a[data-turbo-confirm='#{cancel_confirm}']", text: 'Cancel')
     expect(page).to have_button('Previous')
     expect(page).to have_button('Next')
     expect(page).to have_css('button i.bi-arrow-right[aria-hidden="true"]')

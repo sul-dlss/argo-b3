@@ -105,7 +105,7 @@
 
       <%= render MultiItemDeposit::DiscoveryErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
-    <%= render Elements::FormFooterComponent.new(cancel_path: root_path) do %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: root_path, confirm_cancel: true) do %>
       <% next_enabled = @multi_item_deposit_action.discovery_succeeded? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multi_item_deposits.edit.buttons.discover'), variant: next_enabled ? :'outline-primary' : :primary) %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: MultiItemDepositActionsController::NEXT_VALUE, disabled: !next_enabled) do %>

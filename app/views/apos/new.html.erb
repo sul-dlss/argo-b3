@@ -4,7 +4,7 @@
   <%= form_with(model: @apo_form, url: apos_path, class: 'b3-form') do |form| %>
     <%= render Edit::ApoFieldsComponent.new(form:, agreement_options: @agreement_options) %>
 
-    <%= render Elements::FormFooterComponent.new(cancel_path: @cancel_path || root_path) do %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: @cancel_path || root_path, confirm_cancel: true) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.new.buttons.register')) %>
     <% end %>
   <% end %>

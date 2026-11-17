@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
 module Item
-  # Component for rendering the tab based navigation on registration form
+  # Component for rendering the tab based navigation of the register and edit forms. Cancel asks for confirmation,
+  # since the user's changes on any of the tabs would be lost.
   class TabNavigationComponent < ApplicationComponent
     # @param pane [SdrViewComponents::TabForm::PaneComponent] The pane component the nav is rendered in
     # @param cancel_path [String] The URL for the cancel button
     # @param show_next [Boolean] If next button is rendered (defaults to true)
     # @param show_previous [Boolean] If previous button is rendered (defaults to true)
-    # @param cancel_data [Hash] Data attributes for the cancel button
-    def initialize(pane:, cancel_path:, show_next: true, show_previous: true, cancel_data: {})
+    def initialize(pane:, cancel_path:, show_next: true, show_previous: true)
       @pane = pane
       @cancel_path = cancel_path
-      @cancel_data = cancel_data
       @show_next = show_next
       @show_previous = show_previous
       super()
     end
 
-    attr_reader :pane, :cancel_path, :show_next, :show_previous, :cancel_data
+    attr_reader :pane, :cancel_path, :show_next, :show_previous
+
+    def cancel_data
+      # Turbo confirms only links with a method, so Cancel is followed as a GET form submission.
+      { turbo_method: :get, turbo_confirm: t('edit.cancel_confirm') }
+    end
   end
 end

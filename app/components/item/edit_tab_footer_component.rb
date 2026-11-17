@@ -20,10 +20,9 @@ module Item
     # @param show_deposit [Boolean] If deposit button is rendered, unless depositing is stopped (defaults to false)
     # @param submit_data [Hash] Data attributes for the submit buttons
     # @param actions_data [Hash] Data attributes for the fieldset of action buttons and the discard or purge link
-    # @param cancel_data [Hash] Data attributes for the cancel button
     def initialize(form_id:, cancel_path:, druid:, draft_actions_presenter:, pane: nil, # rubocop:disable Metrics/ParameterLists
                    show_next: true, show_previous: true, show_edit_files: false, show_deposit: false,
-                   submit_data: {}, actions_data: {}, cancel_data: {})
+                   submit_data: {}, actions_data: {})
       @pane = pane
       @form_id = form_id
       @cancel_path = cancel_path
@@ -35,12 +34,11 @@ module Item
       @show_deposit = show_deposit
       @submit_data = submit_data
       @actions_data = actions_data
-      @cancel_data = cancel_data
       super()
     end
 
     attr_reader :pane, :form_id, :cancel_path, :druid, :draft_actions_presenter, :show_next, :show_previous,
-                :show_edit_files, :show_deposit, :submit_data, :actions_data, :cancel_data
+                :show_edit_files, :show_deposit, :submit_data, :actions_data
 
     # Design standard deviation: AVAIL-4. Deposit is hidden, not disabled, while depositing is stopped, since a
     # stopped deposit resumes by retrying the process in error.
