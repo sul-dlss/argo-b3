@@ -15,15 +15,5 @@ module Search
     def url
       url_for(search_form)
     end
-
-    def object_type_options
-      [
-        %w[Agreement agreement],
-        %w[APO APO],
-        %w[Collection collection],
-        %w[Item item],
-        ['Virtual object', 'virtual object']
-      ]
-    end
   end
 end

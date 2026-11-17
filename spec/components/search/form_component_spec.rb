@@ -13,7 +13,6 @@ RSpec.describe Search::FormComponent, type: :component do
 
       expect(URI.parse(page.find('form')[:action]).path).to eq('/search')
       expect(page).to have_field('Search for', type: :search, with: 'test')
-      expect(page).to have_select('Select object type', with_options: ['All object types', 'Item', 'Collection'])
       expect(page).to have_button('Search')
       expect(page).to have_link('Advanced search', href: '/advanced_search')
     end

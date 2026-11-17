@@ -76,7 +76,3 @@ def find_search_field
   # This matches the search field in header.
   find_field('Search for')
 end
-
-def find_object_type_field
-  find_field('Select object type')
-end
