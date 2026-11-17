@@ -52,9 +52,9 @@ class SolrDocPresenter < SearchResults::Item
     object_types.include?(object_type)
   end
 
-  # Items and Agreements have Content (see GLOSSARY), so their files are managed.
+  # Items, Virtual Objects, and Agreements have Content (see GLOSSARY), so their files are managed.
   def object_type_with_content?
-    object_type?('item', 'agreement')
+    object_type?('item', 'virtual object', 'agreement')
   end
 
   def releasable_type?

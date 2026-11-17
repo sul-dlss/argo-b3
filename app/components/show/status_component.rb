@@ -14,7 +14,7 @@ module Show
     attr_reader :object_status_presenter, :solr_doc, :unsaved_content_changes
 
     delegate :status, :workflow_error_messages, :druid, :version_editable?, to: :object_status_presenter
-    delegate :item?, :agreement?, :collection?, :admin_policy?, :virtual_object?, :object_type_with_content?,
+    delegate :agreement?, :collection?, :admin_policy?, :object_type_with_content?,
              to: :solr_doc
 
     def heading
@@ -45,18 +45,18 @@ module Show
       I18n.t("show.status.actions.#{edit_action}")
     end
 
-    # Only items, collections, APOs, and agreements have an edit form so far.
-    def can_edit?
-      edit_path.present? && editable?
+    def editable?
+      (version_editable? || assembly_stopped_with_error?) && allowed_to_edit?
     end
 
-    # @return [String, nil] the path of the object's edit form, or nil if its type has none
+    # @return [String] the path of the object's edit form
     def edit_path
       return edit_apo_path(druid) if admin_policy?
       return edit_agreement_path(druid) if agreement?
       return edit_collection_path(druid) if collection?
 
-      edit_item_path(druid) if item?
+      # Items and Virtual Objects, which are edited as Items.
+      edit_item_path(druid)
     end
 
     def manage_files_button
@@ -82,10 +82,6 @@ module Show
       object_type_with_content? && unsaved_content_changes
     end
 
-    def editable?
-      (version_editable? || assembly_stopped_with_error?) && allowed_to_edit?
-    end
-
     def allowed_to_edit?
       helpers.allowed_to?(:edit?, solr_doc, with: ObjectPolicy)
     end
@@ -94,7 +90,6 @@ module Show
       return :edit_agreement if agreement?
       return :edit_collection if collection?
       return :edit_admin_policy if admin_policy?
-      return :edit_virtual_object if virtual_object?
 
       :edit_item
     end

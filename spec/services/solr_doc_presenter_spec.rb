@@ -174,8 +174,8 @@ RSpec.describe SolrDocPresenter do
     context 'when the object type is virtual object' do
       let(:object_type) { 'virtual object' }
 
-      it 'returns false' do
-        expect(presenter.object_type_with_content?).to be false
+      it 'returns true' do
+        expect(presenter.object_type_with_content?).to be true
       end
     end
   end

@@ -230,11 +230,48 @@ RSpec.describe Show::StatusComponent, type: :component do
   context 'when the object is a virtual object' do
     let(:object_type) { 'virtual object' }
 
-    it 'renders the edit virtual object link without manage files' do
+    it 'renders the item actions' do
       render_inline(component)
 
-      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit virtual object')
-      expect(page).to have_no_css('a', text: 'Manage files')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
+      expect(page).to have_button('Deposit', disabled: true)
+    end
+
+    context 'when the user can edit' do
+      let(:editable) { true }
+
+      before do
+        user = create(:user)
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+        allow(Current).to receive(:user).and_return(user)
+      end
+
+      it 'links to editing the item and managing its files' do
+        render_inline(component)
+
+        expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
+        expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
+        expect(page).to have_button('Deposit', disabled: false)
+      end
+    end
+
+    context 'when the files have unsaved changes' do
+      let(:editable) { true }
+      let(:unsaved_content_changes) { true }
+
+      before do
+        user = create(:user)
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
+        allow(Current).to receive(:user).and_return(user)
+      end
+
+      it 'renders a disabled deposit button with a note' do
+        render_inline(component)
+
+        expect(page).to have_button('Deposit', disabled: true)
+        expect(page).to have_text('Files have unsaved changes.')
+      end
     end
   end
 

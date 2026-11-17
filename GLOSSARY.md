@@ -12,7 +12,7 @@ A DRO that is not an Agreement and not a Virtual Object. This is the default/com
 A DRO identified by its content type (`agreement`). Represents an agreement (e.g., a deposit or licensing agreement) rather than descriptive/curatorial content. An APO references one Agreement via its `hasAgreement` relationship (see below). Agreements are always dark. Its Resources are file Resources, each of which may hold several files (e.g., PDF and DOCX versions of the same terms of deposit).
 
 ### Virtual Object
-A DRO identified by a **structural** distinction, not by content type: its structural metadata references/borrows constituent resources from other objects, rather than the DRO being a standalone work in its own right. Because this is structural rather than a `type` value, a Virtual Object can carry any content type — the same content type space Items use.
+A DRO identified by a **structural** distinction, not by content type: its structural metadata references/borrows constituent resources from other objects, rather than the DRO being a standalone work in its own right. Because this is structural rather than a `type` value, a Virtual Object can carry any content type — the same content type space Items use. It can also have files of its own, and it is edited, and its files managed, as an Item's are.
 
 ### Collection
 A grouping of DROs for conceptual/curatorial purposes, reusable across the system. A DRO may be a member of a Collection (`isMemberOf`). Membership is **one level only** — a Collection cannot itself be a member of another Collection.

@@ -122,7 +122,6 @@ en:
         edit_agreement: "Edit agreement"
         edit_collection: "Edit collection"
         edit_admin_policy: "Edit APO"
-        edit_virtual_object: "Edit virtual object"
         manage_files: "Manage files"
         deposit: "Deposit"
     file_sets:
