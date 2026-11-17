@@ -100,11 +100,10 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
   - In a tabbed form's pane footer, Cancel and the tab navigation (Previous, Next) are on the left, and the save actions are on the right, with the primary action last.
 - **BTN-4 SHOULD** Use `size: :sm` only inside tables, cards, boxes, and facets.
 - **BTN-5** A button's variant may change with state (e.g., a step's action becoming primary once it can proceed).
-- **BTN-6 MUST** A control for a feature not yet built (a placeholder) is a disabled control (the gem's `disabled:`, which removes the `href` and the tab stop), not a link to `#` or `/`.
-- **BTN-7 MUST** Use a link for navigation and a button for actions. A control that changes data (delete, reset, purge) is a button, even when rendered as a link-styled button (`ButtonFormComponent`).
-- **BTN-8 MUST** Destructive actions (discard, purge, delete, reset) ask for confirmation (`turbo_confirm` / the gem's `confirm:`). The message names the object and the consequence (e.g., "Discard the draft of <title>? This cannot be undone.").
-- **BTN-9 MUST NOT** use modals. Use a separate page or an inline expanding section (`CollapsibleSectionComponent`) instead.
-- **BTN-10 MUST** Previous and Next buttons that move between tabs or steps have a decorative arrow: `left_arrow_icon` before Previous and `right_arrow_icon` after Next, with `aria: { hidden: true }`.
+- **BTN-6 MUST** Use a link for navigation and a button for actions. A control that changes data (delete, reset, purge) is a button, even when rendered as a link-styled button (`ButtonFormComponent`).
+- **BTN-7 MUST** Destructive actions (discard, purge, delete, reset) ask for confirmation (`turbo_confirm` / the gem's `confirm:`). The message names the object and the consequence (e.g., "Discard the draft of <title>? This cannot be undone.").
+- **BTN-8 MUST NOT** use modals. Use a separate page or an inline expanding section (`CollapsibleSectionComponent`) instead.
+- **BTN-9 MUST** Previous and Next buttons that move between tabs or steps have a decorative arrow: `left_arrow_icon` before Previous and `right_arrow_icon` after Next, with `aria: { hidden: true }`.
 
 ## Unavailable actions
 
