@@ -1,5 +1,5 @@
 <%= render Item::EditTabFooterComponent.new(form_id:, cancel_path:, druid:, draft_actions_presenter:,
-                                            show_deposit: show_deposit?, cancel_data:,
+                                            show_deposit: show_deposit?,
                                             submit_data: { unassociated_files_target: 'submit' },
                                             actions_data: { disable_actions_target: 'disableable' }) do |footer| %>
   <% footer.with_navigation do %>

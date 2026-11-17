@@ -176,6 +176,7 @@ en:
       skipped: "Skipped process."
       waiting: "Retrying process."
   edit:
+    cancel_confirm: 'Are you sure you want to leave this page? Your changes will not be saved.'
     agreements:
       edit:
         title: "Edit agreement"

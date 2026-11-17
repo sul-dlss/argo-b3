@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Elements::FormFooterComponent, type: :component do
+  let(:cancel_confirm) { I18n.t('edit.cancel_confirm') }
+
   context 'with a cancel path' do
     it 'renders Cancel before the actions' do
       render_inline(described_class.new(cancel_path: '/objects/druid:bc123df4567')) do
@@ -11,6 +13,15 @@ RSpec.describe Elements::FormFooterComponent, type: :component do
 
       expect(page).to have_css('div.d-flex > a.btn-link:first-child[href="/objects/druid:bc123df4567"]', text: 'Cancel')
       expect(page).to have_css('div.d-flex > a + button', text: 'Save')
+      expect(page).to have_no_css('a[data-turbo-confirm]')
+    end
+  end
+
+  context 'with a cancel path that confirms' do
+    it 'renders Cancel asking for confirmation' do
+      render_inline(described_class.new(cancel_path: '/objects/druid:bc123df4567', confirm_cancel: true))
+
+      expect(page).to have_css("a[data-turbo-confirm='#{cancel_confirm}']", text: 'Cancel')
     end
   end
 

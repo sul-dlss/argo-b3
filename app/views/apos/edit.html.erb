@@ -9,7 +9,7 @@
 
     <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-field') %>
 
-    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid), confirm_cancel: true) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.apos.edit.buttons.deposit')) %>
     <% end %>
   <% end %>

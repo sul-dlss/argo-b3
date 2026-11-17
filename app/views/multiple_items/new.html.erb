@@ -122,7 +122,7 @@
     <% end %>
     </div>
 
-    <%= render Elements::FormFooterComponent.new(cancel_path: root_path) do %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: root_path, confirm_cancel: true) do %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.clear'), variant: 'outline-primary', value: MultipleItemsController::CLEAR_VALUE) if @items_registration_form.invalid_item_registrations.any? %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.multiple_items.new.buttons.register')) %>
     <% end %>

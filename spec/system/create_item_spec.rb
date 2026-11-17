@@ -586,7 +586,7 @@ RSpec.describe 'Create an item' do
     it 'cancels item creation' do
       visit new_item_path
 
-      click_link 'Cancel'
+      click_and_accept_confirm(I18n.t('edit.cancel_confirm'), find_link('Cancel'))
       expect(page).to have_current_path(root_path)
     end
 
@@ -595,7 +595,7 @@ RSpec.describe 'Create an item' do
       click_link_or_button 'Item'
 
       expect(page).to have_link('Cancel')
-      click_link 'Cancel'
+      click_and_accept_confirm(I18n.t('edit.cancel_confirm'), find_link('Cancel'))
       expect(page).to have_current_path(root_path)
     end
   end
