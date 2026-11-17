@@ -5,16 +5,15 @@ module Elements
   # Wrapper around the @andypf/json-viewer library.
   # See https://github.com/andypf/json-viewer for more details and documentation of options.
   class JsonViewerComponent < ApplicationComponent
-    def initialize(hash:, expanded: true, show_toolbar: true, show_tip: false, compact: true)
+    def initialize(hash:, expanded: true, show_expand_buttons: true, compact: true)
       @hash = hash
       @expanded = expanded
-      @show_toolbar = show_toolbar
-      @show_tip = show_tip
+      @show_expand_buttons = show_expand_buttons
       @compact = compact
       super()
     end
 
-    attr_reader :expanded, :show_toolbar, :show_tip, :compact
+    attr_reader :expanded, :show_expand_buttons, :compact
 
     def hash
       helpers.format_hash(@hash, compact:, pretty: false)
