@@ -135,7 +135,6 @@ en:
         heading: "Not released"
     errors:
       deposit_failed: "Depositing failed."
-      file_not_available: "%{filepath} is not available for download. If the object is being accessioned, try again when that has finished."
       discard_failed: "Discarding the draft failed."
       goobi_redeposit_failed: "The Goobi workflow could not be started. Try again, or contact SDR support if the problem continues."
       purge_failed: "Purging failed."
