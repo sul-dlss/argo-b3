@@ -224,7 +224,7 @@ RSpec.describe MultiItemDeposit::DiscoverFilesJob do
         .new(structural: { hasMemberOrders: [{ members: ['druid:dd222ff3344'] }] })
     end
 
-    it 'records the files, since a virtual object is also an Item' do
+    it "records the files, since a virtual object's files are managed as an Item's are" do
       expect(perform.discovery_errors).to be_empty
       expect(item_deposit_action.content.content_file_binaries.pluck(:filepath))
         .to contain_exactly('file1.txt', 'folder/file2.txt')
