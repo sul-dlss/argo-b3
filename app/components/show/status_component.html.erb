@@ -17,7 +17,7 @@
     <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
       <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: edit_path, label: edit_label,
                                                                       variant: :'outline-primary', size: :sm,
-                                                                      disabled: !can_edit?) %>
+                                                                      disabled: !editable?) %>
       <%= render manage_files_button if object_type_with_content? %>
       <% if deposit_button? %>
         <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: deposit_object_path(druid), method: :post,

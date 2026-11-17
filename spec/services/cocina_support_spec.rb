@@ -98,10 +98,10 @@ RSpec.describe CocinaSupport do
       expect(described_class.item_or_virtual_object?(admin_policy)).to be false
     end
 
-    it 'identifies Items and Agreements as object types with Content' do
+    it 'identifies Items, Virtual Objects, and Agreements as object types with Content' do
       expect(described_class.object_type_with_content?(item)).to be true
       expect(described_class.object_type_with_content?(agreement)).to be true
-      expect(described_class.object_type_with_content?(virtual_object)).to be false
+      expect(described_class.object_type_with_content?(virtual_object)).to be true
       expect(described_class.object_type_with_content?(collection)).to be false
       expect(described_class.object_type_with_content?(admin_policy)).to be false
     end

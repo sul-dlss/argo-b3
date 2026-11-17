@@ -125,9 +125,8 @@
       <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(classes: 'mb-xl-3 my-4 my-xl-0', content_classes: 'mt-4', variant: :underline, collapse_below: :xl, overflow_menu: true) do |component| %>
         <% component.with_tab(id: 'overview-tab', pane_id: 'overview-pane', label: 'Overview', active: true) %>
         <% component.with_tab(id: 'purl-preview-tab', pane_id: 'purl-preview-pane', label: 'Description preview') if @solr_doc.publishable_type? %>
-        <% if @solr_doc.virtual_object? %>
-          <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') %>
-        <% elsif @solr_doc.object_type_with_content? %>
+        <% component.with_tab(id: 'constituents-tab', pane_id: 'constituents-pane', label: 'Constituents') if @solr_doc.virtual_object? %>
+        <% if @solr_doc.object_type_with_content? %>
           <% component.with_tab(id: 'files-tab', pane_id: 'files-pane', label: 'Files') %>
           <% component.with_tab(id: 'structure-tab', pane_id: 'structure-pane', label: 'Structure') %>
         <% end %>
@@ -158,7 +157,9 @@
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
             <% end %>
           <% end %>
-        <% elsif @solr_doc.object_type_with_content? %>
+        <% end %>
+
+        <% if @solr_doc.object_type_with_content? %>
           <%= component.with_pane(id: 'files-pane', tab_id: 'files-tab') do %>
             <%= turbo_frame_tag(@solr_doc.druid, 'files', src: files_object_path(druid: @druid_token, lock: @cocina_object.lock), loading: :lazy, target: '_top', data: { lock_keyed: true }) do %>
               <%= render SdrViewComponents::Elements::SpinnerComponent.new %>

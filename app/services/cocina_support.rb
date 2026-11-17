@@ -53,9 +53,11 @@ class CocinaSupport
     Array(cocina_object.structural&.hasMemberOrders).any? { |member_order| member_order.members.present? }
   end
 
-  # @param cocina_object [Cocina::Models::DRO] a Virtual Object
-  # @return [Array<String>] the constituent druids, in order
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::RequestDRO]
+  # @return [Array<String>] the constituent druids, in order (empty unless a Virtual Object)
   def self.constituent_druids(cocina_object)
+    return [] unless cocina_object.structural
+
     Array(cocina_object.structural.hasMemberOrders.first&.members)
   end
 
@@ -71,11 +73,11 @@ class CocinaSupport
     cocina_object.dro? && !agreement?(cocina_object)
   end
 
-  # Items and Agreements have Content (see GLOSSARY), so their files are managed.
+  # Items, Virtual Objects, and Agreements have Content (see GLOSSARY), so their files are managed.
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
-  # @return [Boolean] true if the object is an Item or an Agreement
+  # @return [Boolean] true if the object is a DRO
   def self.object_type_with_content?(cocina_object)
-    item?(cocina_object) || agreement?(cocina_object)
+    cocina_object.dro?
   end
 
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]

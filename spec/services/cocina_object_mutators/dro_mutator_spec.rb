@@ -37,6 +37,34 @@ RSpec.describe CocinaObjectMutators::DroMutator do
         expect(result.structural.hasMemberOrders).to be_empty
       end
     end
+
+    context 'when the cocina object is a virtual object' do
+      let(:cocina_object) do
+        dro = build(:dro_with_metadata, type: Cocina::Models::ObjectType.image)
+        dro.new(structural: dro.structural.new(hasMemberOrders: [{ members: %w[druid:bc123df4567 druid:gh456jk7890] }]))
+      end
+
+      before { cocina_model.viewing_direction = 'left-to-right' }
+
+      it 'keeps the constituents along with the viewing direction' do
+        expect(result.structural.hasMemberOrders.map(&:to_h))
+          .to eq([{ members: %w[druid:bc123df4567 druid:gh456jk7890], viewingDirection: 'left-to-right' }])
+      end
+    end
+
+    context 'when the viewing direction of a virtual object is cleared' do
+      let(:cocina_object) do
+        dro = build(:dro_with_metadata, type: Cocina::Models::ObjectType.image)
+        dro.new(structural: dro.structural.new(hasMemberOrders: [{ members: %w[druid:bc123df4567],
+                                                                   viewingDirection: 'right-to-left' }]))
+      end
+
+      before { cocina_model.viewing_direction = nil }
+
+      it 'keeps the constituents' do
+        expect(result.structural.hasMemberOrders.map(&:to_h)).to eq([{ members: %w[druid:bc123df4567] }])
+      end
+    end
   end
 
   describe 'collections' do

@@ -757,15 +757,10 @@ RSpec.describe 'Show item' do
       )
     end
 
-    it 'shows the Constituents tab in place of Files, listing the constituent items' do
+    it 'shows the Constituents tab, listing the constituent items' do
       visit "/objects/#{druid}"
 
       expect(page).to have_css('.object-show.object-type-virtual-object .object-type-badge', text: 'VIRTUAL OBJECT')
-      expect(page).to have_css('.nav-link', text: 'Constituents')
-      expect(page).to have_no_css('.nav-link', text: 'Files')
-      expect(page).to have_no_css('.nav-link', text: 'Structure')
-      expect(page).to have_no_button('Download structural metadata')
-
       click_button 'Constituents'
 
       expect(page).to have_css('h2', text: 'Items in this virtual object (2)')

@@ -56,10 +56,13 @@ module CocinaObjectMutators
       end
     end
 
+    # Keeps a Virtual Object's constituents, which the model does not hold.
     def build_member_orders
-      return [] if cocina_model.viewing_direction.blank?
-
-      [{ viewingDirection: cocina_model.viewing_direction }]
+      member_order = {
+        members: CocinaSupport.constituent_druids(cocina_object).presence,
+        viewingDirection: cocina_model.viewing_direction.presence
+      }.compact
+      member_order.empty? ? [] : [member_order]
     end
   end
 end

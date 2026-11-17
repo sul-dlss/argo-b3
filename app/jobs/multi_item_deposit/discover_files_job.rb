@@ -56,7 +56,7 @@ module MultiItemDeposit
 
     def check_object
       return add_error(:object_not_found) if cocina_object.nil?
-      return add_error(:not_item) unless CocinaSupport.item?(cocina_object)
+      return add_error(:not_item) unless CocinaSupport.item_or_virtual_object?(cocina_object)
       return add_error(:not_authorized) unless update_allowed?
 
       check_version
