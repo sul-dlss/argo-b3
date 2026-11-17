@@ -25,28 +25,29 @@ module Sdr
 
     # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
     # @return [Boolean] true if the object is an image or book Item
-    def self.goobi_type?(cocina_object)
+    def self.goobi_content_type?(cocina_object)
       CocinaSupport.item?(cocina_object) && Constants::GOOBI_CONTENT_TYPES.include?(cocina_object.type)
     end
 
     # @param version_service [Sdr::VersionService] the object's version service
     # @return [Boolean] true if the object's state allows a Goobi Redeposit
-    def self.available?(version_service:)
-      unavailable_error(version_service:).nil?
+    def self.redepositable?(version_service:)
+      check_redepositable!(version_service:)
+      true
+    rescue NotRedepositableError
+      false
     end
 
     # A Goobi Redeposit is not possible while goobiWF has been started for the open version (Goobi has not yet
     # deposited it), or while any workflow has a process that is not complete.
     # @param version_service [Sdr::VersionService] the object's version service
-    # @return [Class, nil] the NotRedepositableError subclass for why the object's state does not allow a Goobi
-    #   Redeposit, or nil if it does
-    def self.unavailable_error(version_service:)
+    # @raise [GoobiProcessingError] if goobiWF was started for the open version
+    # @raise [ActiveWorkflowError] if a workflow has a process that is not complete
+    def self.check_redepositable!(version_service:)
       processes = WorkflowService.workflows_for(druid: version_service.druid).flat_map(&:processes)
       version = version_service.version
-      return GoobiProcessingError if version_service.open? && goobi_started?(processes:, version:)
-      return ActiveWorkflowError unless processes.all? { |process| COMPLETE_STATUSES.include?(process.status) }
-
-      nil
+      raise GoobiProcessingError if version_service.open? && goobi_started?(processes:, version:)
+      raise ActiveWorkflowError unless processes.all? { |process| COMPLETE_STATUSES.include?(process.status) }
     end
 
     def self.goobi_started?(processes:, version:)
@@ -65,11 +66,9 @@ module Sdr
     #   allow a Goobi Redeposit
     # @raise [Sdr::Repository::Error] if opening the version or starting goobiWF fails
     def call
-      raise NotGoobiTypeError unless self.class.goobi_type?(cocina_object)
+      raise NotGoobiTypeError unless self.class.goobi_content_type?(cocina_object)
 
-      unavailable_error = self.class.unavailable_error(version_service:)
-      raise unavailable_error if unavailable_error
-
+      self.class.check_redepositable!(version_service:)
       Dor::Services::Client.object(druid).workflow(WORKFLOW_NAME).create(version: open_version)
     rescue Dor::Services::Client::Error => e
       raise Error, "Starting #{WORKFLOW_NAME} failed: #{e.message}"

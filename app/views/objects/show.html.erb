@@ -75,10 +75,13 @@
         <% end %>
       <% end %>
 
-      <% if @goobi_redeposit_presenter.show? %>
-        <%= render Elements::ButtonListComponent.new(title: 'Update', classes: 'mt-4') do |component| %>
-          <% component.with_button(link: @goobi_redeposit_presenter.path, method: :post, label: 'Redeposit with Goobi',
-                                   variant: 'outline-primary', disabled: !@goobi_redeposit_presenter.available?) %>
+      <%# The section is hidden when none of its buttons applies to the object. %>
+      <%= render Elements::ButtonListComponent.new(title: 'Update', classes: 'mt-4') do |component| %>
+        <%# Only show the Goobi button for image and book items, but disable it if the user can't edit or a workflow is active %>
+        <% if Sdr::GoobiRedepositService.goobi_content_type?(@cocina_object) %>
+          <% component.with_button(link: redeposit_with_goobi_object_path(@solr_doc.druid), method: :post, label: 'Redeposit with Goobi',
+                                   variant: 'outline-primary',
+                                   disabled: !allowed_to?(:redeposit_with_goobi?, @solr_doc, with: ObjectPolicy) || !@goobi_redepositable) %>
         <% end %>
       <% end %>
 

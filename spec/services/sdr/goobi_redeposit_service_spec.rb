@@ -27,15 +27,20 @@ RSpec.describe Sdr::GoobiRedepositService do
     allow(Dor::Services::Client).to receive(:object).and_return(object_client)
   end
 
-  describe '.goobi_type?' do
+  describe '.goobi_content_type?' do
     it 'is true for image and book Items' do
-      expect(described_class.goobi_type?(build(:dro, id: druid, type: Cocina::Models::ObjectType.image))).to be true
-      expect(described_class.goobi_type?(build(:dro, id: druid, type: Cocina::Models::ObjectType.book))).to be true
+      image = build(:dro, id: druid, type: Cocina::Models::ObjectType.image)
+      book = build(:dro, id: druid, type: Cocina::Models::ObjectType.book)
+
+      expect(described_class.goobi_content_type?(image)).to be true
+      expect(described_class.goobi_content_type?(book)).to be true
     end
 
     it 'is false for other content types and object types' do
-      expect(described_class.goobi_type?(build(:dro, id: druid, type: Cocina::Models::ObjectType.map))).to be false
-      expect(described_class.goobi_type?(build(:collection, id: druid))).to be false
+      map = build(:dro, id: druid, type: Cocina::Models::ObjectType.map)
+
+      expect(described_class.goobi_content_type?(map)).to be false
+      expect(described_class.goobi_content_type?(build(:collection, id: druid))).to be false
     end
 
     it 'is false for an image Virtual Object' do
@@ -43,12 +48,12 @@ RSpec.describe Sdr::GoobiRedepositService do
         structural: { hasMemberOrders: [{ members: ['druid:hj456km7890'] }] }
       )
 
-      expect(described_class.goobi_type?(virtual_object)).to be false
+      expect(described_class.goobi_content_type?(virtual_object)).to be false
     end
   end
 
-  describe '.available?' do
-    subject(:available) { described_class.available?(version_service: Sdr::VersionService.new(druid:)) }
+  describe '.redepositable?' do
+    subject(:redepositable) { described_class.redepositable?(version_service: Sdr::VersionService.new(druid:)) }
 
     context 'when every workflow is complete' do
       it { is_expected.to be true }
@@ -82,8 +87,8 @@ RSpec.describe Sdr::GoobiRedepositService do
         XML
       end
 
-      it 'is not available, even once goobiWF is complete' do
-        expect(available).to be false
+      it 'is not redepositable, even once goobiWF is complete' do
+        expect(redepositable).to be false
       end
     end
 
