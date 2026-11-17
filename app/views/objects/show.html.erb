@@ -42,7 +42,6 @@
         <p><%= link_to_purl(@solr_doc.druid) %></p>
       <% end %>
       <%= render Elements::ButtonListComponent.new(title: 'Actions', help_text: '(does not require new version)') do |component| %>
-        <% component.with_button(link: '/', label: 'Use as template', variant: 'outline-primary', disabled: true) %>
         <% if @solr_doc.object_type?('item', 'virtual object', 'collection') %>
           <% component.with_button(link: descriptive_csv_object_path(druid: @druid_token), label: 'Download description', variant: 'outline-primary', data: { turbo: false }) %>
         <% end %>
@@ -96,8 +95,6 @@
         <% component.with_button(link: @draft_actions_presenter.path, method: :delete, label: @draft_actions_presenter.label,
                                  confirm: @draft_actions_presenter.confirm, variant: 'outline-primary',
                                  disabled: !(allowed_to?(:update?, @solr_doc, with: ObjectPolicy) && @draft_actions_presenter.available?)) %>
-        <% component.with_button(link: '/', label: 'Withdraw version', variant: 'outline-primary', disabled: true) %>
-        <% component.with_button(link: '/', label: 'Decommission', variant: 'outline-primary', disabled: true) %>
       <% end %>
     <% end %>
 
