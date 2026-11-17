@@ -359,6 +359,9 @@ en:
           label: "Structure files"
         deposit:
           label: "Deposit"
+          help_text: >-
+            Once you have completed all required fields, click Deposit below. You will be redirected to the item page,
+            where you can check the deposit's progress.
     content_unsaved_changes:
       toasts:
         discarded: "Unsaved changes to files discarded"
@@ -452,6 +455,9 @@ en:
         tabs:
           deposit:
             label: "Deposit"
+            help_text: >-
+              Once you have completed all required fields, click Deposit below. You will be redirected to the item page,
+              where you can check the deposit's progress.
         toasts:
           deposited: "Item updated and deposit started."
           updated: "Item updated."
