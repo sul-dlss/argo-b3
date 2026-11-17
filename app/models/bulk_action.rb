@@ -96,14 +96,23 @@ class BulkAction < ApplicationRecord
     filepath_for(filename: bulk_action_config.find_export(key).filename)
   end
 
-  # @return [Array<BulkActions::Export>] the exports whose files have been created
+  # @return [Array<BulkActions::Export>] the exports whose files have been created, one per file matching a glob
   def existing_exports
-    exports.select { |export| File.exist?(filepath_for(filename: export.filename)) }
+    exports.flat_map do |export|
+      Dir.glob(filepath_for(filename: export.filename)).map do |filepath|
+        export.dup.tap { |existing_export| existing_export.filename = File.basename(filepath) }
+      end
+    end
   end
 
   # Only the log and export files may be downloaded.
   def downloadable_filename?(filename)
-    filename == log_filename || exports.any? { |export| export.filename == filename }
+    filename == log_filename || existing_exports.any? { |export| export.filename == filename }
+  end
+
+  # @return [ActiveSupport::TimeWithZone, nil] when the bulk action is to be destroyed, if it expires
+  def expires_at
+    created_at + bulk_action_config.expires_after if bulk_action_config.expires_after
   end
 
   def reset_druid_counts!

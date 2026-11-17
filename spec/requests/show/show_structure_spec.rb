@@ -97,6 +97,35 @@ RSpec.describe 'Show structure' do
         .to include("href=\"/objects/#{token}/file_download?filepath=folder1%2Fbc123df4567_0001.tiff\"")
     end
 
+    it 'renders the download files bulk action button' do
+      get "/objects/#{token}/structure"
+
+      page = Capybara.string(response.body)
+      expect(page).to have_css("form[action='/objects/#{token}/download_files_bulk_action'] " \
+                               'button:not([disabled])', text: 'Start download files bulk action')
+      expect(page).to have_no_text('No files are available to download.')
+    end
+
+    context 'when no file is available' do
+      let(:cocina_hash) do
+        super().tap do |hash|
+          hash[:structural][:contains][0][:structural][:contains][0][:administrative][:shelve] = false
+        end
+      end
+
+      before do
+        allow(Sdr::WorkflowService).to receive(:accessioned?).and_return(false)
+      end
+
+      it 'disables the download files bulk action button' do
+        get "/objects/#{token}/structure"
+
+        page = Capybara.string(response.body)
+        expect(page).to have_button('Start download files bulk action', disabled: true)
+        expect(page).to have_text('No files are available to download.')
+      end
+    end
+
     context 'when the content is invalid for the content type' do
       # Published files in a file resource are an error for a book.
       let(:cocina_object) do

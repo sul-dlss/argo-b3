@@ -39,7 +39,7 @@ Applying the Object Access to every file when saving an item whose Object Access
 SDR's archival store of every preserved file of each accessioned Version. It is not subject to File Access. A shelved file that is not preserved is copied from Stacks into Preservation when it is changed to preserved.
 
 ### Stacks
-Where shelved files are served from (e.g., for PURL and file download), subject to their File Access.
+Where shelved files are served from (e.g., for PURL and file download), subject to their File Access. Argo-B3 can download any shelved file from Stacks, regardless of its File Access.
 
 ### Version
 A numbered state of an object in SDR; a new version is opened for changes and closed when deposited. DSA stores cocina for each version except legacy versions, and a version's stored cocina may no longer be valid against the current cocina models.

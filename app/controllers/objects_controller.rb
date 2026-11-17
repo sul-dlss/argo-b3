@@ -133,6 +133,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   def show_files
     @content = fetch_content
     @druid_token = params[:druid]
+    @downloadable_files = DownloadableFiles.new(content: @content, file_availability:)
 
     render layout: false
   end
@@ -142,8 +143,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @content_file_sets = @content.content_file_sets.includes(content_files: :content_file_binary).to_a
     @content_type = cocina_hash[:type]
     @content_validation_result = fetch_content_validation_result(content: @content)
-    @file_download_presenter = FileDownloadPresenter.new(druid: verified_druid, druid_token: params[:druid],
-                                                         cocina_version: cocina_hash[:version])
+    @druid_token = params[:druid]
+    @file_download_presenter = FileDownloadPresenter.new(druid_token: @druid_token, file_availability:)
+    @downloadable_files = DownloadableFiles.new(content: @content, file_availability:)
 
     render layout: false
   end
@@ -480,6 +482,10 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   def cocina_object
     # dup since build_from_cocina_hash deletes keys from the hash it is given.
     @cocina_object ||= CocinaSupport.build_from_cocina_hash(cocina_hash.dup)
+  end
+
+  def file_availability
+    @file_availability ||= FileAvailability.new(druid: verified_druid, cocina_version: cocina_hash[:version])
   end
 
   # The immutable Content usually exists for the lock, so the full cocina object is only fetched when it doesn't.

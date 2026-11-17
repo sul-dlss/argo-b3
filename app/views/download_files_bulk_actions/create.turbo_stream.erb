@@ -1,0 +1,5 @@
+<%= turbo_stream.append 'toast-container' do %>
+  <%= render SdrViewComponents::Elements::ToastComponent.new(title: t('.title'),
+                                                             text: link_to(t('.view_bulk_actions'), bulk_actions_path, class: 'text-white'),
+                                                             disappearing: !Rails.env.test?) %>
+<% end %>

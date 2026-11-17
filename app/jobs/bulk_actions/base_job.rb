@@ -27,7 +27,7 @@ module BulkActions
 
       bulk_action.started!
 
-      log("Starting #{self.class} for BulkAction #{bulk_action.id}")
+      log_start
       update_druid_count!
 
       # Current.user is needed for some jobs, e.g., so that permission changes are recorded as events in SDR.
@@ -115,6 +115,13 @@ module BulkActions
       Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
 
       broadcast_toast(title: "#{bulk_action.label} completed", user: bulk_action.user)
+    end
+
+    def log_start
+      log("Starting #{self.class} for BulkAction #{bulk_action.id}")
+      return unless bulk_action.expires_at
+
+      log("This bulk action and its files will be deleted after #{format_datetime(bulk_action.expires_at)}.")
     end
 
     def cancel!

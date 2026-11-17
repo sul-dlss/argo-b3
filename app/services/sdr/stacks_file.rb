@@ -1,13 +1,30 @@
 # frozen_string_literal: true
 
+require 'faraday/retry'
+
 module Sdr
   # Retrieves a shelved file from stacks.
   class StacksFile
+    # Raised when stacks fails (a 5xx response).
+    class Error < StandardError; end
+
     # Raised when stacks does not provide the file, e.g., it is not shelved or the download is not permitted.
-    class NotFoundError < StandardError; end
+    class NotFoundError < Error; end
+
+    RETRY_OPTIONS = {
+      max: 2,
+      interval: 5,
+      backoff_factor: 2,
+      exceptions: [*Faraday::Retry::Middleware::DEFAULT_EXCEPTIONS, Faraday::ConnectionFailed],
+      retry_statuses: [500, 502, 503, 504]
+    }.freeze
 
     def self.stream(druid:, filepath:, &)
       new(druid:, filepath:).stream(&)
+    end
+
+    def self.to_file(druid:, filepath:, destination:)
+      new(druid:, filepath:).to_file(destination:)
     end
 
     # @param [String] druid the druid of the object
@@ -21,23 +38,46 @@ module Sdr
     # Follows a redirect to another host (e.g., a signed S3 URL), but not within stacks (e.g., to log in).
     # @yieldparam [String] chunk of the file
     # @raise [NotFoundError] if stacks does not provide the file
+    # @raise [Error] if stacks fails
     def stream(&)
-      response = get(url, headers, &)
-      redirect_url = redirect_url(response)
-      # The redirect URL carries its own authorization, so the service token is not sent.
-      response = get(redirect_url, {}, &) if redirect_url
-      return if response.status == 200
+      download(Faraday.new, &)
+    end
 
-      raise NotFoundError, "Stacks returned #{response.status} for #{druid} (#{filepath})"
+    # Writes the file to the destination, retrying failed requests.
+    # @param [String] destination path of the file to write
+    # @raise [NotFoundError] if stacks does not provide the file
+    # @raise [Error] if stacks fails
+    def to_file(destination:)
+      File.open(destination, 'wb') do |file|
+        # A retry restarts the download, so the partly written file is discarded.
+        connection = Faraday.new do |builder|
+          builder.request :retry, **RETRY_OPTIONS, retry_block: proc {
+            file.truncate(0)
+            file.rewind
+          }
+        end
+        download(connection) { |chunk| file.write(chunk) }
+      end
     end
 
     private
 
     attr_reader :druid, :filepath
 
+    def download(connection, &)
+      response = get(connection, url, headers, &)
+      redirect_url = redirect_url(response)
+      # The redirect URL carries its own authorization, so the service token is not sent.
+      response = get(connection, redirect_url, {}, &) if redirect_url
+      return if response.status == 200
+
+      error_class = response.status >= 500 ? Error : NotFoundError
+      raise error_class, "Stacks returned #{response.status} for #{druid} (#{filepath})"
+    end
+
     # Yields the body only if the response is OK.
-    def get(url, headers)
-      Faraday.get(url, nil, headers) do |request|
+    def get(connection, url, headers)
+      connection.get(url, nil, headers) do |request|
         request.options.on_data = proc do |chunk, _size, env|
           yield chunk if env.status == 200
         end

@@ -95,6 +95,12 @@ RSpec.describe 'Show files' do
       expect(Sdr::Repository).to have_received(:find).with(druid:, without_structural_contains: false)
     end
 
+    it 'renders the download files bulk action button' do
+      get "/objects/#{token}/files"
+
+      expect(Capybara.string(response.body)).to have_button('Start download files bulk action', disabled: false)
+    end
+
     context 'when the immutable Content already exists for the lock' do
       before do
         Contents::Builder.call(cocina_object:)

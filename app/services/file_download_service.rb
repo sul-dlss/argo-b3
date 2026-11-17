@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 # A Rack body that streams a file of an object from its staged files, preservation, or stacks (the first that has it).
+# It can also write the file to a local path.
 class FileDownloadService
   # Raised, before any data is written, if no source has the file.
   class NotFoundError < StandardError; end
 
   CHUNK_SIZE = 1.megabyte
+
+  def self.to_file(druid:, filepath:, destination:)
+    new(druid:, filepath:).to_file(destination:)
+  end
 
   # @param [String] druid the druid of the object
   # @param [String] filepath the path of the file within the object
@@ -38,6 +43,18 @@ class FileDownloadService
     stream.close
   end
 
+  # Writes the file to the destination, retrying failed downloads from preservation or stacks.
+  # @param [String] destination path of the file to write
+  # @raise [NotFoundError] if no source has the file
+  # @raise [Sdr::StacksFile::Error] if stacks fails
+  def to_file(destination:)
+    return FileUtils.cp(staged_filepath, destination) if staged_filepath
+
+    Preservation::Client.objects.content_to_file(druid:, filepath:, destination_filepath: destination)
+  rescue Preservation::Client::NotFoundError
+    stacks_to_file(destination:)
+  end
+
   private
 
   attr_reader :druid, :filepath, :staged_filepath
@@ -56,6 +73,12 @@ class FileDownloadService
     stream_preserved_file(&)
   rescue Preservation::Client::NotFoundError
     stream_stacks_file(&)
+  end
+
+  def stacks_to_file(destination:)
+    Sdr::StacksFile.to_file(druid:, filepath:, destination:)
+  rescue Sdr::StacksFile::NotFoundError => e
+    raise NotFoundError, e.message
   end
 
   def stream_staged_file

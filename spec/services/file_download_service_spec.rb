@@ -105,4 +105,68 @@ RSpec.describe FileDownloadService do
       end
     end
   end
+
+  describe '.to_file' do
+    let(:filepath) { 'folder1/image1.tif' }
+    let(:destination) { Rails.root.join('tmp/file_download_service_spec.tif').to_s }
+    let(:objects_client) { instance_double(Preservation::Client::Objects, content_to_file: nil) }
+    let(:stacks_url) { "#{Settings.stacks.file_url}/#{druid}/folder1/image1.tif" }
+
+    def to_file
+      described_class.to_file(druid:, filepath:, destination:)
+    end
+
+    after { FileUtils.rm_f(destination) }
+
+    context 'when the file is staged' do
+      let(:staged_filepath) { StagingSupport.staging_filepath(druid:, filepath:) }
+
+      before do
+        FileUtils.mkdir_p(File.dirname(staged_filepath))
+        File.write(staged_filepath, 'staged content')
+      end
+
+      after { FileUtils.rm_rf(StagingSupport.staging_content_path(druid:)) }
+
+      it 'copies the staged file' do
+        to_file
+
+        expect(File.read(destination)).to eq('staged content')
+        expect(objects_client).not_to have_received(:content_to_file)
+      end
+    end
+
+    context 'when the file is preserved' do
+      it 'downloads the file from preservation' do
+        to_file
+
+        expect(objects_client).to have_received(:content_to_file)
+          .with(druid:, filepath:, destination_filepath: destination)
+      end
+    end
+
+    context 'when the file is only in stacks' do
+      before do
+        allow(objects_client).to receive(:content_to_file).and_raise(Preservation::Client::NotFoundError)
+        stub_request(:get, stacks_url).to_return(status: 200, body: 'stacks content')
+      end
+
+      it 'downloads the file from stacks' do
+        to_file
+
+        expect(File.read(destination)).to eq('stacks content')
+      end
+    end
+
+    context 'when no source has the file' do
+      before do
+        allow(objects_client).to receive(:content_to_file).and_raise(Preservation::Client::NotFoundError)
+        stub_request(:get, stacks_url).to_return(status: 404)
+      end
+
+      it 'raises' do
+        expect { to_file }.to raise_error(described_class::NotFoundError)
+      end
+    end
+  end
 end
