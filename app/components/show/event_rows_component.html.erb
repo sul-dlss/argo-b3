@@ -13,7 +13,7 @@
           <dt class="col-sm-3"><%= key_label(key) %></dt>
           <dd class="col-sm-9">
             <% if json?(value) %>
-              <%= render Elements::JsonViewerComponent.new(hash: value, expanded: 1, show_toolbar: false) %>
+              <%= render Elements::JsonViewerComponent.new(hash: value, expanded: 1, show_expand_buttons: false) %>
             <% else %>
               <%= value %>
             <% end %>

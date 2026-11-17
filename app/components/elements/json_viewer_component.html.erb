@@ -1,15 +1,24 @@
-<%# The json is an attribute (not content), since the viewer re-renders on attribute changes (e.g., from a morph). %>
-<%= tag.andypf_json_viewer indent: 3,
-                           expanded:,
-                           theme: 'cupertino',
-                           'show-data-types': false,
-                           'show-toolbar': show_toolbar,
-                           'expand-icon-type': 'arrow',
-                           'show-copy': true,
-                           'show-size': false,
-                           'preserve-expanded': false,
-                           'expand-empty': false,
-                           data: hash %>
-<% if show_tip %>
-  <p class="mt-2"><small><em>Tip: Shift + Click to expand/collapse all nodes.</em></small></p>
+<%= tag.div data: { controller: 'json-viewer' } do %>
+  <% if show_expand_buttons %>
+    <div class="d-flex gap-2 mb-2">
+      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Expand all', variant: :'outline-primary', size: :sm,
+                                                                  data: { action: 'json-viewer#expandAll' }) %>
+      <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Collapse all', variant: :'outline-primary', size: :sm,
+                                                                  data: { action: 'json-viewer#collapseAll' }) %>
+    </div>
+  <% end %>
+  <%# The json is an attribute (not content), since the viewer re-renders on attribute changes (e.g., from a morph).
+      The data option holds the json, so the Stimulus target is given as a literal attribute. %>
+  <%= tag.andypf_json_viewer indent: 3,
+                             expanded:,
+                             theme: 'cupertino',
+                             'show-data-types': false,
+                             'show-toolbar': false,
+                             'expand-icon-type': 'arrow',
+                             'show-copy': true,
+                             'show-size': false,
+                             'preserve-expanded': false,
+                             'expand-empty': false,
+                             'data-json-viewer-target': 'viewer',
+                             data: hash %>
 <% end %>

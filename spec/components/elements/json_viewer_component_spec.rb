@@ -8,11 +8,21 @@ RSpec.describe Elements::JsonViewerComponent, type: :component do
   context 'with default options' do
     let(:component) { described_class.new(hash:) }
 
-    it 'renders the json-viewer element with default attributes' do
+    it 'renders the json-viewer element without the toolbar and with the expand and collapse buttons' do
       render_inline(component)
 
-      expect(page).to have_css('andypf-json-viewer[expanded][show-toolbar]')
-      expect(page).to have_no_text('Tip: Shift + Click')
+      expect(page).to have_css('div[data-controller="json-viewer"] ' \
+                               'andypf-json-viewer[expanded][show-toolbar="false"][data-json-viewer-target="viewer"]')
+      expect(page).to have_button('Expand all')
+      expect(page).to have_css('button[data-action="json-viewer#expandAll"]')
+      expect(page).to have_button('Collapse all')
+      expect(page).to have_css('button[data-action="json-viewer#collapseAll"]')
+    end
+
+    it 'renders the json in the data attribute' do
+      render_inline(component)
+
+      expect(page.find('andypf-json-viewer')['data']).to eq('{"foo":"bar","baz":42}')
     end
   end
 
@@ -26,23 +36,15 @@ RSpec.describe Elements::JsonViewerComponent, type: :component do
     end
   end
 
-  context 'when show_toolbar is false' do
-    let(:component) { described_class.new(hash:, show_toolbar: false) }
+  context 'when show_expand_buttons is false' do
+    let(:component) { described_class.new(hash:, show_expand_buttons: false) }
 
-    it 'renders the json-viewer element without show-toolbar attribute' do
+    it 'does not render the expand and collapse buttons' do
       render_inline(component)
 
-      expect(page).to have_css('andypf-json-viewer[show-toolbar="false"]')
-    end
-  end
-
-  context 'when show_tip is true' do
-    let(:component) { described_class.new(hash:, show_tip: true) }
-
-    it 'renders the tip paragraph' do
-      render_inline(component)
-
-      expect(page).to have_text('Tip: Shift + Click')
+      expect(page).to have_css('andypf-json-viewer')
+      expect(page).to have_no_button('Expand all')
+      expect(page).to have_no_button('Collapse all')
     end
   end
 end
