@@ -104,6 +104,11 @@ $search-color: rgb(#{$search-color-rgb});
   @include media-breakpoint-up(sm) {
     flex-basis: 0;
   }
+
+  // Spaces the component library's search icon from the keyword field.
+  .input-group::before {
+    margin-right: 0.5rem;
+  }
 }
 
 // Removes Tom Select's caret margin so a chosen single value doesn't look like it has a trailing space.

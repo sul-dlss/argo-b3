@@ -114,8 +114,6 @@ class SearchForm < ApplicationForm
   # Not a facet: limits the objects to those of the Multi-Item Deposits.
   attribute :multi_item_deposit_action_ids, array: true, default: -> { [] }
   attribute :object_types, array: true, default: -> { [] }
-  # This removes a blank submitted by the search bar.
-  normalizes_array_compact_blank :object_types
   attribute :processing_statuses, array: true, default: -> { [] }
   attribute :projects, array: true, default: -> { [] }
   attribute :regions, array: true, default: -> { [] }

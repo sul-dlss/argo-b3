@@ -4,19 +4,7 @@
     <search class="search-card d-flex position-relative flex-wrap align-items-center column-gap-3 row-gap-2 py-2 rounded">
       <%= helpers.form_with model: search_form, scope: '', url:, method: :get, class: 'search-query-form' do |form| %>
         <%= render Search::FormHiddenFieldsComponent.new(form_builder: form, search_form:, form_fields: :query) %>
-        <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
-                                                                field_name: :object_types,
-                                                                text: 'Select object type',
-                                                                hidden: true) %>
         <div class="input-group">
-          <%= render SdrViewComponents::Forms::BasicSelectFieldComponent.new(form:,
-                                                                             field_name: :object_types,
-                                                                             classes: 'custom-select search-field d-none d-md-block',
-                                                                             options: object_type_options,
-                                                                             prompt: 'All object types',
-                                                                             # Hack to use a single select (instead of multiselect) submitting to an array field.
-                                                                             name: 'object_types[]') %>
-
           <%= render SdrViewComponents::Forms::LabelComponent.new(form:,
                                                                   field_name: :query,
                                                                   text: 'Search for',
