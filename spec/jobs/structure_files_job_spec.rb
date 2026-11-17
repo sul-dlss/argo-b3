@@ -26,6 +26,19 @@ RSpec.describe StructureFilesJob do
     expect(Sdr::Repository).to have_received(:find).with(druid:)
   end
 
+  context 'when item details are saved with the content' do
+    before do
+      content.update!(content_type: Cocina::Models::ObjectType.object, access_view: 'dark', access_download: 'none')
+    end
+
+    it 'structures the files with the saved content type and access' do
+      job.perform(content:, append: false)
+
+      expect(content.content_file_sets.reload.map(&:file_set_type)).to eq(%w[file file])
+      expect(content.content_files.map(&:view)).to eq(%w[dark dark])
+    end
+  end
+
   context 'when appending' do
     let!(:existing_content_file_set) do
       create(:content_file_set, content:, position: 1, label: 'Existing').tap do |content_file_set|

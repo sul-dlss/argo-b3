@@ -8,8 +8,9 @@ class StructureFilesJob < ApplicationJob
   # @param [Content] content
   # @param [Boolean] append whether to add the unassociated files to the existing resources rather than replacing them
   def perform(content:, append:)
-    cocina_object = Sdr::Repository.find(druid: content.druid)
-    populator = select_populator(content:, cocina_object:)
+    item_details = Contents::ItemDetails.new(content:)
+    cocina_object = item_details.apply_selected_access(Sdr::Repository.find(druid: content.druid))
+    populator = select_populator(content:, cocina_object:, item_details:)
     # A failure leaves the existing resources unchanged.
     ActiveRecord::Base.transaction do
       append ? populator.append(content:, cocina_object:) : populator.structure(content:, cocina_object:)
@@ -23,7 +24,9 @@ class StructureFilesJob < ApplicationJob
 
   private
 
-  def select_populator(content:, cocina_object:)
-    Contents::PopulatorSelector.call(content:, cocina_object:, content_type: cocina_object.type).actual_populator
+  def select_populator(content:, cocina_object:, item_details:)
+    Contents::PopulatorSelector.call(content:, cocina_object:,
+                                     content_type: item_details.selected_content_type(cocina_object))
+                               .actual_populator
   end
 end

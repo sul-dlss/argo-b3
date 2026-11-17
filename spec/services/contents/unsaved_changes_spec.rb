@@ -59,6 +59,28 @@ RSpec.describe Contents::UnsavedChanges do
     end
   end
 
+  context 'when item details were saved that match the object' do
+    before do
+      content.update!(content_type: cocina_object.type, with_embargo: false, access_view: 'world',
+                      access_download: 'world', overwrite_file_access: true, version_description: 'Changed')
+    end
+
+    it 'returns false' do
+      expect(unsaved_content_changes).to be false
+    end
+  end
+
+  context 'when item details were saved that differ from the object' do
+    before do
+      content.update!(content_type: cocina_object.type, with_embargo: false, access_view: 'stanford',
+                      access_download: 'stanford')
+    end
+
+    it 'returns true' do
+      expect(unsaved_content_changes).to be true
+    end
+  end
+
   context 'when the content has been staged but is otherwise unchanged' do
     before { content.content_file_binaries.update_all(file_location: 'stage') } # rubocop:disable Rails/SkipsModelValidations
 

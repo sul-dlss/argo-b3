@@ -77,6 +77,14 @@ RSpec.describe Contents::UnsavedChangesDiscarder do
     expect(content.content_file_binaries.find_by(filepath: 'page1.tif').file_location).to eq('deposited')
   end
 
+  it 'returns to the first step of managing files and clears the item details' do
+    content.update!(step: 'structure', content_type: Cocina::Models::ObjectType.image)
+
+    call
+
+    expect(content.reload).to have_attributes(step: 'details', content_type: nil)
+  end
+
   it 'keeps the content and its text extraction settings' do
     call
 
