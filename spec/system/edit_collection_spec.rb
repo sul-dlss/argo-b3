@@ -93,6 +93,7 @@ RSpec.describe 'Edit a collection' do
 
     click_button 'Apply APO defaults'
 
+    expect(page).to have_toast('APO defaults applied')
     expect(page).to have_field('Copyright', with: 'Other APO copyright.')
     # The APO has no default use and reproduction or license, so the collection's are cleared.
     expect(page).to have_field('Use and reproduction', with: '')

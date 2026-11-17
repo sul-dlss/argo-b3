@@ -14,7 +14,8 @@
             label: t('edit.items.fields.apo_druid.apply_defaults'),
             variant: :'outline-primary',
             classes: 'text-nowrap flex-shrink-0',
-            data: { action: 'apo-defaults#apply' }
+            data: { action: 'apo-defaults#apply',
+                    apo_defaults_toast_param: t('edit.items.fields.apo_druid.defaults_applied') }
           ) %>
     </div>
   <% end %>

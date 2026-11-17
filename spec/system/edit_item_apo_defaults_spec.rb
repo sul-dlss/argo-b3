@@ -73,9 +73,11 @@ RSpec.describe 'Apply APO defaults when editing an item' do
         expect(page).to have_select('Download access', selected: 'World')
         expect(page).to have_css('.form-text', text: 'APO default = Location Based', count: 2)
       end
+      expect(page).to have_no_css('.toast-container .toast', text: 'APO defaults applied')
 
       click_button 'Apply APO defaults'
 
+      expect(page).to have_toast('APO defaults applied')
       expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
       # The APO has no default use and reproduction, so the item's is cleared.
       expect(page).to have_field('Use and reproduction', with: '')

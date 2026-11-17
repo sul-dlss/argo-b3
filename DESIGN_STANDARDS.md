@@ -162,7 +162,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 
 ## Feedback, loading, and empty states
 
-- **FEED-1 MUST** Success and informational messages are disappearing toasts (`flash[:toast]`, or `ApplicationJob#broadcast_toast` from a job).
+- **FEED-1 MUST** Success and informational messages are disappearing toasts (`flash[:toast]`, `ApplicationJob#broadcast_toast` from a job, or a `toast:show` event for an action that happens only in the browser).
 - **FEED-2 MUST** Errors that stop the user are a danger alert (`flash[:danger]`) or field errors (FORM-6). Warnings that don't stop the user are a warning alert (`flash[:warning]`). Don't use `flash[:success]` or other flash keys.
 - **FEED-3 MUST** Inline alerts and banners use `AlertComponent`.
 - **FEED-4 MUST** Loading content shows a spinner with text (`SpinnerComponent`, e.g., inside lazy turbo frames). Use `Elements::RosetteSpinnerComponent` for long waits and placeholder skeletons (`placeholder-glow`) for search results. No spinner without text, visible or visually hidden.
