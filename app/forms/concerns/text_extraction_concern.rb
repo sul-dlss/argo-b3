@@ -12,7 +12,9 @@ module TextExtractionConcern
     attribute :ocr_languages, array: true, default: []
     # The multiple select submits a blank value alongside the selected languages.
     normalizes_array_compact_blank :ocr_languages
-    validates :ocr_languages, presence: true, if: :perform_ocr
+    validates :ocr_languages, if: :perform_ocr, presence: {
+      message: ->(*) { I18n.t('edit.items.fields.ocr_languages.validations.blank') }
+    }
 
     attribute :perform_speech_to_text, :boolean, default: false
   end

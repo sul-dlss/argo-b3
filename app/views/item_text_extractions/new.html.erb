@@ -1,0 +1,26 @@
+<%= page_title(t('edit.item_text_extractions.new.title'), name: @title) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('edit.item_text_extractions.new.title'), subtitle: @title) do %>
+  <%= form_with model: @item_text_extraction_form, url: item_text_extraction_path(@druid), method: :post, class: 'b3-form' do |form| %>
+    <% if form.object.perform_ocr %>
+      <%= render LanguageSelectorComponent.new(form:, label_mark_required: true) %>
+    <% end %>
+
+    <%= render Edit::TextExtractionWarningComponent.new(ocr: form.object.perform_ocr, speech_to_text: form.object.perform_speech_to_text) %>
+
+    <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-field') %>
+
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_text_extractions.new.buttons.draft'),
+                                                               value: ItemTextExtractionsController::DRAFT_VALUE,
+                                                               variant: 'outline-primary') %>
+      <%# Design standard deviation: AVAIL-4. Per #1440, deposit is hidden, not disabled, while files have unsaved changes. %>
+      <% if @unsaved_content_changes %>
+        <span><%= t('show.status.draft.unsaved_content_changes') %></span>
+      <% else %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_text_extractions.new.buttons.deposit'),
+                                                                 value: ItemTextExtractionsController::DEPOSIT_VALUE) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

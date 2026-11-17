@@ -29,6 +29,19 @@ RSpec.describe Elements::ButtonListComponent, type: :component do
     end
   end
 
+  context 'with a button component class' do
+    let(:component) { described_class.new(title: 'Update') }
+
+    it 'renders the button with the component class and the list spacing' do
+      render_inline(component) do |component|
+        component.with_button(component_class: SdrViewComponents::Elements::ButtonLinkComponent,
+                              link: '/extract', label: 'Extract text')
+      end
+
+      expect(page).to have_link('Extract text', href: '/extract', class: 'mb-2')
+    end
+  end
+
   context 'without help text' do
     let(:component) { described_class.new(title: 'Discard') }
 

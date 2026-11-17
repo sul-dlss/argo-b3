@@ -3,7 +3,11 @@
 module Elements
   # Component for a titled list of action buttons with optional help text.
   class ButtonListComponent < ApplicationComponent
-    renders_many :buttons, ->(classes: 'mb-2', **args) { SdrViewComponents::Elements::ButtonFormComponent.new(classes:, **args) }
+    # A button with its own rules (e.g., Show::ExtractTextButtonComponent) passes its component_class.
+    renders_many :buttons,
+                 lambda { |component_class: SdrViewComponents::Elements::ButtonFormComponent, classes: 'mb-2', **args|
+                   component_class.new(classes:, **args)
+                 }
 
     def initialize(title: nil, help_text: nil, classes: [])
       @title = title
