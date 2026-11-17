@@ -17,7 +17,7 @@
       </div>
     <% end %>
     <% layout.with_left_content do %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mb-0', text: t('dashboard.go_to_druid.heading')) %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mt-2 mb-3', text: t('dashboard.go_to_druid.heading')) %>
       <%= form_with model: @go_to_druid_form, url: go_to_druid_path, class: 'mb-5' do |form| %>
           <div class="d-flex">
             <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
@@ -48,33 +48,35 @@
       <% end %>
     <% end %>
     <% layout.with_main_content do %>
-      <% if Rails.env.development? %>
-        <%= render SdrViewComponents::Elements::AlertComponent.new(title: t('dashboard.development.heading'), dismissible: true, variant: :note, classes: 'mt-2') do %>
-          <p><%= t('dashboard.development.connections', solr_url: Settings.solr.url, dsa_url: Settings.dor_services.url) %></p>
+      <div class="pt-4">
+        <% if Rails.env.development? %>
+          <%= render SdrViewComponents::Elements::AlertComponent.new(title: t('dashboard.development.heading'), dismissible: true, variant: :note) do %>
+            <p><%= t('dashboard.development.connections', solr_url: Settings.solr.url, dsa_url: Settings.dor_services.url) %></p>
+          <% end %>
         <% end %>
-      <% end %>
 
-      <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
+        <%= render Dashboard::RecentObjectsTableComponent.new(recent_object_docs: @recent_object_docs) %>
 
-      <%= render Dashboard::MultiItemDepositsTableComponent.new(multi_item_deposit_actions: @recent_multi_item_deposit_actions) %>
+        <%= render Dashboard::MultiItemDepositsTableComponent.new(multi_item_deposit_actions: @recent_multi_item_deposit_actions) %>
 
-      <%= render Dashboard::RecentDraftsAndDepositsTableComponent.new(
-            object_docs: @recent_draft_and_deposit_docs,
-            statuses: @recent_draft_and_deposit_statuses,
-            search_form: @recent_drafts_and_deposits_search_form
-          ) %>
+        <%= render Dashboard::RecentDraftsAndDepositsTableComponent.new(
+              object_docs: @recent_draft_and_deposit_docs,
+              statuses: @recent_draft_and_deposit_statuses,
+              search_form: @recent_drafts_and_deposits_search_form
+            ) %>
 
-      <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
+        <%= render Dashboard::PinnedSearchesTableComponent.new(pinned_searches: @pinned_searches) %>
 
-      <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>
+        <%= render Dashboard::PinnedItemsTableComponent.new(pinned_item_docs: @pinned_item_docs) %>
 
-      <%= render Dashboard::PinnedCollectionsTableComponent.new(pinned_collection_docs: @pinned_collection_docs) %>
+        <%= render Dashboard::PinnedCollectionsTableComponent.new(pinned_collection_docs: @pinned_collection_docs) %>
 
-      <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
+        <%= render Dashboard::PinnedAposTableComponent.new(pinned_apo_docs: @pinned_apo_docs) %>
 
-      <%= render Dashboard::PinnedTagsTableComponent.new(pinned_tags: @pinned_tags) %>
+        <%= render Dashboard::PinnedTagsTableComponent.new(pinned_tags: @pinned_tags) %>
 
-      <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
+        <%= render Dashboard::PinnedVirtualObjectsTableComponent.new(pinned_virtual_object_docs: @pinned_virtual_object_docs) %>
+      </div>
     <% end %>
   <% end %>
 <% end %>

@@ -259,7 +259,7 @@ RSpec.describe 'Show item' do
     expect(page).to have_table_value('overview-table', 'Last deposited', '2026-07-26')
 
     # APO, Collection, Rights table
-    expect(page).to have_table_caption('apo-collection-rights-table', 'APO, Collection, Rights')
+    expect(page).to have_table_caption('apo-collection-rights-table', 'APO, collection, rights')
     within(find_table_value_cell('apo-collection-rights-table', 'APO')) do
       expect(page).to have_link('My APO', href: "/objects/#{apo_druid}")
       expect(page).to have_link('All objects with this APO',
