@@ -27,6 +27,24 @@ end
 
 Capybara::Selenium::Driver.prepend(SeleniumTeardownResilience)
 
+# Chrome 158 rejects the "*" origin Capybara's reset! clears storage for; remove when fixed upstream.
+# See https://github.com/teamcapybara/capybara/issues/2865
+module ChromeResetWithoutWildcardOrigin
+  private
+
+  def execute_cdp(cmd, params = {})
+    return super unless cmd == 'Storage.clearDataForOrigin' && params[:origin] == '*'
+
+    super('Network.clearBrowserCookies')
+    server = Capybara.current_session.server
+    return unless server && params[:storageTypes].include?('local_storage')
+
+    super(cmd, { origin: server.base_url, storageTypes: 'local_storage' })
+  end
+end
+
+Capybara::Selenium::Driver::ChromeDriver.prepend(ChromeResetWithoutWildcardOrigin)
+
 # This is to prevent the animation from running in the system tests which can make the tests flaky.
 Capybara.disable_animation = true
 
