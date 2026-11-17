@@ -142,32 +142,29 @@ RSpec.describe 'Content file sets' do
                                                                                 mime_type: 'image/tiff'))
       end
 
-      it 'redirects to show with a reload of the files sections' do
+      it 'redirects to show with a reload of the structure validation' do
         patch content_content_file_set_path(content_token, content_file_set, counter: 0),
               params: destroy_params
 
         expect(response).to redirect_to(
-          content_content_file_set_path(content_token, content_file_set, counter: 0, files_deleted: true,
-                                                                         structure_changed: true)
+          content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
         )
         follow_redirect!
-        expect(response.body).to include('data-controller="frame-reloader"')
+        expect(response.body)
+          .to include(%(frame-reloader-reloadable-frame-outlet="#structure-validation_content_#{content.id}"))
       end
     end
 
     context 'when every file is deleted' do
       let(:content_file) { create(:content_file, content_file_set:) }
 
-      it 'removes the resource and reloads the files sections' do
+      it 'removes the resource and refreshes the page' do
         patch content_content_file_set_path(content_token, content_file_set, counter: 0),
               params: destroy_params,
               headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
 
         expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-        expect(response.body).to include(
-          %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
-        )
-        expect(response.body).to include('data-controller="frame-reloader"')
+        expect(response.body).to include('<turbo-stream action="refresh"')
         expect(response.body).to include('Resource deleted')
         expect(ContentFileSet.exists?(content_file_set.id)).to be false
       end
@@ -179,17 +176,26 @@ RSpec.describe 'Content file sets' do
       create(:content_file, content_file_set:)
     end
 
-    it 'deletes the resource and reloads the files sections' do
-      delete content_content_file_set_path(content_token, content_file_set),
-             headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+    it 'deletes the resource and redirects to the structure step' do
+      delete content_content_file_set_path(content_token, content_file_set)
 
-      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-      expect(response.body).to include(
-        %(<turbo-stream action="replace" target="content_file_set_#{content_file_set.id}">)
-      )
-      expect(response.body).to include('data-controller="frame-reloader"')
-      expect(response.body).to include('Resource deleted')
+      expect(response).to redirect_to(edit_content_path('druid:bc123df4567'))
+      expect(response).to have_http_status(:see_other)
+      expect(flash[:toast]).to eq('Resource deleted')
       expect(ContentFileSet.exists?(content_file_set.id)).to be false
+    end
+
+    context 'when the content is busy' do
+      let(:content) { create(:content, druid: 'druid:bc123df4567', structuring_state: 'structuring') }
+
+      it 'refreshes the page without deleting' do
+        delete content_content_file_set_path(content_token, content_file_set),
+               headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+
+        expect(response).to have_http_status(:conflict)
+        expect(response.body).to include('<turbo-stream action="refresh"')
+        expect(ContentFileSet.exists?(content_file_set.id)).to be true
+      end
     end
 
     context 'when the file set belongs to a different content' do
@@ -211,16 +217,15 @@ RSpec.describe 'Content file sets' do
     let!(:third_content_file_set) { create(:content_file_set, content:, position: 3, label: 'Third') }
 
     def move(content_file_set, direction:)
-      patch move_content_content_file_set_path(content_token, content_file_set, direction:),
-            headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+      patch move_content_content_file_set_path(content_token, content_file_set, direction:)
     end
 
-    it 'moves the resource up and reloads the files sections' do
+    it 'moves the resource up and redirects to the structure step' do
       move(second_content_file_set, direction: 'up')
 
-      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
-      expect(response.body).to include('data-controller="frame-reloader"')
-      expect(response.body).to include('Resource moved')
+      expect(response).to redirect_to(edit_content_path('druid:bc123df4567'))
+      expect(response).to have_http_status(:see_other)
+      expect(flash[:toast]).to eq('Resource moved')
       expect(content.content_file_sets.pluck(:label)).to eq(%w[Second First Third])
     end
 

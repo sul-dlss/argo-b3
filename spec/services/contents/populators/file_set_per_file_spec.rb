@@ -11,6 +11,12 @@ RSpec.describe Contents::Populators::FileSetPerFile do
   end
   let!(:content_file_binary) { create(:content_file_binary, content:, filepath: 'folder/image1.tif') }
 
+  describe '.label' do
+    it 'returns the label' do
+      expect(described_class.label).to eq 'Default (resource per file)'
+    end
+  end
+
   describe '.structure' do
     it 'creates a file set and file for an unassociated binary' do
       structure

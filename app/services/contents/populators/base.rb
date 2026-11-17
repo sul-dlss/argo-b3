@@ -21,6 +21,11 @@ module Contents
         new(...).append
       end
 
+      # @return [String] the label shown to users, e.g., Book (resource per page)
+      def self.label
+        I18n.t("edit.contents.structure.populators.#{name.demodulize.underscore}")
+      end
+
       # @return [Array<Symbol>] the reasons that this populator cannot be used for the content.
       def self.disqualifying_reasons(**)
         []

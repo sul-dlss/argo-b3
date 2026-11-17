@@ -147,14 +147,14 @@ RSpec.describe Show::FileSetComponent, type: :component do
     end
     let(:content_file_set) { create(:content_file_set) }
 
-    it 'renders a delete button that confirms' do
+    it 'renders a delete button that confirms and submits from the page' do
       render_inline(component)
 
       expect(page).to have_css("form[action='/contents/abc123/content_file_sets/#{content_file_set.id}']" \
                                "[data-turbo-confirm='Delete resource 2 and its files?']")
       expect(page).to have_css('input[name="_method"][value="delete"]', visible: :hidden)
       expect(page).to have_button('Delete resource 2')
-      expect(page).to have_no_css('form[data-turbo-frame="_top"]')
+      expect(page).to have_css('form[data-turbo-frame="_top"]')
     end
 
     it 'renders disableable edit, move, and delete buttons' do

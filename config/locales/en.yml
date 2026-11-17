@@ -298,13 +298,12 @@ en:
             invalid: "Content errors must be fixed."
       discovery:
         spinner: "Discovering files..."
-        toasts:
-          completed: "Completed discovering files"
       edit:
         files_section:
           label: 'Files'
           heading: 'Files (%{file_count})'
-        title: "Manage files"
+        title: "Manage files and structure"
+        files_required: "Add at least one file to continue."
         buttons:
           cancel_confirm: "Discard unsaved changes to files?"
           discover_files: "Discover files"
@@ -330,15 +329,19 @@ en:
           one: "There is 1 file that has not been added to the structure."
           other: "There are %{count} files that have not been added to the structure."
         toasts:
-          structure: "Structure built from files"
-          append: "Files appended to structure"
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"
         buttons:
+          structure: "Structure files"
+          restructure: "Clear and structure files again"
           delete_all: "Delete all files and resources"
           delete_all_confirm: "Are you sure you want to delete all files and resources?"
         warnings:
-          discovering: "Files are being discovered. Try again when discovery has finished."
+          busy: "Files are being staged, discovered, or structured. Try again when that has finished."
+        results:
+          structured: "Files were structured with the %{populator} model."
+          not_used: "The %{populator} model was not used because:"
+          failed: "Structuring files failed. Try again, or contact SDR support if the problem continues."
         populators:
           agreement: 'Agreement (resource per file)'
           book: "Book (resource per page)"
@@ -355,18 +358,15 @@ en:
           no_media: "there are no audio or video files"
           no_models: "there are no 3D model files"
           no_pdfs: "there are no PDF files"
-      tabs:
-        details:
-          label: "Item details"
-        add_files:
-          label: "Add files"
-        structural:
-          label: "Structure files"
-        deposit:
-          label: "Deposit"
-          help_text: >-
-            Once you have completed all required fields, click Deposit below. You will be redirected to the item page,
-            where you can check the deposit's progress.
+      steps:
+        label: "Manage files progress"
+        details: "Item details"
+        files: "Add and edit files"
+        structure: "Structure files"
+        deposit: "Deposit"
+        deposit_help_text: >-
+          Once you have completed all required fields, click Deposit below. You will be redirected to the item page,
+          where you can check the deposit's progress.
     content_unsaved_changes:
       toasts:
         discarded: "Unsaved changes to files discarded"

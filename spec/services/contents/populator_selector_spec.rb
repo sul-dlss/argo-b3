@@ -30,7 +30,8 @@ RSpec.describe Contents::PopulatorSelector do
     it 'selects the book populator without reasons' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Book,
                                         actual_populator: Contents::Populators::Book,
-                                        reasons: [])
+                                        reasons: [],
+                                        fallback_to_default_model?: false)
     end
   end
 
@@ -64,7 +65,8 @@ RSpec.describe Contents::PopulatorSelector do
     it 'falls back to the file set per file populator' do
       expect(result).to have_attributes(populator_for_content_type: Contents::Populators::Image,
                                         actual_populator: Contents::Populators::FileSetPerFile,
-                                        reasons: [:hierarchical_filepaths])
+                                        reasons: [:hierarchical_filepaths],
+                                        fallback_to_default_model?: true)
     end
   end
 
