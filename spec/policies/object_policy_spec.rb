@@ -22,6 +22,10 @@ RSpec.describe ObjectPolicy, type: :policy do
       expect(policy.resolve_rule(:manage_user_versions?)).to eq(:edit?)
     end
 
+    it 'resolves redeposit_with_goobi? to edit?' do
+      expect(policy.resolve_rule(:redeposit_with_goobi?)).to eq(:edit?)
+    end
+
     it 'resolves show_json? to show?' do
       expect(policy.resolve_rule(:show_json?)).to eq(:show?)
     end

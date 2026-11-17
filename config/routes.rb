@@ -123,6 +123,7 @@ Rails.application.routes.draw do
       get 'structure', to: 'objects#show_structure'
       get 'constituents', to: 'objects#show_constituents'
       post 'republish', to: 'objects#republish'
+      post 'redeposit_with_goobi', to: 'objects#redeposit_with_goobi'
       post 'deposit', to: 'objects#deposit'
       delete 'discard_draft', to: 'objects#discard_draft'
       delete 'purge', to: 'objects#purge'

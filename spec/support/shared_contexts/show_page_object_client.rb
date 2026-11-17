@@ -5,7 +5,7 @@
 # lands on the show page picks it up.
 #
 # Requires `druid`. Override the value lets (e.g., `version_inventory`, `milestones`, `release_tags`, `events`,
-# `event_types`) or the `version_status` double for the data a spec cares about.
+# `event_types`, `workflows_xml`) or the `version_status` double for the data a spec cares about.
 #
 # Usage:
 #   include_context 'with show page object client'
@@ -18,12 +18,13 @@ RSpec.shared_context 'with show page object client' do
   let(:release_tags) { [] }
   let(:events) { [] }
   let(:event_types) { %w[version_open] }
+  let(:workflows_xml) { '<workflows/>' }
 
   let(:object_client) do
     instance_double(Dor::Services::Client::Object, version: version_client, milestones: milestones_client,
                                                    release_tags: release_tags_client,
                                                    user_version: user_version_client, events: events_client,
-                                                   lock: object_lock)
+                                                   workflows: workflows_response, lock: object_lock)
   end
   let(:version_client) do
     instance_double(Dor::Services::Client::ObjectVersion, inventory: version_inventory, status: version_status)
@@ -34,6 +35,7 @@ RSpec.shared_context 'with show page object client' do
                                                                          closeable?: true, open?: true,
                                                                          discardable?: true, version: 1)
   end
+  let(:workflows_response) { Dor::Services::Response::Workflows.new(xml: Nokogiri::XML(workflows_xml)) }
   let(:user_version_client) { instance_double(Dor::Services::Client::UserVersion, inventory: user_version_inventory) }
   let(:milestones_client) do
     instance_double(Dor::Services::Client::Milestones, list: milestones, date: milestone_date)

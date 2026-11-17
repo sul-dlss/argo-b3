@@ -62,6 +62,9 @@ A Deposit a user starts for one object, from manage files, the edit item form, o
 ### Bulk Action Object Deposit
 The Deposit of one object made by a Bulk Action, either Redeposit or a Bulk Action that closes versions. Use "Bulk Action Object Deposit" rather than "Bulk Action Deposit", which reads as the name of a Bulk Action.
 
+### Goobi Redeposit
+Sending an existing image or book Item to Goobi to be processed again, opening a Version if one is not already open. It is not a Deposit: Goobi deposits the Item later, outside Argo-B3, which closes the Version. Its outcome is not reported to the user who started it, so it is not a Tracked Deposit.
+
 ### Deposit Lifecycle
 The stages a Deposit passes through: **Initiating** (MID Item Deposits only, while Deposit Initiation runs), **Staging**, **Assembling** (an assembly workflow, e.g., `assemblyWF`, `gisAssemblyWF`, `ocrWF`, is active and the Version is still open), **Accessioning** (the Version is closed and `accessionWF` is active), and **Complete** (`accessionWF` has finished for the Version). Use "Accessioning" even though the UI labels that stage "Depositing", and "Complete" for what the UI shows as "Deposited".
 
