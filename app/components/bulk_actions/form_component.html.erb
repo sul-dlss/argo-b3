@@ -1,4 +1,8 @@
-<%= render Layout::ContainerComponent.new(heading: label, classes: 'b3-form') do %>
+<%= render Layout::ContainerComponent.new(heading: label, classes: 'b3-form') do |container| %>
+  <% container.with_breadcrumb do %>
+    <%= render Elements::BreadcrumbComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
+  <% end %>
+
   <%= content %>
 
   <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,

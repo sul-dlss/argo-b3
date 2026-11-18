@@ -10,7 +10,8 @@ RSpec.describe BulkActions::FormComponent, type: :component do
   it 'renders the bulk action form' do
     render_inline(component)
 
-    expect(page).to have_css('h1', text: BulkActions::REINDEX.label)
+    expect(page).to have_css('nav[aria-label="Breadcrumb"] + h1', text: BulkActions::REINDEX.label)
+    expect(page).to have_link('Bulk actions menu', href: '/bulk_actions/new')
     expect(page).to have_field('Describe this bulk action', type: 'textarea')
     expect(page).to have_no_field('Deposit objects once action is complete')
 
