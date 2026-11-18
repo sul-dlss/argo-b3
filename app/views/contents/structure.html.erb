@@ -52,19 +52,28 @@
           <% end %>
         </fieldset>
 
-        <%# Reloads the page on the add and edit files step. %>
-        <fieldset class="text-end" data-disable-actions-target="disableable">
-          <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
-                                                                          method: :delete,
-                                                                          variant: :'outline-primary',
-                                                                          size: :sm,
-                                                                          classes: 'd-inline-flex align-items-center',
-                                                                          confirm: t('edit.contents.structure.buttons.delete_all_confirm')) do %>
-            <%= delete_icon(classes: 'me-2', aria: { hidden: true }) %><%= t('edit.contents.structure.buttons.delete_all') %>
-          <% end %>
-        </fieldset>
         <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
-        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: "Resources (#{number_with_delimiter(content_file_sets.size)})", classes: 'mt-3') %>
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">
+          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: "Resources (#{number_with_delimiter(content_file_sets.size)})", classes: 'mb-0 me-auto') %>
+          <fieldset class="d-flex flex-wrap gap-2" data-disable-actions-target="disableable">
+            <% if @populator_selection.numbered_labels? %>
+              <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: labels_content_structure_path(content_id: @content_token),
+                                                                              label: t('edit.contents.structure.buttons.update_labels'),
+                                                                              method: :patch,
+                                                                              variant: :'outline-primary',
+                                                                              size: :sm) %>
+            <% end %>
+            <%# Reloads the page on the add and edit files step. %>
+            <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_structure_path(content_id: @content_token),
+                                                                            method: :delete,
+                                                                            variant: :'outline-danger',
+                                                                            size: :sm,
+                                                                            classes: 'd-inline-flex align-items-center',
+                                                                            confirm: t('edit.contents.structure.buttons.delete_all_confirm')) do %>
+              <%= delete_icon(classes: 'me-2', aria: { hidden: true }) %><%= t('edit.contents.structure.buttons.delete_all') %>
+            <% end %>
+          </fieldset>
+        </div>
         <% content_file_sets.each_with_index do |content_file_set, index| %>
           <div class="mb-2">
             <%= turbo_frame_tag content_file_set, class: 'mb-2' do %>

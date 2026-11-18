@@ -53,6 +53,42 @@ RSpec.describe 'Content structure' do
     end
   end
 
+  describe 'labels' do
+    let(:first_content_file_set) { create(:content_file_set, content:, position: 1, label: 'Page 1') }
+    let(:second_content_file_set) { create(:content_file_set, content:, position: 2, label: 'Page 3') }
+    let(:third_content_file_set) { create(:content_file_set, content:, position: 3, label: 'Page 2') }
+
+    before do
+      first_content_file_set
+      second_content_file_set
+      third_content_file_set
+    end
+
+    it 'updates the labels and returns to the structure step with a toast' do
+      content.update!(step: 'structure')
+      patch labels_content_structure_path(content_id: content_token)
+
+      expect(response).to redirect_to(edit_content_path(druid))
+      expect(response).to have_http_status(:see_other)
+      expect(flash[:toast]).to eq('Resource labels updated')
+      expect(content.content_file_sets.reload.map(&:label)).to eq(['Page 1', 'Page 2', 'Page 3'])
+      expect(content.reload.step).to eq('structure')
+    end
+
+    context 'when structuring files' do
+      let(:content) { create(:content, druid:, lock: cocina_object.lock, structuring_state: 'structuring') }
+
+      it 'does not update the labels and returns to the edit page with a warning' do
+        patch labels_content_structure_path(content_id: content_token)
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(flash[:warning]).to eq('Files are being staged, discovered, or structured. ' \
+                                      'Try again when that has finished.')
+        expect(content.content_file_sets.reload.map(&:label)).to eq(['Page 1', 'Page 3', 'Page 2'])
+      end
+    end
+  end
+
   describe 'validation' do
     let(:cocina_object) do
       build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book).new(access:)

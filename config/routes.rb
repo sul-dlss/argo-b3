@@ -180,6 +180,7 @@ Rails.application.routes.draw do
     resource :structure, only: %i[destroy], controller: 'content_structure' do
       get 'csv'
       get 'validation'
+      patch 'labels'
     end
 
     resources :content_file_sets, only: %i[edit update show destroy] do

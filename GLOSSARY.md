@@ -130,6 +130,9 @@ The structure of a DRO for one lock: ordered `ContentFileSet`s holding ordered `
 ### Resource
 One ordered `ContentFileSet` within a Content, typed by its role (e.g., a `page` of a book, an `object`). Use "Resource" when talking to users; it is the same thing as a ContentFileSet (a cocina FileSet).
 
+### Numbered Label
+A Resource label that is a name followed by a number (e.g., `Page 3`, `Video file 2`), numbered separately for each name. **Updating labels** renumbers the Numbered Labels of a Mutable Content in Resource order (e.g., after reordering), leaving other labels unchanged. Use "update labels" rather than "relabel" or "renumber" with users.
+
 ### Hierarchical Filepath
 A file's filepath that includes directories (e.g., `folder1/image1.tif`) rather than a bare filename. Only the file (`object`) and geo content types may have hierarchical filepaths; DSA rejects them for all other content types. Use "hierarchical filepaths" rather than "files in folders", and "folder" for a directory of hierarchical filepaths.
 

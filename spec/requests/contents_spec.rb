@@ -776,7 +776,8 @@ RSpec.describe 'Contents' do
                             content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
     end
 
-    it 'renders the strategy, the validation frame, the restructure button, the CSV upload, and delete all' do
+    it 'renders the strategy, the validation frame, the restructure button, the CSV upload, update labels, ' \
+       'and delete all' do
       get edit_content_path(druid)
 
       page = response.parsed_body
@@ -795,7 +796,10 @@ RSpec.describe 'Contents' do
       delete_form = page.css('form[action$="/structure"]')
                         .find { |form| form.at_css('input[name="_method"][value="delete"]') }
       expect(delete_form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
-      expect(delete_form.at_css('button.btn-outline-primary.btn-sm').text.strip).to eq('Delete all files and resources')
+      expect(delete_form.at_css('button').text.strip).to eq('Delete all files and resources')
+      labels_form = page.at_css('form[action$="/structure/labels"]')
+      expect(labels_form.at_css('input[name="_method"]')['value']).to eq('patch')
+      expect(labels_form.at_css('button').text.strip).to eq('Update labels if you reordered resources')
       expect(page.text).not_to include('Append files to structure')
     end
 
@@ -806,6 +810,17 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         expect(response.body).to include('Strategy for structuring: Image (resource per image)')
+      end
+    end
+
+    context 'when the content type does not have numbered labels' do
+      before { content.update!(content_type: Cocina::Models::ObjectType.object) }
+
+      it 'does not render update labels' do
+        get edit_content_path(druid)
+
+        expect(response.parsed_body.at_css('form[action$="/structure/labels"]')).to be_nil
+        expect(response.body).to include('Delete all files and resources')
       end
     end
   end

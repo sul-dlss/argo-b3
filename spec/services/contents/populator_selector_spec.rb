@@ -294,4 +294,27 @@ RSpec.describe Contents::PopulatorSelector do
       expect(Contents::Analyzer).to have_received(:call).with(content_file_binary:, mime_type_only: true)
     end
   end
+
+  describe '#numbered_labels?' do
+    {
+      Cocina::Models::ObjectType.book => true,
+      Cocina::Models::ObjectType.image => true,
+      Cocina::Models::ObjectType.map => true,
+      Cocina::Models::ObjectType.document => true,
+      Cocina::Models::ObjectType.media => true,
+      Cocina::Models::ObjectType.three_dimensional => true,
+      Cocina::Models::ObjectType.object => false,
+      Cocina::Models::ObjectType.geo => false,
+      Cocina::Models::ObjectType.agreement => false,
+      Cocina::Models::ObjectType.webarchive_seed => false
+    }.each do |type, expected|
+      context "when the content type is #{type}" do
+        let(:cocina_type) { type }
+
+        it "is #{expected}" do
+          expect(result.numbered_labels?).to be expected
+        end
+      end
+    end
+  end
 end
