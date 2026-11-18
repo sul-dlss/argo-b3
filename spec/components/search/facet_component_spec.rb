@@ -100,8 +100,8 @@ RSpec.describe Search::FacetComponent, type: :component do
                                 href: '/search?access_rights_exclude%5B%5D=dark&access_rights_exclude%5B%5D=world')
 
       # Remove an existing facet value
-      collection_item = page.find('li', text: 'dark exclude')
-      expect(collection_item).to have_link('Remove dark exclude', href: '/search')
+      collection_item = page.find('li', text: 'dark')
+      expect(collection_item).to have_link('Remove exclude dark', href: '/search')
     end
   end
 end

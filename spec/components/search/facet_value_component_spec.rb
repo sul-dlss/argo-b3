@@ -69,8 +69,8 @@ RSpec.describe Search::FacetValueComponent, type: :component do
       expect(page).to have_link('dark')
       expect(page).to have_link('Exclude dark',
                                 href: '/search?access_rights_exclude%5B%5D=dark&object_types%5B%5D=collection')
-      expect(page).to have_css('a:not([title]) .visually-hidden', text: 'Exclude dark')
-      expect(page).to have_css('a .bi-exclude[aria-hidden="true"]')
+      expect(page).to have_css('a.btn-link .visually-hidden', text: 'Exclude dark')
+      expect(page).to have_css('a.btn-link span[aria-hidden="true"]', text: 'exclude')
     end
   end
 
@@ -83,11 +83,15 @@ RSpec.describe Search::FacetValueComponent, type: :component do
 
     let(:search_form) { ResultsSearchForm.new(access_rights_exclude: ['dark'], object_types: ['collection'], page: 2) }
 
-    it 'renders the exclude link' do
+    it 'renders the excluded value' do
       render_inline(component)
 
-      expect(page).to have_css('.selected', text: 'dark exclude')
-      expect(page).to have_link('Remove dark exclude', href: '/search?object_types%5B%5D=collection')
+      expect(page).to have_css('.facet-label del', text: 'dark')
+      expect(page).to have_css('.facet-count', text: '10')
+      expect(page).to have_css('strong', text: 'excluded')
+      expect(page).to have_no_link('Exclude dark')
+      expect(page).to have_link('Remove exclude dark', href: '/search?object_types%5B%5D=collection',
+                                                       title: 'Remove exclude dark')
     end
   end
 end

@@ -14,13 +14,7 @@ module Search
       super()
     end
 
-    attr_reader :count, :search_form, :form_field, :value, :link_args, :exclude_form_field
-
-    def label
-      return "#{@label} exclude" if exclude_selected?
-
-      @label
-    end
+    attr_reader :label, :count, :search_form, :form_field, :value, :link_args, :exclude_form_field
 
     def selected?
       search_form.selected?(key: form_field, value:)
@@ -35,11 +29,11 @@ module Search
     end
 
     def remove_title
-      "Remove #{label}"
+      exclude_selected? ? "Remove exclude #{label}" : "Remove #{label}"
     end
 
     def exclude_label
-      "Exclude #{@label}"
+      "Exclude #{label}"
     end
 
     def exclude_path
@@ -49,6 +43,13 @@ module Search
     def remove_path
       remove_form_field = exclude_selected? ? exclude_form_field : form_field
       url_for(search_form.without({ remove_form_field => value, page: nil }))
+    end
+
+    def render_remove_link
+      link_to remove_path, class: 'remove ms-2', rel: 'nofollow', title: remove_title, **link_args do
+        helpers.remove_icon(classes: 'ms-2', aria: { hidden: true }) +
+          tag.span("[#{remove_title}]", class: 'visually-hidden')
+      end
     end
   end
 end
