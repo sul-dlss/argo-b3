@@ -63,6 +63,8 @@ $search-color: rgb(#{$search-color-rgb});
   }
 
   .btn {
+    --bs-btn-border-radius: 3px;
+
     width: 100%;
     max-width: 195px;
     text-align: left;
