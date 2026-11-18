@@ -1,0 +1,18 @@
+<div class="mt-3">
+  <fieldset data-disable-actions-target="disableable">
+    <%= form_with model:, url:, method: :patch, data: helpers.disable_actions_form_data do |form| %>
+      <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                             field_name: :csv_file,
+                                                             container_classes: 'my-field',
+                                                             label_text: upload_label,
+                                                             label_classes: 'fw-bold',
+                                                             label_caption: download_link,
+                                                             help_text:,
+                                                             input_accept:) %>
+      <%= additional_fields %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: submit_label,
+                                                               variant: :'outline-primary',
+                                                               value: submit_value) %>
+    <% end %>
+  </fieldset>
+</div>

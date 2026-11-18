@@ -183,6 +183,7 @@ Rails.application.routes.draw do
     end
     resource :structure, only: %i[destroy], controller: 'content_structure' do
       get 'csv'
+      get 'labels_csv'
       get 'validation'
       patch 'labels'
     end

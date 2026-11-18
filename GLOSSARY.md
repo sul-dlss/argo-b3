@@ -133,6 +133,9 @@ One ordered `ContentFileSet` within a Content, typed by its role (e.g., a `page`
 ### Numbered Label
 A Resource label that is a name followed by a number (e.g., `Page 3`, `Video file 2`), numbered separately for each name. **Updating labels** renumbers the Numbered Labels of a Mutable Content in Resource order (e.g., after reordering), leaving other labels unchanged. Use "update labels" rather than "relabel" or "renumber" with users.
 
+### Labels CSV
+A spreadsheet of a Mutable Content's Resource labels by sequence (the Resource's position), downloaded and uploaded in manage files to edit labels without changing the structure. Resources it doesn't list keep their labels, and rows that don't match a Resource are ignored. Distinct from the structural CSV, which replaces the whole structure.
+
 ### Hierarchical Filepath
 A file's filepath that includes directories (e.g., `folder1/image1.tif`) rather than a bare filename. Only the file (`object`) and geo content types may have hierarchical filepaths; DSA rejects them for all other content types. Use "hierarchical filepaths" rather than "files in folders", and "folder" for a directory of hierarchical filepaths.
 

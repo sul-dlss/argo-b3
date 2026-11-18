@@ -174,4 +174,20 @@ RSpec.describe 'Content structure' do
                                        'resource_type' => 'page', 'filename' => 'page_0001.tif')
     end
   end
+
+  describe 'labels_csv' do
+    before do
+      create(:content_file_set, content:, position: 1, label: 'Cover')
+      create(:content_file_set, content:, position: 2, label: 'Page 1')
+    end
+
+    it 'sends the labels of the resources as a CSV' do
+      get labels_csv_content_structure_path(content_id: content_token)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/csv')
+      expect(response.headers['Content-Disposition']).to include('filename="bc123df4567_labels.csv"')
+      expect(response.body).to eq("druid,sequence,resource_label\nbc123df4567,1,Cover\nbc123df4567,2,Page 1\n")
+    end
+  end
 end

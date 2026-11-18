@@ -776,7 +776,7 @@ RSpec.describe 'Contents' do
                             content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
     end
 
-    it 'renders the strategy, the validation frame, the restructure button, the CSV upload, update labels, ' \
+    it 'renders the strategy, the validation frame, the restructure button, the CSV uploads, update labels, ' \
        'and delete all' do
       get edit_content_path(druid)
 
@@ -791,8 +791,15 @@ RSpec.describe 'Contents' do
       checkbox = page.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
       expect(checkbox['checked']).to be_nil
       download_link = page.at_css('a[href$="/structure/csv"]')
-      expect(download_link.text.strip).to eq('Download structural metadata')
-      expect(download_link.at_css('i.bi-download[aria-hidden="true"]')).to be_present
+      expect(download_link.text.strip).to eq('Download structural metadata CSV')
+      structural_csv_submit = page.at_css('button[name="commit"][value="csv"]')
+      expect(structural_csv_submit.text.strip).to eq('Replace structure')
+      labels_download_link = page.at_css('a[href$="/structure/labels_csv"]')
+      expect(labels_download_link.text.strip).to eq('Download resource labels CSV')
+      labels_csv_input = page.at_css('input[type="file"][name="labels_csv[csv_file]"]')
+      expect(page.at_css("label[for=\"#{labels_csv_input['id']}\"]").text.strip).to eq('Upload resource labels CSV')
+      labels_csv_submit = page.at_css('button[name="commit"][value="labels_csv"]')
+      expect(labels_csv_submit.text.strip).to eq('Change labels')
       delete_form = page.css('form[action$="/structure"]')
                         .find { |form| form.at_css('input[name="_method"][value="delete"]') }
       expect(delete_form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
@@ -1096,6 +1103,71 @@ RSpec.describe 'Contents' do
           expect(response.body).to include('Row 2: Missing druid')
           expect(allow_file_deletion_checkbox['checked']).to eq('checked')
         end
+      end
+    end
+  end
+
+  describe 'uploading a labels CSV' do
+    let(:csv_string) { "druid,sequence,resource_label\nbc123df4567,2,Back cover\nbc123df4567,3,Ignored\n" }
+    let(:csv_file) do
+      Rack::Test::UploadedFile.new(StringIO.new(csv_string), 'text/csv', original_filename: 'labels.csv')
+    end
+    let(:labels) { content.content_file_sets.reload.map(&:label) }
+
+    before do
+      content.update!(step: 'structure')
+      create(:content_file, content_file_set: create(:content_file_set, content:, position: 1, label: 'Page 1'),
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0001.tif'))
+      create(:content_file, content_file_set: create(:content_file_set, content:, position: 2, label: 'Page 2'),
+                            content_file_binary: create(:content_file_binary, content:, filepath: 'page_0002.tif'))
+    end
+
+    def upload(params = { labels_csv: { csv_file: } })
+      patch content_path(druid), params: { commit: ContentsController::LABELS_CSV_VALUE, **params }
+    end
+
+    it 'updates the labels of the matching resources and returns to the structure step with a toast' do
+      upload
+
+      expect(response).to redirect_to(edit_content_path(druid))
+      expect(flash[:toast]).to eq('Resource labels updated from CSV')
+      expect(labels).to eq(['Page 1', 'Back cover'])
+      expect(content.reload.step).to eq('structure')
+    end
+
+    context 'when no file is uploaded' do
+      it 'renders the error on the labels CSV input' do
+        upload({})
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('can&#39;t be blank')
+        page = response.parsed_body
+        expect(page.at_css('input[name="labels_csv[csv_file]"]')['class']).to include('is-invalid')
+        expect(page.at_css('input[name="structural_csv[csv_file]"]')['class']).not_to include('is-invalid')
+      end
+    end
+
+    context 'when a column is missing' do
+      let(:csv_string) { "druid,sequence\nbc123df4567,2\n" }
+
+      it 'renders the error without changing the labels' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 1: Missing required column &quot;resource_label&quot;')
+        expect(labels).to eq(['Page 1', 'Page 2'])
+      end
+    end
+
+    context 'when a row has a different druid' do
+      let(:csv_string) { "druid,sequence,resource_label\nxy987wv6543,2,Back cover\n" }
+
+      it 'renders the error without changing the labels' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('Row 2: Druid druid:xy987wv6543 does not match this object')
+        expect(labels).to eq(['Page 1', 'Page 2'])
       end
     end
   end

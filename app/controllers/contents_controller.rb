@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Controller for managing content (structural): the steps of managing files (see Contents::ManageFilesFlow).
-class ContentsController < ContentsApplicationController
+class ContentsController < ContentsApplicationController # rubocop:disable Metrics/ClassLength
   skip_verify_authorized only: %i[show]
   before_action :set_editable_cocina_object, only: %i[edit update]
 
@@ -12,6 +12,7 @@ class ContentsController < ContentsApplicationController
   PREVIOUS_VALUE = 'previous'
   RESTRUCTURE_VALUE = 'restructure'
   CSV_VALUE = 'csv'
+  LABELS_CSV_VALUE = 'labels_csv'
 
   def show
     @content_token = params[:id]
@@ -72,7 +73,8 @@ class ContentsController < ContentsApplicationController
     when NEXT_VALUE then next_step(cocina_object:, content:)
     when PREVIOUS_VALUE then previous_step(druid: content.druid)
     when RESTRUCTURE_VALUE then restructure(content:)
-    when CSV_VALUE then upload_csv(cocina_object:, content:)
+    when CSV_VALUE then upload_structural_csv(cocina_object:, content:)
+    when LABELS_CSV_VALUE then upload_labels_csv(cocina_object:, content:)
     else save_or_deposit(cocina_object:, content:)
     end
   end
@@ -96,13 +98,27 @@ class ContentsController < ContentsApplicationController
     redirect_to edit_content_path(content.druid)
   end
 
-  # Replaces the structure with the uploaded CSV. Nothing is changed unless the CSV is entirely valid.
-  def upload_csv(cocina_object:, content:)
+  # Replaces the structure with the uploaded CSV.
+  def upload_structural_csv(cocina_object:, content:)
     @structural_csv_form = StructuralCsvForm.new(StructuralCsvForm.params_from(params))
-    @structural_csv_form.replace_structure(content:)
-    return render_invalid_step(cocina_object:, content:) if @structural_csv_form.errors.any?
+    upload_csv(form: @structural_csv_form, toast: t('edit.contents.structure.toasts.csv'), cocina_object:, content:)
+  end
 
-    redirect_to edit_content_path(content.druid), flash: { toast: t('edit.contents.structure.toasts.csv') }
+  # Updates the labels of the resources listed in the uploaded labels CSV.
+  def upload_labels_csv(cocina_object:, content:)
+    @labels_csv_form = LabelsCsvForm.new(LabelsCsvForm.params_from(params))
+    upload_csv(form: @labels_csv_form, toast: t('edit.contents.structure.toasts.labels_csv'),
+               cocina_object:, content:)
+  end
+
+  # Updates the content from an uploaded structural or labels CSV. Nothing is changed unless the CSV is entirely valid.
+  # @param form [SingleObjectCsvUploadConcern] the upload's form, which the structure step renders with any errors
+  # @param toast [String] the toast for a successful upload
+  def upload_csv(form:, toast:, cocina_object:, content:)
+    form.update_content(content:)
+    return render_invalid_step(cocina_object:, content:) if form.errors.any?
+
+    redirect_to edit_content_path(content.druid), flash: { toast: }
   end
 
   def save_or_deposit(cocina_object:, content:)
@@ -188,6 +204,7 @@ class ContentsController < ContentsApplicationController
   def set_structure_step(cocina_object:, content:)
     @content = Content.with_structural_associations.find(content.id)
     @structural_csv_form ||= StructuralCsvForm.new
+    @labels_csv_form ||= LabelsCsvForm.new
     item_details = Contents::ItemDetails.new(content:)
     @populator_selection = Contents::PopulatorSelector.call(
       content: @content,

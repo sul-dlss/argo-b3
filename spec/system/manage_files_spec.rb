@@ -780,8 +780,8 @@ RSpec.describe 'Manage files' do
       csv.each { |row| row['resource_label'] = 'New label' }
       File.write(csv_path, csv.to_csv)
 
-      attach_file('Upload structural CSV', csv_path)
-      click_button 'Structure files', exact: true
+      attach_file('Upload structural metadata CSV', csv_path)
+      click_button 'Replace structure'
 
       expect(page).to have_toast('Structure updated from CSV')
       expect_step('Structure files')
