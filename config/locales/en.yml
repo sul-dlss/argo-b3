@@ -437,7 +437,7 @@ en:
         updated: 'Tags updated'
       errors:
         save_failed: 'The tags could not be saved. Try again, or contact SDR support if the problem continues.'
-    item_releases:
+    releases:
       new:
         title: 'Manage release'
         buttons:

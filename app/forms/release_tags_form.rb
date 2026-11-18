@@ -6,6 +6,13 @@ class ReleaseTagsForm < ApplicationForm
   RELEASE_TO_TARGETS = 'release_to_targets'
   NO_RELEASE = 'no_release'
 
+  # release target => field prefix
+  TARGET_PREFIXES = {
+    'Searchworks' => :searchworks,
+    'Earthworks' => :earthworks,
+    'PURL sitemap' => :purl_sitemap
+  }.freeze
+
   attribute :searchworks_target, :string, default: RELEASE_TO_COLLECTION
   attribute :earthworks_target, :string, default: RELEASE_TO_COLLECTION
   attribute :purl_sitemap_target, :string, default: RELEASE_TO_COLLECTION

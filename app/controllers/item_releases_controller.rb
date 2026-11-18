@@ -19,7 +19,7 @@ class ItemReleasesController < ApplicationController
     @item_release_tags_form = ItemReleaseTagsForm.new(item_release_tags_form_params)
     release_targets = @item_release_tags_form.save!(druid: @druid, user_name: current_user.sunetid,
                                                     release_tags: item_release_tags)
-    flash[:toast] = t('edit.item_releases.toasts.updated') if release_targets.any?
+    flash[:toast] = t('edit.releases.toasts.updated') if release_targets.any?
     redirect_to object_path(@druid)
   rescue Sdr::Repository::Error
     render_save_failed
@@ -41,7 +41,7 @@ class ItemReleasesController < ApplicationController
   end
 
   def render_save_failed
-    flash.now[:danger] = t('edit.item_releases.errors.save_failed')
+    flash.now[:danger] = t('edit.releases.errors.save_failed')
     set_follow_collection_disabled_fields
     render :new, status: :unprocessable_content
   end
@@ -53,7 +53,7 @@ class ItemReleasesController < ApplicationController
   end
 
   def redirect_dark
-    flash[:danger] = t('edit.item_releases.errors.dark')
+    flash[:danger] = t('edit.releases.errors.dark')
     redirect_to object_path(@druid)
   end
 end

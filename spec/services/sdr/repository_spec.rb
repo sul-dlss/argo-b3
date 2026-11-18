@@ -506,14 +506,16 @@ RSpec.describe Sdr::Repository do
       end
     end
 
-    context 'when release_what and lane_id are given' do
-      it 'creates a release tag with the given release_what and lane_id' do
+    context 'when release_what, lane_id, and date are given' do
+      it 'creates a release tag with the given release_what, lane_id, and date' do
         described_class.create_release_tag(druid:, user_name:, release_target:, release: false,
-                                           release_what: 'collection', lane_id: 'low')
+                                           release_what: 'collection', lane_id: 'low',
+                                           date: Time.utc(2026, 1, 2, 3, 4, 5))
 
         expect(release_tags_client).to have_received(:create) do |tag:, lane_id:|
           expect(tag.what).to eq('collection')
           expect(tag.release).to be(false)
+          expect(tag.date).to eq(DateTime.parse('2026-01-02T03:04:05Z'))
           expect(lane_id).to eq('low')
         end
       end

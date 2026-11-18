@@ -185,13 +185,15 @@ module Sdr
     # @param [Boolean] release false to not release the object
     # @param [String] release_what self or collection
     # @param [String] lane_id lane to using for releaseWF (high, default, or low) if object has been published
-    def self.create_release_tag(druid:, user_name:, release_target:, release:, release_what: 'self', lane_id: 'high') # rubocop:disable Metrics/ParameterLists
+    # @param [Time] date when the tag was made; DSA keeps whole seconds, which order an object's tags
+    def self.create_release_tag(druid:, user_name:, release_target:, release:, release_what: 'self', lane_id: 'high', # rubocop:disable Metrics/ParameterLists
+                                date: Time.now.utc)
       new_tag = Dor::Services::Client::ReleaseTag.new(
         to: release_target || '', # "to" must be a string; released_to is NOT NULL in DSA DB.
         who: user_name,
         what: release_what,
         release:,
-        date: DateTime.now.utc.iso8601
+        date: date.utc.iso8601
       )
       Dor::Services::Client.object(druid).release_tags.create(tag: new_tag, lane_id:)
     rescue Dor::Services::Client::Error => e

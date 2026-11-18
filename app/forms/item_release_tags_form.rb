@@ -7,11 +7,7 @@ class ItemReleaseTagsForm < ApplicationForm
   RELEASE = ReleaseTagsForm::RELEASE_TO_TARGETS
   NO_RELEASE = ReleaseTagsForm::NO_RELEASE
 
-  TARGET_FIELDS = {
-    'Searchworks' => :searchworks_target,
-    'Earthworks' => :earthworks_target,
-    'PURL sitemap' => :purl_sitemap_target
-  }.freeze
+  TARGET_FIELDS = ReleaseTagsForm::TARGET_PREFIXES.transform_values { |prefix| :"#{prefix}_target" }.freeze
 
   attribute :searchworks_target, :string, default: FOLLOW_COLLECTION
   attribute :earthworks_target, :string, default: FOLLOW_COLLECTION
