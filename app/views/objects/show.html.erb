@@ -16,19 +16,8 @@
       <%= render Search::ItemNavigationComponent.new(last_search_form: @last_search_form,
                                                      current_position: @search_position, navigation: @navigation) %>
 
-      <div class="d-flex flex-column d-xl-block">
-        <%= render Elements::BadgeComponent.new(label: @solr_doc.object_type_label, variant: :object_type, size: :large, tag: :div,
-                                                classes: 'object-type-badge text-center float-xl-end order-2 mb-4 mb-xl-0') %>
-
-        <div class="object-heading mb-xl-4 mb-3 d-flex order-1">
-          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: @solr_doc.title, classes: 'mb-0') %>
-          <%= render Pin::PinnedObjectComponent.new(druid: @solr_doc.druid, pinned: @pinned) unless @solr_doc.agreement? %>
-          <% unless allowed_to?(:update?, @solr_doc, with: ObjectPolicy) %>
-            <%= render Elements::BadgeComponent.new(label: 'Read only', variant: :status, size: :medium,
-                                                    classes: 'read-only-badge px-3 ms-3 align-self-center') %>
-          <% end %>
-        </div>
-      </div>
+      <%= render Show::HeadingComponent.new(solr_doc: @solr_doc, pinned: @pinned,
+                                            read_only_badge: !allowed_to?(:update?, @solr_doc, with: ObjectPolicy)) %>
 
       <%= render Show::EmbargoBannerComponent.new(release_date: @solr_doc.formatted_embargo_release_date) %>
     <% end %>

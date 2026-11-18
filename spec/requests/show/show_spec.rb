@@ -13,7 +13,7 @@ RSpec.describe 'Show object' do
     context 'when the object is not found' do
       before do
         allow(Sdr::Repository).to receive(:lock).with(druid:).and_return('v1')
-        allow(Sdr::Repository).to receive(:find_solr).with(druid:).and_raise(Sdr::Repository::NotFoundResponse)
+        allow(Sdr::Repository).to receive(:find).and_raise(Sdr::Repository::NotFoundResponse)
       end
 
       it 'renders a 404' do
@@ -28,7 +28,7 @@ RSpec.describe 'Show object' do
 
       before do
         allow(Sdr::Repository).to receive(:lock).and_return('v1')
-        allow(Sdr::Repository).to receive(:find_solr).and_raise(Sdr::Repository::NotFoundResponse)
+        allow(Sdr::Repository).to receive(:find).and_raise(Sdr::Repository::NotFoundResponse)
       end
 
       it 'prepends the druid: prefix before looking up the object' do

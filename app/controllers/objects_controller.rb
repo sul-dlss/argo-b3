@@ -29,15 +29,18 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # already made it fresh.
   # The cached cocina hash omits the file sets (structural.contains), which can be large; frames that need them
   # use the full cocina hash, which is fetched on demand.
+  #
+  # The cocina is fetched before the live solr doc, since DSA may not be able to build the live solr doc from
+  # invalid cocina. An object whose cocina is invalid gets a page with only its heading (see #show_invalid_cocina).
   def show # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     druid = druid_param
     lock = Sdr::Repository.lock(druid:)
 
-    @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
-    authorize! @solr_doc, with: ObjectPolicy
-
     # Also warms the cache for the other frames (e.g., overview, json, purl_preview).
     @cocina_object = CocinaSupport.build_from_cocina_hash(refresh_cocina_hash(druid, lock).dup)
+
+    @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
+    authorize! @solr_doc, with: ObjectPolicy
 
     set_from_last_search_cookie # This provides @last_search_form and @total_results
     set_search_navigation
@@ -56,6 +59,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
     @pinned = PinnedObject.exists?(druid:, user: current_user)
+  rescue Sdr::Repository::InvalidCocinaError
+    show_invalid_cocina(druid)
   end
 
   def show_overview
@@ -249,6 +254,26 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  # The title and the druids that authorization needs come from the solr doc in Solr, since DSA can't provide them.
+  def show_invalid_cocina(druid)
+    @solr_doc = SolrDocPresenter.new(solr_doc: indexed_solr_doc(druid))
+    authorize! @solr_doc, with: ObjectPolicy
+
+    set_from_last_search_cookie # This provides @last_search_form and @total_results
+    set_search_navigation
+    @pinned = PinnedObject.exists?(druid:, user: current_user)
+    render :show_invalid_cocina
+  end
+
+  def indexed_solr_doc(druid)
+    fields = [Search::Fields::ID, Search::Fields::TITLE, Search::Fields::OBJECT_TYPES, Search::Fields::APO_DRUID,
+              Search::Fields::COLLECTION_DRUIDS]
+    result = Searchers::ItemByDruid.call(druids: [druid], user_scope: nil, fields:).first
+    raise Sdr::Repository::NotFoundResponse, "Object not found in Solr: #{druid}" unless result
+
+    result.solr_doc
+  end
 
   def render_collection_overview
     @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid,
