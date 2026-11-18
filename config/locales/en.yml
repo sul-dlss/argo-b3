@@ -666,7 +666,6 @@ en:
         discovery_results:
           heading: "Results of checking manifest"
         structure_results:
-          download_report: "Download report"
           heading: "Results of checking files"
         text_extraction:
           ocr_heading: "For book, image, or document/PDF content types"
@@ -783,6 +782,17 @@ en:
       error_count: '# of errors'
       heading: 'Summary'
       item_count: '# of items'
+    structure_summary:
+      download_report: 'Download report'
+      error_count: '# with errors'
+      file_count_and_size:
+        one: '%{file_count} file / %{size}'
+        other: '%{file_count} files / %{size}'
+      heading: 'Summary'
+      item_count: '# of items'
+      mime_types_label: 'MIME types:'
+      started: 'Started %{started_at}'
+      total_size: 'Total size'
     error_details:
       label: 'Error details'
       headers:

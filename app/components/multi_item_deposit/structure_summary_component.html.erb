@@ -1,0 +1,31 @@
+<%# The boxes match the bulk action show page's; object-type-multi-item-deposit sets their colors. %>
+<div class="object-type-multi-item-deposit mb-4">
+  <div class="d-flex flex-wrap align-items-baseline column-gap-4 mb-2">
+    <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: t('multi_item_deposit.structure_summary.heading'), classes: 'mb-0') %>
+    <span><%= t('multi_item_deposit.structure_summary.started', started_at:) %></span>
+    <%= link_to report_path, download: true do %>
+      <%= helpers.download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('multi_item_deposit.structure_summary.download_report') %>
+    <% end %>
+  </div>
+  <%= render Show::BoxRowComponent.new do %>
+    <div class="show-box">
+      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.structure_summary.item_count'), heading_level: :h4) do %>
+        <p class="mb-0 text-center fs-4"><%= number_with_delimiter(item_count) %></p>
+      <% end %>
+    </div>
+    <div class="show-box">
+      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.structure_summary.error_count'), heading_level: :h4, classes: error_classes) do %>
+        <p class="mb-0 text-center fs-4"><%= number_with_delimiter(items_with_errors_count) %></p>
+      <% end %>
+    </div>
+    <div class="show-box">
+      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.structure_summary.total_size'), heading_level: :h4) do %>
+        <p class="mb-0 text-center fs-4"><%= file_count_and_size %></p>
+      <% end %>
+    </div>
+  <% end %>
+  <% if mime_types %>
+    <%# Design standard deviation: COPY-4 (no trailing colon on labels). This run-in label introduces the list on the same line, as in the issue's design and the show page's run-in labels (e.g., "Label:"); without the colon it would read as one phrase. %>
+    <p class="mt-3 mb-0"><span class="fw-bold"><%= t('multi_item_deposit.structure_summary.mime_types_label') %></span> <%= mime_types %></p>
+  <% end %>
+</div>
