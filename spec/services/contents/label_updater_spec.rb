@@ -28,7 +28,7 @@ RSpec.describe Contents::LabelUpdater do
   context 'with numbered labels for several names' do
     let(:labels) { ['Video file 2', 'Image 4', 'Video file 1', 'Image 2', 'File 7'] }
 
-    it 'numbers each name separately' do
+    it 'numbers each name separately, as they occur in order' do
       described_class.call(content:)
 
       expect(updated_labels).to eq(['Video file 1', 'Image 1', 'Video file 2', 'Image 2', 'File 1'])

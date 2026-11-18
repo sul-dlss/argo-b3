@@ -16,11 +16,14 @@ module Contents
       @content = content
     end
 
+    # Resources are visited in position order, keeping a count per name, so each Numbered Label gets the next number
+    # for its name (e.g., Page 1, Video file 1, Page 2). A label that doesn't match is skipped without being counted.
+    # The transaction keeps the labels consistent: either every Numbered Label is updated, or none is.
     def call
       counts = Hash.new(0)
       ContentFileSet.transaction do
         content.content_file_sets.each do |content_file_set|
-          name = NUMBERED_LABEL.match(content_file_set.label.to_s)&.[](:name)
+          name = content_file_set.label.to_s[NUMBERED_LABEL, :name]
           next unless name
 
           counts[name] += 1
