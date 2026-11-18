@@ -1,0 +1,10 @@
+<div>
+  <%# The column headings (for visual reference only) repeat what each row's hidden label and legend say (for accessibility). %>
+  <div class="row fw-bold" aria-hidden="true">
+    <div class="col-4 col-lg-3">Release to</div>
+    <div class="col">Include in release</div>
+  </div>
+  <% target_prefixes.each do |prefix| %>
+    <%= render Edit::CollectionReleaseTargetComponent.new(form:, prefix:) %>
+  <% end %>
+</div>

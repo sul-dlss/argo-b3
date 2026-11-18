@@ -91,10 +91,10 @@ RSpec.describe Show::ReleasedToComponent, type: :component do
 
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
 
-    it 'does not render the manage release button' do
+    it 'renders the manage release button for the collection' do
       render_inline(component)
 
-      expect(page).to have_no_link('Manage release')
+      expect(page).to have_link('Manage release', href: "/collections/#{druid}/releases/new")
     end
   end
 end

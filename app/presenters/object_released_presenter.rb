@@ -18,9 +18,16 @@ class ObjectReleasedPresenter
     I18n.t('show.released_to.released.heading')
   end
 
-  # Dark items cannot be released.
+  # Dark objects cannot be released.
   def manageable?
-    solr_doc.object_type?('item', 'virtual object') && !solr_doc.dark?
+    solr_doc.releasable_type? && !solr_doc.dark?
+  end
+
+  def manage_release_path
+    url_helpers = Rails.application.routes.url_helpers
+    return url_helpers.new_collection_release_path(solr_doc.druid) if solr_doc.collection?
+
+    url_helpers.new_item_release_path(solr_doc.druid)
   end
 
   def release_tag_links

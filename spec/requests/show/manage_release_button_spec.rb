@@ -74,10 +74,12 @@ RSpec.describe 'Show object Manage release button' do
 
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
 
-    it 'renders a disabled button' do
+    it 'renders an enabled button to the collection release form' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_css("#{button_selector}[disabled]", text: 'Manage release')
+      expect(rendered_page).to have_css("form[action='/collections/#{druid}/releases/new'] button:not([disabled])",
+                                        text: 'Manage release')
+      expect(rendered_page).to have_css(".card a[href='/collections/#{druid}/releases/new']", text: 'Manage release')
     end
   end
 
