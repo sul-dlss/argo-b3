@@ -6,7 +6,9 @@ RSpec.describe 'Project search', :solr do
   let!(:solr_item) { create(:solr_item, tickets: ['TESTREQ-0']) }
 
   before do
-    Search::Facets::TICKETS.limit = 5
+    tickets = Search::Facets::TICKETS
+    stub_const('Search::Facets::ALL',
+               Search::Facets::ALL.map { |config| config == tickets ? tickets.with(limit: 5) : config })
     create_list(:solr_item, 6)
     create(:solr_item, tickets: ['TESTREQ-Z9'])
     sign_in(create(:user, :reader))

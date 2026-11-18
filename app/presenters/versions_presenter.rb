@@ -2,8 +2,13 @@
 
 # Presenter for versions information about an object.
 class VersionsPresenter
-  Version = Struct.new('Version', :version, :user_version, :description, :opened_at, :accessioned_at, :purl_url,
-                       :cocina, :withdrawn, :withdrawable, :restorable) do
+  Version = Data.define(:version, :user_version, :description, :opened_at, :accessioned_at, :purl_url,
+                        :cocina, :withdrawn, :withdrawable, :restorable) do
+    # Members not given are nil.
+    def initialize(**attrs)
+      super(**members.index_with(nil).merge(attrs))
+    end
+
     def cocina?
       cocina
     end

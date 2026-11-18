@@ -38,72 +38,72 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
   end
   private_class_method :register
 
-  Config = Struct.new('BulkActionConfig',
-                      :job,
-                      # Form class; a config without one has no routes (e.g., REGISTER_FORM).
-                      :form,
-                      :label,
-                      :help_text,
-                      # Key of SECTIONS listing this bulk action on the new bulk actions page.
-                      :section,
-                      # Whether the form offers depositing (closing the version) once the action is complete.
-                      :close_version,
-                      # AdminPolicy rule a non-admin must pass to see and submit the bulk action.
-                      :admin_policy_rule,
-                      # Controller (within BulkActions) for the new and create routes.
-                      :controller,
-                      # Array of Export for the files created by this bulk action, if any.
-                      :exports,
-                      :cancellable,
-                      # Duration after creation when the bulk action is destroyed (by ExpiredBulkActionsCleanupJob).
-                      :expires_after) do
-                        def initialize(cancellable: true, close_version: false, controller: 'forms', **)
-                          super
-                        end
+  Config = Data.define(
+    :job,
+    # Form class; a config without one has no routes (e.g., REGISTER_FORM).
+    :form,
+    :label,
+    :help_text,
+    # Key of SECTIONS listing this bulk action on the new bulk actions page.
+    :section,
+    # Whether the form offers depositing (closing the version) once the action is complete.
+    :close_version,
+    # AdminPolicy rule a non-admin must pass to see and submit the bulk action.
+    :admin_policy_rule,
+    # Controller (within BulkActions) for the new and create routes.
+    :controller,
+    # Array of Export for the files created by this bulk action, if any.
+    :exports,
+    :cancellable,
+    # Duration after creation when the bulk action is destroyed (by ExpiredBulkActionsCleanupJob).
+    :expires_after
+  ) do
+    # Members not given are nil.
+    def initialize(cancellable: true, close_version: false, controller: 'forms', exports: [], **attrs)
+      super(**members.index_with(nil), **attrs, cancellable:, close_version:, controller:, exports:)
+    end
 
-                        # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
-                        def action_type
-                          job.to_s.demodulize.delete_suffix('Job').underscore.upcase
-                        end
+    # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
+    def action_type
+      job.to_s.demodulize.delete_suffix('Job').underscore.upcase
+    end
 
-                        # The route name, e.g., 'add_workflow'.
-                        def key
-                          action_type.downcase
-                        end
+    # The route name, e.g., 'add_workflow'.
+    def key
+      action_type.downcase
+    end
 
-                        def routable?
-                          form.present?
-                        end
+    def routable?
+      form.present?
+    end
 
-                        def exports
-                          self[:exports] || []
-                        end
+    def new_path
+      Rails.application.routes.url_helpers.public_send(:"new_bulk_actions_#{key}_path")
+    end
 
-                        def new_path
-                          Rails.application.routes.url_helpers.public_send(:"new_bulk_actions_#{key}_path")
-                        end
+    def create_path
+      Rails.application.routes.url_helpers.public_send(:"bulk_actions_#{key}_path")
+    end
 
-                        def create_path
-                          Rails.application.routes.url_helpers.public_send(:"bulk_actions_#{key}_path")
-                        end
+    def cancellable?
+      cancellable
+    end
 
-                        def cancellable?
-                          cancellable
-                        end
+    def close_version?
+      close_version
+    end
 
-                        def close_version?
-                          close_version
-                        end
-
-                        def find_export(key)
-                          exports.find { |export| export.key == key } ||
-                            raise(ArgumentError, "Unknown export #{key} for #{action_type}")
-                        end
-                      end
+    def find_export(key)
+      exports.find { |export| export.key == key } ||
+        raise(ArgumentError, "Unknown export #{key} for #{action_type}")
+    end
+  end
 
   # A file created by a bulk action; its filename may be a glob (e.g., '*.zip') when the name varies.
   # When show is true and the file is a CSV, the CSV is displayed as a table on the bulk action show page.
-  Export = Struct.new('BulkActionExport', :key, :filename, :label, :show)
+  Export = Data.define(:key, :filename, :label, :show) do
+    def initialize(show: false, **) = super
+  end
 
   REGISTER_EXPORTS = [
     Export.new(key: :registration_report, filename: 'registration_report.csv', label: 'Registration report',

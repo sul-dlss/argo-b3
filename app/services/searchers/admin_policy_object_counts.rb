@@ -3,7 +3,7 @@
 module Searchers
   # Searcher for counting items and collections governed by an admin policy.
   class AdminPolicyObjectCounts
-    Result = Struct.new(:item_count, :collection_count)
+    Result = Data.define(:item_count, :collection_count)
 
     def self.call(...)
       new(...).call

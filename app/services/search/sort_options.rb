@@ -19,7 +19,7 @@ module Search
       (find_config_by_sort_field(sort_field) || RELEVANCE).sort_value
     end
 
-    Config = Struct.new(:label, :sort_value)
+    Config = Data.define(:label, :sort_value)
 
     # Secondary sorts on druid (id) keep paging stable when objects share the primary sorted attribute.
     RELEVANCE = Config.new(label: 'Relevance', sort_value: 'score desc, id asc')
