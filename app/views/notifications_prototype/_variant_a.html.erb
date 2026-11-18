@@ -1,0 +1,25 @@
+<%# PROTOTYPE variant A: header text link; a plain table page; settings on a separate page. %>
+<%= render Layout::ContainerComponent.new(heading: 'Notifications') do %>
+  <div class="d-flex justify-content-between align-items-baseline mb-3">
+    <p class="mb-0">Your 25 most recent notifications from the last 30 days.</p>
+    <%= link_to 'Notification settings', notifications_prototype_settings_path(variant: 'A') %>
+  </div>
+  <%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Notifications', show_label: false, id: 'notifications-table', empty_message: 'No notifications.') do |table| %>
+    <%= table.with_header(label: 'When') %>
+    <%= table.with_header(label: 'Notification') %>
+    <%= table.with_header(label: 'About') %>
+    <% notifications.each do |notification| %>
+      <% table.with_row do %>
+        <tr>
+        <td class="text-nowrap"><%= time_ago_in_words(notification.created_at) %> ago</td>
+        <td>
+          <i class="bi <%= prototype_outcome_icon(notification.outcome) %> me-1" aria-hidden="true"></i>
+          <span class="fw-bold"><%= notification.title %></span>
+          <% if notification.text %><div><%= notification.text %></div><% end %>
+        </td>
+        <td><%= link_to notification.subject_label, '#' %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

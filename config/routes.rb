@@ -17,6 +17,9 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root 'dashboard#index'
+  # PROTOTYPE (throwaway, never merge): notifications indicator, inbox, and settings variants.
+  get 'notifications_prototype', to: 'notifications_prototype#index', as: :notifications_prototype
+  get 'notifications_prototype/settings', to: 'notifications_prototype#settings', as: :notifications_prototype_settings
   post 'go_to_druid', to: 'dashboard#go_to_druid'
 
   # resource :home, only: [:show], controller: 'home'

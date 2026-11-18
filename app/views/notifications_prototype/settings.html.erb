@@ -1,0 +1,10 @@
+<%# PROTOTYPE (throwaway, never merge): the separate settings page used by variant A. %>
+<%= page_title('Notification settings') %>
+<%= render Layout::ContainerComponent.new(heading: 'Notification settings') do |container| %>
+  <% container.with_breadcrumb do %>
+    <%= render Elements::BreadcrumbComponent.new(label: 'Notifications', link: notifications_prototype_path(variant: prototype_variant)) %>
+  <% end %>
+  <p>You always see notifications in Argo. Choose which ones are also emailed to <%= current_user.email_address %>.</p>
+  <%= render 'settings_form', email_kinds: @email_kinds, cancel_path: notifications_prototype_path(variant: prototype_variant) %>
+<% end %>
+<%= render 'switcher' %>

@@ -2,6 +2,34 @@
   <%= header.with_primary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: "mailto:#{Settings.support_email}") %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: logged_in_text) %>
+    <%# PROTOTYPE (throwaway, never merge): notifications indicator variants. %>
+    <% case helpers.prototype_variant %>
+    <% when 'A' %>
+      <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: safe_join([tag.i(class: 'bi bi-bell me-1', aria: { hidden: true }), 'Notifications']), path: helpers.notifications_prototype_path(variant: 'A')) %>
+    <% when 'B' %>
+      <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Notifications') do |dropdown| %>
+        <% NotificationsPrototypeController.sample.first(5).each do |notification| %>
+          <% dropdown.with_item do %>
+            <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: "#{notification.title}: #{notification.subject_label.split(' (').first} · #{helpers.time_ago_in_words(notification.created_at)} ago", link: '#') %>
+          <% end %>
+        <% end %>
+        <% dropdown.with_item do %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownDividerComponent.new %>
+        <% end %>
+        <% dropdown.with_item do %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'All notifications', link: helpers.notifications_prototype_path(variant: 'B')) %>
+        <% end %>
+        <% dropdown.with_item do %>
+          <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: 'Notification settings', link: helpers.notifications_prototype_path(variant: 'B', anchor: 'email-settings')) %>
+        <% end %>
+      <% end %>
+    <% when 'C' %>
+      <li class="nav-item">
+        <%= link_to helpers.notifications_prototype_path(variant: 'C'), class: 'nav-link fs-5 py-1', title: 'Notifications' do %>
+          <i class="bi bi-bell-fill" aria-hidden="true"></i><span class="visually-hidden">Notifications</span>
+        <% end %>
+      </li>
+    <% end %>
   <% end %>
   <%= header.with_secondary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>

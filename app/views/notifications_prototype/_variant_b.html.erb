@@ -1,0 +1,28 @@
+<%# PROTOTYPE variant B: header dropdown previews the latest 5; a feed page; settings in a collapsible section on the same page. %>
+<%= render Layout::ContainerComponent.new(heading: 'Notifications') do %>
+  <p class="text-body-secondary">Your 25 most recent notifications from the last 30 days.</p>
+  <% if notifications.empty? %>
+    <p>No notifications.</p>
+  <% else %>
+    <ul class="list-unstyled mb-5">
+      <% notifications.each do |notification| %>
+        <li class="d-flex gap-3 border-start border-4 ps-3 py-2 mb-3 <%= { error: 'border-danger', success: 'border-success', info: 'border-primary' }[notification.outcome] %>">
+          <i class="bi <%= prototype_outcome_icon(notification.outcome) %> fs-4" aria-hidden="true"></i>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <span><span class="visually-hidden"><%= prototype_outcome_label(notification.outcome) %>: </span><%= link_to notification.title, '#', class: 'fw-bold' %></span>
+              <span class="text-body-secondary text-nowrap ms-3"><%= time_ago_in_words(notification.created_at) %> ago</span>
+            </div>
+            <div><%= notification.subject_label %></div>
+            <% if notification.text %><div class="text-body-secondary"><%= notification.text %></div><% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <div id="email-settings">
+    <%= render SdrViewComponents::Elements::CollapsibleSectionComponent.new(id: 'email-settings-section', heading: 'Email settings', expanded: false) do %>
+      <%= render 'settings_form', email_kinds:, cancel_path: notifications_prototype_path(variant: 'B') %>
+    <% end %>
+  </div>
+<% end %>

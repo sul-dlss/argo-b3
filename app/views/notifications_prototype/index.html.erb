@@ -1,0 +1,4 @@
+<%# PROTOTYPE (throwaway, never merge): three variants of the notifications inbox, switchable with ?variant=. %>
+<%= page_title('Notifications') %>
+<%= render "variant_#{prototype_variant.downcase}", notifications: @notifications, email_kinds: @email_kinds %>
+<%= render 'switcher' %>
