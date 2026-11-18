@@ -334,6 +334,16 @@ en:
         unassociated_files:
           one: "There is 1 file that has not been added to the structure."
           other: "There are %{count} files that have not been added to the structure."
+        csv:
+          allow_file_deletion: "Allow files to be deleted"
+          labels:
+            download: "Download resource labels"
+            submit: "Upload labels"
+            upload: "Upload resource labels CSV"
+          structural:
+            download: "Download structural metadata"
+            submit: "Structure files"
+            upload: "Upload structural CSV"
         toasts:
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"

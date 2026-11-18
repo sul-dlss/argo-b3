@@ -1,0 +1,26 @@
+<div class="mt-3">
+  <%= link_to download_path, data: { turbo: false } do %>
+    <%= helpers.download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= download_label %>
+  <% end %>
+</div>
+
+<fieldset data-disable-actions-target="disableable">
+  <%= form_with model:, url:, method: :patch, class: 'mt-3', data: helpers.disable_actions_form_data do |form| %>
+    <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :csv_file,
+                                                           label_text: upload_label,
+                                                           label_classes: 'fw-bold',
+                                                           input_classes: 'form-control-sm',
+                                                           input_accept:) %>
+    <% if allow_file_deletion_field %>
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
+                                                                 label_text: t('edit.contents.structure.csv.allow_file_deletion'),
+                                                                 container_classes: '') %>
+    <% end %>
+    <%= render SdrViewComponents::Forms::SubmitComponent.new(label: submit_label,
+                                                             variant: :'outline-primary',
+                                                             classes: 'btn-sm my-field',
+                                                             value: submit_value) %>
+  <% end %>
+</fieldset>

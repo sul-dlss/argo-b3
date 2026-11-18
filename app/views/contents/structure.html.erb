@@ -23,59 +23,20 @@
         <%# Reloaded when a resource changes (see content_file_sets/show). %>
         <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
 
-        <div class="mt-3">
-          <%= link_to csv_content_structure_path(content_id: @content_token), data: { turbo: false } do %>
-            <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> Download structural metadata
-          <% end %>
-        </div>
+        <%= render Edit::ContentCsvComponent.new(model: @structural_csv_form, url: content_path(@content.druid),
+                                                 download_path: csv_content_structure_path(content_id: @content_token),
+                                                 download_label: t('edit.contents.structure.csv.structural.download'),
+                                                 upload_label: t('edit.contents.structure.csv.structural.upload'),
+                                                 submit_label: t('edit.contents.structure.csv.structural.submit'),
+                                                 submit_value: ContentsController::CSV_VALUE,
+                                                 allow_file_deletion_field: true) %>
 
-        <%# While uploading a CSV, actions (e.g., the resources' actions) are disabled. %>
-        <fieldset data-disable-actions-target="disableable">
-          <%= form_with model: @structural_csv_form, url: content_path(@content.druid), method: :patch, class: 'mt-3',
-                        data: disable_actions_form_data do |form| %>
-            <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
-            <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                                   field_name: :csv_file,
-                                                                   label_text: 'Upload structural CSV',
-                                                                   label_classes: 'fw-bold',
-                                                                   input_classes: 'form-control-sm',
-                                                                   input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(',')) %>
-
-              <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
-                                                                         label_text: 'Allow files to be deleted',
-                                                                         container_classes: '') %>
-              <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Structure files',
-                                                                       variant: :'outline-primary',
-                                                                       classes: 'btn-sm my-field',
-                                                                       value: ContentsController::CSV_VALUE) %>
-
-          <% end %>
-        </fieldset>
-
-        <div class="mt-3">
-          <%= link_to labels_csv_content_structure_path(content_id: @content_token), data: { turbo: false } do %>
-            <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> Download resource labels
-          <% end %>
-        </div>
-
-        <%# While uploading a CSV, actions (e.g., the resources' actions) are disabled. %>
-        <fieldset data-disable-actions-target="disableable">
-          <%= form_with model: @labels_csv_form, url: content_path(@content.druid), method: :patch, class: 'mt-3',
-                        data: disable_actions_form_data do |form| %>
-            <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
-            <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                                   field_name: :csv_file,
-                                                                   label_text: 'Upload resource labels CSV',
-                                                                   label_classes: 'fw-bold',
-                                                                   input_classes: 'form-control-sm',
-                                                                   input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(',')) %>
-
-              <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload labels',
-                                                                       variant: :'outline-primary',
-                                                                       classes: 'btn-sm my-field',
-                                                                       value: ContentsController::LABELS_CSV_VALUE) %>
-          <% end %>
-        </fieldset>
+        <%= render Edit::ContentCsvComponent.new(model: @labels_csv_form, url: content_path(@content.druid),
+                                                 download_path: labels_csv_content_structure_path(content_id: @content_token),
+                                                 download_label: t('edit.contents.structure.csv.labels.download'),
+                                                 upload_label: t('edit.contents.structure.csv.labels.upload'),
+                                                 submit_label: t('edit.contents.structure.csv.labels.submit'),
+                                                 submit_value: ContentsController::LABELS_CSV_VALUE) %>
 
         <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">
