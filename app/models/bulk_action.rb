@@ -100,7 +100,7 @@ class BulkAction < ApplicationRecord
   def existing_exports
     exports.flat_map do |export|
       Dir.glob(filepath_for(filename: export.filename)).map do |filepath|
-        export.dup.tap { |existing_export| existing_export.filename = File.basename(filepath) }
+        export.with(filename: File.basename(filepath))
       end
     end
   end

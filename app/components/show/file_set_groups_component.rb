@@ -12,7 +12,7 @@ module Show
       Cocina::Models::ObjectType.document => ['Documents', [FileSetTypes::DOCUMENT]]
     }.freeze
 
-    Group = Struct.new(:label, :indexed_content_file_sets) do
+    Group = Data.define(:label, :indexed_content_file_sets) do
       def id
         "file-set-group-#{label.parameterize}"
       end

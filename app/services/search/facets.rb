@@ -11,53 +11,59 @@ module Search
       value == MISSING_VALUE
     end
 
-    Config = Struct.new('FacetConfig',
-                        :form_field,
-                        # How the sidebar loads the facet (see SIDEBAR): :primary, :secondary, :lazy, or nil.
-                        :loading,
-                        # Provide if this facet supports excluding values.
-                        :exclude_form_field,
-                        # True to sort alphabetically, otherwise sort by count.
-                        :alpha_sort,
-                        :limit,
-                        # Solr field.
-                        :field,
-                        # Solr hierarchical field containing the exploded hierarchy. Only for hierarchical facets.
-                        :hierarchical_field,
-                        # Form field for the from/to dates in a date range facet.
-                        :date_from_form_field,
-                        :date_to_form_field,
-                        # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
-                        # Routes are drawn from this (see ROUTED) and served by Search::FacetsController.
-                        # Path helpers are resolved from this plus the search form's route scope.
-                        # See Search::FacetPathResolver.
-                        :facet_resource,
-                        # True if the facet has an index endpoint.
-                        # This is used for a lazy facet and/or a pageable facet.
-                        # If true and the number of facet values exceeds the limit, paging will be enabled.
-                        :facet_index,
-                        # True if the facet has a children endpoint. Only for hierarchical facets.
-                        :facet_children,
-                        # True if the facet has a search endpoint. If true, search will be enabled.
-                        :facet_search,
-                        # How multiple selected values for the facet are combined: :and or :or.
-                        # An :or facet's counts ignore the facet's own selection (see FacetBuilder), so that all
-                        # of its values remain selectable. This is used, for example, for a checkbox facet.
-                        :operator,
-                        # Hash of dynamic facet keys to Solr queries.
-                        # This is used for facets like released_to_earthworks.
-                        :dynamic_facet,
-                        # True to offer a "No value" option for objects without a value for the field.
-                        :missing_value,
-                        # `composite_facet_field` is a solr field whose values encode "<label>:<id>"
-                        # (see Search::CompositeFacetValue), where the id is a druid or a URI,
-                        # e.g. "Stanford Theses:druid:bc123df4567" or
-                        # "CC Zero 1.0:https://creativecommons.org/publicdomain/zero/1.0/legalcode".
-                        # Set this when a facet needs to filter on an identifier (eg druid) but display and
-                        # text-search a human-readable label (eg object title). Since a title alone isn't unique
-                        # faceting on the display label directly (like most facets do) is ambiguous for
-                        # objects with a shared title.
-                        :composite_facet_field) do
+    Config = Data.define(
+      :form_field,
+      # How the sidebar loads the facet (see SIDEBAR): :primary, :secondary, :lazy, or nil.
+      :loading,
+      # Provide if this facet supports excluding values.
+      :exclude_form_field,
+      # True to sort alphabetically, otherwise sort by count.
+      :alpha_sort,
+      :limit,
+      # Solr field.
+      :field,
+      # Solr hierarchical field containing the exploded hierarchy. Only for hierarchical facets.
+      :hierarchical_field,
+      # Form field for the from/to dates in a date range facet.
+      :date_from_form_field,
+      :date_to_form_field,
+      # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
+      # Routes are drawn from this (see ROUTED) and served by Search::FacetsController.
+      # Path helpers are resolved from this plus the search form's route scope.
+      # See Search::FacetPathResolver.
+      :facet_resource,
+      # True if the facet has an index endpoint.
+      # This is used for a lazy facet and/or a pageable facet.
+      # If true and the number of facet values exceeds the limit, paging will be enabled.
+      :facet_index,
+      # True if the facet has a children endpoint. Only for hierarchical facets.
+      :facet_children,
+      # True if the facet has a search endpoint. If true, search will be enabled.
+      :facet_search,
+      # How multiple selected values for the facet are combined: :and or :or.
+      # An :or facet's counts ignore the facet's own selection (see FacetBuilder), so that all
+      # of its values remain selectable. This is used, for example, for a checkbox facet.
+      :operator,
+      # Hash of dynamic facet keys to Solr queries.
+      # This is used for facets like released_to_earthworks.
+      :dynamic_facet,
+      # True to offer a "No value" option for objects without a value for the field.
+      :missing_value,
+      # `composite_facet_field` is a solr field whose values encode "<label>:<id>"
+      # (see Search::CompositeFacetValue), where the id is a druid or a URI,
+      # e.g. "Stanford Theses:druid:bc123df4567" or
+      # "CC Zero 1.0:https://creativecommons.org/publicdomain/zero/1.0/legalcode".
+      # Set this when a facet needs to filter on an identifier (eg druid) but display and
+      # text-search a human-readable label (eg object title). Since a title alone isn't unique
+      # faceting on the display label directly (like most facets do) is ambiguous for
+      # objects with a shared title.
+      :composite_facet_field
+    ) do
+      # Members not given are nil.
+      def initialize(**attrs)
+        super(**members.index_with(nil).merge(attrs))
+      end
+
       # @return [String] the Solr field to facet/search on
       def facet_field
         composite_facet_field || field

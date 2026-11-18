@@ -13,7 +13,7 @@ module StructuralCsv
     DEFAULT_FILE_SET_TYPE = FileSetTypes::OBJECT
 
     # A built ContentFileSet, with the rows it was built from and its built ContentFiles (in the same order as the rows)
-    BuiltContentFileSet = Struct.new(:rows, :content_file_set, :content_files)
+    BuiltContentFileSet = Data.define(:rows, :content_file_set, :content_files)
 
     def self.call(...)
       new(...).call

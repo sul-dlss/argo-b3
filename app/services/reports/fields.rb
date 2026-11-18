@@ -11,10 +11,7 @@ module Reports
       nil
     end
 
-    Config = Struct.new('ReportFieldConfig',
-                        :field,
-                        :label,
-                        :help_text)
+    Config = Data.define(:field, :label, :help_text)
 
     ACCESS_RIGHTS = Config.new(
       field: Search::Fields::ACCESS_RIGHTS,

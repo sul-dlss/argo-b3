@@ -4,7 +4,7 @@ module Searchers
   # Searcher for the items immediately before and after an item in a search result set.
   # Used for the item page search result navigation
   class ItemNavigation
-    Result = Struct.new(:previous_druid, :next_druid, :total_results)
+    Result = Data.define(:previous_druid, :next_druid, :total_results)
 
     def self.call(...)
       new(...).call

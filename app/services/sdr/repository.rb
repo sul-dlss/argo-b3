@@ -6,7 +6,7 @@ module Sdr
     class Error < StandardError; end
     class NotFoundResponse < Error; end
     # A version's stored cocina that is no longer valid against the current cocina models.
-    InvalidCocina = Struct.new(:cocina_hash)
+    InvalidCocina = Data.define(:cocina_hash)
 
     REGISTERED_BY_TAG_PREFIX = 'Registered By : '
     FIND_ALL_SLICE_SIZE = 25
