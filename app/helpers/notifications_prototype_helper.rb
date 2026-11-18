@@ -2,7 +2,7 @@
 
 # PROTOTYPE (throwaway, never merge)
 module NotificationsPrototypeHelper
-  PROTOTYPE_VARIANTS = { 'A' => 'Header link + table', 'B' => 'Header dropdown + feed',
+  PROTOTYPE_VARIANTS = { 'A' => 'Header link + table, settings tab (revised)', 'B' => 'Header dropdown + feed',
                          'C' => 'Bell icon + grouped by subject, settings tab' }.freeze
 
   def prototype_variant

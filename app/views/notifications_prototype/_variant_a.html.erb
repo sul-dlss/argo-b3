@@ -1,25 +1,32 @@
-<%# PROTOTYPE variant A: header text link; a plain table page; settings on a separate page. %>
+<%# PROTOTYPE variant A (revised): header text link; table (About, Notification, When); email settings as a tab (from C). %>
 <%= render Layout::ContainerComponent.new(heading: 'Notifications') do %>
-  <div class="d-flex justify-content-between align-items-baseline mb-3">
-    <p class="mb-0">Your 25 most recent notifications from the last 30 days.</p>
-    <%= link_to 'Notification settings', notifications_prototype_settings_path(variant: 'A') %>
-  </div>
-  <%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Notifications', show_label: false, id: 'notifications-table', empty_message: 'No notifications.') do |table| %>
-    <%= table.with_header(label: 'When') %>
-    <%= table.with_header(label: 'Notification') %>
-    <%= table.with_header(label: 'About') %>
-    <% notifications.each do |notification| %>
-      <% table.with_row do %>
-        <tr>
-        <td class="text-nowrap"><%= time_ago_in_words(notification.created_at) %> ago</td>
-        <td>
-          <i class="bi <%= prototype_outcome_icon(notification.outcome) %> me-1" aria-hidden="true"></i>
-          <span class="fw-bold"><%= notification.title %></span>
-          <% if notification.text %><div><%= notification.text %></div><% end %>
-        </td>
-        <td><%= link_to notification.subject_label, '#' %></td>
-        </tr>
+  <%= render SdrViewComponents::Elements::Tabs::TabListComponent.new(variant: :underline, content_classes: 'mt-4') do |tabs| %>
+    <% tabs.with_tab(id: 'recent-tab', pane_id: 'recent-pane', label: 'Recent', active: true) %>
+    <% tabs.with_tab(id: 'email-tab', pane_id: 'email-pane', label: 'Email settings') %>
+    <%= tabs.with_pane(id: 'recent-pane', tab_id: 'recent-tab', active: true) do %>
+      <p>Your 25 most recent notifications from the last 30 days.</p>
+      <%= render SdrViewComponents::Tables::RawTableComponent.new(label: 'Notifications', show_label: false, id: 'notifications-table', empty_message: 'No notifications.') do |table| %>
+        <%= table.with_header(label: 'About') %>
+        <%= table.with_header(label: 'Notification') %>
+        <%= table.with_header(label: 'When') %>
+        <% notifications.each do |notification| %>
+          <% table.with_row do %>
+            <tr>
+              <td><%= link_to notification.subject_label, '#' %></td>
+              <td>
+                <i class="bi <%= prototype_outcome_icon(notification.outcome) %> me-1" aria-hidden="true"></i>
+                <span class="fw-bold"><%= notification.title %></span>
+                <% if notification.text %><div><%= notification.text %></div><% end %>
+              </td>
+              <td class="text-nowrap"><%= time_ago_in_words(notification.created_at) %> ago</td>
+            </tr>
+          <% end %>
+        <% end %>
       <% end %>
+    <% end %>
+    <%= tabs.with_pane(id: 'email-pane', tab_id: 'email-tab') do %>
+      <p>You always see notifications in Argo. Choose which ones are also emailed to <%= current_user.email_address %>.</p>
+      <%= render 'settings_form', email_kinds:, cancel_path: notifications_prototype_path(variant: 'A') %>
     <% end %>
   <% end %>
 <% end %>
