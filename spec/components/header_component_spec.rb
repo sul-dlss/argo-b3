@@ -14,8 +14,8 @@ RSpec.describe HeaderComponent, type: :component do
   it 'renders the header' do
     render_inline(component)
 
-    expect(page).to have_css('header .masthead .h1', text: 'Argo: Build Back Better')
-    expect(page).to have_link(href: '/', text: 'Argo: Build Back Better')
+    expect(page).to have_css('header .masthead .h1', exact_text: 'Argo B3')
+    expect(page).to have_link(href: '/', exact_text: 'Argo B3')
     expect(page).to have_link(href: 'mailto:argo-feedback@lists.stanford.edu', text: 'Feedback')
     expect(page).to have_css('.nav-item', text: 'Logged in as Test User')
     expect(page).to have_link('Workflow status', href: '/workflow_grid')

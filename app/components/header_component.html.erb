@@ -1,4 +1,4 @@
-<%= render SdrViewComponents::Structure::HeaderComponent.new(title: 'Argo: Build Back Better', variant: :dark, background_color: '84, 73, 72') do |header| %>
+<%= render SdrViewComponents::Structure::HeaderComponent.new(title: t('layouts.application.product_name'), variant: :dark, background_color: 'var(--stanford-archway-dark-rgb)') do |header| %>
   <%= header.with_primary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: "mailto:#{Settings.support_email}") %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: logged_in_text) %>
