@@ -9,6 +9,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
   before_action :set_multi_item_deposit_action, only: %i[edit update destroy structural_metadata_csv_template
                                                          discovery_report structure_report]
+  before_action :set_structure_summary, only: %i[edit update]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -210,6 +211,15 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
   def set_multi_item_deposit_action
     @multi_item_deposit_action = MultiItemDepositAction.find(params.expect(:id))
+  end
+
+  # The structure page shows the totals of the results of checking files once there are results. They are loaded
+  # here so that the summary component renders them without querying.
+  def set_structure_summary
+    return unless @multi_item_deposit_action.structure_step? && @multi_item_deposit_action.structuring_completed_at?
+
+    @structure_summary = MultiItemDeposit::StructureResults.new(multi_item_deposit_action: @multi_item_deposit_action)
+                                                           .summary
   end
 
   # A saved uploaded manifest is used for an upload unless another manifest is provided.

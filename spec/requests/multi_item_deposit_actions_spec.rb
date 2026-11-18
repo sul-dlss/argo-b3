@@ -389,15 +389,25 @@ RSpec.describe 'Multi-item deposit actions' do
       end
 
       it 'renders the summary of the Item Deposits once structuring has completed' do
-        multi_item_deposit_action.update!(structuring_completed_at: Time.current)
+        multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
         create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567')
 
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
+        expect(rendered_page).to have_css('h2', text: 'Results of checking files')
+        expect(rendered_page).to have_css('h3', text: 'Summary')
+        expect(rendered_page).to have_css('.card', text: '# with errors')
         expect(rendered_page).to have_css('table[aria-label="Summary"] td', text: 'bc123df4567')
         expect(rendered_page).to have_link(
-          'Download report', href: structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
+          'Download report', href: structure_report_multi_item_deposit_action_path(multi_item_deposit_action), count: 1
         )
+      end
+
+      it 'does not render the summary before structuring has completed' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_no_css('h3', text: 'Summary')
+        expect(rendered_page).to have_no_link('Download report')
       end
 
       it 'renders Previous and a disabled Next until structuring succeeds' do
@@ -1004,6 +1014,18 @@ RSpec.describe 'Multi-item deposit actions' do
           '[aria-describedby~="multi_item_deposit_structure_structural_metadata_csv_choice_error"]', count: 2
         )
         expect(multi_item_deposit_action.reload).not_to be_structuring
+      end
+
+      it 'renders the summary of the earlier results of checking files' do
+        multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
+
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_css('h3', text: 'Summary')
+        expect(rendered_page).to have_css('.card', text: '# of items') do |box|
+          box.has_css?('.card-text p', exact_text: '0')
+        end
       end
     end
 
