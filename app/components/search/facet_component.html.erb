@@ -1,6 +1,7 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
   <% if checkbox? %>
-    <%= tag.p 'Selecting a value updates the results.', id: checkbox_description_id, class: 'visually-hidden' %>
+    <%= tag.p 'Selecting a value updates the results.',
+              id: checkbox_description_id, class: 'visually-hidden', data: { controller: 'facet-checkbox-focus' } %>
   <% end %>
 
   <%= helpers.turbo_frame_tag frame_id do %>
