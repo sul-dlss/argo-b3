@@ -37,8 +37,8 @@ export default class extends Controller {
     this.update({ applyValues: this.applyOnConnectValue })
   }
 
-  apply () {
-    this.update({ applyValues: true })
+  apply ({ params: { toast } }) {
+    this.update({ applyValues: true, toast })
   }
 
   // Shows the selected APO's defaults in the help texts, without changing the field values.
@@ -46,7 +46,7 @@ export default class extends Controller {
     this.update({ applyValues: false })
   }
 
-  async update ({ applyValues }) {
+  async update ({ applyValues, toast }) {
     // There is no selected APO when the user has no APOs to register with.
     const option = this.apoTarget.selectedOptions[0]
     if (!option) return
@@ -57,7 +57,12 @@ export default class extends Controller {
     if (!defaults || druid !== this.apoTarget.value) return
 
     this.showHelpTexts(defaults)
-    if (applyValues) this.applyValues(defaults)
+    if (!applyValues) return
+
+    this.applyValues(defaults)
+
+    // if toast details were passed in, we will show the toast
+    if (toast) this.dispatch('show', { prefix: 'toast', detail: { title: toast } })
   }
 
   async fetchDefaults (url) {

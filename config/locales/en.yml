@@ -517,6 +517,7 @@ en:
         apo_druid:
           label: "APO"
           apply_defaults: "Apply APO defaults"
+          defaults_applied: "APO defaults applied"
         barcode:
           label: "Barcode"
         catalog_link_refresh:

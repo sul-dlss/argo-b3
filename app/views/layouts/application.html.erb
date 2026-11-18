@@ -44,9 +44,15 @@
     <%= render Search::FormComponent.new(current_search_form: @search_form, last_search_form: @last_search_form) %>
     <%= render ImpersonationBannerComponent.new %>
 
-    <%# Toasts can be rendered into this container. %>
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080" id="toast-container" data-turbo-permanent>
+    <%# Toasts can be rendered into this container, or shown from JS with the toast-container Stimulus controller. %>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080" id="toast-container" data-turbo-permanent
+         data-controller="toast-container" data-action="toast:show@window->toast-container#show">
     </div>
+    <%# The toast that the toast-container Stimulus controller copies, filling in the title. %>
+    <template id="toast-template">
+      <%= render SdrViewComponents::Elements::ToastComponent.new(title: tag.span(data: { toast_title: true }),
+                                                                 disappearing: !Rails.env.test?) %>
+    </template>
     <%= render Elements::FlashToastComponent.new %>
 
     <%# tabindex lets the skip link move focus here. %>

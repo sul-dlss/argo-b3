@@ -43,6 +43,7 @@ RSpec.describe Edit::ApoComponent, type: :component do
                                '[data-apo-defaults-url="/apo_defaults/druid:bc123df4567"]')
       expect(page).to have_button('Apply APO defaults', type: 'button')
       expect(page).to have_css('button[data-action="apo-defaults#apply"]', text: 'Apply APO defaults')
+      expect(page).to have_css('button[data-apo-defaults-toast-param="APO defaults applied"]')
     end
   end
 
