@@ -25,18 +25,11 @@
 
         <%= render Edit::ContentCsvComponent.new(model: @structural_csv_form, url: content_path(@content.druid),
                                                  download_path: csv_content_structure_path(content_id: @content_token),
-                                                 download_label: t('edit.contents.structure.csv.structural.download'),
-                                                 upload_label: t('edit.contents.structure.csv.structural.upload'),
-                                                 submit_label: t('edit.contents.structure.csv.structural.submit'),
-                                                 submit_value: ContentsController::CSV_VALUE,
+                                                 i18n_key: :structural, submit_value: ContentsController::CSV_VALUE,
                                                  allow_file_deletion_field: true) %>
-
         <%= render Edit::ContentCsvComponent.new(model: @labels_csv_form, url: content_path(@content.druid),
                                                  download_path: labels_csv_content_structure_path(content_id: @content_token),
-                                                 download_label: t('edit.contents.structure.csv.labels.download'),
-                                                 upload_label: t('edit.contents.structure.csv.labels.upload'),
-                                                 submit_label: t('edit.contents.structure.csv.labels.submit'),
-                                                 submit_value: ContentsController::LABELS_CSV_VALUE) %>
+                                                 i18n_key: :labels, submit_value: ContentsController::LABELS_CSV_VALUE) %>
 
         <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">

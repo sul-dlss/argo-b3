@@ -337,13 +337,15 @@ en:
         csv:
           allow_file_deletion: "Allow files to be deleted"
           labels:
-            download: "Download resource labels"
-            submit: "Upload labels"
+            download: "Download resource labels CSV"
+            help: "Changes the labels of the resources listed, matched by sequence."
+            submit: "Change labels"
             upload: "Upload resource labels CSV"
           structural:
-            download: "Download structural metadata"
-            submit: "Structure files"
-            upload: "Upload structural CSV"
+            download: "Download structural metadata CSV"
+            help: "Replaces all resources and files with those in the CSV. To delete files that the CSV leaves out, select \"Allow files to be deleted\"."
+            submit: "Replace structure"
+            upload: "Upload structural metadata CSV"
         toasts:
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"

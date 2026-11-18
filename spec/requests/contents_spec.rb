@@ -791,14 +791,15 @@ RSpec.describe 'Contents' do
       checkbox = page.at_css('input[type="checkbox"][name="structural_csv[allow_file_deletion]"]')
       expect(checkbox['checked']).to be_nil
       download_link = page.at_css('a[href$="/structure/csv"]')
-      expect(download_link.text.strip).to eq('Download structural metadata')
-      expect(download_link.at_css('i.bi-download[aria-hidden="true"]')).to be_present
+      expect(download_link.text.strip).to eq('Download structural metadata CSV')
+      structural_csv_submit = page.at_css('button[name="commit"][value="csv"]')
+      expect(structural_csv_submit.text.strip).to eq('Replace structure')
       labels_download_link = page.at_css('a[href$="/structure/labels_csv"]')
-      expect(labels_download_link.text.strip).to eq('Download resource labels')
+      expect(labels_download_link.text.strip).to eq('Download resource labels CSV')
       labels_csv_input = page.at_css('input[type="file"][name="labels_csv[csv_file]"]')
       expect(page.at_css("label[for=\"#{labels_csv_input['id']}\"]").text.strip).to eq('Upload resource labels CSV')
       labels_csv_submit = page.at_css('button[name="commit"][value="labels_csv"]')
-      expect(labels_csv_submit.text.strip).to eq('Upload labels')
+      expect(labels_csv_submit.text.strip).to eq('Change labels')
       delete_form = page.css('form[action$="/structure"]')
                         .find { |form| form.at_css('input[name="_method"][value="delete"]') }
       expect(delete_form['data-turbo-confirm']).to eq('Are you sure you want to delete all files and resources?')
