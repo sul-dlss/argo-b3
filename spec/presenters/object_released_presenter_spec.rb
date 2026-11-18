@@ -151,8 +151,37 @@ RSpec.describe ObjectReleasedPresenter do
     context 'when a collection' do
       let(:object_type) { 'collection' }
 
+      it 'is true' do
+        expect(presenter.manageable?).to be true
+      end
+    end
+
+    context 'when a dark collection' do
+      let(:object_type) { 'collection' }
+      let(:access_rights) { ['dark'] }
+
       it 'is false' do
         expect(presenter.manageable?).to be false
+      end
+    end
+  end
+
+  describe '#manage_release_path' do
+    let(:release_tags) { [] }
+    let(:solr_doc) do
+      SolrDocPresenter.new(solr_doc: { Search::Fields::ID => druid, Search::Fields::OBJECT_TYPES => [object_type] })
+    end
+    let(:object_type) { 'item' }
+
+    it 'is the item release path for an item' do
+      expect(presenter.manage_release_path).to eq('/items/druid:bc123df4567/releases/new')
+    end
+
+    context 'when a collection' do
+      let(:object_type) { 'collection' }
+
+      it 'is the collection release path' do
+        expect(presenter.manage_release_path).to eq('/collections/druid:bc123df4567/releases/new')
       end
     end
   end

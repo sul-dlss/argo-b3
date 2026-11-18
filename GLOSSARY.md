@@ -81,7 +81,7 @@ Permanently deleting an object from SDR, along with its Mutable Content and stag
 When, and by whom, an object was most recently registered, opened, updated, or closed. Other activity, such as accessioning or releasing, does not count.
 
 ### Release Tag
-An instruction to release an object to (or withhold it from) a discovery target: SearchWorks, EarthWorks, or search engines (the PURL sitemap). Tags are only ever added, never deleted; for each target, an item's latest tag overrides its collections' tags, so an item that has its own tag for a target no longer follows its collection for that target. A collection's tag applies to its member items only when it releases the collection and its members.
+An instruction to release an object to (or withhold it from) a discovery target: SearchWorks, EarthWorks, or search engines (the PURL sitemap). Tags are only ever added, never deleted; for each target, an item's latest tag overrides its collections' tags, so an item that has its own tag for a target no longer follows its collection for that target. A collection's tag covers either the collection alone or the collection and its members; member items follow only the collection's latest tag that covers its members, so a tag for the collection alone leaves them as they were.
 
 ### Tag
 An administrative label on an object, made of two or more terms separated by ` : ` (e.g., `Project : Maps : 2024`), used to find and group objects in Argo; tags are not public. **Project** and **Ticket** tags are tags whose first term is `Project` or `Ticket`. Unlike Release Tags, tags can be changed and removed.

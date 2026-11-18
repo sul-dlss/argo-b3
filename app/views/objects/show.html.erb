@@ -57,9 +57,8 @@
                                    variant: 'outline-primary',
                                    disabled: !allowed_to?(:update?, @solr_doc, with: ObjectPolicy) || !@previously_published) %>
         <% end %>
-        <%# Collections show the button but cannot yet be released here. %>
         <% if @solr_doc.releasable_type? %>
-          <% component.with_button(link: new_item_release_path(@solr_doc.druid), label: 'Manage release',
+          <% component.with_button(link: @object_released_presenter.manage_release_path, label: 'Manage release',
                                    variant: 'outline-primary',
                                    disabled: !(@object_released_presenter.manageable? &&
                                                allowed_to?(:release?, @solr_doc, with: ObjectPolicy))) %>

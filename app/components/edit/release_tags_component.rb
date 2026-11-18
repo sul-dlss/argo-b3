@@ -10,19 +10,10 @@ module Edit
       ['Do not release', ReleaseTagsForm::NO_RELEASE]
     ].freeze
 
-    COLLECTION_OPTIONS = [
-      ['Do not release', CollectionReleaseTagsForm::NO_RELEASE],
-      ['Release collection', CollectionReleaseTagsForm::RELEASE_COLLECTION],
-      ['Release collection and member items', CollectionReleaseTagsForm::RELEASE_COLLECTION_AND_MEMBERS]
-    ].freeze
-
-    # @param form [ActionView::Helpers::FormBuilder] the form for a ReleaseTagsForm, ItemReleaseTagsForm, or
-    #   CollectionReleaseTagsForm
-    # @param options [Array<Array(String, String)>] the [label, value] choices for each release target
+    # @param form [ActionView::Helpers::FormBuilder] the form for a ReleaseTagsForm or ItemReleaseTagsForm
     # @param follow_collection_disabled_fields [Array<Symbol>] target fields whose follow collection choice is disabled
-    def initialize(form:, options: ITEM_OPTIONS, follow_collection_disabled_fields: [])
+    def initialize(form:, follow_collection_disabled_fields: [])
       @form = form
-      @options = options
       @follow_collection_disabled_fields = follow_collection_disabled_fields
       super()
     end
@@ -30,9 +21,9 @@ module Edit
     attr_reader :form
 
     def options_for(field_name)
-      return @options unless @follow_collection_disabled_fields.include?(field_name)
+      return ITEM_OPTIONS unless @follow_collection_disabled_fields.include?(field_name)
 
-      @options.map do |label, value|
+      ITEM_OPTIONS.map do |label, value|
         value == ReleaseTagsForm::RELEASE_TO_COLLECTION ? [label, value, { disabled: true }] : [label, value]
       end
     end

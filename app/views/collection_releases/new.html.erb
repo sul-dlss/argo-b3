@@ -1,0 +1,15 @@
+<%= page_title(t('edit.releases.new.title'), name: @title) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('edit.releases.new.title'), subtitle: @title) do %>
+
+  <%= form_with model: @collection_release_tags_form, url: collection_releases_path(@druid), class: 'b3-form' do |form| %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.collections.tabs.release.label'), hidden_label: true,
+                                                               help_text: t('edit.collections.tabs.release.help_text')) do %>
+      <%= render Edit::CollectionReleaseTagsComponent.new(form:) %>
+    <% end %>
+
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.releases.new.buttons.save')) %>
+    <% end %>
+  <% end %>
+<% end %>

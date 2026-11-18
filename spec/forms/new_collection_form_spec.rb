@@ -9,7 +9,7 @@ RSpec.describe NewCollectionForm do
                         use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
                         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
                         other_tags_attributes: { '0' => { tag: 'Some : Tag' } },
-                        release_tags_attributes: { searchworks_target: 'collection' })
+                        release_tags_attributes: { searchworks_release: true, searchworks_what: 'collection' })
   end
 
   let(:title) { 'My collection' }
@@ -117,7 +117,7 @@ RSpec.describe NewCollectionForm do
       end
       expect(Sdr::Repository).to have_received(:create_release_tag)
         .with(druid: 'druid:xz987wv6543', user_name: 'jcoyne', release_target: 'Searchworks', release: true,
-              release_what: 'collection').ordered
+              release_what: 'collection', date: Time).ordered
       expect(Sdr::Repository).to have_received(:accession)
         .with(cocina_object: registered_cocina_object, user_name: 'jcoyne').ordered
     end

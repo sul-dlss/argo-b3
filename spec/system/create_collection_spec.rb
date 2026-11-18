@@ -76,7 +76,18 @@ RSpec.describe 'Create a collection' do
 
     click_button 'Next'
     expect(page).to have_css('#release-tab.active')
-    select 'Release collection and member items', from: 'SearchWorks'
+    expect(page).to have_field('Collection and member items', type: 'radio', disabled: true, count: 3)
+    check 'Release to SearchWorks'
+    within_fieldset('Include in release to SearchWorks') do
+      expect(page).to have_checked_field('Collection and member items')
+    end
+    check 'Release to EarthWorks'
+    within_fieldset('Include in release to EarthWorks') { choose 'Collection', exact: true }
+    check 'Release to Search engines'
+    uncheck 'Release to Search engines'
+    within_fieldset('Include in release to Search engines') do
+      expect(page).to have_no_checked_field('Collection and member items', disabled: true)
+    end
 
     click_button 'Next'
     expect(page).to have_css('#deposit-tab.active')
@@ -98,8 +109,13 @@ RSpec.describe 'Create a collection' do
         .to eq([['abstract', 'My abstract.']])
       expect(args[:tags]).to include('Some : Tag')
     end
+    expect(Sdr::Repository).to have_received(:create_release_tag).twice
     expect(Sdr::Repository).to have_received(:create_release_tag)
-      .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true, release_what: 'collection')
+      .with(druid:, user_name: user.sunetid, release_target: 'Searchworks', release: true, release_what: 'collection',
+            date: Time)
+    expect(Sdr::Repository).to have_received(:create_release_tag)
+      .with(druid:, user_name: user.sunetid, release_target: 'Earthworks', release: true, release_what: 'self',
+            date: Time)
     expect(Sdr::Repository).to have_received(:accession)
   end
 end

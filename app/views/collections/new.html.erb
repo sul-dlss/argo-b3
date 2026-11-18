@@ -77,9 +77,9 @@
                                                                           help_text: t('edit.collections.tabs.release.help_text'))) do |pane| %>
         <%= render SdrViewComponents::Forms::HasOneComponent.new(form:,
                                                                  field_name: :release_tags,
-                                                                 form_component: Edit::ReleaseTagsComponent,
-                                                                 form_options: Edit::ReleaseTagsComponent::COLLECTION_OPTIONS,
-                                                                 fieldset_label: t('edit.collections.tabs.release.label')) %>
+                                                                 form_component: Edit::CollectionReleaseTagsComponent,
+                                                                 fieldset_label: t('edit.collections.tabs.release.label'),
+                                                                 fieldset_hidden_label: true) %>
 
         <% pane.with_footer do %>
           <%= render Item::TabNavigationComponent.new(pane:, cancel_path: @cancel_path) %>

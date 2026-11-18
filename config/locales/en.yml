@@ -51,7 +51,9 @@ en:
       read_unrestricted: 'Read unrestricted'
       edit: 'Edit'
   release_tags:
-    earthworks: "EarthWorks (requires geo coordinates or release will not be successful)"
+    earthworks: "EarthWorks"
+    # Items, unlike collections, need geo coordinates to release to EarthWorks.
+    earthworks_requires_geo: "EarthWorks (requires geo coordinates or release will not be successful)"
     purl_sitemap: "Search engines"
     searchworks: "SearchWorks"
   banner:
@@ -290,9 +292,9 @@ en:
         release:
           label: "Release"
           help_text: >-
-            If you choose to release the collection and its member items, this will affect all current and future member
-            items. You can override the collection-level release settings for a specific member item by editing its
-            item-level release settings.
+            Check a target to choose what to release to it. "Collection" releases only the collection and stops releasing
+            its member items. "Collection and member items" also releases the member items. Member items with their own
+            release settings are not affected. Leaving a target unchecked releases neither.
         rights:
           label: "APO and rights"
         tags:

@@ -34,8 +34,9 @@ RSpec.describe 'Collections' do
       expect(page).to have_no_field('collection[barcode]')
       expect(page).to have_select('collection[apo_druid]', options: ['My APO'])
       expect(page).to have_select('collection[access_view]', selected: 'world', options: %w[world dark])
-      expect(page).to have_select('collection[release_tags_attributes][searchworks_target]',
-                                  selected: 'Do not release')
+      expect(page).to have_unchecked_field('collection[release_tags_attributes][searchworks_release]')
+      expect(page).to have_field('collection_release_tags_attributes_searchworks_what_collection', disabled: true,
+                                                                                                   checked: false)
       expect(page).to have_field('collection[other_tags_attributes][0][tag]')
       expect(page).to have_button('Register and deposit collection')
       expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope,
@@ -71,7 +72,7 @@ RSpec.describe 'Collections' do
       { title: 'My collection', description_choice: 'title', apo_druid:, access_view: 'dark',
         use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
-        release_tags_attributes: { searchworks_target: 'self' } }
+        release_tags_attributes: { searchworks_release: '1', searchworks_what: 'self', earthworks_release: '0' } }
     end
 
     before do
@@ -98,7 +99,7 @@ RSpec.describe 'Collections' do
         end
         expect(Sdr::Repository).to have_received(:create_release_tag)
           .with(druid: 'druid:xz987wv6543', user_name: user.sunetid, release_target: 'Searchworks', release: true,
-                release_what: 'self')
+                release_what: 'self', date: Time).once
         expect(Sdr::Repository).to have_received(:accession)
       end
     end

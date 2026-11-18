@@ -1,0 +1,34 @@
+<div class="row align-items-center my-field" data-controller="enable-when-checked">
+  <div class="col-4 col-lg-3">
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+          form:,
+          field_name: :"#{prefix}_release",
+          label_text: safe_join([tag.span('Release to ', class: 'visually-hidden'), target_label]),
+          container_classes: 'mb-0',
+          input_data: { enable_when_checked_target: 'checkbox', action: 'enable-when-checked#toggle' }
+        ) %>
+  </div>
+  <div class="col">
+    <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+          form:,
+          field_name: :"#{prefix}_what",
+          label: "Include in release to #{target_label}",
+          hidden_label: true,
+          classes: 'd-flex flex-wrap column-gap-5 mb-0',
+          data: { enable_when_checked_target: 'dependent' }
+        ) do |group| %>
+      <%# An unreleased target shows no choice; checking it chooses the default. %>
+      <%# Flex rather than the input's float, which wraps below the label in a shrink-to-fit container. %>
+      <% group.with_radio_button(label_text: 'Collection', label_classes: 'order-1',
+                                 container_classes: 'd-flex align-items-center gap-2',
+                                 input_value: CollectionReleaseTagsForm::RELEASE_COLLECTION, input_disabled: !released?,
+                                 input_checked: checked?(CollectionReleaseTagsForm::RELEASE_COLLECTION)) %>
+      <% group.with_radio_button(label_text: 'Collection and member items', label_classes: 'order-1',
+                                 container_classes: 'd-flex align-items-center gap-2',
+                                 input_value: CollectionReleaseTagsForm::RELEASE_COLLECTION_AND_MEMBERS,
+                                 input_disabled: !released?,
+                                 input_checked: checked?(CollectionReleaseTagsForm::RELEASE_COLLECTION_AND_MEMBERS),
+                                 input_data: { enable_when_checked_target: 'default' }) %>
+    <% end %>
+  </div>
+</div>

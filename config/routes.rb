@@ -161,6 +161,9 @@ Rails.application.routes.draw do
   resources :apos, only: %i[new create edit update]
   resources :agreements, only: %i[new create edit update]
   resources :collections, only: %i[new create edit update]
+  scope 'collections/:druid', as: :collection do
+    resources :releases, only: %i[new create], controller: 'collection_releases'
+  end
 
   resources :multiple_items, only: %i[new create show]
 
