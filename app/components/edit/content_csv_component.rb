@@ -25,13 +25,25 @@ module Edit
 
     attr_reader :model, :url, :submit_value, :allow_file_deletion_field
 
-    def copy(key)
-      t(key, scope: ['edit.contents.structure.csv', @i18n_key])
+    def download_label
+      t("edit.contents.structure.csv.#{@i18n_key}.download")
+    end
+
+    def upload_label
+      t("edit.contents.structure.csv.#{@i18n_key}.upload")
+    end
+
+    def help_text
+      t("edit.contents.structure.csv.#{@i18n_key}.help")
+    end
+
+    def submit_label
+      t("edit.contents.structure.csv.#{@i18n_key}.submit")
     end
 
     def download_link
       link_to(@download_path, download: true, data: { turbo: false }) do
-        safe_join([helpers.download_icon(aria: { hidden: true }, classes: 'me-1'), copy(:download)], ' ')
+        safe_join([helpers.download_icon(aria: { hidden: true }, classes: 'me-1'), download_label], ' ')
       end
     end
 
