@@ -9,11 +9,7 @@
                                                              label_caption: download_link,
                                                              help_text:,
                                                              input_accept:) %>
-      <% if allow_file_deletion_field %>
-        <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
-                                                                   label_text: t('edit.contents.structure.csv.allow_file_deletion'),
-                                                                   container_classes: 'my-field') %>
-      <% end %>
+      <%= additional_fields %>
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: submit_label,
                                                                variant: :'outline-primary',
                                                                value: submit_value) %>

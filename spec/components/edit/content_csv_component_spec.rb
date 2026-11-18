@@ -5,11 +5,10 @@ require 'rails_helper'
 RSpec.describe Edit::ContentCsvComponent, type: :component do
   let(:component) do
     described_class.new(model:, url: '/contents/druid:bc123df4567', download_path: '/contents/abc123/structure/csv',
-                        i18n_key:, submit_value: 'csv', allow_file_deletion_field:)
+                        i18n_key:, submit_value: 'csv')
   end
   let(:model) { StructuralCsvForm.new }
   let(:i18n_key) { :structural }
-  let(:allow_file_deletion_field) { false }
 
   it 'renders an upload form with a download link, which disables actions while uploading' do
     render_inline(component)
@@ -25,16 +24,16 @@ RSpec.describe Edit::ContentCsvComponent, type: :component do
       .to eq('Replaces all resources and files with those in the CSV. ' \
              'To delete files that the CSV leaves out, select "Allow files to be deleted".')
     expect(form.find_button('Replace structure')['value']).to eq('csv')
-    expect(form).to have_no_field('Allow files to be deleted')
   end
 
-  context 'with the allow file deletion field' do
-    let(:allow_file_deletion_field) { true }
+  context 'with additional fields' do
+    it 'renders them in the upload form, after the file field and before the submit button' do
+      render_inline(component) do |content_csv_component|
+        content_csv_component.with_additional_fields { '<input type="checkbox" name="extra">'.html_safe }
+      end
 
-    it 'renders the checkbox' do
-      render_inline(component)
-
-      expect(page).to have_unchecked_field('Allow files to be deleted')
+      inputs = page.all('form input:not([type="hidden"]), form button').map { |input| input['name'] || input['type'] }
+      expect(inputs).to eq(['structural_csv[csv_file]', 'extra', 'commit'])
     end
   end
 

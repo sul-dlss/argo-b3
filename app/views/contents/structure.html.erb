@@ -25,8 +25,15 @@
 
         <%= render Edit::ContentCsvComponent.new(model: @structural_csv_form, url: content_path(@content.druid),
                                                  download_path: csv_content_structure_path(content_id: @content_token),
-                                                 i18n_key: :structural, submit_value: ContentsController::CSV_VALUE,
-                                                 allow_file_deletion_field: true) %>
+                                                 i18n_key: :structural, submit_value: ContentsController::CSV_VALUE) do |component| %>
+          <% component.with_additional_fields do %>
+            <%= fields_for @structural_csv_form do |form| %>
+              <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
+                                                                         label_text: t('edit.contents.structure.csv.allow_file_deletion'),
+                                                                         container_classes: 'my-field') %>
+            <% end %>
+          <% end %>
+        <% end %>
         <%= render Edit::ContentCsvComponent.new(model: @labels_csv_form, url: content_path(@content.druid),
                                                  download_path: labels_csv_content_structure_path(content_id: @content_token),
                                                  i18n_key: :labels, submit_value: ContentsController::LABELS_CSV_VALUE) %>
