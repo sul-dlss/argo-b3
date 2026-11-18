@@ -12,7 +12,7 @@
     <%= link_to params[:empty] ? 'Show sample data' : 'Show empty', url_for(params.permit!.merge(empty: params[:empty] ? nil : 1)), class: 'btn btn-sm btn-outline-light' %>
     <template data-prototype-switcher-target="toast">
       <% toast_text = case prototype_variant
-                      when 'A' then 'Map of the Bay Area, 1906 (bc123df4567): gisAssemblyWF:extract-iso19139-metadata'
+                      when 'A' then safe_join([link_to('Map of the Bay Area, 1906 (bc123df4567)', '#', class: 'text-white text-decoration-underline'), ': gisAssemblyWF:extract-iso19139-metadata'])
                       when 'B' then safe_join([link_to('Map of the Bay Area, 1906', '#', class: 'text-white'), tag.br, 'gisAssemblyWF:extract-iso19139-metadata'])
                       else safe_join(['Map of the Bay Area, 1906. ', link_to('View item', '#', class: 'text-white'), ' · ', link_to('All notifications', notifications_prototype_path(variant: 'C'), class: 'text-white')])
                       end %>

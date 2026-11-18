@@ -9,7 +9,7 @@
       </div>
     <% end %>
   <% end %>
-  <%= render Elements::FormFooterComponent.new(cancel_path:) do %>
+  <%= render Elements::FormFooterComponent.new(cancel_path: local_assigns[:cancel]) do %>
     <%= render SdrViewComponents::Elements::ButtonComponent.new(label: 'Save', variant: :primary, type: :submit) %>
   <% end %>
 <% end %>
