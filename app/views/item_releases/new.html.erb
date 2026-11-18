@@ -1,6 +1,6 @@
-<%= page_title(t('edit.item_releases.new.title'), name: @title) %>
+<%= page_title(t('edit.releases.new.title'), name: @title) %>
 
-<%= render Layout::ContainerComponent.new(heading: t('edit.item_releases.new.title'), subtitle: @title) do %>
+<%= render Layout::ContainerComponent.new(heading: t('edit.releases.new.title'), subtitle: @title) do %>
 
   <p>
     If the item is not already in a collection, "Follow collection settings" will not have any effect until the item is added to a
@@ -11,7 +11,7 @@
     <%= render Edit::ReleaseTagsComponent.new(form:, follow_collection_disabled_fields: @follow_collection_disabled_fields) %>
 
     <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_releases.new.buttons.save')) %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.releases.new.buttons.save')) %>
     <% end %>
   <% end %>
 <% end %>
