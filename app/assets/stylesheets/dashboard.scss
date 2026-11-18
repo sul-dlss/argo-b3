@@ -8,3 +8,15 @@
     --bs-btn-padding-x: 0;
   }
 }
+
+// Anchored left and never shrunk, so narrower viewports show the image's left portion.
+.dashboard-header {
+  // Cancels the search bar's mb-3, so the image meets the search bar.
+  margin-top: -$spacer;
+  background: url("dashboard-header.jpg") left center / cover no-repeat;
+
+  // The alert's tint is translucent; lay it over the body color so the image doesn't show through.
+  .alert {
+    background: linear-gradient(var(--bs-alert-bg), var(--bs-alert-bg)), var(--bs-body-bg);
+  }
+}

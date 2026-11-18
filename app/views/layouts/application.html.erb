@@ -57,6 +57,8 @@
 
     <%# tabindex lets the skip link move focus here. %>
     <main id="main-container" tabindex="-1">
+      <%# A full-width band above the flash alerts (e.g., the dashboard's heading). %>
+      <%= yield :page_header %>
       <div class="container mt-3">
         <%# This prevents the flash from being cached by turbo. %>
         <div id="flash-alerts" data-turbo-temporary="true">
