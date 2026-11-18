@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# Sets up a Claude Code cloud environment session for development and specs:
+# installs Matt Pocock's skills (mattpocock/skills) for Claude Code, installs
+# prebuilt Ruby and Node at the versions named in the Dockerfile, installs
+# playwright-cli for screencasts and a ChromeDriver matching Chrome, prepares the
+# development and parallel test databases, and starts the Solr containers.
+#
+# Call it from the cloud environment's setup script, which starts one directory
+# above the repository:
+#   cd argo-b3 && bin/setup-claude-cloud-env
+#
+# The environment's network access must explicitly allow:
+#   *.github.com      Matt Pocock's skills, prebuilt Ruby (ruby/ruby-builder releases),
+#                     and the Solr config fetched by the Solr image build
+#                     (sul-dlss/sul-solr-configs)
+#   cdn.jsdelivr.net  JavaScript and styles the app's pages load in system specs
+#                     (Bootstrap, Popper, Tom Select, and the SUL component library)
+# The other hosts it uses (Node, npm, Yarn, RubyGems, Chrome for Testing, and Docker
+# Hub) are allowed by default.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# ~/.local/bin precedes the preinstalled /opt/node22/bin and /usr/local/bin on the
+# session's PATH, so linking executables here makes these versions the defaults.
+bin_dir="$HOME/.local/bin"
+mkdir -p "$bin_dir"
+export PATH="$bin_dir:$PATH"
+
+# Matches bin/parallel_rspec: one test database and Solr per process.
+parallel_processes=4
+solr_services=(solr solr-test1 solr-test2 solr-test3 solr-test4)
+
+step() { printf '\n== %s ==\n' "$*"; }
+
+dockerfile_arg() {
+  local value
+  value="$(sed -nE "s/^ARG $1=([^[:space:]]+).*/\1/p" Dockerfile | head -n1)"
+  [[ -n "$value" ]] || { echo "No 'ARG $1=' in Dockerfile" >&2; exit 1; }
+  echo "$value"
+}
+
+link_executables() {
+  for exe in "$1"/bin/*; do
+    ln -sfn "$exe" "$bin_dir/$(basename "$exe")"
+  done
+  hash -r
+}
+
+case "$(uname -m)" in
+  x86_64) arch=x64 ;;
+  aarch64 | arm64) arch=arm64 ;;
+  *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+wait_for() {
+  local description="$1" seconds="$2"
+  shift 2
+  for _ in $(seq "$seconds"); do
+    "$@" >/dev/null 2>&1 && return 0
+    sleep 1
+  done
+  echo "Timed out after ${seconds}s waiting for $description" >&2
+  exit 1
+}
+
+step "Installing Matt Pocock's skills"
+if ! claude plugin list 2>/dev/null | grep -q "mattpocock-skills@mattpocock"; then
+  claude plugin marketplace add mattpocock/skills --scope user
+  claude plugin install mattpocock-skills@mattpocock --scope user
+fi
+
+ruby_version="$(dockerfile_arg RUBY_VERSION)"
+step "Installing Ruby $ruby_version"
+# Prebuilt by ruby/ruby-builder for GitHub Actions runners (as used by
+# ruby/setup-ruby), for the Ubuntu release this container runs. Each archive holds
+# an <arch>/ directory and is installed at the runner tool cache path it was built for.
+# shellcheck source=/dev/null
+ubuntu_version="$(. /etc/os-release && [[ "$ID" == ubuntu ]] && echo "$VERSION_ID")" ||
+  { echo "Prebuilt Ruby needs an Ubuntu container" >&2; exit 1; }
+ruby_prefix="/opt/hostedtoolcache/Ruby/$ruby_version/$arch"
+if [[ ! -x "$ruby_prefix/bin/ruby" ]]; then
+  mkdir -p "$(dirname "$ruby_prefix")"
+  curl -fsSL "https://github.com/ruby/ruby-builder/releases/download/ruby-$ruby_version/ruby-$ruby_version-ubuntu-$ubuntu_version-$arch.tar.gz" |
+    tar xz -C "$(dirname "$ruby_prefix")"
+fi
+bundler_version="$(awk '/^BUNDLED WITH/ { getline; gsub(/ /, ""); print }' Gemfile.lock)"
+"$ruby_prefix/bin/gem" install bundler --version "$bundler_version" --no-document --conservative
+link_executables "$ruby_prefix"
+ruby -v
+bundle -v
+
+node_version="$(dockerfile_arg NODE_VERSION)"
+yarn_version="$(dockerfile_arg YARN_VERSION)"
+step "Installing Node $node_version and Yarn $yarn_version"
+node_prefix="/opt/node-$node_version"
+if [[ ! -x "$node_prefix/bin/node" ]]; then
+  node_archive="node-v$node_version-linux-$arch.tar.xz"
+  node_tmp="$(mktemp -d)"
+  curl -fsSL --output "$node_tmp/$node_archive" "https://nodejs.org/dist/v$node_version/$node_archive"
+  curl -fsSL "https://nodejs.org/dist/v$node_version/SHASUMS256.txt" |
+    grep " $node_archive\$" | (cd "$node_tmp" && sha256sum --check --quiet)
+  mkdir -p "$node_prefix"
+  tar xJ -C "$node_prefix" --strip-components=1 -f "$node_tmp/$node_archive"
+  rm -rf "$node_tmp"
+fi
+if [[ "$("$node_prefix/bin/yarn" --version 2>/dev/null)" != "$yarn_version" ]]; then
+  "$node_prefix/bin/npm" install --global "yarn@$yarn_version"
+fi
+link_executables "$node_prefix"
+node -v
+yarn -v
+
+# For screencasts (.claude/skills/screencast). Its bundled Playwright can expect a
+# newer FFmpeg build than the preinstalled browsers directory has, and the older
+# build doesn't produce a video, so point the expected build at the system FFmpeg.
+step "Installing playwright-cli"
+if [[ ! -x "$node_prefix/bin/playwright-cli" ]]; then
+  "$node_prefix/bin/npm" install --global @playwright/cli
+fi
+link_executables "$node_prefix"
+playwright-cli --version
+playwright_browsers_json="$node_prefix/lib/node_modules/@playwright/cli/node_modules/playwright-core/browsers.json"
+ffmpeg_revision="$(node -p "require('$playwright_browsers_json').browsers.find(b => b.name === 'ffmpeg').revision")"
+ffmpeg_dir="${PLAYWRIGHT_BROWSERS_PATH:-/opt/pw-browsers}/ffmpeg-$ffmpeg_revision"
+if [[ ! -e "$ffmpeg_dir/ffmpeg-linux" ]]; then
+  mkdir -p "$ffmpeg_dir"
+  ln -sfn "$(command -v ffmpeg)" "$ffmpeg_dir/ffmpeg-linux"
+fi
+
+# The preinstalled chromedriver (from the chromedriver npm package) can lag the
+# preinstalled Chrome, and Selenium Manager can't fetch a matching one because the
+# version lookup host (googlechromelabs.github.io) is blocked. So install the driver
+# for Chrome's exact version from Chrome for Testing, where every version has one.
+chrome_version="$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+){3}')"
+step "Installing ChromeDriver $chrome_version"
+chromedriver_dir="/opt/chromedriver-$chrome_version"
+if [[ ! -x "$chromedriver_dir/chromedriver" ]]; then
+  chromedriver_tmp="$(mktemp -d)"
+  curl -fsSL --output "$chromedriver_tmp/chromedriver.zip" \
+    "https://storage.googleapis.com/chrome-for-testing-public/$chrome_version/linux64/chromedriver-linux64.zip"
+  unzip -q "$chromedriver_tmp/chromedriver.zip" -d "$chromedriver_tmp"
+  mkdir -p "$chromedriver_dir"
+  mv "$chromedriver_tmp/chromedriver-linux64/chromedriver" "$chromedriver_dir/"
+  rm -rf "$chromedriver_tmp"
+fi
+ln -sfn "$chromedriver_dir/chromedriver" "$bin_dir/chromedriver"
+hash -r
+chromedriver --version
+
+# bin/setup and parallel:prepare need a database. The local Postgres uses the
+# credentials config/database.yml defaults to (postgres/postgres on localhost:5432).
+step "Starting Postgres"
+service postgresql start
+wait_for "Postgres" 30 pg_isready --host localhost
+su postgres --command "psql --quiet --command \"ALTER USER postgres PASSWORD 'postgres'\""
+
+step "Running bin/setup"
+bin/setup --skip-server
+
+# bin/setup doesn't build the CSS, and system specs need it (e.g., to hide collapsed sections).
+step "Building CSS"
+yarn build:css
+
+step "Preparing $parallel_processes parallel test databases"
+bin/rake "parallel:prepare[$parallel_processes]" "parallel:seed[$parallel_processes]"
+
+# Started directly: the init script fails in cloud containers, which don't permit its ulimit call.
+step "Starting Docker"
+if ! docker info >/dev/null 2>&1; then
+  setsid dockerd >/var/log/dockerd.log 2>&1 < /dev/null &
+fi
+wait_for "Docker" 60 docker info
+
+step "Starting Solr containers"
+docker compose up --detach --build "${solr_services[@]}"
+for port in 8983 8984 8985 8986 8987; do
+  wait_for "Solr on port $port" 120 curl -fsS "http://localhost:$port/solr/argo/admin/ping"
+done
+
+step "Done"
