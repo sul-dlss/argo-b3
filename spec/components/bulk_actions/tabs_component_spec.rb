@@ -11,7 +11,7 @@ RSpec.describe BulkActions::TabsComponent, type: :component do
       expect(page).to have_css('a.nav-link.active[aria-current="page"][href="/bulk_actions"]',
                                text: 'Recent bulk actions')
       expect(page).to have_css('a.nav-link:not(.active):not([aria-current])[href="/bulk_actions/new"]',
-                               text: 'Bulk action menu')
+                               text: 'Bulk actions menu')
     end
   end
 
@@ -22,7 +22,7 @@ RSpec.describe BulkActions::TabsComponent, type: :component do
       expect(page).to have_css('a.nav-link:not(.active):not([aria-current])[href="/bulk_actions"]',
                                text: 'Recent bulk actions')
       expect(page).to have_css('a.nav-link.active[aria-current="page"][href="/bulk_actions/new"]',
-                               text: 'Bulk action menu')
+                               text: 'Bulk actions menu')
     end
   end
 
