@@ -46,10 +46,9 @@ RSpec.describe 'Show object Redeposit with Goobi button' do
   context 'with another content type' do
     let(:content_type) { Cocina::Models::ObjectType.map }
 
-    it 'renders neither the Update section nor the button' do
+    it 'does not render the button' do
       get "/objects/#{druid}"
 
-      expect(rendered_page).to have_no_css('h2', text: 'Update')
       expect(rendered_page).to have_no_button('Redeposit with Goobi')
     end
   end

@@ -29,6 +29,21 @@ class Content < ApplicationRecord
     find_by(druid: cocina_object.externalIdentifier, lock: cocina_object.lock, immutable: false)
   end
 
+  # Accessioning reads these from its context to decide whether to start OCR or speech to text.
+  # Only the text extraction for the content type is requested, since the content type may have changed since
+  # the settings were saved.
+  # @param content_type [String] the cocina type URI of the object being accessioned
+  # @return [Hash] the workflow context to start accessioning with
+  def self.workflow_context(content_type:, perform_ocr:, ocr_languages:, perform_speech_to_text:)
+    if perform_ocr && Sdr::TextExtraction.ocr_type?(content_type)
+      { runOCR: true, ocrLanguages: ocr_languages }
+    elsif perform_speech_to_text && Sdr::TextExtraction.speech_to_text_type?(content_type)
+      { runSpeechToText: true }
+    else
+      {}
+    end
+  end
+
   # Staging changes the lock and immutability of the Content being staged, so this is not scoped by either.
   # @param druid [String] the druid of the object
   # @return [Content, nil] the most recently updated Content for the druid that is staging or failed staging
@@ -60,19 +75,10 @@ class Content < ApplicationRecord
     StageFilesJob.perform_later(content: self, user:, **stage_files_options)
   end
 
-  # Accessioning reads these from its context to decide whether to start OCR or speech to text.
-  # Only the text extraction for the content type is requested, since the content type may have changed since
-  # the settings were saved.
   # @param content_type [String] the cocina type URI of the object being accessioned
-  # @return [Hash] the workflow context to start accessioning with
+  # @return [Hash] the workflow context to start accessioning with these text extraction settings
   def workflow_context(content_type:)
-    if perform_ocr && Sdr::TextExtraction.ocr_type?(content_type)
-      { runOCR: true, ocrLanguages: ocr_languages }
-    elsif perform_speech_to_text && Sdr::TextExtraction.speech_to_text_type?(content_type)
-      { runSpeechToText: true }
-    else
-      {}
-    end
+    self.class.workflow_context(content_type:, perform_ocr:, ocr_languages:, perform_speech_to_text:)
   end
 
   # Memoized, since several populators and views may ask for the same Content.

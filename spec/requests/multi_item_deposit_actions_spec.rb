@@ -1144,7 +1144,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(rendered_page).to have_css('#multi_item_deposit_structure_ocr_languages_error',
-                                          text: "can't be blank")
+                                          text: 'Choose at least one language.')
         expect(multi_item_deposit_action.reload).not_to be_structuring
         expect(multi_item_deposit_action.perform_ocr).to be false
         expect(batch_class).not_to have_received(:enqueue)

@@ -449,6 +449,18 @@ en:
       errors:
         dark: 'Dark objects cannot be released.'
         save_failed: 'The release could not be saved. Try again, or contact SDR support if the problem continues.'
+    item_text_extractions:
+      new:
+        title: 'Extract text'
+        default_version_description: 'Extract text'
+        buttons:
+          deposit: 'Extract text and deposit'
+          draft: 'Save as draft'
+      toasts:
+        deposit: 'Text extraction started.'
+        draft: 'Text extraction will run when the item is deposited.'
+      errors:
+        save_failed: 'Text extraction could not be started. Try again, or contact SDR support if the problem continues.'
     items:
       edit:
         title: "Edit item"
@@ -601,6 +613,9 @@ en:
             view access is dark, and are not shelved or published again when it changes from dark.
         part_label:
           label: 'Part label'
+        ocr_languages:
+          validations:
+            blank: 'Choose at least one language.'
         perform_ocr:
           label: 'Run OCR?'
         perform_speech_to_text:

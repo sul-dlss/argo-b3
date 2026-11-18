@@ -156,6 +156,7 @@ Rails.application.routes.draw do
   resources :items, only: %i[new create edit update]
   scope 'items/:druid', as: :item do
     resources :releases, only: %i[new create], controller: 'item_releases'
+    resource :text_extraction, only: %i[new create], controller: 'item_text_extractions'
   end
 
   resources :apos, only: %i[new create edit update]
