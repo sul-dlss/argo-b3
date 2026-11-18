@@ -99,15 +99,16 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
   end
 
   # Replaces the structure with the uploaded CSV.
-  def upload_structural_csv(**)
+  def upload_structural_csv(cocina_object:, content:)
     @structural_csv_form = StructuralCsvForm.new(StructuralCsvForm.params_from(params))
-    upload_csv(form: @structural_csv_form, toast: t('edit.contents.structure.toasts.csv'), **)
+    upload_csv(form: @structural_csv_form, toast: t('edit.contents.structure.toasts.csv'), cocina_object:, content:)
   end
 
   # Updates the labels of the resources listed in the uploaded labels CSV.
-  def upload_labels_csv(**)
+  def upload_labels_csv(cocina_object:, content:)
     @labels_csv_form = LabelsCsvForm.new(LabelsCsvForm.params_from(params))
-    upload_csv(form: @labels_csv_form, toast: t('edit.contents.structure.toasts.labels_csv'), **)
+    upload_csv(form: @labels_csv_form, toast: t('edit.contents.structure.toasts.labels_csv'),
+               cocina_object:, content:)
   end
 
   # Updates the content from an uploaded structural or labels CSV. Nothing is changed unless the CSV is entirely valid.
