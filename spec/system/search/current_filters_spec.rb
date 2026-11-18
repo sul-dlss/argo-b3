@@ -25,11 +25,9 @@ RSpec.describe 'Current filters', :solr do
 
     # Select a facet.
     find_facet_section('Object type').click
-    within(find_facet_section('Object type')) do
-      check('item')
-      check('agreement')
-      click_button('Filter')
-    end
+    within(find_facet_section('Object type')) { check('agreement') }
+    expect(page).to have_current_filter('Object type', 'agreement')
+    within(find_facet_section('Object type')) { check('item') }
 
     # Values selected from the object types facet are ORed and displayed as a single current filter.
     expect(page).to have_result_count(2)

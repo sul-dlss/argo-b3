@@ -22,6 +22,7 @@ RSpec.describe Search::ConfiguredFacetComponent, type: :component do
 
       expect(page).to have_css('section[aria-label="Object type"]')
       expect(page).to have_field('item', type: 'checkbox')
+      expect(page).to have_no_button('Filter')
     end
   end
 

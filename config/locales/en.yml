@@ -74,6 +74,7 @@ en:
       mimetypes: "MIME type"
       dates: "Year"
       access_rights: "Access rights"
+      languages_exclude: "Language exclude"
       mods_resource_types: "MODS resource type"
       multi_item_deposit_action_ids: "Multi-item deposit"
       released_to_earthworks: "Released to EarthWorks"

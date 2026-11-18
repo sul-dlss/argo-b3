@@ -1,16 +1,12 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
+  <% if checkbox? %>
+    <%= tag.p 'Selecting a value updates the results.', id: checkbox_description_id, class: 'visually-hidden' %>
+  <% end %>
+
   <%= helpers.turbo_frame_tag frame_id do %>
     <ul class="facet-values list-unstyled">
       <% facet_counts.each do |facet_count| %>
-        <li>
-          <%= render Search::FacetValueComponent.new(count: facet_count.count,
-                                                     search_form:,
-                                                     form_field:,
-                                                     exclude_form_field:,
-                                                     value: facet_count.value,
-                                                     label: facet_count.label,
-                                                     data: { turbo_frame: '_top' }) %>
-        </li>
+        <li><%= render facet_value_component(facet_count) %></li>
       <% end %>
     </ul>
 

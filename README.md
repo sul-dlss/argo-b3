@@ -320,7 +320,8 @@ Notes:
 * Field value search is implemented as a Solr facet query: it asks Solr which values of a field match the query rather than which documents do. This is why the result wrapper is named `SearchResults::FacetValues` - the name describes the Solr payload being unwrapped, not the feature. The feature is field value search, and the components that render it are named for field values rather than facets.
 * By default, multiple values selected from the same facet are ANDed (including for dynamic and exclude selections), so facet counts reflect the current selection. Excluded values remain listed so that they can be un-excluded.
 * Facets configured with `operator: :or` (the checkbox facets, e.g., object types) OR their selected values instead. Their counts ignore the facet's own selection, so that all values remain selectable, and their selected values are displayed as a single current filter (e.g., "Object types ❯ item OR collection").
-* Putting Turbo stream replace elements directly in HTML is not a typical pattern for turbo streams.
+* Putting Turbo stream update elements directly in HTML is not a typical pattern for turbo streams.
+* Visiting another search on the same page (e.g., selecting a facet value) updates the page in place: it is morphed rather than replaced, and the results, field value results, and facets keep their current content, dimmed and inert, until their new content loads, rather than returning to loading placeholders. This is why a facet's stream updates its placeholder's contents, keeping the placeholder as the target for the next search.
 
 ### Debugging
 To view the Solr response for all Solr requests made to render a page, add `debug=true` to the URL.
@@ -333,7 +334,8 @@ Each facet is a `Search::Facets::Config` constant, and that configuration is the
 * `Search::Facets::SIDEBAR` lists the facets shown in the sidebar, in display order. Each one's `loading` says when it loads: `:primary` (with the item results), `:secondary` (with the secondary facets), or `:lazy` (its own turbo frame request, for slow facets). Placeholders, Solr facet requests, and turbo stream replacements are all derived from these.
 * Every config is used for filtering (`Search::ItemQueryBuilder`) and for describing a search (`Search::Serializer`), in the order the constants are defined.
 * A facet with a `facet_resource` gets its endpoints (`index`, and `children` / `search` if `facet_children` / `facet_search`) drawn in the `:search_endpoints` routing concern, served by `Search::FacetsController` for every search view.
-* The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a checkbox facet for `operator: :or`, a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured).
+* The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured), whose values are checkboxes for `operator: :or`.
+* Checking or unchecking a checkbox facet value updates the search at once; each checkbox carries the URL of the search it leads to (as a link facet value does), so it works across pages of values, and focus returns to the checkbox once its facet reloads.
 
 ### Adding a facet
 1. Add an attribute for the facet to `SearchForm`.
@@ -371,7 +373,7 @@ Dynamic facets may optionally have a date range filter (where the user specifies
 2. Add `date_from_form_field`, `date_to_form_field`, and `field` to the configuration constant in `Search::Facets`.
 
 ### Adding exclude (query negation) to a facet
-Currently, excluding is only available for basic facets (i.e., not hierarchical, dynamic, checkbox, etc.).
+Currently, excluding is only available for basic facets, including checkbox facets (i.e., not hierarchical or dynamic). Excluding a selected value deselects it, and selecting an excluded value stops excluding it.
 
 1. Add an attribute (`*_exclude`) for the facet exclude to `SearchForm`.
 2. Assign the attribute name to `exclude_form_field` for the configuration constant in `Search::Facets`.
