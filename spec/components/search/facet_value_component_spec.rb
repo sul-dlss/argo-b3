@@ -94,4 +94,23 @@ RSpec.describe Search::FacetValueComponent, type: :component do
                                                        title: 'Remove exclude dark')
     end
   end
+
+  context 'when exclude form field is provided and the value is excluded' do
+    let(:component) do
+      described_class.new(count: 10, search_form:, form_field: :access_rights,
+                          exclude_form_field: :access_rights_exclude,
+                          value: 'world')
+    end
+
+    let(:search_form) { ResultsSearchForm.new(access_rights: ['dark'], access_rights_exclude: ['world']) }
+
+    it 'switches the value between selected and excluded' do
+      render_inline(component)
+
+      expect(page).to have_no_link('world', exact: true)
+      expect(component.select_path).to eq('/search?access_rights%5B%5D=dark&access_rights%5B%5D=world')
+      expect(component.exclude_path)
+        .to eq('/search?access_rights%5B%5D=dark&access_rights_exclude%5B%5D=world')
+    end
+  end
 end

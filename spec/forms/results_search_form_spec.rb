@@ -165,10 +165,10 @@ RSpec.describe ResultsSearchForm do
     end
 
     context 'when multiple values are set for an ANDed facet' do
-      subject(:form) { described_class.new(languages: %w[English German]) }
+      subject(:form) { described_class.new(genres: %w[maps poetry]) }
 
       it 'returns a separate current filter for each value' do
-        expect(form.current_filters).to eq([['languages', ['English']], ['languages', ['German']]])
+        expect(form.current_filters).to eq([['genres', ['maps']], ['genres', ['poetry']]])
       end
     end
 

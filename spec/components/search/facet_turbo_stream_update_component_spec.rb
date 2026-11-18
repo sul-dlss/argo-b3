@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
+RSpec.describe Search::FacetTurboStreamUpdateComponent, type: :component do
   let(:component) { described_class.new(facet_config: Search::Facets::OBJECT_TYPES, results:, search_form:) }
 
   let(:search_form) { ResultsSearchForm.new }
@@ -17,12 +17,12 @@ RSpec.describe Search::FacetTurboStreamReplaceComponent, type: :component do
     }
   end
 
-  it 'replaces the facet placeholder with the facet from the results' do
+  it 'updates the facet placeholder with the facet from the results' do
     results = render_inline(component)
 
-    expect(page).to have_css("turbo-stream[action='replace'][target='object-types-facet']")
+    expect(page).to have_css("turbo-stream[action='update'][target='object-types-facet']")
     # The content inside the template is not available to Capybara.
     expect(results.to_html).to include('<section aria-label="Object type"')
-    expect(results.to_html).to include('value="item"')
+    expect(results.to_html).to include('data-facet-checkbox-url-value="/search?object_types%5B%5D=item"')
   end
 end
