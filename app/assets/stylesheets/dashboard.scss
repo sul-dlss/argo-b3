@@ -8,3 +8,10 @@
     --bs-btn-padding-x: 0;
   }
 }
+
+// The negative margin cancels the search bar's mb-3, so the image meets it.
+// The image is anchored left at natural size, so narrower viewports crop it; it scales up only past its 1753px width.
+.dashboard-header {
+  margin-top: -$spacer;
+  background: url("dashboard-header.jpg") left center / max(100%, 1753px) auto no-repeat;
+}
