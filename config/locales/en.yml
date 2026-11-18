@@ -337,7 +337,9 @@ en:
         toasts:
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"
+          labels: "Resource labels updated"
         buttons:
+          update_labels: "Update labels if you reordered resources"
           structure: "Structure files"
           restructure: "Clear and structure files again"
           delete_all: "Delete all files and resources"

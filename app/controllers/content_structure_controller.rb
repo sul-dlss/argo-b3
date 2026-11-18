@@ -3,16 +3,13 @@
 # Controller for the structure of a content: deleting it, exporting it, and validating it.
 # Structuring files and uploading a structural CSV are steps of managing files (see ContentsController).
 class ContentStructureController < ContentsApplicationController
-  skip_verify_authorized only: %i[destroy csv validation]
+  skip_verify_authorized only: %i[destroy csv validation labels]
   before_action :set_content
 
   # Deletes all of the files and resources, then reloads the page on the add and edit files step.
   def destroy
     # Deleting is disabled while busy (e.g., discovering may be adding files), so this is from a stale page.
-    if @content.busy?
-      return redirect_to edit_content_path(@content.druid),
-                         flash: { warning: t('edit.contents.structure.warnings.busy') }
-    end
+    return redirect_busy if @content.busy?
 
     ActiveRecord::Base.transaction do
       ContentFileSet.where(content: @content).destroy_all
@@ -20,6 +17,15 @@ class ContentStructureController < ContentsApplicationController
       @content.update!(step: :files)
     end
     redirect_to edit_content_path(@content.druid), flash: { toast: t('edit.contents.structure.toasts.delete_all') }
+  end
+
+  # Updates the Numbered Labels of the resources in their current order, then reloads the structure step.
+  def labels
+    return redirect_busy if @content.busy?
+
+    Contents::LabelUpdater.call(content: @content)
+    redirect_to edit_content_path(@content.druid), status: :see_other,
+                                                   flash: { toast: t('edit.contents.structure.toasts.labels') }
   end
 
   # Exports the current (possibly in-progress) structure, not necessarily what has been saved to SDR.
@@ -45,6 +51,11 @@ class ContentStructureController < ContentsApplicationController
   end
 
   private
+
+  # Changing the structure is disabled while busy, so a request then is from a stale page.
+  def redirect_busy
+    redirect_to edit_content_path(@content.druid), flash: { warning: t('edit.contents.structure.warnings.busy') }
+  end
 
   def set_content
     @content_token = params[:content_id]

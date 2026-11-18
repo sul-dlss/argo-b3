@@ -23,7 +23,18 @@ module Contents
       def fallback_to_default_model?
         actual_populator != populator_for_content_type
       end
+
+      # @return [Boolean] true when the content type's populator gives resources Numbered Labels (e.g., Page 1)
+      def numbered_labels?
+        NUMBERED_LABEL_POPULATORS.any? { |populator| populator_for_content_type <= populator }
+      end
     end
+
+    # The populators that number labels (see Populators::Base#label_for), including their subclasses (e.g., Book).
+    NUMBERED_LABEL_POPULATORS = [
+      Contents::Populators::Document, Contents::Populators::Image, Contents::Populators::Media,
+      Contents::Populators::ThreeDimensional
+    ].freeze
 
     # The populator for content types without a populator of their own, and for when the populator for
     # the content type cannot handle the content.
