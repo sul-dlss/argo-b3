@@ -11,10 +11,10 @@ Everything this skill produces is visible to others under the user's name. Draft
 
 ## Opening a draft PR
 
-1. **Screencast**: for a user-facing change, record one with the `screencast` skill. Backend-only changes and refactors skip it.
+1. **Screencast**: for a user-facing change, capture screenshots or a video with the `screencast` skill. Backend-only changes and refactors skip it.
 2. **Commit, then push, then create**: run them one after another. `gh pr create` fails with "No commits between main and …" when it runs before the push lands.
-3. **Write the body** from the template below, in a file (e.g., `/tmp/<feature>/pr-body.md`) next to the video.
-4. **Create the PR**: `test -s pr-body.md && gh pr create -R sul-dlss/argo-b3 --draft --base main --head <branch> --title "<title>" --body-file pr-body.md --attach ./<video>.webm`, run from the directory holding both files. `-R` is needed because that directory is outside the repo, and `test -s` stops an empty body file from replacing the description. Reference the video in the body as `![<alt>](./<video>.webm)` so `gh` (2.99 or later) places it inline. Confirm with `gh pr view <N> -R sul-dlss/argo-b3 --json isDraft,body` that it is a draft and the body has a `user-attachments` URL. To add or replace a video later, use `gh pr edit <N> -R sul-dlss/argo-b3 --attach ./<video>.webm`, with the same `--body-file` check.
+3. **Write the body** from the template below, in a file (e.g., `/tmp/<feature>/pr-body.md`) next to the screenshots or video.
+4. **Create the PR**: `test -s pr-body.md && gh pr create -R sul-dlss/argo-b3 --draft --base main --head <branch> --title "<title>" --body-file pr-body.md --attach ./<video>.webm`, with one `--attach './<nn>-<beat>.png#<alt text>'` per screenshot in place of the video, run from the directory holding the files. `-R` is needed because that directory is outside the repo, and `test -s` stops an empty body file from replacing the description. Reference each attachment in the body (`![<alt>](./<video>.webm)`, `![<alt>](./<nn>-<beat>.png)`) so `gh` (2.99 or later) places it inline. Confirm with `gh pr view <N> -R sul-dlss/argo-b3 --json isDraft,body` that it is a draft and the body has a `user-attachments` URL. To add or replace an attachment later, use `gh pr edit <N> -R sul-dlss/argo-b3 --attach <file>`, with the same `--body-file` check.
 5. **Inline comments**: post them as one review (below).
 6. **Report**: the PR link, the decisions flagged, and what the inline comments cover.
 
@@ -27,7 +27,7 @@ Closes #<issue>
 
 <What changed, from the user's side, in two or three sentences.>
 
-![<feature> walkthrough](./<video>.webm)
+![<feature> walkthrough](./<video>.webm) <or one ![<beat>](./<nn>-<beat>.png) per screenshot>
 
 ### Approach
 
@@ -40,7 +40,7 @@ Closes #<issue>
 ## Evidence
 
 - **Before:** <the old behaviour>
-  **After:** <the screencast, plus each spec added or changed and what it covers>
+  **After:** <the screencast or screenshots, plus each spec added or changed and what it covers>
 - <Lint and test results. Name anything not run, and who will run it.>
 
 ## Merge Danger
