@@ -11,8 +11,10 @@ module LabelsCsv
     end
 
     # @param rows [Array<StructuralCsv::Row>] the rows for a single object
-    def initialize(rows:)
+    # @param headers [Array<String>] the CSV's headers (which a CSV without any rows still has)
+    def initialize(rows:, headers:)
       @all_rows = rows
+      @headers = headers
       @errors = []
     end
 
@@ -29,18 +31,15 @@ module LabelsCsv
 
     private
 
-    attr_reader :all_rows, :errors
+    attr_reader :all_rows, :headers, :errors
 
     # Entirely blank rows are ignored.
     def rows
       @rows ||= all_rows.reject(&:entirely_blank?)
     end
 
-    # A CSV without any rows has no headers to check, so it is reported as having no labels.
     def validate_columns
-      return if all_rows.empty?
-
-      (REQUIRED_COLUMNS - all_rows.first.headers).each do |column|
+      (REQUIRED_COLUMNS - headers).each do |column|
         errors << StructuralCsv::ValidationError.new(1, "Missing required column \"#{column}\"")
       end
     end

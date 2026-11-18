@@ -8,6 +8,6 @@ class LabelsCsvForm < ApplicationForm
   # @param content [Content] the mutable Content to update
   # @return [Dry::Monads::Result] see LabelsCsv::Import
   def import(content:)
-    LabelsCsv::Import.call(rows: numbered_rows, content:)
+    LabelsCsv::Import.call(rows: numbered_rows, headers: csv_headers, content:)
   end
 end

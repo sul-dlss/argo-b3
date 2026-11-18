@@ -20,12 +20,14 @@ module LabelsCsv
 
     # @param rows [Array<Array(Integer, CSV::Row)>] the rows for a single object, each paired with its spreadsheet
     #   row number (used in error messages)
+    # @param headers [Array<String>] the CSV's headers (which a CSV without any rows still has)
     # @param content [Content] the mutable Content to update
     # @raise [ArgumentError] if the Content is immutable
-    def initialize(rows:, content:)
+    def initialize(rows:, headers:, content:)
       raise ArgumentError, 'Content must be mutable' if content.immutable?
 
       @rows = rows.map { |number, csv_row| StructuralCsv::Row.new(number:, csv_row:) }
+      @headers = headers
       @content = content
     end
 
@@ -33,7 +35,7 @@ module LabelsCsv
     # @return [Dry::Monads::Result] Success if the labels were updated, or Failure with an
     #   Array<StructuralCsv::ValidationError>
     def call
-      errors = Validator.call(rows:)
+      errors = Validator.call(rows:, headers:)
       return Failure(errors) if errors.any?
 
       save
@@ -42,7 +44,7 @@ module LabelsCsv
 
     private
 
-    attr_reader :rows, :content
+    attr_reader :rows, :headers, :content
 
     def save
       labels_by_sequence = rows.reject(&:entirely_blank?).to_h { |row| [row.sequence, row.value('resource_label')] }

@@ -3,10 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe LabelsCsv::Import do
-  subject(:result) { described_class.call(rows:, content:) }
+  subject(:result) { described_class.call(rows:, headers: table.headers, content:) }
 
   let(:content) { create(:content, :mutable, druid: 'druid:bc123df4567') }
-  let(:rows) { CSV.parse(csv_string, headers: true).each.with_index(2).map { |row, number| [number, row] } }
+  let(:table) { CSV.parse(csv_string, headers: true) }
+  let(:rows) { table.each.with_index(2).map { |row, number| [number, row] } }
   let(:labels) { content.content_file_sets.reload.map(&:label) }
 
   before do
@@ -67,11 +68,28 @@ RSpec.describe LabelsCsv::Import do
     end
   end
 
-  context 'with no rows' do
+  context 'with only blank rows' do
     let(:csv_string) { "druid,sequence,resource_label\ndruid:bc123df4567,,\n" }
 
     it 'fails' do
       expect(result.failure).to eq([StructuralCsv::ValidationError.new(2, 'No labels to import')])
+    end
+  end
+
+  context 'with only a header row' do
+    let(:csv_string) { "druid,sequence,resource_label\n" }
+
+    it 'fails without a row number' do
+      expect(result.failure).to eq([StructuralCsv::ValidationError.new(nil, 'No labels to import')])
+    end
+  end
+
+  context 'with only a header row that is missing columns' do
+    let(:csv_string) { "druid,label\n" }
+
+    it 'fails with the missing columns' do
+      expect(result.failure).to eq([StructuralCsv::ValidationError.new(1, 'Missing required column "sequence"'),
+                                    StructuralCsv::ValidationError.new(1, 'Missing required column "resource_label"')])
     end
   end
 

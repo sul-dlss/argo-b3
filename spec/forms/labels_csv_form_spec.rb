@@ -45,6 +45,17 @@ RSpec.describe LabelsCsvForm do
       end
     end
 
+    context 'when the CSV has only a header row that is missing columns' do
+      let(:csv_string) { "druid,label\n" }
+
+      it 'adds the missing columns' do
+        form.update_content(content:)
+
+        expect(form.errors[:csv_file]).to eq(['Row 1: Missing required column "sequence"',
+                                              'Row 1: Missing required column "resource_label"'])
+      end
+    end
+
     context 'when no file is uploaded' do
       let(:csv_file) { nil }
       let(:csv_string) { '' }

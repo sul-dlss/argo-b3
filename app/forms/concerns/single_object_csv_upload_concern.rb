@@ -17,8 +17,14 @@ module SingleObjectCsvUploadConcern
   # @return [Array<Array(Integer, CSV::Row)>]
   # @raise [CsvUpload::Normalizer::Error] if the file cannot be read
   def numbered_rows
-    @numbered_rows ||= CSV.parse(CsvUpload::Normalizer.read(csv_file.path), headers: true)
-                          .each.with_index(2).map { |row, row_number| [row_number, row] }
+    @numbered_rows ||= csv_table.each.with_index(2).map { |row, row_number| [row_number, row] }
+  end
+
+  # The headers, which a CSV without any rows still has.
+  # @return [Array<String>]
+  # @raise [CsvUpload::Normalizer::Error] if the file cannot be read
+  def csv_headers
+    csv_table.headers
   end
 
   # Updates an object's content from the uploaded CSV. Nothing is changed unless the upload and every row are valid;
@@ -42,6 +48,10 @@ module SingleObjectCsvUploadConcern
   end
 
   private
+
+  def csv_table
+    @csv_table ||= CSV.parse(CsvUpload::Normalizer.read(csv_file.path), headers: true)
+  end
 
   # Since the CSV is for one object, every row must have its druid (rather than being grouped by druid, as by the
   # bulk action). The druids have already been prefixed by CsvUpload::Normalizer.
