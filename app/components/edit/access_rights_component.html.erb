@@ -7,6 +7,7 @@
         label_classes:,
         label_mark_required: true,
         help_text: apo_default_help_text('view'),
+        input_classes: 'select-narrow',
         input_data: { access_rights_target: 'view', action: 'access-rights#toggle' },
         container_classes:
       ) %>
@@ -19,6 +20,7 @@
         label_classes:,
         label_mark_required: true,
         help_text: apo_default_help_text('download'),
+        input_classes: 'select-narrow',
         input_data: { access_rights_target: 'download', action: 'access-rights#toggle' },
         container_classes:
       ) %>
@@ -31,6 +33,7 @@
         label_classes:,
         label_mark_required: false,
         help_text: apo_default_help_text('location'),
+        input_classes: 'select-narrow',
         input_data: { access_rights_target: 'location' },
         container_classes:,
         container_data: { access_rights_target: 'locationField' }

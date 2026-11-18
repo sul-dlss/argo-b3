@@ -55,6 +55,12 @@ $search-color: rgb(#{$search-color-rgb});
   border-style: solid;
 }
 
+// Narrow select for fields with short options (DESIGN_STANDARDS FORM-15).
+// Design standard deviation: 350px is the designer's width, with no matching Bootstrap utility.
+.select-narrow {
+  max-width: 350px;
+}
+
 // left navigation on dashboard and object show pages
 .left-nav {
   // Only render background color on xl or above

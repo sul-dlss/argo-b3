@@ -10,6 +10,7 @@
           <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :new_content_type,
                                                                         options: Constants::CONTENT_TYPES,
                                                                         container_classes: 'my-field',
+                                                                        input_classes: 'select-narrow',
                                                                         label_text: 'New content type') %>
         <% end %>
       <% end %>
