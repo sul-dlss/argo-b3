@@ -14,7 +14,8 @@ RSpec.describe 'Bulk actions menu' do
     get new_bulk_action_path
 
     expect(response).to have_http_status(:ok)
-    expect(rendered_page).to have_css('h1', text: 'Bulk actions menu')
+    expect(rendered_page).to have_css('h1', text: 'Bulk actions')
+    expect(rendered_page).to have_link('Bulk action menu', href: '/bulk_actions/new', class: 'active')
     expect(rendered_page).to have_title('Bulk actions menu | Argo B3', exact: true)
 
     expect(rendered_page.all('section h2').map(&:text)).to eq(

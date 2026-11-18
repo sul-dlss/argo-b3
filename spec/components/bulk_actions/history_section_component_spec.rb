@@ -31,6 +31,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('h1', text: 'Bulk actions')
+    expect(page).to have_link('Recent bulk actions', href: '/bulk_actions', class: 'active')
 
     form = page.find("form#bulk-actions-filter[action='/bulk_actions'][method='get']")
     expect(form).to have_css("select[multiple][data-controller='checkbox-tom-select'] " \

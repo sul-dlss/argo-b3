@@ -1,6 +1,8 @@
 <%= page_title(t('bulk_actions.menu')) %>
 
-<%= render Layout::ContainerComponent.new(heading: t('bulk_actions.menu')) do %>
+<%= render Layout::ContainerComponent.new(heading: t('bulk_actions.history')) do %>
+  <%= render BulkActions::TabsComponent.new(active: :menu) %>
+
   <%# Sections read row by row in the three-column layout. %>
   <div class="row mt-2 gy-3">
     <% BulkActions::SECTIONS.each do |section, section_label| %>
