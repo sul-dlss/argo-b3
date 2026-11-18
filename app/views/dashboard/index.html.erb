@@ -6,21 +6,18 @@
 <% end %>
 
 <% content_for :page_header do %>
-  <div class="dashboard-header py-4">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-xl-2 col-lg-12">
-          <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('dashboard.heading'), classes: 'mb-3 mb-xl-0') %>
-        </div>
-
-        <%= render Dashboard::BannerComponent.new(text: t('banner.dashboard_html')) %>
-      </div>
-    </div>
+  <div class="dashboard-header">
+    <%= render Layout::ContainerComponent.new(heading: t('dashboard.heading'), classes: 'pt-4 pb-2') %>
   </div>
 <% end %>
 
 <%= render Layout::ContainerComponent.new(classes: 'pt-0', data: { controller: 'preserve-collapsed-sections' }) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
+    <% layout.with_top_content do %>
+      <div class="row">
+        <%= render Dashboard::BannerComponent.new(text: t('banner.dashboard_html')) %>
+      </div>
+    <% end %>
     <% layout.with_left_content do %>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mt-2 mb-3', text: t('dashboard.go_to_druid.heading')) %>
       <%= form_with model: @go_to_druid_form, url: go_to_druid_path, class: 'mb-5' do |form| %>

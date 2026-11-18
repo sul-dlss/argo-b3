@@ -9,14 +9,9 @@
   }
 }
 
-// Anchored left and never shrunk, so narrower viewports show the image's left portion.
+// The negative margin cancels the search bar's mb-3, so the image meets it.
+// The image is anchored left at natural size, so narrower viewports crop it; it scales up only past its 1753px width.
 .dashboard-header {
-  // Cancels the search bar's mb-3, so the image meets the search bar.
   margin-top: -$spacer;
-  background: url("dashboard-header.jpg") left center / cover no-repeat;
-
-  // The alert's tint is translucent; lay it over the body color so the image doesn't show through.
-  .alert {
-    background: linear-gradient(var(--bs-alert-bg), var(--bs-alert-bg)), var(--bs-body-bg);
-  }
+  background: url("dashboard-header.jpg") left center / max(100%, 1753px) auto no-repeat;
 }
