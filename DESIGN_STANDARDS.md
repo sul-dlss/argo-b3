@@ -134,6 +134,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 - **FORM-12 MUST** A select with more than 15 options, or whose list grows with data (e.g., APOs, collections, workgroups), is searchable (Tom Select). It allows new values (`creatable-select`) only when values outside the list are legitimate (e.g., languages, MIME types).
 - **FORM-13 MUST** Several choices from 10 or fewer options use a checkbox list in a fieldset; from more, a searchable multi-select. Don't use a native `<select multiple>`.
 - **FORM-14 MUST** In a bulk action that can update more than one field, each field offers an explicit way to leave it unchanged, selected by default (e.g., a "Do not update ..." radio, or an unchecked "Change ..." checkbox that enables the field). A blank field never means "clear this".
+- **FORM-15 MUST** A select is full width unless the issue or design calls for the narrow size (`select-narrow`); don't pick a size on your own.
 
 ## Tables
 
