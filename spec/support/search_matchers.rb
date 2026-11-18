@@ -33,6 +33,14 @@ RSpec::Matchers.define :have_selected_facet_value do |facet_value, facet:, **arg
   end
 end
 
+RSpec::Matchers.define :have_excluded_facet_value do |facet_value, facet:, **args|
+  match do |actual|
+    actual.has_css?("section[aria-label='#{facet}'] li", text: 'excluded', **args) do |el|
+      el.has_css?('del', text: facet_value) && el.has_link?("Remove exclude #{facet_value}")
+    end
+  end
+end
+
 RSpec::Matchers.define :have_item_result do |solr_doc, args = {}|
   match do |actual|
     actual.has_css?("#item-result-#{solr_doc[Search::Fields::BARE_DRUID]}", **args)

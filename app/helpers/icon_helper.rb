@@ -16,10 +16,6 @@ module IconHelper
     icon(icon_classes: %w[bi bi-x-lg], **)
   end
 
-  def exclude_icon(**)
-    icon(icon_classes: %w[bi bi-exclude], **)
-  end
-
   # The expand-icon / collapse-icon classes are hooks that search.scss uses to show
   # whichever of the pair matches the aria-expanded state of the surrounding link.
   def expand_icon(**)

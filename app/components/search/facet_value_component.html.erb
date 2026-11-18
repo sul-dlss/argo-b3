@@ -1,12 +1,17 @@
-<% if selected? || exclude_selected? %>
+<% if selected? %>
   <span class="facet-label">
     <span class="selected"><%= label %></span>
 
-    <%= link_to remove_path, class: 'remove ms-2', rel: 'nofollow', title: remove_title, **link_args do %>
-      <%= helpers.remove_icon(classes: 'ms-2', aria: { hidden: true }) %>
-
-      <span class="visually-hidden">[<%= remove_title %>]</span>
-    <% end %>
+    <%= render_remove_link %>
+  </span>
+<% elsif exclude_selected? %>
+  <span class="facet-label">
+    <del><%= label %></del>
+  </span>
+  <span class="facet-count"><%= number_with_delimiter(count) %></span>
+  <span class="ms-2">
+    <strong>excluded</strong>
+    <%= render_remove_link %>
   </span>
 <% else %>
   <span class="facet-label">
@@ -14,6 +19,9 @@
   </span>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
   <% if with_exclude? %>
-    <%= render SdrViewComponents::Elements::IconButtonLinkComponent.new(icon: :exclude, label: exclude_label, link: exclude_path, classes: 'ms-2 p-0', **link_args) %>
+    <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: exclude_path, variant: :link, size: :sm, classes: 'ms-2 p-0 align-baseline', **link_args) do %>
+      <span aria-hidden="true">exclude</span>
+      <span class="visually-hidden"><%= exclude_label %></span>
+    <% end %>
   <% end %>
 <% end %>
