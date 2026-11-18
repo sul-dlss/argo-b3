@@ -1,0 +1,6 @@
+<%= render text_field_component %>
+<%= tag.datalist id: datalist_id do %>
+  <% suggestions.each do |suggestion| %>
+    <%= tag.option value: suggestion %>
+  <% end %>
+<% end %>
