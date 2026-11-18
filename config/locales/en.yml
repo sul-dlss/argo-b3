@@ -153,6 +153,7 @@ en:
       cannot_purge: "This object cannot be purged because it has been submitted."
       content_busy: "Files for this object are being staged, discovered, or structured. Try again when that has finished."
       goobi_processing: "Goobi is already processing this version. Try again after Goobi has deposited it."
+      invalid_cocina: "This object is currently not available, likely because it is part of an ongoing cocina migration. Please check back later."
       not_depositable: "This draft cannot be deposited."
       not_discardable: "This draft cannot be discarded."
       not_goobi_type: "Only image and book items can be redeposited with Goobi."
