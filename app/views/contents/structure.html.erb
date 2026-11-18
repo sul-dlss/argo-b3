@@ -52,6 +52,31 @@
           <% end %>
         </fieldset>
 
+        <div class="mt-3">
+          <%= link_to labels_csv_content_structure_path(content_id: @content_token), data: { turbo: false } do %>
+            <%= download_icon(aria: { hidden: true }, classes: 'me-1') %> Download resource labels
+          <% end %>
+        </div>
+
+        <%# While uploading a CSV, actions (e.g., the resources' actions) are disabled. %>
+        <fieldset data-disable-actions-target="disableable">
+          <%= form_with model: @labels_csv_form, url: content_path(@content.druid), method: :patch, class: 'mt-3',
+                        data: disable_actions_form_data do |form| %>
+            <%# The errors are ordered last so that they are placed below the input (see .inline-upload-field). %>
+            <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                                   field_name: :csv_file,
+                                                                   label_text: 'Upload resource labels CSV',
+                                                                   label_classes: 'fw-bold',
+                                                                   input_classes: 'form-control-sm',
+                                                                   input_accept: CsvUpload::Normalizer::SUPPORTED_FILE_EXTENSIONS.join(',')) %>
+
+              <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Upload labels',
+                                                                       variant: :'outline-primary',
+                                                                       classes: 'btn-sm my-field',
+                                                                       value: ContentsController::LABELS_CSV_VALUE) %>
+          <% end %>
+        </fieldset>
+
         <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">
           <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: "Resources (#{number_with_delimiter(content_file_sets.size)})", classes: 'mb-0 me-auto') %>

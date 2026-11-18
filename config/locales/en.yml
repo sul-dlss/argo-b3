@@ -338,6 +338,7 @@ en:
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"
           labels: "Resource labels updated"
+          labels_csv: "Resource labels updated from CSV"
         buttons:
           update_labels: "Update labels if you reordered resources"
           structure: "Structure files"

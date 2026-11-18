@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # Controller for the structure of a content: deleting it, exporting it, and validating it.
-# Structuring files and uploading a structural CSV are steps of managing files (see ContentsController).
+# Structuring files and uploading a structural or labels CSV are steps of managing files (see ContentsController).
 class ContentStructureController < ContentsApplicationController
-  skip_verify_authorized only: %i[destroy csv validation labels]
+  skip_verify_authorized only: %i[destroy csv labels_csv validation labels]
   before_action :set_content
 
   # Deletes all of the files and resources, then reloads the page on the add and edit files step.
@@ -32,6 +32,12 @@ class ContentStructureController < ContentsApplicationController
   def csv
     send_data StructuralCsv::Export.as_csv(content: @content),
               type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(@content.druid)}_structural.csv"
+  end
+
+  # Exports the labels of the current (possibly in-progress) resources.
+  def labels_csv
+    send_data LabelsCsv::Export.as_csv(content: @content),
+              type: 'text/csv', filename: "#{DruidSupport.bare_druid_from(@content.druid)}_labels.csv"
   end
 
   # Validates the current (possibly in-progress) structure against the selected content type.
