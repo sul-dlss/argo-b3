@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe NewCollectionForm do
   subject(:new_collection_form) do
-    described_class.new(title:, abstract:, description_choice:, catalog_record_id:, access_view:,
+    described_class.new(title:, abstract:, description_choice:, catalog_record_id:, description_csv_file:, access_view:,
                         apo_druid: 'druid:hv992ry2431',
                         use_and_reproduction_statement: 'Use at will.', copyright: 'Copyright © Stanford.',
                         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
@@ -16,6 +16,7 @@ RSpec.describe NewCollectionForm do
   let(:abstract) { nil }
   let(:description_choice) { 'title' }
   let(:catalog_record_id) { nil }
+  let(:description_csv_file) { nil }
   let(:access_view) { 'world' }
 
   describe '.permitted_params' do
@@ -56,12 +57,60 @@ RSpec.describe NewCollectionForm do
       end
     end
 
-    context 'when the description choice is not title or FOLIO' do
+    context 'when uploading a description spreadsheet' do
       let(:description_choice) { 'spreadsheet' }
+      let(:title) { nil }
+      let(:abstract) { 'Ignored abstract.' }
+      let(:description_csv_file) { fixture_file_upload('item_description.csv', 'text/csv') }
+
+      it 'is valid and populates the description from the spreadsheet without the abstract' do
+        expect(new_collection_form).to be_valid
+        expect(new_collection_form.description_hash[:title].first).to include(value: 'A spreadsheet title')
+        expect(new_collection_form.description_hash[:note].map { |note| note.slice(:type, :value) })
+          .to eq([{ type: 'summary', value: 'A note' }])
+      end
+    end
+
+    context 'when uploading a description spreadsheet without a file' do
+      let(:description_choice) { 'spreadsheet' }
+      let(:title) { nil }
 
       it 'is invalid' do
         expect(new_collection_form).not_to be_valid
-        expect(new_collection_form.errors[:description_choice]).to include('is not included in the list')
+        expect(new_collection_form.errors[:description_csv_file]).to eq(["can't be blank"])
+      end
+    end
+
+    context 'when uploading an invalid description spreadsheet' do
+      let(:description_choice) { 'spreadsheet' }
+      let(:title) { nil }
+      let(:description_csv_file) { fixture_file_upload('item_description_invalid.csv', 'text/csv') }
+
+      it 'is invalid' do
+        expect(new_collection_form).not_to be_valid
+        expect(new_collection_form.errors[:description_csv_file]).to eq(['Title column not found.'])
+      end
+    end
+
+    context 'when uploading a description spreadsheet with more than one row' do
+      let(:description_choice) { 'spreadsheet' }
+      let(:title) { nil }
+      let(:description_csv_file) { fixture_file_upload('item_description_multiple_rows.csv', 'text/csv') }
+
+      it 'is invalid' do
+        expect(new_collection_form).not_to be_valid
+        expect(new_collection_form.errors[:description_csv_file]).to eq(['Only one row of description is allowed.'])
+      end
+    end
+
+    context 'when uploading a description spreadsheet without a title value' do
+      let(:description_choice) { 'spreadsheet' }
+      let(:title) { nil }
+      let(:description_csv_file) { fixture_file_upload('item_description_no_title_value.csv', 'text/csv') }
+
+      it 'is invalid' do
+        expect(new_collection_form).not_to be_valid
+        expect(new_collection_form.errors[:description_csv_file]).to eq(['Title value not found.'])
       end
     end
 

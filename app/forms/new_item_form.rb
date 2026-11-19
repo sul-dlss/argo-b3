@@ -13,13 +13,10 @@ class NewItemForm < CocinaModels::Dro
   include CollectionFormConcern
   include CatalogRecordIdFormConcern
   include DescriptionCsvFormConcern
-  # Provides the title and catalog id description choices; the spreadsheet choice is specific to items.
   include DescriptionChoiceFormConcern
 
   SOURCE_ID_PROVIDED_CHOICE = 'provide'
   SOURCE_ID_GENERATE_CHOICE = 'generate'
-
-  DESCRIPTION_SPREADSHEET_CHOICE = 'spreadsheet'
 
   attribute :source_id_choice, :string, default: SOURCE_ID_PROVIDED_CHOICE
 
@@ -28,9 +25,6 @@ class NewItemForm < CocinaModels::Dro
   validates :source_id_prefix, presence: true, if: -> { source_id_choice == SOURCE_ID_GENERATE_CHOICE }
 
   has_one :release_tags
-
-  validates :description_csv_file, presence: true, if: :description_spreadsheet_choice?
-  validate :description_csv_must_be_valid, if: -> { description_spreadsheet_choice? && description_csv_file.present? }
 
   before_validation :generate_source_id, if: lambda {
     source_id_choice == SOURCE_ID_GENERATE_CHOICE && source_id_prefix.present?
@@ -49,10 +43,6 @@ class NewItemForm < CocinaModels::Dro
   end
 
   private
-
-  def description_spreadsheet_choice?
-    description_choice == DESCRIPTION_SPREADSHEET_CHOICE
-  end
 
   def generate_source_id
     self.source_id = "#{source_id_prefix}:#{SecureRandom.uuid}"

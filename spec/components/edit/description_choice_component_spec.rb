@@ -47,7 +47,7 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       NewCollectionForm.new(description_choice: 'catalog_id', catalog_record_id: 'in11403803')
     end
 
-    it 'renders the title and FOLIO choices without the item-only fields' do
+    it 'renders the description choices without the item-only fields' do
       render_inline(component)
 
       expect(page).to have_field('Enter title myself', type: 'radio', checked: false)
@@ -58,7 +58,8 @@ RSpec.describe Edit::DescriptionChoiceComponent, type: :component do
       expect(page).to have_no_field('Barcode')
       expect(page).to have_no_field('Part label')
       expect(page).to have_no_field('Sort key')
-      expect(page).to have_no_field('Upload description spreadsheet')
+      expect(page).to have_field('Upload description spreadsheet', type: 'radio', checked: false)
+      expect(page).to have_field('collection[description_csv_file]', type: 'file')
     end
   end
 

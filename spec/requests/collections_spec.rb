@@ -30,7 +30,9 @@ RSpec.describe 'Collections' do
       expect(page).to have_field('Enter title and abstract myself', type: 'radio')
       expect(page).to have_field('collection[abstract]', type: 'textarea')
       expect(page).to have_field('collection[catalog_record_id]')
-      expect(page).to have_no_field('collection[description_csv_file]')
+      expect(page).to have_field('Upload description spreadsheet', type: 'radio')
+      expect(page).to have_field('collection[description_csv_file]', type: 'file')
+      expect(page).to have_css('form#tabbed_form[enctype="multipart/form-data"]')
       expect(page).to have_no_field('collection[barcode]')
       expect(page).to have_select('collection[apo_druid]', options: ['My APO'])
       expect(page).to have_select('collection[access_view]', selected: 'world', options: %w[world dark])
@@ -113,6 +115,42 @@ RSpec.describe 'Collections' do
           expect(args[:request_cocina_object].description.note.map { |note| [note.type, note.value] })
             .to eq([['abstract', 'My abstract.']])
         end
+      end
+    end
+
+    context 'with a description spreadsheet' do
+      it 'registers the collection with the description from the spreadsheet' do
+        post '/collections', params: {
+          collection: collection_params.merge(
+            title: '', description_choice: 'spreadsheet',
+            description_csv_file: fixture_file_upload('item_description.csv', 'text/csv')
+          )
+        }
+
+        expect(response).to redirect_to('/objects/druid:xz987wv6543')
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          description = args[:request_cocina_object].description
+          expect(description.title.first.value).to eq('A spreadsheet title')
+          expect(description.note.map { |note| [note.type, note.value] }).to eq([['summary', 'A note']])
+        end
+        expect(Sdr::Repository).to have_received(:accession)
+      end
+    end
+
+    context 'with an invalid description spreadsheet' do
+      it 'renders the form with the spreadsheet error' do
+        post '/collections', params: {
+          collection: collection_params.merge(
+            title: '', description_choice: 'spreadsheet',
+            description_csv_file: fixture_file_upload('item_description_invalid.csv', 'text/csv')
+          )
+        }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        page = Capybara.string(response.body)
+        expect(page).to have_field('Upload description spreadsheet', type: 'radio', checked: true)
+        expect(page).to have_css('.invalid-feedback', text: 'Title column not found.')
+        expect(Sdr::Repository).not_to have_received(:register)
       end
     end
 
