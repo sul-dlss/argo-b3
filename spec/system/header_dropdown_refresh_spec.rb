@@ -7,26 +7,22 @@ RSpec.describe 'Header dropdowns on pages that refresh themselves' do
   let(:toggle) { find('header button.dropdown-toggle', text: 'Bulk actions') }
   let(:menu) { toggle.find(:xpath, 'following-sibling::ul[contains(@class, "dropdown-menu")]', visible: :all) }
 
-  # Morph refreshes the page, as its refresh timer would, and waits for the refresh to render.
-  def refresh_page
-    page.execute_script(<<~JS)
-      window.refreshRendered = false
-      document.addEventListener('turbo:render', () => { window.refreshRendered = true }, { once: true })
-      Turbo.session.refresh(window.location.href)
-    JS
-    page.document.synchronize do
-      raise Capybara::ExpectationNotMet, 'Refresh not rendered' unless page.evaluate_script('window.refreshRendered')
-    end
+  # Waits for the page to be morph refreshed: by its own refresh timer, or else started here.
+  # The marker is not in the server-rendered page, so a morph removes it.
+  def wait_for_refresh(start: true)
+    page.execute_script("document.body.dataset.refreshMarker = 'true'")
+    page.execute_script('Turbo.session.refresh(window.location.href)') if start
+    expect(page).to have_no_css('body[data-refresh-marker]')
   end
 
   def expect_open
-    expect(menu).to be_visible
-    expect(toggle['aria-expanded']).to eq('true')
+    expect(menu).to match_selector('.dropdown-menu.show', visible: :visible)
+    expect(toggle).to match_selector('[aria-expanded="true"]')
   end
 
   def expect_closed
-    expect(menu).not_to be_visible
-    expect(toggle['aria-expanded']).to eq('false')
+    expect(menu).to match_selector('.dropdown-menu:not(.show)', visible: :hidden)
+    expect(toggle).to match_selector('[aria-expanded="false"]')
   end
 
   before { sign_in(user) }
@@ -59,13 +55,13 @@ RSpec.describe 'Header dropdowns on pages that refresh themselves' do
       visit "/objects/#{druid}"
       expect(page).to have_css('h1', text: 'My collection')
 
-      refresh_page
+      wait_for_refresh
       expect_closed
 
       toggle.click
       expect_open
 
-      refresh_page
+      wait_for_refresh
       expect_open
 
       # The dropdown still closes and reopens normally.
@@ -77,7 +73,7 @@ RSpec.describe 'Header dropdowns on pages that refresh themselves' do
       # Escape still closes it, and a closed dropdown stays closed.
       toggle.send_keys(:escape)
       expect_closed
-      refresh_page
+      wait_for_refresh
       expect_closed
     end
   end
@@ -85,14 +81,14 @@ RSpec.describe 'Header dropdowns on pages that refresh themselves' do
   context 'when on a page that refreshes on a schedule' do
     let(:bulk_action) { create(:bulk_action, user:, action_type: 'export_cocina_json', description: 'My bulk action') }
 
-    it 'keeps an open dropdown open across refreshes' do
+    it 'keeps an open dropdown open across scheduled refreshes' do
       visit bulk_action_path(bulk_action)
       expect(page).to have_css('h2', text: 'Processing')
 
       toggle.click
       expect_open
 
-      refresh_page
+      wait_for_refresh(start: false)
       expect_open
 
       toggle.click

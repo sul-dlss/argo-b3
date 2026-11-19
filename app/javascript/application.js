@@ -3,6 +3,3 @@ import '@hotwired/turbo-rails'
 import 'controllers'
 import * as bootstrap from 'bootstrap' // eslint-disable-line no-unused-vars
 import '@andypf/json-viewer'
-import { preserveOpenDropdowns } from 'controllers/dropdown_morph'
-
-document.addEventListener('turbo:before-morph-attribute', preserveOpenDropdowns)
