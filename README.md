@@ -428,6 +428,12 @@ There are two parts:
 
 The worker task belongs to one person's claude.ai account: sessions use that account's usage, and comments, commits, and PRs appear under that person's GitHub user. The dispatcher's secrets are the task's trigger URL and token, a fine-grained token that can read team membership and write organization projects, and a token that can upload PR attachments (the workflow's own token can't).
 
+The cloud environment's network access is **Limited**, with **Allow package managers** checked, plus these **Allowed domains**:
+
+- `*.github.com`: Matt Pocock's skills, prebuilt Ruby, and the Solr config, all fetched by `bin/setup-claude-cloud-env`.
+- `cdn.jsdelivr.net`: JavaScript and styles that the app's pages load in system specs.
+- `private-user-images.githubusercontent.com`: images in issues and PRs (the `ok-claude` skill says how sessions download them).
+
 To debug, check the workflow's runs in the Actions tab, then the worker task's runs (and their logs) in Claude Code.
 
 ## Design
