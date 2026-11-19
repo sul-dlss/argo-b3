@@ -335,6 +335,7 @@ Each facet is a `Search::Facets::Config` constant, and that configuration is the
 * Every config is used for filtering (`Search::ItemQueryBuilder`) and for describing a search (`Search::Serializer`), in the order the constants are defined.
 * A facet with a `facet_resource` gets its endpoints (`index`, and `children` / `search` if `facet_children` / `facet_search`) drawn in the `:search_endpoints` routing concern, served by `Search::FacetsController` for every search view.
 * The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured), whose values are checkboxes for `operator: :or`.
+* A basic facet lists its selected and excluded values on its first page, after its top values, when they are not among them (e.g., a value chosen from a later page or from facet search).
 * Checking or unchecking a checkbox facet value updates the search at once; each checkbox carries the URL of the search it leads to (as a link facet value does), so it works across pages of values, and focus returns to the checkbox once its facet reloads.
 
 ### Adding a facet

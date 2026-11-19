@@ -72,4 +72,35 @@ RSpec.describe Searchers::Facet do
       end
     end
   end
+
+  context 'when the facet is an :or facet with selected values' do
+    let(:facet_config) { Search::Facets::LANGUAGES }
+    let(:search_form) { ResultsSearchForm.new(query:, languages: ['Welsh']) }
+    let(:results) { described_class.call(search_form:, facet_config:, page:, user_scope:) }
+    let(:page) { nil }
+
+    def facet_json
+      facet_json = nil
+      expect(Search::SolrService).to have_received(:post) do |args|
+        facet_json = JSON.parse(args[:request][:'json.facet']).with_indifferent_access
+      end
+      facet_json
+    end
+
+    it 'ignores the facet filters and counts the selected values' do
+      results
+      expect(facet_json.dig(Search::Fields::LANGUAGES, :domain, :excludeTags)).to eq([Search::Fields::LANGUAGES])
+      expect(facet_json).to include("#{Search::Fields::LANGUAGES}-selected")
+    end
+
+    context 'when not the first page' do
+      let(:page) { 2 }
+
+      it 'does not count the selected values' do
+        results
+        expect(facet_json[Search::Fields::LANGUAGES][:domain]).to be_present
+        expect(facet_json).not_to include("#{Search::Fields::LANGUAGES}-selected")
+      end
+    end
+  end
 end

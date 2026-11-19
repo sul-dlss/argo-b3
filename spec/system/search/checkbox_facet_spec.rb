@@ -16,7 +16,7 @@ RSpec.describe 'Checkbox facets', :solr do
     sign_in(create(:user, :reader))
   end
 
-  it 'returns focus to the facet when the checked value is not shown after the update' do
+  it 'lists a checked value that is not among the top values' do
     visit search_path(query: 'test')
     find_facet_section('Language').click
     find_facet_more_link('Language').click
@@ -24,7 +24,16 @@ RSpec.describe 'Checkbox facets', :solr do
     within(find_facet_section('Language')) { check('German') }
 
     expect(page).to have_current_filter('Language', 'German')
-    # German was on the second page of values, which is not shown once the facet reloads.
-    expect(page).to have_button('Language', focused: true)
+    # German was on the second page of values, so it follows the top values once the facet reloads.
+    within(find_facet_section('Language')) do
+      expect(page).to have_checked_field('German', focused: true)
+      expect(all('.form-check-label').map(&:text)).to eq(%w[English French German])
+    end
+
+    # So is an excluded value.
+    within(find_facet_section('Language')) { click_link('Exclude German') }
+
+    expect(page).to have_current_filter('Language exclude', 'German')
+    expect(page).to have_excluded_facet_value('German', facet: 'Language')
   end
 end
