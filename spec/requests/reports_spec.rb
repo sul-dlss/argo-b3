@@ -17,7 +17,19 @@ RSpec.describe 'Reports' do
       expect(page).to have_css('h1', text: 'Druid report')
       expect(page).to have_title('Druid report | Argo B3', exact: true)
       expect(page.all('h2').map { |heading| heading.text.strip })
-        .to eq(['Frequently used', 'Citation', 'History', 'Identifiers', 'Content', 'Preview'])
+        .to eq(['Frequently used', 'Description', 'History', 'Identifiers', 'Content', 'Preview'])
+    end
+
+    it 'renders an unticked Genre checkbox last in the Description section' do
+      get report_path
+
+      page = Capybara.string(response.body)
+      section_labels = page.all(:xpath, '//div[contains(@class, "form-check")]' \
+                                        '[preceding-sibling::h2[1][normalize-space()="Description"]]/label')
+                           .map(&:text)
+      expect(section_labels.last).to eq('Genre')
+      expect(page).to have_field('Genre', type: 'checkbox', checked: false)
+      expect(page).to have_css('.form-check', text: /Genre\s*For example: Dataset/)
     end
 
     it 'renders the source of items chooser' do
@@ -127,6 +139,30 @@ RSpec.describe 'Reports' do
 
       expect(Search::SolrService).to have_received(:stream)
         .with(hash_including(request: hash_including(rows: 10_000_000)))
+    end
+  end
+
+  describe 'Genre', :solr do
+    let!(:item_doc) { create(:solr_item, genres: %w[Maps Dataset]) }
+    let(:params) do
+      { report: { source: 'druids', druid_list: item_doc[Search::Fields::BARE_DRUID],
+                  fields: [Search::Fields::BARE_DRUID, Search::Fields::GENRES] } }
+    end
+
+    it 'previews the genres joined with ;' do
+      post(preview_report_path, params:)
+
+      page = Capybara.string(response.body)
+      expect(page.all('table#preview-table th').map { |header| header.text.strip }).to eq(%w[Druid Genre])
+      expect(page).to have_css('table#preview-table td', text: 'Maps;Dataset')
+    end
+
+    it 'downloads the genres joined with ;' do
+      post(download_report_path, params:)
+
+      csv = CSV.parse(response.body, headers: true)
+      expect(csv.headers).to eq(%w[Druid Genre])
+      expect(csv.first['Genre']).to eq('Maps;Dataset')
     end
   end
 end
