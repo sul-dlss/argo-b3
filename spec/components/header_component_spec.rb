@@ -21,12 +21,50 @@ RSpec.describe HeaderComponent, type: :component do
     expect(page).to have_link('Workflow status', href: '/workflow_grid')
   end
 
-  describe 'bulk actions dropdown' do
+  describe 'bulk actions menu' do
+    let(:menu) { page.find('li.mega-menu') }
+
     it 'renders links to the bulk actions pages' do
+      with_request_url '/bulk_actions/new' do
+        render_inline(component)
+      end
+
+      expect(menu).to have_button('Bulk actions')
+      expect(menu).to have_css('[role="heading"]', exact_text: 'Bulk action pages')
+      expect(menu).to have_link('Recent bulk actions', href: '/bulk_actions')
+      expect(menu).to have_css('a[aria-current="page"][href="/bulk_actions/new"]', exact_text: 'Bulk actions menu')
+    end
+
+    it 'renders a section for each bulk action section with links to its bulk actions' do
       render_inline(component)
 
-      expect(page).to have_link('Recent bulk actions', href: '/bulk_actions')
-      expect(page).to have_link('Bulk actions menu', href: '/bulk_actions/new')
+      expect(menu.all('[role="heading"]').map(&:text))
+        .to eq(['Bulk action pages', 'Perform actions', 'Register and deposit', 'Tags and reporting',
+                'Modify objects', 'Manage structural metadata', 'Manage rights and administrative metadata',
+                'Manage descriptive metadata'])
+      expect(menu).to have_link('Manage release', href: '/bulk_actions/manage_release/new')
+      expect(menu).to have_link('Add workflow', href: '/bulk_actions/add_workflow/new')
+    end
+
+    context 'when the user is not an admin' do
+      it 'does not render bulk actions limited to admins' do
+        render_inline(component)
+
+        expect(menu).to have_no_css('[role="heading"]', text: 'Manage permissions')
+        expect(menu).to have_no_link('Import read unrestricted workgroups')
+      end
+    end
+
+    context 'when the user is an admin' do
+      let(:user) { build_stubbed(:user, :admin, name: 'Admin User') }
+
+      it 'renders bulk actions limited to admins' do
+        render_inline(component)
+
+        expect(menu).to have_css('[role="heading"]', exact_text: 'Manage permissions')
+        expect(menu).to have_link('Import read unrestricted workgroups',
+                                  href: '/bulk_actions/import_read_unrestricted_workgroups/new')
+      end
     end
   end
 

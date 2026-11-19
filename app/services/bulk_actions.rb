@@ -3,17 +3,18 @@
 # Configurations for bulk actions.
 # A config with a form gets new and create routes, handled by BulkActions::FormsController unless it names a controller.
 module BulkActions # rubocop:disable Metrics/ModuleLength
-  # Sections of the new bulk actions page, in display order; each lists its configs in definition order.
-  SECTIONS = {
-    perform_actions: 'Perform actions',
-    register_and_deposit: 'Register and deposit',
-    tags_and_reporting: 'Tags and reporting',
-    modify_objects: 'Modify objects',
-    structural_metadata: 'Manage structural metadata',
-    rights_and_administrative_metadata: 'Manage rights and administrative metadata',
-    descriptive_metadata: 'Manage descriptive metadata',
-    permissions: 'Manage permissions'
-  }.freeze
+  # Sections of the new bulk actions page and the header's bulk actions menu, in display order; each lists its configs
+  # in definition order. Labels are in en.yml under bulk_actions.sections.
+  SECTIONS = %i[
+    perform_actions
+    register_and_deposit
+    tags_and_reporting
+    modify_objects
+    structural_metadata
+    rights_and_administrative_metadata
+    descriptive_metadata
+    permissions
+  ].freeze
 
   def self.find_config(bulk_action_type)
     constant_name = bulk_action_type.to_s.upcase
@@ -33,6 +34,21 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     all.select { |config| config.section == section }
   end
 
+  # @return [String] the label of the section
+  def self.section_label(section)
+    I18n.t("bulk_actions.sections.#{section}")
+  end
+
+  # @yieldparam admin_policy_rule [Symbol] the AdminPolicy rule of a config that has one
+  # @yieldreturn [Boolean] whether the user passes the rule
+  # @return [Hash{Symbol => Array<Config>}] the configs of each section that the user may use, in display order,
+  #   omitting sections left empty
+  def self.available_sections
+    SECTIONS.index_with do |section|
+      in_section(section).select { |config| config.admin_policy_rule.nil? || yield(config.admin_policy_rule) }
+    end.compact_blank
+  end
+
   def self.register(**)
     Config.new(**).tap { |config| all << config }
   end
@@ -44,7 +60,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     :form,
     :label,
     :help_text,
-    # Key of SECTIONS listing this bulk action on the new bulk actions page.
+    # Key of SECTIONS listing this bulk action on the new bulk actions page and in the bulk actions menu.
     :section,
     # Whether the form offers depositing (closing the version) once the action is complete.
     :close_version,

@@ -1,0 +1,15 @@
+<li class="nav-item dropdown mega-menu">
+  <button
+    type="button"
+    class="nav-link logout-dropdown dropdown-toggle"
+    data-bs-toggle="dropdown"
+    data-bs-display="static"
+    aria-expanded="false"><%= text %></button>
+  <div class="dropdown-menu mega-menu-panel">
+    <div class="row row-cols-1 row-cols-md-3 gy-3 gx-0 gx-md-3">
+      <% sections.each do |section| %>
+        <%= section %>
+      <% end %>
+    </div>
+  </div>
+</li>

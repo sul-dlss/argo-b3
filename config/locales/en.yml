@@ -965,6 +965,16 @@ en:
     tabs:
       history: 'Recent bulk actions'
       menu: 'Bulk actions menu'
+    sections:
+      pages: 'Bulk action pages'
+      perform_actions: 'Perform actions'
+      register_and_deposit: 'Register and deposit'
+      tags_and_reporting: 'Tags and reporting'
+      modify_objects: 'Modify objects'
+      structural_metadata: 'Manage structural metadata'
+      rights_and_administrative_metadata: 'Manage rights and administrative metadata'
+      descriptive_metadata: 'Manage descriptive metadata'
+      permissions: 'Manage permissions'
     cancel: 'Cancel'
     cancel_confirm: 'Cancel this bulk action? Changes already made to objects will not be undone.'
     cancel_failed: 'Bulk action could not be cancelled.'

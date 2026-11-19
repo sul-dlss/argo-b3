@@ -29,7 +29,8 @@ RSpec.describe 'Show object Redeposit with Goobi button' do
       expect(rendered_page).to have_css('h2', text: 'Update')
       expect(rendered_page).to have_css("form[action='/objects/#{druid}/redeposit_with_goobi']")
       expect(rendered_page).to have_css('button:not(.disabled)', exact_text: 'Redeposit with Goobi')
-      expect(response.body.index('Actions')).to be < response.body.index('Update')
+      main_html = rendered_page.find('main').native.to_html
+      expect(main_html.index('Actions')).to be < main_html.index('Update')
     end
   end
 
