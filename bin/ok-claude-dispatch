@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+# Dispatcher for the agent workflow (README "Agent workflow"), run by
+# .github/workflows/ok-claude-dispatch.yml.
+#
+# Usage:
+#   bin/ok-claude-dispatch sweep                  claim waiting items and fire a worker for each, up to the cap
+#   bin/ok-claude-dispatch stale                  comment on items that have been "on it" for over a day
+#   bin/ok-claude-dispatch review-status <issue>  move an issue to In review on the project board
+#   bin/ok-claude-dispatch attach-media <pr>      upload a PR's claude/pr-media/<head branch> files into its body
+#
+# Environment:
+#   GH_TOKEN                labels and comments; in Actions, GITHUB_TOKEN, whose changes don't retrigger workflows
+#   OK_CLAUDE_GITHUB_TOKEN  team membership and the project board (defaults to gh's own token)
+#   OK_CLAUDE_ATTACH_TOKEN  uploading attachments, if GH_TOKEN can't (defaults to GH_TOKEN)
+#   OK_CLAUDE_FIRE_URL      the worker scheduled task's /fire URL
+#   OK_CLAUDE_FIRE_TOKEN    the worker scheduled task's API trigger token
+#   DRY_RUN=1               print writes and fires instead of making them
+set -euo pipefail
+
+repo="${GITHUB_REPOSITORY:-sul-dlss/argo-b3}"
+org="${repo%%/*}"
+team=infrastructure-team
+project_number=93
+max_workers=3
+stale_hours=24
+
+triage_label='ok claude : triage'
+implement_label='ok claude : implement'
+address_review_label='ok claude : address review'
+on_it_label='ok claude : on it'
+human_label='ok claude : human please'
+dispatcher_note='> *Posted by the ok claude dispatcher (README "Agent workflow").*'
+stale_marker='<!-- ok-claude-stale -->'
+
+# Runs a command that changes something, or prints it when DRY_RUN is set.
+write() {
+  if [[ -n "${DRY_RUN:-}" ]]; then
+    printf 'DRY RUN:'
+    printf ' %q' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
+}
+
+# gh with the token that can read team membership and write the project board.
+org_gh() {
+  if [[ -n "${OK_CLAUDE_GITHUB_TOKEN:-}" ]]; then
+    GH_TOKEN="$OK_CLAUDE_GITHUB_TOKEN" gh "$@"
+  else
+    gh "$@"
+  fi
+}
+
+uri_encode() { jq -rn --arg value "$1" '$value | @uri'; }
+
+add_label() { write gh api --silent -X POST "repos/$repo/issues/$1/labels" -f "labels[]=$2"; }
+
+remove_label() { write gh api --silent -X DELETE "repos/$repo/issues/$1/labels/$(uri_encode "$2")"; }
+
+comment() { write gh api --silent -X POST "repos/$repo/issues/$1/comments" -f "body=$2"; }
+
+# Open issues and PRs with a label, oldest first, as: number, is PR, URL, has "on it", has "human please".
+items_labelled() {
+  gh api -X GET "repos/$repo/issues" -f state=open -f "labels=$1" -f sort=created -f direction=asc \
+    -f per_page=100 --paginate \
+    --jq ".[] | [.number, (.pull_request != null), .html_url,
+                 any(.labels[]; .name == \"$on_it_label\"), any(.labels[]; .name == \"$human_label\")] | @tsv"
+}
+
+# Who most recently added a label to an issue or PR.
+labeller() {
+  gh api --paginate "repos/$repo/issues/$1/events?per_page=100" \
+    --jq ".[] | select(.event == \"labeled\" and .label.name == \"$2\") | .actor.login" | tail -n 1
+}
+
+team_member() {
+  [[ -n "$1" ]] &&
+    [[ "$(org_gh api "orgs/$org/teams/$team/memberships/$1" --jq .state 2>/dev/null)" == active ]]
+}
+
+# Adds the issue to the project board if needed and sets its Status.
+set_status() {
+  local issue="$1" status="$2" project node_id project_id field_id option_id item_id
+  project="$(org_gh api graphql -F "number=$project_number" -f "org=$org" -f query='
+    query($org: String!, $number: Int!) {
+      organization(login: $org) { projectV2(number: $number) {
+        id
+        field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
+      } }
+    }')"
+  project_id="$(jq -r '.data.organization.projectV2.id' <<<"$project")"
+  field_id="$(jq -r '.data.organization.projectV2.field.id' <<<"$project")"
+  option_id="$(jq -r --arg status "$status" \
+    '.data.organization.projectV2.field.options[] | select(.name == $status) | .id' <<<"$project")"
+  [[ -n "$option_id" ]] || { echo "No '$status' Status on project $project_number" >&2; return 1; }
+  node_id="$(gh api "repos/$repo/issues/$issue" --jq .node_id)"
+
+  if [[ -n "${DRY_RUN:-}" ]]; then
+    echo "DRY RUN: add #$issue to project $project_number and set Status to $status"
+    return 0
+  fi
+  # Returns the existing item when the issue is already on the board.
+  item_id="$(org_gh api graphql -f "project=$project_id" -f "content=$node_id" --jq '.data.addProjectV2ItemById.item.id' -f query='
+    mutation($project: ID!, $content: ID!) {
+      addProjectV2ItemById(input: { projectId: $project, contentId: $content }) { item { id } }
+    }')"
+  org_gh api graphql --silent -f "project=$project_id" -f "item=$item_id" -f "field=$field_id" -f "option=$option_id" -f query='
+    mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+      updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field,
+                                             value: { singleSelectOptionId: $option } }) { clientMutationId }
+    }'
+}
+
+fire_worker() {
+  local text="$1"
+  if [[ -n "${DRY_RUN:-}" ]]; then
+    echo "DRY RUN: fire worker with '$text'"
+    return 0
+  fi
+  curl --fail --silent --show-error --output /dev/null -X POST "${OK_CLAUDE_FIRE_URL:?}" \
+    -H "Authorization: Bearer ${OK_CLAUDE_FIRE_TOKEN:?}" \
+    -H 'anthropic-beta: experimental-cc-routine-2026-04-01' \
+    -H 'anthropic-version: 2023-06-01' \
+    -H 'Content-Type: application/json' \
+    --data "$(jq -n --arg text "$text" '{text: $text}')"
+}
+
+running_count() {
+  gh api -X GET "repos/$repo/issues" -f state=open -f "labels=$on_it_label" -f per_page=100 --paginate \
+    --jq '.[].number' | wc -l | tr -d ' '
+}
+
+sweep() {
+  local running failed=0 action label wants_pr items number is_pr url has_on_it has_human login
+  if [[ -z "${DRY_RUN:-}" &&
+    (-z "${OK_CLAUDE_GITHUB_TOKEN:-}" || -z "${OK_CLAUDE_FIRE_URL:-}" || -z "${OK_CLAUDE_FIRE_TOKEN:-}") ]]; then
+    echo "OK_CLAUDE_GITHUB_TOKEN, OK_CLAUDE_FIRE_URL, and OK_CLAUDE_FIRE_TOKEN must all be set; nothing dispatched"
+    return 0
+  fi
+  running="$(running_count)"
+  echo "$running item(s) already on it (cap $max_workers)"
+
+  for action in address-review triage implement; do
+    case "$action" in
+      address-review) label="$address_review_label" wants_pr=true ;;
+      triage) label="$triage_label" wants_pr=false ;;
+      implement) label="$implement_label" wants_pr=false ;;
+    esac
+    items="$(items_labelled "$label")"
+    while IFS=$'\t' read -r number is_pr url has_on_it has_human; do
+      [[ -n "$number" && "$is_pr" == "$wants_pr" && "$has_on_it" == false ]] || continue
+
+      login="$(labeller "$number" "$label")"
+      if ! team_member "$login"; then
+        echo "#$number: '$label' added by ${login:-unknown}, not in $org/$team; removing it"
+        remove_label "$number" "$label"
+        comment "$number" "$dispatcher_note
+
+Only members of $org/$team can start agent work, so \`$label\` was removed."
+        continue
+      fi
+
+      if ((running >= max_workers)); then
+        echo "#$number: waiting ($running of $max_workers workers running)"
+        continue
+      fi
+
+      echo "#$number: claiming for $action"
+      add_label "$number" "$on_it_label"
+      remove_label "$number" "$label"
+      [[ "$has_human" == false ]] || remove_label "$number" "$human_label"
+      if [[ "$action" == implement ]]; then
+        set_status "$number" 'In progress' || echo "#$number: couldn't set Status to In progress" >&2
+      fi
+
+      if fire_worker "$action $url"; then
+        running=$((running + 1))
+      else
+        echo "#$number: firing the worker failed; restoring '$label'" >&2
+        add_label "$number" "$label"
+        remove_label "$number" "$on_it_label"
+        failed=1
+      fi
+    done <<<"$items"
+  done
+  return "$failed"
+}
+
+stale() {
+  local items number since
+  items="$(items_labelled "$on_it_label")"
+  while IFS=$'\t' read -r number _; do
+    [[ -n "$number" ]] || continue
+    since="$(gh api --paginate "repos/$repo/issues/$number/events?per_page=100" \
+      --jq ".[] | select(.event == \"labeled\" and .label.name == \"$on_it_label\") | .created_at" | tail -n 1)"
+    [[ -n "$since" ]] || continue
+    if jq -en --arg since "$since" --argjson hours "$stale_hours" \
+      '($since | fromdateiso8601) > (now - $hours * 3600)' >/dev/null; then
+      continue
+    fi
+    if gh api --paginate "repos/$repo/issues/$number/comments?since=$since&per_page=100" --jq '.[].body' |
+      grep -qF "$stale_marker"; then
+      continue
+    fi
+    echo "#$number: on it since $since"
+    comment "$number" "$dispatcher_note
+$stale_marker
+
+This has been \`$on_it_label\` for over $stale_hours hours, so its agent session may have stopped. Check the worker's run log, then remove \`$on_it_label\` and add the label for the next step."
+  done <<<"$items"
+}
+
+# Uploads the files on the PR's media branch, which replace the body's ./<file> references, then deletes the branch.
+attach_media() {
+  local pr="$1" head media dir name files=() attach=()
+  head="$(gh api "repos/$repo/pulls/$pr" --jq .head.ref)"
+  media="claude/pr-media/$head"
+  if ! gh api --silent "repos/$repo/branches/$media" 2>/dev/null; then
+    echo "#$pr: no $media branch; nothing to attach"
+    return 0
+  fi
+
+  dir="$(mktemp -d)"
+  while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
+    gh api -H 'Accept: application/vnd.github.raw' -X GET "repos/$repo/contents/$(uri_encode "$name")" \
+      -f "ref=$media" >"$dir/$name"
+    files+=("$name")
+    attach+=(--attach "./$name")
+  done < <(gh api -X GET "repos/$repo/contents" -f "ref=$media" \
+    --jq '.[] | select(.type == "file" and (.name | test("\\.(png|gif|jpe?g|webm|mp4|mov)$"; "i"))) | .name')
+  if ((${#files[@]} == 0)); then
+    echo "#$pr: no media files on $media"
+    return 0
+  fi
+  gh api "repos/$repo/pulls/$pr" --jq .body >"$dir/body.md"
+
+  echo "#$pr: attaching ${files[*]}"
+  if (cd "$dir" && GH_TOKEN="${OK_CLAUDE_ATTACH_TOKEN:-${GH_TOKEN:-}}" \
+    write gh pr edit "$pr" -R "$repo" --body-file body.md "${attach[@]}") &&
+    { [[ -n "${DRY_RUN:-}" ]] || gh api "repos/$repo/pulls/$pr" --jq .body | grep -q user-attachments; }; then
+    write gh api --silent -X DELETE "repos/$repo/git/refs/heads/$media"
+  else
+    comment "$pr" "$dispatcher_note
+
+Couldn't attach the screencast files from \`$media\` to this PR; they're still on that branch. See the dispatcher's run in the Actions tab."
+    return 1
+  fi
+}
+
+case "${1:-}" in
+  sweep) sweep ;;
+  attach-media)
+    [[ -n "${2:-}" ]] || { echo "Usage: $0 attach-media <pr number>" >&2; exit 2; }
+    attach_media "$2"
+    ;;
+  stale) stale ;;
+  review-status)
+    [[ -n "${2:-}" ]] || { echo "Usage: $0 review-status <issue number>" >&2; exit 2; }
+    set_status "$2" 'In review'
+    ;;
+  *)
+    echo "Usage: $0 sweep | stale | review-status <issue number> | attach-media <pr number>" >&2
+    exit 2
+    ;;
+esac
