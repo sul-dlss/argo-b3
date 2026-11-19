@@ -2,11 +2,12 @@
 
 module Searchers
   # Searcher that returns the collections the user can edit (i.e., add items to) with titles matching a query,
-  # for populating select options. A blank query returns the first collections by title.
+  # for populating select options. A blank query returns all of them by title.
+  # Results are not limited (beyond Solr's row cap), so that every match can be chosen (issue #1145).
   class CollectionList
     include Search::Fields
 
-    LIMIT = 25
+    ROWS = 10_000
 
     QUERY_FIELDS = %w[
       main_title_text_anchored_im^100
@@ -45,7 +46,7 @@ module Searchers
       request = {
         fq: ["#{OBJECT_TYPES}:collection", apo_filter, permission_filter].compact,
         fl: [ID, TITLE],
-        rows: LIMIT
+        rows: ROWS
       }
       return request.merge(q: '*:*', sort: Search::SortOptions::TITLE.sort_value) if query.blank?
 

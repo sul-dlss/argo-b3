@@ -83,10 +83,10 @@ RSpec.describe 'Edit a collection' do
 
     click_button 'Next'
     expect(page).to have_css('#rights-tab.active')
-    expect(page).to have_select('APO', selected: 'My APO')
+    expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: 'My APO')
     expect(page).to have_field('Copyright', with: 'My copyright.')
 
-    select 'Another APO', from: 'APO'
+    select_searchable_option('Another APO', from: 'APO')
     # Selecting an APO only shows its defaults.
     expect(page).to have_css('#collection_copyright_help', text: 'APO default = Other APO copyright.')
     expect(page).to have_field('Copyright', with: 'My copyright.')

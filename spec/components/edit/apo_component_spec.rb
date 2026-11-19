@@ -12,6 +12,7 @@ RSpec.describe Edit::ApoComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_select('APO', selected: 'APO One', options: ['APO One', 'APO Two'])
+    expect(page).to have_css('select[data-controller="searchable-select"][aria-required="true"]')
     expect(page).to have_no_button('Apply APO defaults')
   end
 
@@ -21,7 +22,8 @@ RSpec.describe Edit::ApoComponent, type: :component do
     it 'renders the targets that the apo-defaults Stimulus controller expects' do
       render_inline(component)
 
-      expect(page).to have_css('select[data-apo-defaults-target="apo"][data-action="apo-defaults#apply"]')
+      expect(page).to have_css('select[data-controller="searchable-select"][data-apo-defaults-target="apo"]' \
+                               '[data-action="apo-defaults#apply"]')
       expect(page).to have_css('option[value="druid:bc123df4567"]' \
                                '[data-apo-defaults-url="/apo_defaults/druid:bc123df4567"]')
       expect(page).to have_css('option[value="druid:xz987wv6543"]' \
@@ -38,7 +40,8 @@ RSpec.describe Edit::ApoComponent, type: :component do
 
       expect(page).to have_select('APO', selected: 'APO One', options: ['APO One', 'APO Two'])
       expect(page).to have_css('select[aria-required="true"]')
-      expect(page).to have_css('select[data-apo-defaults-target="apo"][data-action="apo-defaults#refresh"]')
+      expect(page).to have_css('select[data-controller="searchable-select"][data-apo-defaults-target="apo"]' \
+                               '[data-action="apo-defaults#refresh"]')
       expect(page).to have_css('option[value="druid:bc123df4567"]' \
                                '[data-apo-defaults-url="/apo_defaults/druid:bc123df4567"]')
       expect(page).to have_button('Apply APO defaults', type: 'button')

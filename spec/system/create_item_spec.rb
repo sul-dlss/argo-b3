@@ -63,7 +63,7 @@ RSpec.describe 'Create an item' do
 
       click_button 'Next'
       expect(page).to have_css('#rights-tab.active')
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       check 'Only view collections in selected APO'
       collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
@@ -173,7 +173,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       # Leaving Use and reproduction, Copyright, and License blank.
 
       find_by_id('deposit-tab').click
@@ -201,7 +201,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -225,7 +225,7 @@ RSpec.describe 'Create an item' do
       fill_in 'FOLIO Instance HRID', with: 'in11403803'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -251,7 +251,7 @@ RSpec.describe 'Create an item' do
       attach_file 'Upload a CSV file', file_fixture('item_description.csv')
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -275,7 +275,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       select 'Stanford', from: 'View access'
       select 'Stanford', from: 'Download access'
 
@@ -301,7 +301,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       select 'Location Based', from: 'View access'
       select 'Special collections', from: 'Location'
 
@@ -327,7 +327,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       choose 'With embargo', allow_label_click: true
 
       fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
@@ -362,7 +362,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       # Leaving the blank tag row empty.
@@ -386,7 +386,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
@@ -419,7 +419,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in_tag 'item[project_tags_attributes][0][tag]', with: 'Project : Argo'
@@ -444,7 +444,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
@@ -482,7 +482,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo"
@@ -515,7 +515,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       select_tag_suggestion('Remediated By : 5.0.0', query: 'remed', field_name: 'item[other_tags_attributes][0][tag]')
@@ -568,7 +568,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register and add files')

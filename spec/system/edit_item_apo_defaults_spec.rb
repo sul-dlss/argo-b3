@@ -63,7 +63,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       visit_rights_tab
 
       # The item's rights are kept when the form is shown.
-      expect(page).to have_select('APO', selected: apo_title)
+      expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: apo_title)
       expect(page).to have_css('#item_copyright_help', text: 'APO default = Copyright © Stanford University.')
       expect(page).to have_field('Copyright', with: 'My copyright.')
       expect(page).to have_field('Use and reproduction', with: 'My use and reproduction statement.')
@@ -95,7 +95,7 @@ RSpec.describe 'Apply APO defaults when editing an item' do
       visit_rights_tab
       expect(page).to have_css('#item_copyright_help', text: 'APO default = Copyright © Stanford University.')
 
-      select other_apo_title, from: 'APO'
+      select_searchable_option(other_apo_title, from: 'APO')
 
       expect(page).to have_css('#item_copyright_help', text: 'APO default = none')
       expect(page).to have_css('#item_license_help', text: 'APO default = none')
