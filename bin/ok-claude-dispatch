@@ -3,6 +3,7 @@
 # .github/workflows/ok-claude-dispatch.yml.
 #
 # Usage:
+#   bin/ok-claude-dispatch -h | --help            print the usage line
 #   bin/ok-claude-dispatch sweep                  claim waiting items and fire a worker for each, up to the cap
 #   bin/ok-claude-dispatch stale                  comment on items that have been "on it" for over a day
 #   bin/ok-claude-dispatch review-status <issue>  move an issue to In review on the project board
@@ -249,7 +250,10 @@ Couldn't attach the screencast files from \`$media\` to this PR; they're still o
   fi
 }
 
+usage="Usage: $0 sweep | stale | review-status <issue number> | attach-media <pr number>"
+
 case "${1:-}" in
+  -h | --help) echo "$usage" ;;
   sweep) sweep ;;
   attach-media)
     [[ -n "${2:-}" ]] || { echo "Usage: $0 attach-media <pr number>" >&2; exit 2; }
@@ -261,7 +265,7 @@ case "${1:-}" in
     set_status "$2" 'In review'
     ;;
   *)
-    echo "Usage: $0 sweep | stale | review-status <issue number> | attach-media <pr number>" >&2
+    echo "$usage" >&2
     exit 2
     ;;
 esac
