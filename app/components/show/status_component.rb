@@ -3,15 +3,17 @@
 module Show
   # Component for rendering the deposit status box on the show page.
   class StatusComponent < ApplicationComponent
+    # @param deposit_form [DepositDraftForm] the form for depositing a Draft
     # @param unsaved_content_changes [Boolean] true if the object's mutable Content has unsaved changes
-    def initialize(object_status_presenter:, solr_doc:, unsaved_content_changes: false)
+    def initialize(object_status_presenter:, solr_doc:, deposit_form:, unsaved_content_changes: false)
       @object_status_presenter = object_status_presenter
       @solr_doc = solr_doc
+      @deposit_form = deposit_form
       @unsaved_content_changes = unsaved_content_changes
       super()
     end
 
-    attr_reader :object_status_presenter, :solr_doc, :unsaved_content_changes
+    attr_reader :object_status_presenter, :solr_doc, :deposit_form, :unsaved_content_changes
 
     delegate :status, :workflow_error_messages, :druid, :version_editable?, to: :object_status_presenter
     delegate :agreement?, :collection?, :admin_policy?, :object_type_with_content?,
@@ -57,6 +59,10 @@ module Show
 
       # Items and Virtual Objects, which are edited as Items.
       edit_item_path(druid)
+    end
+
+    def deposit_dropdown
+      Show::DepositDropdownComponent.new(deposit_form:, druid:, disabled: !can_deposit?)
     end
 
     def manage_files_button

@@ -3,7 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Show::StatusComponent, type: :component do
-  subject(:component) { described_class.new(object_status_presenter:, solr_doc:, unsaved_content_changes:) }
+  subject(:component) do
+    described_class.new(object_status_presenter:, solr_doc:, deposit_form:, unsaved_content_changes:)
+  end
+
+  let(:deposit_form) { DepositDraftForm.new(lock: 'abc123', version_description: 'Fixed the title') }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(solr_doc:, version_service:, content:) }
   let(:solr_doc) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }
@@ -30,7 +34,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2', text: 'Registered')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
-      expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
+      expect(page).to have_button('Deposit', class: %w[dropdown-toggle disabled], disabled: true)
     end
   end
 
@@ -43,7 +47,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       expect(page).to have_css('h2', text: 'Deposited, in draft')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
-      expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
+      expect(page).to have_button('Deposit', class: %w[dropdown-toggle disabled], disabled: true)
     end
   end
 
@@ -235,7 +239,7 @@ RSpec.describe Show::StatusComponent, type: :component do
 
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit item')
       expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
-      expect(page).to have_button('Deposit', disabled: true)
+      expect(page).to have_button('Deposit', class: %w[dropdown-toggle disabled], disabled: true)
     end
 
     context 'when the user can edit' do
@@ -252,7 +256,7 @@ RSpec.describe Show::StatusComponent, type: :component do
 
         expect(page).to have_link('Edit item', href: "/items/#{druid}/edit")
         expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
-        expect(page).to have_button('Deposit', disabled: false)
+        expect(page).to have_button('Deposit', class: 'dropdown-toggle', disabled: false)
       end
     end
 
@@ -269,7 +273,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       it 'renders a disabled deposit button with a note' do
         render_inline(component)
 
-        expect(page).to have_button('Deposit', disabled: true)
+        expect(page).to have_button('Deposit', class: %w[dropdown-toggle disabled], disabled: true)
         expect(page).to have_text('Files have unsaved changes.')
       end
     end
@@ -287,8 +291,9 @@ RSpec.describe Show::StatusComponent, type: :component do
     it 'renders an enabled deposit button' do
       render_inline(component)
 
-      expect(page).to have_css("form[action='/objects/#{druid}/deposit'][method='post'] button", text: 'Deposit')
-      expect(page).to have_button('Deposit', disabled: false)
+      expect(page).to have_button('Deposit', class: 'dropdown-toggle', disabled: false)
+      expect(page).to have_css("form[action='/objects/#{druid}/deposit'][method='post'] button[type='submit']",
+                               text: 'Deposit')
       expect(page).to have_no_text('Files have unsaved changes.')
     end
 
@@ -298,7 +303,7 @@ RSpec.describe Show::StatusComponent, type: :component do
       it 'renders a disabled deposit button with a note' do
         render_inline(component)
 
-        expect(page).to have_button('Deposit', class: 'disabled', disabled: true)
+        expect(page).to have_button('Deposit', class: %w[dropdown-toggle disabled], disabled: true)
         expect(page).to have_text('Files have unsaved changes. Deposit from Manage files.')
       end
     end

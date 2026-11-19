@@ -105,7 +105,8 @@
       <%= render Show::BoxRowComponent.new(classes: 'px-xl-5 mt-4 mb-5') do %>
         <div class="show-box">
           <%= render Show::StatusComponent.new(object_status_presenter: @object_status_presenter, solr_doc: @solr_doc,
-                                               unsaved_content_changes: @unsaved_content_changes) %>
+                                               unsaved_content_changes: @unsaved_content_changes,
+                                               deposit_form: @deposit_form) %>
         </div>
         <% if @solr_doc.releasable_type? %>
           <div class="show-box">
