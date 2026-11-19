@@ -35,11 +35,14 @@ module Edit
       @options.map { |title, druid| [title, druid, { data: { apo_defaults_url: helpers.apo_default_path(druid) } }] }
     end
 
+    # The select is searchable, since a user may be able to choose from many APOs (DESIGN_STANDARDS.md FORM-12).
     # With the apply defaults button, selecting an APO only shows its defaults, without applying them.
     def input_data
-      return {} unless @apo_defaults
+      data = { controller: 'searchable-select' }
+      return data unless @apo_defaults
 
-      { apo_defaults_target: 'apo', action: apply_defaults_button? ? 'apo-defaults#refresh' : 'apo-defaults#apply' }
+      data.merge(apo_defaults_target: 'apo',
+                 action: apply_defaults_button? ? 'apo-defaults#refresh' : 'apo-defaults#apply')
     end
 
     def input_aria

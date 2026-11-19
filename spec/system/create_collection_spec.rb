@@ -59,7 +59,7 @@ RSpec.describe 'Create a collection' do
 
     click_button 'Next'
     expect(page).to have_css('#rights-tab.active')
-    select 'My APO', from: 'APO'
+    select_searchable_option('My APO', from: 'APO')
     select 'dark', from: 'View access'
 
     # The APO defaults are applied to the rights fields.
