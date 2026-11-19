@@ -137,6 +137,21 @@ RSpec.describe CocinaSupport do
     end
   end
 
+  describe '.citation_only?' do
+    it 'is true for a citation-only object' do
+      expect(described_class.citation_only?(build(:dro).new(access: { view: 'citation-only', download: 'none' })))
+        .to be true
+    end
+
+    it 'is false for an object that is not citation-only' do
+      expect(described_class.citation_only?(build(:dro).new(access: { view: 'world', download: 'world' }))).to be false
+    end
+
+    it 'is false for an APO' do
+      expect(described_class.citation_only?(build(:admin_policy))).to be false
+    end
+  end
+
   describe '.title' do
     let(:dro) { build(:dro, title: 'My title') }
 

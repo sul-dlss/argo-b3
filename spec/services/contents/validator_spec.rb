@@ -192,6 +192,14 @@ RSpec.describe Contents::Validator do
         expect(result.warnings).not_to include(dark_published_warning)
       end
     end
+
+    context 'when citation-only' do
+      let(:access) { { view: 'citation-only', download: 'none' } }
+
+      it 'has no warning, since the files of a citation-only object are expected to be dark' do
+        expect(result.warnings).not_to include(dark_published_warning)
+      end
+    end
   end
 
   context 'when dark' do
