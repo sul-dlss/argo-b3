@@ -88,6 +88,14 @@ class CocinaSupport
     cocina_object.access.view == 'dark'
   end
 
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [Boolean] true if the object is citation-only (APOs have no access, so are never citation-only)
+  def self.citation_only?(cocina_object)
+    return false if cocina_object.admin_policy?
+
+    cocina_object.access.view == 'citation-only'
+  end
+
   # Matches the display title DSA indexes (Search::Fields::TITLE).
   # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
   # @return [String] the display title
