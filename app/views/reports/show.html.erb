@@ -7,7 +7,7 @@
           label: 'Select source of items for report',
           radio_action: 'report#update',
           druids_radio_data: { report_target: 'sourceRadio' },
-          druid_list_data: { report_target: 'druidListInput', action: 'input->report#update' }
+          druid_list_data: { report_target: 'druidListInput', action: 'input->report#updateSubmit change->report#update' }
         ) %>
 
     <fieldset class="mt-4" data-controller="checkbox-select">
@@ -45,6 +45,11 @@
     <% end %>
   <% end %>
 
+  <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new(classes: 'my-4') %>
+
+  <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, variant: :h3, text: 'Preview', classes: 'mt-4') %>
+  <p>The first <%= ReportsController::PREVIEW_ROWS %> rows of the report, updated when you change the source or fields.</p>
+  <div class="visually-hidden" role="status" data-report-target="status"></div>
   <%= turbo_frame_tag 'report-preview', data: { report_target: 'preview' } %>
   <template data-report-target="loadingTemplate">
     <%= render SdrViewComponents::Elements::SpinnerComponent.new(message: 'Loading preview...') %>

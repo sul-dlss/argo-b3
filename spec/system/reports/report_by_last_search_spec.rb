@@ -38,6 +38,8 @@ RSpec.describe 'Report by last search', :solr do
       expect(page).to have_css('th', text: 'Title')
       expect(page).to have_css('tbody tr', count: 3)
     end
+    # ...without announcing it.
+    expect(page).to have_no_css('[role="status"]', text: 'Preview updated.', visible: :all)
 
     choose 'From druid list'
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: false)

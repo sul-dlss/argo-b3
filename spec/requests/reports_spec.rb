@@ -8,7 +8,7 @@ RSpec.describe 'Reports' do
   end
 
   describe 'show' do
-    it 'renders one h1 and a level-2 heading for each field section' do
+    it 'renders one h1 and a level-2 heading for each field section and the preview' do
       get report_path
 
       expect(response).to have_http_status(:ok)
@@ -17,7 +17,7 @@ RSpec.describe 'Reports' do
       expect(page).to have_css('h1', text: 'Druid report')
       expect(page).to have_title('Druid report | Argo B3', exact: true)
       expect(page.all('h2').map { |heading| heading.text.strip })
-        .to eq(['Frequently used', 'Citation', 'History', 'Identifiers', 'Content'])
+        .to eq(['Frequently used', 'Citation', 'History', 'Identifiers', 'Content', 'Preview'])
     end
 
     it 'renders the source of items chooser' do
