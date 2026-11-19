@@ -56,6 +56,10 @@
             <% tab_list.with_tab(id: export_tab_id(export), pane_id: export_pane_id(export), label: export.label,
                                  active: export_tab_id(export) == active_tab_id) %>
           <% end %>
+          <% if success_lines.present? %>
+            <% tab_list.with_tab(id: successes_tab_id, pane_id: successes_pane_id, label: 'Successes',
+                                 active: successes_tab_id == active_tab_id) %>
+          <% end %>
           <% if error_lines.present? %>
             <% tab_list.with_tab(id: errors_tab_id, pane_id: errors_pane_id, label: 'Errors',
                                  active: errors_tab_id == active_tab_id) %>
@@ -73,6 +77,12 @@
                   <% table.with_row(values: export_row_values(row)) %>
                 <% end %>
               <% end %>
+            <% end %>
+          <% end %>
+
+          <% if success_lines.present? %>
+            <%= tab_list.with_pane(id: successes_pane_id, tab_id: successes_tab_id, active: successes_tab_id == active_tab_id) do %>
+              <pre class="mb-0"><%= success_lines.join("\n") %></pre>
             <% end %>
           <% end %>
 
