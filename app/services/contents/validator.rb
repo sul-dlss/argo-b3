@@ -57,8 +57,9 @@ module Contents
     attr_reader :content, :cocina_object, :content_type, :saved_access
 
     # The agreement and dark files validators already report published files as errors.
+    # A citation-only object's files are expected to be dark, since a file cannot be citation-only.
     def dark_published_files_warnings
-      return [] if content_type == Cocina::Models::ObjectType.agreement || validate_dark_files?
+      return [] if content_type == Cocina::Models::ObjectType.agreement || validate_dark_files? || citation_only?
 
       Contents::Validators::DarkPublishedFiles.call(content:, dark: dark?).warnings
     end
@@ -83,6 +84,10 @@ module Contents
     # its files' access.
     def validate_dark_files?
       [cocina_object.access.view, saved_access.view].all?('dark')
+    end
+
+    def citation_only?
+      cocina_object.access.view == 'citation-only'
     end
 
     # Validates based on the access that the files get from the object.
