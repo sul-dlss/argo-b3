@@ -58,7 +58,7 @@ Configuration for the mattpocock-skills plugin, kept here rather than in `docs/a
 | `wontfix` | `ok claude : human please` (recommend; don't close) |
 
 ## References
-For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
+For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from GitHub.
 
 - Voids (Repository: https://github.com/sul-dlss/voids) - Active Record-like base for the form objects and models. It can usually be found locally for reading at `../voids`.
 - Cocina Models (Repository: https://github.com/sul-dlss/cocina-models, Namespace: `Cocina::Models`) - Ruby implementation of the SDR data model for DROs (digital repository objects), Collections, and Admin Policies. It can usually be found locally for reading at `../cocina-models`.
