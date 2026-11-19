@@ -80,11 +80,23 @@ RSpec.describe 'Reports' do
   end
 
   describe 'preview' do
-    context 'when the last search cookie has an attribute the search form no longer has' do
-      let(:csv_string) { +"druid_bare_ssi\nbc123df4567\n" }
+    let(:csv_string) { +"druid_bare_ssi\nbc123df4567\n" }
 
+    before do
+      allow(Search::SolrService).to receive(:post).and_return(csv_string)
+    end
+
+    it 'limits the report to 5 rows' do
+      post preview_report_path,
+           params: { report: { source: 'druids', druid_list: 'bc123df4567', fields: ['druid_bare_ssi'] } }
+
+      expect(response).to have_http_status(:ok)
+      expect(Capybara.string(response.body)).to have_css('table#preview-table td', text: 'bc123df4567')
+      expect(Search::SolrService).to have_received(:post).with(request: hash_including(rows: 5))
+    end
+
+    context 'when the last search cookie has an attribute the search form no longer has' do
       before do
-        allow(Search::SolrService).to receive(:post).and_return(csv_string)
         cookies[:last_search] = Rails.application
                                      .message_verifier(Rails.application.config.action_dispatch.signed_cookie_salt)
                                      .generate({ form: { 'query' => 'cats', 'removed_attribute' => 'x' },
@@ -93,7 +105,7 @@ RSpec.describe 'Reports' do
 
       it 'generates the report from the remaining attributes' do
         post preview_report_path,
-             params: { report: { source: 'results', fields: ['druid_bare_ssi'] }, commit: 'Preview' }
+             params: { report: { source: 'results', fields: ['druid_bare_ssi'] } }
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('bc123df4567')
@@ -101,6 +113,20 @@ RSpec.describe 'Reports' do
           expect(args[:request].with_indifferent_access['q']).to eq('cats')
         end
       end
+    end
+  end
+
+  describe 'download' do
+    before do
+      allow(Search::SolrService).to receive(:stream)
+    end
+
+    it 'does not limit the report to the preview rows' do
+      post download_report_path,
+           params: { report: { source: 'druids', druid_list: 'bc123df4567', fields: ['druid_bare_ssi'] } }
+
+      expect(Search::SolrService).to have_received(:stream)
+        .with(hash_including(request: hash_including(rows: 10_000_000)))
     end
   end
 end

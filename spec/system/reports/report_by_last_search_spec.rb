@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Report by druids', :solr do
+RSpec.describe 'Report by last search', :solr do
   let(:druid) { 'druid:hc000wh0120' }
 
-  let(:headers) { [Reports::Fields::DRUID.label, Reports::Fields::PURL.label] }
+  let(:headers) { %w[Druid PURL] }
 
   before do
     create(:solr_item, druid:)
@@ -31,44 +31,59 @@ RSpec.describe 'Report by druids', :solr do
 
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: true, visible: :hidden)
     expect(page).to have_button('Download', disabled: false)
-    expect(page).to have_button('Preview', disabled: false)
+    expect(page).to have_no_button('Preview')
+
+    # The preview of the default fields is shown on page load.
+    within 'table#preview-table' do
+      expect(page).to have_css('th', text: 'Title')
+      expect(page).to have_css('tbody tr', count: 3)
+    end
 
     choose 'From druid list'
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: false)
     expect(page).to have_button('Download', disabled: true)
-    expect(page).to have_button('Preview', disabled: true)
+    expect(page).to have_no_table('preview-table')
 
     choose 'From last search'
     expect(page).to have_field('Enter druid list', type: 'textarea', disabled: true, visible: :hidden)
     expect(page).to have_button('Download', disabled: false)
-    expect(page).to have_button('Preview', disabled: false)
+    expect(page).to have_css('table#preview-table tbody tr', count: 3)
 
     # Some checkboxes are selected
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: true)
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: false)
 
-    click_button 'Select all'
-    # All checkboxes are selected
-    expect(page).to have_no_field('report[fields][]', type: 'checkbox', checked: false)
-    expect(page).to have_field('report[fields][]', type: 'checkbox', checked: true)
+    # Select all sends one preview request, however many checkboxes it changes.
+    preview_count = count_preview_requests do
+      click_button 'Select all'
+      # All checkboxes are selected
+      expect(page).to have_no_field('report[fields][]', type: 'checkbox', checked: false)
+      expect(page).to have_field('report[fields][]', type: 'checkbox', checked: true)
+      expect(page).to have_css('table#preview-table th', text: 'DOI')
+    end
+    expect(preview_count).to eq(1)
 
     click_button 'Deselect all'
     expect(page).to have_no_field('report[fields][]', type: 'checkbox', checked: true)
     expect(page).to have_field('report[fields][]', type: 'checkbox', checked: false)
     expect(page).to have_button('Download', disabled: true)
-    expect(page).to have_button('Preview', disabled: true)
+    expect(page).to have_no_table('preview-table')
 
-    check 'Druid'
-    check 'PURL'
+    # A burst of changes sends one preview request, which matches the final fields.
+    # Fields are found first so the clicks come within the debounce of each other.
+    druid_field, title_field, purl_field = %w[Druid Title PURL].map { |label| find_field(label) }
+    preview_count = count_preview_requests do
+      [druid_field, title_field, purl_field, title_field].each(&:click)
 
-    click_button 'Preview'
-
-    within 'table#preview-table' do
-      headers.each do |header|
-        expect(page).to have_css('th', text: header)
+      within 'table#preview-table' do
+        expect(page).to have_css('th', count: 2)
+        headers.each do |header|
+          expect(page).to have_css('th', text: header)
+        end
+        expect(page).to have_css('tbody tr', count: 3)
       end
-      expect(page).to have_css('tbody tr', count: 3)
     end
+    expect(preview_count).to eq(1)
 
     report_csv = with_download('report.csv') do
       click_button 'Download'
@@ -82,5 +97,15 @@ RSpec.describe 'Report by druids', :solr do
         'PURL' => "https://purl.stanford.edu/#{DruidSupport.bare_druid_from(druid)}"
       }
     )
+  end
+
+  # @return [Integer] the number of preview requests started while the block runs
+  def count_preview_requests(&)
+    count = 0
+    callback = lambda do |event|
+      count += 1 if event.payload[:controller] == 'ReportsController' && event.payload[:action] == 'preview'
+    end
+    ActiveSupport::Notifications.subscribed(callback, 'start_processing.action_controller', &)
+    count
   end
 end

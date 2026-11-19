@@ -46,7 +46,7 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
 
   context 'when a label and Stimulus options are provided' do
     let(:component) do
-      described_class.new(form:, label: 'Select source of items for report', radio_action: 'report#updateSubmit',
+      described_class.new(form:, label: 'Select source of items for report', radio_action: 'report#update',
                           druids_radio_data: { report_target: 'sourceRadio' },
                           druid_list_data: { report_target: 'druidListInput' })
     end
@@ -55,9 +55,9 @@ RSpec.describe BulkActions::SelectSourceComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('fieldset legend', exact_text: 'Select source of items for report', normalize_ws: true)
-      expect(page).to have_css('input[value="results"][data-action="radio#toggle report#updateSubmit"]')
+      expect(page).to have_css('input[value="results"][data-action="radio#toggle report#update"]')
       expect(page).to have_css(
-        'input[value="druids"][data-action="radio#toggle report#updateSubmit"][data-report-target="sourceRadio"]'
+        'input[value="druids"][data-action="radio#toggle report#update"][data-report-target="sourceRadio"]'
       )
       expect(page).to have_css('textarea[data-report-target="druidListInput"]')
     end

@@ -1,13 +1,13 @@
 <%= page_title(t('reports.title')) %>
 
-<%= render Layout::ContainerComponent.new(heading: t('reports.title'), data: { controller: 'report' }) do %>
+<%= render Layout::ContainerComponent.new(heading: t('reports.title'), data: { controller: 'report', report_preview_url_value: preview_report_path }) do %>
   <%= form_with model: @report_form, url: download_report_path do |form| %>
     <%= render BulkActions::SelectSourceComponent.new(
           form:, search_form: @last_search_form, total_results: @total_results, example_druids: @example_druids,
           label: 'Select source of items for report',
-          radio_action: 'report#updateSubmit',
+          radio_action: 'report#update',
           druids_radio_data: { report_target: 'sourceRadio' },
-          druid_list_data: { report_target: 'druidListInput', action: 'input->report#updateSubmit' }
+          druid_list_data: { report_target: 'druidListInput', action: 'input->report#update' }
         ) %>
 
     <fieldset class="mt-4" data-controller="checkbox-select">
@@ -42,10 +42,14 @@
       <%= render SdrViewComponents::Forms::SubmitComponent.new(value: 'Download', variant: :primary, formtarget: '_blank') do %>
         <%= new_tab_label('Download') %>
       <% end %>
-      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Preview', variant: :primary, formaction: preview_report_path,
-                                                               data: { turbo_frame: 'report-preview' }) %>
     <% end %>
   <% end %>
 
-  <%= turbo_frame_tag 'report-preview' %>
+  <%= turbo_frame_tag 'report-preview', data: { report_target: 'preview' } %>
+  <template data-report-target="loadingTemplate">
+    <%= render SdrViewComponents::Elements::SpinnerComponent.new(message: 'Loading preview...') %>
+  </template>
+  <template data-report-target="errorTemplate">
+    <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, text: 'The preview could not be loaded. Change a field to try again.') %>
+  </template>
 <% end %>

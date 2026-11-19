@@ -65,6 +65,9 @@ class ReportsController < ApplicationController
     Reports::Fields::PRESERVATION_SIZE
   ].freeze
 
+  # The number of rows shown in the report preview.
+  PREVIEW_ROWS = 5
+
   def show
     @report_form = ReportForm.new(fields: FREQUENTLY_USED_FIELDS.map(&:field))
     set_from_last_search_cookie
@@ -92,7 +95,7 @@ class ReportsController < ApplicationController
   end
 
   def rows
-    params[:commit] == 'Preview' ? 5 : 10_000_000
+    action_name == 'preview' ? PREVIEW_ROWS : 10_000_000
   end
 
   def add_report_response_headers

@@ -18,23 +18,30 @@ RSpec.describe 'Report by druids', :solr do
     expect(page).to have_field('From druid list', type: 'radio', checked: true)
     expect(page).to have_button('Download (opens in new tab)', disabled: true)
     expect(page).to have_css('button[formtarget="_blank"] i.bi-box-arrow-up-right[aria-hidden="true"]')
-    expect(page).to have_button('Preview', disabled: true)
+    expect(page).to have_no_button('Preview')
+    # No preview without druids
+    expect(page).to have_no_table('preview-table')
 
     # Various separators, whitespace, and druid forms
     druids = "#{item_docs[0][Search::Fields::ID]}\n#{item_docs[1][Search::Fields::ID]} \t\t#{item_docs[2][Search::Fields::BARE_DRUID]} " # rubocop:disable Layout/LineLength
     fill_in 'Enter druid list', with: druids
 
     expect(page).to have_button('Download', disabled: false)
-    expect(page).to have_button('Preview', disabled: false)
 
-    click_button 'Preview'
-
+    # The preview refreshes without a button click.
     within 'table#preview-table' do
       ReportsController::FREQUENTLY_USED_FIELDS.each do |config|
         expect(page).to have_css('th', text: config.label)
       end
       expect(page).to have_css('tbody tr', count: 3)
     end
+
+    # Clearing the druid list clears the preview.
+    fill_in 'Enter druid list', with: ''
+    expect(page).to have_no_table('preview-table')
+
+    fill_in 'Enter druid list', with: druids
+    expect(page).to have_css('table#preview-table tbody tr', count: 3)
 
     report_csv = with_download('report.csv') do
       click_button 'Download'
