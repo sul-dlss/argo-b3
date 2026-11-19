@@ -406,5 +406,29 @@ A bulk action is defined by its configuration in `services/bulk_actions.rb`. Eac
 4. If the form has fields beyond the druid list (or CSV upload), add a `views/bulk_actions/<bulk action>/new.html.erb` view; otherwise the default view is used. Add a controller (a subclass of `BulkActions::FormsController`, named by the configuration's `controller`) only when rendering the form needs something the form can't provide, such as options limited to what the user may edit.
 5. The bulk action forms request spec covers rendering every form and submitting those that use `BulkActions::BasicForm`. For other forms, add a request spec, or a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
+## Agent workflow
+
+Infrastructure Team members can hand an issue to Claude by labelling it. Each request runs in its own Claude Code cloud session, which can run the app, linters, and specs.
+
+| Label | Added by | Meaning |
+| --- | --- | --- |
+| `ok claude : triage` | a person | Decide whether an agent can implement the issue (the `triage` skill). |
+| `ok claude : implement` | a person, or triage | Implement the issue and open a PR (the `implement` skill). |
+| `ok claude : address review` | a person, on a PR | Address the PR's unresolved review comments. |
+| `ok claude : on it` | the dispatcher | A session is working on it. |
+| `ok claude : ready for dev review` | a session | A PR is ready for review (on the issue and the PR). |
+| `ok claude : human please` | a session | A person is needed; the session's comment says why, with questions. |
+
+Triage that finds the issue implementable adds `ok claude : implement`, which starts implementation. To send an item back after a `human please`, answer in a comment and add the triage or implement label again.
+
+There are two parts:
+
+- **Dispatcher**: a GitHub Actions workflow (`ok-claude-dispatch.yml`, running `bin/ok-claude-dispatch`). When a request label is added, or a session finishes, it claims waiting items (replacing the request label with `on it`) and starts a worker session for each, oldest first, up to three at a time; an hourly run picks up anything left waiting. It ignores requests from people outside the Infrastructure Team, and comments on items that have been `on it` for over a day. It also moves implemented issues on the Argo Work Cycle board: In progress when claimed, In review when the PR is ready. Cloud sessions can't upload PR attachments, so when a PR is ready it also uploads the screencast the worker pushed to a `claude/pr-media/<branch>` branch, then deletes that branch.
+- **Worker**: a Claude Code scheduled task, started through its API trigger, that runs the `ok-claude` skill (`.claude/skills/ok-claude`) in the cloud environment set up by `bin/setup-claude-cloud-env`. It follows the `triage` or `implement` skill unattended, opens PRs as ready for review, and addresses review comments while its session lasts; after that, use `ok claude : address review`.
+
+The worker task belongs to one person's claude.ai account: sessions use that account's usage, and comments, commits, and PRs appear under that person's GitHub user. The dispatcher's secrets are the task's trigger URL and token, a fine-grained token that can read team membership and write organization projects, and, only if the workflow's own token can't upload attachments, a token that can.
+
+To debug, check the workflow's runs in the Actions tab, then the worker task's runs (and their logs) in Claude Code.
+
 ## Design
 Design standards (layout, components, typography, color, accessibility, copy) are in `DESIGN_STANDARDS.md`. Deliberate deviations are marked in the code with a `Design standard deviation:` comment.

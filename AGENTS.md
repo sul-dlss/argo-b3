@@ -42,6 +42,21 @@ If you notice an `argo_b3_*_spec.rb` not listed above, ask the user to update th
 
 - Before reporting work done, run `bin/rake lint` (rubocop, erb_lint, herb, JS and SCSS linters, i18n-tasks); fix offenses before committing. While iterating, `bin/rake lint:changed` lints only changed files. Both end with a summary of the offenses and `LINT OK` or `LINT FAILED: <linters>`, so `tail` the output rather than rerunning linters.
 
+## Agent skills
+
+Configuration for the mattpocock-skills plugin, kept here rather than in `docs/agents/` (rerunning `/setup-matt-pocock-skills` would recreate that directory).
+
+- **Issue tracker**: GitHub issues in sul-dlss/argo-b3. PRs are not a request surface for triage.
+- **Domain docs**: `GLOSSARY.md` (single context, no ADRs).
+- **Triage labels**: these labels also start cloud agent sessions (README "Agent workflow"). Don't add `bug` or `enhancement` labels.
+
+| Triage role | Label |
+| --- | --- |
+| `needs-triage` | `ok claude : triage` |
+| `ready-for-agent` | `ok claude : implement` |
+| `needs-info`, `ready-for-human` | `ok claude : human please` |
+| `wontfix` | `ok claude : human please` (recommend; don't close) |
+
 ## References
 For gems, read the source at the indicated path rather than guessing interfaces. If this local source isn't available, read from Github.
 

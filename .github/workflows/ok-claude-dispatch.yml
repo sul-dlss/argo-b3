@@ -1,0 +1,65 @@
+# Dispatcher for the agent workflow (README "Agent workflow"): starts a cloud worker session for
+# each item labelled for an agent, and moves issues on the project board.
+name: ok claude dispatch
+
+on:
+  issues:
+    types: [labeled, unlabeled]
+  # pull_request_target runs this workflow from main, so a PR can't change what runs with the secrets.
+  pull_request_target:
+    types: [labeled, unlabeled]
+  schedule:
+    - cron: "23 * * * *" # hourly sweep, for items left waiting
+    - cron: "47 16 * * 1-5" # daily stale check
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  review-status:
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/ok-claude-dispatch review-status "${{ github.event.issue.number }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OK_CLAUDE_GITHUB_TOKEN: ${{ secrets.OK_CLAUDE_GITHUB_TOKEN }}
+
+  # Cloud sessions can't upload PR attachments, so the worker pushes screencasts to a media branch for this job.
+  attach-media:
+    if: github.event_name == 'pull_request_target' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # deletes the media branch
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install a gh with --attach (2.99 or later)
+        run: gh pr edit --help | grep -q -- --attach || { sudo apt-get update -qq && sudo apt-get install -y -qq gh; }
+      - run: bin/ok-claude-dispatch attach-media "${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OK_CLAUDE_ATTACH_TOKEN: ${{ secrets.OK_CLAUDE_ATTACH_TOKEN }}
+
+  dispatch:
+    if: >-
+      github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'labeled' &&
+       contains(fromJSON('["ok claude : triage", "ok claude : implement", "ok claude : address review"]'), github.event.label.name)) ||
+      (github.event.action == 'unlabeled' && github.event.label.name == 'ok claude : on it')
+    runs-on: ubuntu-latest
+    # Every run sweeps all waiting items, so a run replaced while pending loses nothing.
+    concurrency: ok-claude-dispatch
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/ok-claude-dispatch "${{ github.event.schedule == '47 16 * * 1-5' && 'stale' || 'sweep' }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OK_CLAUDE_GITHUB_TOKEN: ${{ secrets.OK_CLAUDE_GITHUB_TOKEN }}
+          OK_CLAUDE_FIRE_URL: ${{ secrets.OK_CLAUDE_FIRE_URL }}
+          OK_CLAUDE_FIRE_TOKEN: ${{ secrets.OK_CLAUDE_FIRE_TOKEN }}
