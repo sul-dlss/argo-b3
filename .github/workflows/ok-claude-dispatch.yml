@@ -20,7 +20,8 @@ permissions:
 
 jobs:
   review-status:
-    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
+    if: >-
+      github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +32,8 @@ jobs:
 
   # Cloud sessions can't upload PR attachments, so the worker pushes screencasts to a media branch for this job.
   attach-media:
-    if: github.event_name == 'pull_request_target' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
+    if: >-
+      github.event_name == 'pull_request_target' && github.event.action == 'labeled' && github.event.label.name == 'ok claude : ready for dev review'
     runs-on: ubuntu-latest
     permissions:
       contents: write # deletes the media branch
