@@ -67,8 +67,10 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       visit_rights_tab
 
       apo_select = search_searchable_select('my', from: 'APO')
+      # Filtered as soon as typed (not after a delay), so that a delayed refresh can't reopen the dropdown after
+      # an option that was already shown is chosen, taking the focus from the next field.
+      expect(apo_select).to have_no_css('.ts-dropdown .option', exact_text: other_apo_title, wait: 0)
       expect(apo_select).to have_css('.ts-dropdown .option', exact_text: apo_title)
-      expect(apo_select).to have_no_css('.ts-dropdown .option', exact_text: other_apo_title)
       apo_select.find('.ts-dropdown .option', exact_text: apo_title).click
 
       expect(apo_select).to have_css('.ts-control .item', exact_text: apo_title)

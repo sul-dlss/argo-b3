@@ -16,6 +16,10 @@ export default class extends Controller {
       create: false,
       // Otherwise the dropdown stays open after choosing, and the next click on the field closes it.
       closeAfterSelect: true,
+      // Filter as soon as the user types, rather than after tom-select's default 300 ms delay. Otherwise choosing an
+      // option already shown (within the delay) leaves a refresh pending, which reopens the dropdown and takes the
+      // focus, e.g., from the collection field the user clicks next.
+      refreshThrottle: 0,
       // Show every matching option rather than tom-select's default of 50.
       maxOptions: null
     })
