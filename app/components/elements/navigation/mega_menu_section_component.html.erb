@@ -1,0 +1,12 @@
+<div class="col">
+  <%= tag.div class: class_names('mega-menu-section', 'mega-menu-section-featured' => featured?) do %>
+    <%# Design standard deviation: HEAD-2. Like the other header dropdowns' section headers, the label is a role="heading"
+        span (DropdownHeaderComponent): heading elements in the header would come before the page's h1 (HEAD-1). %>
+    <%= render SdrViewComponents::Elements::Navigation::DropdownHeaderComponent.new(text: label, classes: 'mega-menu-heading h4 text-body text-uppercase') %>
+    <ul class="list-unstyled mb-0">
+      <% links.each do |link| %>
+        <li><%= link %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
