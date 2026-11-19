@@ -155,8 +155,10 @@ RSpec.describe 'Show bulk actions history' do
     click_button 'Filter'
     expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
 
-    click_button 'Bulk actions'
-    click_link 'Recent bulk actions'
+    within('nav', text: 'Workflow status') do
+      click_button 'Bulk actions'
+      click_link 'Recent bulk actions'
+    end
 
     expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
     expect(page).to have_css("tr##{dom_id(reindex_bulk_action, 'row')}")

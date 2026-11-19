@@ -11,6 +11,8 @@ const PRESERVED_CLASSES = ['nav-link', 'tab-pane', 'toggle-row-button', 'toggle-
 // state that must survive the refresh (e.g., the active tab or expanded/collapsed rows) is only kept if
 // the element's attributes are skipped by the turbo:before-morph-attribute hook (preserveTab): either add
 // the element's class to PRESERVED_CLASSES or extend that hook.
+// Dropdown toggles (e.g., in the header) are .nav-link elements, so their attributes are always kept here; their
+// menus are kept while open by the app-wide dropdown_morph hook, so a toggle and its menu stay in step.
 export default class extends Controller {
   static values = {
     interval: Number
