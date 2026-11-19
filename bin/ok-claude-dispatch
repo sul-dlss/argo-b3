@@ -11,7 +11,7 @@
 # Environment:
 #   GH_TOKEN                labels and comments; in Actions, GITHUB_TOKEN, whose changes don't retrigger workflows
 #   OK_CLAUDE_GITHUB_TOKEN  team membership and the project board (defaults to gh's own token)
-#   OK_CLAUDE_ATTACH_TOKEN  uploading attachments, if GH_TOKEN can't (defaults to GH_TOKEN)
+#   OK_CLAUDE_ATTACH_TOKEN  uploading attachments (GH_TOKEN is refused): Contents and Pull requests read/write
 #   OK_CLAUDE_FIRE_URL      the worker scheduled task's /fire URL
 #   OK_CLAUDE_FIRE_TOKEN    the worker scheduled task's API trigger token
 #   DRY_RUN=1               print writes and fires instead of making them
@@ -235,9 +235,13 @@ attach_media() {
     return 0
   fi
   gh api "repos/$repo/pulls/$pr" --jq .body >"$dir/body.md"
+  # A plain link to a media file would become a link, not an inline image or video.
+  for name in "${files[@]}"; do
+    MEDIA_NAME="$name" perl -pi -e 's/(?<!!)(\[[^\]]*\]\(\.\/\Q$ENV{MEDIA_NAME}\E\))/!$1/g' "$dir/body.md"
+  done
 
   echo "#$pr: attaching ${files[*]}"
-  if (cd "$dir" && GH_TOKEN="${OK_CLAUDE_ATTACH_TOKEN:-${GH_TOKEN:-}}" \
+  if (cd "$dir" && GH_TOKEN="${OK_CLAUDE_ATTACH_TOKEN:-}" \
     write gh pr edit "$pr" -R "$repo" --body-file body.md "${attach[@]}") &&
     { [[ -n "${DRY_RUN:-}" ]] || gh api "repos/$repo/pulls/$pr" --jq .body | grep -q user-attachments; }; then
     write gh api --silent -X DELETE "repos/$repo/git/refs/heads/$media"
