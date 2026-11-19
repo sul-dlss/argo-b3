@@ -10,6 +10,7 @@ class NewCollectionForm < CocinaModels::Collection
   include TitleFormConcern
   include TagsFormConcern
   include CatalogRecordIdFormConcern
+  include DescriptionCsvFormConcern
   include DescriptionChoiceFormConcern
   include SelectableApoFormConcern
 
@@ -24,8 +25,6 @@ class NewCollectionForm < CocinaModels::Collection
   normalizes :abstract, with: ->(abstract) { abstract.strip }
 
   attribute :access_view, :string, default: 'world'
-  # The spreadsheet choice of the shared description choice UI is only for items.
-  validates :description_choice, inclusion: { in: [DESCRIPTION_TITLE_CHOICE, DESCRIPTION_CATALOG_ID_CHOICE] }
 
   has_one :release_tags, class_name: 'CollectionReleaseTagsForm'
 

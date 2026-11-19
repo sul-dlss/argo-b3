@@ -50,7 +50,6 @@ RSpec.describe 'Create a collection' do
     click_on 'Collection'
 
     expect(page).to have_css('h1', text: 'Register and deposit collection')
-    expect(page).to have_no_field('Upload description spreadsheet')
     expect(page).to have_field('Enter title and abstract myself', checked: true)
     fill_in 'Title', with: 'My collection'
     fill_in 'Abstract', with: 'My abstract.'
@@ -117,5 +116,45 @@ RSpec.describe 'Create a collection' do
       .with(druid:, user_name: user.sunetid, release_target: 'Earthworks', release: true, release_what: 'self',
             date: Time)
     expect(Sdr::Repository).to have_received(:accession)
+  end
+
+  it 'registers and deposits a collection with a description from a spreadsheet' do
+    visit new_collection_path
+
+    choose 'Upload description spreadsheet'
+    attach_file 'Upload a CSV file', file_fixture('item_description.csv')
+
+    find_by_id('rights-tab').click
+    select 'My APO', from: 'APO'
+
+    find_by_id('deposit-tab').click
+    click_button 'Register and deposit collection'
+
+    expect(page).to have_current_path("/objects/#{druid}")
+    expect(page).to have_toast('Collection registered and deposit started.')
+
+    expect(Sdr::Repository).to have_received(:register) do |args|
+      description = args[:request_cocina_object].description
+      expect(description.title.first.value).to eq('A spreadsheet title')
+      expect(description.note.first.value).to eq('A note')
+    end
+  end
+
+  it 'requires a description spreadsheet when uploading a description spreadsheet' do
+    visit new_collection_path
+
+    choose 'Upload description spreadsheet'
+    # Leaving the spreadsheet unattached.
+
+    find_by_id('rights-tab').click
+    select 'My APO', from: 'APO'
+
+    find_by_id('deposit-tab').click
+    click_button 'Register and deposit collection'
+
+    find_by_id('description-tab').click
+    expect(page).to have_invalid_feedback('Upload a CSV file', "can't be blank")
+
+    expect(Sdr::Repository).not_to have_received(:register)
   end
 end

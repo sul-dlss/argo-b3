@@ -42,19 +42,17 @@
     <% end %>
   <% end %>
 
-  <% if item_fields? %>
-    <% group.with_radio_button(
-         label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
-         input_value: NewItemForm::DESCRIPTION_SPREADSHEET_CHOICE,
-         input_data: { radio_target: 'radio', action: 'radio#toggle' },
-         container_classes: 'my-fieldset'
-       ) do %>
-      <%= render SdrViewComponents::Forms::FileComponent.new(form:,
-                                                             field_name: :description_csv_file,
-                                                             container_classes: 'my-field',
-                                                             label_text: t('edit.items.fields.description_csv_file.label'),
-                                                             label_hidden: true) %>
-    <% end %>
+  <% group.with_radio_button(
+       label_text: t('edit.items.fields.description_choice.spreadsheet.label'),
+       input_value: DescriptionChoiceFormConcern::DESCRIPTION_SPREADSHEET_CHOICE,
+       input_data: { radio_target: 'radio', action: 'radio#toggle' },
+       container_classes: 'my-fieldset'
+     ) do %>
+    <%= render SdrViewComponents::Forms::FileComponent.new(form:,
+                                                           field_name: :description_csv_file,
+                                                           container_classes: 'my-field',
+                                                           label_text: t('edit.items.fields.description_csv_file.label'),
+                                                           label_hidden: true) %>
   <% end %>
 
 <% end %>
