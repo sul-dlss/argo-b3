@@ -250,7 +250,7 @@ Couldn't attach the screencast files from \`$media\` to this PR; they're still o
   fi
 }
 
-usage="Usage: $0 sweep | stale | review-status <issue number> | attach-media <pr number>"
+usage="Usage: $0 [-h | --help] | sweep | stale | review-status <issue number> | attach-media <pr number>"
 
 case "${1:-}" in
   "" | -h | --help) echo "$usage" ;;
