@@ -7,12 +7,15 @@ module Edit
     # @param help_text [String, nil] help text shown with the field
     # @param disabled [Boolean] true if the version description is fixed (e.g., set automatically for initial
     #   versions), so it is neither editable nor required
-    def initialize(form:, container_classes: 'mb-3', label_classes: nil, help_text: nil, disabled: false)
+    # @param required [Boolean] true to require the field in the browser, for forms without server-side validation
+    def initialize(form:, container_classes: 'mb-3', label_classes: nil, help_text: nil, disabled: false, # rubocop:disable Metrics/ParameterLists
+                   required: false)
       @form = form
       @container_classes = container_classes
       @label_classes = label_classes
       @help_text = help_text
       @disabled = disabled
+      @required = required
       super()
     end
 
@@ -25,6 +28,7 @@ module Edit
         label_classes: @label_classes,
         label_mark_required: !@disabled,
         input_disabled: @disabled,
+        input_required: (true if @required && !@disabled),
         help_text: @help_text,
         container_classes: @container_classes
       }.compact

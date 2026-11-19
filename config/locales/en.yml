@@ -141,7 +141,6 @@ en:
         heading: "Not released"
     errors:
       deposit_failed: "Depositing failed."
-      version_description_blank: "Enter a version description, then deposit again."
       discard_failed: "Discarding the draft failed."
       goobi_redeposit_failed: "The Goobi workflow could not be started. Try again, or contact SDR support if the problem continues."
       purge_failed: "Purging failed."

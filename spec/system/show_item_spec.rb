@@ -787,7 +787,6 @@ RSpec.describe 'Show item' do
       create(:permission, :edit, workgroup: 'sdr:argo-access', target_druid: druid)
       allow(Sdr::Repository).to receive_messages(find_solr: build_solr_doc(title: original_title),
                                                  find: build_cocina_object(title: original_title))
-      allow(version_client).to receive(:update_description)
       allow(Sdr::DepositDraftService).to receive(:call)
     end
 
@@ -806,9 +805,9 @@ RSpec.describe 'Show item' do
       within('.dropdown-menu') { click_button 'Deposit' }
 
       expect(page).to have_toast('Deposit started.')
-      expect(version_client).to have_received(:update_description)
-        .with(hash_including(description: 'Fixed the title')).once
-      expect(Sdr::DepositDraftService).to have_received(:call).once
+      expect(page).to have_no_field('Version description')
+      expect(Sdr::DepositDraftService).to have_received(:call)
+        .with(hash_including(version_description: 'Fixed the title')).once
     end
   end
 

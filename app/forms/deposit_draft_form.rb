@@ -7,8 +7,8 @@ class DepositDraftForm < ApplicationForm
   # The lock of the Cocina object when the object page was loaded, submitted back with the form.
   attribute :lock, :string
 
+  # Required in the browser; a blank one keeps the open version's description (see Sdr::DepositDraftService).
   attribute :version_description, :string
-  validates :version_description, presence: true
 
   # @param lock [String] the lock of the Cocina object as the object page loaded it
   # @param version_service [Sdr::VersionService] for the object's open version
@@ -40,18 +40,12 @@ class DepositDraftForm < ApplicationForm
     lock != cocina_object.lock
   end
 
-  # Updates the open version's description if it changed, then deposits the Draft as last staged.
+  # Deposits the Draft as last staged, first updating the open version's description if it changed.
   # @param cocina_object (see .stale_warning) the current object, at the open version
-  # @param version_service [Sdr::VersionService] for the object's open version
   # @param user_name [String] the sunetid of the user depositing
-  # @raise [ActiveModel::ValidationError] if the version description is blank
   # @raise [Sdr::DepositDraftService::Error] if the Draft can't be deposited (see Sdr::DepositDraftService#call)
   # @raise [Sdr::Repository::Error] if updating the version description or starting accessioning fails
-  def deposit!(cocina_object:, version_service:, user_name:)
-    validate!
-    if version_description != version_service.version_description
-      version_service.update_description(description: version_description, user_name:)
-    end
-    Sdr::DepositDraftService.call(cocina_object:, user_name:)
+  def deposit!(cocina_object:, user_name:)
+    Sdr::DepositDraftService.call(cocina_object:, user_name:, version_description:)
   end
 end

@@ -16,6 +16,7 @@ RSpec.describe Show::DepositDropdownComponent, type: :component do
     expect(page).to have_css('button.dropdown-toggle[data-bs-toggle="dropdown"]', text: 'Deposit')
     form = page.find(".dropdown-menu form[action='/objects/#{druid}/deposit'][method='post']")
     expect(form).to have_field('Version description', with: 'Fixed the title')
+    expect(form).to have_css('input[name="deposit[version_description]"][required]')
     expect(form).to have_field('deposit[lock]', type: :hidden, with: 'abc123')
     expect(form).to have_button('Cancel', type: 'button')
     expect(form).to have_button('Deposit', type: 'submit')

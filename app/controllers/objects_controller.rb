@@ -270,12 +270,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Permission.highest_permission_type_by_workgroup(target_druid: @solr_doc.druid)
   end
 
-  def deposit_and_respond(deposit_form:, cocina_object:) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-    deposit_form.deposit!(cocina_object:, version_service: Sdr::VersionService.new(druid: druid_param),
-                          user_name: current_user.sunetid)
+  def deposit_and_respond(deposit_form:, cocina_object:) # rubocop:disable Metrics/AbcSize
+    deposit_form.deposit!(cocina_object:, user_name: current_user.sunetid)
     toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
-  rescue ActiveModel::ValidationError
-    redirect_to object_path(druid_param), flash: { danger: t('show.errors.version_description_blank') }
   rescue Sdr::DepositDraftService::ContentBusyError
     redirect_to object_path(druid_param), flash: { danger: t('show.warnings.content_busy') }
   rescue Sdr::DepositDraftService::NotDepositableError

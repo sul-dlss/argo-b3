@@ -9,21 +9,12 @@ RSpec.describe 'Deposit' do
     let(:druid) { 'druid:bc123df4567' }
     # The factory's lock is 'abc123'.
     let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
-    let(:version_client) do
-      instance_double(Dor::Services::Client::ObjectVersion, status: version_status, update_description: nil)
-    end
-    let(:version_status) do
-      instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, version_description: 'Fixed the title')
-    end
     let(:params) { { deposit: { version_description: 'Fixed the title', lock: 'abc123' } } }
 
     before do
       create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
       allow(Sdr::Repository).to receive(:find).and_return(cocina_object)
       allow(Sdr::DepositDraftService).to receive(:call)
-      allow(Dor::Services::Client).to receive(:object).with(druid)
-                                                      .and_return(instance_double(Dor::Services::Client::Object,
-                                                                                  version: version_client))
       sign_in(user)
     end
 
@@ -33,22 +24,8 @@ RSpec.describe 'Deposit' do
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:toast]).to eq('Deposit started.')
-        expect(Sdr::DepositDraftService).to have_received(:call).with(cocina_object:, user_name: user.sunetid)
-        expect(version_client).not_to have_received(:update_description)
-      end
-
-      context 'when the version description changed' do
-        let(:params) { { deposit: { version_description: 'Fixed the title and abstract', lock: 'abc123' } } }
-
-        it 'updates the version description, then deposits' do
-          post(deposit_object_path(druid), params:)
-
-          expect(response).to redirect_to(object_path(druid))
-          expect(flash[:toast]).to eq('Deposit started.')
-          expect(version_client).to have_received(:update_description)
-            .with(description: 'Fixed the title and abstract', user_name: user.sunetid)
-          expect(Sdr::DepositDraftService).to have_received(:call).with(cocina_object:, user_name: user.sunetid)
-        end
+        expect(Sdr::DepositDraftService).to have_received(:call)
+          .with(cocina_object:, user_name: user.sunetid, version_description: 'Fixed the title')
       end
 
       context 'when a Turbo request' do
@@ -72,20 +49,6 @@ RSpec.describe 'Deposit' do
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:warning]).to eq('This item was changed since you opened it. ' \
                                       'Review the current values and make your changes again.')
-        expect(version_client).not_to have_received(:update_description)
-        expect(Sdr::DepositDraftService).not_to have_received(:call)
-      end
-    end
-
-    context 'when the version description is blank' do
-      let(:params) { { deposit: { version_description: '', lock: 'abc123' } } }
-
-      it 'redirects to the object page with an error without depositing' do
-        post(deposit_object_path(druid), params:)
-
-        expect(response).to redirect_to(object_path(druid))
-        expect(flash[:danger]).to eq('Enter a version description, then deposit again.')
-        expect(version_client).not_to have_received(:update_description)
         expect(Sdr::DepositDraftService).not_to have_received(:call)
       end
     end
