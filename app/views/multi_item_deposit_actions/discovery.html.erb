@@ -81,10 +81,11 @@
              input_data: { radio_target: 'radio', action: 'radio#toggle' },
              container_classes: 'my-fieldset'
            ) do %>
-          <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:,
-                                                                      field_name: :mount_path,
-                                                                      container_classes: 'my-field',
-                                                                      label_text: t('edit.multi_item_deposits.fields.mount_path.label')) %>
+          <%= render Elements::Forms::MountPathFieldComponent.new(form:,
+                                                                  field_name: :mount_path,
+                                                                  container_classes: 'my-field',
+                                                                  label_text: t('edit.multi_item_deposits.fields.mount_path.label'),
+                                                                  input_placeholder: t('edit.multi_item_deposits.fields.mount_path.placeholder')) %>
         <% end %>
       <% end %>
     <% end %>

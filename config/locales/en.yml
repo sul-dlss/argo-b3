@@ -612,6 +612,7 @@ en:
           help_text: "Assigning a license may improve discovery of your work in web searches."
         mount_path:
           label: "Mount path"
+          placeholder: "Start typing a mount..."
         multiple_tags:
           label: 'Enter multiple tags'
           button: 'Add tags'
@@ -727,6 +728,7 @@ en:
             blank: "Create a Globus link before discovering files"
         mount_path:
           label: "Mount path"
+          placeholder: "Start typing a mount..."
         manifest_file:
           label: "Upload manifest file"
           retained: "A manifest has been uploaded. Choose a file to replace it."
