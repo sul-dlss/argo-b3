@@ -65,12 +65,14 @@ module Show
       { object_druid: druid_token, version: }
     end
 
+    # Opens in a new tab, since it shows raw JSON (LINK-2).
     def cocina_link
-      link_to(with_version_context('Cocina'), cocina_object_version_path(**path_params))
+      helpers.link_to_new_tab(with_version_context('Cocina'), cocina_object_version_path(**path_params))
     end
 
+    # Items, virtual objects, and agreements.
     def structural_csv_link
-      return unless CocinaSupport.item_or_virtual_object?(cocina_object)
+      return unless cocina_object.dro?
 
       link_to(with_version_context('Structural metadata'), structural_csv_object_version_path(**path_params),
               data: { turbo: false })
