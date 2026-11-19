@@ -109,6 +109,12 @@ module Reports
       help_text: 'For example: 42'
     )
 
+    GENRE = Config.new(
+      field: Search::Fields::GENRES,
+      label: 'Genre',
+      help_text: 'For example: Dataset'
+    )
+
     HUMAN_PRESERVED_SIZE = Config.new(
       field: Search::Fields::HUMAN_PRESERVED_SIZE,
       label: 'Preservation size',
