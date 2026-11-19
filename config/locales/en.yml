@@ -961,7 +961,10 @@ en:
   bulk_actions:
     label: 'Bulk action'
     menu: 'Bulk actions menu'
-    history: 'Bulk actions'
+    heading: 'Bulk actions'
+    tabs:
+      history: 'Recent bulk actions'
+      menu: 'Bulk actions menu'
     cancel: 'Cancel'
     cancel_confirm: 'Cancel this bulk action? Changes already made to objects will not be undone.'
     cancel_failed: 'Bulk action could not be cancelled.'

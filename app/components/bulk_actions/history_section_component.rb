@@ -26,7 +26,7 @@ module BulkActions
     end
 
     def heading
-      I18n.t('bulk_actions.history')
+      I18n.t('bulk_actions.heading')
     end
 
     private

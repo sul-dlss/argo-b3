@@ -84,6 +84,11 @@ $search-color: rgb(#{$search-color-rgb});
   }
 }
 
+// Link tabs (e.g., bulk actions) don't underline their text on hover, matching button tabs.
+.nav-underline a.nav-link:hover {
+  text-decoration: none;
+}
+
 .nav-underline .nav-link.active {
   border-bottom: 3px solid rgb(var(--stanford-archway-dark-rgb)) !important;
   color: rgb(var(--stanford-archway-dark-rgb)) !important;

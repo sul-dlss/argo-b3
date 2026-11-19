@@ -1,4 +1,5 @@
 <%= render Layout::ContainerComponent.new(heading:, data:) do %>
+  <%= render BulkActions::TabsComponent.new(active: :history) %>
 
   <%= form_with model: filter_form, url: bulk_actions_path, method: :get,
                 id: 'bulk-actions-filter', class: 'd-flex gap-3 mb-4 align-items-end' do |form| %>
