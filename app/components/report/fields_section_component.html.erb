@@ -4,7 +4,7 @@
   <% help_text_id = form.field_id(:fields, builder.value, :help) if builder.object.help_text.present? %>
   <div class="form-check">
     <%= builder.check_box(class: 'form-check-input', aria: { describedby: help_text_id },
-                          data: { checkbox_select_target: 'checkbox', action: 'change->report#updateSubmit' }) %>
+                          data: { checkbox_select_target: 'checkbox', action: 'change->report#update' }) %>
     <%= builder.label(class: 'form-check-label') %>
     <%= render SdrViewComponents::Forms::HelpTextComponent.new(id: help_text_id, text: builder.object.help_text, classes: 'mt-0 mb-0') %>
   </div>
