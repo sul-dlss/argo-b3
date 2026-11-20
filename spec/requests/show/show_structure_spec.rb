@@ -133,11 +133,66 @@ RSpec.describe 'Show structure' do
                                      'abc123')
       end
 
+      let(:version_service) do
+        instance_double(Sdr::VersionService, assembling?: false, accessioning?: false, closed?: false, version: 1)
+      end
+
+      before do
+        # Registered: the content is validated since the item has files.
+        allow(Sdr::VersionService).to receive(:new).with(druid:).and_return(version_service)
+      end
+
       it 'renders the content errors after the heading' do
         get "/objects/#{token}/structure"
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to match(/Resources \(1\).*Content errors.*Resource 1 \(Image 1\) has published/m)
+      end
+    end
+
+    context 'when the item has no files' do
+      let(:cocina_hash) { super().merge(structural: {}) }
+      let(:version_service) do
+        instance_double(Sdr::VersionService, assembling?: false, accessioning?: false, closed?: false, version: 1)
+      end
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).with(druid:).and_return({ Search::Fields::ID => druid })
+        allow(Sdr::VersionService).to receive(:new).with(druid:).and_return(version_service)
+      end
+
+      context 'when the item is registered' do
+        it 'does not render the content warnings' do
+          get "/objects/#{token}/structure"
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Resources (0)')
+          expect(response.body).not_to include('Content warnings')
+        end
+      end
+
+      context 'when the item is a draft' do
+        let(:version_service) do
+          instance_double(Sdr::VersionService, assembling?: false, accessioning?: false, closed?: false, version: 2)
+        end
+
+        it 'renders the content warnings' do
+          get "/objects/#{token}/structure"
+
+          expect(response.body).to include('Content warnings')
+        end
+      end
+
+      context 'when the item is deposited' do
+        let(:version_service) do
+          instance_double(Sdr::VersionService, assembling?: false, accessioning?: false, closed?: true, version: 1)
+        end
+
+        it 'renders the content warnings' do
+          get "/objects/#{token}/structure"
+
+          expect(response.body).to include('Content warnings')
+        end
       end
     end
 
