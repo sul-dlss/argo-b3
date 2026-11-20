@@ -24,8 +24,7 @@ RSpec.describe 'Apply APO defaults' do
   let(:rendered_page) { Capybara.string(response.body) }
 
   before do
-    allow(Sdr::Repository).to receive(:find).with(druid:).and_return(cocina_object)
-    allow(Sdr::Repository).to receive(:find).with(druid: apo_druid).and_return(apo_cocina_object)
+    allow(Sdr::Repository).to receive(:find) { |druid:| druid == apo_druid ? apo_cocina_object : cocina_object }
     allow(Sdr::Repository).to receive_messages(update: updated_cocina_object, accession: nil)
     allow(Sdr::VersionService).to receive_messages(new: version_service, open: opened_cocina_object)
     sign_in(user)

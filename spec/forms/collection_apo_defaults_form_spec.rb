@@ -19,7 +19,7 @@ RSpec.describe CollectionApoDefaultsForm do
   end
 
   before do
-    allow(Sdr::Repository).to receive(:find).with(druid: apo_druid).and_return(apo_cocina_object)
+    allow(Sdr::Repository).to receive(:find).and_return(apo_cocina_object)
   end
 
   it 'applies the APO rights defaults without changing the view access' do
