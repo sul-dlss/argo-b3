@@ -69,6 +69,32 @@ RSpec.describe BulkActions::DruidsJob do
     end
   end
 
+  context 'when items are still being performed' do
+    let(:druids) { %w[druid:bb111cc2222 druid:cc111dd2222 druid:dd111ff2222] }
+    let(:saved_counts) { [] }
+
+    before do
+      bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
+        def perform
+          saved = BulkAction.find(job.bulk_action.id)
+          job.saved_counts << [saved.druid_count_success, saved.druid_count_fail]
+          druid == 'druid:cc111dd2222' ? failure!(message: 'Testing failed') : success!(message: 'Testing successful')
+        end
+      end
+      stub_const('TestBulkActionJob::JobItem', bulk_action_item_class)
+
+      counts = saved_counts
+      TestBulkActionJob.define_method(:saved_counts) { counts }
+    end
+
+    it 'saves the counts after each item so that progress is shown' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      # Saved [success, fail] counts as each item starts.
+      expect(saved_counts).to eq([[0, 0], [1, 0], [1, 1]])
+    end
+  end
+
   context 'when closing versions' do
     before do
       bulk_action_item_class = Class.new(BulkActions::BaseJobItem) do
