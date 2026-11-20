@@ -568,7 +568,7 @@ RSpec.describe 'Create an item' do
         fill_in 'Title', with: 'The Title'
 
         find_by_id('rights-tab').click
-        select apo_title, from: 'APO'
+        select_searchable_option(apo_title, from: 'APO')
 
         find_by_id('tags-tab').click
       end
