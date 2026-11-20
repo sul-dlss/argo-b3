@@ -149,7 +149,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 ## Links
 
 - **LINK-1 MUST** Link text makes sense on its own. Repeated per-row links (e.g., "Log file") have visually hidden context (e.g., "Log file for <bulk action>"). No "click here", "here", "more", or "More »"; write "More <facet name>".
-- **LINK-2 MUST** Open a new tab only for pages outside Argo B3 (e.g., PURL, Globus, downloads), using `link_to_new_tab` (or `new_tab_label` for a button with `target: '_blank'`), which announces the new tab.
+- **LINK-2 MUST** Open a new tab only for pages outside Argo B3 (e.g., PURL, Globus, downloads) and for raw JSON (e.g., Cocina JSON), using `link_to_new_tab` (or `new_tab_label` for a button with `target: '_blank'`), which announces the new tab.
 - **LINK-3 SHOULD** Link to objects with `link_to_object` (object title as link text) and display druids without the `druid:` prefix.
 - **LINK-4 MUST** Links have an `href`. *(linted)*
 

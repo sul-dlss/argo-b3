@@ -29,11 +29,12 @@ class ReportsController < ApplicationController
     Reports::Fields::ACCESS_RIGHTS
   ].freeze
 
-  CITATION_FIELDS = [
+  DESCRIPTION_FIELDS = [
     Reports::Fields::AUTHORS,
     Reports::Fields::PUBLICATION_PLACE,
     Reports::Fields::PUBLISHER,
-    Reports::Fields::PUBLICATION_CREATED_DATE
+    Reports::Fields::PUBLICATION_CREATED_DATE,
+    Reports::Fields::GENRE
   ].freeze
 
   HISTORY_FIELDS = [
@@ -65,6 +66,9 @@ class ReportsController < ApplicationController
     Reports::Fields::PRESERVATION_SIZE
   ].freeze
 
+  # The number of rows shown in the report preview.
+  PREVIEW_ROWS = 5
+
   def show
     @report_form = ReportForm.new(fields: FREQUENTLY_USED_FIELDS.map(&:field))
     set_from_last_search_cookie
@@ -92,7 +96,7 @@ class ReportsController < ApplicationController
   end
 
   def rows
-    params[:commit] == 'Preview' ? 5 : 10_000_000
+    action_name == 'preview' ? PREVIEW_ROWS : 10_000_000
   end
 
   def add_report_response_headers

@@ -2,12 +2,12 @@
 
 module Edit
   # Component for rendering edit form for description choice
-  # The form's object must include DescriptionChoiceFormConcern and, with item_fields, also CocinaModels::BarcodeConcern
-  # and DescriptionCsvFormConcern. With abstract_field, it must also have an abstract attribute.
+  # The form's object must include DescriptionChoiceFormConcern and DescriptionCsvFormConcern and, with item_fields,
+  # also CocinaModels::BarcodeConcern. With abstract_field, it must also have an abstract attribute.
   class DescriptionChoiceComponent < ApplicationComponent
     # @param form [ActionView::Helpers::FormBuilder]
     # @param item_fields [Boolean] whether to render the fields that only apply to items: barcode and serials
-    #   (part label and sort key) for FOLIO, and the description spreadsheet choice
+    #   (part label and sort key) for FOLIO
     # @param abstract_field [Boolean] whether to render an abstract field with the title
     def initialize(form:, item_fields: true, abstract_field: false)
       @form = form

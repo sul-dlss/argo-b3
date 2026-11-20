@@ -4,7 +4,10 @@
 
   <% form_id = 'tabbed_form' %>
 
-  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @new_collection_form, id: form_id, url: collections_path) %>
+  <%# enctype is necessary to support file upload. %>
+  <%# Rails normally handles magically, but doesn't because the file input isn't nested in the form. %>
+  <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @new_collection_form, id: form_id, url: collections_path,
+                                                                       html_options: { enctype: 'multipart/form-data' }) %>
 
   <%# Change events from fields in the panes bubble up here, clearing the validation errors reported by the
       previous submission once the user edits the offending field. %>
