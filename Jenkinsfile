@@ -55,7 +55,7 @@ pipeline {
           sshagent (['sul-devops-team', 'sul-continuous-deployment']) {
             sh '''#!/bin/bash -l
               # Load application dependencies
-              rvm use 4.0.9@argo-b3 --create
+              rvm use 4.0.10@argo-b3 --create
               gem install bundler
               bundle install
 
