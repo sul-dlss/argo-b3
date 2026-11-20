@@ -1,15 +1,14 @@
 <%= render Search::FacetSectionComponent.new(label:, show: show?) do %>
   <% if checkbox? %>
-    <%= tag.p 'Selecting a value updates the results.',
-              id: checkbox_description_id, class: 'visually-hidden', data: { controller: 'facet-checkbox-focus' } %>
+    <%= tag.p 'Selecting a value updates the results.', id: checkbox_description_id, class: 'visually-hidden' %>
   <% end %>
 
   <%= helpers.turbo_frame_tag frame_id do %>
-    <ul class="facet-values list-unstyled">
+    <%= tag.ul class: 'facet-values list-unstyled', data: { controller: ('visit' if checkbox?) } do %>
       <% facet_counts.each do |facet_count| %>
         <li><%= render facet_value_component(facet_count) %></li>
       <% end %>
-    </ul>
+    <% end %>
 
     <%= render Search::FacetPageLinkComponent.new(facet_counts:, search_form:, facet_path_helper: facet_page_path_helper, form_field:) %>
   <% end %>

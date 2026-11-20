@@ -18,7 +18,7 @@ RSpec.describe Search::CheckboxFacetValueComponent, type: :component do
 
       expect(checkbox).not_to be_checked
       expect(checkbox['aria-describedby']).to eq('languages-facet-checkbox-description')
-      expect(checkbox['data-facet-checkbox-url-value']).to eq('/search?languages%5B%5D=English&query=maps')
+      expect(checkbox['data-visit-url-param']).to eq('/search?languages%5B%5D=English&query=maps')
       expect(page).to have_css('.facet-count', text: '27')
       expect(page).to have_link('Exclude English',
                                 href: '/search?languages_exclude%5B%5D=English&query=maps')
@@ -33,7 +33,7 @@ RSpec.describe Search::CheckboxFacetValueComponent, type: :component do
 
       expect(checkbox).to be_checked
       expect(page).to have_css('label.selected', text: 'English')
-      expect(checkbox['data-facet-checkbox-url-value']).to eq('/search?languages%5B%5D=French')
+      expect(checkbox['data-visit-url-param']).to eq('/search?languages%5B%5D=French')
       expect(page).to have_link('Exclude English',
                                 href: '/search?languages%5B%5D=French&languages_exclude%5B%5D=English')
     end
@@ -51,7 +51,7 @@ RSpec.describe Search::CheckboxFacetValueComponent, type: :component do
       expect(page).to have_css('strong', text: 'excluded')
       expect(page).to have_no_link('Exclude English')
       expect(page).to have_link('Remove exclude English', href: '/search')
-      expect(checkbox['data-facet-checkbox-url-value']).to eq('/search?languages%5B%5D=English')
+      expect(checkbox['data-visit-url-param']).to eq('/search?languages%5B%5D=English')
     end
   end
 

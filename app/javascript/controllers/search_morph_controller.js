@@ -4,10 +4,12 @@ import { Turbo } from '@hotwired/turbo-rails'
 // Updates a search page in place when visiting another search on the same page (e.g., selecting a facet value):
 // the page is morphed instead of replaced and the scroll position is kept. Each element marked
 // data-search-morph-keep keeps its content, inert, until its new content loads, instead of showing a loading
-// placeholder: a marked turbo-frame reloads from its new src, and a marked facet is updated by a turbo stream.
+// placeholder: a marked turbo-frame reloads from its new src, and a marked facet is morphed by a turbo stream.
+// Focus within a kept element, which inert removes, is returned once it is released.
 export default class extends Controller {
   connect () {
     this.morphing = false
+    this.keptFocus = null
     this.listeners = {
       'turbo:visit': this.visit,
       'turbo:before-render': this.beforeRender,
@@ -48,6 +50,9 @@ export default class extends Controller {
     if (!currentElement.hasAttribute('data-search-morph-keep') || currentElement.id !== newElement.id) return
 
     event.preventDefault()
+    if (currentElement.contains(document.activeElement)) {
+      this.keptFocus = { element: document.activeElement, keptElement: currentElement }
+    }
     const src = newElement.getAttribute('src')
     if (currentElement.tagName === 'TURBO-FRAME') {
       if (!src) return
@@ -73,18 +78,41 @@ export default class extends Controller {
 
   beforeStreamRender (event) {
     const render = event.detail.render
-    // Released first, so that the new content can take focus (see facet_checkbox_controller.js).
-    event.detail.render = (streamElement) => {
-      document.getElementById(streamElement.getAttribute('target'))?.removeAttribute('inert')
-      return render(streamElement)
+    event.detail.render = async (streamElement) => {
+      const target = document.getElementById(streamElement.getAttribute('target'))
+      target?.removeAttribute('inert')
+      await render(streamElement)
+      if (target) this.restoreFocus(target)
     }
   }
 
   frameLoad (event) {
-    if (event.target.hasAttribute('data-search-morph-keep')) event.target.inert = false
+    if (!event.target.hasAttribute('data-search-morph-keep')) return
+
+    event.target.inert = false
+    this.restoreFocus(event.target)
   }
 
   releaseAll () {
-    document.querySelectorAll('[data-search-morph-keep][inert]').forEach((element) => { element.inert = false })
+    document.querySelectorAll('[data-search-morph-keep][inert]').forEach((element) => {
+      element.inert = false
+      this.restoreFocus(element)
+    })
+  }
+
+  // Focuses the element that had focus if the morph kept it, else the facet's toggle (e.g., the facet collapsed,
+  // or a checked value is on a later page of values).
+  restoreFocus (keptElement) {
+    if (this.keptFocus?.keptElement !== keptElement) return
+
+    const { element } = this.keptFocus
+    this.keptFocus = null
+    // Unless the user has moved focus elsewhere meanwhile.
+    if (document.activeElement !== document.body) return
+
+    const target = element.isConnected && element.checkVisibility()
+      ? element
+      : keptElement.querySelector('.accordion-button')
+    target?.focus()
   }
 }

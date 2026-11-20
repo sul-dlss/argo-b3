@@ -23,6 +23,6 @@ RSpec.describe Search::FacetTurboStreamUpdateComponent, type: :component do
     expect(page).to have_css("turbo-stream[action='update'][target='object-types-facet']")
     # The content inside the template is not available to Capybara.
     expect(results.to_html).to include('<section aria-label="Object type"')
-    expect(results.to_html).to include('data-facet-checkbox-url-value="/search?object_types%5B%5D=item"')
+    expect(results.to_html).to include('data-visit-url-param="/search?object_types%5B%5D=item"')
   end
 end
