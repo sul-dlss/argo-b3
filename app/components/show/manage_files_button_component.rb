@@ -4,7 +4,7 @@ module Show
   # Component for the status box's manage files button, which links to managing files only when enabled, opening on
   # structure files (see Contents::ManageFilesFlow#open_on!).
   class ManageFilesButtonComponent < ApplicationComponent
-    # @param label [String] the name of managing files for the object (see ManageFilesLabel)
+    # @param label [String] the name of managing files for the object (see ManageFilesHelper)
     def initialize(druid:, label:, enabled:)
       @druid = druid
       @label = label

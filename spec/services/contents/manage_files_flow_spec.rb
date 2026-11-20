@@ -122,6 +122,18 @@ RSpec.describe Contents::ManageFilesFlow do
       end
     end
 
+    context 'when opening while discovering files' do
+      let(:content) do
+        create(:content, :mutable, druid: 'druid:bc123df4567', step: 'files', mount_state: 'discovering')
+      end
+
+      it 'keeps the saved step' do
+        manage_files_flow.open_on!('first')
+
+        expect(content.reload.step).to eq('files')
+      end
+    end
+
     context 'when opening on structure files without files' do
       it 'opens on add and edit files' do
         manage_files_flow.open_on!('structure')

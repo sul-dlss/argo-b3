@@ -111,9 +111,4 @@ class ItemsController < ApplicationController
       object_path(@new_item_form.druid)
     end
   end
-
-  # Adding files opens managing files on its first step.
-  def manage_files_first_step_path(druid)
-    edit_content_path(druid, open_on: Contents::ManageFilesFlow::OPEN_ON_FIRST)
-  end
 end
