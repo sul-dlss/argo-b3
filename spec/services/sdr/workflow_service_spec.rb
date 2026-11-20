@@ -105,6 +105,12 @@ RSpec.describe Sdr::WorkflowService do
       it { is_expected.to be true }
     end
 
+    context 'when the process in error is in gisDerivativeWF' do
+      let(:workflow_name) { 'gisDerivativeWF' }
+
+      it { is_expected.to be true }
+    end
+
     context 'when another process is queued' do
       let(:other_status) { 'queued' }
 

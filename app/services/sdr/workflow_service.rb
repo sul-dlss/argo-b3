@@ -9,8 +9,8 @@ module Sdr
     end
 
     # The workflows whose incomplete processes keep a version from closing (DSA's Workflow::StateBatchService).
-    ASSEMBLY_WORKFLOW_NAMES = %w[assemblyWF gisAssemblyWF wasSeedPreassemblyWF wasCrawlPreassemblyWF ocrWF
-                                 speechToTextWF].freeze
+    ASSEMBLY_WORKFLOW_NAMES = %w[assemblyWF gisAssemblyWF gisDerivativeWF wasSeedPreassemblyWF wasCrawlPreassemblyWF
+                                 ocrWF speechToTextWF].freeze
 
     # @return [Boolean] true if an assembly workflow has a process in error for the version and no process of any
     #   workflow is queued or started for it, so nothing will run until a process is retried
