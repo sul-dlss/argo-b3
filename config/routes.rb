@@ -150,6 +150,7 @@ Rails.application.routes.draw do
   end
   scope 'objects/:druid', as: :object do
     resource :tags, only: %i[edit update], controller: 'administrative_tags'
+    resource :apo_defaults, only: %i[new create], controller: 'object_apo_defaults'
     patch 'workflows/:workflow_name/processes/:process', to: 'workflow_processes#update', as: :workflow_process
   end
 
