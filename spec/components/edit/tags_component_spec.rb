@@ -31,20 +31,11 @@ RSpec.describe Edit::TagsComponent, type: :component do
     expect(page).to have_button('Add another ticket')
   end
 
-  it 'renders a text area and button for entering multiple tags at once' do
+  it 'renders a text area for entering multiple tags at once, without an add button' do
     render_inline(component)
 
     expect(page).to have_field('Enter multiple tags', type: 'textarea')
-    expect(page).to have_button('Add tags')
-    expect(page).to have_css('div[role="status"]')
-  end
-
-  it 'wires the multiple tags controller to each tag section' do
-    render_inline(component)
-
-    expect(page).to have_css('[data-controller="multiple-tags"][data-multiple-tags-has-many-outlet=".tag-fields"]')
-    expect(page).to have_css('.tag-fields[data-has-many-field-name-value="other_tags"]')
-    expect(page).to have_css('.tag-fields[data-has-many-field-name-value="project_tags"]')
-    expect(page).to have_css('.tag-fields[data-has-many-field-name-value="ticket_tags"]')
+    expect(page).to have_text('They are added when you save.')
+    expect(page).to have_no_button('Add tags')
   end
 end
