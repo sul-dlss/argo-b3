@@ -64,6 +64,10 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
     @version_service ||= Sdr::VersionService.new(druid: params[:id])
   end
 
+  def manage_files_label
+    helpers.manage_files_label(version_service:)
+  end
+
   def deposit?
     params[:commit] == DEPOSIT_VALUE
   end
@@ -150,10 +154,9 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
 
   # Opens on the step for where managing files was entered from (see Contents::ManageFilesFlow#open_on!), then
   # continues without the param, so that reloading the page (e.g., while structuring) keeps the user's step.
-  # The step is kept while the content is busy, since discovering or structuring needs the step it started on.
   def redirect_opened_on
     content = Contents::Builder.find_or_create(cocina_object: @cocina_object, immutable: false)
-    build_manage_files_flow(cocina_object: @cocina_object, content:).open_on!(params[:open_on]) unless content.busy?
+    build_manage_files_flow(cocina_object: @cocina_object, content:).open_on!(params[:open_on])
     # E.g., the unsaved changes warning when depositing from the status box.
     flash.keep
     redirect_to edit_content_path(content.druid)
@@ -207,7 +210,7 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
     @content_token = generate_token(content.id)
     @content_form = ContentForm.new
     @manage_files_flow ||= build_manage_files_flow(cocina_object:, content:)
-    @manage_files_label = ManageFilesLabel.call(version_service:)
+    @manage_files_label = manage_files_label
     # Computed once, since every step's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: cocina_object.version, version_service:,
                                                          purge_label: t('edit.contents.edit.buttons.purge'))

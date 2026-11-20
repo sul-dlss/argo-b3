@@ -79,9 +79,12 @@ module Contents
 
     # Moves to the step that entering managing files opens on. Opening on structure files opens on add and edit files
     # when there are no files, and otherwise structures (or appends) the files that are not in a resource, as leaving
-    # add and edit files does.
+    # add and edit files does. The step is kept while the content is busy, since discovering or structuring needs the
+    # step it started on.
     # @param open_on [String] OPEN_ON_FIRST or OPEN_ON_STRUCTURE
     def open_on!(open_on)
+      return if content.busy?
+
       case open_on
       when OPEN_ON_FIRST then content.update!(step: steps.first)
       when OPEN_ON_STRUCTURE then open_on_structure!

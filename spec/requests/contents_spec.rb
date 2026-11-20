@@ -166,6 +166,35 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when opening an agreement on the first step' do
+      let(:cocina_object) { build(:agreement_with_metadata, id: druid) }
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, :agreement, druid:))
+        content.update!(step: 'deposit')
+      end
+
+      it 'opens on the add and edit files step' do
+        get edit_content_path(druid, open_on: 'first')
+        follow_redirect!
+
+        expect(content.reload.step).to eq('files')
+        expect(Capybara.string(response.body)).to have_css('#manage-files-step-files')
+      end
+    end
+
+    context 'when opening on structure files without files' do
+      before { content.update!(step: 'deposit') }
+
+      it 'opens on the add and edit files step' do
+        get edit_content_path(druid, open_on: 'structure')
+        follow_redirect!
+
+        expect(content.reload.step).to eq('files')
+        expect(Capybara.string(response.body)).to have_css('#manage-files-step-files')
+      end
+    end
+
     context 'when opening on structure files while discovering files' do
       let!(:content) do
         create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'files', mount_state: 'discovering')
