@@ -291,9 +291,9 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   # Depositing from the status box with unsaved changes opens managing files as the status box button does.
   def redirect_unsaved_content_changes
-    manage_files = ManageFilesLabel.call(version_service: Sdr::VersionService.new(druid: druid_param))
+    manage_files_label = ManageFilesLabel.call(version_service: Sdr::VersionService.new(druid: druid_param))
     redirect_to edit_content_path(druid_param, open_on: Contents::ManageFilesFlow::OPEN_ON_STRUCTURE),
-                flash: { danger: t('show.warnings.unsaved_content_changes', manage_files:) }
+                flash: { danger: t('show.warnings.unsaved_content_changes', manage_files: manage_files_label) }
   end
 
   def permission_types_by_workgroup

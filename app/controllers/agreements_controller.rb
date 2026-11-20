@@ -90,9 +90,4 @@ class AgreementsController < ApplicationController
     # Computed once, since every pane's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
   end
-
-  # Adding files opens managing files on its first step.
-  def manage_files_first_step_path(druid)
-    edit_content_path(druid, open_on: Contents::ManageFilesFlow::OPEN_ON_FIRST)
-  end
 end
