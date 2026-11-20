@@ -56,14 +56,14 @@ Write the ticket in this shape:
 
 ## What to build
 
-<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. Two to four sentences or a few bullets. Include the why in a sentence when it isn't obvious.>
+<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. One to two sentences or a few bullets. Additional optional sentences: why implement this (only if discussed in the grilling session as context for the decisions made) and what feature(s) it works like.
 
 [Screenshot: <what it shows>]
 
 ## Acceptance criteria
 
-- [ ] <One observable, checkable behaviour per line>
-- [ ] ...
+- <One observable, checkable behaviour per line. Include something along the lines of "User is able to..." to ensure the use case behind the ticket is captured as an acceptance criterion.>
+- ...
 
 ## Out of scope
 
@@ -74,7 +74,7 @@ Write the ticket in this shape:
 - <Behaviour outside argo-b3 that couldn't be checked, for the developer to confirm>
 ```
 
-- Keep it concise: a developer should be able to read it in a minute or two. Every decision from the grilling should be covered, but only state what a developer could otherwise get wrong. Leave out behaviour that stays as it is today, and anything already implied by "works like <feature>". Don't record the discussion or the alternatives you rejected.
+- Keep it very concise: a developer should be able to read it in a minute or two. Every decision from the grilling should be covered, but only state what a developer could otherwise get wrong. Leave out behaviour that stays as it is today, and anything already implied by "works like <feature>". Don't record the discussion or the alternatives you rejected.
 - One short line per criterion. Merge criteria that say the same thing, and drop any that just restate What to build.
 - Write criteria someone can verify by using the app: "A user who can't edit the object doesn't see the button", not "add a policy check".
 - When the user chose to follow an existing feature, name it in What to build by its name in the app (e.g., "works like the Manage release form"), so the developer knows what to match. Record a deliberate departure, with its reason.
@@ -83,9 +83,14 @@ Write the ticket in this shape:
 - Omit Out of scope if nothing was excluded, and Assumptions to confirm if everything was checked.
 - When rewriting, keep the existing image Markdown (the attachment URLs still work after an edit), placed where each image helps most. When you show the draft, list anything from the original you dropped, so nothing disappears without the user agreeing.
 
-Before showing the draft, reread it and cut anything a developer wouldn't miss. Then show it and revise until the user approves it.
+## 6. Edit the ticket
+Before showing the draft, reread it and aggressively cut unnecessary words, including any acceptance criteria that:
+1. are covered by "works like <feature>"
+2. are not required in order to implement the feature
 
-## 6. Deliver
+Show the draft to the user. Also show criteria and points that were removed in this step. Revise until the user approves it.
+
+## 7. Deliver
 
 Ask the user which they want:
 
