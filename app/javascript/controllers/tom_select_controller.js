@@ -37,6 +37,8 @@ export default class extends Controller {
       plugins: ['remove_button'],
       clearAfterSelect: true,
       closeAfterSelect: true,
+      // Show every loaded option rather than tom-select's default of 50.
+      maxOptions: null,
       // The endpoint determines which options match and their order, so every loaded option is shown as is.
       score: () => () => 1,
       // A blank query loads the endpoint's default options, e.g., on focus or after clearing the typed text.

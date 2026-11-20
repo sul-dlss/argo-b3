@@ -4,7 +4,8 @@
                                                                   options: @apo_options,
                                                                   label_text: 'New governing APO',
                                                                   label_classes: 'fw-bold',
-                                                                  label_mark_required: true) %>
+                                                                  label_mark_required: true,
+                                                                  input_data: { controller: 'searchable-select' }) %>
 
     <%= render BulkActions::SelectSourceComponent.new(form:, search_form: @last_search_form,
                                                       total_results: @total_results, example_druids: @example_druids) %>
