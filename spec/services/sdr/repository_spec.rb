@@ -31,6 +31,26 @@ RSpec.describe Sdr::Repository do
         expect { described_class.find(druid:) }.to raise_error(Sdr::Repository::NotFoundResponse)
       end
     end
+
+    context 'when the stored cocina is invalid' do
+      let(:object_client) { instance_double(Dor::Services::Client::Object) }
+      let(:invalid_cocina_error) do
+        Dor::Services::Client::InvalidCocinaError.new(
+          response: instance_double(Faraday::Response),
+          errors: [{ 'title' => 'Invalid cocina', 'detail' => 'unevaluated property bogus' }]
+        )
+      end
+
+      before do
+        allow(Dor::Services::Client).to receive(:object).and_return(object_client)
+        allow(object_client).to receive(:find).and_raise(invalid_cocina_error)
+      end
+
+      it 'raises with the validation detail' do
+        expect { described_class.find(druid:) }
+          .to raise_error(Sdr::Repository::InvalidCocinaError, 'Invalid cocina (unevaluated property bogus)')
+      end
+    end
   end
 
   describe '.find_version' do
