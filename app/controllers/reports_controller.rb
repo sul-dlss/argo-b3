@@ -29,11 +29,12 @@ class ReportsController < ApplicationController
     Reports::Fields::ACCESS_RIGHTS
   ].freeze
 
-  CITATION_FIELDS = [
+  DESCRIPTION_FIELDS = [
     Reports::Fields::AUTHORS,
     Reports::Fields::PUBLICATION_PLACE,
     Reports::Fields::PUBLISHER,
-    Reports::Fields::PUBLICATION_CREATED_DATE
+    Reports::Fields::PUBLICATION_CREATED_DATE,
+    Reports::Fields::GENRE
   ].freeze
 
   HISTORY_FIELDS = [
