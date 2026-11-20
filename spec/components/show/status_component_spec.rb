@@ -7,7 +7,7 @@ RSpec.describe Show::StatusComponent, type: :component do
     described_class.new(object_status_presenter:, solr_doc:, deposit_form:, unsaved_content_changes:)
   end
 
-  let(:deposit_form) { DepositDraftForm.new(lock: 'abc123', version_description: 'Fixed the title') }
+  let(:deposit_form) { DepositDraftForm.new(version_description: 'Fixed the title') }
 
   let(:object_status_presenter) { ObjectStatusPresenter.new(solr_doc:, version_service:, content:) }
   let(:solr_doc) { SolrDocPresenter.new(solr_doc: build(:solr_item, druid:, workflow_errors:, object_type:)) }

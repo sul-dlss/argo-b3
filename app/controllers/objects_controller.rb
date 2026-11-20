@@ -46,7 +46,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(solr_doc: @solr_doc, version_service:, content:)
     @unsaved_content_changes = unsaved_content_changes?(druid)
-    @deposit_form = DepositDraftForm.for_status(lock:, version_service:)
+    @deposit_form = DepositDraftForm.for_status(version_service:)
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
@@ -231,8 +231,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     authorize! cocina_object, to: :update?, with: ObjectPolicy
 
     deposit_form = DepositDraftForm.new(DepositDraftForm.params_from(params))
-    return redirect_stale_deposit(cocina_object:) if deposit_form.stale?(cocina_object)
-
     deposit_and_respond(deposit_form:, cocina_object:)
   end
 
@@ -286,11 +284,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: druid_param })
     redirect_to object_path(druid_param), flash: { danger: t('show.errors.deposit_failed') }
-  end
-
-  # The status box has no form page to re-render, so the user reviews the object page and deposits again.
-  def redirect_stale_deposit(cocina_object:)
-    redirect_to object_path(druid_param), flash: { warning: DepositDraftForm.stale_warning(cocina_object) }
   end
 
   def discard_draft_and_redirect(cocina_object:) # rubocop:disable Metrics/AbcSize

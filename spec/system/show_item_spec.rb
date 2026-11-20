@@ -773,8 +773,6 @@ RSpec.describe 'Show item' do
   end
 
   describe 'depositing a draft from the status box' do
-    # The cocina factory's lock, so the object hasn't changed since the page was loaded.
-    let(:object_lock) { 'abc123' }
     let(:version_status) do
       instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                            closed?: false, version: 2, open?: true,

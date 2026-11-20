@@ -20,7 +20,7 @@
                                                                       disabled: !editable?) %>
       <%= render manage_files_button if object_type_with_content? %>
       <% if deposit_button? %>
-        <%= render deposit_dropdown %>
+        <%= render Show::DepositDropdownComponent.new(deposit_form:, druid:, disabled: !can_deposit?) %>
       <% end %>
     </div>
     <% if unsaved_content_changes_note? %>

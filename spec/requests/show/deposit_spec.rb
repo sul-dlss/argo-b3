@@ -7,9 +7,8 @@ RSpec.describe 'Deposit' do
 
   describe 'POST /objects/:druid/deposit' do
     let(:druid) { 'druid:bc123df4567' }
-    # The factory's lock is 'abc123'.
     let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
-    let(:params) { { deposit: { version_description: 'Fixed the title', lock: 'abc123' } } }
+    let(:params) { { deposit: { version_description: 'Fixed the title' } } }
 
     before do
       create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
@@ -37,19 +36,6 @@ RSpec.describe 'Deposit' do
           expect(response.body).to include('Deposit started.')
           expect(response.body).to include('turbo-stream action="refresh"')
         end
-      end
-    end
-
-    context 'when the object changed since the object page was loaded' do
-      let(:params) { { deposit: { version_description: 'Fixed the title and abstract', lock: 'def456' } } }
-
-      it 'redirects to the object page with a warning without changing anything' do
-        post(deposit_object_path(druid), params:)
-
-        expect(response).to redirect_to(object_path(druid))
-        expect(flash[:warning]).to eq('This item was changed since you opened it. ' \
-                                      'Review the current values and make your changes again.')
-        expect(Sdr::DepositDraftService).not_to have_received(:call)
       end
     end
 

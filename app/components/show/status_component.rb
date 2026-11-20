@@ -61,10 +61,6 @@ module Show
       edit_item_path(druid)
     end
 
-    def deposit_dropdown
-      Show::DepositDropdownComponent.new(deposit_form:, druid:, disabled: !can_deposit?)
-    end
-
     def manage_files_button
       Show::ManageFilesButtonComponent.new(druid:, enabled: object_type_with_content? && editable?)
     end
