@@ -85,6 +85,10 @@
           <% component.with_button(component_class: Show::ExtractTextButtonComponent, solr_doc: @solr_doc,
                                    object_status_presenter: @object_status_presenter, content_type: @cocina_object.type) %>
         <% end %>
+        <% if @solr_doc.object_type?('item', 'virtual object', 'collection') %>
+          <% component.with_button(component_class: Show::ApplyApoDefaultsButtonComponent, solr_doc: @solr_doc,
+                                   object_status_presenter: @object_status_presenter) %>
+        <% end %>
       <% end %>
 
       <% if @solr_doc.object_type?('APO', 'collection') && allowed_to?(:manage_permissions?, nil, with: AdminPolicy) %>
