@@ -148,7 +148,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @content = fetch_content
     @content_file_sets = @content.content_file_sets.includes(content_files: :content_file_binary).to_a
     @content_type = cocina_hash[:type]
-    @content_validation_result = fetch_content_validation_result(content: @content)
+    @content_validation_result = structure_content_validation_result
     @druid_token = params[:druid]
     @file_download_presenter = FileDownloadPresenter.new(druid_token: @druid_token, file_availability:)
     @downloadable_files = DownloadableFiles.new(content: @content, file_availability:)
@@ -528,6 +528,21 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
       Contents::Validator.call(content:, cocina_object:).to_h
     end
     Contents::Validators::Result.new(**result_hash)
+  end
+
+  # For a Registered item with no files, don't validate or display warning.
+  def structure_content_validation_result
+    return Contents::Validators::Result.new if registered_without_files?
+
+    fetch_content_validation_result(content: @content)
+  end
+
+  # Registered means an open first version; the version status (a DSA request) is only checked when there are no files.
+  def registered_without_files?
+    return false if @content_file_sets.any? { |content_file_set| content_file_set.content_files.any? }
+
+    version_service = Sdr::VersionService.new(druid: verified_druid)
+    version_service.open? && version_service.version == 1
   end
 
   # Looks up titles/permissions of given druids without filtering by view permission, so that an object
