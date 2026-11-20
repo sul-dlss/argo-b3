@@ -74,12 +74,12 @@ module BulkActions
 
     # @return [Array<String>] the lines of the log file reporting a success
     def success_lines
-      @success_lines ||= log_lines.select { |line| line.include?("\tSuccess:") }
+      log_lines_by_status[:success]
     end
 
     # @return [Array<String>] the lines of the log file reporting an error
     def error_lines
-      @error_lines ||= log_lines.select { |line| line.include?("\tError:") }
+      log_lines_by_status[:error]
     end
 
     # @return [Array<ActiveSupport::SafeBuffer>] download links for the log file and any exports
@@ -115,11 +115,20 @@ module BulkActions
 
     private
 
-    # @return [Array<String>] the lines of the log file, read once for both successes and errors
-    def log_lines
-      return [] unless completed? && log_file?
+    # Streams the log file once, keeping only the success and error lines rather than the whole file.
+    # @return [Hash{Symbol => Array<String>}] the success and error lines of the log file
+    def log_lines_by_status
+      @log_lines_by_status ||= { success: [], error: [] }.tap do |lines|
+        next unless completed? && log_file?
 
-      @log_lines ||= File.readlines(bulk_action.log_filepath, chomp: true)
+        File.foreach(bulk_action.log_filepath, chomp: true) do |line|
+          if line.include?("\tSuccess:")
+            lines[:success] << line
+          elsif line.include?("\tError:")
+            lines[:error] << line
+          end
+        end
+      end
     end
 
     def log_file_link
