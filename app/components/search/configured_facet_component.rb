@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Search
-  # Renders a facet with the facet component that its config calls for (checkbox, dynamic, hierarchical, or basic)
+  # Renders a facet with the facet component that its config calls for (dynamic, hierarchical, or basic)
   class ConfiguredFacetComponent < ViewComponent::Base
     # @param facet_config [Search::Facets::Config]
     # @param facet_counts [SearchResults::FacetCounts] counts of the type that the facet's searcher returns
@@ -24,9 +24,7 @@ module Search
     delegate :form_field, :exclude_form_field, :date_from_form_field, :date_to_form_field, to: :facet_config
 
     def facet_component # rubocop:disable Metrics/AbcSize
-      if facet_config.operator == :or
-        Search::CheckboxFacetComponent.new(facet_counts:, search_form:, form_field:)
-      elsif facet_config.dynamic_facet.present?
+      if facet_config.dynamic_facet.present?
         Search::DynamicFacetComponent.new(facet_counts:, search_form:, form_field:,
                                           date_from_form_field:, date_to_form_field:)
       elsif facet_config.hierarchical?
@@ -36,7 +34,8 @@ module Search
                                                facet_search_path_helper:)
       else
         Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:,
-                                   facet_page_path_helper:, facet_search_path_helper:)
+                                   facet_page_path_helper:, facet_search_path_helper:,
+                                   checkbox: facet_config.operator == :or)
       end
     end
 

@@ -9,19 +9,11 @@
     <del><%= label %></del>
   </span>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
-  <span class="ms-2">
-    <strong>excluded</strong>
-    <%= render_remove_link %>
-  </span>
+  <%= render_excluded %>
 <% else %>
   <span class="facet-label">
-    <%= link_to label, url_for(search_form.with({ form_field => [value], page: nil })), **link_args %>
+    <%= link_to label, select_path, **link_args %>
   </span>
   <span class="facet-count"><%= number_with_delimiter(count) %></span>
-  <% if with_exclude? %>
-    <%= render SdrViewComponents::Elements::ButtonLinkComponent.new(link: exclude_path, variant: :link, size: :sm, classes: 'ms-2 p-0 align-baseline', **link_args) do %>
-      <span aria-hidden="true">exclude</span>
-      <span class="visually-hidden"><%= exclude_label %></span>
-    <% end %>
-  <% end %>
+  <%= render_exclude_link if with_exclude? %>
 <% end %>

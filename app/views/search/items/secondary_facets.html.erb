@@ -1,6 +1,6 @@
 <%= turbo_frame_tag 'items-search-secondary' do %>
   <%= render Search::DebugComponent.new(search_form: @search_form, results: @results) %>
 
-  <%= render Search::FacetTurboStreamReplaceComponent.with_collection(Searchers::SecondaryFacet.facet_configs_for(@search_form),
-                                                                      results: @results, search_form: @search_form) %>
+  <%= render Search::FacetTurboStreamUpdateComponent.with_collection(Searchers::SecondaryFacet.facet_configs_for(@search_form),
+                                                                     results: @results, search_form: @search_form) %>
 <% end %>

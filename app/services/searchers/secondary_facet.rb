@@ -45,7 +45,7 @@ module Searchers
     end
 
     def facet_json
-      Search::FacetsBuilder.call(facet_configs: self.class.facet_configs_for(search_form)).to_json
+      Search::FacetsBuilder.call(facet_configs: self.class.facet_configs_for(search_form), search_form:).to_json
     end
   end
 end

@@ -97,6 +97,7 @@ class SearchForm < ApplicationForm
   attribute :genres, array: true, default: -> { [] }
   attribute :identifiers, array: true, default: -> { [] }
   attribute :languages, array: true, default: -> { [] }
+  attribute :languages_exclude, array: true, default: -> { [] }
   attribute :licenses, array: true, default: -> { [] }
   attribute :last_accessioned_date, array: true, default: -> { [] }
   attribute :last_accessioned_date_from, :date, default: nil

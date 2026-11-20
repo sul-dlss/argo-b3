@@ -7,8 +7,16 @@ module Search
       new(...).call
     end
 
-    def initialize(facet_configs:)
+    # True if the facet's counts ignore the facet's own filters (see ItemQueryBuilder#facet_filter_query).
+    def self.exclude?(facet_config)
+      facet_config.operator == :or || facet_config.exclude_form_field.present?
+    end
+
+    # @param facet_configs [Array<Search::Facets::Config>]
+    # @param search_form [SearchForm] the search, whose selected values are counted for each facet
+    def initialize(facet_configs:, search_form:)
       @facet_configs = facet_configs
+      @search_form = search_form
     end
 
     def call
@@ -17,17 +25,18 @@ module Search
           facet_hash.merge!(Search::DynamicFacetBuilder.call(**facet_config.to_h.slice(:form_field, :dynamic_facet)))
         else
           facet_hash[facet_config.facet_field] = facet_json_for(facet_config)
+          facet_hash.merge!(Search::SelectedFacetValuesBuilder.call(facet_config:, search_form:))
         end
       end
     end
 
     private
 
-    attr_reader :facet_configs
+    attr_reader :facet_configs, :search_form
 
     def facet_json_for(facet_config)
-      exclude = facet_config.operator == :or || facet_config.exclude_form_field.present?
-      Search::FacetBuilder.call(field: facet_config.facet_field, tag: facet_config.field, exclude:,
+      Search::FacetBuilder.call(field: facet_config.facet_field, tag: facet_config.field,
+                                exclude: self.class.exclude?(facet_config),
                                 **facet_config.to_h.slice(:limit, :alpha_sort, :missing_value))
     end
   end
