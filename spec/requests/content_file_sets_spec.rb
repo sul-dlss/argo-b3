@@ -58,7 +58,8 @@ RSpec.describe 'Content file sets' do
               params: { content_file_set: { content_files_attributes: { '0' => { id: content_file.id,
                                                                                  view: 'stanford',
                                                                                  download: 'stanford',
-                                                                                 administrative: 'preserve_only' } } } }
+                                                                                 publish: '0',
+                                                                                 preserve: '1' } } } }
 
         expect(response).to redirect_to(
           content_content_file_set_path(content_token, content_file_set, counter: 0, structure_changed: true)
@@ -118,18 +119,18 @@ RSpec.describe 'Content file sets' do
       end
     end
 
-    context 'when no administrative option is selected' do
+    context 'when neither publish nor preserve is selected' do
       let(:content_file) do
         create(:content_file, content_file_set:, publish: false, preserve: false, shelve: false,
                               content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
       end
 
-      it 're-renders the edit form with a single error for the options' do
+      it 're-renders the edit form with a single error for the file' do
         patch content_content_file_set_path(content_token, content_file_set, counter: 0),
               params: { content_file_set: { content_files_attributes: { '0' => { id: content_file.id } } } }
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(response.body.scan('must be selected').size).to eq(1)
+        expect(response.body.scan('Select publish, preserve, or both.').size).to eq(1)
       end
     end
 

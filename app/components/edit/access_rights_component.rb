@@ -28,20 +28,28 @@ module Edit
       :"#{fieldname_prefix}#{field_name}"
     end
 
-    def view_options
-      view_rights = @citation_only ? VIEW_RIGHTS : VIEW_RIGHTS - ['citation-only']
+    # Option builders are class methods so that components rendering the access fields separately
+    # (e.g., Edit::ContentFileComponent, in table cells) offer the same options.
+    def self.view_options(citation_only: true)
+      view_rights = citation_only ? VIEW_RIGHTS : VIEW_RIGHTS - ['citation-only']
       view_rights.map { |view_right| [AccessRightsSupport.view_or_download_label(view_right), view_right] }
     end
 
-    def download_options
+    def self.download_options
       DOWNLOAD_RIGHTS.map do |download_right|
         [AccessRightsSupport.view_or_download_label(download_right), download_right]
       end
     end
 
-    def location_options
+    def self.location_options
       Constants::ACCESS_LOCATIONS.map { |location| [AccessRightsSupport.location_label(location), location] }
     end
+
+    def view_options
+      self.class.view_options(citation_only: @citation_only)
+    end
+
+    delegate :download_options, :location_options, to: :class
 
     def container_data
       return {} unless apo_defaults_group

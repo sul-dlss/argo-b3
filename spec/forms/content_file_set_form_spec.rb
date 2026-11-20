@@ -183,13 +183,13 @@ RSpec.describe ContentFileSetForm do
       end
     end
 
-    {
-      'publish_and_preserve' => { publish: true, preserve: true, shelve: true },
-      'publish_only' => { publish: true, preserve: false, shelve: true },
-      'preserve_only' => { publish: false, preserve: true, shelve: false }
-    }.each do |administrative, expected_attributes|
-      it "saves publish, preserve, and shelve for #{administrative}" do
-        form.assign_attributes(content_files_attributes: [{ id: content_file.id, administrative: }])
+    [
+      ['1', '1', { publish: true, preserve: true, shelve: true }],
+      ['1', '0', { publish: true, preserve: false, shelve: true }],
+      ['0', '1', { publish: false, preserve: true, shelve: false }]
+    ].each do |publish, preserve, expected_attributes|
+      it "saves publish, preserve, and shelve for publish #{publish} and preserve #{preserve}" do
+        form.assign_attributes(content_files_attributes: [{ id: content_file.id, publish:, preserve: }])
 
         expect(form.save).to be true
         expect(content_file.reload).to have_attributes(expected_attributes)
@@ -201,17 +201,15 @@ RSpec.describe ContentFileSetForm do
         content_file.update!(publish: false, preserve: false, shelve: false)
       end
 
-      it 'has no administrative option and is invalid until one is selected' do
-        expect(form.content_files[0].administrative).to be_nil
-
+      it 'is invalid until publish or preserve is selected' do
         form.assign_attributes(label: 'New label')
 
         expect(form.save).to be false
-        expect(form.errors.attribute_names).to include(:'content_files[0].administrative')
+        expect(form.errors.attribute_names).to include(:'content_files[0].publish')
         expect(content_file_set.reload.label).to eq('Original label')
       end
 
-      it 'can be deleted without selecting an option' do
+      it 'can be deleted without selecting publish or preserve' do
         form.assign_attributes(content_files_attributes: [{ id: content_file.id, _destroy: 'true' }])
 
         expect(form.save).to be true

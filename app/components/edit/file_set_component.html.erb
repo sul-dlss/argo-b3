@@ -1,25 +1,43 @@
 <%= render SdrViewComponents::Elements::CardComponent.new(classes:) do |card| %>
   <% card.with_body do %>
-    <div class="card-title">
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h4, text: "Resource (#{index}):", variant: :h3) %>
-    </div>
-    <div class="card-body">
-      <%= form_with model: content_file_set_form, url: path do |form| %>
-      <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :file_set_type,
-                                                                    options: file_set_type_options,
-                                                                    label_text: t('edit.content_file_sets.fields.file_set_type.label'),
-                                                                    label_mark_required: true,
-                                                                    label_classes: 'fw-bold',
-                                                                    container_classes: 'my-field') %>
-
-      <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :label,
-                                                                  label_text: t('edit.content_file_sets.fields.label.label'),
-                                                                  label_classes: 'fw-bold',
-                                                                  container_classes: 'my-field') %>
+    <%= form_with model: content_file_set_form, url: path do |form| %>
+      <div class="card-title d-flex flex-wrap align-items-center gap-3">
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h4, text: t('edit.content_file_sets.heading', index:), variant: :h3, classes: 'mb-0') %>
+        <%# Design standard deviation: FORM-2. The resource type label is visually hidden, as in the design, since the select follows the resource heading. %>
+        <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :file_set_type,
+                                                                      options: file_set_type_options,
+                                                                      label_text: t('edit.content_file_sets.fields.file_set_type.label'),
+                                                                      label_hidden: true,
+                                                                      label_mark_required: true) %>
+        <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :label,
+                                                                    label_text: t('edit.content_file_sets.fields.label.label'),
+                                                                    label_classes: 'fw-bold mb-0',
+                                                                    container_classes: 'd-flex align-items-center gap-2 ms-auto file-set-label-field') %>
+      </div>
 
       <div data-controller="content-files">
-        <%= form.fields_for :content_files do |content_file_form| %>
-          <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
+        <%# Not a responsive table: its scroll container would clip the tom-select dropdowns. %>
+        <%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('edit.content_file_sets.files_table.label', index:),
+                                                                    show_label: false,
+                                                                    classes: 'border align-middle file-set-edit-table',
+                                                                    empty_message: t('edit.content_file_sets.files_table.empty')) do |component| %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.filepath.label'), classes: 'file-set-filename') %>
+          <% component.with_header(label: required_header(:mime_type)) %>
+          <% component.with_header(label: required_header(:view)) %>
+          <% component.with_header(label: required_header(:download)) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.location.label')) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.publish.label')) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.preserve.label')) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.use.label')) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.corrected_for_accessibility.label')) %>
+          <% component.with_header(label: t('edit.content_file_sets.fields.content_files.language_tag.label')) %>
+          <% component.with_header(label: tag.span(t('edit.content_file_sets.fields.content_files.actions.label'), class: 'visually-hidden')) %>
+          <%# The id is rendered in the row (include_id: false), since this block's own output is not rendered. %>
+          <% form.fields_for :content_files, include_id: false do |content_file_form| %>
+            <% component.with_row do %>
+              <%= render Edit::ContentFileComponent.new(form: content_file_form) %>
+            <% end %>
+          <% end %>
         <% end %>
         <%# The alert region stays in the page so that showing the note is announced. %>
         <div role="alert">
@@ -27,10 +45,9 @@
         </div>
       </div>
 
-        <%= render Elements::FormFooterComponent.new(cancel_path: path) do %>
-          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', data: { disable_actions_target: 'disableable' }) %>
-        <% end %>
+      <%= render Elements::FormFooterComponent.new(cancel_path: path, classes: 'justify-content-end') do %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', data: { disable_actions_target: 'disableable' }) %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>
