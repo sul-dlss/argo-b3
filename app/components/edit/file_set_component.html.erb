@@ -16,10 +16,11 @@
       </div>
 
       <div data-controller="content-files">
+        <%# Not a responsive table: its scroll container would clip the tom-select dropdowns. %>
         <%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('edit.content_file_sets.files_table.label', index:),
                                                                     show_label: false,
                                                                     classes: 'border align-middle file-set-edit-table',
-                                                                    responsive: true) do |component| %>
+                                                                    empty_message: t('edit.content_file_sets.files_table.empty')) do |component| %>
           <% component.with_header(label: t('edit.content_file_sets.fields.content_files.filepath.label'), classes: 'file-set-filename') %>
           <% component.with_header(label: required_header(:mime_type)) %>
           <% component.with_header(label: required_header(:view)) %>
@@ -44,7 +45,7 @@
         </div>
       </div>
 
-      <%= render Elements::FormFooterComponent.new(cancel_path: path, classes: 'justify-content-end mt-3') do %>
+      <%= render Elements::FormFooterComponent.new(cancel_path: path, classes: 'justify-content-end') do %>
         <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Save', data: { disable_actions_target: 'disableable' }) %>
       <% end %>
     <% end %>

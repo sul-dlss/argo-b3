@@ -69,20 +69,20 @@ turbo-frame[aria-busy="true"] .spinner-on-frame-submit .submit-spinner {
 // inputs show (e.g., a MIME type such as application/pdf), which have no matching Bootstrap utility.
 .file-set-edit-table {
   .file-set-filename {
-    min-width: 16ch;
+    min-width: 14ch;
     width: auto;
   }
 
   .file-set-mime-type {
-    min-width: 18ch;
+    min-width: 17ch;
   }
 
   .file-set-access {
-    min-width: 11ch;
+    min-width: 16ch;
   }
 
   .file-set-select {
-    min-width: 14ch;
+    min-width: 12ch;
   }
 
   // Checkboxes in a cell have a visually hidden label, so the form-check padding is not needed.
@@ -90,12 +90,16 @@ turbo-frame[aria-busy="true"] .spinner-on-frame-submit .submit-spinner {
     min-height: 0;
     padding-left: 0;
 
+    // Not floated, so that an error is shown below the checkbox.
     .form-check-input {
+      float: none;
       margin-left: 0;
     }
   }
 }
 
+// Design standard deviation: LAY-6. The label input in the resource header is sized for typical labels
+// (e.g., "Page 12"), which has no matching Bootstrap utility.
 .file-set-label-field input {
-  min-width: 30ch;
+  min-width: 20ch;
 }

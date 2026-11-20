@@ -836,11 +836,12 @@ RSpec.describe 'Manage files' do
       expect(page).to have_css('tbody tr .invalid-feedback', text: 'Select publish, preserve, or both.')
       expect(content.content_files.sole).to have_attributes(publish: false, preserve: true)
 
-      check 'Publish dropzone_upload.txt'
+      check 'Preserve dropzone_upload.txt'
+      select_multi_option('transcription', from: 'Role for dropzone_upload.txt')
       click_button 'Save'
 
       expect(page).to have_toast('Resource updated')
-      expect(content.content_files.sole).to have_attributes(publish: true, preserve: false, shelve: true)
+      expect(content.content_files.sole).to have_attributes(publish: false, preserve: true, use: 'transcription')
     end
 
     it 'deletes the resource' do

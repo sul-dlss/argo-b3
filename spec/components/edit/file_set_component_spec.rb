@@ -93,6 +93,21 @@ RSpec.describe Edit::FileSetComponent, type: :component do
 
       expect(page).to have_css('tbody tr .invalid-feedback', text: 'Select publish, preserve, or both.')
       expect(page).to have_field('Publish image1.tif', unchecked: true) { |field| field['aria-invalid'] == 'true' }
+      expect(page).to have_field('Preserve image1.tif', unchecked: true) do |field|
+        field['aria-invalid'] == 'true' &&
+          field['aria-describedby'] == 'content_file_set_content_files_attributes_0_publish_error'
+      end
+      expect(page).to have_css('#content_file_set_content_files_attributes_0_publish_error')
+    end
+  end
+
+  context 'when the resource has no files' do
+    before { content_file.destroy! }
+
+    it 'says so' do
+      render_inline(component)
+
+      expect(page).to have_text('No files.')
     end
   end
 

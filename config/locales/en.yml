@@ -407,6 +407,7 @@ en:
     content_file_sets:
       all_files_removed: 'Saving will delete this resource.'
       files_table:
+        empty: 'No files.'
         label: 'Files for resource %{index}'
       heading: 'Resource %{index}'
       buttons:

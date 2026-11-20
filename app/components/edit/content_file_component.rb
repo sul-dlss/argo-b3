@@ -28,6 +28,14 @@ module Edit
 
     delegate :download_options, :location_options, to: Edit::AccessRightsComponent
 
+    # The publish or preserve error is shown under Publish (see ContentFileForm), so Preserve, which also fixes it,
+    # is marked invalid and described by that error too.
+    def preserve_aria
+      return {} if content_file_form.errors[:publish].blank?
+
+      { invalid: true, describedby: form.field_id(:publish, 'error') }
+    end
+
     # The visually hidden label of an input in the row, which names the file since the column headers
     # do not label the inputs.
     # The label components mark their text as HTML safe, so the filepath is escaped here.

@@ -1,3 +1,4 @@
+<%# Design standard deviation: FORM-3. Publish and Preserve are not in a fieldset, since the column headers group them. %>
 <%= tag.tr data: { content_files_target: 'row', controller: 'access-rights' } do %>
   <td class="file-set-filename">
     <%= filepath %>
@@ -39,7 +40,8 @@
   <td>
     <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :preserve,
                                                                label_text: row_label(:preserve),
-                                                               label_hidden: true) %>
+                                                               label_hidden: true,
+                                                               input_aria: preserve_aria) %>
   </td>
   <td class="file-set-select">
     <%= render Edit::UseComponent.new(form:, label_text: row_label(:use)) %>
