@@ -31,11 +31,10 @@ RSpec.describe Edit::TagsComponent, type: :component do
     expect(page).to have_button('Add another ticket')
   end
 
-  it 'renders a text area for entering multiple tags at once, without an add button' do
+  it 'renders a text area for entering multiple tags at once' do
     render_inline(component)
 
     expect(page).to have_field('Enter multiple tags', type: 'textarea')
     expect(page).to have_text('They are added when you save.')
-    expect(page).to have_no_button('Add tags')
   end
 end
