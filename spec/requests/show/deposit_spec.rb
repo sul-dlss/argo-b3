@@ -8,6 +8,7 @@ RSpec.describe 'Deposit' do
   describe 'POST /objects/:druid/deposit' do
     let(:druid) { 'druid:bc123df4567' }
     let(:cocina_object) { build(:dro_with_metadata, id: druid, version: 2) }
+    let(:params) { { deposit: { version_description: 'Fixed the title' } } }
 
     before do
       create(:permission, :edit, workgroup: user.groups.first, target_druid: druid)
@@ -18,16 +19,18 @@ RSpec.describe 'Deposit' do
 
     context 'when the draft is deposited' do
       it 'deposits the draft and redirects to the object page with a toast' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:toast]).to eq('Deposit started.')
-        expect(Sdr::DepositDraftService).to have_received(:call).with(cocina_object:, user_name: user.sunetid)
+        expect(Sdr::DepositDraftService).to have_received(:call)
+          .with(cocina_object:, user_name: user.sunetid, version_description: 'Fixed the title')
       end
 
       context 'when a Turbo request' do
         it 'shows the toast and refreshes the page with a turbo stream' do
-          post deposit_object_path(druid), headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+          post deposit_object_path(druid), params:,
+                                           headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
 
           expect(response.media_type).to eq('text/vnd.turbo-stream.html')
           expect(response.body).to include('Deposit started.')
@@ -42,7 +45,7 @@ RSpec.describe 'Deposit' do
       end
 
       it 'redirects to the object page with an error' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:danger]).to eq('Files for this object are being staged, discovered, or structured. ' \
@@ -56,7 +59,7 @@ RSpec.describe 'Deposit' do
       end
 
       it 'redirects to the object page with an error' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:danger]).to eq('This draft cannot be deposited.')
@@ -69,7 +72,7 @@ RSpec.describe 'Deposit' do
       end
 
       it 'redirects to managing files with an error' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(edit_content_path(druid))
         expect(flash[:danger]).to eq('Files have unsaved changes. Save or deposit them from Manage files.')
@@ -82,7 +85,7 @@ RSpec.describe 'Deposit' do
       end
 
       it 'redirects to managing files to show the content errors' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to("/contents/#{druid}/edit?deposit=true")
       end
@@ -95,7 +98,7 @@ RSpec.describe 'Deposit' do
       end
 
       it 'redirects to the object page with an error and notifies' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:danger]).to eq('Depositing failed.')
@@ -107,7 +110,7 @@ RSpec.describe 'Deposit' do
       before { Permission.permission_type_edit.destroy_all }
 
       it 'denies access without depositing' do
-        post deposit_object_path(druid)
+        post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(root_path)
         expect(Sdr::DepositDraftService).not_to have_received(:call)

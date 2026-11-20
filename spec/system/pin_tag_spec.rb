@@ -11,7 +11,8 @@ RSpec.describe 'Pin and unpin a tag' do
 
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: true,
-                                                                         closed?: true)
+                                                                         closed?: true,
+                                                                         version_description: 'Initial version')
   end
 
   let(:solr_doc) do

@@ -7,7 +7,9 @@ RSpec.describe Sdr::DepositDraftService do
 
   let(:druid) { 'druid:bc123df4567' }
   let(:cocina_object) { build(:dro_with_metadata, id: druid, type: Cocina::Models::ObjectType.book) }
-  let(:version_service) { version_service_double(open?: open, closeable?: closeable) }
+  let(:version_service) do
+    version_service_double(open?: open, closeable?: closeable, version_description: 'Fixed the title')
+  end
   let(:open) { true }
   let(:closeable) { true }
 
@@ -54,6 +56,43 @@ RSpec.describe Sdr::DepositDraftService do
       expect(deposit_draft).to eq 'assemblyWF'
       expect(Sdr::Repository).to have_received(:accession)
         .with(cocina_object:, user_name: 'jdoe', lane_id: 'default', context: {})
+    end
+  end
+
+  context 'when a version description is given' do
+    subject(:deposit_draft) do
+      described_class.call(cocina_object:, user_name: 'jdoe', version_description:)
+    end
+
+    let(:version_description) { 'Fixed the title and abstract' }
+
+    it 'updates the version description, then accessions' do
+      deposit_draft
+
+      expect(version_service).to have_received(:update_description)
+        .with(description: 'Fixed the title and abstract', user_name: 'jdoe')
+      expect(Sdr::Repository).to have_received(:accession)
+    end
+
+    context 'when it is the current description' do
+      let(:version_description) { 'Fixed the title' }
+
+      it 'accessions without updating the version description' do
+        deposit_draft
+
+        expect(version_service).not_to have_received(:update_description)
+        expect(Sdr::Repository).to have_received(:accession)
+      end
+    end
+
+    context 'when the draft cannot be deposited' do
+      let(:closeable) { false }
+
+      it 'raises without updating the version description' do
+        expect { deposit_draft }.to raise_error(described_class::NotDepositableError)
+
+        expect(version_service).not_to have_received(:update_description)
+      end
     end
   end
 

@@ -46,6 +46,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(solr_doc: @solr_doc, version_service:, content:)
     @unsaved_content_changes = unsaved_content_changes?(druid)
+    @deposit_form = DepositDraftForm.for_status(version_service:)
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
@@ -229,7 +230,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     cocina_object = Sdr::Repository.find(druid: druid_param)
     authorize! cocina_object, to: :update?, with: ObjectPolicy
 
-    deposit_and_respond(cocina_object:)
+    deposit_form = DepositDraftForm.new(DepositDraftForm.params_from(params))
+    deposit_and_respond(deposit_form:, cocina_object:)
   end
 
   def discard_draft
@@ -266,8 +268,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Permission.highest_permission_type_by_workgroup(target_druid: @solr_doc.druid)
   end
 
-  def deposit_and_respond(cocina_object:) # rubocop:disable Metrics/AbcSize
-    Sdr::DepositDraftService.call(cocina_object:, user_name: current_user.sunetid)
+  def deposit_and_respond(deposit_form:, cocina_object:) # rubocop:disable Metrics/AbcSize
+    deposit_form.deposit!(cocina_object:, user_name: current_user.sunetid)
     toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
   rescue Sdr::DepositDraftService::ContentBusyError
     redirect_to object_path(druid_param), flash: { danger: t('show.warnings.content_busy') }

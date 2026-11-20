@@ -16,6 +16,17 @@ RSpec.describe Edit::VersionDescriptionComponent, type: :component do
 
     expect(page).to have_field('Version description', with: 'Fixed the title')
     expect(page).to have_css('label', text: 'Version description') { |label| label.has_css?('span.required') }
+    expect(page).to have_no_css('input[required]')
+  end
+
+  context 'when required' do
+    let(:component) { described_class.new(form:, required: true) }
+
+    it 'renders a field the browser requires' do
+      render_inline(component)
+
+      expect(page).to have_css('input[required]#agreement_version_description')
+    end
   end
 
   context 'with label classes, container classes, and help text' do
@@ -40,6 +51,7 @@ RSpec.describe Edit::VersionDescriptionComponent, type: :component do
 
       expect(page).to have_field('Version description', disabled: true)
       expect(page).to have_no_css('label span.required')
+      expect(page).to have_no_css('input[required]')
     end
   end
 end

@@ -126,6 +126,8 @@ en:
         edit_admin_policy: "Edit APO"
         manage_files: "Manage files"
         deposit: "Deposit"
+      deposit_dropdown:
+        cancel: "Cancel"
     file_sets:
       buttons:
         download: "Download %{filepath}"

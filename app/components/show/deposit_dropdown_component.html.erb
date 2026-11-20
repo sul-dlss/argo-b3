@@ -1,0 +1,20 @@
+<div class="dropdown" data-controller="dropdown-form">
+  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: t('show.status.actions.deposit'),
+                                                              variant: :primary, size: :sm, classes: 'dropdown-toggle',
+                                                              disabled:,
+                                                              data: toggle_data, aria: { expanded: false }) %>
+  <div class="dropdown-menu deposit-dropdown-menu p-4">
+    <%= form_with model: deposit_form, url: deposit_object_path(druid), method: :post, class: 'b3-form',
+                  data: { turbo_frame: '_top', dropdown_form_target: 'form',
+                          action: 'turbo:submit-start->dropdown-form#close' } do |form| %>
+      <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'mb-4',
+                                                       required: true) %>
+      <div class="d-flex align-items-center gap-3">
+        <%= render SdrViewComponents::Elements::ButtonComponent.new(label: t('show.status.deposit_dropdown.cancel'),
+                                                                    variant: :link,
+                                                                    data: { action: 'dropdown-form#cancel' }) %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('show.status.actions.deposit')) %>
+      </div>
+    <% end %>
+  </div>
+</div>
