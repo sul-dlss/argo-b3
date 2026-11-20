@@ -85,7 +85,7 @@ class ItemsController < ApplicationController
   end
 
   def update_redirect_path
-    params[:commit] == DRAFT_TO_ADD_FILES_VALUE ? edit_content_path(@druid) : object_path(@druid)
+    params[:commit] == DRAFT_TO_ADD_FILES_VALUE ? manage_files_first_step_path(@druid) : object_path(@druid)
   end
 
   def set_edit_view
@@ -106,7 +106,7 @@ class ItemsController < ApplicationController
 
   def create_redirect_path
     if params[:commit] == DRAFT_TO_ADD_FILES_VALUE
-      edit_content_path(@new_item_form.druid)
+      manage_files_first_step_path(@new_item_form.druid)
     else
       object_path(@new_item_form.druid)
     end

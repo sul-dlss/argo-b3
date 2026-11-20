@@ -1,6 +1,6 @@
-<%# locals: (title:, manage_files_flow:, data: { controller: 'unassociated-files files-required disable-actions', action: 'dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable' }) -%>
+<%# locals: (title:, manage_files_flow:, heading:, data: { controller: 'unassociated-files files-required disable-actions', action: 'dropzone:upload-start->disable-actions#disable dropzone:upload-end->disable-actions#enable' }) -%>
 <%# Layout shared by the pages of managing files (the steps and the wait page). %>
-<%= page_title(t('edit.contents.edit.title'), name: title) %>
+<%= page_title(heading, name: title) %>
 
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
@@ -9,7 +9,7 @@
 
 <%# By default, disable-actions disables actions (e.g., deleting files, depositing) while files are uploading and while
     forms with DisableActionsHelper#disable_actions_form_data (e.g., uploading a structural CSV) are submitting. %>
-<%= render Layout::ContainerComponent.new(heading: t('edit.contents.edit.title'), subtitle: title, data:) do %>
+<%= render Layout::ContainerComponent.new(heading:, subtitle: title, data:) do %>
   <%= render Item::ManageFilesProgressStepperComponent.new(manage_files_flow:) %>
 
   <%# An id per step, so that a step change replaces the step rather than morphing it, which would keep its frames. %>

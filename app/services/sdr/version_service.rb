@@ -116,6 +116,11 @@ module Sdr
       raise Error, "Discarding version failed: #{e.message}"
     end
 
+    # @return [Boolean] true if the first version has been deposited: it is closed, or there is a later version
+    def first_version_deposited?
+      version > 1 || closed?
+    end
+
     def open_and_not_assembling?
       open? && !assembling?
     end

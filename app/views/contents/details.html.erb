@@ -1,4 +1,4 @@
-<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow } do %>
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow, heading: @manage_files_label } do %>
   <%= form_with(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: 'item_form', class: 'b3-form') do |item_form| %>
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.steps.details'), classes: 'mb-3') %>
 

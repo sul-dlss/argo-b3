@@ -4,6 +4,7 @@
 class ContentsController < ContentsApplicationController # rubocop:disable Metrics/ClassLength
   skip_verify_authorized only: %i[show]
   before_action :set_editable_cocina_object, only: %i[edit update]
+  before_action :redirect_opened_on, only: %i[edit], if: -> { params[:open_on].present? }
 
   # Values for submit buttons, which are rendered by Item::ManageFilesStepFooterComponent and the structure step.
   DEPOSIT_VALUE = ItemsController::DEPOSIT_VALUE
@@ -147,6 +148,16 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
     false
   end
 
+  # Opens on the step for where managing files was entered from (see Contents::ManageFilesFlow#open_on!), then
+  # continues without the param, so that reloading the page (e.g., while structuring) keeps the user's step.
+  def redirect_opened_on
+    content = Contents::Builder.find_or_create(cocina_object: @cocina_object, immutable: false)
+    build_manage_files_flow(cocina_object: @cocina_object, content:).open_on!(params[:open_on])
+    # E.g., the unsaved changes warning when depositing from the status box.
+    flash.keep
+    redirect_to edit_content_path(content.druid)
+  end
+
   def redirect_assembly_stopped_with_error(druid:)
     redirect_to object_path(druid), flash: { warning: t('edit.items.edit.warnings.assembly_stopped_with_error') }
   end
@@ -195,6 +206,7 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
     @content_token = generate_token(content.id)
     @content_form = ContentForm.new
     @manage_files_flow ||= build_manage_files_flow(cocina_object:, content:)
+    @manage_files_label = ManageFilesLabel.call(version_service:)
     # Computed once, since every step's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: cocina_object.version, version_service:,
                                                          purge_label: t('edit.contents.edit.buttons.purge'))

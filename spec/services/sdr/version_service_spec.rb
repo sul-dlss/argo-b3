@@ -153,6 +153,39 @@ RSpec.describe Sdr::VersionService do
     end
   end
 
+  describe '#first_version_deposited?' do
+    before do
+      allow(status).to receive_messages(version:, closed?: closed)
+    end
+
+    context 'when the first version is open' do
+      let(:version) { 1 }
+      let(:closed) { false }
+
+      it 'returns false' do
+        expect(service.first_version_deposited?).to be false
+      end
+    end
+
+    context 'when the first version is closed' do
+      let(:version) { 1 }
+      let(:closed) { true }
+
+      it 'returns true' do
+        expect(service.first_version_deposited?).to be true
+      end
+    end
+
+    context 'when a later version is open' do
+      let(:version) { 2 }
+      let(:closed) { false }
+
+      it 'returns true' do
+        expect(service.first_version_deposited?).to be true
+      end
+    end
+  end
+
   describe '#assembly_stopped_with_error? and #draft_editable?' do
     let(:jp2_create_status) { 'error' }
     let(:workflows_xml) do

@@ -115,13 +115,97 @@ RSpec.describe 'Contents' do
       end
     end
 
-    it 'sets the page title with the object title' do
+    it 'names the page for adding files before the first version is deposited' do
       allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, druid:, title: 'Maps & charts'))
 
       get edit_content_path(druid)
 
-      expect(Capybara.string(response.body))
-        .to have_title('Manage files and structure – Maps & charts | Argo B3', exact: true)
+      page = Capybara.string(response.body)
+      expect(page).to have_title('Add files and deposit – Maps & charts | Argo B3', exact: true)
+      expect(page).to have_css('h1', exact_text: 'Add files and deposit')
+    end
+
+    context 'when the first version has been deposited' do
+      let(:version) { 2 }
+
+      it 'names the page for editing files' do
+        allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, druid:, title: 'Maps & charts'))
+
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_title('Edit files and structure – Maps & charts | Argo B3', exact: true)
+        expect(page).to have_css('h1', exact_text: 'Edit files and structure')
+      end
+    end
+
+    context 'when opening on the first step' do
+      before { content.update!(step: 'deposit') }
+
+      it 'saves the first step and continues without the param' do
+        get edit_content_path(druid, open_on: 'first')
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload.step).to eq('details')
+      end
+    end
+
+    context 'when opening on structure files with files' do
+      before do
+        content.update!(step: 'details')
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+      end
+
+      it 'opens on the structure step' do
+        get edit_content_path(druid, open_on: 'structure')
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload.step).to eq('structure')
+
+        follow_redirect!
+        expect(Capybara.string(response.body)).to have_css('#manage-files-step-structure')
+      end
+    end
+
+    context 'when opening an agreement on the first step' do
+      let(:cocina_object) { build(:agreement_with_metadata, id: druid) }
+
+      before do
+        allow(Sdr::Repository).to receive(:find_solr).and_return(build(:solr_item, :agreement, druid:))
+        content.update!(step: 'deposit')
+      end
+
+      it 'opens on the add and edit files step' do
+        get edit_content_path(druid, open_on: 'first')
+        follow_redirect!
+
+        expect(content.reload.step).to eq('files')
+        expect(Capybara.string(response.body)).to have_css('#manage-files-step-files')
+      end
+    end
+
+    context 'when opening on structure files without files' do
+      before { content.update!(step: 'deposit') }
+
+      it 'opens on the add and edit files step' do
+        get edit_content_path(druid, open_on: 'structure')
+        follow_redirect!
+
+        expect(content.reload.step).to eq('files')
+        expect(Capybara.string(response.body)).to have_css('#manage-files-step-files')
+      end
+    end
+
+    context 'when opening on structure files while discovering files' do
+      let!(:content) do
+        create(:content, :mutable, druid:, lock: cocina_object.lock, step: 'files', mount_state: 'discovering')
+      end
+
+      it 'keeps the saved step' do
+        get edit_content_path(druid, open_on: 'structure')
+
+        expect(response).to redirect_to(edit_content_path(druid))
+        expect(content.reload.step).to eq('files')
+      end
     end
 
     context 'when the initial version' do
@@ -140,7 +224,7 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_css('ol[aria-label="Manage files progress"] li', count: 4)
+        expect(page).to have_css('ol[aria-label="Steps"] li', count: 4)
         expect(page).to have_css('li[aria-current="step"]', text: 'Item details')
         expect(page).to have_select('Content type', visible: :all)
         expect(page).to have_no_css('#file-dropzone', visible: :all)
@@ -295,7 +379,7 @@ RSpec.describe 'Contents' do
         get edit_content_path(druid)
 
         page = Capybara.string(response.body)
-        expect(page).to have_css('ol[aria-label="Manage files progress"] li', count: 3)
+        expect(page).to have_css('ol[aria-label="Steps"] li', count: 3)
         expect(page).to have_css('li[aria-current="step"]', text: 'Add and edit files')
         expect(page).to have_no_text('Item details')
         expect(page).to have_no_select('Content type', visible: :all)
