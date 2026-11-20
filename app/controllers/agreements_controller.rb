@@ -75,12 +75,12 @@ class AgreementsController < ApplicationController
   end
 
   def create_redirect_path
-    add_files? ? edit_content_path(@new_agreement_form.druid) : object_path(@new_agreement_form.druid)
+    add_files? ? manage_files_first_step_path(@new_agreement_form.druid) : object_path(@new_agreement_form.druid)
   end
 
   def redirect_updated
     toast_key = deposit? ? 'deposited' : 'updated'
-    redirect_to add_files? ? edit_content_path(@druid) : object_path(@druid),
+    redirect_to add_files? ? manage_files_first_step_path(@druid) : object_path(@druid),
                 flash: { toast: t("edit.agreements.edit.toasts.#{toast_key}") }
   end
 
@@ -89,5 +89,10 @@ class AgreementsController < ApplicationController
     @title = CocinaSupport.title(@cocina_object)
     # Computed once, since every pane's footer renders the discard or purge button.
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
+  end
+
+  # Adding files opens managing files on its first step.
+  def manage_files_first_step_path(druid)
+    edit_content_path(druid, open_on: Contents::ManageFilesFlow::OPEN_ON_FIRST)
   end
 end

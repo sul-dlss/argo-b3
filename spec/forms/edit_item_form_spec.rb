@@ -129,12 +129,13 @@ RSpec.describe EditItemForm do
       create(:content_file_binary, content:, file_location: 'attached')
       edit_item_form.content = content
       edit_item_form.version_description = 'Redeposit'
+      edit_item_form.version_service = version_service_double(version: 2)
     end
 
     it 'is not valid when depositing' do
       expect(edit_item_form.valid?(:deposit)).to be false
       expect(edit_item_form.errors[:content])
-        .to eq(['Files have unsaved changes. Save or deposit them from Manage files.'])
+        .to eq(['Files have unsaved changes. Save or deposit them from "Edit files and structure".'])
     end
 
     it 'is valid when not depositing' do

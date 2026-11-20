@@ -6,7 +6,7 @@ RSpec.describe Item::ManageFilesProgressStepperComponent, type: :component do
   let(:content) { build(:content, step: 'structure') }
 
   def step_statuses
-    page.find('ol[aria-label="Manage files progress"]').all('li').to_h do |step|
+    page.find('ol[aria-label="Steps"]').all('li').to_h do |step|
       [step.find('.progress-stepper-label').text, step.find('.progress-stepper-status').text]
     end
   end

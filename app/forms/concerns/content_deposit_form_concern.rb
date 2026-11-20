@@ -50,6 +50,7 @@ module ContentDepositFormConcern
   def content_is_saved
     return unless Contents::UnsavedChanges.call(content:, cocina_object: previous_cocina_object)
 
-    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved'))
+    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved',
+                                manage_files: ManageFilesLabel.call(version_service:)))
   end
 end

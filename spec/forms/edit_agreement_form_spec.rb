@@ -66,12 +66,13 @@ RSpec.describe EditAgreementForm do
         # A file that has not been staged is an unsaved change.
         create(:content_file_binary, content:, file_location: 'attached')
         edit_agreement_form.content = content
+        edit_agreement_form.version_service = version_service_double
       end
 
       it 'is not valid when depositing' do
         expect(edit_agreement_form.valid?(:deposit)).to be false
         expect(edit_agreement_form.errors[:content])
-          .to eq(['Files have unsaved changes. Save or deposit them from Manage files.'])
+          .to eq(['Files have unsaved changes. Save or deposit them from "Add files and deposit".'])
       end
 
       it 'is valid when not depositing' do

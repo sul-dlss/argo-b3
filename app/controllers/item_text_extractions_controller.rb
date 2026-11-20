@@ -60,6 +60,7 @@ class ItemTextExtractionsController < ApplicationController
   def set_unsaved_content_changes(content:)
     @unsaved_content_changes = content.present? &&
                                Contents::UnsavedChanges.call(content:, cocina_object: @cocina_object)
+    @manage_files_label = ManageFilesLabel.call(version_service:) if @unsaved_content_changes
   end
 
   # The errors of the content (e.g., not valid for the content type) have no field on the page.

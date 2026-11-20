@@ -76,9 +76,9 @@ RSpec.describe 'Manage files' do
   it 'displays the object title and the steps, opening on the item details step', :rack_test do
     visit "/contents/#{druid}/edit"
 
-    expect(page).to have_css('h1', text: 'Manage files and structure')
+    expect(page).to have_css('h1', text: 'Add files and deposit')
     expect(page).to have_css('p', text: title)
-    expect(page).to have_css('ol[aria-label="Manage files progress"] li', count: 4)
+    expect(page).to have_css('ol[aria-label="Steps"] li', count: 4)
     expect_step('Item details')
     expect(page).to have_no_css('[role="tab"]')
   end
