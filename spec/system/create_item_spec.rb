@@ -452,15 +452,6 @@ RSpec.describe 'Create an item' do
       # last three characters as keystrokes, so keep the delimiters away from both ends.
       fill_in 'Enter multiple tags',
               with: "Registered By : mjgiarlo\tProject : Argo\nTicket : ABC-123\tRemediated By : 5.0.0"
-      click_button 'Add tags'
-
-      # The first tag fills the blank row that is already there; the second is appended.
-      expect(find_tag_select_item('item[other_tags_attributes][0][tag]')).to have_text('Registered By : mjgiarlo')
-      expect(find_tag_select_item('item[other_tags_attributes][1][tag]')).to have_text('Remediated By : 5.0.0')
-      # Project and ticket tags are filed under their own sections with the prefix removed.
-      expect(find_tag_select_item('item[project_tags_attributes][0][tag]')).to have_text('Argo')
-      expect(find_tag_select_item('item[ticket_tags_attributes][0][tag]')).to have_text('ABC-123')
-      expect(page).to have_field('Enter multiple tags', with: '')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -473,7 +464,7 @@ RSpec.describe 'Create an item' do
       end
     end
 
-    it 'shows a validation error for tags entered at once but not added' do
+    it 'shows a validation error for an invalid tag entered at once' do
       visit new_item_path
 
       fill_in 'Source ID', with: 'new:source-id'
@@ -485,7 +476,7 @@ RSpec.describe 'Create an item' do
       select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
-      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo"
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nproject:Argo"
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -493,8 +484,9 @@ RSpec.describe 'Create an item' do
       expect(page).to have_css('#tags-tab.is-invalid')
       find_by_id('tags-tab').click
       expect(page).to have_invalid_feedback('Enter multiple tags',
-                                            'Click "Add tags" to add these tags, or clear this field.')
-      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo")
+                                            'These tags are not valid: project:Argo. Each tag needs two or more ' \
+                                            'terms separated by " : " (e.g., Project : Maps).')
+      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nproject:Argo")
 
       expect(Sdr::Repository).not_to have_received(:register)
     end

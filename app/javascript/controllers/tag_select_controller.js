@@ -10,8 +10,7 @@ const NON_EDITING_KEYS = ['Tab', 'Enter', 'Escape', 'ArrowUp', 'ArrowDown', 'Shi
 // while still allowing the user to enter their own tag.
 //   <input type="text" name="item[project_tags_attributes][0][tag]"
 //          data-controller="tag-select"
-//          data-tag-select-url-path-value="/tag_suggestions?type=project"
-//          data-action="input->tag-select#sync">
+//          data-tag-select-url-path-value="/tag_suggestions?type=project">
 // The endpoint receives the typed text as the q param and returns a list of options,
 // e.g., [{ "value": "Argo : Phase 1", "text": "Argo : Phase 1" }].
 export default class extends Controller {
@@ -118,12 +117,6 @@ export default class extends Controller {
 
   disconnect () {
     this.morphable.disconnect()
-  }
-
-  // Updates Tom Select when the value of the input is set by other code (e.g., has-many#addValue).
-  // Tom Select also dispatches input events when the user changes the value, in which case the values already match.
-  sync () {
-    if (this.element.value !== this.tomSelect.getValue()) this.tomSelect.sync()
   }
 
   async load (query, callback) {

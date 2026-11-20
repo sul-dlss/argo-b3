@@ -14,7 +14,6 @@ RSpec.describe Edit::TicketTagComponent, type: :component do
     expect(page).to have_css('label.visually-hidden', text: 'Ticket')
     expect(page).to have_css('input[name="item[ticket_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \
-                             '[data-tag-select-url-path-value="/tag_suggestions?type=ticket"]' \
-                             '[data-action="input->tag-select#sync"]')
+                             '[data-tag-select-url-path-value="/tag_suggestions?type=ticket"]')
   end
 end

@@ -14,7 +14,6 @@ RSpec.describe Edit::OtherTagComponent, type: :component do
     expect(page).to have_css('label.visually-hidden', text: 'Tag')
     expect(page).to have_css('input[name="item[other_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \
-                             '[data-tag-select-url-path-value="/tag_suggestions?type=other"]' \
-                             '[data-action="input->tag-select#sync"]')
+                             '[data-tag-select-url-path-value="/tag_suggestions?type=other"]')
   end
 end
