@@ -30,12 +30,12 @@ module BulkActions
     # Note that unlike other bulk action jobs, the druid is optional since it does not exist
     # until the object has been registered.
     def success!(message:, index:, druid: nil)
-      bulk_action.increment(:druid_count_success).save
+      bulk_action.increment!(:druid_count_success) # rubocop:disable Rails/SkipsModelValidations
       log(delimited_log_message(message:, index:, druid:))
     end
 
     def failure!(message:, index:, druid: nil)
-      bulk_action.increment(:druid_count_fail).save
+      bulk_action.increment!(:druid_count_fail) # rubocop:disable Rails/SkipsModelValidations
       log(delimited_log_message(message:, index:, druid:))
     end
 
