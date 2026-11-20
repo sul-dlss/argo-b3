@@ -180,15 +180,38 @@ RSpec.describe TagsFormConcern do
   end
 
   describe 'multiple_tags' do
-    context 'when tags were entered but not added' do
+    context 'when valid tags are entered' do
       before do
-        new_item_form.multiple_tags = "Registered By : mjgiarlo\nProject : Argo"
+        new_item_form.other_tags_attributes = [{ tag: 'Registered By : mjgiarlo' }]
+        new_item_form.project_tags_attributes = [{ tag: 'Argo' }]
+        new_item_form.multiple_tags = "Remediated By : 5.0.0\tProject : Google Books\r\n" \
+                                      "ticket : ABC-123\n  project  :  Maps : 2024  \nRegistered By : mjgiarlo"
       end
 
-      it 'is invalid' do
+      it 'is valid and adds them to the tags in the rows, as project and ticket tags where prefixed' do
+        expect(new_item_form).to be_valid
+        expect(new_item_form.tags).to eq(['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
+                                          'Project : Argo', 'Project : Google Books', 'Project : Maps : 2024',
+                                          'Ticket : ABC-123'])
+      end
+
+      it 'keeps the text as typed' do
+        new_item_form.valid?
+        expect(new_item_form.multiple_tags).to start_with("Remediated By : 5.0.0\tProject")
+      end
+    end
+
+    context 'when a tag is invalid' do
+      before do
+        new_item_form.other_tags_attributes = [{ tag: 'Registered By : mjgiarlo' }]
+        new_item_form.multiple_tags = "not a tag\nProject : Argo\nproject:Argo\nProject : \nTicket : ABC-123"
+      end
+
+      it 'is invalid and names the invalid tags' do
         expect(new_item_form).not_to be_valid
         expect(new_item_form.errors[:multiple_tags])
-          .to eq(['Click "Add tags" to add these tags, or clear this field.'])
+          .to eq(['These tags are not valid: not a tag, project:Argo, Project :. ' \
+                  'Each tag needs two or more terms separated by " : " (e.g., Project : Maps).'])
       end
     end
 
@@ -199,6 +222,7 @@ RSpec.describe TagsFormConcern do
 
       it 'is valid' do
         expect(new_item_form).to be_valid
+        expect(new_item_form.tags).to eq([])
       end
     end
   end
