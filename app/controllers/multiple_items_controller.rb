@@ -9,6 +9,8 @@
 # 4. When the form validation is complete, the user is redirected if valid,
 #    or shown the form with errors if invalid.
 class MultipleItemsController < ApplicationController
+  include RegistrationSettingsConcern
+
   CLEAR_VALUE = 'clear'
 
   def show # rubocop:disable Metrics/AbcSize
@@ -31,11 +33,15 @@ class MultipleItemsController < ApplicationController
     end
   end
 
+  # The form is prefilled with the settings of the from_druid item, if given, which the user must be able to
+  # register with.
   def new
     authorize! with: ItemPolicy
+    authorize! registration_settings, to: :create?, with: ItemPolicy if registration_settings
 
-    @items_registration_form = ItemsRegistrationForm.new
-    set_form_options(apply_apo_defaults_on_connect: true)
+    attributes = registration_settings&.items_registration_form_attributes || {}
+    @items_registration_form = ItemsRegistrationForm.new(attributes)
+    set_form_options(apply_apo_defaults_on_connect: apply_apo_defaults_on_new?)
   end
 
   def create
@@ -59,8 +65,8 @@ class MultipleItemsController < ApplicationController
   private
 
   # @param apply_apo_defaults_on_connect [Boolean] true to apply the selected APO's defaults when the form is
-  #   displayed. Only a new form does, so that a form redisplayed after validation (which may have no errors,
-  #   e.g., when validation failed) or after clearing the items keeps the user's values.
+  #   displayed. Only a blank new form does, so that a form prefilled from an item, or redisplayed after validation
+  #   (which may have no errors, e.g., when validation failed) or after clearing the items, keeps its values.
   def set_form_options(apply_apo_defaults_on_connect:)
     @apply_apo_defaults_on_connect = apply_apo_defaults_on_connect
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)

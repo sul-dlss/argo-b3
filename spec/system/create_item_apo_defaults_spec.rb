@@ -62,6 +62,40 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     end
   end
 
+  context 'when copying the registration settings of an item' do
+    let(:item_druid) { 'druid:dc234fg5678' }
+    let(:item_cocina_object) do
+      build(:dro_with_metadata, id: item_druid, admin_policy_id: apo_druid)
+        .new(access: { view: 'stanford', download: 'none', copyright: 'Item copyright.' })
+    end
+
+    before do
+      cocina_objects = { apo_druid => apo_cocina_object, other_apo_druid => other_apo_cocina_object,
+                         item_druid => item_cocina_object }
+      allow(Sdr::Repository).to receive(:find) { |druid:, **| cocina_objects.fetch(druid) }
+      allow(Sdr::Repository).to receive(:release_tags).and_return([])
+      allow(Sdr::AdministrativeTags).to receive(:list).and_return([])
+    end
+
+    it 'keeps the copied values, showing the APO defaults, until another APO is selected' do
+      visit new_item_path(from_druid: item_druid)
+      find_by_id('rights-tab').click
+
+      expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: apo_title)
+      expect(page).to have_css('#item_copyright_help', text: 'APO default = Copyright © Stanford University.')
+      expect(page).to have_field('Copyright', with: 'Item copyright.')
+      within('[data-apo-defaults-group="without_embargo"]') do
+        expect(page).to have_select('View access', selected: 'Stanford')
+        expect(page).to have_select('Download access', selected: 'None')
+      end
+
+      select_searchable_option(other_apo_title, from: 'APO')
+
+      expect(page).to have_field('Copyright', with: '')
+      expect(page).to have_css('#item_copyright_help', text: 'APO default = none')
+    end
+  end
+
   context 'when searching the APOs' do
     it 'shows only the matching APOs and applies the defaults of the one selected' do
       visit_rights_tab

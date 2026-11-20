@@ -33,6 +33,67 @@ RSpec.describe 'Items' do
     end
   end
 
+  describe 'new with the registration settings of an item' do
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: 'druid:bc123df4567', type: Cocina::Models::ObjectType.map,
+                                admin_policy_id: 'druid:hv992ry2431', collection_ids: ['druid:xz987wv6543'],
+                                source_id: 'sul:abc123', title: 'Source item title')
+        .new(access: { view: 'stanford', download: 'none', copyright: 'Copyright © Stanford University.' })
+    end
+    let(:release_tags) do
+      [Dor::Services::Client::ReleaseTag.new(to: 'Searchworks', release: true, what: 'self', who: 'jdoe',
+                                             date: '2026-01-01T00:00:00Z')]
+    end
+
+    before do
+      allow(Sdr::Repository).to receive_messages(find: cocina_object, release_tags:)
+      allow(Sdr::AdministrativeTags).to receive(:list).and_return(['Project : Maps'])
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
+      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['My Collection', 'druid:xz987wv6543']])
+      sign_in(user)
+    end
+
+    context 'when the user can register with the item’s APO and collections' do
+      before do
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:hv992ry2431')
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:xz987wv6543')
+      end
+
+      it 'prefills the settings without the identifiers or description and keeps them from the APO defaults' do
+        get '/items/new', params: { from_druid: 'druid:bc123df4567' }
+
+        expect(response).to have_http_status(:ok)
+        page = Capybara.string(response.body)
+        expect(page).to have_select('item[content_type]', selected: 'map')
+        expect(page).to have_select('item[apo_druid]', visible: :all, selected: 'My APO')
+        expect(page).to have_select('item[collection_druids][]', visible: :all, selected: ['My Collection'])
+        expect(page).to have_select('item[access_view]', selected: 'Stanford')
+        expect(page).to have_select('item[access_download]', selected: 'None')
+        expect(page).to have_field('item[copyright]', with: 'Copyright © Stanford University.')
+        expect(page).to have_field('item[project_tags_attributes][0][tag]', with: 'Maps')
+        expect(page).to have_select('item[release_tags_attributes][searchworks_target]', selected: 'Release')
+        expect(page).to have_select('item[release_tags_attributes][earthworks_target]',
+                                    selected: 'Follow collection settings')
+        expect(page).to have_css('input[name="item[source_id]"]:not([value])')
+        expect(page).to have_css('input[name="item[title]"]:not([value])')
+        expect(page).to have_css('[data-controller="apo-defaults"][data-apo-defaults-apply-on-connect-value="false"]')
+        expect(Sdr::Repository).to have_received(:find).with(druid: 'druid:bc123df4567')
+      end
+    end
+
+    context 'when the user cannot register with the item’s APO' do
+      before do
+        create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:xz987wv6543')
+      end
+
+      it 'denies access' do
+        get '/items/new', params: { from_druid: 'druid:bc123df4567' }
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
   describe 'create' do
     context 'when invalid' do
       before do
