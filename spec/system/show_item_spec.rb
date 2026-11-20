@@ -641,6 +641,8 @@ RSpec.describe 'Show item' do
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       # The dashboard, visited to set the last search cookie, searches for recent drafts and deposits.
       allow(Searchers::Item).to receive(:call).and_return([])
+      # It also looks up recent objects, which a session left from an earlier example may hold.
+      allow(Searchers::ItemByDruid).to receive(:call).and_return([])
       allow(Search::SolrService).to receive(:post)
         .with(request: hash_including(start: 1, rows: 3))
         .and_return('response' => { 'numFound' => 10,
