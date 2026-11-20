@@ -16,7 +16,7 @@ Everything this skill produces is visible to others under the user's name. Draft
 3. **Write the body** from the template below, in a file (e.g., `/tmp/<feature>/pr-body.md`) next to the screenshots or video.
 4. **Create the PR**: `test -s pr-body.md && gh pr create -R sul-dlss/argo-b3 --draft --base main --head <branch> --title "<title>" --body-file pr-body.md --attach ./<video>.webm`, with one `--attach './<nn>-<beat>.png#<alt text>'` per screenshot in place of the video, run from the directory holding the files. `-R` is needed because that directory is outside the repo, and `test -s` stops an empty body file from replacing the description. Reference each attachment in the body (`![<alt>](./<video>.webm)`, `![<alt>](./<nn>-<beat>.png)`) so `gh` (2.99 or later) places it inline. Confirm with `gh pr view <N> -R sul-dlss/argo-b3 --json isDraft,body` that it is a draft and the body has a `user-attachments` URL. To add or replace an attachment later, use `gh pr edit <N> -R sul-dlss/argo-b3 --attach <file>`, with the same `--body-file` check.
 5. **Inline comments**: post them as one review (below).
-6. **Report**: the PR link, the decisions flagged, and what the inline comments cover.
+6. **Report**: the PR link, the decisions flagged on each list, and what the inline comments cover.
 
 ### Body template
 
@@ -35,7 +35,13 @@ Closes #<issue>
 
 ### Provisional decisions and open questions (feedback welcome)
 
-1. **<Decision, in a few words>.** <What was chosen, the alternative, and why.> <A question, when the choice is the reviewers' to make.>
+#### For product owners and designers
+
+1. **<Decision, in a few words>.** <What was chosen, the alternative, and why.> <A question, when the choice is theirs to make.> <"None." if empty.>
+
+#### For developers
+
+2. **<Decision, in a few words>.** <What was chosen, the alternative, and why.> <A question, when the choice is theirs to make.> <Number on from the list above; "None." if empty.>
 
 ## Evidence
 
@@ -59,7 +65,9 @@ Closes #<issue>
 - assumption made without asking;
 - known problem left unfixed, and why.
 
-Done when each appears, with its alternative.
+Sort each item onto exactly one list. Product owners and designers get the *what*: anything that changes what a user sees, does, or reads. Developers get the *how*: everything else. An item that touches both goes on the first list, with its technical reason inside it. Write the first list in users' terms (GLOSSARY.md), naming screens and actions rather than code.
+
+Done when each appears, with its alternative, on exactly one list.
 
 ### Inline comments
 
