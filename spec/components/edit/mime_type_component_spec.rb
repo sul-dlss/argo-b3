@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Edit::MimeTypeComponent, type: :component do
-  let(:component) { described_class.new(form:) }
+  let(:component) { described_class.new(form:, label_text: 'MIME type for image1.tif') }
   let(:form) { ActionView::Helpers::FormBuilder.new(:content_file, content_file_form, vc_test_view_context, {}) }
   let(:content_file_form) { ContentFileForm.new(mime_type:) }
   let(:mime_type) { 'image/jp2' }
@@ -11,7 +11,7 @@ RSpec.describe Edit::MimeTypeComponent, type: :component do
   it 'renders the MIME type select' do
     render_inline(component)
 
-    expect(page).to have_select('MIME type', selected: 'image/jp2', options: MimeTypes::COMMON)
+    expect(page).to have_select('MIME type for image1.tif', selected: 'image/jp2', options: MimeTypes::COMMON)
     expect(page).to have_css('select[data-controller="creatable-select"]')
   end
 
@@ -21,8 +21,8 @@ RSpec.describe Edit::MimeTypeComponent, type: :component do
     it 'adds the MIME type as an option' do
       render_inline(component)
 
-      expect(page).to have_select('MIME type', selected: 'image/x-custom',
-                                               with_options: ['image/x-custom', 'image/jp2'])
+      expect(page).to have_select('MIME type for image1.tif', selected: 'image/x-custom',
+                                                              with_options: ['image/x-custom', 'image/jp2'])
     end
   end
 

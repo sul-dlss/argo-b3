@@ -63,3 +63,39 @@
 turbo-frame[aria-busy="true"] .spinner-on-frame-submit .submit-spinner {
   display: flex !important;
 }
+
+// Edit resource form (Edit::FileSetComponent): a table with one row of inputs per file.
+// Design standard deviation: LAY-6. Column minimum widths are in ch, since they depend on the values the
+// inputs show (e.g., a MIME type such as application/pdf), which have no matching Bootstrap utility.
+.file-set-edit-table {
+  .file-set-filename {
+    min-width: 16ch;
+    width: auto;
+  }
+
+  .file-set-mime-type {
+    min-width: 18ch;
+  }
+
+  .file-set-access {
+    min-width: 11ch;
+  }
+
+  .file-set-select {
+    min-width: 14ch;
+  }
+
+  // Checkboxes in a cell have a visually hidden label, so the form-check padding is not needed.
+  .form-check {
+    min-height: 0;
+    padding-left: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
+  }
+}
+
+.file-set-label-field input {
+  min-width: 30ch;
+}
