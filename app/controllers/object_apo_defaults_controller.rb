@@ -75,10 +75,13 @@ class ObjectApoDefaultsController < ApplicationController
                                Contents::UnsavedChanges.call(content:, cocina_object: @cocina_object)
   end
 
-  # The errors of the content (e.g., not valid for the content type) have no field on the page.
+  # The errors of the content (e.g., not valid for the content type) and of the access built from the APO defaults
+  # have no field on the page.
   def render_invalid
-    content_errors = @apo_defaults_form.errors.messages_for(:content)
-    flash.now[:danger] = content_errors.to_sentence if content_errors.any?
+    errors = @apo_defaults_form.errors
+    errors_without_field = errors.messages_for(:content) +
+                           errors.full_messages_for(:access) + errors.full_messages_for(:embargo_access)
+    flash.now[:danger] = errors_without_field.to_sentence if errors_without_field.any?
     set_unsaved_content_changes(content: mutable_content)
     render :new, status: :unprocessable_content
   end

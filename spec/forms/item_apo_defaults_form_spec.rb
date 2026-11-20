@@ -22,7 +22,7 @@ RSpec.describe ItemApoDefaultsForm do
   end
 
   before do
-    allow(Sdr::Repository).to receive(:find).with(druid: apo_druid).and_return(apo_cocina_object)
+    allow(Sdr::Repository).to receive(:find).and_return(apo_cocina_object)
   end
 
   describe '.build_from_cocina_object' do
