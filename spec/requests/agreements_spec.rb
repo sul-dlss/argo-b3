@@ -60,7 +60,7 @@ RSpec.describe 'Agreements' do
         post '/agreements', params: { commit: 'add_files',
                                       agreement: { title: 'My Agreement', source_id: 'sul:agreement-1' } }
 
-        expect(response).to redirect_to('/contents/druid:xz987wv6543/edit')
+        expect(response).to redirect_to('/contents/druid:xz987wv6543/edit?open_on=first')
       end
     end
 
@@ -238,7 +238,7 @@ RSpec.describe 'Agreements' do
       it 'saves and redirects to manage files' do
         patch "/agreements/#{druid}", params: { agreement: agreement_params, commit: }
 
-        expect(response).to redirect_to("/contents/#{druid}/edit")
+        expect(response).to redirect_to("/contents/#{druid}/edit?open_on=first")
         expect(Sdr::Repository).to have_received(:update)
         expect(Sdr::Repository).not_to have_received(:accession)
       end

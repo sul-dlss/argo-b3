@@ -36,7 +36,7 @@ RSpec.describe 'Show unsaved content changes' do
 
       rendered_page = Capybara.string(response.body)
       expect(rendered_page).to have_button('Deposit', disabled: true)
-      expect(rendered_page).to have_text('Files have unsaved changes. Deposit from Manage files.')
+      expect(rendered_page).to have_text('Files have unsaved changes. Deposit from "Add files and deposit".')
     end
   end
 

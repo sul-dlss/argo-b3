@@ -69,13 +69,15 @@ RSpec.describe 'Deposit' do
     context 'when the files have unsaved changes' do
       before do
         allow(Sdr::DepositDraftService).to receive(:call).and_raise(Sdr::DepositDraftService::UnsavedChangesError)
+        allow(Sdr::VersionService).to receive(:new).and_return(version_service_double(version: 2))
       end
 
-      it 'redirects to managing files with an error' do
+      it 'redirects to managing files, opening on structure files, with an error' do
         post(deposit_object_path(druid), params:)
 
-        expect(response).to redirect_to(edit_content_path(druid))
-        expect(flash[:danger]).to eq('Files have unsaved changes. Save or deposit them from Manage files.')
+        expect(response).to redirect_to("/contents/#{druid}/edit?open_on=structure")
+        expect(flash[:danger])
+          .to eq('Files have unsaved changes. Save or deposit them from "Edit files and structure".')
       end
     end
 

@@ -12,7 +12,8 @@ module VersionServiceDouble
     status = DEFAULTS.merge(overrides)
     editable = status.fetch(:editable?) { status[:openable?] || status[:closeable?] }
     derived = { editable?: editable, draft_editable?: editable || status[:assembly_stopped_with_error?],
-                open_and_not_assembling?: status[:open?] && !status[:assembling?] }
+                open_and_not_assembling?: status[:open?] && !status[:assembling?],
+                first_version_deposited?: status[:version] > 1 || status[:closed?] }
     instance_double(Sdr::VersionService, **derived, **status)
   end
 end

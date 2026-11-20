@@ -86,7 +86,7 @@ RSpec.describe 'Item text extraction' do
 
         expect(rendered_page).to have_button('Save as draft')
         expect(rendered_page).to have_no_button('Extract text and deposit')
-        expect(rendered_page).to have_text('Files have unsaved changes. Deposit from Manage files.')
+        expect(rendered_page).to have_text('Files have unsaved changes. Deposit from "Edit files and structure".')
       end
     end
 

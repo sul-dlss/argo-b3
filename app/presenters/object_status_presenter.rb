@@ -39,6 +39,11 @@ class ObjectStatusPresenter
     status == :error && version_service.assembly_stopped_with_error?
   end
 
+  # @return [String] the name of managing files for the object (see ManageFilesLabel)
+  def manage_files_label
+    @manage_files_label ||= ManageFilesLabel.call(version_service:)
+  end
+
   def workflow_error_messages
     workflow_errors.map { |workflow_error| format_workflow_error(workflow_error) }
   end

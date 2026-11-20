@@ -3,8 +3,15 @@
 module Contents
   # The steps of managing files: item details (except for agreements), add and edit files, structure files, and
   # deposit. The current step is saved with the mutable Content, along with the item details chosen so far.
+  # Entering managing files opens on a step chosen by where it is entered from (see #open_on!); moving within it
+  # keeps the saved step.
   class ManageFilesFlow
     STEPS = Content.steps.keys.freeze
+
+    # Where managing files can be entered from, as the step to open on: the first step (e.g., from registering, or
+    # from "Save draft and edit files"), or structure files (from the status box).
+    OPEN_ON_FIRST = 'first'
+    OPEN_ON_STRUCTURE = 'structure'
 
     # The steps with the fields of attributes that are not item details.
     STEPS_BY_ERROR_ATTRIBUTE = { content: 'structure', version_description: 'deposit' }.freeze
@@ -70,6 +77,17 @@ module Contents
       ItemDetails.new(content:).save!(form, step: step_at(-1))
     end
 
+    # Moves to the step that entering managing files opens on. Opening on structure files opens on add and edit files
+    # when there are no files, and otherwise structures (or appends) the files that are not in a resource, as leaving
+    # add and edit files does.
+    # @param open_on [String] OPEN_ON_FIRST or OPEN_ON_STRUCTURE
+    def open_on!(open_on)
+      case open_on
+      when OPEN_ON_FIRST then content.update!(step: steps.first)
+      when OPEN_ON_STRUCTURE then open_on_structure!
+      end
+    end
+
     # Moves to the step with the fields of the first error that depositing would find, if any.
     # @param form [ContentsItemForm]
     def go_to_deposit_errors!(form)
@@ -98,6 +116,13 @@ module Contents
 
     def step_at(offset)
       steps.fetch((steps.index(current_step) + offset).clamp(0, steps.size - 1))
+    end
+
+    def open_on_structure!
+      return content.update!(step: 'files') unless content.content_file_binaries.exists?
+
+      content.update!(step: 'structure')
+      start_structuring!
     end
 
     def start_structuring!
