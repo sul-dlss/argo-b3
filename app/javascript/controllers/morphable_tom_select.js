@@ -36,6 +36,11 @@ export default class MorphableTomSelect {
     if (!this.tomSelect) return
 
     const { target } = event
+    // A dropdown in the body (dropdownParent) isn't in the morphed page, but belongs to the widget until it's destroyed.
+    if (target === this.tomSelect.dropdown && !this.tomSelect.wrapper.contains(target)) {
+      event.preventDefault()
+      return
+    }
     // The input is being removed, so disconnect tears down the widget.
     if (target === this.input && !event.detail.newElement) return
     if (![this.input, this.tomSelect.wrapper, this.label].includes(target)) return

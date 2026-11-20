@@ -21,12 +21,14 @@ module Edit
     ].freeze
 
     # @param form [ActionView::Helpers::FormBuilder] a nested form builder for a ContentFileForm
-    def initialize(form:)
+    # @param label_text [String] the visually hidden label, which names the file (the field is in a table row)
+    def initialize(form:, label_text:)
       @form = form
+      @label_text = label_text
       super()
     end
 
-    attr_reader :form
+    attr_reader :form, :label_text
 
     # Includes the current language tag when it is not a common one, so that it remains selected.
     def options

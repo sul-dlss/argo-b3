@@ -1,24 +1,61 @@
-<%= render SdrViewComponents::Elements::CardComponent.new(classes: 'mb-3', data: { content_files_target: 'row' }) do |card| %>
-  <% card.with_body do %>
-    <div class="card-title d-flex justify-content-between align-items-start">
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h5, text: filepath, variant: :h4) %>
-      <%= render Elements::DeleteButtonComponent.new(label: t('edit.content_file_sets.buttons.remove_file', filepath:),
-                                                     data: { action: 'content-files#remove' }) %>
-    </div>
+<%# Design standard deviation: FORM-3. Publish and Preserve are not in a fieldset, since the column headers group them. %>
+<%= tag.tr data: { content_files_target: 'row', controller: 'access-rights' } do %>
+  <td class="file-set-filename">
+    <%= filepath %>
+    <%= form.hidden_field :id %>
     <%= form.hidden_field :_destroy, data: { content_files_target: 'destroy' } %>
-    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('edit.content_file_sets.fields.content_files.access.label'),
-                                                               classes: 'my-fieldset') do %>
-      <%= render Edit::AccessRightsComponent.new(form:, citation_only: false, container_classes: 'my-field') %>
-    <% end %>
-    <%= render Edit::FileAdministrativeComponent.new(form:, container_classes: 'my-fieldset') %>
-    <%= render Edit::UseComponent.new(form:) %>
-    <%= render Edit::MimeTypeComponent.new(form:) %>
-    <%= render Edit::FileLanguageComponent.new(form:) %>
-    <%= render SdrViewComponents::Forms::CheckboxComponent.new(
-          form:,
-          field_name: :corrected_for_accessibility,
-          label_text: t('edit.content_file_sets.fields.content_files.corrected_for_accessibility.label'),
-          container_classes: 'my-field'
-        ) %>
-  <% end %>
+  </td>
+  <td class="file-set-mime-type">
+    <%= render Edit::MimeTypeComponent.new(form:, label_text: row_label(:mime_type)) %>
+  </td>
+  <td class="file-set-access">
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :view,
+                                                                  options: view_options,
+                                                                  label_text: row_label(:view),
+                                                                  label_hidden: true,
+                                                                  label_mark_required: true,
+                                                                  input_data: { access_rights_target: 'view', action: 'access-rights#toggle' }) %>
+  </td>
+  <td class="file-set-access">
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :download,
+                                                                  options: download_options,
+                                                                  label_text: row_label(:download),
+                                                                  label_hidden: true,
+                                                                  label_mark_required: true,
+                                                                  input_data: { access_rights_target: 'download', action: 'access-rights#toggle' }) %>
+  </td>
+  <td class="file-set-access">
+    <%= render SdrViewComponents::Forms::SelectFieldComponent.new(form:, field_name: :location,
+                                                                  options: location_options,
+                                                                  label_text: row_label(:location),
+                                                                  label_hidden: true,
+                                                                  input_data: { access_rights_target: 'location' },
+                                                                  container_data: { access_rights_target: 'locationField' }) %>
+  </td>
+  <td>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :publish,
+                                                               label_text: row_label(:publish),
+                                                               label_hidden: true) %>
+  </td>
+  <td>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :preserve,
+                                                               label_text: row_label(:preserve),
+                                                               label_hidden: true,
+                                                               input_aria: preserve_aria) %>
+  </td>
+  <td class="file-set-select">
+    <%= render Edit::UseComponent.new(form:, label_text: row_label(:use)) %>
+  </td>
+  <td>
+    <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :corrected_for_accessibility,
+                                                               label_text: row_label(:corrected_for_accessibility),
+                                                               label_hidden: true) %>
+  </td>
+  <td class="file-set-language">
+    <%= render Edit::FileLanguageComponent.new(form:, label_text: row_label(:language_tag)) %>
+  </td>
+  <td>
+    <%= render Elements::DeleteButtonComponent.new(label: t('edit.content_file_sets.buttons.remove_file', filepath:),
+                                                   data: { action: 'content-files#remove' }) %>
+  </td>
 <% end %>

@@ -2,22 +2,17 @@
 
 # Form object for editing a ContentFile (file) within a ContentFileSetForm (resource)
 class ContentFileForm < ApplicationForm
-  PUBLISH_AND_PRESERVE = 'publish_and_preserve'
-  PUBLISH_ONLY = 'publish_only'
-  PRESERVE_ONLY = 'preserve_only'
-  ADMINISTRATIVE_OPTIONS = [PUBLISH_AND_PRESERVE, PUBLISH_ONLY, PRESERVE_ONLY].freeze
-
   # NOTE: A file that is being deleted does not need to be valid so some validation
   # are limited to marked_for_destruction?
 
-  inherit_attributes_from ContentFile, only: %i[id use view download location language_tag corrected_for_accessibility]
+  inherit_attributes_from ContentFile, only: %i[id use view download location language_tag corrected_for_accessibility
+                                                publish preserve]
   # Stored on the ContentFileBinary, so shared by every file that references the binary.
   attribute :mime_type, :string
   # For display only; not editable.
   attribute :filepath, :string
-  # Maps to publish and preserve. Nil when the file is neither published nor preserved.
-  attribute :administrative, :string
-  validate :validate_administrative, unless: :marked_for_destruction?
+  # A file must be published, preserved, or both.
+  validate :validate_publish_or_preserve, unless: :marked_for_destruction?
 
   normalizes_whitespace :use, :mime_type, :language_tag
 
@@ -35,37 +30,13 @@ class ContentFileForm < ApplicationForm
     super + [:_destroy]
   end
 
-  def from_model(content_file)
-    super
-    self.administrative = administrative_for(publish: content_file.publish, preserve: content_file.preserve)
-    self
-  end
-
-  def publish?
-    [PUBLISH_AND_PRESERVE, PUBLISH_ONLY].include?(administrative)
-  end
-
-  def preserve?
-    [PUBLISH_AND_PRESERVE, PRESERVE_ONLY].include?(administrative)
-  end
-
   private
 
-  def administrative_for(publish:, preserve:)
-    if publish && preserve
-      PUBLISH_AND_PRESERVE
-    elsif publish
-      PUBLISH_ONLY
-    elsif preserve
-      PRESERVE_ONLY
-    end
-  end
+  # The error is added to publish, so that it is shown in the file's row.
+  def validate_publish_or_preserve
+    return if publish || preserve
 
-  def validate_administrative
-    return if ADMINISTRATIVE_OPTIONS.include?(administrative)
-
-    errors.add(:administrative,
-               I18n.t('edit.content_file_sets.fields.content_files.administrative.validations.required'))
+    errors.add(:publish, I18n.t('edit.content_file_sets.fields.content_files.publish.validations.required'))
   end
 
   def location_applies?

@@ -3,21 +3,28 @@
 require 'rails_helper'
 
 RSpec.describe ContentFileForm do
-  describe '.from_model' do
-    subject(:form) { described_class.from_model(content_file) }
+  subject(:form) do
+    described_class.new(publish:, preserve:, mime_type: 'image/tiff', view: 'world', download: 'world')
+  end
 
-    {
-      { publish: true, preserve: true } => 'publish_and_preserve',
-      { publish: true, preserve: false } => 'publish_only',
-      { publish: false, preserve: true } => 'preserve_only'
-    }.each do |attributes, administrative|
-      context "when publish is #{attributes[:publish]} and preserve is #{attributes[:preserve]}" do
-        let(:content_file) { build(:content_file, **attributes) }
+  [[true, false], [false, true], [true, true]].each do |publish_value, preserve_value|
+    context "when publish is #{publish_value} and preserve is #{preserve_value}" do
+      let(:publish) { publish_value }
+      let(:preserve) { preserve_value }
 
-        it "maps to #{administrative}" do
-          expect(form.administrative).to eq(administrative)
-        end
+      it 'is valid' do
+        expect(form).to be_valid
       end
+    end
+  end
+
+  context 'when neither publish nor preserve is selected' do
+    let(:publish) { false }
+    let(:preserve) { false }
+
+    it 'is invalid with an error on publish' do
+      expect(form).not_to be_valid
+      expect(form.errors[:publish]).to eq(['Select publish, preserve, or both.'])
     end
   end
 end
