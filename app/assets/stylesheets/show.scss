@@ -222,3 +222,8 @@
 .workflow-in-progress {
   color: #ad4e00;
 }
+
+// The status box's Deposit dropdown form, wider than the box. It is narrower on small screens, so that it fits.
+.deposit-dropdown-menu {
+  width: min(40rem, calc(100vw - 2rem));
+}
