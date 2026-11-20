@@ -185,14 +185,15 @@ RSpec.describe TagsFormConcern do
         new_item_form.other_tags_attributes = [{ tag: 'Registered By : mjgiarlo' }]
         new_item_form.project_tags_attributes = [{ tag: 'Argo' }]
         new_item_form.multiple_tags = "Remediated By : 5.0.0\tProject : Google Books\r\n" \
-                                      "ticket : ABC-123\n  project  :  Maps : 2024  \nRegistered By : mjgiarlo"
+                                      "ticket : ABC-123\n  project  :  Maps : 2024  \nRegistered By : mjgiarlo\n" \
+                                      'Project : Project : Atlases'
       end
 
       it 'is valid and adds them to the tags in the rows, as project and ticket tags where prefixed' do
         expect(new_item_form).to be_valid
         expect(new_item_form.tags).to eq(['Registered By : mjgiarlo', 'Remediated By : 5.0.0',
                                           'Project : Argo', 'Project : Google Books', 'Project : Maps : 2024',
-                                          'Ticket : ABC-123'])
+                                          'Project : Atlases', 'Ticket : ABC-123'])
       end
 
       it 'keeps the text as typed' do

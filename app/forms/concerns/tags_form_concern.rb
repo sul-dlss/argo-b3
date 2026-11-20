@@ -71,14 +71,17 @@ module TagsFormConcern
   end
 
   def multiple_project_tags
-    valid_multiple_tags.grep(MULTIPLE_PROJECT_TAG_PATTERN) do |tag|
-      tag.sub(MULTIPLE_PROJECT_TAG_PATTERN, ProjectTagForm::PROJECT_TAG_PREFIX)
-    end
+    prefixed_multiple_tags(MULTIPLE_PROJECT_TAG_PATTERN, ProjectTagForm::PROJECT_TAG_PREFIX)
   end
 
   def multiple_ticket_tags
-    valid_multiple_tags.grep(MULTIPLE_TICKET_TAG_PATTERN) do |tag|
-      tag.sub(MULTIPLE_TICKET_TAG_PATTERN, TicketTagForm::TICKET_TAG_PREFIX)
+    prefixed_multiple_tags(MULTIPLE_TICKET_TAG_PATTERN, TicketTagForm::TICKET_TAG_PREFIX)
+  end
+
+  # Like the project and ticket tag forms, tolerates a tag that repeats the prefix (e.g., "Project : Project : Maps").
+  def prefixed_multiple_tags(pattern, prefix)
+    valid_multiple_tags.grep(pattern) do |tag|
+      "#{prefix}#{tag.sub(pattern, '').delete_prefix(prefix).strip}"
     end
   end
 end
