@@ -5,13 +5,8 @@
 
   <%# Sections read row by row in the three-column layout. %>
   <div class="row mt-2 gy-3">
-    <% BulkActions::SECTIONS.each do |section, section_label| %>
-      <% bulk_action_configs = BulkActions.in_section(section).select do |config|
-           config.admin_policy_rule.nil? || allowed_to?(config.admin_policy_rule, nil, with: AdminPolicy)
-         end %>
-      <% next if bulk_action_configs.empty? %>
-
-      <%= render BulkActions::ListSectionComponent.new(label: section_label, classes: 'col-lg-4 col-md-6', bulk_action_configs:) %>
+    <% available_bulk_action_sections.each do |section, bulk_action_configs| %>
+      <%= render BulkActions::ListSectionComponent.new(label: BulkActions.section_label(section), classes: 'col-lg-4 col-md-6', bulk_action_configs:) %>
     <% end %>
   </div>
 <% end %>

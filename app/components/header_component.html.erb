@@ -5,12 +5,17 @@
   <% end %>
   <%= header.with_secondary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>
-    <%= render SdrViewComponents::Elements::Navigation::DropdownMenuComponent.new(text: 'Bulk actions') do |dropdown| %>
-      <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.tabs.history'), link: bulk_actions_path) %>
+    <%= render Elements::Navigation::MegaMenuComponent.new(text: 'Bulk actions') do |menu| %>
+      <% menu.with_section(label: t('bulk_actions.sections.pages'), featured: true) do |section| %>
+        <% section.with_link(label: t('bulk_actions.tabs.history'), link: bulk_actions_path) %>
+        <% section.with_link(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
       <% end %>
-      <% dropdown.with_item do %>
-        <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(label: t('bulk_actions.menu'), link: new_bulk_action_path) %>
+      <% bulk_action_sections.each do |bulk_action_section, bulk_action_configs| %>
+        <% menu.with_section(label: BulkActions.section_label(bulk_action_section)) do |section| %>
+          <% bulk_action_configs.each do |bulk_action_config| %>
+            <% section.with_link(label: bulk_action_config.label, link: bulk_action_config.new_path) %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
 

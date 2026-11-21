@@ -1,0 +1,58 @@
+// The header's mega menus (Elements::Navigation::MegaMenuComponent)
+.mega-menu {
+  .mega-menu-heading {
+    padding-left: 0;
+    padding-right: 0;
+    white-space: normal;
+  }
+
+  .dropdown-item {
+    padding-left: map.get($spacers, 2);
+    white-space: normal;
+  }
+}
+
+.mega-menu-panel {
+  padding: map.get($spacers, 2);
+}
+
+// The component library lays out .masthead .navbar-nav li inline; the panel's links are stacked.
+.masthead .navbar-nav .mega-menu-panel li {
+  display: block;
+}
+
+@include media-breakpoint-up(md) {
+  // The panel spans the secondary navigation (.navbars, from SdrViewComponents::Structure::HeaderComponent),
+  // aligned to its right edge, rather than hanging from its toggle.
+  .masthead .navbars {
+    position: relative;
+  }
+
+  .masthead .navbar-nav .mega-menu {
+    position: static;
+  }
+
+  // A bar to the left of each section, spanning its heading and links, separates the columns; there is none in
+  // the single column.
+  .mega-menu-section {
+    border-left: var(--bs-border-width) solid var(--bs-border-color);
+    padding-left: map.get($spacers, 2);
+  }
+
+  // The thicker bar takes from the padding, so the text stays aligned with the other sections'.
+  .mega-menu-section-featured {
+    border-left: map.get($spacers, 1) solid rgb(var(--stanford-archway-light-rgb));
+    padding-left: calc(#{map.get($spacers, 2)} + var(--bs-border-width) - #{map.get($spacers, 1)});
+  }
+
+  // data-bs-popper is set when the toggle's data-bs-display is static, so Popper doesn't position the panel.
+  .mega-menu-panel[data-bs-popper] {
+    left: auto;
+    padding: map.get($spacers, 3);
+    right: 0;
+
+    // Design standard deviation: LAY-6. A minimum width keeps three columns readable when the navigation is
+    // narrow; 40rem fits within the container at the md breakpoint.
+    width: max(100%, 40rem);
+  }
+}

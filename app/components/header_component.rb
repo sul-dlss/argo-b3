@@ -18,6 +18,11 @@ class HeaderComponent < ApplicationComponent
 
   delegate :impersonating?, to: :Current
 
+  # @return [Hash{Symbol => Array<BulkActions::Config>}] the bulk action configs the user may use, by section
+  def bulk_action_sections
+    helpers.available_bulk_action_sections
+  end
+
   def can_register_item?
     helpers.allowed_to?(:new?, nil, with: ItemPolicy)
   end
