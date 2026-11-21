@@ -22,12 +22,16 @@
     <% end %>
     <% component.with_row(label: 'Collection') do |row_component| %>
       <% row_component.with_cell do %>
-        <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
-          <% collection_title = Array(@solr_doc.collection_titles)[index] %>
-          <%= link_to_object collection_title, collection_druid %>
-          <% search_form = ResultsSearchForm.new(collection_druids: [collection_druid]) %>
-          (<%= link_to('All objects with this collection', url_for(search_form)) %>)
-        <% end %>
+        <ul class="list-unstyled mb-0">
+          <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
+            <% collection_title = Array(@solr_doc.collection_titles)[index] %>
+            <li>
+              <%= link_to_object collection_title, collection_druid %>
+              <% search_form = ResultsSearchForm.new(collection_druids: [collection_druid]) %>
+              (<%= link_to('All objects with this collection', url_for(search_form)) %>)
+            </li>
+          <% end %>
+        </ul>
       <% end %>
     <% end %>
     <% component.with_row(label: 'Access rights', value: @cocina_model.display_access_rights) %>
