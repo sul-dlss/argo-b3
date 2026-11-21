@@ -39,6 +39,28 @@ RSpec.describe Dashboard::RecentObjectsTableComponent, type: :component do
     end
   end
 
+  context 'when a viewed object has many tags' do
+    let(:recent_object_docs) { [object_doc] }
+    let(:object_doc) do
+      SearchResults::Item.new(solr_doc: {
+                                Search::Fields::ID => druid,
+                                Search::Fields::TITLE => 'Liver and bacon: fox trot',
+                                Search::Fields::OBJECT_TYPES => ['item'],
+                                Search::Fields::ALL_TAGS => ['Project : Riegler-Deutsch Index', 'Remediated',
+                                                             'Ticket : TECHMD-1', 'Process : Content Type : Book',
+                                                             'Registered By : jdoe']
+                              })
+    end
+
+    it 'renders the first three tags and a count of the rest' do
+      render_inline(component)
+
+      cell = page.find('tbody tr').all('td')[3]
+      expect(cell.all('li').map(&:text)).to eq ['Project : Riegler-Deutsch Index', 'Remediated',
+                                                'Ticket : TECHMD-1', 'and 2 more tags']
+    end
+  end
+
   context 'when no objects have been viewed' do
     let(:recent_object_docs) { [] }
 
