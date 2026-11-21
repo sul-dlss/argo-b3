@@ -1,0 +1,20 @@
+<%= tag.div class: classes do %>
+  <%# text-wrap overrides Bootstrap keeping a dropdown toggle on one line, since the label is too long for the narrow Actions panel. %>
+  <%= render SdrViewComponents::Elements::ButtonComponent.new(label: t('show.copy_registration_settings.label'),
+                                                              variant: :'outline-primary', classes: 'dropdown-toggle text-wrap',
+                                                              disabled:,
+                                                              data: { 'bs-toggle': 'dropdown' },
+                                                              aria: { expanded: false }) %>
+  <div class="dropdown-menu" role="menu">
+    <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(
+          label: t('show.copy_registration_settings.single_item'),
+          link: new_item_path(from_druid: druid),
+          role: 'menuitem'
+        ) %>
+    <%= render SdrViewComponents::Elements::Navigation::DropdownLinkComponent.new(
+          label: t('show.copy_registration_settings.multiple_items'),
+          link: new_multiple_item_path(from_druid: druid),
+          role: 'menuitem'
+        ) %>
+  </div>
+<% end %>

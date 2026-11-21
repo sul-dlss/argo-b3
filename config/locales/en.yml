@@ -97,6 +97,10 @@ en:
     label: "Search results"
     advanced: "Advanced search"
   show:
+    copy_registration_settings:
+      label: "Copy registration settings from"
+      multiple_items: "Multiple items"
+      single_item: "Single item"
     status:
       assembling:
         heading: "Assembling..."

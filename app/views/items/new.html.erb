@@ -47,8 +47,9 @@
                                                                           label: t('edit.items.tabs.rights.label'),
                                                                           mark_required: true)) do |pane| %>
         <%# Selecting an APO applies its object defaults to the rights fields. The defaults of the initially selected
-            APO are also applied to a new form, but not to a form redisplayed with errors, which keeps the user's values. %>
-        <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: @new_item_form.errors.empty? } do %>
+            APO are also applied to a blank new form, but not to a form prefilled from an item or redisplayed with
+            errors, which keep their values. %>
+        <%= tag.div data: { controller: 'apo-defaults', apo_defaults_apply_on_connect_value: @apply_apo_defaults_on_connect } do %>
           <%= render Edit::ApoComponent.new(form:, options: @apo_options, apo_defaults: true) %>
 
           <%= render Edit::CollectionsComponent.new(form:, options: @collection_options) %>

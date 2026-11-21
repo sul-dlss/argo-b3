@@ -282,6 +282,8 @@ RSpec.describe 'Show item' do
 
     # Only APOs can register collections
     expect(page).to have_no_button('Register & deposit collection')
+    # Copying registration settings needs edit permission on the item's APO and collections, which the user lacks
+    expect(page).to have_button('Copy registration settings from', disabled: true)
 
     # Identification table
     expect(page).to have_table_caption('identification-table', 'Identification')
