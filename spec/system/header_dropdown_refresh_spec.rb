@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Header dropdowns on pages that refresh themselves' do
   let(:user) { create(:user) }
   let(:toggle) { find('header button.dropdown-toggle', text: 'Bulk actions') }
-  let(:menu) { toggle.find(:xpath, 'following-sibling::ul[contains(@class, "dropdown-menu")]', visible: :all) }
+  let(:menu) { toggle.find(:xpath, 'following-sibling::*[contains(@class, "dropdown-menu")]', visible: :all) }
 
   # Waits for the page to be morph refreshed: by its own refresh timer, or else started here.
   # The marker is not in the server-rendered page, so a morph removes it.
