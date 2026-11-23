@@ -23,10 +23,21 @@ RSpec.describe RegistrationSettings do
                                            date: '2026-02-01T00:00:00Z')]
   end
 
+  let(:goobi_version) { 1 }
+  let(:workflows) do
+    [Dor::Services::Response::Workflow.new(xml: <<~XML)]
+      <workflow id="goobiWF">
+        <process version="#{goobi_version}" status="completed" name="start"/>
+        <process version="#{goobi_version}" status="completed" name="goobi-notify"/>
+      </workflow>
+    XML
+  end
+
   before do
     allow(Sdr::AdministrativeTags).to receive(:list)
       .and_return(['Project : Maps', 'Ticket : DIGREQ-1', 'Registered By : jdoe'])
     allow(Sdr::Repository).to receive(:release_tags).and_return(release_tags)
+    allow(Sdr::WorkflowService).to receive(:workflows_for).and_return(workflows)
   end
 
   describe '#items_registration_form_attributes' do
@@ -48,16 +59,38 @@ RSpec.describe RegistrationSettings do
         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
         other_tags_attributes: [{ tag: 'Registered By : jdoe' }],
         project_tags_attributes: [{ tag: 'Project : Maps' }],
-        ticket_tags_attributes: [{ tag: 'Ticket : DIGREQ-1' }]
+        ticket_tags_attributes: [{ tag: 'Ticket : DIGREQ-1' }],
+        deposit_with_goobi: true
       )
       expect(Sdr::AdministrativeTags).to have_received(:list).with(druid: 'druid:bc123df4567')
+      expect(Sdr::WorkflowService).to have_received(:workflows_for).with(druid: 'druid:bc123df4567')
+    end
+
+    context 'when goobiWF was started only by a later Goobi Redeposit' do
+      let(:goobi_version) { 2 }
+
+      it 'does not copy deposit with Goobi' do
+        expect(registration_settings.items_registration_form_attributes).to include(deposit_with_goobi: false)
+      end
+    end
+
+    context 'when the item is not of a Goobi content type' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: 'druid:bc123df4567', type: Cocina::Models::ObjectType.map)
+      end
+
+      it 'does not copy deposit with Goobi' do
+        expect(registration_settings.items_registration_form_attributes).to include(deposit_with_goobi: false)
+        expect(Sdr::WorkflowService).not_to have_received(:workflows_for)
+      end
     end
   end
 
   describe '#new_item_form_attributes' do
     it 'also copies the latest release tag of each of the item’s own release targets' do
-      expect(registration_settings.new_item_form_attributes)
-        .to include(release_tags_attributes: { searchworks_target: 'no_release' })
+      attributes = registration_settings.new_item_form_attributes
+      expect(attributes).to include(release_tags_attributes: { searchworks_target: 'no_release' })
+      expect(attributes).not_to have_key(:deposit_with_goobi)
       expect(Sdr::Repository).to have_received(:release_tags).with(druid: 'druid:bc123df4567', public: false)
     end
   end

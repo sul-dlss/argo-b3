@@ -28,12 +28,12 @@ class RegistrationSettings
     Array(cocina_object.structural&.isMemberOf)
   end
 
+  # Registering multiple items also chooses whether to deposit with Goobi, which is copied as yes when the item
+  # is of a Goobi content type and was registered with Goobi (goobiWF for version 1, not a later Goobi Redeposit).
   # @return [Hash] attributes for ItemsRegistrationForm
-  # @raise [Sdr::AdministrativeTags::NotFoundResponse] if the item is not found
+  # @raise [Dor::Services::Client::NotFoundResponse, Sdr::AdministrativeTags::NotFoundResponse] if the item is not found
   def items_registration_form_attributes
-    CocinaModelMappers::DroMapper.call(cocina_object:)
-                                 .slice(*COPIED_ATTRIBUTES)
-                                 .merge(TagsFormConcern.tag_fields_attributes(tags))
+    common_attributes.merge(deposit_with_goobi: deposited_with_goobi?)
   end
 
   # Unlike registering multiple items, registering an item also sets its release.
@@ -42,7 +42,7 @@ class RegistrationSettings
   # @raise [Sdr::Repository::NotFoundResponse, Sdr::AdministrativeTags::NotFoundResponse] if the item is not found
   def new_item_form_attributes
     release_tags = Sdr::Repository.release_tags(druid:, public: false)
-    items_registration_form_attributes.merge(release_tags_attributes: ItemReleaseTagsForm.tagged_choices(release_tags))
+    common_attributes.merge(release_tags_attributes: ItemReleaseTagsForm.tagged_choices(release_tags))
   end
 
   private
@@ -55,5 +55,18 @@ class RegistrationSettings
 
   def tags
     Sdr::AdministrativeTags.list(druid:)
+  end
+
+  def common_attributes
+    CocinaModelMappers::DroMapper.call(cocina_object:)
+                                 .slice(*COPIED_ATTRIBUTES)
+                                 .merge(TagsFormConcern.tag_fields_attributes(tags))
+  end
+
+  def deposited_with_goobi?
+    return false unless Sdr::GoobiRedepositService.goobi_content_type?(cocina_object)
+
+    processes = Sdr::WorkflowService.workflows_for(druid:).flat_map(&:processes)
+    Sdr::GoobiRedepositService.goobi_started?(processes:, version: 1)
   end
 end

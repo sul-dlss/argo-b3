@@ -40,7 +40,7 @@ RSpec.describe 'Multiple items' do
 
   context 'with the registration settings of an item' do
     let(:cocina_object) do
-      build(:dro_with_metadata, id: 'druid:bc123df4567', type: Cocina::Models::ObjectType.map,
+      build(:dro_with_metadata, id: 'druid:bc123df4567', type: Cocina::Models::ObjectType.image,
                                 admin_policy_id: 'druid:hv992ry2431', collection_ids: ['druid:xz987wv6543'])
         .new(access: { view: 'stanford', download: 'none', copyright: 'Copyright © Stanford University.' })
     end
@@ -50,6 +50,10 @@ RSpec.describe 'Multiple items' do
       allow(Sdr::AdministrativeTags).to receive(:list).and_return(['Project : Maps'])
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
       allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['My Collection', 'druid:xz987wv6543']])
+      goobi_workflow = Dor::Services::Response::Workflow.new(
+        xml: '<workflow id="goobiWF"><process version="1" status="completed" name="start"/></workflow>'
+      )
+      allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([goobi_workflow])
     end
 
     context 'when the user can register with the item’s APO and collections' do
@@ -63,7 +67,8 @@ RSpec.describe 'Multiple items' do
 
         expect(response).to have_http_status(:ok)
         page = Capybara.string(response.body)
-        expect(page).to have_select('items_registration[content_type]', selected: 'map')
+        expect(page).to have_select('items_registration[content_type]', selected: 'image')
+        expect(page).to have_checked_field('items_registration[deposit_with_goobi]', with: 'true')
         expect(page).to have_select('items_registration[apo_druid]', visible: :all, selected: 'My APO')
         expect(page).to have_select('items_registration[collection_druids][]', visible: :all,
                                                                                selected: ['My Collection'])

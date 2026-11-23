@@ -50,10 +50,12 @@ module Sdr
       raise ActiveWorkflowError unless processes.all? { |process| COMPLETE_STATUSES.include?(process.status) }
     end
 
+    # @param processes [Array<Dor::Services::Response::Process>] the processes of the object's workflows
+    # @param version [Integer] the version
+    # @return [Boolean] true if goobiWF was started for the version (for version 1, at registration)
     def self.goobi_started?(processes:, version:)
       processes.any? { |process| process.workflow_name == WORKFLOW_NAME && process.version == version }
     end
-    private_class_method :goobi_started?
 
     # @param cocina_object [Cocina::Models::DROWithMetadata] the object
     # @param user_name [String] the user starting the Goobi Redeposit
