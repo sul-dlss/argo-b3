@@ -1,0 +1,61 @@
+<%= render SdrViewComponents::Elements::CollapsibleSectionComponent.new(id: 'use-a-spreadsheet', heading: t('edit.contents.structure.csv.heading'), level: :h3,
+                                                                        expanded: expanded?, classes: 'mb-3') do %>
+  <p class="mt-2">
+    <%= helpers.download_icon(aria: { hidden: true }, classes: 'me-1') %>
+    <%# Each link also says "Download" to assistive technology, so that it makes sense on its own. %>
+    <span aria-hidden="true"><%= t('edit.contents.structure.csv.download') %></span>
+    <%= download_link(path: csv_download_path, label: t('edit.contents.structure.csv.structural_csv')) %>
+    <span class="mx-1" aria-hidden="true">|</span>
+    <%= download_link(path: labels_csv_download_path, label: t('edit.contents.structure.csv.labels_csv')) %>
+  </p>
+
+  <div data-controller="toggle">
+    <%# The toggle is not in either upload form, so its value is not submitted; each form's own submit button selects the upload (see ContentsController). %>
+    <%# Disabled while uploading, since showing a section enables its form again (see toggle_controller.js). %>
+    <fieldset data-disable-actions-target="disableable">
+      <%= fields :content_csv_upload, model: upload_selection do |form| %>
+        <%= render SdrViewComponents::Forms::ToggleComponent.new(form:, field_name: :csv_type, label_text: t('edit.contents.structure.csv.upload'),
+                                                                 label_classes: 'fw-bold mb-0',
+                                                                 container_classes: 'd-flex align-items-center gap-3 my-field') do |component| %>
+          <% component.with_left_toggle_option(form:, field_name: :csv_type, label: t('edit.contents.structure.csv.structural_csv'), value: STRUCTURAL,
+                                               data: { toggle_target: 'radio', toggle_section: STRUCTURAL, action: 'toggle#toggle' }) %>
+          <% component.with_right_toggle_option(form:, field_name: :csv_type, label: t('edit.contents.structure.csv.labels_csv'), value: LABELS,
+                                                data: { toggle_target: 'radio', toggle_section: LABELS, action: 'toggle#toggle' }) %>
+        <% end %>
+      <% end %>
+    </fieldset>
+
+    <%= tag.div class: section_classes(STRUCTURAL), data: { toggle_target: 'section', toggle_section: STRUCTURAL } do %>
+      <fieldset data-disable-actions-target="disableable">
+        <%= form_with model: structural_csv_form, url:, method: :patch, data: form_data do |form| %>
+          <div class="row align-items-start">
+            <%= render SdrViewComponents::Forms::FileComponent.new(form:, field_name: :csv_file, container_classes: 'my-field col-lg-7',
+                                                                   label_text: t('edit.contents.structure.csv.structural_file'), label_hidden: true,
+                                                                   help_text: t('edit.contents.structure.csv.structural_help'), variant: :help_text_below,
+                                                                   input_accept:) %>
+            <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
+                                                                       label_text: t('edit.contents.structure.csv.allow_file_deletion'),
+                                                                       container_classes: 'my-field col-lg-auto pt-lg-2') %>
+          </div>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.structure.csv.submit'), variant: :'outline-primary',
+                                                                   value: ContentsController::CSV_VALUE) %>
+        <% end %>
+      </fieldset>
+    <% end %>
+
+    <%= tag.div class: section_classes(LABELS), data: { toggle_target: 'section', toggle_section: LABELS } do %>
+      <fieldset data-disable-actions-target="disableable">
+        <%= form_with model: labels_csv_form, url:, method: :patch, data: form_data do |form| %>
+          <div class="row">
+            <%= render SdrViewComponents::Forms::FileComponent.new(form:, field_name: :csv_file, container_classes: 'my-field col-lg-7',
+                                                                   label_text: t('edit.contents.structure.csv.labels_file'), label_hidden: true,
+                                                                   help_text: t('edit.contents.structure.csv.labels_help'), variant: :help_text_below,
+                                                                   input_accept:) %>
+          </div>
+          <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.contents.structure.csv.submit'), variant: :'outline-primary',
+                                                                   value: ContentsController::LABELS_CSV_VALUE) %>
+        <% end %>
+      </fieldset>
+    <% end %>
+  </div>
+<% end %>
