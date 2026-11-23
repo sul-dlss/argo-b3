@@ -42,19 +42,17 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     expect(form).to have_button('Filter', class: 'btn-outline-primary')
 
     table = page.find("table#bulk-actions-history-table[aria-label='Bulk actions']")
-    expect(table).to have_css('thead th:nth-of-type(1)', text: 'Bulk action')
-    expect(table).to have_css('thead th:nth-of-type(2)', text: 'Action')
-    expect(table).to have_css('thead th:nth-of-type(3)', text: 'Submitted')
-    expect(table).to have_css('thead th', count: 7)
-    expect(table).to have_css('thead th:nth-of-type(7) .visually-hidden', text: 'Actions')
-    expect(table).to have_no_css('thead th', text: 'User')
+    headers = ['Action', 'Description', 'Submitted', 'Status', 'Total / Success / Failed', 'Download',
+               'Clear from history']
+    expect(table.all('thead th').map { it.text.strip }).to eq(headers)
     expect(form).to have_no_select('Users')
     expect(table).to have_css('tbody tr', count: 2)
 
-    expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(1)",
-                              text: "Bulk action #{bulk_action.id}")
-    expect(table).to have_css("tr##{dom_id(bulk_action_with_files, 'row')} td:nth-of-type(1)",
-                              text: "Bulk action #{bulk_action_with_files.id}")
+    expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(1) a", exact_text: 'Reindex')
+    expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(2)", text: 'Test description')
+    expect(table).to have_css("tr##{dom_id(bulk_action_with_files, 'row')} td:nth-of-type(1) a",
+                              exact_text: 'Download full Cocina JSON')
+    expect(table).to have_css("tr##{dom_id(bulk_action_with_files, 'row')} td", count: 7)
   end
 
   context 'when there are multiple pages' do
@@ -98,7 +96,7 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
     let(:admin_user) { create(:user, email_address: 'admin@stanford.edu') }
     let(:bulk_action) { create(:bulk_action, user: create(:user, email_address: 'mmouse@stanford.edu')) }
 
-    it 'renders the users filter and the user column' do
+    it 'renders the users filter and the user and cancel columns' do
       render_inline(component)
 
       expect(page).to have_css("select[multiple][data-controller='checkbox-tom-select'] " \
@@ -106,9 +104,10 @@ RSpec.describe BulkActions::HistorySectionComponent, type: :component do
       expect(page).to have_css("select option[value='#{bulk_action.user_id}']:not([selected])", text: 'mmouse')
 
       table = page.find('table#bulk-actions-history-table')
-      expect(table).to have_css('thead th', count: 8)
-      expect(table).to have_css('thead th:nth-of-type(2)', text: 'User')
-      expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(2)", text: 'mmouse')
+      headers = ['Action', 'Description', 'User', 'Submitted', 'Status', 'Total / Success / Failed', 'Download',
+                 'Clear from history', 'Cancel bulk action']
+      expect(table.all('thead th').map { it.text.strip }).to eq(headers)
+      expect(table).to have_css("tr##{dom_id(bulk_action, 'row')} td:nth-of-type(3)", text: 'mmouse')
     end
   end
 end
