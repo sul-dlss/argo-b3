@@ -343,16 +343,16 @@ en:
           other: "There are %{count} files that have not been added to the structure."
         csv:
           allow_file_deletion: "Allow files to be deleted"
-          labels:
-            download: "Download resource labels CSV"
-            help: "Changes the labels of the resources listed, matched by sequence."
-            submit: "Change labels"
-            upload: "Upload resource labels CSV"
-          structural:
-            download: "Download structural metadata CSV"
-            help: "Replaces all resources and files with those in the CSV. To delete files that the CSV leaves out, select \"Allow files to be deleted\"."
-            submit: "Replace structure"
-            upload: "Upload structural metadata CSV"
+          download: "Download"
+          heading: "Use a spreadsheet"
+          labels_csv: "Labels CSV"
+          labels_file: "Labels CSV file"
+          labels_help: "Changes the labels of the resources listed, matched by sequence."
+          structural_csv: "Structural metadata CSV"
+          structural_file: "Structural metadata CSV file"
+          structural_help: "Replaces all resources and files with those in the CSV. To delete files that the CSV leaves out, select \"Allow files to be deleted\"."
+          submit: "Structure files"
+          upload: "Upload"
         toasts:
           csv: "Structure updated from CSV"
           delete_all: "All files and resources deleted"

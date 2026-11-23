@@ -780,10 +780,41 @@ RSpec.describe 'Manage files' do
       csv.each { |row| row['resource_label'] = 'New label' }
       File.write(csv_path, csv.to_csv)
 
-      attach_file('Upload structural metadata CSV', csv_path)
-      click_button 'Replace structure'
+      click_button 'Use a spreadsheet'
+      attach_file('Structural metadata CSV file', csv_path)
+      click_button 'Structure files'
 
       expect(page).to have_toast('Structure updated from CSV')
+      expect_step('Structure files')
+      expect(content.content_file_sets.reload.sole.label).to eq('New label')
+    ensure
+      FileUtils.rm_f(csv_path)
+    end
+  end
+
+  context 'when uploading a labels CSV' do
+    let(:content) { mutable_content }
+
+    it 'shows the labels CSV upload when selected, and updates the labels from the CSV' do
+      visit_files_step
+
+      upload_file('dropzone_upload.txt')
+      structure_files
+
+      csv_path = Rails.root.join('tmp/labels.csv')
+      File.write(csv_path, "druid,sequence,resource_label\n#{druid},1,New label\n")
+
+      expect(page).to have_no_button('Structure files')
+      click_button 'Use a spreadsheet'
+      expect(page).to have_field('Allow files to be deleted')
+      expect(page).to have_no_field('Labels CSV file')
+
+      choose 'Labels CSV', allow_label_click: true
+      expect(page).to have_no_field('Allow files to be deleted')
+      attach_file('Labels CSV file', csv_path)
+      click_button 'Structure files'
+
+      expect(page).to have_toast('Resource labels updated from CSV')
       expect_step('Structure files')
       expect(content.content_file_sets.reload.sole.label).to eq('New label')
     ensure
