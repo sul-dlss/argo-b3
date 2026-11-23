@@ -27,5 +27,3 @@ ignore_unused:
   - 'multi_item_deposit.structure.*'
   # Built from symbol keys in MultiItemDeposit::DepositJob#message.
   - 'multi_item_deposit.deposit.*'
-  # Built from the i18n_key of Edit::ContentCsvComponent (e.g., :structural, :labels).
-  - 'edit.contents.structure.csv.{labels,structural}.*'

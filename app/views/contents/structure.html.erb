@@ -5,6 +5,13 @@
   <div class="b3-form">
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.steps.structure'), classes: 'mb-3') %>
 
+    <% if @content.content_file_sets.any? %>
+      <%= render Edit::ContentCsvSectionComponent.new(structural_csv_form: @structural_csv_form, labels_csv_form: @labels_csv_form,
+                                                      url: content_path(@content.druid),
+                                                      csv_download_path: csv_content_structure_path(content_id: @content_token),
+                                                      labels_csv_download_path: labels_csv_content_structure_path(content_id: @content_token)) %>
+    <% end %>
+
     <%= render Edit::StructuringResultAlertComponent.new(structuring_result: @structuring_result, populator_selection: @populator_selection) %>
 
     <%= fields_for :contents_item_form, @contents_item_form do |item_form| %>
@@ -22,21 +29,6 @@
       <% if @content.content_file_sets.any? %>
         <%# Reloaded when a resource changes (see content_file_sets/show). %>
         <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token), refresh: 'morph', data: { controller: 'reloadable-frame' } %>
-
-        <%= render Edit::ContentCsvComponent.new(model: @structural_csv_form, url: content_path(@content.druid),
-                                                 download_path: csv_content_structure_path(content_id: @content_token),
-                                                 i18n_key: :structural, submit_value: ContentsController::CSV_VALUE) do |component| %>
-          <% component.with_additional_fields do %>
-            <%= fields_for @structural_csv_form do |form| %>
-              <%= render SdrViewComponents::Forms::CheckboxComponent.new(form:, field_name: :allow_file_deletion,
-                                                                         label_text: t('edit.contents.structure.csv.allow_file_deletion'),
-                                                                         container_classes: 'my-field') %>
-            <% end %>
-          <% end %>
-        <% end %>
-        <%= render Edit::ContentCsvComponent.new(model: @labels_csv_form, url: content_path(@content.druid),
-                                                 download_path: labels_csv_content_structure_path(content_id: @content_token),
-                                                 i18n_key: :labels, submit_value: ContentsController::LABELS_CSV_VALUE) %>
 
         <% content_file_sets = @content.content_file_sets.to_a %> <%# This avoids extra queries. %>
         <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">
