@@ -19,7 +19,8 @@ RSpec.describe 'Show object Apply APO defaults button' do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                          closed?: true, openable?: true,
                                                                          closeable?: false, open?: false,
-                                                                         discardable?: false, version: 2)
+                                                                         discardable?: false, version: 2,
+                                                                         version_description: 'Initial version')
   end
 
   before do
