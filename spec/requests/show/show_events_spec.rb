@@ -48,6 +48,9 @@ RSpec.describe 'Show events' do
                                               'Version description update', 'Version open'],
                                     selected: ['Publishing complete', 'Version close', 'Version description update',
                                                'Version open'])
+        # The filter's fields are in this order.
+        labels = page.all('form[id^=events_filter_] label').map { |label| label.text.strip }
+        expect(labels).to eq(['Event types', 'Date from', 'Date to'])
         expect(page).to have_button('Filter')
       end
     end
@@ -61,8 +64,8 @@ RSpec.describe 'Show events' do
         expect(events_client).to have_received(:list)
           .with(event_types: ['version_open'], from: Time.utc(2026, 4, 1, 16, 0), to: Time.utc(2026, 5, 1, 0, 0))
         page = Capybara.string(response.body)
-        expect(page).to have_field('From', with: '2026-04-01T09:00')
-        expect(page).to have_field('To', with: '2026-04-30T17:00')
+        expect(page).to have_field('Date from', with: '2026-04-01T09:00')
+        expect(page).to have_field('Date to', with: '2026-04-30T17:00')
         expect(page).to have_select('Event types', selected: ['Version open'])
       end
     end
