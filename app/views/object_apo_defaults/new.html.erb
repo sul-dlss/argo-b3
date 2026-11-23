@@ -31,7 +31,7 @@
       <% end %>
       <%# Design standard deviation: AVAIL-4. As in Extract text, deposit is hidden, not disabled, while files have unsaved changes. %>
       <% if @unsaved_content_changes %>
-        <span><%= t('show.status.draft.unsaved_content_changes') %></span>
+        <span><%= t('show.status.draft.unsaved_content_changes', manage_files: @manage_files_label) %></span>
       <% else %>
         <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.object_apo_defaults.new.buttons.deposit'),
                                                                  value: ObjectApoDefaultsController::DEPOSIT_VALUE) %>

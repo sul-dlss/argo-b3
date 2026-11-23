@@ -83,7 +83,7 @@ RSpec.describe 'Apply APO defaults' do
 
         expect(rendered_page).to have_button('Apply APO defaults and save as draft')
         expect(rendered_page).to have_no_button('Apply APO defaults and deposit')
-        expect(rendered_page).to have_text('Files have unsaved changes. Deposit from Manage files.')
+        expect(rendered_page).to have_text('Files have unsaved changes. Deposit from "Edit files and structure".')
       end
     end
 
