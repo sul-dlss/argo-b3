@@ -61,6 +61,12 @@ RSpec.describe 'Show bulk actions history' do
   it 'links to the show page for a bulk action' do
     bulk_action = create(:bulk_action, user:, description: 'First bulk action',
                                        action_type: 'export_cocina_json')
+    # A show page slower than the reload interval ensures a reload is due while the link's visit is in flight.
+    allow(Settings.reload_intervals).to receive(:bulk_actions_history).and_return(100)
+    allow(BulkActions::ShowComponent).to receive(:new).and_wrap_original do |original, **args|
+      sleep 0.5
+      original.call(**args)
+    end
 
     visit bulk_actions_path
 
