@@ -1,5 +1,3 @@
-<div class="col-xl-10 offset-xl-2 col-lg-12">
-  <%= render SdrViewComponents::Elements::AlertComponent.new(variant:, dismissible:) do %>
-    <%= text %>
-  <% end %>
-</div>
+<%= render SdrViewComponents::Elements::AlertComponent.new(variant:, dismissible:, classes: 'dashboard-banner') do %>
+  <%= text %>
+<% end %>

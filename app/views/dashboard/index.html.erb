@@ -7,17 +7,18 @@
 
 <% content_for :page_header do %>
   <div class="dashboard-header">
-    <%= render Layout::ContainerComponent.new(heading: t('dashboard.heading'), classes: 'pt-4 pb-2') %>
+    <%= render Layout::ContainerComponent.new(classes: 'pt-4 pb-2') do %>
+      <%# The banner sits beside the heading, wrapping below it when the line is too narrow for both. %>
+      <div class="d-flex flex-wrap align-items-center column-gap-4">
+        <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: t('dashboard.heading'), classes: 'mb-3') %>
+        <%= render Dashboard::BannerComponent.new(text: t('banner.dashboard_html')) %>
+      </div>
+    <% end %>
   </div>
 <% end %>
 
 <%= render Layout::ContainerComponent.new(classes: 'pt-0', data: { controller: 'preserve-collapsed-sections' }) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
-    <% layout.with_top_content do %>
-      <div class="row">
-        <%= render Dashboard::BannerComponent.new(text: t('banner.dashboard_html')) %>
-      </div>
-    <% end %>
     <% layout.with_left_content do %>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, classes: 'mt-2 mb-3', text: t('dashboard.go_to_druid.heading')) %>
       <%= form_with model: @go_to_druid_form, url: go_to_druid_path, class: 'mb-5' do |form| %>
