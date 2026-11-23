@@ -10,8 +10,20 @@
 }
 
 // The negative margin cancels the search bar's mb-3, so the image meets it.
-// The image is anchored left at natural size, so narrower viewports crop it; it scales up only past its 1753px width.
+// The image (1753 x 115px) is anchored left at natural size, so narrower viewports crop it. It scales up only to fill
+// a wider viewport or a taller band (e.g., when the banner wraps below the heading on a narrow viewport).
+// Design standard deviation: LAY-6. The 115px height and 1753px breakpoint are the image's natural dimensions.
 .dashboard-header {
   margin-top: -$spacer;
-  background: url("dashboard-header.jpg") left center / max(100%, 1753px) auto no-repeat;
+  background: url("dashboard-header.jpg") left center / auto max(100%, 115px) no-repeat;
+
+  @media (width >= 1753px) {
+    background-size: cover;
+  }
+}
+
+// The alert's background is translucent, so layer it over the page background to keep the banner legible on the
+// header image and looking as it does on white.
+.alert.dashboard-banner {
+  background: linear-gradient(var(--bs-alert-bg), var(--bs-alert-bg)), var(--bs-body-bg);
 }

@@ -169,3 +169,8 @@ $search-color: rgb(#{$search-color-rgb});
     transition: none;
   }
 }
+
+// Below a page header (see the application layout), space the flash alerts from the band only when there are any.
+.flash-below-page-header #flash-alerts > .alert:first-child {
+  margin-top: $spacer;
+}
