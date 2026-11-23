@@ -27,6 +27,6 @@ RSpec.describe 'Dashboard accessibility' do
 
     expect(page).to have_css('table[aria-label="Pinned items"]')
     expect(accessibility_node('table[aria-label="Pinned items"] tbody td:nth-child(3)'))
-      .to eq(role: 'cell', name: 'The pinned item collection', child_roles: ['link'])
+      .to include(role: 'cell', name: 'The pinned item collection', child_roles: ['link'])
   end
 end

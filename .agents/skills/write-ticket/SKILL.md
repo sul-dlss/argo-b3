@@ -19,6 +19,8 @@ The user knows the domain and the users; you know the codebase. Use the code to 
 
 Work from what the user gave you: their description, any issue they reference (with `gh`, read it using `gh issue view <number> --comments`), and any screenshots. A screenshot may show the current UI, a mockup, or a bug; read it, and note what each one shows, since it will be placed in the ticket later.
 
+**A screen reader bug** (e.g., VoiceOver says something wrong): read "What a report needs" in `.claude/skills/screen-reader-bug/SKILL.md`, and ask for each item the user hasn't given.
+
 **Rewriting an existing ticket**: read the issue and all its comments. Note what it already settles, what is vague or missing, and where the comments change or contradict the body. Images already in the issue are GitHub attachment URLs; try to view them, and if you can't, ask the user what each shows.
 
 ## 2. Learn the current behaviour
@@ -81,6 +83,7 @@ Write the ticket in this shape:
 - Write each unseen detail as its own criterion beside the behaviour it belongs to, quoting the exact words: 'Removing a file announces "<filename> removed" and moves focus to the next file'. A design can't carry these, so a developer would otherwise guess them.
 - When the user chose to follow an existing feature, name it in What to build by its name in the app (e.g., "works like the Manage release form"), so the developer knows what to match. Record a deliberate departure, with its reason.
 - No file paths, class names, or code: they go stale and pre-empt the developer's design.
+- For a screen reader bug, What to build quotes the words announced and the words expected, and names the screen reader, the browser, and their versions.
 - Put each `[Screenshot: ...]` placeholder where that image helps most, usually under What to build or beside the criterion it illustrates.
 - Omit Out of scope if nothing was excluded, and Assumptions to confirm if everything was checked.
 - When rewriting, keep the existing image Markdown (the attachment URLs still work after an edit), placed where each image helps most. When you show the draft, list anything from the original you dropped, so nothing disappears without the user agreeing.

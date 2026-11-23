@@ -39,6 +39,7 @@ For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also
 - Every change to a component's rendered output adds or updates its component spec (`spec/components/...`), even when a system spec also covers it, unless the change is presentation-only (see below).
 - Assert on content and behavior, not presentation. Presentation covers spacing, sizing, grid, flex, alignment, and visual-variant classes (e.g., `mt-1`, `gap-4`, `col-lg-3`, `text-end`, `h5`), rendered sizes or positions, decorative icons (e.g., arrows), static markers such as required-field asterisks, and placeholder text (e.g., `Start typing a tag...`). A presentation-only change needs no new spec; show it in the PR's screenshots or screencast instead. Content order in the DOM (e.g., which button comes first) is behavior and may be tested.
 - When removing markup or an attribute, delete or update the specs that covered it rather than adding one that asserts its absence.
+- Test a fix to what a screen reader announces with a system spec that asserts on Chrome's accessibility tree (`spec/support/accessibility_tree_helpers.rb`), as the `screen-reader-bug` skill describes.
 
 ### Expected values
 - Expected values are independent of the implementation. Do not compute them with the code under test or the helpers, constants, or expressions it uses (e.g., `DruidSupport.bare_druid_from`, `Form.permitted_params`, `File.size(filepath_on_disk)`); use literals instead (e.g., `'bc123df4567'`, `[:tag]`, `52`).
