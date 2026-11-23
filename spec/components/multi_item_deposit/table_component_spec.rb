@@ -7,12 +7,15 @@ RSpec.describe MultiItemDeposit::TableComponent, type: :component do
 
   let(:component) do
     described_class.new(multi_item_deposit_actions: MultiItemDepositAction.where(id: multi_item_deposit_action.id),
-                        label: 'Deposits', id: 'deposits-table', show_label:)
+                        label: 'Deposits', id: 'deposits-table', show_user:, show_label:)
   end
-  let(:multi_item_deposit_action) { create(:multi_item_deposit_action, description: 'Maps') }
+  let(:multi_item_deposit_action) do
+    create(:multi_item_deposit_action, description: 'Maps', user: create(:user, email_address: 'mmouse@stanford.edu'))
+  end
+  let(:show_user) { false }
   let(:show_label) { false }
 
-  it 'renders the table without a caption' do
+  it 'renders the table without the user column or a caption' do
     render_inline(component)
 
     table = page.find("table#deposits-table[aria-label='Deposits']")
@@ -26,13 +29,19 @@ RSpec.describe MultiItemDeposit::TableComponent, type: :component do
     expect(row).to have_css('td:nth-of-type(5)', text: 'Not submitted')
   end
 
-  context 'when showing the label' do
+  context 'when showing the user and label' do
+    let(:show_user) { true }
     let(:show_label) { true }
 
-    it 'renders the caption' do
+    it 'renders the user column and caption' do
       render_inline(component)
 
-      expect(page).to have_css('table#deposits-table caption', text: 'Deposits')
+      table = page.find('table#deposits-table')
+      expect(table).to have_css('caption', text: 'Deposits')
+      expect(table.all('thead th').map { it.text.strip })
+        .to eq(['Action', 'Description', 'User', 'Created', 'Submitted', 'Status', 'Workflow status'])
+      expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(3)",
+                                exact_text: 'mmouse')
     end
   end
 
