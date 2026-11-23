@@ -458,7 +458,7 @@ RSpec.describe 'Show item' do
     # The last event type is listed without searching for it.
     find('.ts-dropdown .option', text: 'Version open').click
     expect(page).to have_css('form[id^=events_filter_] .ts-count', text: '1 selected')
-    fill_in 'From', with: Time.zone.local(2021, 3, 31, 13, 0, 0)
+    fill_in 'Date from', with: Time.zone.local(2021, 3, 31, 13, 0, 0)
     click_button 'Filter'
 
     expect(page).to have_no_css('#events-table td', text: 'Publishing complete')
