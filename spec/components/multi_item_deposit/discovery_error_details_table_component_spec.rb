@@ -34,12 +34,12 @@ RSpec.describe MultiItemDeposit::DiscoveryErrorDetailsTableComponent, type: :com
         .to eq([%w[2 bc123df4567 folder1], %w[3 cd234fg5678 folder2], %w[4 df345gh6789 folder3]])
 
       # Only errors are styled as errors.
-      expect(rows[0]).to have_css('ul li span.text-danger', text: 'Not an Item')
+      expect(rows[0]).to have_css('td > span.text-danger', text: 'Not an Item')
 
       expect(rows[1]).to have_css('ul li span.text-danger', text: 'Object not found')
       expect(rows[1]).to have_css('ul li span:not(.text-danger)', text: 'Empty files: a.txt')
 
-      expect(rows[2]).to have_css('ul li span:not(.text-danger)', text: 'Version cannot be opened')
+      expect(rows[2]).to have_css('td > span:not(.text-danger)', text: 'Version cannot be opened')
     end
   end
 
