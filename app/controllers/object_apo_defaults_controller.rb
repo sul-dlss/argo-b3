@@ -73,6 +73,7 @@ class ObjectApoDefaultsController < ApplicationController
   def set_unsaved_content_changes(content:)
     @unsaved_content_changes = content.present? &&
                                Contents::UnsavedChanges.call(content:, cocina_object: @cocina_object)
+    @manage_files_label = helpers.manage_files_label(version_service:) if @unsaved_content_changes
   end
 
   # The errors of the content (e.g., not valid for the content type) and of the access built from the APO defaults
