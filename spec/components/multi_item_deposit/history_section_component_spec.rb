@@ -103,7 +103,7 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
       create(:multi_item_deposit_action, user: create(:user, email_address: 'mmouse@stanford.edu'))
     end
 
-    it 'renders the users filter without a user column' do
+    it 'renders the users filter and the user column' do
       render_inline(component)
 
       expect(page).to have_css("select[multiple][data-controller='checkbox-tom-select'] " \
@@ -113,8 +113,11 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
 
       table = page.find('table#multi-item-deposits-history-table')
       expect(table.all('thead th').map { it.text.strip })
-        .to eq(['Action', 'Description', 'Created', 'Submitted', 'Status', 'Workflow status'])
-      expect(table).to have_no_css('td', text: 'mmouse')
+        .to eq(['Action', 'Description', 'User', 'Created', 'Submitted', 'Status', 'Workflow status'])
+
+      row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
+      expect(row).to have_css('td:nth-of-type(3)', exact_text: 'mmouse')
+      expect(row).to have_css('td:nth-of-type(6)', text: 'Not submitted')
     end
   end
 end

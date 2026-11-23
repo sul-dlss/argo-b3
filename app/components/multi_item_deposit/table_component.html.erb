@@ -1,10 +1,13 @@
 <%= render SdrViewComponents::Tables::TableComponent.new(label:, show_label:, id:, empty_message:) do |table| %>
-  <%= table.with_header(label: 'Action', style: 'width: 20%;') %>
-  <%= table.with_header(label: 'Description', style: 'width: 24%;') %>
-  <%= table.with_header(label: 'Created', style: 'width: 14%;') %>
-  <%= table.with_header(label: 'Submitted', style: 'width: 14%;') %>
-  <%= table.with_header(label: 'Status', style: 'width: 14%;') %>
-  <%= table.with_header(label: 'Workflow status', style: 'width: 14%;') %>
+  <%= table.with_header(label: 'Action', style: "width: #{show_user? ? 18 : 20}%;") %>
+  <%= table.with_header(label: 'Description', style: "width: #{show_user? ? 20 : 24}%;") %>
+  <% if show_user? %>
+    <%= table.with_header(label: 'User', style: 'width: 10%;') %>
+  <% end %>
+  <%= table.with_header(label: 'Created', style: "width: #{show_user? ? 13 : 14}%;") %>
+  <%= table.with_header(label: 'Submitted', style: "width: #{show_user? ? 13 : 14}%;") %>
+  <%= table.with_header(label: 'Status', style: "width: #{show_user? ? 13 : 14}%;") %>
+  <%= table.with_header(label: 'Workflow status', style: "width: #{show_user? ? 13 : 14}%;") %>
   <% multi_item_deposit_actions.each do |multi_item_deposit_action| %>
     <%= table.with_row(values: values_for(multi_item_deposit_action),
                        id: dom_id(multi_item_deposit_action, 'row')) %>
