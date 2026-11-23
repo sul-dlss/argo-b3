@@ -3,18 +3,18 @@
 require 'rails_helper'
 
 RSpec.describe Show::ManageFilesButtonComponent, type: :component do
-  subject(:component) { described_class.new(druid:, enabled:) }
+  subject(:component) { described_class.new(druid:, label: 'Edit files and structure', enabled:) }
 
   let(:druid) { 'druid:bc123df4567' }
 
   context 'when enabled' do
     let(:enabled) { true }
 
-    it 'renders a link to manage files' do
+    it 'renders a link to managing files that opens on structure files' do
       render_inline(component)
 
-      expect(page).to have_link('Manage files', href: "/contents/#{druid}/edit")
-      expect(page).to have_no_css('a.disabled', text: 'Manage files')
+      expect(page).to have_link('Edit files and structure', href: "/contents/#{druid}/edit?open_on=structure")
+      expect(page).to have_no_css('a.disabled', text: 'Edit files and structure')
     end
   end
 
@@ -24,8 +24,8 @@ RSpec.describe Show::ManageFilesButtonComponent, type: :component do
     it 'renders a disabled link' do
       render_inline(component)
 
-      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Manage files')
-      expect(page).to have_no_link('Manage files')
+      expect(page).to have_css('a.disabled[aria-disabled="true"]', text: 'Edit files and structure')
+      expect(page).to have_no_link('Edit files and structure')
     end
   end
 end

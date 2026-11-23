@@ -289,6 +289,13 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     render :show_admin_policy_overview, layout: false
   end
 
+  # Depositing from the status box with unsaved changes opens managing files as the status box button does.
+  def redirect_unsaved_content_changes
+    manage_files_label = helpers.manage_files_label(version_service: Sdr::VersionService.new(druid: druid_param))
+    redirect_to edit_content_path(druid_param, open_on: Contents::ManageFilesFlow::OPEN_ON_STRUCTURE),
+                flash: { danger: t('show.warnings.unsaved_content_changes', manage_files: manage_files_label) }
+  end
+
   def permission_types_by_workgroup
     Permission.highest_permission_type_by_workgroup(target_druid: @solr_doc.druid)
   end
@@ -301,7 +308,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   rescue Sdr::DepositDraftService::NotDepositableError
     redirect_to object_path(druid_param), flash: { danger: t('show.warnings.not_depositable') }
   rescue Sdr::DepositDraftService::UnsavedChangesError
-    redirect_to edit_content_path(druid_param), flash: { danger: t('show.warnings.unsaved_content_changes') }
+    redirect_unsaved_content_changes
   rescue Sdr::DepositDraftService::InvalidContentError
     # Manage files shows the content errors.
     redirect_to edit_content_path(druid_param, deposit: true)

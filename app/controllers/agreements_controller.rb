@@ -75,12 +75,12 @@ class AgreementsController < ApplicationController
   end
 
   def create_redirect_path
-    add_files? ? edit_content_path(@new_agreement_form.druid) : object_path(@new_agreement_form.druid)
+    add_files? ? manage_files_first_step_path(@new_agreement_form.druid) : object_path(@new_agreement_form.druid)
   end
 
   def redirect_updated
     toast_key = deposit? ? 'deposited' : 'updated'
-    redirect_to add_files? ? edit_content_path(@druid) : object_path(@druid),
+    redirect_to add_files? ? manage_files_first_step_path(@druid) : object_path(@druid),
                 flash: { toast: t("edit.agreements.edit.toasts.#{toast_key}") }
   end
 

@@ -8,6 +8,7 @@
 module ContentDepositFormConcern
   extend ActiveSupport::Concern
   include EditCocinaObjectFormConcern
+  include ManageFilesHelper
 
   included do
     # Only depositing requires the structure to be valid for the content type.
@@ -50,6 +51,7 @@ module ContentDepositFormConcern
   def content_is_saved
     return unless Contents::UnsavedChanges.call(content:, cocina_object: previous_cocina_object)
 
-    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved'))
+    errors.add(:content, I18n.t('edit.items.fields.content.validations.unsaved',
+                                manage_files: manage_files_label(version_service:)))
   end
 end

@@ -104,7 +104,7 @@ en:
         heading: "Deposited"
       draft:
         heading: "Deposited, in draft"
-        unsaved_content_changes: "Files have unsaved changes. Deposit from Manage files."
+        unsaved_content_changes: "Files have unsaved changes. Deposit from \"%{manage_files}\"."
       initiating:
         heading: "Initiating deposit..."
       registered:
@@ -124,7 +124,6 @@ en:
         edit_agreement: "Edit agreement"
         edit_collection: "Edit collection"
         edit_admin_policy: "Edit APO"
-        manage_files: "Manage files"
         deposit: "Deposit"
       deposit_dropdown:
         cancel: "Cancel"
@@ -160,7 +159,7 @@ en:
       not_discardable: "This draft cannot be discarded."
       not_goobi_type: "Only image and book items can be redeposited with Goobi."
       republish_failed: "Republish is not possible"
-      unsaved_content_changes: "Files have unsaved changes. Save or deposit them from Manage files."
+      unsaved_content_changes: "Files have unsaved changes. Save or deposit them from \"%{manage_files}\"."
   download_files_bulk_actions:
     create:
       title: "Download files bulk action created"
@@ -309,11 +308,13 @@ en:
             invalid: "Content errors must be fixed."
       discovery:
         spinner: "Discovering files..."
+      labels:
+        add_files_and_deposit: "Add files and deposit"
+        edit_files_and_structure: "Edit files and structure"
       edit:
         files_section:
           label: 'Files'
           heading: 'Files (%{file_count})'
-        title: "Manage files and structure"
         files_required: "Add at least one file to continue."
         buttons:
           cancel_confirm: "Discard unsaved changes to files?"
@@ -385,7 +386,7 @@ en:
           no_models: "there are no 3D model files"
           no_pdfs: "there are no PDF files"
       steps:
-        label: "Manage files progress"
+        label: "Steps"
         details: "Item details"
         files: "Add and edit files"
         structure: "Structure files"
@@ -592,7 +593,7 @@ en:
         content:
           validations:
             invalid: "The files are not valid for the content type. \"Save draft and edit files\" to fix them before depositing."
-            unsaved: "Files have unsaved changes. Save or deposit them from Manage files."
+            unsaved: "Files have unsaved changes. Save or deposit them from \"%{manage_files}\"."
         content_type:
           label: "Content type"
         copyright:

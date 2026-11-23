@@ -74,6 +74,76 @@ RSpec.describe Contents::ManageFilesFlow do
     end
   end
 
+  describe '#open_on!' do
+    let(:step) { 'deposit' }
+
+    context 'when opening on the first step' do
+      it 'opens on item details' do
+        manage_files_flow.open_on!('first')
+
+        expect(content.reload.step).to eq('details')
+      end
+    end
+
+    context 'when opening on the first step of an agreement' do
+      let(:agreement) { true }
+
+      it 'opens on add and edit files' do
+        manage_files_flow.open_on!('first')
+
+        expect(content.reload.step).to eq('files')
+      end
+    end
+
+    context 'when opening on structure files with structured files' do
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+      end
+
+      it 'opens on structure files without structuring' do
+        manage_files_flow.open_on!('structure')
+
+        expect(content.reload.step).to eq('structure')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
+      end
+    end
+
+    context 'when opening on structure files with files not in a resource' do
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+        create(:content_file_binary, content:, filepath: 'image2.tif', basename: 'image2')
+      end
+
+      it 'opens on structure files and appends the files' do
+        manage_files_flow.open_on!('structure')
+
+        expect(content.reload.step).to eq('structure')
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+      end
+    end
+
+    context 'when opening while discovering files' do
+      let(:content) do
+        create(:content, :mutable, druid: 'druid:bc123df4567', step: 'files', mount_state: 'discovering')
+      end
+
+      it 'keeps the saved step' do
+        manage_files_flow.open_on!('first')
+
+        expect(content.reload.step).to eq('files')
+      end
+    end
+
+    context 'when opening on structure files without files' do
+      it 'opens on add and edit files' do
+        manage_files_flow.open_on!('structure')
+
+        expect(content.reload.step).to eq('files')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
+      end
+    end
+  end
+
   describe '#next!' do
     it 'saves the item details on the next step' do
       manage_files_flow.next!(form)

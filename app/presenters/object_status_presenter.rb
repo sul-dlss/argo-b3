@@ -2,6 +2,8 @@
 
 # Presenter for determining the deposit status of an object.
 class ObjectStatusPresenter
+  include ManageFilesHelper
+
   # Every status returned by #status, from in progress to done.
   STATUSES = %i[initiating staging staging_failed error assembling depositing draft registered deposited].freeze
 
@@ -37,6 +39,11 @@ class ObjectStatusPresenter
   # @return [Boolean] true if assembly stopped with a process in error (see Sdr::VersionService#assembly_stopped_with_error?)
   def assembly_stopped_with_error?
     status == :error && version_service.assembly_stopped_with_error?
+  end
+
+  # @return [String] the name of managing files for the object (see ManageFilesHelper)
+  def manage_files_label
+    @manage_files_label ||= super(version_service:)
   end
 
   def workflow_error_messages

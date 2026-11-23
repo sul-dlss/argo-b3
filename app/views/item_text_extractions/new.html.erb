@@ -16,7 +16,7 @@
                                                                variant: 'outline-primary') %>
       <%# Design standard deviation: AVAIL-4. Per #1440, deposit is hidden, not disabled, while files have unsaved changes. %>
       <% if @unsaved_content_changes %>
-        <span><%= t('show.status.draft.unsaved_content_changes') %></span>
+        <span><%= t('show.status.draft.unsaved_content_changes', manage_files: @manage_files_label) %></span>
       <% else %>
         <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.item_text_extractions.new.buttons.deposit'),
                                                                  value: ItemTextExtractionsController::DEPOSIT_VALUE) %>
