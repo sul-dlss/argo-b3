@@ -10,20 +10,23 @@ RSpec.describe MultiItemDeposit::TableComponent, type: :component do
                         label: 'Deposits', id: 'deposits-table', show_user:, show_label:)
   end
   let(:multi_item_deposit_action) do
-    create(:multi_item_deposit_action, user: create(:user, email_address: 'mmouse@stanford.edu'))
+    create(:multi_item_deposit_action, description: 'Maps', user: create(:user, email_address: 'mmouse@stanford.edu'))
   end
   let(:show_user) { false }
   let(:show_label) { false }
 
-  it 'renders the table without the user column or caption' do
+  it 'renders the table without the user column or a caption' do
     render_inline(component)
 
     table = page.find("table#deposits-table[aria-label='Deposits']")
     expect(table).to have_no_css('caption')
-    expect(table).to have_css('thead th', count: 5)
-    expect(table).to have_no_css('thead th', text: 'User')
-    expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(4)",
-                              text: 'Not submitted')
+    expect(table.all('thead th').map { it.text.strip })
+      .to eq(['Action', 'Description', 'Created', 'Submitted', 'Status', 'Workflow status'])
+    row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
+    expect(row).to have_css("td:nth-of-type(1) a[href='/multi_item_deposit_actions/#{multi_item_deposit_action.id}']",
+                            exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
+    expect(row).to have_css('td:nth-of-type(2)', exact_text: 'Maps')
+    expect(row).to have_css('td:nth-of-type(5)', text: 'Not submitted')
   end
 
   context 'when showing the user and label' do
@@ -35,8 +38,10 @@ RSpec.describe MultiItemDeposit::TableComponent, type: :component do
 
       table = page.find('table#deposits-table')
       expect(table).to have_css('caption', text: 'Deposits')
-      expect(table).to have_css('thead th:nth-of-type(2)', text: 'User')
-      expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(2)", text: 'mmouse')
+      expect(table.all('thead th').map { it.text.strip })
+        .to eq(['Action', 'Description', 'User', 'Created', 'Submitted', 'Status', 'Workflow status'])
+      expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(3)",
+                                exact_text: 'mmouse')
     end
   end
 

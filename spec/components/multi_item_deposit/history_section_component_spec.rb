@@ -39,27 +39,25 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
     expect(form).to have_no_select('Users')
 
     table = page.find("table#multi-item-deposits-history-table[aria-label='Multi-item deposits']")
-    expect(table).to have_css('thead th:nth-of-type(1)', text: 'Multi-item deposit')
-    expect(table).to have_css('thead th:nth-of-type(2)', text: 'Created')
-    expect(table).to have_css('thead th:nth-of-type(3)', text: 'Submitted')
-    expect(table).to have_css('thead th:nth-of-type(4)', text: 'Status')
-    expect(table).to have_css('thead th:nth-of-type(5)', text: 'Workflow status')
-    expect(table).to have_css('thead th', count: 5)
+    expect(table.all('thead th').map { it.text.strip })
+      .to eq(['Action', 'Description', 'Created', 'Submitted', 'Status', 'Workflow status'])
     expect(table).to have_css('tbody tr', count: 2)
 
     row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
     expect(row).to have_css("td:nth-of-type(1) a[href='/multi_item_deposit_actions/#{multi_item_deposit_action.id}']",
                             exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
-    expect(row).to have_css('td:nth-of-type(2)', exact_text: '2026-04-16')
-    expect(row).to have_css('td:nth-of-type(3)', exact_text: '')
-    expect(row).to have_css('td:nth-of-type(4)', text: 'Discovering files')
-    expect(row).to have_no_css('td:nth-of-type(5) a')
+    expect(row).to have_css('td:nth-of-type(2)', exact_text: '')
+    expect(row).to have_css('td:nth-of-type(3)', exact_text: '2026-04-16')
+    expect(row).to have_css('td:nth-of-type(4)', exact_text: '')
+    expect(row).to have_css('td:nth-of-type(5)', text: 'Discovering files')
+    expect(row).to have_no_css('td:nth-of-type(6) a')
 
     submitted_row = table.find("tr##{dom_id(submitted_multi_item_deposit_action, 'row')}")
     expect(submitted_row).to have_css('td:nth-of-type(1) a',
-                                      text: "Multi-item deposit #{submitted_multi_item_deposit_action.id}: Maps")
-    expect(submitted_row).to have_css('td:nth-of-type(3)', exact_text: '2026-04-17')
-    expect(submitted_row).to have_css('td:nth-of-type(4)', text: 'Submitted')
+                                      exact_text: "Multi-item deposit #{submitted_multi_item_deposit_action.id}")
+    expect(submitted_row).to have_css('td:nth-of-type(2)', exact_text: 'Maps')
+    expect(submitted_row).to have_css('td:nth-of-type(4)', exact_text: '2026-04-17')
+    expect(submitted_row).to have_css('td:nth-of-type(5)', text: 'Submitted')
     expect(submitted_row).to have_link('Workflow status',
                                        href: '/workflow_grid?multi_item_deposit_action_ids%5B%5D=' \
                                              "#{submitted_multi_item_deposit_action.id}")
@@ -114,12 +112,12 @@ RSpec.describe MultiItemDeposit::HistorySectionComponent, type: :component do
                                text: 'mmouse')
 
       table = page.find('table#multi-item-deposits-history-table')
-      expect(table).to have_css('thead th', count: 6)
-      expect(table).to have_css('thead th:nth-of-type(2)', text: 'User')
+      expect(table.all('thead th').map { it.text.strip })
+        .to eq(['Action', 'Description', 'User', 'Created', 'Submitted', 'Status', 'Workflow status'])
 
       row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
-      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
-      expect(row).to have_css('td:nth-of-type(5)', text: 'Not submitted')
+      expect(row).to have_css('td:nth-of-type(3)', exact_text: 'mmouse')
+      expect(row).to have_css('td:nth-of-type(6)', text: 'Not submitted')
     end
   end
 end

@@ -19,13 +19,14 @@ module MultiItemDeposit
 
     def values_for(multi_item_deposit_action)
       values = [
-        link_to(multi_item_deposit_action.name, multi_item_deposit_action_path(multi_item_deposit_action)),
+        link_for(multi_item_deposit_action),
+        multi_item_deposit_action.description,
         helpers.format_datetime(multi_item_deposit_action.created_at, format: :date_only),
         helpers.format_datetime(multi_item_deposit_action.initiating_deposit_completed_at, format: :date_only),
         MultiItemDepositAction::DISPLAY_STATUSES.fetch(multi_item_deposit_action.display_status),
         workflow_status_link_for(multi_item_deposit_action)
       ]
-      values.insert(1, multi_item_deposit_action.user.sunetid) if show_user?
+      values.insert(2, multi_item_deposit_action.user.sunetid) if show_user?
       values
     end
 
@@ -34,6 +35,12 @@ module MultiItemDeposit
     end
 
     private
+
+    # The description has its own column, so the link omits it (unlike MultiItemDepositAction#name).
+    def link_for(multi_item_deposit_action)
+      link_to("Multi-item deposit #{multi_item_deposit_action.id}",
+              multi_item_deposit_action_path(multi_item_deposit_action))
+    end
 
     # Without Item Deposits, the workflow grid would not be limited to any objects.
     def workflow_status_link_for(multi_item_deposit_action)
