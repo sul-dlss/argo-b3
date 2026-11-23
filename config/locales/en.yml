@@ -467,6 +467,22 @@ en:
       errors:
         dark: 'Dark objects cannot be released.'
         save_failed: 'The release could not be saved. Try again, or contact SDR support if the problem continues.'
+    object_apo_defaults:
+      new:
+        title: 'Apply APO defaults'
+        default_version_description: 'Apply APO defaults'
+        governing_apo_html: 'These defaults of the governing APO, %{apo}, will be applied.'
+        embargo: 'The access defaults apply both during the embargo and once it ends. The embargo release date is kept.'
+        buttons:
+          deposit: 'Apply APO defaults and deposit'
+          draft: 'Apply APO defaults and save as draft'
+      toasts:
+        deposit: 'APO defaults applied and deposit started.'
+        draft: 'APO defaults applied.'
+      warnings:
+        not_editable: 'This object is not editable.'
+      errors:
+        save_failed: 'The APO defaults could not be applied. Try again, or contact SDR support if the problem continues.'
     item_text_extractions:
       new:
         title: 'Extract text'
