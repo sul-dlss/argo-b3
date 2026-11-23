@@ -952,6 +952,9 @@ en:
     recent_objects:
       label: 'Recently viewed'
       empty: 'No objects have been viewed.'
+      more_tags:
+        one: 'and 1 more tag'
+        other: 'and %{count} more tags'
     multi_item_deposits:
       view_all: 'View all multi-item deposits'
     recent_drafts_and_deposits:
