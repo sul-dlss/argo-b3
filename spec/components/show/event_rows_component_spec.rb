@@ -61,7 +61,8 @@ RSpec.describe Show::EventRowsComponent, type: :component do
     it 'renders the value with the JSON viewer' do
       data_row = table.find("tr##{component.data_id}")
       expect(data_row).to have_css('dt', text: 'Request')
-      expect(data_row).to have_css('dd andypf-json-viewer')
+      expect(data_row).to have_css('dd andypf-json-viewer[role="region"]' \
+                                   '[aria-label="Request for Registration event at 2026-04-15 03:00:00 PT"]')
     end
   end
 

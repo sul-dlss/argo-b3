@@ -35,7 +35,8 @@ RSpec.describe 'Show item' do
                                                timestamp: '2021-03-31T21:01:20.000Z'),
       Dor::Services::Client::Events::Event.new(event_type: 'version_open',
                                                data: { 'version' => '2', 'who' => 'jdoe',
-                                                       'description' => 'Fix title' },
+                                                       'description' => 'Fix title',
+                                                       'request' => { 'type' => 'dro' } },
                                                timestamp: '2021-03-31T20:23:30.000Z')
     ]
   end
@@ -427,7 +428,12 @@ RSpec.describe 'Show item' do
     expect(toggle_button['aria-expanded']).to eq('true')
     within('#events-table tr.collapse.show') do
       expect(page).to have_css('dd', text: 'Fix title')
+      expect(page).to have_css('andypf-json-viewer' \
+                               '[aria-label="Request for Version open event at 2021-03-31 13:23:30 PT"]')
     end
+    # The event's JSON viewer follows the toggle button in the tab order.
+    toggle_button.send_keys(:tab)
+    expect(page).to have_css('#events-table andypf-json-viewer:focus')
     toggle_button.send_keys(:space)
     expect(page).to have_no_css('#events-table dt', text: 'Description')
     expect(toggle_button['aria-expanded']).to eq('false')
