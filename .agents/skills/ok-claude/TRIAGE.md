@@ -3,7 +3,7 @@
 Decide whether an agent can implement the issue, following the installed plugin's `triage` skill ("Triage a specific issue or PR") with these changes for an unattended run:
 
 - **Recommend, then decide.** Don't wait for direction after step 2: make the call yourself.
-- **Verify** as the skill says (reproduce a bug where you can; the environment can run the app and specs).
+- **Verify** as the skill says (reproduce a bug where you can; the environment can run the app and specs). Verify a screen reader report with the `screen-reader-bug` skill.
 - **Don't grill.** Questions you would have asked the maintainer go into the `human please` comment instead.
 - **Don't close the issue or write to `.out-of-scope/`**, whatever the outcome, and don't mention `.out-of-scope/` in comments.
 - **Earlier triage**: if the issue has triage comments from an earlier run, follow the skill's "Resuming a previous session": read the answers given since, and don't re-ask what's resolved.
