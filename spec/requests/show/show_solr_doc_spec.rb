@@ -25,6 +25,7 @@ RSpec.describe 'Show Solr document' do
 
         expect(response).to have_http_status(:ok)
         expect(Sdr::Repository).to have_received(:find_solr).with(druid:)
+        expect(response.body).to include('role="region"', 'aria-label="Solr document"')
       end
     end
 

@@ -8,8 +8,15 @@
     </div>
   <% end %>
   <%# The json is an attribute (not content), since the viewer re-renders on attribute changes (e.g., from a morph).
-      The data option holds the json, so the Stimulus target is given as a literal attribute. %>
-  <%= tag.andypf_json_viewer indent: 3,
+      The data option holds the json, so the Stimulus target is given as a literal attribute.
+      The viewer draws its content in a shadow root with nothing focusable, so the viewer itself (rather than the wrapper,
+      which also holds the buttons) is a focusable, labelled region; screen readers read the shadow root content as the
+      region's content. It is a block so that its focus outline (the browser's) surrounds the json. %>
+  <%= tag.andypf_json_viewer role: 'region',
+                             tabindex: 0,
+                             'aria-label': label,
+                             class: 'd-block',
+                             indent: 3,
                              expanded:,
                              theme: 'cupertino',
                              'show-data-types': false,
