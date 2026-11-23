@@ -41,7 +41,6 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
       cells = row.all('td')
       expect(cells[0]).to have_link('Liver and bacon: fox trot', href: object_path(druid:))
       expect(cells[1]).to have_text('bc123df4567')
-      expect(cells[2]).to have_css('ul li')
       expect(cells[2]).to have_link('Riegler-Deutsch Index', href: object_path(druid: collection_druid))
       expect(cells[3]).to have_link('Test APO', href: object_path(druid: apo_druid))
       expect(cells[4]).to have_button('Unpin')
@@ -65,8 +64,7 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
 
       row = page.find('table[aria-label="Pinned items"] tbody tr')
       cells = row.all('td')
-      expect(cells[2]).to have_css('ul')
-      expect(cells[2]).to have_no_css('li')
+      expect(cells[2].text.strip).to be_empty
     end
   end
 
