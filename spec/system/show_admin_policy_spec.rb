@@ -17,7 +17,8 @@ RSpec.describe 'Show APO' do
 
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: true,
-                                                                         closed?: true)
+                                                                         closed?: true,
+                                                                         version_description: 'Initial version')
   end
   let(:object_counts) do
     Searchers::AdminPolicyObjectCounts::Result.new(item_count: 12, collection_count: 12)

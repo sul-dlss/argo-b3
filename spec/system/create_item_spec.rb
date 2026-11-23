@@ -63,7 +63,7 @@ RSpec.describe 'Create an item' do
 
       click_button 'Next'
       expect(page).to have_css('#rights-tab.active')
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       check 'Only view collections in selected APO'
       collection_input = find_field(placeholder: 'Start typing the collection name or druid...')
@@ -173,7 +173,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       # Leaving Use and reproduction, Copyright, and License blank.
 
       find_by_id('deposit-tab').click
@@ -201,7 +201,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -225,7 +225,7 @@ RSpec.describe 'Create an item' do
       fill_in 'FOLIO Instance HRID', with: 'in11403803'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -251,7 +251,7 @@ RSpec.describe 'Create an item' do
       attach_file 'Upload a CSV file', file_fixture('item_description.csv')
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register only')
@@ -275,7 +275,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       select 'Stanford', from: 'View access'
       select 'Stanford', from: 'Download access'
 
@@ -301,7 +301,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       select 'Location Based', from: 'View access'
       select 'Special collections', from: 'Location'
 
@@ -327,7 +327,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       choose 'With embargo', allow_label_click: true
 
       fill_in 'When will this embargo end?', with: Date.new(2040, 6, 1)
@@ -362,7 +362,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       # Leaving the blank tag row empty.
@@ -386,7 +386,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
@@ -419,7 +419,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in_tag 'item[project_tags_attributes][0][tag]', with: 'Project : Argo'
@@ -444,7 +444,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
@@ -482,7 +482,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nProject : Argo"
@@ -515,7 +515,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('tags-tab').click
       select_tag_suggestion('Remediated By : 5.0.0', query: 'remed', field_name: 'item[other_tags_attributes][0][tag]')
@@ -554,6 +554,85 @@ RSpec.describe 'Create an item' do
         .with(query: 'arg', tag_type: 'project', user_scope: an_instance_of(Permissions::UserScope))
     end
 
+    context 'when editing entered tags' do
+      before do
+        allow(Searchers::TagSuggestions).to receive(:call).and_return([])
+        allow(Searchers::TagSuggestions).to receive(:call).with(hash_including(tag_type: 'project'))
+                                                          .and_return(['Argo : Phase 1', 'Argo : Phase 2'])
+
+        visit new_item_path
+
+        fill_in 'Source ID', with: 'new:source-id'
+
+        find_by_id('description-tab').click
+        fill_in 'Title', with: 'The Title'
+
+        find_by_id('rights-tab').click
+        select_searchable_option(apo_title, from: 'APO')
+
+        find_by_id('tags-tab').click
+      end
+
+      def register
+        find_by_id('deposit-tab').click
+        click_button('Register only')
+
+        expect(page).to have_current_path("/objects/#{druid}")
+      end
+
+      it 'registers a tag edited after returning to the field' do
+        fill_in_tag 'item[other_tags_attributes][0][tag]', with: 'Registered By : mjgiarlo'
+        click_button 'Add another tag'
+        fill_in_tag 'item[other_tags_attributes][1][tag]', with: 'Remediated By : 5.0.0'
+        click_button 'Add another tag'
+        fill_in_tag 'item[other_tags_attributes][2][tag]', with: 'Cleared'
+
+        # Returning to a field puts its tag back in the text box, with the cursor at the end.
+        find_tag_select('item[other_tags_attributes][0][tag]').click
+        input = find_tag_select_input('item[other_tags_attributes][0][tag]')
+        expect(input.value).to eq('Registered By : mjgiarlo')
+        input.send_keys(*([:left] * 'mjgiarlo'.length), 'x')
+        expect(input.value).to eq('Registered By : xmjgiarlo')
+        # Tab enters the edited tag, and tabbing again leaves the field.
+        input.send_keys(:tab)
+        expect(find_tag_select_item('item[other_tags_attributes][0][tag]')).to have_text('Registered By : xmjgiarlo')
+        input.send_keys(:tab)
+        expect(page).to have_no_css('.ts-wrapper.focus')
+
+        # A field returned to and left without changes keeps its tag.
+        find_tag_select('item[other_tags_attributes][1][tag]').click
+        expect(find_tag_select_input('item[other_tags_attributes][1][tag]').value).to eq('Remediated By : 5.0.0')
+
+        # A field whose text is cleared is left empty.
+        find_tag_select('item[other_tags_attributes][2][tag]').click
+        input = find_tag_select_input('item[other_tags_attributes][2][tag]')
+        input.send_keys(*([:backspace] * 'Cleared'.length))
+        expect(input.value).to eq('')
+
+        register
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:tags]).to eq(['Registered By : xmjgiarlo', 'Remediated By : 5.0.0'])
+        end
+      end
+
+      it 'registers a suggested tag edited after choosing it' do
+        select_tag_suggestion('Argo : Phase 2', query: 'argo', field_name: 'item[project_tags_attributes][0][tag]')
+
+        # Editing the chosen suggestion moves it into the text box.
+        expect(find_tag_select_item('item[project_tags_attributes][0][tag]')).to have_text('Argo : Phase 2')
+        input = find_tag_select_input('item[project_tags_attributes][0][tag]')
+        input.send_keys(*([:left] * 2), 'b')
+        expect(input.value).to eq('Argo : Phaseb 2')
+
+        register
+
+        expect(Sdr::Repository).to have_received(:register) do |args|
+          expect(args[:tags]).to eq(['Project : Argo : Phaseb 2'])
+        end
+      end
+    end
+
     it 'registers and redirects to add files' do
       version_service = version_service_double(druid:, open?: true, editable?: true, version: 1,
                                                version_description: 'Initial version')
@@ -568,7 +647,7 @@ RSpec.describe 'Create an item' do
       fill_in 'Title', with: 'The Title'
 
       find_by_id('rights-tab').click
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       find_by_id('deposit-tab').click
       click_button('Register and add files')

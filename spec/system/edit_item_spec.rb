@@ -50,7 +50,8 @@ RSpec.describe 'Edit an item' do
     click_button 'APO, collection, rights'
     expect(page).to have_css('#rights-tab.active')
     # The user cannot otherwise select the item's APO, so it is labeled with its druid.
-    expect(page).to have_select('APO', selected: DruidSupport.bare_druid_from(apo_druid))
+    expect(find_searchable_select('APO'))
+      .to have_css('.ts-control .item', exact_text: DruidSupport.bare_druid_from(apo_druid))
     expect(page).to have_field('Without embargo', type: 'radio', checked: true, visible: :all)
     expect(page).to have_select('item[embargo_view]', disabled: true, visible: :all)
     fill_in 'Copyright', with: 'Copyright © Stanford University.'
@@ -211,7 +212,7 @@ RSpec.describe 'Edit an item' do
 
       click_button 'APO, collection, rights'
       within('.ts-control .item', text: 'Art History Slides') { find('.remove').click }
-      expect(page).to have_no_css('.ts-control .item')
+      expect(page).to have_no_css('.ts-control .item', text: 'Art History Slides')
 
       find_by_id('deposit-tab').click
       fill_in 'Version description', with: 'Removed the collection'

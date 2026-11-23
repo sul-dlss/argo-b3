@@ -126,6 +126,8 @@ en:
         edit_admin_policy: "Edit APO"
         manage_files: "Manage files"
         deposit: "Deposit"
+      deposit_dropdown:
+        cancel: "Cancel"
     file_sets:
       buttons:
         download: "Download %{filepath}"
@@ -153,6 +155,7 @@ en:
       cannot_purge: "This object cannot be purged because it has been submitted."
       content_busy: "Files for this object are being staged, discovered, or structured. Try again when that has finished."
       goobi_processing: "Goobi is already processing this version. Try again after Goobi has deposited it."
+      invalid_cocina: "This object is currently not available, likely because it is part of an ongoing cocina migration. Please check back later."
       not_depositable: "This draft cannot be deposited."
       not_discardable: "This draft cannot be discarded."
       not_goobi_type: "Only image and book items can be redeposited with Goobi."
@@ -464,6 +467,22 @@ en:
       errors:
         dark: 'Dark objects cannot be released.'
         save_failed: 'The release could not be saved. Try again, or contact SDR support if the problem continues.'
+    object_apo_defaults:
+      new:
+        title: 'Apply APO defaults'
+        default_version_description: 'Apply APO defaults'
+        governing_apo_html: 'These defaults of the governing APO, %{apo}, will be applied.'
+        embargo: 'The access defaults apply both during the embargo and once it ends. The embargo release date is kept.'
+        buttons:
+          deposit: 'Apply APO defaults and deposit'
+          draft: 'Apply APO defaults and save as draft'
+      toasts:
+        deposit: 'APO defaults applied and deposit started.'
+        draft: 'APO defaults applied.'
+      warnings:
+        not_editable: 'This object is not editable.'
+      errors:
+        save_failed: 'The APO defaults could not be applied. Try again, or contact SDR support if the problem continues.'
     item_text_extractions:
       new:
         title: 'Extract text'
@@ -933,6 +952,9 @@ en:
     recent_objects:
       label: 'Recently viewed'
       empty: 'No objects have been viewed.'
+      more_tags:
+        one: 'and 1 more tag'
+        other: 'and %{count} more tags'
     multi_item_deposits:
       view_all: 'View all multi-item deposits'
     recent_drafts_and_deposits:
@@ -965,6 +987,16 @@ en:
     tabs:
       history: 'Recent bulk actions'
       menu: 'Bulk actions menu'
+    sections:
+      pages: 'Bulk action pages'
+      perform_actions: 'Perform actions'
+      register_and_deposit: 'Register and deposit'
+      tags_and_reporting: 'Tags and reporting'
+      modify_objects: 'Modify objects'
+      structural_metadata: 'Manage structural metadata'
+      rights_and_administrative_metadata: 'Manage rights and administrative metadata'
+      descriptive_metadata: 'Manage descriptive metadata'
+      permissions: 'Manage permissions'
     cancel: 'Cancel'
     cancel_confirm: 'Cancel this bulk action? Changes already made to objects will not be undone.'
     cancel_failed: 'Bulk action could not be cancelled.'

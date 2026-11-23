@@ -24,7 +24,8 @@ RSpec.describe 'Show item' do
   let(:version_status) do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                          closed?: true, version: 2,
-                                                                         openable?: true, closeable?: false)
+                                                                         openable?: true, closeable?: false,
+                                                                         version_description: 'Fixed the title')
   end
   let(:milestone_date) { true }
   # More event types than Tom Select lists by default (50), so that the last one is only listed if all are.
@@ -634,6 +635,8 @@ RSpec.describe 'Show item' do
       allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
       # The dashboard, visited to set the last search cookie, searches for recent drafts and deposits.
       allow(Searchers::Item).to receive(:call).and_return([])
+      # It also looks up recent objects, which a session left from an earlier example may hold.
+      allow(Searchers::ItemByDruid).to receive(:call).and_return([])
       allow(Search::SolrService).to receive(:post)
         .with(request: hash_including(start: 1, rows: 3))
         .and_return('response' => { 'numFound' => 10,
@@ -768,6 +771,43 @@ RSpec.describe 'Show item' do
       expect(page).to have_link('Constituent two', href: "/objects/#{second_constituent_druid}")
       expect(page).to have_css('td', text: 'jh330cm3013')
       expect(page).to have_css('td', text: 'mn667qr8901')
+    end
+  end
+
+  describe 'depositing a draft from the status box' do
+    let(:version_status) do
+      instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
+                                                                           closed?: false, version: 2, open?: true,
+                                                                           openable?: false, closeable?: true,
+                                                                           discardable?: true,
+                                                                           version_description: 'Fixed the abstract')
+    end
+
+    before do
+      create(:permission, :edit, workgroup: 'sdr:argo-access', target_druid: druid)
+      allow(Sdr::Repository).to receive_messages(find_solr: build_solr_doc(title: original_title),
+                                                 find: build_cocina_object(title: original_title))
+      allow(Sdr::DepositDraftService).to receive(:call)
+    end
+
+    it 'cancels without changing anything, then describes the version and deposits' do
+      visit "/objects/#{druid}"
+
+      click_button 'Deposit'
+      expect(page).to have_field('Version description', with: 'Fixed the abstract')
+      fill_in 'Version description', with: 'Changed my mind'
+      click_button 'Cancel'
+      expect(page).to have_no_field('Version description')
+
+      click_button 'Deposit'
+      expect(page).to have_field('Version description', with: 'Fixed the abstract')
+      fill_in 'Version description', with: 'Fixed the title'
+      within('.dropdown-menu') { click_button 'Deposit' }
+
+      expect(page).to have_toast('Deposit started.')
+      expect(page).to have_no_field('Version description')
+      expect(Sdr::DepositDraftService).to have_received(:call)
+        .with(hash_including(version_description: 'Fixed the title')).once
     end
   end
 

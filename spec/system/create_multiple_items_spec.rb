@@ -50,7 +50,7 @@ RSpec.describe 'Create multiple items' do
 
   def fill_in_registration_settings
     select 'image', from: 'Content type'
-    select apo_title, from: 'APO'
+    select_searchable_option(apo_title, from: 'APO')
     select 'Stanford', from: 'View access'
     select 'Stanford', from: 'Download access'
 
@@ -364,7 +364,7 @@ RSpec.describe 'Create multiple items' do
       visit_new_multiple_item
 
       select 'image', from: 'Content type'
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       select 'Stanford', from: 'View access'
       select 'Stanford', from: 'Download access'
       # Leaving Use and reproduction, Copyright, and License blank.
@@ -394,7 +394,7 @@ RSpec.describe 'Create multiple items' do
     it 'shows a validation error and does not enqueue a bulk action' do
       visit_new_multiple_item
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       choose 'Enter each item individually. Either FOLIO Instance HRID or Title is required.'
       # Leaving all of the item fields blank.
 

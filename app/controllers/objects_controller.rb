@@ -29,15 +29,18 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   # already made it fresh.
   # The cached cocina hash omits the file sets (structural.contains), which can be large; frames that need them
   # use the full cocina hash, which is fetched on demand.
+  #
+  # The cocina is fetched before the live solr doc, since DSA may not be able to build the live solr doc from
+  # invalid cocina. An object whose cocina is invalid gets a page with only its heading (see #show_invalid_cocina).
   def show # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     druid = druid_param
     lock = Sdr::Repository.lock(druid:)
 
-    @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
-    authorize! @solr_doc, with: ObjectPolicy
-
     # Also warms the cache for the other frames (e.g., overview, json, purl_preview).
     @cocina_object = CocinaSupport.build_from_cocina_hash(refresh_cocina_hash(druid, lock).dup)
+
+    @solr_doc = SolrDocPresenter.new(solr_doc: refresh_solr_doc(druid, lock))
+    authorize! @solr_doc, with: ObjectPolicy
 
     set_from_last_search_cookie # This provides @last_search_form and @total_results
     set_search_navigation
@@ -46,6 +49,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     content = Content.latest_staging_activity(druid:)
     @object_status_presenter = ObjectStatusPresenter.new(solr_doc: @solr_doc, version_service:, content:)
     @unsaved_content_changes = unsaved_content_changes?(druid)
+    @deposit_form = DepositDraftForm.for_status(version_service:)
     release_tags = @solr_doc.releasable_type? ? Sdr::Repository.release_tags(druid:) : []
     @object_released_presenter = ObjectReleasedPresenter.new(solr_doc: @solr_doc, version_service:, release_tags:)
     @previously_published = republishable?
@@ -55,6 +59,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set
     @pinned = PinnedObject.exists?(druid:, user: current_user)
+  rescue Sdr::Repository::InvalidCocinaError
+    show_invalid_cocina(druid)
   end
 
   def show_overview
@@ -229,7 +235,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     cocina_object = Sdr::Repository.find(druid: druid_param)
     authorize! cocina_object, to: :update?, with: ObjectPolicy
 
-    deposit_and_respond(cocina_object:)
+    deposit_form = DepositDraftForm.new(DepositDraftForm.params_from(params))
+    deposit_and_respond(deposit_form:, cocina_object:)
   end
 
   def discard_draft
@@ -247,6 +254,26 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
   end
 
   private
+
+  # The title and the druids that authorization needs come from the solr doc in Solr, since DSA can't provide them.
+  def show_invalid_cocina(druid)
+    @solr_doc = SolrDocPresenter.new(solr_doc: indexed_solr_doc(druid))
+    authorize! @solr_doc, with: ObjectPolicy
+
+    set_from_last_search_cookie # This provides @last_search_form and @total_results
+    set_search_navigation
+    @pinned = PinnedObject.exists?(druid:, user: current_user)
+    render :show_invalid_cocina
+  end
+
+  def indexed_solr_doc(druid)
+    fields = [Search::Fields::ID, Search::Fields::TITLE, Search::Fields::OBJECT_TYPES, Search::Fields::APO_DRUID,
+              Search::Fields::COLLECTION_DRUIDS]
+    result = Searchers::ItemByDruid.call(druids: [druid], user_scope: nil, fields:).first
+    raise Sdr::Repository::NotFoundResponse, "Object not found in Solr: #{druid}" unless result
+
+    result.solr_doc
+  end
 
   def render_collection_overview
     @item_count = Searchers::CollectionItemCount.call(collection_druid: @solr_doc.druid,
@@ -266,8 +293,8 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     Permission.highest_permission_type_by_workgroup(target_druid: @solr_doc.druid)
   end
 
-  def deposit_and_respond(cocina_object:) # rubocop:disable Metrics/AbcSize
-    Sdr::DepositDraftService.call(cocina_object:, user_name: current_user.sunetid)
+  def deposit_and_respond(deposit_form:, cocina_object:) # rubocop:disable Metrics/AbcSize
+    deposit_form.deposit!(cocina_object:, user_name: current_user.sunetid)
     toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
   rescue Sdr::DepositDraftService::ContentBusyError
     redirect_to object_path(druid_param), flash: { danger: t('show.warnings.content_busy') }

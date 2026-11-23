@@ -59,7 +59,7 @@ RSpec.describe 'Create a collection' do
 
     click_button 'Next'
     expect(page).to have_css('#rights-tab.active')
-    select 'My APO', from: 'APO'
+    select_searchable_option('My APO', from: 'APO')
     select 'dark', from: 'View access'
 
     # The APO defaults are applied to the rights fields.
@@ -125,7 +125,7 @@ RSpec.describe 'Create a collection' do
     attach_file 'Upload a CSV file', file_fixture('item_description.csv')
 
     find_by_id('rights-tab').click
-    select 'My APO', from: 'APO'
+    select_searchable_option('My APO', from: 'APO')
 
     find_by_id('deposit-tab').click
     click_button 'Register and deposit collection'
@@ -147,7 +147,7 @@ RSpec.describe 'Create a collection' do
     # Leaving the spreadsheet unattached.
 
     find_by_id('rights-tab').click
-    select 'My APO', from: 'APO'
+    select_searchable_option('My APO', from: 'APO')
 
     find_by_id('deposit-tab').click
     click_button 'Register and deposit collection'

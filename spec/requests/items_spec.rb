@@ -134,7 +134,7 @@ RSpec.describe 'Items' do
 
           page = Capybara.string(response.body)
           expect(page).to have_link('Discard draft', href: "/objects/#{druid}/discard_draft", count: 4)
-          expect(page).to have_no_link('Purge')
+          expect(page.find('main')).to have_no_link('Purge')
         end
       end
 

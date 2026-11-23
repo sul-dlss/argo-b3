@@ -39,7 +39,7 @@ module Lint
     Linter.new(name: 'stylelint', commands: ['yarn -s run stylelint --formatter unix --no-color'],
                changed_command: 'yarn -s run stylelint --formatter unix --no-color',
                files: %r{\Aapp/assets/stylesheets/.*\.scss\z}, offenses: FILE_LINE_COLUMN),
-    Linter.new(name: 'i18n', commands: ['bundle exec i18n-tasks missing', 'bundle exec i18n-tasks unused'])
+    Linter.new(name: 'i18n', commands: ['bin/i18n-tasks missing', 'bin/i18n-tasks unused'])
   ].freeze
 
   # Files changed on this branch, uncommitted, or untracked, relative to origin/main.

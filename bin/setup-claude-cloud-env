@@ -159,6 +159,9 @@ su postgres --command "psql --quiet --command \"ALTER USER postgres PASSWORD 'po
 
 step "Running bin/setup"
 bin/setup --skip-server
+# Link the executables of the gems bin/setup just installed (e.g., i18n-tasks, which
+# bin/rake lint runs with bundle exec and so needs on PATH).
+link_executables "$ruby_prefix"
 
 # bin/setup doesn't build the CSS, and system specs need it (e.g., to hide collapsed sections).
 step "Building CSS"
