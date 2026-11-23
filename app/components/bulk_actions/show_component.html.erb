@@ -1,7 +1,7 @@
 <%= render Layout::ContainerComponent.new(classes: 'bulk-action-show object-type-bulk-action', data:) do %>
   <%= render Layout::TwoColumnWithHeaderComponent.new do |layout| %>
     <% layout.with_top_content do %>
-      <%= render Elements::BreadcrumbComponent.new(label: t('bulk_actions.heading'), link: bulk_actions_path) %>
+      <%= render Elements::BreadcrumbComponent.new(label: t('bulk_actions.tabs.history'), link: bulk_actions_path) %>
 
       <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h1, text: name, classes: 'mb-0') %>
@@ -11,8 +11,8 @@
 
     <% layout.with_left_content do %>
       <%= render Elements::ButtonListComponent.new do |component| %>
+        <% component.with_button(link: bulk_actions_path, label: t('bulk_actions.tabs.history'), variant: 'outline-primary') %>
         <% component.with_button(link: new_bulk_action_path, label: t('bulk_actions.menu'), variant: 'outline-primary') %>
-        <% component.with_button(link: bulk_actions_path, label: t('bulk_actions.heading'), variant: 'outline-primary') %>
       <% end %>
     <% end %>
 
