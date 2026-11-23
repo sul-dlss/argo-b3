@@ -40,7 +40,7 @@ RSpec.describe Search::Serializer do
     let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
 
     it 'labels the missing value as No value' do
-      expect(serialized_query).to eq('Language: ("English" AND "No value")')
+      expect(serialized_query).to eq('Language: ("English" OR "No value")')
     end
   end
 

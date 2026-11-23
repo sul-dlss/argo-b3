@@ -227,13 +227,15 @@ module Search
 
     LANGUAGES = Config.with_defaults(
       form_field: :languages,
+      exclude_form_field: :languages_exclude,
       loading: :secondary,
       field: Search::Fields::LANGUAGES,
       limit: 25,
       facet_resource: :language_facets,
       facet_index: true,
       facet_search: true,
-      missing_value: true
+      missing_value: true,
+      operator: :or
     )
 
     LAST_ACCESSIONED_DATE = Config.with_defaults(

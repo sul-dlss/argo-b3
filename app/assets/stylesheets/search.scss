@@ -62,3 +62,8 @@ a[aria-expanded="false"] {
     width: 6rem;
   }
 }
+
+// Content kept on the page while a new search loads (see search_morph_controller.js).
+[data-search-morph-keep][inert] {
+  opacity: 0.6;
+}

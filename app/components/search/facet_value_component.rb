@@ -36,8 +36,15 @@ module Search
       "Exclude #{label}"
     end
 
+    # Selecting an excluded value stops excluding it.
+    def select_path
+      form = with_exclude? ? search_form.without({ exclude_form_field => value }) : search_form
+      url_for(form.with({ form_field => [value], page: nil }))
+    end
+
+    # Excluding a selected value stops selecting it.
     def exclude_path
-      url_for(search_form.with({ exclude_form_field => [value], page: nil }))
+      url_for(search_form.without({ form_field => value }).with({ exclude_form_field => [value], page: nil }))
     end
 
     def remove_path
@@ -50,6 +57,17 @@ module Search
         helpers.remove_icon(classes: 'ms-2', aria: { hidden: true }) +
           tag.span("[#{remove_title}]", class: 'visually-hidden')
       end
+    end
+
+    def render_exclude_link
+      render SdrViewComponents::Elements::ButtonLinkComponent.new(link: exclude_path, variant: :link, size: :sm,
+                                                                  classes: 'ms-2 p-0 align-baseline', **link_args) do
+        tag.span('exclude', aria: { hidden: true }) + tag.span(exclude_label, class: 'visually-hidden')
+      end
+    end
+
+    def render_excluded
+      tag.span(class: 'ms-2 text-nowrap') { tag.strong('excluded') + render_remove_link }
     end
   end
 end

@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Search::FacetsBuilder do
-  subject(:facet_json) { described_class.call(facet_configs:).with_indifferent_access }
+  subject(:facet_json) { described_class.call(facet_configs:, search_form:).with_indifferent_access }
+
+  let(:search_form) { ResultsSearchForm.new(languages: ['Welsh']) }
 
   let(:facet_configs) do
     [
@@ -32,6 +34,9 @@ RSpec.describe Search::FacetsBuilder do
                 })
     expect(facet_json[Search::Fields::LANGUAGES]).to include(missing: true)
     expect(facet_json[Search::Fields::ACCESS_RIGHTS]).not_to include(:missing)
+    # Selected values are counted too (see SelectedFacetValuesBuilder spec).
+    expect(facet_json).to include("#{Search::Fields::LANGUAGES}-selected")
+    expect(facet_json).not_to include("#{Search::Fields::ACCESS_RIGHTS}-selected")
     # Only testing one dynamic facet here so that the test is not brittle.
     expect(facet_json).to include(
       'released_to_earthworks-today',

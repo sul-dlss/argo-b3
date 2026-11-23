@@ -1,3 +1,3 @@
-<%= helpers.turbo_stream.replace facet_id do %>
+<%= helpers.turbo_stream.update facet_id, method: :morph do %>
   <%= render Search::ConfiguredFacetComponent.new(facet_config:, facet_counts:, search_form:) %>
 <% end %>

@@ -42,7 +42,6 @@ RSpec.describe 'Workflow grid as a view of the current search', :solr do
 
     within(find_facet_section('Object type')) do
       check('item')
-      click_button('Filter')
     end
 
     # Refining keeps the user on the grid.

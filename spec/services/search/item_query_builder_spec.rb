@@ -83,31 +83,45 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
-  context 'with multiple languages (facet filter query)' do
-    let(:search_form) { ResultsSearchForm.new(languages: %w[English German]) }
+  context 'with multiple genres (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(genres: %w[maps poetry]) }
 
     it 'ANDs the values in the filter query' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("#{Search::Fields::LANGUAGES}:(\"English\" AND \"German\")")
+      expect(Array(result[:fq])).to include("#{Search::Fields::GENRES}:(\"maps\" AND \"poetry\")")
     end
   end
 
-  context 'with a missing value for languages (facet filter query)' do
-    let(:search_form) { ResultsSearchForm.new(languages: ['_missing_value']) }
+  context 'with a missing value for genres (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(genres: ['_missing_value']) }
 
-    it 'filters on objects without a language' do
+    it 'filters on objects without a genre' do
       result = described_class.call(search_form:, user_scope:)
-      expect(Array(result[:fq])).to include("(*:* -#{Search::Fields::LANGUAGES}:[* TO *])")
+      expect(Array(result[:fq])).to include("(*:* -#{Search::Fields::GENRES}:[* TO *])")
     end
   end
 
-  context 'with a language and a missing value for languages (facet filter query)' do
-    let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
+  context 'with a genre and a missing value for genres (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(genres: %w[maps _missing_value]) }
 
-    it 'ANDs the language and missing value in the filter query' do
+    it 'ANDs the genre and missing value in the filter query' do
       result = described_class.call(search_form:, user_scope:)
       expect(Array(result[:fq]))
-        .to include("(#{Search::Fields::LANGUAGES}:(\"English\") AND (*:* -#{Search::Fields::LANGUAGES}:[* TO *]))")
+        .to include("(#{Search::Fields::GENRES}:(\"maps\") AND (*:* -#{Search::Fields::GENRES}:[* TO *]))")
+    end
+  end
+
+  context 'with selected and excluded languages (facet filter query)' do
+    let(:search_form) do
+      ResultsSearchForm.new(languages: %w[English _missing_value], languages_exclude: %w[French German])
+    end
+
+    it 'ORs the values and tags both filter queries' do
+      result = described_class.call(search_form:, user_scope:)
+      field = Search::Fields::LANGUAGES
+      expect(Array(result[:fq]))
+        .to include("{!tag=#{field}}(#{field}:(\"English\") OR (*:* -#{field}:[* TO *]))",
+                    "{!tag=#{field}}-#{field}:(\"French\" OR \"German\")")
     end
   end
 

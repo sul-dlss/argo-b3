@@ -49,8 +49,16 @@ module Searchers
     def facet_json
       {
         facet_field => Search::FacetBuilder.call(field: facet_field, tag: facet_config.field, alpha_sort:, limit:,
-                                                 page:, missing_value: facet_config.missing_value)
-      }
+                                                 page:, missing_value: facet_config.missing_value,
+                                                 exclude: Search::FacetsBuilder.exclude?(facet_config))
+      }.merge(selected_facet_json)
+    end
+
+    # Selected values are listed on the first page only.
+    def selected_facet_json
+      return {} if page.present? && page > 1
+
+      Search::SelectedFacetValuesBuilder.call(facet_config:, search_form:)
     end
   end
 end
