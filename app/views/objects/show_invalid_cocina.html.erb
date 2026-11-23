@@ -1,0 +1,11 @@
+<%= page_title(@solr_doc.title) %>
+
+<%= render Layout::ContainerComponent.new(classes: ['object-show', @solr_doc.object_type_class]) do %>
+  <%= render Search::ItemNavigationComponent.new(last_search_form: @last_search_form,
+                                                 current_position: @search_position, navigation: @navigation) %>
+
+  <%# read-only badge suppressed due to irrelevance here, not user permissions %>
+  <%= render Show::HeadingComponent.new(solr_doc: @solr_doc, pinned: @pinned, read_only_badge: false) %>
+
+  <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :warning, text: t('show.warnings.invalid_cocina')) %>
+<% end %>

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Search
-  # Component for rendering a turbo stream to replace a search facet's placeholder with the facet
-  class FacetTurboStreamReplaceComponent < ViewComponent::Base
+  # Component for rendering a turbo stream to update a search facet's placeholder (or earlier content) with the facet
+  class FacetTurboStreamUpdateComponent < ViewComponent::Base
     with_collection_parameter :facet_config
 
     # @param facet_config [Search::Facets::Config]

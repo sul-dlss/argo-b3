@@ -16,7 +16,7 @@ Follow the repo's `pull-request` skill ("Opening a draft PR"), with these change
   1. Push the files, and only them, at the top level of a new orphan branch `claude/pr-media/<PR head branch>`.
   2. Reference each in the PR body by bare filename, as the `pull-request` skill says (`![<alt>](./<file>)`).
   When the PR is labelled `ok claude : ready for dev review`, the dispatcher uploads the files into the body in place of those references and deletes the media branch. If it can't, it comments on the PR and leaves the branch.
-- **Provisional decisions** matter most here, since no one answered planning questions: list every judgement call you made.
+- **Provisional decisions** matter most here, since no one answered planning questions: list every judgement call you made, each on the matching list.
 - **Merge Danger**: include the integration-spec reminder from AGENTS.md when it applies.
 - **Inline comments**: post them as one review, with the session's review tools, ending each with "Created by Claude."
 - Label the PR `ok claude : ready for dev review`, last of these steps.

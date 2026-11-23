@@ -47,7 +47,8 @@ def find_ticket_result(ticket)
 end
 
 def find_facet_section(facet_label)
-  find("section[aria-label='#{facet_label}']")
+  # A facet is inert while the search updates in place.
+  find(":not([inert]) > section[aria-label='#{facet_label}']")
 end
 
 def find_current_filters_section

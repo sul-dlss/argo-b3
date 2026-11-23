@@ -20,6 +20,24 @@ RSpec.describe 'Create a new update governing APO bulk action' do
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[new_apo_title, new_apo_id]])
   end
 
+  context 'when there are more than 50 APOs' do
+    before do
+      apos = (1..60).map { |n| [format('APO %02d', n), "druid:bc#{format('%03d', n)}df4567"] }
+      allow(Searchers::AdminPolicyList).to receive(:call).and_return(apos)
+    end
+
+    it 'shows all of the matching APOs' do
+      visit new_bulk_action_path
+      click_link bulk_action_label
+
+      apo_select = search_searchable_select('APO', from: 'New governing APO')
+
+      expect(apo_select).to have_css('.ts-dropdown .option', count: 60)
+      apo_select.find('.ts-dropdown .option', exact_text: 'APO 60').click
+      expect(apo_select).to have_css('.ts-control .item', exact_text: 'APO 60')
+    end
+  end
+
   it 'submits an update governing APO bulk action' do
     visit new_bulk_action_path
 
@@ -28,7 +46,7 @@ RSpec.describe 'Create a new update governing APO bulk action' do
     expect(page).to have_css('h1', text: bulk_action_label)
     expect(Searchers::AdminPolicyList).to have_received(:call).with(user_scope: Permissions::UserScope, editable: true)
 
-    select new_apo_title, from: 'New governing APO'
+    select_searchable_option(new_apo_title, from: 'New governing APO')
 
     fill_in 'Enter druid list', with: druids.join("\n")
     fill_in 'Describe this bulk action', with: 'Move test items to a new governing APO'

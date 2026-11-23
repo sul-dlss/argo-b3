@@ -73,7 +73,7 @@ module Searchers
     end
 
     def facet_json
-      Search::FacetsBuilder.call(facet_configs: Search::Facets::PRIMARY).to_json
+      Search::FacetsBuilder.call(facet_configs: Search::Facets::PRIMARY, search_form:).to_json
     end
 
     # @return [String] Solr sort value

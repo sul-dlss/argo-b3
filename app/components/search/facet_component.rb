@@ -11,19 +11,37 @@ module Search
     # @param facet_page_path_helper [Proc, nil] Optional path helper for paging the facet. Enables paging if provided.
     # @param facet_search_path_helper [Proc, nil] Optional path helper for searching the facet. Enables searching
     #   if provided.
+    # @param checkbox [Boolean] true to display the values as checkboxes
     def initialize(facet_counts:, search_form:, form_field:, exclude_form_field: nil, facet_page_path_helper: nil, # rubocop:disable Metrics/ParameterLists
-                   facet_search_path_helper: nil)
+                   facet_search_path_helper: nil, checkbox: false)
       @facet_counts = facet_counts
       @search_form = search_form
       @form_field = form_field
       @exclude_form_field = exclude_form_field
       @facet_page_path_helper = facet_page_path_helper
       @facet_search_path_helper = facet_search_path_helper
+      @checkbox = checkbox
       super()
     end
 
     attr_reader :facet_counts, :search_form, :form_field, :facet_page_path_helper, :facet_search_path_helper,
                 :exclude_form_field
+
+    def checkbox?
+      @checkbox
+    end
+
+    def checkbox_description_id
+      helpers.facet_id(form_field, suffix: 'checkbox-description')
+    end
+
+    def facet_value_component(facet_count)
+      args = { count: facet_count.count, search_form:, form_field:, exclude_form_field:, value: facet_count.value,
+               label: facet_count.label, data: { turbo_frame: '_top' } }
+      return Search::CheckboxFacetValueComponent.new(description_id: checkbox_description_id, **args) if checkbox?
+
+      Search::FacetValueComponent.new(**args)
+    end
 
     def show?
       search_form.selected?(key: form_field) ||

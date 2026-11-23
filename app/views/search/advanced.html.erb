@@ -3,6 +3,8 @@
 <% content_for :head do %>
   <meta name="turbo-refresh-method" content="morph">
   <meta name="turbo-refresh-scroll" content="preserve">
+  <%# A cached snapshot would be taken after the page is morphed (see search_morph_controller.js). %>
+  <meta name="turbo-cache-control" content="no-cache">
 <% end %>
 
 <%= render Layout::ContainerComponent.new(heading: t('search.advanced')) do %>
@@ -15,11 +17,12 @@
         <%= render Search::ViewToggleComponent.new(search_form: @search_form) %>
 
         <%= turbo_frame_tag 'items-search', src: advanced_search_items_path(@search_form.attributes),
-                                            data: { controller: 'frame-url',
+                                            data: { controller: 'frame-url', search_morph_keep: true,
                                                     action: 'turbo:frame-load->frame-url#updateURL' } do %>
           <%= render Search::LoadingItemResultsComponent.new %>
         <% end %>
-        <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_advanced_search_items_path(@search_form.attributes) %>
+        <%= turbo_frame_tag 'items-search-secondary', src: secondary_facets_advanced_search_items_path(@search_form.attributes),
+                                                      data: { search_morph_keep: true } %>
       <% end %>
       <%= layout.with_sidebar do %>
         <%= render Search::FacetsSectionComponent.new(search_form: @search_form) %>

@@ -22,11 +22,15 @@
     <% end %>
     <% component.with_row(label: 'Collection') do |row_component| %>
       <% row_component.with_cell do %>
-        <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
-          <% collection_title = Array(@solr_doc.collection_titles)[index] %>
-          <%= link_to_object collection_title, collection_druid %>
-          <% search_form = ResultsSearchForm.new(collection_druids: [collection_druid]) %>
-          (<%= link_to('All objects with this collection', url_for(search_form)) %>)
+        <%= render SdrViewComponents::Tables::ListCellComponent.new do |list_component| %>
+          <% Array(@solr_doc.collection_druids).each_with_index do |collection_druid, index| %>
+            <% collection_title = Array(@solr_doc.collection_titles)[index] %>
+            <% list_component.with_item do %>
+              <%= link_to_object collection_title, collection_druid %>
+              <% search_form = ResultsSearchForm.new(collection_druids: [collection_druid]) %>
+              (<%= link_to('All objects with this collection', url_for(search_form)) %>)
+            <% end %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

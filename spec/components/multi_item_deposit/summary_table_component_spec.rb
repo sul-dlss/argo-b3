@@ -58,7 +58,7 @@ RSpec.describe MultiItemDeposit::SummaryTableComponent, type: :component do
         .to eq(['Error: Row 2: Missing filename', 'Error: Page has more than one image'])
       expect(status_cells[0]).to have_css('ul li > span.text-danger i.bi-exclamation-triangle-fill', count: 2)
       expect(status_cells[0]).to have_css('ul li > span:not(.text-danger)', text: 'No displayable image')
-      expect(status_cells[1]).to have_css('ul li > span:not(.text-danger)', text: 'No displayable image')
+      expect(status_cells[1]).to have_css('span:not(.text-danger)', text: 'No displayable image')
       expect(status_cells[2].text.strip).to eq('OK')
     end
   end

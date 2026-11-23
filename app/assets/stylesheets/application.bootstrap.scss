@@ -24,6 +24,7 @@ $search-color: rgb(#{$search-color-rgb});
 @import 'dashboard';
 @import 'forms';
 @import 'progress_stepper';
+@import 'header';
 
 // Local custom properties for object-type colors without a matching Stanford palette entry.
 :root {
@@ -168,4 +169,9 @@ $search-color: rgb(#{$search-color-rgb});
     // Prevents Turbo's page morph from animating the pin.
     transition: none;
   }
+}
+
+// Below a page header (see the application layout), space the flash alerts from the band only when there are any.
+.flash-below-page-header #flash-alerts > .alert:first-child {
+  margin-top: $spacer;
 }

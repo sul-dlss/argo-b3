@@ -14,7 +14,7 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
     it 'renders the pill, boxes, and polls for updates, without tabs' do
       render_inline(component)
 
-      expect(page).to have_link('← Bulk actions', href: '/bulk_actions')
+      expect(page).to have_link('← Recent bulk actions', href: '/bulk_actions')
       expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: Test description")
       expect(page).to have_css('.object-type-bulk-action span.object-type-bg', text: 'Bulk action')
       expect(page).to have_css('div[data-controller="scheduled-refresh"]' \
@@ -78,15 +78,86 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
              druid_count_success: 1, druid_count_fail: 1, druid_count_total: 2)
     end
 
-    it 'renders a "complete with errors" status and an active Errors tab' do
+    it 'renders a "complete with errors" status, an active Successes tab, and an Errors tab' do
       render_inline(component)
 
       expect(page).to have_css('h2 i.bi-exclamation-triangle-fill.text-warning')
       expect(page).to have_css('h2', text: 'Completed with errors')
 
-      expect(page).to have_button('Errors', class: 'active')
-      expect(page).to have_css('pre', text: 'Error: Something went wrong')
-      expect(page).to have_no_css('pre', text: 'Success: Did the thing')
+      expect(page.all('[role="tab"]').map(&:text)).to eq(%w[Successes Errors])
+      expect(page).to have_button('Successes', class: 'active')
+      expect(page).to have_button('Errors')
+      expect(page).to have_no_button('Errors', class: 'active')
+
+      successes_pane = page.find_by_id('bulk-action-successes-pane', visible: :all)
+      expect(successes_pane).to have_css('pre', text: 'Success: Did the thing')
+      expect(successes_pane).to have_no_css('pre', text: 'Error: Something went wrong', visible: :all)
+
+      errors_pane = page.find_by_id('bulk-action-errors-pane', visible: :all)
+      expect(errors_pane).to have_css('pre', text: 'Error: Something went wrong', visible: :all)
+      expect(errors_pane).to have_no_css('pre', text: 'Success: Did the thing', visible: :all)
+    end
+  end
+
+  context 'when the bulk action is completed with only successes' do
+    let(:log_content) do
+      "2026-04-16 03:00:00 PT\tStarting reindex\n" \
+        "2026-04-16 03:00:00 PT\tline 2\tdruid:bc123df4567\tSuccess: Did the thing\n" \
+        "2026-04-16 03:00:01 PT\tline 3\tdruid:df456gh7890\tSuccess: Did the other thing\n" \
+        "2026-04-16 03:00:02 PT\tFinished reindex\n"
+    end
+    let(:bulk_action) do
+      create(:bulk_action, :with_log,
+             action_type: :reindex,
+             status: :completed,
+             log_content:,
+             druid_count_success: 2, druid_count_fail: 0, druid_count_total: 2)
+    end
+
+    it 'renders an active Successes tab listing the success lines in log order, and no Errors tab' do
+      render_inline(component)
+
+      expect(page).to have_button('Successes', class: 'active')
+      expect(page).to have_no_button('Errors')
+      expect(page.find('#bulk-action-successes-pane pre').text).to eq(
+        "2026-04-16 03:00:00 PT\tline 2\tdruid:bc123df4567\tSuccess: Did the thing\n" \
+        "2026-04-16 03:00:01 PT\tline 3\tdruid:df456gh7890\tSuccess: Did the other thing"
+      )
+    end
+  end
+
+  context 'when the bulk action is completed with a log that has no labelled successes or errors' do
+    let(:bulk_action) do
+      create(:bulk_action, :with_log,
+             action_type: :reindex,
+             status: :completed,
+             log_content: "2026-04-16 03:00:00 PT\tline 2\tdruid:bc123df4567\tExported\n")
+    end
+
+    it 'renders no tabs' do
+      render_inline(component)
+
+      expect(page).to have_no_css('[role="tablist"]')
+    end
+  end
+
+  context 'when the bulk action is completed with an export that should be shown and successes' do
+    let(:bulk_action) do
+      create(:bulk_action, :with_log, :with_export,
+             action_type: :register_csv,
+             status: :completed,
+             log_content: "2026-04-16 03:00:00 PT\tline 2\tdruid:bc123df4567\tSuccess: Registered\n" \
+                          "2026-04-16 03:00:00 PT\tline 3\t\tError: Not registered\n",
+             export_content: "Druid,Title\ndruid:bc123df4567,First title\n")
+    end
+
+    it 'renders the export tab as active, followed by the Successes and Errors tabs' do
+      render_inline(component)
+
+      expect(page.all('[role="tab"]').map(&:text)).to eq(['Registration report', 'Successes', 'Errors'])
+      expect(page).to have_button('Registration report', class: 'active')
+      expect(page).to have_no_button('Successes', class: 'active')
+      expect(page).to have_no_button('Errors', class: 'active')
     end
   end
 

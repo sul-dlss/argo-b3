@@ -134,7 +134,7 @@ RSpec.describe 'Items' do
 
           page = Capybara.string(response.body)
           expect(page).to have_link('Discard draft', href: "/objects/#{druid}/discard_draft", count: 4)
-          expect(page).to have_no_link('Purge')
+          expect(page.find('main')).to have_no_link('Purge')
         end
       end
 
@@ -425,10 +425,10 @@ RSpec.describe 'Items' do
     context 'when saving as a draft and editing files' do
       let(:commit) { ItemsController::DRAFT_TO_ADD_FILES_VALUE }
 
-      it 'saves and redirects to the content edit page' do
+      it 'saves and redirects to the content edit page, opening on the first step' do
         patch "/items/#{druid}", params: { item: item_params, commit: }
 
-        expect(response).to redirect_to(edit_content_path(druid))
+        expect(response).to redirect_to("/contents/#{druid}/edit?open_on=first")
         expect(flash[:toast]).to eq('Item updated.')
         expect(Sdr::Repository).to have_received(:update)
         expect(Sdr::Repository).not_to have_received(:accession)
@@ -647,7 +647,7 @@ RSpec.describe 'Items' do
           expect(response).to have_http_status(:unprocessable_content)
           expect(Capybara.string(response.body))
             .to have_css('.invalid-feedback', text: 'Files have unsaved changes. Save or deposit them ' \
-                                                    'from Manage files.')
+                                                    'from "Add files and deposit".')
           expect(Sdr::Repository).not_to have_received(:accession)
         end
       end

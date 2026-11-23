@@ -40,4 +40,38 @@ RSpec.describe 'Exclude facets', :solr do
 
     expect(page).to have_result_count(5)
   end
+
+  context 'with a checkbox facet' do
+    let!(:french_item_doc) { create(:solr_item, languages: ['French']) }
+
+    it 'excludes and switches values' do
+      visit search_path(query: 'test')
+
+      expect(page).to have_result_count(6)
+      find_facet_section('Language').click
+      expect(page).to have_facet_value('English', count: 5, facet: 'Language')
+
+      within(find_facet_section('Language')) { click_link('Exclude English') }
+
+      expect(page).to have_result_count(1)
+      expect(page).to have_item_result(french_item_doc)
+      expect(page).to have_excluded_facet_value('English', facet: 'Language')
+      expect(page).to have_current_filter('Language exclude', 'English')
+
+      # Checking an excluded value stops excluding it.
+      within(find_facet_section('Language')) { check('English') }
+
+      expect(page).to have_result_count(5)
+      expect(page).to have_current_filter('Language', 'English')
+      expect(page).not_to have_current_filter('Language exclude', 'English', wait: 0)
+      expect(page).to have_field('English', checked: true, focused: true)
+
+      # Excluding a selected value deselects it.
+      within(find_facet_section('Language')) { click_link('Exclude English') }
+
+      expect(page).to have_result_count(1)
+      expect(page).to have_excluded_facet_value('English', facet: 'Language')
+      expect(page).not_to have_current_filter('Language', 'English', wait: 0)
+    end
+  end
 end

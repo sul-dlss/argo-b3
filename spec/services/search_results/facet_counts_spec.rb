@@ -211,4 +211,66 @@ RSpec.describe SearchResults::FacetCounts do
       expect(facet_counts.map(&:value)).to eq(['item'])
     end
   end
+
+  context 'when selected values are not among the top values' do
+    let(:facet_config) { Search::Facets::LANGUAGES }
+    let(:field) { Search::Fields::LANGUAGES }
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English Welsh], languages_exclude: ['Breton']) }
+    let(:facet_json) do
+      {
+        field => { type: 'terms', field:, limit: 25, offset: }
+      }.merge(Search::SelectedFacetValuesBuilder.call(facet_config:, search_form:))
+    end
+    let(:solr_response) do
+      {
+        'responseHeader' => { 'params' => { 'json.facet' => facet_json.to_json } },
+        'facets' => {
+          field => { 'buckets' => [{ 'val' => 'English', 'count' => 5 }], 'numBuckets' => 30 },
+          "#{field}-selected" => { 'count' => 9, '0' => { 'count' => 5 }, '1' => { 'count' => 2 },
+                                   '2' => { 'count' => 0 } }
+        }
+      }
+    end
+
+    it 'yields them after the top values' do
+      expect(facet_counts.map { |facet_count| [facet_count.value, facet_count.count] })
+        .to eq([['English', 5], ['Welsh', 2], ['Breton', 0]])
+    end
+
+    context 'when not the first page' do
+      let(:offset) { 25 }
+
+      it 'does not yield them' do
+        expect(facet_counts.map(&:value)).to eq(['English'])
+      end
+    end
+  end
+
+  context 'when a selected composite value is not among the top values' do
+    let(:facet_config) { Search::Facets::ADMIN_POLICIES }
+    let(:field) { Search::Fields::APO_TITLE_DRUID }
+    let(:search_form) { ResultsSearchForm.new(admin_policy_druids: ['druid:bc123df4567']) }
+    let(:facet_json) do
+      { field => { type: 'terms', field:, limit: 25 } }
+        .merge(Search::SelectedFacetValuesBuilder.call(facet_config:, search_form:))
+    end
+    let(:solr_response) do
+      {
+        'responseHeader' => { 'params' => { 'json.facet' => facet_json.to_json } },
+        'facets' => {
+          field => { 'buckets' => [], 'numBuckets' => 0 },
+          "#{field}-selected" => {
+            'count' => 3,
+            '0' => { 'count' => 3, 'labels' => { 'buckets' => [{ 'val' => 'University Archives:druid:bc123df4567',
+                                                                 'count' => 3 }] } }
+          }
+        }
+      }
+    end
+
+    it 'yields it with its label' do
+      expect(facet_counts.map { |facet_count| [facet_count.value, facet_count.label, facet_count.count] })
+        .to eq([['druid:bc123df4567', 'University Archives', 3]])
+    end
+  end
 end

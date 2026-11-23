@@ -27,6 +27,12 @@ RSpec.describe 'Dashboard' do
       expect(rendered_page).to have_title('Argo dashboard | Argo B3', exact: true)
     end
 
+    it 'shows the banner in the header, after the heading' do
+      get root_path
+
+      expect(rendered_page).to have_css('.dashboard-header h1 + [role="alert"]', text: 'Welcome to the new Argo')
+    end
+
     it 'labels each navigation landmark distinctly' do
       get root_path
 

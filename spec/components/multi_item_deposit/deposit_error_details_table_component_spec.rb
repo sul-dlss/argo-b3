@@ -27,7 +27,7 @@ RSpec.describe MultiItemDeposit::DepositErrorDetailsTableComponent, type: :compo
       rows = table.all('tbody tr')
       expect(rows.map { |row| row.first('td').text.strip }).to eq(%w[bc123df4567 cd234fg5678])
 
-      expect(rows[0]).to have_css('ul li span.text-danger', text: 'Object not found')
+      expect(rows[0]).to have_css('td > span.text-danger', text: 'Object not found')
       expect(rows[1]).to have_css('ul li span.text-danger', text: 'Version cannot be opened')
       expect(rows[1]).to have_css('ul li span.text-danger', text: 'Object is locked')
     end

@@ -56,7 +56,6 @@ RSpec.describe 'Advanced search', :solr do
     find_facet_section('Object type').click
     within(find_facet_section('Object type')) do
       check 'item'
-      click_button 'Filter'
     end
 
     expect(page).to have_current_path(

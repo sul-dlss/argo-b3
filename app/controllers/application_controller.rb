@@ -18,6 +18,11 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Adding files (e.g., "Register and add files") opens managing files on its first step.
+  def manage_files_first_step_path(druid)
+    edit_content_path(druid, open_on: Contents::ManageFilesFlow::OPEN_ON_FIRST)
+  end
+
   def deny_access
     flash[:danger] = helpers.t('errors.not_authorized')
     redirect_to main_app.root_path

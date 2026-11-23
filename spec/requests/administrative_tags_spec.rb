@@ -95,15 +95,38 @@ RSpec.describe 'Administrative tags' do
         end
       end
 
-      context 'when tags were entered but not added' do
-        let(:tag_params) { { multiple_tags: 'Registered By : mjgiarlo' } }
+      context 'when multiple tags are entered' do
+        let(:tag_params) do
+          { other_tags_attributes: { '0' => { tag: 'Registered By : jdoe' } },
+            project_tags_attributes: { '0' => { tag: 'Maps' } },
+            multiple_tags: "Remediated By : 5.0.0\nProject : Maps\nTicket : DIGREQ-2\nRegistered By : jdoe" }
+        end
 
-        it 'renders the form with an error' do
+        it 'adds them to the tags in the rows, dropping duplicates' do
+          patch "/objects/#{druid}/tags", params: { administrative_tags: tag_params }
+
+          expect(Sdr::AdministrativeTags).to have_received(:replace)
+            .with(druid:,
+                  tags: ['Registered By : jdoe', 'Remediated By : 5.0.0', 'Project : Maps', 'Ticket : DIGREQ-2'])
+          expect(response).to redirect_to(object_path(druid))
+        end
+      end
+
+      context 'when a multiple tag is invalid' do
+        let(:tag_params) do
+          { other_tags_attributes: { '0' => { tag: 'Registered By : jdoe' } },
+            multiple_tags: "Remediated By : 5.0.0\nproject:Argo" }
+        end
+
+        it 'renders the form with an error, keeping the text as typed' do
           patch "/objects/#{druid}/tags", params: { administrative_tags: tag_params }
 
           expect(response).to have_http_status(:unprocessable_content)
           expect(Sdr::AdministrativeTags).not_to have_received(:replace)
-          expect(response.body).to include('Click &quot;Add tags&quot; to add these tags, or clear this field.')
+          page = Capybara.string(response.body)
+          expect(page).to have_text('These tags are not valid: project:Argo. ' \
+                                    'Each tag needs two or more terms separated by " : " (e.g., Project : Maps).')
+          expect(page).to have_field('Enter multiple tags', with: "Remediated By : 5.0.0\nproject:Argo")
         end
       end
 

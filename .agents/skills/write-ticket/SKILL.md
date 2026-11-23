@@ -19,13 +19,15 @@ The user knows the domain and the users; you know the codebase. Use the code to 
 
 Work from what the user gave you: their description, any issue they reference (with `gh`, read it using `gh issue view <number> --comments`), and any screenshots. A screenshot may show the current UI, a mockup, or a bug; read it, and note what each one shows, since it will be placed in the ticket later.
 
+**A screen reader bug** (e.g., VoiceOver says something wrong): read "What a report needs" in `.claude/skills/screen-reader-bug/SKILL.md`, and ask for each item the user hasn't given.
+
 **Rewriting an existing ticket**: read the issue and all its comments. Note what it already settles, what is vague or missing, and where the comments change or contradict the body. Images already in the issue are GitHub attachment URLs; try to view them, and if you can't, ask the user what each shows.
 
 ## 2. Learn the current behaviour
 
 Before asking anything, find out how the area works today. Read `GLOSSARY.md` and the `README.md` sections for the area, then dispatch a sub-agent to explore the relevant code and report back in user-facing terms: which pages and forms are involved, what they show, who can use them (the policies), what happens on save, and what the related features do. Ask it for behaviour, not file listings.
 
-Also have it find **similar features** elsewhere in the app: features that solve a comparable problem the new one should feel like (e.g., another bulk action, another edit form, another facet, another way of choosing a collection). For each, ask for the established pattern a user would notice: where it lives and how it's reached, its labels and wording, its controls, how it confirms success and reports errors, and who can use it.
+Also have it find **similar features** elsewhere in the app: features that solve a comparable problem the new one should feel like (e.g., another bulk action, another edit form, another facet, another way of choosing a collection). For each, ask for the established pattern a user would notice: where it lives and how it's reached, its labels and wording, its controls, how it confirms success and reports errors, what a screen reader user hears that isn't on screen, and who can use it.
 
 This is what lets you ask 'the release form currently offers "Follow collection settings", "Release", and "Do not release"; should the new option sit beside those?' instead of 'what does the form look like?'. Facts about the system are yours to find; never ask the user something the code can answer.
 
@@ -40,6 +42,7 @@ Assume the idea is one ticket. If it actually holds several independent topics (
 Invoke the `mattpocock-skills:grilling` skill and run its interview with this focus:
 
 - **Ask about** who the user is and what they are trying to accomplish; where in the app this happens and how they get there; what they see and do, step by step; labels and wording; empty, error, and edge cases; permissions (who can and can't); what happens to existing objects and data; what is explicitly not included; how someone would check it works.
+- **Ask about the unseen**: go through each element of the idea and its design for what assistive technology needs that the design doesn't show, using the cases in `DESIGN_STANDARDS.md` "Accessibility": the name of each icon-only control, the alt text of each meaningful image, the words announced when something changes without a page load (an error, a status update, a row added or removed), where focus lands afterwards, a text equivalent wherever color or position alone carries meaning, and the keyboard way to do anything done by dragging or hovering. Propose wording that follows the similar features and let the user confirm it. Settle the words and the focus destinations; the developer chooses the markup.
 - **Don't ask about** classes, tables, jobs, gems, or how to build it. If a question only matters for implementation, leave it to the developer. If the code shows a behavioural consequence the user may not have thought of (e.g., the change also affects bulk actions, or admins already bypass this rule), raise that as a behaviour question.
 - **Push for consistency** with the similar features from step 2. Where a decision has an established pattern, name the feature it comes from and recommend following it ("Other bulk actions show a confirmation with the number of objects affected; should this one too?"). If the user wants to depart from the pattern, ask why. A good reason belongs in the ticket; otherwise follow the pattern. If similar features disagree with each other, point out the inconsistency and ask which one to follow.
 - **When rewriting**, start from the existing ticket: don't re-ask what it already settles clearly. Confirm a decision only if the code or the comments call it into question. Spend the rounds on its gaps, ambiguities and contradictions.
@@ -77,8 +80,10 @@ Write the ticket in this shape:
 - Keep it concise: a developer should be able to read it in a minute or two. Every decision from the grilling should be covered, but only state what a developer could otherwise get wrong. Leave out behaviour that stays as it is today, and anything already implied by "works like <feature>". Don't record the discussion or the alternatives you rejected.
 - One short line per criterion. Merge criteria that say the same thing, and drop any that just restate What to build.
 - Write criteria someone can verify by using the app: "A user who can't edit the object doesn't see the button", not "add a policy check".
+- Write each unseen detail as its own criterion beside the behaviour it belongs to, quoting the exact words: 'Removing a file announces "<filename> removed" and moves focus to the next file'. A design can't carry these, so a developer would otherwise guess them.
 - When the user chose to follow an existing feature, name it in What to build by its name in the app (e.g., "works like the Manage release form"), so the developer knows what to match. Record a deliberate departure, with its reason.
 - No file paths, class names, or code: they go stale and pre-empt the developer's design.
+- For a screen reader bug, What to build quotes the words announced and the words expected, and names the screen reader, the browser, and their versions.
 - Put each `[Screenshot: ...]` placeholder where that image helps most, usually under What to build or beside the criterion it illustrates.
 - Omit Out of scope if nothing was excluded, and Assumptions to confirm if everything was checked.
 - When rewriting, keep the existing image Markdown (the attachment URLs still work after an edit), placed where each image helps most. When you show the draft, list anything from the original you dropped, so nothing disappears without the user agreeing.

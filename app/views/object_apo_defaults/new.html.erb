@@ -1,0 +1,41 @@
+<%= page_title(t('edit.object_apo_defaults.new.title'), name: @title) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('edit.object_apo_defaults.new.title'), subtitle: @title) do %>
+  <%= form_with model: @apo_defaults_form, url: object_apo_defaults_path(@druid), method: :post, class: 'b3-form' do |form| %>
+    <p><%= t('edit.object_apo_defaults.new.governing_apo_html', apo: link_to_object(form.object.apo_title, form.object.apo_druid)) %></p>
+
+    <%= render Edit::ApoDefaultsListComponent.new(apo_defaults: ApoDefaultsPresenter.new(apo: form.object.apo),
+                                                  access: form.object.dro?) %>
+
+    <% if form.object.dro? %>
+      <% if form.object.embargo_release_date? %>
+        <p><%= t('edit.object_apo_defaults.new.embargo') %></p>
+      <% end %>
+
+      <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+            form:,
+            field_name: :overwrite_file_access,
+            label_text: t('edit.items.fields.overwrite_file_access.label'),
+            help_text: t('edit.items.fields.overwrite_file_access.help_text'),
+            container_classes: 'my-field'
+          ) %>
+    <% end %>
+
+    <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-field') %>
+
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
+      <% if form.object.dro? %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.object_apo_defaults.new.buttons.draft'),
+                                                                 value: ObjectApoDefaultsController::DRAFT_VALUE,
+                                                                 variant: 'outline-primary') %>
+      <% end %>
+      <%# Design standard deviation: AVAIL-4. As in Extract text, deposit is hidden, not disabled, while files have unsaved changes. %>
+      <% if @unsaved_content_changes %>
+        <span><%= t('show.status.draft.unsaved_content_changes', manage_files: @manage_files_label) %></span>
+      <% else %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.object_apo_defaults.new.buttons.deposit'),
+                                                                 value: ObjectApoDefaultsController::DEPOSIT_VALUE) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

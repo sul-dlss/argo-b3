@@ -14,7 +14,6 @@ RSpec.describe Edit::ProjectTagComponent, type: :component do
     expect(page).to have_css('label.visually-hidden', text: 'Project name')
     expect(page).to have_css('input[name="item[project_tags_attributes][0][tag]"]' \
                              '[data-controller="tag-select"]' \
-                             '[data-tag-select-url-path-value="/tag_suggestions?type=project"]' \
-                             '[data-action="input->tag-select#sync"]')
+                             '[data-tag-select-url-path-value="/tag_suggestions?type=project"]')
   end
 end

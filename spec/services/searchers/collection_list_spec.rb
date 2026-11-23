@@ -34,7 +34,7 @@ RSpec.describe Searchers::CollectionList do
         expect(solr_query['mm']).to eq('100%')
         expect(solr_query['fq']).to eq(["#{Search::Fields::OBJECT_TYPES}:collection"])
         expect(solr_query['fl']).to eq([Search::Fields::ID, Search::Fields::TITLE])
-        expect(solr_query['rows']).to eq(25)
+        expect(solr_query['rows']).to eq(10_000)
       end
     end
 
@@ -48,7 +48,7 @@ RSpec.describe Searchers::CollectionList do
           expect(solr_query['sort']).to eq(Search::SortOptions::TITLE.sort_value)
           expect(solr_query).not_to have_key('defType')
           expect(solr_query['fq']).to eq(["#{Search::Fields::OBJECT_TYPES}:collection"])
-          expect(solr_query['rows']).to eq(25)
+          expect(solr_query['rows']).to eq(10_000)
         end
       end
     end

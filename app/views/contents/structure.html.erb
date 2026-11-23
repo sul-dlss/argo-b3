@@ -1,4 +1,4 @@
-<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow } do %>
+<%= render layout: 'contents/step_layout', locals: { title: @solr_doc.title, manage_files_flow: @manage_files_flow, heading: @manage_files_label } do %>
   <%# The item form has no fields on this step; the footer's buttons submit it. %>
   <%= render SdrViewComponents::TabForm::HiddenFieldsFormComponent.new(model: @contents_item_form, url: content_path(@contents_item_form.druid), id: 'item_form') %>
 

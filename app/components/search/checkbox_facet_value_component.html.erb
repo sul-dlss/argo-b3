@@ -1,0 +1,16 @@
+<div class="form-check d-flex flex-grow-1 mb-0">
+  <div class="me-3">
+    <%= tag.input type: 'checkbox', id:, checked: selected?, class: 'form-check-input',
+                  aria: { describedby: description_id },
+                  data: { action: 'change->visit#visit', visit_url_param: toggle_path } %>
+    <%= tag.label for: id, class: label_classes do %>
+      <%= exclude_selected? ? tag.del(label) : label %>
+    <% end %>
+  </div>
+  <span class="facet-count"><%= number_with_delimiter(count) %></span>
+  <% if exclude_selected? %>
+    <%= render_excluded %>
+  <% elsif with_exclude? %>
+    <%= render_exclude_link %>
+  <% end %>
+</div>

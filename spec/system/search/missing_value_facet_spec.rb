@@ -20,7 +20,7 @@ RSpec.describe 'Missing value facet', :solr do
     expect(page).to have_facet_value('English', count: 1, facet: 'Language')
 
     within(find_facet_section('Language')) do
-      click_link('No value')
+      check('No value')
     end
 
     expect(page).to have_result_count(1)

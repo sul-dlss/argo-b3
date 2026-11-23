@@ -34,12 +34,12 @@ module BulkActions
     end
 
     def success!(druid:, message:, index:)
-      bulk_action.increment(:druid_count_success).save
+      bulk_action.increment!(:druid_count_success) # rubocop:disable Rails/SkipsModelValidations
       log(delimited_log_message(message:, index:, druid:))
     end
 
     def failure!(druid:, message:, index:)
-      bulk_action.increment(:druid_count_fail).save
+      bulk_action.increment!(:druid_count_fail) # rubocop:disable Rails/SkipsModelValidations
       log(delimited_log_message(message:, index:, druid:))
     end
 

@@ -30,7 +30,8 @@ RSpec.describe 'Show bulk actions history' do
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
     expect(row).to have_css("td:nth-of-type(1) a[href='#{bulk_action_path(bulk_action)}']",
-                            text: "Bulk action #{bulk_action.id}: First bulk action")
+                            exact_text: 'Download full Cocina JSON')
+    expect(row).to have_css('td:nth-of-type(2)', exact_text: 'First bulk action')
     expect(row).to have_css('td:nth-of-type(3)', text: format_datetime(bulk_action.created_at))
     expect(row).to have_css('td:nth-of-type(4)', text: 'Processing')
     expect(row).to have_css('td:nth-of-type(5)', text: '0 / 0 / 0')
@@ -51,7 +52,7 @@ RSpec.describe 'Show bulk actions history' do
 
     expect(row).to have_css('td:nth-of-type(6) a', text: 'Cocina JSON')
     export_txt = with_download('cocina.jsonl.gz') do
-      row.click_link('Cocina JSON')
+      row.find('td:nth-of-type(6)').click_link('Cocina JSON')
     end
     expect(export_txt).to eq('Export content')
     expect(BulkAction.exists?(bulk_action.id)).to be true
@@ -60,11 +61,17 @@ RSpec.describe 'Show bulk actions history' do
   it 'links to the show page for a bulk action' do
     bulk_action = create(:bulk_action, user:, description: 'First bulk action',
                                        action_type: 'export_cocina_json')
+    # A show page slower than the reload interval ensures a reload is due while the link's visit is in flight.
+    allow(Settings.reload_intervals).to receive(:bulk_actions_history).and_return(100)
+    allow(BulkActions::ShowComponent).to receive(:new).and_wrap_original do |original, **args|
+      sleep 0.5
+      original.call(**args)
+    end
 
     visit bulk_actions_path
 
     row = page.find("tr##{dom_id(bulk_action, 'row')}")
-    row.click_link("Bulk action #{bulk_action.id}: First bulk action")
+    row.click_link('Download full Cocina JSON')
 
     expect(page).to have_current_path(bulk_action_path(bulk_action))
     expect(page).to have_css('h1', text: "Bulk action #{bulk_action.id}: First bulk action")
@@ -138,7 +145,7 @@ RSpec.describe 'Show bulk actions history' do
       click_button 'Filter'
 
       row = page.find("tr##{dom_id(bulk_action_other_user, 'row')}")
-      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
+      expect(row).to have_css('td:nth-of-type(3)', text: 'mmouse')
       expect(page).to have_css("tr##{dom_id(user_bulk_action, 'row')}")
     end
   end

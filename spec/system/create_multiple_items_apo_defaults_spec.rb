@@ -55,7 +55,7 @@ RSpec.describe 'Apply APO defaults when creating multiple items' do
     it 'applies the defaults of the initially selected APO' do
       visit new_multiple_item_path
 
-      expect(page).to have_select('APO', selected: other_apo_title)
+      expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: other_apo_title)
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
         expect(page).to have_select('Download access', selected: 'None')
@@ -73,7 +73,7 @@ RSpec.describe 'Apply APO defaults when creating multiple items' do
       fill_in 'Use and reproduction', with: 'Property rights reside with the repository.'
       fill_in 'Copyright', with: 'My copyright.'
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
       expect(page).to have_css('#items_registration_copyright_help',
@@ -138,7 +138,7 @@ RSpec.describe 'Apply APO defaults when creating multiple items' do
   def visit_and_enter_rights
     visit new_multiple_item_path
 
-    select apo_title, from: 'APO'
+    select_searchable_option(apo_title, from: 'APO')
     expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
     fill_in 'Copyright', with: 'My copyright.'
     within('[data-apo-defaults-group="without_embargo"]') do

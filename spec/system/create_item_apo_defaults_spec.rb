@@ -52,13 +52,47 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     it 'applies the defaults of the initially selected APO' do
       visit_rights_tab
 
-      expect(page).to have_select('APO', selected: other_apo_title)
+      expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: other_apo_title)
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Stanford')
         expect(page).to have_select('Download access', selected: 'None')
         expect(page).to have_css('.form-text', text: 'APO default = Stanford')
       end
       expect(page).to have_css('#item_copyright_help', text: 'APO default = none')
+    end
+  end
+
+  context 'when searching the APOs' do
+    it 'shows only the matching APOs and applies the defaults of the one selected' do
+      visit_rights_tab
+
+      apo_select = search_searchable_select('my', from: 'APO')
+      # Filtered as soon as typed (not after a delay), so that a delayed refresh can't reopen the dropdown after
+      # an option that was already shown is chosen, taking the focus from the next field.
+      expect(apo_select).to have_no_css('.ts-dropdown .option', exact_text: other_apo_title, wait: 0)
+      expect(apo_select).to have_css('.ts-dropdown .option', exact_text: apo_title)
+      apo_select.find('.ts-dropdown .option', exact_text: apo_title).click
+
+      expect(apo_select).to have_css('.ts-control .item', exact_text: apo_title)
+      expect(apo_select).to have_css('.ts-control input[aria-required="true"]', visible: :all)
+      expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
+      expect(page).to have_css('#item_copyright_help', text: 'APO default = Copyright © Stanford University.')
+    end
+  end
+
+  context 'when there are more than 50 collections' do
+    before do
+      collections = (1..60).map { |n| [format('Collection %02d', n), "druid:bc#{format('%03d', n)}df4567"] }
+      allow(Searchers::CollectionList).to receive(:call).and_return(collections)
+    end
+
+    it 'shows all of them' do
+      visit_rights_tab
+
+      find_field(placeholder: 'Start typing the collection name or druid...').click
+
+      expect(page).to have_css('.ts-dropdown .option', count: 60)
+      expect(page).to have_css('.ts-dropdown .option', text: 'Collection 60')
     end
   end
 
@@ -70,7 +104,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     it 'shows the defaults of the selected APO, keeping the entered values' do
       visit_rights_tab
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
       fill_in 'Copyright', with: 'My copyright.'
       within('[data-apo-defaults-group="without_embargo"]') do
@@ -83,7 +117,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       expect(page).to have_css('.invalid-feedback', text: "can't be blank", visible: :all)
 
       find_by_id('rights-tab').click
-      expect(page).to have_select('APO', selected: apo_title)
+      expect(find_searchable_select('APO')).to have_css('.ts-control .item', exact_text: apo_title)
       expect(page).to have_field('Copyright', with: 'My copyright.')
       expect(page).to have_css('#item_copyright_help', text: 'APO default = Copyright © Stanford University.')
       within('[data-apo-defaults-group="without_embargo"]') do
@@ -101,7 +135,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       fill_in 'Copyright', with: 'My copyright.'
       select 'CC Zero 1.0', from: 'License'
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       # The APO default overwrites the entered copyright.
       expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
@@ -126,7 +160,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     it 'replaces the previous APO defaults, clearing the fields that the APO has no defaults for' do
       visit_rights_tab
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       expect(page).to have_field('Copyright', with: 'Copyright © Stanford University.')
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('Location', selected: 'Media and Microtext')
@@ -134,7 +168,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       fill_in 'Copyright', with: 'My copyright.'
       fill_in 'Use and reproduction', with: 'Property rights reside with the repository.'
 
-      select other_apo_title, from: 'APO'
+      select_searchable_option(other_apo_title, from: 'APO')
 
       expect(page).to have_field('Copyright', with: '')
       expect(page).to have_css('#item_copyright_help', text: 'APO default = none')
@@ -167,10 +201,10 @@ RSpec.describe 'Apply APO defaults when creating an item' do
     it 'clears the license and shows the APO license in the help text' do
       visit_rights_tab
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       expect(page).to have_select('License', selected: 'CC Attribution 4.0 International')
 
-      select other_apo_title, from: 'APO'
+      select_searchable_option(other_apo_title, from: 'APO')
 
       expect(page).to have_select('License', selected: '')
       expect(page).to have_css('#item_license_help', text: 'APO default = https://cocina.sul.stanford.edu/licenses/none')
@@ -182,7 +216,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
       visit_rights_tab
       choose 'With embargo', allow_label_click: true
 
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
 
       within('[data-apo-defaults-group="embargo_ends"]') do
         expect(page).to have_select('View access', selected: 'Location Based')
@@ -201,7 +235,7 @@ RSpec.describe 'Apply APO defaults when creating an item' do
   context 'when choosing an embargo after selecting the APO' do
     it 'sets the access once the embargo ends' do
       visit_rights_tab
-      select apo_title, from: 'APO'
+      select_searchable_option(apo_title, from: 'APO')
       within('[data-apo-defaults-group="without_embargo"]') do
         expect(page).to have_select('View access', selected: 'Location Based')
       end

@@ -17,7 +17,8 @@ RSpec.describe 'Show object Extract text button' do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                          closed?: true, openable?: true,
                                                                          closeable?: false, open?: false,
-                                                                         discardable?: false, version: 2)
+                                                                         discardable?: false, version: 2,
+                                                                         version_description: 'Fixed the title')
   end
 
   before do
@@ -47,7 +48,8 @@ RSpec.describe 'Show object Extract text button' do
       instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                            closed?: false, openable?: false,
                                                                            closeable?: true, open?: true,
-                                                                           discardable?: true, version: 2)
+                                                                           discardable?: true, version: 2,
+                                                                           version_description: 'Fixed the title')
     end
 
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
@@ -64,7 +66,8 @@ RSpec.describe 'Show object Extract text button' do
       instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: false, accessioning?: false,
                                                                            closed?: false, openable?: false,
                                                                            closeable?: true, open?: true,
-                                                                           discardable?: false, version: 1)
+                                                                           discardable?: false, version: 1,
+                                                                           version_description: 'Initial version')
     end
 
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
@@ -81,7 +84,8 @@ RSpec.describe 'Show object Extract text button' do
       instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, assembling?: true, accessioning?: false,
                                                                            closed?: false, openable?: false,
                                                                            closeable?: false, open?: true,
-                                                                           discardable?: false, version: 2)
+                                                                           discardable?: false, version: 2,
+                                                                           version_description: 'Fixed the title')
     end
 
     before { create(:permission, :edit, workgroup: user.groups.first, target_druid: druid) }
