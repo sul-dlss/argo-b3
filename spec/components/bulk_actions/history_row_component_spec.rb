@@ -28,9 +28,8 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
 
       row = page.find("tr##{dom_id(bulk_action, 'row')}")
       expect(row).to have_css('td', count: 7)
-      expect(row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']",
-                              text: "Bulk action #{bulk_action.id}: Test description")
-      expect(row).to have_css('td:nth-of-type(2)', text: 'Reindex')
+      expect(row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']", exact_text: 'Reindex')
+      expect(row).to have_css('td:nth-of-type(2)', text: 'Test description')
       expect(row).to have_css('td:nth-of-type(3)', text: '2026-04-16 03:00:00 PT')
       expect(row).to have_css('td:nth-of-type(4)', text: 'Processing')
       expect(row).to have_no_css('td:nth-of-type(4) i.bi')
@@ -54,8 +53,8 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
 
       row = page.find("tr##{dom_id(bulk_action, 'row')}")
       expect(row).to have_css("td:nth-of-type(1) a[href='/bulk_actions/#{bulk_action.id}']",
-                              exact_text: "Bulk action #{bulk_action.id}")
-      expect(row).to have_css('td:nth-of-type(2)', text: 'Download full Cocina JSON')
+                              exact_text: 'Download full Cocina JSON')
+      expect(row).to have_css('td:nth-of-type(2)', text: /\A\s*\z/)
       expect(row).to have_css('td:nth-of-type(4)', text: 'Completed')
       expect(row).to have_css('td:nth-of-type(4) i.bi-exclamation-triangle-fill.text-warning')
       expect(row).to have_css('td:nth-of-type(5)', text: '7 / 5 / 2')
@@ -67,9 +66,9 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
       expect(row).to have_css(
         "td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action.id}']" \
         "[data-turbo-confirm='Delete this bulk action from history? Its log and export files will also be deleted. " \
-        "This cannot be undone.'] button.btn-sm i.bi-trash[aria-hidden=\"true\"]"
+        "This cannot be undone.'] button.btn-sm.btn-outline-primary", text: 'Clear'
       )
-      expect(row).to have_button('Clear')
+      expect(row).to have_no_css('td:nth-of-type(7) i.bi')
     end
   end
 
@@ -113,13 +112,14 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
       create(:bulk_action, action_type: :reindex, user: create(:user, email_address: 'mmouse@stanford.edu'))
     end
 
-    it 'renders the user after the bulk action name' do
+    it 'renders the user after the description and an empty cancel cell' do
       render_row
 
       row = page.find("tr##{dom_id(bulk_action, 'row')}")
-      expect(row).to have_css('td', count: 8)
-      expect(row).to have_css('td:nth-of-type(2)', text: 'mmouse')
-      expect(row).to have_css('td:nth-of-type(3)', text: 'Reindex')
+      expect(row).to have_css('td', count: 9)
+      expect(row).to have_css('td:nth-of-type(1)', text: 'Reindex')
+      expect(row).to have_css('td:nth-of-type(3)', text: 'mmouse')
+      expect(row).to have_css('td:nth-of-type(9)', text: /\A\s*\z/)
     end
   end
 
@@ -128,14 +128,17 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
     let(:status) { :started }
 
     context 'when an admin and the bulk action is cancellable' do
+      let(:component) { described_class.new(bulk_action:, admin: true) }
       let(:user) { create(:user, :admin) }
 
       it 'renders the cancel button' do
         render_row
 
         row = page.find("tr##{dom_id(bulk_action, 'row')}")
-        expect(row).to have_css("td:nth-of-type(7) form[action='/bulk_actions/#{bulk_action.id}/cancel'] " \
-                                'button.btn-sm i.bi-x-square[aria-hidden="true"]')
+        expect(row).to have_css("td:nth-of-type(9) form[action='/bulk_actions/#{bulk_action.id}/cancel'] " \
+                                'button.btn-sm.btn-outline-primary', text: 'Cancel')
+        expect(row).to have_no_css('td:nth-of-type(9) i.bi')
+        expect(row).to have_no_css('td:nth-of-type(8) form')
         expect(row).to have_css("form[action='/bulk_actions/#{bulk_action.id}/cancel'][method='post']" \
                                 "[data-turbo-confirm='Cancel this bulk action? Changes already made to objects " \
                                 "will not be undone.']")
@@ -144,6 +147,7 @@ RSpec.describe BulkActions::HistoryRowComponent, type: :component do
     end
 
     context 'when an admin and the bulk action is not cancellable' do
+      let(:component) { described_class.new(bulk_action:, admin: true) }
       let(:user) { create(:user, :admin) }
       let(:status) { :completed }
 
