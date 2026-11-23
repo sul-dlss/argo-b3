@@ -1,0 +1,9 @@
+<%= tag.div data: { controller: 'visit' } do %>
+  <%= helpers.fields do |form| %>
+    <%= render SdrViewComponents::Forms::ToggleComponent.new(form:, field_name: operator_form_field, label_text: label,
+                                                             label_hidden: true, container_classes: 'mb-2') do |component| %>
+      <% component.with_left_toggle_option(form:, field_name: operator_form_field, **option_args('and')) %>
+      <% component.with_right_toggle_option(form:, field_name: operator_form_field, **option_args('or')) %>
+    <% end %>
+  <% end %>
+<% end %>

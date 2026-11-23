@@ -318,8 +318,10 @@ The following will help illustrate the discovery system components involved for 
 Notes:
 * On the home page, items AND field values are searched. Once the user has selected facets, ONLY items are searched.
 * Field value search is implemented as a Solr facet query: it asks Solr which values of a field match the query rather than which documents do. This is why the result wrapper is named `SearchResults::FacetValues` - the name describes the Solr payload being unwrapped, not the feature. The feature is field value search, and the components that render it are named for field values rather than facets.
-* By default, multiple values selected from the same facet are ANDed (including for dynamic and exclude selections), so facet counts reflect the current selection. Excluded values remain listed so that they can be un-excluded.
-* Facets configured with `operator: :or` (the checkbox facets, e.g., object types) OR their selected values instead. Their counts ignore the facet's own selection, so that all values remain selectable, and their selected values are displayed as a single current filter (e.g., "Object types ❯ item OR collection").
+* By default, multiple values selected from the same facet are ANDed (including for dynamic selections), so facet counts reflect the current selection. Excluded values are always ORed, so that objects with any of them are removed, and remain listed so that they can be un-excluded.
+* Facets configured with `operator: :or` (e.g., object types) OR their selected values instead. Their counts ignore the facet's own selection, so that all values remain selectable.
+* A checkbox facet (`checkbox: true`) displays its selected values as a single current filter, joined by its operator (e.g., "Object types ❯ item OR collection").
+* A facet with an `operator_form_field` (e.g., languages) has an And/Or toggle that lets users override its `operator`. The chosen operator is kept only when it differs from the default, so choosing the default is the same search (and pin) as not choosing.
 * Putting Turbo stream update elements directly in HTML is not a typical pattern for turbo streams.
 * Visiting another search on the same page (e.g., selecting a facet value) updates the page in place: it is morphed rather than replaced, and the results, field value results, and facets keep their current content, dimmed and inert, until their new content loads, rather than returning to loading placeholders. This is why a facet's stream updates its placeholder's contents, keeping the placeholder as the target for the next search.
 
@@ -334,7 +336,7 @@ Each facet is a `Search::Facets::Config` constant, and that configuration is the
 * `Search::Facets::SIDEBAR` lists the facets shown in the sidebar, in display order. Each one's `loading` says when it loads: `:primary` (with the item results), `:secondary` (with the secondary facets), or `:lazy` (its own turbo frame request, for slow facets). Placeholders, Solr facet requests, and turbo stream replacements are all derived from these.
 * Every config is used for filtering (`Search::ItemQueryBuilder`) and for describing a search (`Search::Serializer`), in the order the constants are defined.
 * A facet with a `facet_resource` gets its endpoints (`index`, and `children` / `search` if `facet_children` / `facet_search`) drawn in the `:search_endpoints` routing concern, served by `Search::FacetsController` for every search view.
-* The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured), whose values are checkboxes for `operator: :or`.
+* The facet component is chosen from the config by `Search::ConfiguredFacetComponent`: a dynamic facet for `dynamic_facet` (with date range inputs given `date_from_form_field` / `date_to_form_field`), a hierarchical facet for `hierarchical_field`, and otherwise a basic facet (with paging, search, and exclude as configured), whose values are checkboxes for `checkbox: true`.
 * A basic facet lists its selected and excluded values on its first page, after its top values, when they are not among them (e.g., a value chosen from a later page or from facet search).
 * Checking or unchecking a checkbox facet value updates the search at once; each checkbox carries the URL of the search it leads to (as a link facet value does), so it works across pages of values, and focus returns to the checkbox once its facet reloads.
 
@@ -350,6 +352,10 @@ Add a `facet_resource` (e.g., `:mimetype_facets`) and `facet_index: true` to the
 
 ### Adding facet search to a facet
 Add a `facet_resource` and `facet_search: true` to the configuration constant in `Search::Facets`.
+
+### Adding an And/Or toggle to a checkbox facet
+1. Add an attribute (`*_operator`) for the operator to `SearchForm`, followed by `normalizes_operator`.
+2. Assign the attribute name to `operator_form_field` for the configuration constant in `Search::Facets`; its `operator` is the default.
 
 ### Composite (label + druid) facets
 Some facets need to filter on a unique identifier (a druid) but display a human-friendly, searchable label (a title) — e.g., the APO and Collections facets. A title isn't unique, so faceting directly on the display value of the facet (like most facets do) would be ambiguous. Instead, DSA indexes a composite Solr field whose values are `"<label>:<druid>"` (see`Indexing::CompositeFacetValue` in dor-services-app), and the APO and Collection facet (and links) are built using that composite field.

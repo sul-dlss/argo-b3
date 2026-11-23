@@ -53,6 +53,38 @@ RSpec.describe ResultsSearchForm do
         expect(form.blank?).to be false
       end
     end
+
+    context 'when only a facet operator is present' do
+      subject(:form) { described_class.new(languages_operator: 'and') }
+
+      it 'returns true' do
+        expect(form.blank?).to be true
+      end
+    end
+  end
+
+  describe 'languages_operator' do
+    it 'keeps And' do
+      expect(described_class.new(languages_operator: 'and').languages_operator).to eq 'and'
+    end
+
+    it 'drops the default, Or' do
+      expect(described_class.new(languages_operator: 'or').attributes).not_to have_key('languages_operator')
+    end
+
+    it 'drops an unknown operator' do
+      expect(described_class.new(languages_operator: 'xor').attributes).not_to have_key('languages_operator')
+    end
+  end
+
+  describe '#operator_for' do
+    it 'returns the chosen operator' do
+      expect(described_class.new(languages_operator: 'and').operator_for(Search::Facets::LANGUAGES)).to eq :and
+    end
+
+    it "returns the facet's default when no operator is chosen" do
+      expect(described_class.new.operator_for(Search::Facets::LANGUAGES)).to eq :or
+    end
   end
 
   describe '#with_attributes' do
@@ -155,12 +187,20 @@ RSpec.describe ResultsSearchForm do
     end
 
     context 'when facet attributes are set' do
-      it 'returns the current filters, grouping the values of ORed facets' do
+      it 'returns the current filters, grouping the values of checkbox facets' do
         expect(form.current_filters).to contain_exactly(
           ['query', ['test']],
           ['object_types', %w[item collection]],
           ['projects', ['Project 1']]
         )
+      end
+    end
+
+    context 'when values are set for a checkbox facet combined with And' do
+      subject(:form) { described_class.new(languages: %w[English Spanish], languages_operator: 'and') }
+
+      it 'returns a single current filter for the values' do
+        expect(form.current_filters).to eq([['languages', %w[English Spanish]]])
       end
     end
 

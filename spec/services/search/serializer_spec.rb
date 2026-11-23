@@ -36,6 +36,18 @@ RSpec.describe Search::Serializer do
              'Registered date: ("Last 30 days" AND 2021-02-01 TO 2022-02-01)')
   end
 
+  context 'with languages combined with And and excluded languages' do
+    let(:search_form) do
+      ResultsSearchForm.new(languages: %w[English Spanish], languages_exclude: %w[French German],
+                            languages_operator: 'and')
+    end
+
+    it 'joins the selected languages with AND and the excluded languages with OR' do
+      expect(serialized_query)
+        .to eq('Language: ("English" AND "Spanish") AND Language: NOT ("French" OR "German")')
+    end
+  end
+
   context 'with a missing value' do
     let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
 

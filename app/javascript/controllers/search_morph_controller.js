@@ -14,6 +14,7 @@ export default class extends Controller {
       'turbo:visit': this.visit,
       'turbo:before-render': this.beforeRender,
       'turbo:before-morph-element': this.beforeMorphElement,
+      'turbo:before-morph-attribute': this.beforeMorphAttribute,
       'turbo:render': this.render,
       'turbo:before-stream-render': this.beforeStreamRender,
       'turbo:frame-load': this.frameLoad,
@@ -66,6 +67,12 @@ export default class extends Controller {
       this.reloadingFrames++
     }
     currentElement.inert = true
+  }
+
+  // A facet whose And/Or toggle had focus stays expanded, even when no value is checked, so focus stays on the toggle.
+  beforeMorphAttribute (event) {
+    if (this.keptFocus?.element.closest('.toggle-radio') && this.keptFocus.keptElement.contains(event.target) &&
+        event.target.matches('.accordion-button, .accordion-collapse')) event.preventDefault()
   }
 
   render () {

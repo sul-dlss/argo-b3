@@ -2,7 +2,7 @@
 
 module Search
   # Component to display a single current filter applied to a search.
-  # A filter has multiple values when the values of a facet are ORed.
+  # A filter has multiple values for a checkbox facet, joined by the facet's operator.
   class CurrentFilterComponent < ViewComponent::Base
     def initialize(form_field:, values:, search_form:, facet_labels: {})
       @form_field = form_field
@@ -46,7 +46,12 @@ module Search
     end
 
     def values_label
-      values.map { |value| value_label(value) }.join(' OR ')
+      values.map { |value| value_label(value) }.join(" #{operator.upcase} ")
+    end
+
+    def operator
+      facet_config = Search::Facets.find_config_by_form_field(form_field)
+      facet_config ? search_form.operator_for(facet_config) : :and
     end
 
     def field_label

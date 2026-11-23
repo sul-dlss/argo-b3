@@ -21,7 +21,8 @@ module Search
 
     attr_reader :facet_config, :facet_counts, :search_form
 
-    delegate :form_field, :exclude_form_field, :date_from_form_field, :date_to_form_field, to: :facet_config
+    delegate :form_field, :exclude_form_field, :operator_form_field, :date_from_form_field, :date_to_form_field,
+             to: :facet_config
 
     def facet_component # rubocop:disable Metrics/AbcSize
       if facet_config.dynamic_facet.present?
@@ -34,8 +35,8 @@ module Search
                                                facet_search_path_helper:)
       else
         Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:,
-                                   facet_page_path_helper:, facet_search_path_helper:,
-                                   checkbox: facet_config.operator == :or)
+                                   operator_form_field:, facet_page_path_helper:, facet_search_path_helper:,
+                                   checkbox: facet_config.checkbox)
       end
     end
 

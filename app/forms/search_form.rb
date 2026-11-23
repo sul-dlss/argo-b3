@@ -36,6 +36,18 @@ class SearchForm < ApplicationForm
 
   delegate :route_scope, to: :class
 
+  # Keeps only an operator that differs from the facet's default, so that choosing the default is the same search
+  # as not choosing.
+  # Attributes that choose a facet's operator. They change which objects match only together with the facet's values.
+  def self.operator_attributes
+    Search::Facets::ALL.filter_map { |facet_config| facet_config.operator_form_field&.to_s }
+  end
+
+  def self.normalizes_operator(name)
+    default = Search::Facets.find_config_by_form_field(name.to_s.delete_suffix('_operator')).operator.to_s
+    normalizes name, with: ->(value) { value if value != default && %w[and or].include?(value) }
+  end
+
   # Keyword searches use DisMax, so AND, OR and NOT are ordinary words. Advanced searches use eDisMax
   # for Boolean operators, parentheses and field expressions.
   def solr_query_parameters
@@ -98,6 +110,8 @@ class SearchForm < ApplicationForm
   attribute :identifiers, array: true, default: -> { [] }
   attribute :languages, array: true, default: -> { [] }
   attribute :languages_exclude, array: true, default: -> { [] }
+  attribute :languages_operator, :string, default: nil
+  normalizes_operator :languages_operator
   attribute :licenses, array: true, default: -> { [] }
   attribute :last_accessioned_date, array: true, default: -> { [] }
   attribute :last_accessioned_date_from, :date, default: nil
@@ -137,7 +151,8 @@ class SearchForm < ApplicationForm
   attribute :wps_workflows, array: true, default: -> { [] }
 
   def blank?
-    attributes.except(*self.class.non_query_attributes, 'advanced').values.all?(&:blank?)
+    attributes.except(*self.class.non_query_attributes, *self.class.operator_attributes, 'advanced')
+              .values.all?(&:blank?)
   end
 
   # @return [hash] this form's attributes merged with new_attrs
@@ -218,14 +233,21 @@ class SearchForm < ApplicationForm
     attributes.except(*self.class.non_query_attributes, 'query', 'advanced')
   end
 
-  # The values of a facet whose values are ORed are grouped into a single filter;
+  # @param facet_config [Search::Facets::Config]
+  # @return [Symbol] how the facet's selected values are combined: :and or :or
+  def operator_for(facet_config)
+    operator = public_send(facet_config.operator_form_field) if facet_config.operator_form_field
+    operator&.to_sym || facet_config.operator
+  end
+
+  # The values of a checkbox facet are grouped into a single filter;
   # otherwise, each value is a separate filter.
   # @return [Array<Array(String, Array<String>)>] current filters as attribute name/values pairs
   def current_filters
     @current_filters ||= [].tap do |filters|
       filters << ['query', [query]] if query.present?
-      facet_attributes.each do |attr_name, values|
-        if Search::Facets.find_config_by_form_field(attr_name)&.operator == :or
+      facet_value_attributes.each do |attr_name, values|
+        if Search::Facets.find_config_by_form_field(attr_name)&.checkbox
           filters << [attr_name, Array(values)]
         else
           Array(values).each { |value| filters << [attr_name, [value]] }
@@ -236,7 +258,7 @@ class SearchForm < ApplicationForm
 
   # @return [Boolean] whether any facets are selected
   def facets_selected?
-    facet_attributes.values.any?(&:present?)
+    facet_value_attributes.values.any?(&:present?)
   end
 
   def to_s
@@ -244,6 +266,10 @@ class SearchForm < ApplicationForm
   end
 
   private
+
+  def facet_value_attributes
+    facet_attributes.except(*self.class.operator_attributes)
+  end
 
   # Builds a form of the given class, dropping attributes that the class does not declare.
   # Callers pass attributes that not every view has -- most commonly page, which facet links reset

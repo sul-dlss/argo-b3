@@ -104,4 +104,20 @@ RSpec.describe Search::FacetComponent, type: :component do
       expect(collection_item).to have_link('Remove exclude dark', href: '/search')
     end
   end
+
+  context 'when a facet with operator_form_field' do
+    let(:component) do
+      described_class.new(facet_counts:, search_form:, form_field: :languages, operator_form_field: :languages_operator,
+                          checkbox: true)
+    end
+    let(:search_form) { ResultsSearchForm.new(languages_operator: 'and') }
+
+    it 'renders the And/Or toggle above the values and shows the facet' do
+      render_inline(component)
+
+      expect(page).to have_css('section[aria-label="Language"] h3 button[aria-expanded="true"]')
+      expect(page).to have_checked_field('And')
+      expect(page.all('[role="group"], turbo-frame').map(&:tag_name)).to eq %w[div turbo-frame]
+    end
+  end
 end
