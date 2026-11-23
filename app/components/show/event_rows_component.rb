@@ -53,6 +53,11 @@ module Show
       key.to_s.humanize
     end
 
+    # Names the event, since several events' details (and so their JSON viewers) can be on the page at once.
+    def json_label(key)
+      "#{key_label(key)} for #{event_type_label} event at #{when_label}"
+    end
+
     def json?(value)
       value.is_a?(Hash) || value.is_a?(Array)
     end
