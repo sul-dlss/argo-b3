@@ -438,11 +438,11 @@ RSpec.describe 'Create multiple items' do
       )
     end
 
-    it 'shows a validation error for tags entered all at once but not added' do
+    it 'shows a validation error for an invalid tag entered all at once' do
       visit_new_multiple_item
 
       fill_in_registration_settings
-      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nTicket : ABC-123"
+      fill_in 'Enter multiple tags', with: "Registered By : mjgiarlo\nticket:ABC-123"
       fill_in_two_items
 
       click_button 'Register items'
@@ -452,8 +452,9 @@ RSpec.describe 'Create multiple items' do
       ValidateFormJob.perform_now(form_validation_action:)
 
       expect(page).to have_invalid_feedback('Enter multiple tags',
-                                            'Click "Add tags" to add these tags, or clear this field.')
-      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nTicket : ABC-123")
+                                            'These tags are not valid: ticket:ABC-123. Each tag needs two or more ' \
+                                            'terms separated by " : " (e.g., Project : Maps).')
+      expect(page).to have_field('Enter multiple tags', with: "Registered By : mjgiarlo\nticket:ABC-123")
 
       expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
     end
@@ -465,24 +466,13 @@ RSpec.describe 'Create multiple items' do
 
       fill_in_registration_settings
 
-      # A project name is already filled in, so the pasted project tag has to be appended below it
-      # rather than overwrite it.
+      # A project name is already filled in, so the typed project tag is added to it.
       fill_in_tag 'items_registration[project_tags_attributes][0][tag]', with: 'Argo'
       # Capybara only takes its fast path for values longer than 30 characters; otherwise it sends
       # the tabs as real keystrokes, which blur the text area. It also sends the first four and
       # last three characters as keystrokes, so keep the delimiters away from both ends.
       fill_in 'Enter multiple tags',
               with: "Registered By : mjgiarlo\tProject : Google Books\nTicket : ABC-123\tRemediated By : 5.0.0"
-      click_button 'Add tags'
-
-      expect(find_tag_select_item('items_registration[other_tags_attributes][0][tag]'))
-        .to have_text('Registered By : mjgiarlo')
-      expect(find_tag_select_item('items_registration[other_tags_attributes][1][tag]'))
-        .to have_text('Remediated By : 5.0.0')
-      expect(find_tag_select_item('items_registration[project_tags_attributes][0][tag]')).to have_text('Argo')
-      expect(find_tag_select_item('items_registration[project_tags_attributes][1][tag]')).to have_text('Google Books')
-      expect(find_tag_select_item('items_registration[ticket_tags_attributes][0][tag]')).to have_text('ABC-123')
-      expect(page).to have_field('Enter multiple tags', with: '')
 
       fill_in_two_items
 

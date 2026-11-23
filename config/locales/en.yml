@@ -635,10 +635,11 @@ en:
           placeholder: "Start typing a mount..."
         multiple_tags:
           label: 'Enter multiple tags'
-          button: 'Add tags'
-          not_added: 'Click "Add tags" to add these tags, or clear this field.'
+          invalid: >-
+            These tags are not valid: %{tags}. Each tag needs two or more terms separated by " : " (e.g., Project : Maps).
           help_text: >-
             Enter a list of tags separated by tabs or new lines. You can add Project and Ticket tags here as well.
+            They are added when you save.
         other_tag:
           label: 'Tag'
           placeholder: 'Start typing a tag...'
