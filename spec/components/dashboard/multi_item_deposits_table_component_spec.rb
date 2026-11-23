@@ -16,10 +16,11 @@ RSpec.describe Dashboard::MultiItemDepositsTableComponent, type: :component do
 
       table = page.find("table#multi-item-deposits-table[aria-label='Multi-item deposits']")
       expect(page).to have_css('h2', text: 'Multi-item deposits')
-      expect(table).to have_css('thead th', count: 5)
-      expect(table).to have_no_css('thead th', text: 'User')
-      expect(table).to have_css("tr##{dom_id(multi_item_deposit_action, 'row')} td:nth-of-type(1) a",
-                                text: "Multi-item deposit #{multi_item_deposit_action.id}: Maps")
+      expect(table.all('thead th').map { it.text.strip })
+        .to eq(['Action', 'Description', 'Created', 'Submitted', 'Status', 'Workflow status'])
+      row = table.find("tr##{dom_id(multi_item_deposit_action, 'row')}")
+      expect(row).to have_css('td:nth-of-type(1) a', exact_text: "Multi-item deposit #{multi_item_deposit_action.id}")
+      expect(row).to have_css('td:nth-of-type(2)', exact_text: 'Maps')
       expect(page).to have_link('View all multi-item deposits', href: '/multi_item_deposit_actions')
     end
   end
