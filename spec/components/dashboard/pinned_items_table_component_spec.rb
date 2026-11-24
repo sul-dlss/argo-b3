@@ -25,6 +25,13 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
   context 'when there are pinned items' do
     let(:pinned_item_docs) { [item_doc] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-items-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-items-section.collapse.show')
+    end
+
     it 'renders a row for each pinned item' do
       render_inline(component)
 
@@ -71,10 +78,11 @@ RSpec.describe Dashboard::PinnedItemsTableComponent, type: :component do
   context 'when there are no pinned items' do
     let(:pinned_item_docs) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No items have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-items-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-items-section.collapse:not(.show)', text: 'No items have been pinned.')
     end
   end
 end

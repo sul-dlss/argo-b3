@@ -1,4 +1,4 @@
-<%= render Dashboard::SectionComponent.new(id: 'pinned-items-section', label:, pinned: true, classes:) do %>
+<%= render Dashboard::SectionComponent.new(id: 'pinned-items-section', label:, pinned: true, expanded: expanded?, classes:) do %>
   <%= render SdrViewComponents::Tables::TableComponent.new(
         empty_message: t('dashboard.pinned_items.empty'),
         label:,

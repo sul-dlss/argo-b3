@@ -22,6 +22,13 @@ RSpec.describe Dashboard::PinnedAposTableComponent, type: :component do
   context 'when there are pinned APOs' do
     let(:pinned_apo_docs) { [apo_doc] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-apos-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-apos-section.collapse.show')
+    end
+
     it 'renders a row for each pinned APO' do
       render_inline(component)
 
@@ -65,10 +72,11 @@ RSpec.describe Dashboard::PinnedAposTableComponent, type: :component do
   context 'when there are no pinned APOs' do
     let(:pinned_apo_docs) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No APOs have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-apos-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-apos-section.collapse:not(.show)', text: 'No APOs have been pinned.')
     end
   end
 end

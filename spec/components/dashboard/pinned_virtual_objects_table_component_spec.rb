@@ -26,6 +26,13 @@ RSpec.describe Dashboard::PinnedVirtualObjectsTableComponent, type: :component d
   context 'when there are pinned virtual objects' do
     let(:pinned_virtual_object_docs) { [virtual_object_doc] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-virtual-objects-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-virtual-objects-section.collapse.show')
+    end
+
     it 'renders a row for each pinned virtual object' do
       render_inline(component)
 
@@ -53,10 +60,12 @@ RSpec.describe Dashboard::PinnedVirtualObjectsTableComponent, type: :component d
   context 'when there are no pinned virtual objects' do
     let(:pinned_virtual_object_docs) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No virtual objects have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-virtual-objects-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-virtual-objects-section.collapse:not(.show)',
+                               text: 'No virtual objects have been pinned.')
     end
   end
 end

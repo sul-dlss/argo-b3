@@ -24,4 +24,15 @@ RSpec.describe Dashboard::SectionComponent, type: :component do
       expect(page).to have_css('h2 button .bi-pin-fill[aria-hidden="true"]')
     end
   end
+
+  context 'when not expanded' do
+    it 'renders a collapsed section' do
+      render_inline(described_class.new(id: 'pinned-items-section', label: 'Pinned items', expanded: false)) do
+        'The content'
+      end
+
+      expect(page).to have_css('h2 button.collapsed[aria-controls="pinned-items-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-items-section.collapse:not(.show)', text: 'The content')
+    end
+  end
 end

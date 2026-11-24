@@ -30,6 +30,11 @@ module Dashboard
       end
     end
 
+    # Collapse the section when nothing is pinned, so empty sections don't dominate the dashboard.
+    def expanded?
+      pinned_virtual_object_docs.present?
+    end
+
     def classes
       merge_classes('object-type-virtual-object', @classes)
     end

@@ -1,4 +1,4 @@
-<%= render SdrViewComponents::Elements::CollapsibleSectionComponent.new(id:, level: :h2, classes:) do |component| %>
+<%= render SdrViewComponents::Elements::CollapsibleSectionComponent.new(id:, level: :h2, expanded: expanded?, classes:) do |component| %>
   <% component.with_heading_content do %>
     <%= label %>
     <%# Design standard deviation: HEAD-4. The pin marks the section as listing pins; it is not an action. %>
