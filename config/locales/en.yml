@@ -901,8 +901,6 @@ en:
         empty_files: 'Empty files: %{filepaths}'
         empty_folders: 'Empty folders: %{paths}'
         discarded_content: 'Discarded in-progress file edits'
-      toasts:
-        completed: 'Completed discovering files'
     structure:
       errors:
         no_rows: 'No rows for this object in the structural metadata CSV'
@@ -921,7 +919,6 @@ en:
         unexpected: 'An unexpected error occurred while checking the deposit. Contact SDR support for assistance.'
         deposit_failed: 'An unexpected error occurred while depositing. Contact SDR support for assistance.'
       toasts:
-        errors: 'Deposit check found errors'
         started: 'Deposit started'
   dashboard:
     heading: 'Argo dashboard'
@@ -1064,3 +1061,15 @@ en:
       text_with_errors:
         one: '%{label} completed with 1 error.'
         other: '%{label} completed with %{count} errors.'
+    multi_item_deposit_discovery_finished:
+      title: 'Discovery finished'
+      title_with_errors: 'Discovery finished with errors'
+      text: 'Discovery completed for %{name}.'
+      text_with_errors:
+        one: 'Discovery found errors in 1 item of %{name}.'
+        other: 'Discovery found errors in %{formatted_count} items of %{name}.'
+    multi_item_deposit_initiation_errors:
+      title: 'Deposit Initiation found errors'
+      text:
+        one: 'Nothing in %{name} was deposited because 1 item has errors.'
+        other: 'Nothing in %{name} was deposited because %{formatted_count} items have errors.'

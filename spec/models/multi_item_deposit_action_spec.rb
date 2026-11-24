@@ -396,6 +396,16 @@ RSpec.describe MultiItemDepositAction do
       expect { multi_item_deposit_action.destroy! }.to change(ItemDepositAction, :count).by(-1)
       expect(Content.exists?(content.id)).to be true
     end
+
+    it 'deletes the notifications about it' do
+      MultiItemDepositDiscoveryFinishedNotifier.with(record: multi_item_deposit_action, name: 'Deposit', error_count: 0)
+                                               .deliver(multi_item_deposit_action.user, enqueue_job: false)
+
+      multi_item_deposit_action.destroy!
+
+      expect(Noticed::Event.count).to eq(0)
+      expect(Noticed::Notification.count).to eq(0)
+    end
   end
 
   describe '#discardable?' do

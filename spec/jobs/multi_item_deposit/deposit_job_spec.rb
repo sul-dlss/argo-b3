@@ -51,7 +51,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
   end
 
   shared_examples 'completes with an error' do |error|
-    it 'records the error, completes initiating the deposit, and notifies the user' do
+    it 'records the error, completes initiating the deposit, and notifies the owner' do
       perform
 
       expect(item_deposit_action.reload.deposit_errors).to eq([error])
@@ -60,15 +60,18 @@ RSpec.describe MultiItemDeposit::DepositJob do
         step: 'deposit', initiating_deposit_state: 'initiating_deposit_not_in_progress',
         initiating_deposit_completed_at: be_within(1.second).of(Time.current)
       )
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
-        .with('notifications', user, target: 'toast-container', html: include('Deposit check found errors'))
+      notification = user.notifications.sole
+      expect(notification).to be_a(MultiItemDepositInitiationErrorsNotifier::Notification)
+      expect(notification.record).to eq(multi_item_deposit_action)
+      expect(notification.params).to eq(name: multi_item_deposit_action.name, error_count: 1)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
       expect(Sdr::VersionService).not_to have_received(:open)
       expect(StageFilesJob).not_to have_been_enqueued
     end
   end
 
   context 'when there are no errors' do
-    it 'clears previous errors, submits the deposit, completes initiating it, and notifies the user' do
+    it 'clears previous errors, submits the deposit, completes initiating it, and toasts the user' do
       perform
 
       expect(item_deposit_action.reload.deposit_errors).to eq([])
@@ -78,6 +81,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
       )
       expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
         .with('notifications', user, target: 'toast-container', html: include('Deposit started'))
+      expect(user.notifications).to be_empty
       expect(Sdr::Repository).to have_received(:find_all).with(druids: contain_exactly(druid, other_druid))
       expect(Sdr::VersionService).to have_received(:statuses).with(druids: contain_exactly(druid, other_druid))
     end
@@ -244,8 +248,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
         step: 'deposit', initiating_deposit_state: 'initiating_deposit_not_in_progress'
       )
       expect(Honeybadger).to have_received(:notify).with(error)
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
-        .with('notifications', user, target: 'toast-container', html: include('Deposit check found errors'))
+      expect(user.notifications.sole.params).to eq(name: multi_item_deposit_action.name, error_count: 2)
     end
   end
 end

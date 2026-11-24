@@ -77,7 +77,15 @@ module MultiItemDeposit
 
     def complete_with_errors
       multi_item_deposit_action.initiating_deposit_completed!
-      broadcast_toast(title: message(:toasts, :errors), user:, variant: :red)
+      notify_errors
+    end
+
+    def notify_errors
+      error_count = multi_item_deposit_action.item_deposit_actions.with_deposit_errors.count
+      deliver_notification(MultiItemDepositInitiationErrorsNotifier, recipient: user,
+                                                                     record: multi_item_deposit_action,
+                                                                     name: multi_item_deposit_action.name,
+                                                                     error_count:)
     end
 
     # A failure is recorded on the Item Deposit, so that the other Item Deposits are still deposited.

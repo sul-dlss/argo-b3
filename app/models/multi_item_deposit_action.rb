@@ -6,6 +6,7 @@
 class MultiItemDepositAction < ApplicationRecord
   belongs_to :user
   has_many :item_deposit_actions, dependent: :destroy
+  has_many :noticed_events, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
 
   # Item Deposit content types are stored as the last segment of the cocina type URI.
   OCR_CONTENT_TYPES = Sdr::TextExtraction::OCR_TYPES.map { |type| UriSupport.last(uri: type) }.freeze
