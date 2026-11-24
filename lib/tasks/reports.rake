@@ -14,6 +14,8 @@ namespace :reports do
   # /tmp is the host's, so the files survive a deploy, but a deploy while the sweep runs stops it.
   desc 'Write a CSV of the DROs whose Content errors would block a Deposit (args: path, processes; default 4)'
   task :content_errors, %i[path processes] => :environment do |_task, args| # rubocop:disable Metrics/BlockLength
+    # Unbuffered, so progress shows promptly when stdout is redirected to a file.
+    $stdout.sync = true
     path = args.fetch(:path)
     druid_slices = Searchers::DroDruidSlices.new(slice_size: 25)
     checked_count = 0
