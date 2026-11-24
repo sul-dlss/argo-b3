@@ -18,4 +18,6 @@
   <% end %>
 
   <%= render Search::FacetSearchComponent.new(form_field:, search_form:, facet_search_path_helper:, classes: 'mt-4') %>
+
+  <%= render Search::YearRangeComponent.new(search_form:) if year_range? %>
 <% end %>

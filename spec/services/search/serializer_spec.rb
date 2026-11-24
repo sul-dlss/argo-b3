@@ -48,6 +48,22 @@ RSpec.describe Search::Serializer do
     end
   end
 
+  context 'with a year range' do
+    let(:search_form) { ResultsSearchForm.new(dates: ['2001'], dates_from: '2000', dates_to: '2020') }
+
+    it 'returns the selected years and the year range' do
+      expect(serialized_query).to eq('Year: "2001" AND Year: 2000 TO 2020')
+    end
+  end
+
+  context 'with only a to year' do
+    let(:search_form) { ResultsSearchForm.new(dates_to: '2020') }
+
+    it 'returns an open-ended year range' do
+      expect(serialized_query).to eq('Year: * TO 2020')
+    end
+  end
+
   context 'with a missing value' do
     let(:search_form) { ResultsSearchForm.new(languages: %w[English _missing_value]) }
 

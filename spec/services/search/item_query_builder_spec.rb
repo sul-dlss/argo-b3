@@ -286,4 +286,41 @@ RSpec.describe Search::ItemQueryBuilder do
       end
     end
   end
+
+  context 'with a year range (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(dates_from: '-10', dates_to: '2020') }
+
+    it 'builds a range filter query on the integer publication year' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include('publication_year_ipsidv:[-10 TO 2020]')
+    end
+
+    context 'with only a from year' do
+      let(:search_form) { ResultsSearchForm.new(dates_from: '2000') }
+
+      it 'builds an open-ended range filter query' do
+        result = described_class.call(search_form:, user_scope:)
+        expect(Array(result[:fq])).to include('publication_year_ipsidv:[2000 TO *]')
+      end
+    end
+
+    context 'with only a to year' do
+      let(:search_form) { ResultsSearchForm.new(dates_to: '2020') }
+
+      it 'builds an open-ended range filter query' do
+        result = described_class.call(search_form:, user_scope:)
+        expect(Array(result[:fq])).to include('publication_year_ipsidv:[* TO 2020]')
+      end
+    end
+
+    context 'with a year range and a selected year' do
+      let(:search_form) { ResultsSearchForm.new(dates: ['2001'], dates_from: '2000', dates_to: '2020') }
+
+      it 'builds both filter queries' do
+        result = described_class.call(search_form:, user_scope:)
+        expect(Array(result[:fq]))
+          .to include('publication_year_ssidv:("2001")', 'publication_year_ipsidv:[2000 TO 2020]')
+      end
+    end
+  end
 end

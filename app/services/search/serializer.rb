@@ -42,6 +42,7 @@ module Search
           else
             parts << facet_part_for(facet_config:)
             parts << facet_part_for(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
+            parts << year_range_part_for(facet_config:) if facet_config.year_range
           end
         end
       end.compact
@@ -67,6 +68,14 @@ module Search
       values = form_values.map { |value| quote(facet_value_label(value)) }
       values << combine_dates(date_from_value:, date_to_value:) if [date_from_value, date_to_value].any?(&:present?)
       combine_label_and_values(facet_config:, values:)
+    end
+
+    def year_range_part_for(facet_config:)
+      year_from = search_form.dates_from
+      year_to = search_form.dates_to
+      return if year_from.nil? && year_to.nil?
+
+      "#{facet_label(facet_config.form_field)}: #{combine_dates(date_from_value: year_from, date_to_value: year_to)}"
     end
 
     def combine_label_and_values(facet_config:, values:, exclude: false)
