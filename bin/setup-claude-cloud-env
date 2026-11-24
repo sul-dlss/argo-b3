@@ -9,6 +9,9 @@
 # above the repository:
 #   cd argo-b3 && bin/setup-claude-cloud-env
 #
+# A resumed session skips this script, so .claude/hooks/session-start.sh restarts
+# Postgres, Docker, and the Solr containers; keep its service list in sync.
+#
 # The environment's network access must explicitly allow:
 #   *.github.com      Matt Pocock's skills, prebuilt Ruby (ruby/ruby-builder releases),
 #                     and the Solr config fetched by the Solr image build
