@@ -22,6 +22,13 @@ RSpec.describe Dashboard::PinnedCollectionsTableComponent, type: :component do
   context 'when there are pinned collections' do
     let(:pinned_collection_docs) { [collection_doc] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-collections-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-collections-section.collapse.show')
+    end
+
     it 'renders a row for each pinned collection' do
       render_inline(component)
 
@@ -46,10 +53,12 @@ RSpec.describe Dashboard::PinnedCollectionsTableComponent, type: :component do
   context 'when there are no pinned collections' do
     let(:pinned_collection_docs) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No collections have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-collections-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-collections-section.collapse:not(.show)',
+                               text: 'No collections have been pinned.')
     end
   end
 end

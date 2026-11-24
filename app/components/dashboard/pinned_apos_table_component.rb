@@ -26,6 +26,11 @@ module Dashboard
       helpers.link_to_object(apo_doc.agreement_title, apo_doc.agreement_druid)
     end
 
+    # Collapse the section when nothing is pinned, so empty sections don't dominate the dashboard.
+    def expanded?
+      pinned_apo_docs.present?
+    end
+
     def classes
       merge_classes('object-type-apo', @classes)
     end

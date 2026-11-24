@@ -22,6 +22,11 @@ module Dashboard
       helpers.link_to(pinned_tag.tag, search_path_for(pinned_tag.tag))
     end
 
+    # Collapse the section when nothing is pinned, so empty sections don't dominate the dashboard.
+    def expanded?
+      pinned_tags.present?
+    end
+
     def classes
       merge_classes('object-type-tag', @classes)
     end

@@ -10,6 +10,13 @@ RSpec.describe Dashboard::PinnedTagsTableComponent, type: :component do
   context 'when there are pinned tags' do
     let(:pinned_tags) { [build(:pinned_tag, tag: 'Registered By : jdoe')] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-tags-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-tags-section.collapse.show')
+    end
+
     it 'renders a row for each pinned tag' do
       render_inline(component)
 
@@ -29,10 +36,11 @@ RSpec.describe Dashboard::PinnedTagsTableComponent, type: :component do
   context 'when there are no pinned tags' do
     let(:pinned_tags) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No tags have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-tags-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-tags-section.collapse:not(.show)', text: 'No tags have been pinned.')
     end
   end
 

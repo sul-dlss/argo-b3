@@ -12,6 +12,13 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
   context 'when there are pinned searches' do
     let(:pinned_searches) { [build(:pinned_search, search_form_attributes: search_form.attributes)] }
 
+    it 'renders an expanded section' do
+      render_inline(component)
+
+      expect(page).to have_css('h2 button[aria-controls="pinned-searches-section"][aria-expanded="true"]')
+      expect(page).to have_css('div#pinned-searches-section.collapse.show')
+    end
+
     it 'renders a row for each pinned search' do
       render_inline(component)
 
@@ -44,10 +51,11 @@ RSpec.describe Dashboard::PinnedSearchesTableComponent, type: :component do
   context 'when there are no pinned searches' do
     let(:pinned_searches) { [] }
 
-    it 'renders the empty message' do
+    it 'renders the empty message in a collapsed section' do
       render_inline(component)
 
-      expect(page).to have_text('No searches have been pinned.')
+      expect(page).to have_css('h2 button[aria-controls="pinned-searches-section"][aria-expanded="false"]')
+      expect(page).to have_css('div#pinned-searches-section.collapse:not(.show)', text: 'No searches have been pinned.')
     end
   end
 end
