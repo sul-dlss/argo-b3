@@ -6,18 +6,13 @@
 # - `title`: the Notification's title.
 # - `text`: the toast's text, linking to the subject (`subject_link`).
 # - `subject_label` and `subject_path`: the subject's link text and path, for the list of recent notifications.
-# - `detail` (optional): the detail or error summary shown below the title in the list of recent notifications.
+# - `detail`: the detail or error summary shown below the title in the list of recent notifications, or nil.
 # - `error?` (optional): whether the Notification reports an error.
 class ApplicationNotifier < Noticed::Event
   notification_methods do
     # @return [Boolean] whether the Notification reports an error
     def error?
       false
-    end
-
-    # @return [String, nil] the detail or error summary, if any
-    def detail
-      nil
     end
 
     private
