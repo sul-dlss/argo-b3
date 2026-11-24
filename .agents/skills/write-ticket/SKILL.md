@@ -59,14 +59,14 @@ Write the ticket in this shape:
 
 ## What to build
 
-<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. One to two sentences or a few bullets. Additional optional sentences: why implement this (only if discussed in the grilling session as context for the decisions made) and what feature(s) it works like.
+<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. One to two sentences or a few bullets. Additional optional sentences: why implement this (only if discussed in the grilling session as context for the decisions made) and what feature(s) it works like.>
 
 [Screenshot: <what it shows>]
 
 ## Acceptance criteria
 
-- <One observable, checkable behaviour per line. Include something along the lines of "User is able to..." to ensure the use case behind the ticket is captured as an acceptance criterion.>
-- ...
+- [ ] <One observable, checkable behaviour per line>
+- [ ] ...
 
 ## Out of scope
 
@@ -89,14 +89,13 @@ Write the ticket in this shape:
 - When rewriting, keep the existing image Markdown (the attachment URLs still work after an edit), placed where each image helps most. When you show the draft, list anything from the original you dropped, so nothing disappears without the user agreeing.
 
 ## 6. Edit the ticket
-Before showing the draft, reread it and aggressively cut unnecessary words, including any acceptance criteria that:
-1. are covered by "works like <feature>"
-2. are not required in order to implement the feature
+Before showing the draft, reread it and aggressively cut unnecessary words. Cut anything that a developer wouldn't miss, and cut any acceptance criteria that:
+- are covered by "works like <feature>"
+- are not required in order to implement the feature
 
 Show the draft to the user. Also show criteria and points that were removed in this step. Revise until the user approves it.
 
 ## 7. Deliver
-
 Ask the user which they want:
 
 - **Create the GitHub issue**: run `gh issue create --title "<title>" --body-file <file>` in the current repo, and share the URL. If there are screenshot placeholders, tell the user that GitHub only accepts images through its web UI, so they need to edit the issue there and drag each image onto its placeholder.
@@ -105,3 +104,5 @@ Ask the user which they want:
 When rewriting, offer **Update the existing issue** in place of creating one: run `gh issue edit <number> --title "<title>" --body-file <file>` and share the URL. GitHub keeps the issue's edit history, so the original body can still be seen. With Markdown to paste, the user pastes it in by editing the issue.
 
 Without a working `gh` (step 0), skip the question and give the Markdown. Mention that installing `gh` (`brew install gh`) and logging in (`gh auth login`, in a separate terminal) would let the skill create the issue directly next time.
+
+If the user does not answer the question before moving on to another topic, assume that they have already copied the Markdown.
