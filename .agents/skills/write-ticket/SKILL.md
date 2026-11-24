@@ -59,7 +59,7 @@ Write the ticket in this shape:
 
 ## What to build
 
-<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. Two to four sentences or a few bullets. Include the why in a sentence when it isn't obvious.>
+<The end-to-end behaviour from the user's point of view: who, where, what they do, what happens. One to two sentences or a few bullets. Additional optional sentences: why implement this (only if discussed in the grilling session as context for the decisions made) and what feature(s) it works like.>
 
 [Screenshot: <what it shows>]
 
@@ -77,7 +77,7 @@ Write the ticket in this shape:
 - <Behaviour outside argo-b3 that couldn't be checked, for the developer to confirm>
 ```
 
-- Keep it concise: a developer should be able to read it in a minute or two. Every decision from the grilling should be covered, but only state what a developer could otherwise get wrong. Leave out behaviour that stays as it is today, and anything already implied by "works like <feature>". Don't record the discussion or the alternatives you rejected.
+- Keep it very concise: a developer should be able to read it in a minute or two. Every decision from the grilling should be covered, but only state what a developer could otherwise get wrong. Leave out behaviour that stays as it is today, and anything already implied by "works like <feature>". Don't record the discussion or the alternatives you rejected.
 - One short line per criterion. Merge criteria that say the same thing, and drop any that just restate What to build.
 - Write criteria someone can verify by using the app: "A user who can't edit the object doesn't see the button", not "add a policy check".
 - Write each unseen detail as its own criterion beside the behaviour it belongs to, quoting the exact words: 'Removing a file announces "<filename> removed" and moves focus to the next file'. A design can't carry these, so a developer would otherwise guess them.
@@ -88,10 +88,14 @@ Write the ticket in this shape:
 - Omit Out of scope if nothing was excluded, and Assumptions to confirm if everything was checked.
 - When rewriting, keep the existing image Markdown (the attachment URLs still work after an edit), placed where each image helps most. When you show the draft, list anything from the original you dropped, so nothing disappears without the user agreeing.
 
-Before showing the draft, reread it and cut anything a developer wouldn't miss. Then show it and revise until the user approves it.
+## 6. Edit the ticket
+Before showing the draft, reread it and aggressively cut unnecessary words. Cut anything that a developer wouldn't miss, and cut any acceptance criteria that:
+- are covered by "works like <feature>"
+- are not required in order to implement the feature
 
-## 6. Deliver
+Show the draft to the user. Also show criteria and points that were removed in this step. Revise until the user approves it.
 
+## 7. Deliver
 Ask the user which they want:
 
 - **Create the GitHub issue**: run `gh issue create --title "<title>" --body-file <file>` in the current repo, and share the URL. If there are screenshot placeholders, tell the user that GitHub only accepts images through its web UI, so they need to edit the issue there and drag each image onto its placeholder.
@@ -100,3 +104,5 @@ Ask the user which they want:
 When rewriting, offer **Update the existing issue** in place of creating one: run `gh issue edit <number> --title "<title>" --body-file <file>` and share the URL. GitHub keeps the issue's edit history, so the original body can still be seen. With Markdown to paste, the user pastes it in by editing the issue.
 
 Without a working `gh` (step 0), skip the question and give the Markdown. Mention that installing `gh` (`brew install gh`) and logging in (`gh auth login`, in a separate terminal) would let the skill create the issue directly next time.
+
+If the user does not answer the question before moving on to another topic, assume that they have already copied the Markdown.
