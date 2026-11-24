@@ -1,0 +1,36 @@
+<%= page_title(t('edit.object_folio_refreshes.new.title'), name: @title) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('edit.object_folio_refreshes.new.title'), subtitle: @title) do %>
+  <%= form_with model: @folio_refresh_form, url: object_folio_refresh_path(@druid), method: :post, class: 'b3-form' do |form| %>
+    <%# As "Preview FOLIO record" in Edit item shows it, so that the user can confirm the record. %>
+    <%= render Elements::DescriptionListComponent.new(
+          hash: { t('edit.items.fields.catalog_record_id.label') => form.object.catalog_record_id,
+                  t('edit.items.fields.retrieved_title.label') => form.object.retrieved_title },
+          humanize_terms: false
+        ) %>
+    <%= form.hidden_field :retrieved_title %>
+
+    <%= render Edit::VersionDescriptionComponent.new(form:, label_classes: 'fw-bold', container_classes: 'my-field') %>
+
+    <%# Without the title, the user can't confirm the FOLIO record, and the refresh would likely fail too. %>
+    <% title_unavailable = form.object.retrieved_title.blank? %>
+    <%= render Elements::FormFooterComponent.new(cancel_path: object_path(@druid)) do %>
+      <% if form.object.dro? %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.object_folio_refreshes.new.buttons.draft'),
+                                                                 value: ObjectFolioRefreshesController::DRAFT_VALUE,
+                                                                 variant: 'outline-primary', disabled: title_unavailable) %>
+      <% end %>
+      <%# Design standard deviation: AVAIL-4. As in Apply APO defaults, deposit is hidden, not disabled, while files have unsaved changes. %>
+      <% if @unsaved_content_changes %>
+        <span><%= t('show.status.draft.unsaved_content_changes', manage_files: @manage_files_label) %></span>
+      <% else %>
+        <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('edit.object_folio_refreshes.new.buttons.deposit'),
+                                                                 value: ObjectFolioRefreshesController::DEPOSIT_VALUE,
+                                                                 disabled: title_unavailable) %>
+      <% end %>
+      <% if title_unavailable %>
+        <span><%= t('edit.object_folio_refreshes.new.title_unavailable') %></span>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

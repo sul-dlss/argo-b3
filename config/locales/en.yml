@@ -494,6 +494,23 @@ en:
         not_editable: 'This object is not editable.'
       errors:
         save_failed: 'The APO defaults could not be applied. Try again, or contact SDR support if the problem continues.'
+    object_folio_refreshes:
+      new:
+        title: 'Refresh from FOLIO'
+        default_version_description: 'Refresh from FOLIO'
+        title_unavailable: "The FOLIO record couldn't be retrieved. Try again, or contact SDR support if the problem continues."
+        buttons:
+          deposit: 'Refresh from FOLIO and deposit'
+          draft: 'Refresh from FOLIO and save as draft'
+      toasts:
+        deposit: 'Description refreshed from FOLIO and deposit started.'
+        draft: 'Description refreshed from FOLIO.'
+      warnings:
+        not_editable: 'This object is not editable.'
+        not_refreshable: 'This object has no FOLIO Instance HRID to refresh from.'
+      errors:
+        not_deposited: "Description refreshed from FOLIO, but the deposit couldn't be started (%{message}). Try depositing again, or contact SDR support if the problem continues."
+        save_failed: "The description couldn't be refreshed from FOLIO. Try again, or contact SDR support if the problem continues."
     item_text_extractions:
       new:
         title: 'Extract text'
@@ -504,6 +521,8 @@ en:
       toasts:
         deposit: 'Text extraction started.'
         draft: 'Text extraction will run when the item is deposited.'
+      warnings:
+        not_editable: 'Item is not editable.'
       errors:
         save_failed: 'Text extraction could not be started. Try again, or contact SDR support if the problem continues.'
     items:

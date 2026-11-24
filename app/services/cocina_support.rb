@@ -103,4 +103,14 @@ class CocinaSupport
     catalog_links = cocina_object.admin_policy? ? [] : Array(cocina_object.identification.catalogLinks)
     Cocina::Models::Builders::TitleBuilder.build(cocina_object.description.title, catalog_links:)
   end
+
+  # The FOLIO Instance HRID that DSA refreshes the description from (the FOLIO link marked Refresh on deposit).
+  # @param cocina_object [Cocina::Models::DRO, Cocina::Models::Collection, Cocina::Models::AdminPolicy]
+  # @return [String, nil] nil if the object has no FOLIO link to refresh from
+  def self.folio_refresh_catalog_record_id(cocina_object)
+    return if cocina_object.admin_policy?
+
+    Array(cocina_object.identification&.catalogLinks)
+      .find { |link| link.catalog == 'folio' && link.refresh }&.catalogRecordId
+  end
 end

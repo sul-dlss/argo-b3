@@ -82,6 +82,8 @@
         <% if @solr_doc.object_type?('item', 'virtual object', 'collection') %>
           <% component.with_button(component_class: Show::ApplyApoDefaultsButtonComponent, solr_doc: @solr_doc,
                                    object_status_presenter: @object_status_presenter) %>
+          <% component.with_button(component_class: Show::FolioRefreshButtonComponent, solr_doc: @solr_doc,
+                                   cocina_object: @cocina_object, object_status_presenter: @object_status_presenter) %>
         <% end %>
       <% end %>
 

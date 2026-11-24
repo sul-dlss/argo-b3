@@ -65,6 +65,9 @@ The Deposit of one object made by a Bulk Action, either Redeposit or a Bulk Acti
 ### Goobi Redeposit
 Sending an existing image or book Item to Goobi to be processed again, opening a Version if one is not already open. It is not a Deposit: Goobi deposits the Item later, outside Argo-B3, which closes the Version. Its outcome is not reported to the user who started it, so it is not a Tracked Deposit.
 
+### Refresh from FOLIO
+Replacing an object's description with one made from its FOLIO record: the FOLIO Instance HRID marked **Refresh on deposit**. Only items and collections have FOLIO records. It needs an open Version, so it creates a Draft (or changes the open one).
+
 ### Deposit Lifecycle
 The stages a Deposit passes through: **Initiating** (MID Item Deposits only, while Deposit Initiation runs), **Staging**, **Assembling** (an assembly workflow, e.g., `assemblyWF`, `gisAssemblyWF` and the `gisDerivativeWF` it starts, `ocrWF`, is active and the Version is still open), **Accessioning** (the Version is closed and `accessionWF` is active, including while it waits on `preservationIngestWF`), and **Complete** (`accessionWF` has finished for the Version). Use "Accessioning" even though the UI labels that stage "Depositing", and "Complete" for what the UI shows as "Deposited".
 
