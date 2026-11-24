@@ -30,7 +30,6 @@ module Contents
     # since an XML file that does not accompany an image is some other sort of metadata.
     ATTRIBUTES_FOR_MIME_TYPE_WITH_OCR = {
       MimeTypes::TIFF => { preserve: true, shelve: false, publish: false },
-      MimeTypes::JP2 => { preserve: true, shelve: true, publish: true },
       MimeTypes::JPEG => { preserve: true, shelve: false, publish: false },
       MimeTypes::PNG => { preserve: true, shelve: false, publish: false },
       MimeTypes::PDF => { preserve: true, shelve: true, publish: true, use: 'transcription' },

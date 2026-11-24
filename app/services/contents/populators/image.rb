@@ -88,9 +88,10 @@ module Contents
       end
 
       # Adding OCR or an image to a file set changes the attributes of the files that are already in it, e.g.,
-      # the deliverable image becomes preserved or the JSON becomes annotations. The existing files are only
+      # a PDF becomes a transcription or the JSON becomes annotations. The existing files are only
       # updated when one of these changes, so that appending to a file set does not otherwise overwrite
-      # attributes that have been edited by hand.
+      # attributes that have been edited by hand. Existing JP2s are never updated, since their attributes do not
+      # depend on the file set, so that a JP2 that was set to be preserved stays preserved.
       def append_to_content_file_set(content_file_set:, content_file_binaries:)
         existing_content_files = content_file_set.content_files.to_a
         existing_content_file_binaries = existing_content_files.map(&:content_file_binary)
@@ -102,6 +103,8 @@ module Contents
         return unless gains_ocr_or_image?(existing_content_file_binaries:, all_content_file_binaries:)
 
         existing_content_files.each do |content_file|
+          next if content_file.mime_type == MimeTypes::JP2
+
           content_file.update!(**file_attributes_for(mime_type: content_file.mime_type, ocr:, with_image:))
         end
       end
