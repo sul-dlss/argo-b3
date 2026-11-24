@@ -19,10 +19,8 @@ class NotificationMailer < ApplicationMailer
   private
 
   def file_check_finished_subject
-    args = { prefix: description_prefix, id: @multi_item_deposit_action.id }
-    return t('notification_mailer.multi_item_deposit_file_check_finished.subject_with_errors', **args) if @with_errors
-
-    t('notification_mailer.multi_item_deposit_file_check_finished.subject', **args)
+    outcome = @with_errors ? 'errors' : 'complete'
+    "#{description_prefix}SDR multi-item deposit #{@multi_item_deposit_action.id} file check #{outcome}"
   end
 
   # @return [Array<String>] the first MAX_LISTED_ERRORS File Check errors, each preceded by its druid
@@ -48,7 +46,7 @@ class NotificationMailer < ApplicationMailer
 
   # @return [String] the Multi-Item Deposit's number, followed by its description in parentheses if it has one
   def deposit_label
-    label = t('notification_mailer.multi_item_deposit_file_check_finished.deposit', id: @multi_item_deposit_action.id)
+    label = "SDR multi-item deposit #{@multi_item_deposit_action.id}"
     description = @multi_item_deposit_action.description
     description.present? ? "#{label} (#{description})" : label
   end

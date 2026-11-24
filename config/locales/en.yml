@@ -31,9 +31,6 @@ en:
   layouts:
     application:
       product_name: "Argo B3"
-    mailer:
-      footer: 'If you have questions, please contact the SDR team at %{email}.'
-      footer_html: 'If you have questions, please contact the SDR team at %{email}.'
   time:
     formats:
       date_only: "%Y-%m-%d"
@@ -1092,19 +1089,6 @@ en:
       detail:
         one: 'Nothing was deposited because 1 item has errors.'
         other: 'Nothing was deposited because %{formatted_count} items have errors.'
-  notification_mailer:
-    multi_item_deposit_file_check_finished:
-      deposit: 'SDR multi-item deposit %{id}'
-      subject: '%{prefix}SDR multi-item deposit %{id} file check complete'
-      subject_with_errors: '%{prefix}SDR multi-item deposit %{id} file check errors'
-      body: 'Your %{deposit} has successfully passed its file check. View details and complete the deposit in Argo at %{url}.'
-      body_html: 'Your %{deposit} has successfully passed its file check. View details and complete the deposit in Argo at %{url}.'
-      body_with_errors: 'Your %{deposit} has completed its file check with errors. You must fix the errors before depositing. View details and address the errors in Argo at %{url}.'
-      body_with_errors_html: 'Your %{deposit} has completed its file check with errors. You must fix the errors before depositing. View details and address the errors in Argo at %{url}.'
-      errors_found: 'Errors found:'
-      more_errors:
-        one: 'And 1 more error, listed in the file check report in Argo.'
-        other: 'And %{count} more errors, listed in the file check report in Argo.'
   notifications:
     heading: 'Notifications'
     tabs:

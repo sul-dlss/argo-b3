@@ -70,12 +70,11 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       expect(email.from).to eq(['no-reply@sdr.stanford.edu'])
       expect(email.reply_to).to be_nil
       expect(email.subject).to eq("Maps SDR multi-item deposit #{id} file check complete")
-      expect(email.text_part.body.to_s).to include(
-        "Your SDR multi-item deposit #{id} (Maps) has successfully passed its file check. " \
-        "View details and complete the deposit in Argo at #{url}.",
-        "If you have questions, please contact the SDR team at #{Settings.support_email}."
-      )
-      html = Capybara.string(email.html_part.body.to_s)
+      html = Capybara.string(email.body.to_s)
+      expect(html).to have_css('p', text: "Your SDR multi-item deposit #{id} (Maps) has successfully passed its " \
+                                          "file check. View details and complete the deposit in Argo at #{url}.")
+      expect(html).to have_css('p', text: 'If you have questions, please contact the SDR team at ' \
+                                          "#{Settings.support_email}.")
       expect(html).to have_link(url, href: url)
       expect(html).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
     end
@@ -105,10 +104,10 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       send_due_email
 
       expect(email.subject).to eq("Maps SDR multi-item deposit #{multi_item_deposit_action.id} file check errors")
-      expect(email.text_part.body.to_s).to include('has completed its file check with errors.',
-                                                   "Errors found:\n- gh456jk7890: No rows\n- " \
-                                                   'gh456jk7890: Bad structure')
-      expect(Capybara.string(email.html_part.body.to_s)).to have_css('li', text: 'gh456jk7890: Bad structure')
+      html = Capybara.string(email.body.to_s)
+      expect(html).to have_css('p', text: 'has completed its file check with errors.')
+      expect(html).to have_css('li', exact_text: 'gh456jk7890: No rows')
+      expect(html).to have_css('li', exact_text: 'gh456jk7890: Bad structure')
     end
   end
 
@@ -121,8 +120,10 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
     end
 
     it 'lists only the first errors and says how many more there are' do
-      expect(email.text_part.body.to_s).to include("- bc123df4567: No rows\nAnd 2 more errors")
-      expect(email.text_part.body.to_s).not_to include('gh456jk7890')
+      html = Capybara.string(email.body.to_s)
+      expect(html).to have_css('li', count: 1, exact_text: 'bc123df4567: No rows')
+      expect(html).to have_css('p', text: 'And 2 more errors, listed in the file check report in Argo.')
+      expect(html).to have_no_text('gh456jk7890')
     end
   end
 
@@ -136,7 +137,7 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
     it 'leaves the description out of the email' do
       id = multi_item_deposit_action.id
       expect(email.subject).to eq("SDR multi-item deposit #{id} file check complete")
-      expect(email.text_part.body.to_s).to include("Your SDR multi-item deposit #{id} has successfully passed")
+      expect(Capybara.string(email.body.to_s)).to have_text("Your SDR multi-item deposit #{id} has successfully passed")
     end
   end
 

@@ -9,6 +9,6 @@
 
   <body>
     <%= yield %>
-    <p><%= t('layouts.mailer.footer_html', email: mail_to(Settings.support_email)) %></p>
+    <p>If you have questions, please contact the SDR team at <%= mail_to Settings.support_email %>.</p>
   </body>
 </html>
