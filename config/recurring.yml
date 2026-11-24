@@ -22,3 +22,6 @@ production:
   expired_bulk_actions_cleanup:
     class: ExpiredBulkActionsCleanupJob
     schedule: every day at 3:30am
+  notifications_cleanup:
+    class: NotificationsCleanupJob
+    schedule: every day at 3:45am

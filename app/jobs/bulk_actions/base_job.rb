@@ -113,8 +113,18 @@ module BulkActions
 
     def perform_broadcast
       Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
+      notify_finished
+    end
 
-      broadcast_toast(title: "#{bulk_action.label} completed", user: bulk_action.user)
+    # The bulk action has already completed, so a failure to notify is reported rather than failing the job,
+    # which a retry would perform again.
+    def notify_finished
+      BulkActionFinishedNotifier.with(record: bulk_action, label: bulk_action.label,
+                                      failure_count: bulk_action.druid_count_fail)
+                                .deliver(bulk_action.user, queue: :real_time)
+    rescue StandardError => e
+      Rails.logger.error(e.full_message)
+      Honeybadger.notify(e)
     end
 
     def log_start

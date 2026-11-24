@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :pinned_objects, dependent: :destroy
   has_many :pinned_searches, dependent: :destroy
   has_many :pinned_tags, dependent: :destroy
+  has_many :notifications, as: :recipient, dependent: :destroy, class_name: 'Noticed::Notification'
 
   EMAIL_SUFFIX = '@stanford.edu'
 

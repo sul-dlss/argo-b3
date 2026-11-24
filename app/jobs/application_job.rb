@@ -13,9 +13,6 @@ class ApplicationJob < ActiveJob::Base
   # @param [String] text optional body text for the toast
   # @param [Symbol] variant the toast color variant (e.g., :red for errors)
   def broadcast_toast(title:, user:, disappearing: true, text: nil, variant: :black)
-    component = SdrViewComponents::Elements::ToastComponent.new(title:, text:, variant:, disappearing:)
-    Turbo::StreamsChannel.broadcast_append_to('notifications', user,
-                                              target: 'toast-container',
-                                              html: ApplicationController.render(component, layout: false))
+    ToastBroadcaster.call(title:, user:, disappearing:, text:, variant:)
   end
 end

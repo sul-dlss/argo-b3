@@ -87,6 +87,22 @@ RSpec.describe BulkAction do
     end
   end
 
+  describe '#destroy' do
+    let(:bulk_action) { create(:bulk_action) }
+
+    before do
+      BulkActionFinishedNotifier.with(record: bulk_action, label: 'Reindex', failure_count: 0)
+                                .deliver(bulk_action.user, enqueue_job: false)
+    end
+
+    it 'deletes the notifications about it' do
+      bulk_action.destroy!
+
+      expect(Noticed::Event.count).to eq(0)
+      expect(Noticed::Notification.count).to eq(0)
+    end
+  end
+
   describe '.enqueue_job' do
     subject(:bulk_action) { described_class.create!(action_type: :reindex, user:) }
 
