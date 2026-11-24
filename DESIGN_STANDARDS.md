@@ -140,7 +140,7 @@ All pages, including staff-only and form pages, MUST conform to WCAG 2.2 level A
 
 - **TABLE-1 MUST** Tables use the gem's table components (`TableComponent`, `RawTableComponent`).
 - **TABLE-2 MUST** Every column has a header. A column of actions has a visually hidden header (e.g., "Actions"), not `label: ''`.
-- **TABLE-3 MUST** A table has an accessible name: its caption (`label:`, hidden with `show_label: false` when a heading already precedes it) or a caption containing the heading.
+- **TABLE-3 MUST** A table has an accessible name: its caption (`label:`, hidden with `show_label: false` when a heading already precedes it) or a caption containing the heading. A caption contains no links or controls, since Firefox tabs to them only after the table's own; put a heading with a link before the table instead.
 - **TABLE-4 MUST** An empty table shows `empty_message:` worded "No <things>." (e.g., "No events."), not a hand-written paragraph.
 - **TABLE-5 SHOULD** Column headers are words, not symbols (e.g., "Items", not "# of items").
 - **TABLE-6 MUST** Column widths come from a CSS class, not inline styles (see LAY-3).

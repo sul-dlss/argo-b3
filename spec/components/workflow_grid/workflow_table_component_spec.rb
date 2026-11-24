@@ -59,8 +59,10 @@ RSpec.describe WorkflowGrid::WorkflowTableComponent, type: :component do
       render_inline(component)
 
       table = page.find('table.table-data#workflow-table-accessionWF')
-      expect(table).to have_css('caption', text: 'accessionWF')
-      expect(table).to have_link('accessionWF', href: '/search?wps_workflows%5B%5D=accessionWF')
+      expect(table).to have_no_css('caption')
+      expect(table['aria-label']).to eq('accessionWF')
+      expect(page).to have_css('h2 a', text: 'accessionWF')
+      expect(page).to have_link('accessionWF', href: '/search?wps_workflows%5B%5D=accessionWF')
       first_row = table.find('tbody tr:first-child')
       expect(first_row).to have_css('th', text: /1\..+start-accession/m)
       expect(page).to have_link('start-accession', href: '/search?wps_workflows%5B%5D=accessionWF%3Astart-accession')
@@ -83,7 +85,7 @@ RSpec.describe WorkflowGrid::WorkflowTableComponent, type: :component do
       render_inline(component)
 
       table = page.find('table.table-data#workflow-table-accessionWF')
-      expect(table).to have_css('caption', text: 'accessionWF')
+      expect(table['aria-label']).to eq('accessionWF')
       row = table.find('tbody tr:nth-child(4)')
       expect(row).to have_css('th', text: /4\..+shelve/m)
       cells = row.all('td')
