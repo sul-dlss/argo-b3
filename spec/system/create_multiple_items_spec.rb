@@ -531,6 +531,11 @@ RSpec.describe 'Create multiple items' do
                                                       'Please try again.')
       expect(page).to have_button('Register items')
 
+      # The form opens at the top.
+      wait_for_animation_frame
+      expect(page).to have_no_css(':focus')
+      expect(window_scroll_y).to eq(0)
+
       expect(BulkActions::RegisterFormJob).not_to have_been_enqueued
       expect(BulkAction.count).to eq(0)
     end
@@ -544,9 +549,12 @@ RSpec.describe 'Create multiple items' do
 
       ValidateFormJob.perform_now(form_validation_action:)
 
-      expect(page).to have_css('.alert-danger',
+      # The form opens at the alert.
+      expect(page).to have_css('.alert-danger:focus',
                                text: 'Fix the errors or delete items below and click "Register items" again, ' \
                                      'or click "Clear all items and enter again."')
+      expect(window_scroll_y).to be > 0
+      expect(scrolled_to_focused_element?).to be true
 
       # Only the item with errors is displayed.
       expect(item_registrations).to have_css('.form-instance', count: 1)
@@ -559,13 +567,48 @@ RSpec.describe 'Create multiple items' do
 
       expect(page).to have_no_text('Enter each item individually')
 
+      # Reloading does not open at the alert. (Scrolled to the top first, since the browser restores the scroll
+      # position on reload.)
+      page.execute_script('window.scrollTo(0, 0)')
+      page.refresh
+      expect(page).to have_css('.alert-danger', text: 'Fix the errors or delete items below')
+      wait_for_animation_frame
+      expect(page).to have_no_css(':focus')
+      expect(window_scroll_y).to eq(0)
+
       click_button 'Clear all items and enter again'
 
+      # The form opens at the choice of how to enter items.
+      expect(page).to have_field('Upload CSV from computer', type: 'radio', focused: true)
+      expect(scrolled_to_focused_element?).to be true
       expect(page).to have_text('Enter each item individually')
       expect(page).to have_no_button('Clear all items and enter again')
       expect(item_registrations).to have_css('.form-instance', count: 1)
       expect(page).to have_field('Source ID', with: '')
       expect(page).to have_no_field(with: 'sul:first-item', type: 'hidden', visible: :hidden)
+    end
+  end
+
+  context 'when there are item errors and errors in the fields above the items' do
+    it 'opens the form at the top' do
+      visit_new_multiple_item
+
+      fill_in_registration_settings
+      fill_in_tag 'items_registration[other_tags_attributes][0][tag]', with: 'Registered By'
+      fill_in_valid_and_invalid_item
+
+      click_button 'Register items'
+
+      form_validation_action = wait_for_validating_page
+
+      ValidateFormJob.perform_now(form_validation_action:)
+
+      expect(page).to have_css('.alert-danger', text: 'Fix the errors or delete items below')
+      expect(page).to have_css('.invalid-feedback',
+                               text: 'must be a series of 2 or more strings delimited with space-padded colons')
+      wait_for_animation_frame
+      expect(page).to have_no_css(':focus')
+      expect(window_scroll_y).to eq(0)
     end
   end
 

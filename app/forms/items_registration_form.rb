@@ -73,6 +73,14 @@ class ItemsRegistrationForm < ApplicationForm
     @invalid_item_registrations ||= item_registrations.to_a.select { |item_registration| item_registration.errors.any? }
   end
 
+  # @return [Boolean] true if the only errors are in item registrations, and not in the fields above them
+  #   (e.g., APO, access, or tags). Validation copies the errors of nested forms to this form, keyed by
+  #   "<association>[<index>].<attribute>".
+  def errors_only_in_item_registrations?
+    invalid_item_registrations.any? &&
+      errors.attribute_names.all? { |attribute| attribute.to_s.start_with?('item_registrations[') }
+  end
+
   private
 
   # Only some content types may be deposited with Goobi.

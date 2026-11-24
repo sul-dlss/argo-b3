@@ -24,7 +24,8 @@
     <% end %>
 
     <% if @multi_item_deposit_action.initiating_deposit_completed_at.present? %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.deposit_results.heading'), classes: 'mb-3') %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.deposit_results.heading'), classes: 'mb-3',
+                                                                   data: { controller: ('focus-on-load' if @focus_results) }) %>
 
       <%= render MultiItemDeposit::DepositErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>

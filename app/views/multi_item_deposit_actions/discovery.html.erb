@@ -90,7 +90,8 @@
       <% end %>
     <% end %>
     <% if @multi_item_deposit_action.discovery_completed_at.present? %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.discovery_results.heading'), classes: 'mb-3') %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.discovery_results.heading'), classes: 'mb-3',
+                                                                   data: { controller: ('focus-on-load' if @focus_results) }) %>
 
       <% unless @multi_item_deposit_action.discovery_succeeded? %>
         <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, title: t('edit.multi_item_deposits.edit.discovery_errors_alert.title')) do %>

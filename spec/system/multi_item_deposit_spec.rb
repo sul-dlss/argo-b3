@@ -114,8 +114,10 @@ RSpec.describe 'Multi-item deposit' do
     end
     MultiItemDeposit::DiscoverFilesFinishJob.perform_now(multi_item_deposit_action:)
 
-    # The wait page refreshes to show the results.
-    expect(page).to have_css('h2', text: 'Results of checking manifest')
+    # The wait page refreshes to show the results, opening at them.
+    expect(page).to have_css('h2:focus', text: 'Results of checking manifest')
+    expect(window_scroll_y).to be > 0
+    expect(scrolled_to_focused_element?).to be true
     expect(page).to have_css('.alert-success', text: 'No errors with manifest')
     expect(page).to have_no_css('.alert-danger')
     expect(page).to have_no_table('Error details')
@@ -154,19 +156,24 @@ RSpec.describe 'Multi-item deposit' do
 
     run_structure_jobs(multi_item_deposit_action)
 
-    # The wait page refreshes to show the results.
-    expect(page).to have_css('h2', text: 'Results of checking files')
+    # The wait page refreshes to show the results, opening at them.
+    expect(page).to have_css('h2:focus', text: 'Results of checking files')
+    expect(window_scroll_y).to be > 0
+    expect(scrolled_to_focused_element?).to be true
     summary_rows = page.find('table[aria-label="Summary"]').all('tbody tr')
     expect(summary_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
       .to eq([%w[bc123df4567 folder1 1 OK file redeposit],
               %w[cd234fg5678 folder2 1 OK file redeposit]])
     expect(page).to have_field('Publish and preserve all files', checked: true)
 
-    # Returning to discovery discards nothing.
+    # Returning to discovery discards nothing, and opens at the top.
     click_on 'Previous'
 
     expect(page).to have_css('h2', text: 'Results of checking manifest')
     expect(multi_item_deposit_action.reload).to be_discovery_step
+    wait_for_animation_frame
+    expect(page).to have_no_css('h2:focus')
+    expect(window_scroll_y).to eq(0)
 
     click_on 'Next'
 
@@ -202,13 +209,24 @@ RSpec.describe 'Multi-item deposit' do
 
     run_deposit_job(multi_item_deposit_action, changed_druids: ['druid:cd234fg5678'])
 
-    # The wait page refreshes to show the errors, and nothing is deposited.
-    expect(page).to have_css('h2', text: 'Results of checking version status')
+    # The wait page refreshes to show the errors, opening at them, and nothing is deposited.
+    expect(page).to have_css('h2:focus', text: 'Results of checking version status')
+    expect(window_scroll_y).to be > 0
+    expect(scrolled_to_focused_element?).to be true
     error_rows = page.find('table[aria-label="Error details"]').all('tbody tr')
     expect(error_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
       .to eq([['cd234fg5678', 'Object changed since discovery; re-run Discover files']])
     expect(page).to have_field('Version description', with: 'Adding files')
     expect(version_service).not_to have_received(:open)
+
+    # Reloading does not open at the results. (Scrolled to the top first, since the browser restores the scroll
+    # position on reload.)
+    page.execute_script('window.scrollTo(0, 0)')
+    page.refresh
+    expect(page).to have_css('h2', text: 'Results of checking version status')
+    wait_for_animation_frame
+    expect(page).to have_no_css('h2:focus')
+    expect(window_scroll_y).to eq(0)
 
     click_on 'Check version status and deposit'
 

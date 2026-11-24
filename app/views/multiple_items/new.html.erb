@@ -60,14 +60,15 @@
 
     <div id="item-registrations">
     <% if @items_registration_form.invalid_item_registrations.blank? %>
+      <%# After clearing the items, the form opens at the choice of how to enter them again. %>
       <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(form:, field_name: :items_choice,
-                                                                         data: { controller: 'radio' },
+                                                                         data: { controller: ['radio', ('focus-on-load' if @focus_items_choice)].compact.join(' ') },
                                                                          classes: 'my-fieldset',
                                                                          label: 'How do you want to enter items?') do |group| %>
       <% group.with_radio_button(container_classes: 'my-fieldset',
                                  label_text: 'Upload CSV from computer',
                                  input_value: ItemsRegistrationForm::UPLOAD_CSV_CHOICE,
-                                 input_data: { radio_target: 'radio', action: 'radio#toggle' }) do %>
+                                 input_data: { radio_target: 'radio', action: 'radio#toggle', focus_on_load_target: 'focus' }) do %>
         <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                                field_name: :csv_file,
                                                                container_classes: 'my-fieldset',
@@ -99,7 +100,8 @@
       <% end %>
       <% end %>
     <% else %>
-      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger) do %>
+      <%# When validation has just found errors only in the items, the form opens at this alert. %>
+      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, data: { controller: ('focus-on-load' if @focus_item_errors) }) do %>
         <%= t('edit.multiple_items.new.invalid_items_alert',
               register_label: t('edit.multiple_items.new.buttons.register'),
               clear_label: t('edit.multiple_items.new.buttons.clear')) %>

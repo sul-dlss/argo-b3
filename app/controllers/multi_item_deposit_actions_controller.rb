@@ -3,6 +3,8 @@
 # Controller for Multi-Item Deposits.
 # It drives the deposit's three steps and their downloads, which keeps it slightly over the class length limit.
 class MultiItemDepositActionsController < ApplicationController # rubocop:disable Metrics/ClassLength
+  include ResultsFocusConcern
+
   NEXT_VALUE = 'next'
   PREVIOUS_VALUE = 'previous'
   PER_PAGE = 20
@@ -10,6 +12,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   before_action :set_multi_item_deposit_action, only: %i[edit update destroy structural_metadata_csv_template
                                                          discovery_report structure_report]
   before_action :set_structure_summary, only: %i[edit update]
+  before_action :set_focus_results, only: %i[edit]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -143,7 +146,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     MultiItemDeposit::DiscoveryStarter.call(multi_item_deposit_action: @multi_item_deposit_action,
                                             discovery_form: @discovery_form,
                                             effective_groups: current_effective_groups)
-    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    redirect_to_check_in_progress
   end
 
   def update_structure
@@ -159,7 +162,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
     MultiItemDeposit::StructureStarter.call(multi_item_deposit_action: @multi_item_deposit_action,
                                             structure_form: @structure_form)
-    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    redirect_to_check_in_progress
   end
 
   def update_deposit
@@ -175,7 +178,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     MultiItemDeposit::DepositStarter.call(multi_item_deposit_action: @multi_item_deposit_action,
                                           deposit_form: @deposit_form,
                                           effective_groups: current_effective_groups)
-    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+    redirect_to_check_in_progress
   end
 
   def build_submitted_deposit_form
@@ -209,6 +212,12 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
   end
 
+  # The page shows the check in progress, and then its results.
+  def redirect_to_check_in_progress
+    remember_results_focus(@multi_item_deposit_action)
+    redirect_to edit_multi_item_deposit_action_path(@multi_item_deposit_action)
+  end
+
   def set_multi_item_deposit_action
     @multi_item_deposit_action = MultiItemDepositAction.find(params.expect(:id))
   end
@@ -220,6 +229,12 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
     @structure_summary = MultiItemDeposit::StructureResults.new(multi_item_deposit_action: @multi_item_deposit_action)
                                                            .summary
+  end
+
+  # A step page opens at the results of a check that has just finished. While the check is in progress, the wait page
+  # is shown and the check is still remembered.
+  def set_focus_results
+    @focus_results = !wait? && take_results_focus?(@multi_item_deposit_action)
   end
 
   # A saved uploaded manifest is used for an upload unless another manifest is provided.

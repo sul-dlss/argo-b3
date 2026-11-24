@@ -153,6 +153,48 @@ RSpec.describe ItemsRegistrationForm do
     end
   end
 
+  describe '#errors_only_in_item_registrations?' do
+    let(:form) do
+      described_class.new(
+        apo_druid: 'druid:bc123df4567',
+        content_type: Cocina::Models::ObjectType.book,
+        access_view: 'world',
+        access_download: 'world',
+        item_registrations_attributes: [{ source_id: 'sul:5678' }],
+        **other_attributes
+      )
+    end
+    let(:other_attributes) { {} }
+
+    context 'when only item registrations have errors' do
+      it 'returns true' do
+        form.valid?
+
+        expect(form.errors_only_in_item_registrations?).to be true
+      end
+    end
+
+    context 'when a field above the item registrations also has an error' do
+      let(:other_attributes) { { access_view: nil } }
+
+      it 'returns false' do
+        form.valid?
+
+        expect(form.errors_only_in_item_registrations?).to be false
+      end
+    end
+
+    context 'when a tag also has an error' do
+      let(:other_attributes) { { other_tags_attributes: [{ tag: 'Registered By' }] } }
+
+      it 'returns false' do
+        form.valid?
+
+        expect(form.errors_only_in_item_registrations?).to be false
+      end
+    end
+  end
+
   describe 'tab-delimited items' do
     let(:items_choice) { described_class::ENTER_TAB_DELIMITED_CHOICE }
 

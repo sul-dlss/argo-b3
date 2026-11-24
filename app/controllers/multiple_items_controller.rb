@@ -9,9 +9,11 @@
 # 4. When the form validation is complete, the user is redirected if valid,
 #    or shown the form with errors if invalid.
 class MultipleItemsController < ApplicationController
+  include ResultsFocusConcern
+
   CLEAR_VALUE = 'clear'
 
-  def show # rubocop:disable Metrics/AbcSize
+  def show
     form_validation_action = FormValidationAction.find(params.expect(:id))
     authorize! form_validation_action, with: MultipleItemsPolicy
 
@@ -23,9 +25,7 @@ class MultipleItemsController < ApplicationController
       flash[:toast] = "#{bulk_action_config.label} submitted"
       redirect_to bulk_action_path(bulk_action)
     when 'invalid', 'failed'
-      set_form_options(apply_apo_defaults_on_connect: false)
-      flash.now[:danger] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
-      render :new, status: :unprocessable_content
+      render_validated_form(form_validation_action)
     else
       render :show
     end
@@ -45,18 +45,29 @@ class MultipleItemsController < ApplicationController
     if params[:commit] == CLEAR_VALUE
       @items_registration_form.item_registrations.clear
       set_form_options(apply_apo_defaults_on_connect: false)
+      @focus_items_choice = true
       render :new, status: :unprocessable_content
     else
       form_validation_action = FormValidationAction.create!(user: current_user, form: @items_registration_form,
                                                             status: 'queued')
 
       ValidateFormJob.perform_later(form_validation_action:)
+      remember_results_focus(form_validation_action)
 
       redirect_to multiple_item_path(form_validation_action.id)
     end
   end
 
   private
+
+  def render_validated_form(form_validation_action)
+    set_form_options(apply_apo_defaults_on_connect: false)
+    flash.now[:danger] = I18n.t('edit.multiple_items.errors.failed') if form_validation_action.status_failed?
+    # The form opens at the item errors when validation has just found only them; otherwise at the top.
+    @focus_item_errors = take_results_focus?(form_validation_action) &&
+                         @items_registration_form.errors_only_in_item_registrations?
+    render :new, status: :unprocessable_content
+  end
 
   # @param apply_apo_defaults_on_connect [Boolean] true to apply the selected APO's defaults when the form is
   #   displayed. Only a new form does, so that a form redisplayed after validation (which may have no errors,

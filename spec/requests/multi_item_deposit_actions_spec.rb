@@ -929,6 +929,25 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(MultiItemDeposit::StructureJob).to have_been_enqueued.with(item_deposit_action:)
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
+
+      it 'opens the structure page at the results once checking files finishes, and only then' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        # The wait page is shown while checking files.
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+        expect(Capybara.string(response.body)).to have_no_css('[data-controller~="focus-on-load"]')
+
+        multi_item_deposit_action.reload.structuring_completed!
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+        expect(Capybara.string(response.body)).to have_css('h2[data-controller="focus-on-load"]',
+                                                           text: 'Results of checking files')
+
+        # e.g., reloading
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+        expect(Capybara.string(response.body)).to have_css('h2', text: 'Results of checking files')
+        expect(Capybara.string(response.body)).to have_no_css('[data-controller~="focus-on-load"]')
+      end
     end
 
     context 'when building the structure from an uploaded structural metadata CSV' do
@@ -1023,6 +1042,8 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(rendered_page).to have_css('h3', text: 'Summary')
+        # No check ran, so the page does not open at the earlier results.
+        expect(rendered_page).to have_no_css('[data-controller~="focus-on-load"]')
         expect(rendered_page).to have_css('.card', text: '# of items') do |box|
           box.has_css?('.card-text p', exact_text: '0')
         end
