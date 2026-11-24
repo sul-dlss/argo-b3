@@ -16,6 +16,9 @@ namespace :reports do
   task :content_errors, %i[path processes] => :environment do |_task, args| # rubocop:disable Metrics/BlockLength
     # Unbuffered, so progress shows promptly when stdout is redirected to a file.
     $stdout.sync = true
+    # As the gem does for a Rails console, so millions of DSA and Solr requests aren't sent as Insights events.
+    Honeybadger::Agent.instance.config[:'insights.enabled'] = false
+    Honeybadger::Agent.instance.stop_insights
     path = args.fetch(:path)
     druid_slices = Searchers::DroDruidSlices.new(slice_size: 25)
     checked_count = 0
