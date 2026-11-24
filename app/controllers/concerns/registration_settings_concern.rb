@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Concern for controllers whose registration form can be prefilled with the settings of an existing item,
-# given by the from_druid param ("Copy registration settings from" on the item show page).
+# given by the from_druid param ("Copy registration settings for" on the item show page).
 module RegistrationSettingsConcern
   extend ActiveSupport::Concern
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Show
-  # Component for the item page's Copy registration settings from dropdown, which opens Register an item or
+  # Component for the item page's Copy registration settings for dropdown, which opens Register an item or
   # Register multiple items prefilled with the item's settings.
   class CopyRegistrationSettingsDropdownComponent < ApplicationComponent
     # @param druid [String] the druid of the item

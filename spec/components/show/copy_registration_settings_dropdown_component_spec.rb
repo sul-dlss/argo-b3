@@ -11,7 +11,7 @@ RSpec.describe Show::CopyRegistrationSettingsDropdownComponent, type: :component
     render_inline(component)
 
     expect(page).to have_css('button.dropdown-toggle[data-bs-toggle="dropdown"]:not([disabled])',
-                             text: 'Copy registration settings from')
+                             text: 'Copy registration settings for')
     expect(page.all('.dropdown-menu a').map { [it.text.strip, it[:href]] }).to eq(
       [['Single item', '/items/new?from_druid=druid%3Abc123df4567'],
        ['Multiple items', '/multiple_items/new?from_druid=druid%3Abc123df4567']]
@@ -24,7 +24,7 @@ RSpec.describe Show::CopyRegistrationSettingsDropdownComponent, type: :component
     it 'renders a disabled dropdown toggle' do
       render_inline(component)
 
-      expect(page).to have_button('Copy registration settings from', class: 'dropdown-toggle', disabled: true)
+      expect(page).to have_button('Copy registration settings for', class: 'dropdown-toggle', disabled: true)
     end
   end
 end

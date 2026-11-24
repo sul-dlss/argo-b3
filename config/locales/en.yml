@@ -98,7 +98,7 @@ en:
     advanced: "Advanced search"
   show:
     copy_registration_settings:
-      label: "Copy registration settings from"
+      label: "Copy registration settings for"
       multiple_items: "Multiple items"
       single_item: "Single item"
     status:

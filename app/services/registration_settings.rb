@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The registration settings of an existing item, copied into the forms for registering new items
-# ("Copy registration settings from" on the item show page).
+# ("Copy registration settings for" on the item show page).
 # Identifiers (source ID, catalog record ID, barcode) and the description are not copied.
 class RegistrationSettings
   # Attributes of the item's cocina model that are copied.

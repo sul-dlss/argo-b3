@@ -90,7 +90,7 @@ RSpec.describe 'Show collection' do
 
     # Only APOs can register collections
     expect(page).to have_no_button('Register & deposit collection')
-    expect(page).to have_no_button('Copy registration settings from')
+    expect(page).to have_no_button('Copy registration settings for')
 
     # Overview table
     expect(page).to have_css('table[id="overview-table"] caption', text: 'Overview')
