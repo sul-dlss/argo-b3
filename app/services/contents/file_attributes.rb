@@ -28,7 +28,7 @@ module Contents
 
     # Attributes for a file that is accompanied by OCR. Note that application/xml is only present here,
     # since an XML file that does not accompany an image is some other sort of metadata.
-    # Unlike pre-assembly, a JP2 is not preserved because it is accompanied by OCR, so it is not present here.
+    # Unlike in pre-assembly, OCR does not make a JP2 preserved, so JP2 is not present here.
     ATTRIBUTES_FOR_MIME_TYPE_WITH_OCR = {
       MimeTypes::TIFF => { preserve: true, shelve: false, publish: false },
       MimeTypes::JPEG => { preserve: true, shelve: false, publish: false },
