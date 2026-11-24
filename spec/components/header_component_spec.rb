@@ -18,8 +18,9 @@ RSpec.describe HeaderComponent, type: :component do
     expect(page).to have_link(href: '/', exact_text: 'Argo B3')
     expect(page).to have_link(href: 'mailto:argo-feedback@lists.stanford.edu', text: 'Feedback')
     expect(page).to have_css('.nav-item', text: 'Logged in as Test User')
-    expect(page).to have_css('.nav-item:contains("Logged in as Test User") + .nav-item a[href="/notifications"]',
-                             exact_text: 'Notifications')
+    expect(page).to have_css('.nav-item:has(a[href="/notifications"]) + .nav-item a[href^="mailto:"]',
+                             exact_text: 'Feedback') # Notifications comes before Feedback
+    expect(page).to have_link('Notifications', href: '/notifications')
     expect(page).to have_link('Workflow status', href: '/workflow_grid')
   end
 
