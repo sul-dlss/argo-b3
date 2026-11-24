@@ -7,6 +7,14 @@
   <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
 
   <%= form_with model: @deposit_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
+    <% if @multi_item_deposit_action.initiating_deposit_completed_at.present? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.deposit_results.heading'), classes: 'mb-3') %>
+
+      <%= render MultiItemDeposit::DepositErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+    <% end %>
+
     <% if @multi_item_deposit_action.all_initial_versions? %>
       <%# When all are initial versions, the version description is fixed, so rendering a disabled text input. %>
       <%= render Edit::VersionDescriptionComponent.new(
@@ -21,12 +29,6 @@
             label_classes: 'fw-bold',
             help_text: t('edit.multi_item_deposits.fields.version_description.help_text')
           ) %>
-    <% end %>
-
-    <% if @multi_item_deposit_action.initiating_deposit_completed_at.present? %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.deposit_results.heading'), classes: 'mb-3') %>
-
-      <%= render MultiItemDeposit::DepositErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
 
     <%= render Elements::FormFooterComponent.new(cancel_path: root_path, confirm_cancel: true) do %>

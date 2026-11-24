@@ -7,6 +7,13 @@ RSpec.describe 'Multi-item deposit actions' do
   let(:user) { create(:user, groups: [workgroup]) }
   let(:rendered_page) { Capybara.string(response.body) }
 
+  # Names of the step form's visible fields rendered before the heading.
+  def fields_before(heading)
+    rendered_page.all(:xpath, "//form[contains(@class, 'b3-form')]//*[self::input or self::textarea or self::select]" \
+                              "[not(@type='hidden')][following::h2[normalize-space()='#{heading}']]")
+                 .map { |field| field[:name] }
+  end
+
   before do
     sign_in(user)
   end
@@ -277,6 +284,7 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_css('h2', text: 'Results of checking manifest')
+        expect(fields_before('Results of checking manifest')).to be_empty
         expect(rendered_page).to have_css('h3', text: 'Summary')
         expect(rendered_page).to have_link(
           'Download report', href: discovery_report_multi_item_deposit_action_path(multi_item_deposit_action)
@@ -395,6 +403,7 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_css('h2', text: 'Results of checking files')
+        expect(fields_before('Results of checking files')).to be_empty
         expect(rendered_page).to have_css('h3', text: 'Summary')
         expect(rendered_page).to have_css('.card', text: '# with errors')
         expect(rendered_page).to have_css('table[aria-label="Summary"] td', text: 'bc123df4567')
@@ -551,6 +560,7 @@ RSpec.describe 'Multi-item deposit actions' do
           get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
           expect(rendered_page).to have_css('h2', text: 'Results of checking version status')
+          expect(fields_before('Results of checking version status')).to be_empty
           table = rendered_page.find('table[aria-label="Error details"]')
           expect(table).to have_css('td', text: 'bc123df4567')
           expect(table).to have_css('span.text-danger', text: 'Version cannot be opened')

@@ -7,6 +7,26 @@
   <%= render MultiItemDeposit::ProgressStepperComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
 
   <%= form_with model: @discovery_form, url: multi_item_deposit_action_path(@multi_item_deposit_action), method: :patch, class: 'b3-form' do |form| %>
+    <% if @multi_item_deposit_action.discovery_completed_at.present? %>
+      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.discovery_results.heading'), classes: 'mb-3') %>
+
+      <% unless @multi_item_deposit_action.discovery_succeeded? %>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, title: t('edit.multi_item_deposits.edit.discovery_errors_alert.title')) do %>
+          <%= t('edit.multi_item_deposits.edit.discovery_errors_alert.body', discover_label: t('edit.multi_item_deposits.edit.buttons.discover')) %>
+        <% end %>
+      <% else %>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :success, title: t('edit.multi_item_deposits.edit.no_discovery_errors_alert.title')) do %>
+          <%= t('edit.multi_item_deposits.edit.no_discovery_errors_alert.body', next_label: t('edit.multi_item_deposits.edit.buttons.next')) %>
+        <% end %>
+      <% end %>
+
+      <%= render MultiItemDeposit::DiscoverySummaryComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
+      <%= render MultiItemDeposit::DiscoveryErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
+
+      <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
+    <% end %>
+
     <%= render SdrViewComponents::Forms::TextAreaComponent.new(form:,
                                                                field_name: :description,
                                                                container_classes: 'my-fieldset',
@@ -88,23 +108,6 @@
                                                                   input_placeholder: t('edit.multi_item_deposits.fields.mount_path.placeholder')) %>
         <% end %>
       <% end %>
-    <% end %>
-    <% if @multi_item_deposit_action.discovery_completed_at.present? %>
-      <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.discovery_results.heading'), classes: 'mb-3') %>
-
-      <% unless @multi_item_deposit_action.discovery_succeeded? %>
-        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, title: t('edit.multi_item_deposits.edit.discovery_errors_alert.title')) do %>
-          <%= t('edit.multi_item_deposits.edit.discovery_errors_alert.body', discover_label: t('edit.multi_item_deposits.edit.buttons.discover')) %>
-        <% end %>
-      <% else %>
-        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :success, title: t('edit.multi_item_deposits.edit.no_discovery_errors_alert.title')) do %>
-          <%= t('edit.multi_item_deposits.edit.no_discovery_errors_alert.body', next_label: t('edit.multi_item_deposits.edit.buttons.next')) %>
-        <% end %>
-      <% end %>
-
-      <%= render MultiItemDeposit::DiscoverySummaryComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
-
-      <%= render MultiItemDeposit::DiscoveryErrorDetailsTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
     <% end %>
     <%= render Elements::FormFooterComponent.new(cancel_path: root_path, confirm_cancel: true) do %>
       <% next_enabled = @multi_item_deposit_action.discovery_succeeded? %>
