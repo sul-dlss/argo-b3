@@ -45,4 +45,25 @@ RSpec.describe Searchers::DroDruidSlices do
 
     expect(druid_slices.total_count).to eq(4)
   end
+
+  context 'with a limit' do
+    subject(:druid_slices) { described_class.new(slice_size: 2, limit: 3) }
+
+    it 'returns only the first druids, without querying Solr after reaching the limit' do
+      expect(Array.new(3) { druid_slices.next }).to eq([['druid:bc123df4567', 'druid:hj456km7891'],
+                                                        ['druid:mn789pq0123'],
+                                                        nil])
+      expect(druid_slices.total_count).to eq(3)
+      expect(Search::SolrService).to have_received(:post).once
+    end
+  end
+
+  context 'with a limit larger than the number of DROs' do
+    subject(:druid_slices) { described_class.new(slice_size: 2, limit: 10) }
+
+    it 'returns all of the druids' do
+      expect(Array.new(4) { druid_slices.next }.compact.flatten.size).to eq(4)
+      expect(druid_slices.total_count).to eq(4)
+    end
+  end
 end
