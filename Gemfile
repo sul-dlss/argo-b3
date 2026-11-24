@@ -55,6 +55,7 @@ gem 'kaminari'
 gem 'marcel' # For MIME type detection
 gem 'mission_control-jobs'
 gem 'okcomputer'
+gem 'parallel' # runs the content errors sweep in processes
 gem 'positioning' # For ordering ContentFileSets and ContentFiles
 gem 'prawn' # PDF generation; used in TracksheetService
 gem 'prawn-table' # table support for Prawn PDFs

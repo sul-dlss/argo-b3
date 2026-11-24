@@ -811,6 +811,7 @@ DEPENDENCIES
   mission_control-jobs
   okcomputer
   overmind
+  parallel
   parallel_tests
   pg
   positioning

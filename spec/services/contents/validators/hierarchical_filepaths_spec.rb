@@ -46,4 +46,30 @@ RSpec.describe Contents::Validators::HierarchicalFilepaths do
       end
     end
   end
+
+  context 'when the Content is unsaved' do
+    let(:content) { Contents::Builder.build(cocina_object:) }
+    let(:cocina_object) do
+      build(:dro_with_metadata, id: 'druid:bc123df4567').new(
+        structural: {
+          contains: %w[folder1/image1.tif image3.tif folder2/image2.tif].map do |filename|
+            {
+              type: Cocina::Models::FileSetType.image,
+              externalIdentifier: "bc123df4567_#{filename.parameterize}",
+              label: '',
+              version: 1,
+              structural: {
+                contains: [{ type: Cocina::Models::ObjectType.file, externalIdentifier: "bc123df4567_#{filename}",
+                             label: filename, filename:, version: 1 }]
+              }
+            }
+          end
+        }
+      )
+    end
+
+    it 'has an error listing the files' do
+      expect(result).to have_attributes(errors: [error], warnings: [])
+    end
+  end
 end
