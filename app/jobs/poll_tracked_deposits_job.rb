@@ -5,20 +5,26 @@
 # the object was purged or the draft discarded). An error does not end tracking.
 class PollTrackedDepositsJob < ApplicationJob
   queue_as :cleanup
+  # Overlapping runs (e.g., when queued behind other jobs) would notify twice.
+  limits_concurrency key: 'poll_tracked_deposits', duration: 1.hour
+
+  # Bounds the druids in each Solr titles query, which Solr's maxBooleanClauses limits.
+  BATCH_SIZE = 500
 
   def perform
-    tracked_deposits = TrackedDeposit.includes(:user).to_a
-    return if tracked_deposits.empty?
-
-    statuses = Sdr::VersionService.statuses(druids: tracked_deposits.map(&:druid).uniq)
-    by_outcome = tracked_deposits.group_by do |tracked_deposit|
-      outcome(tracked_deposit, status: statuses[tracked_deposit.druid])
-    end
-    by_outcome.fetch(:abandoned, []).each(&:destroy!)
-    complete(by_outcome.fetch(:complete, []))
+    TrackedDeposit.includes(:user).find_in_batches(batch_size: BATCH_SIZE) { |batch| poll(batch) }
   end
 
   private
+
+  def poll(tracked_deposits)
+    statuses = Sdr::VersionService.statuses(druids: tracked_deposits.map(&:druid).uniq)
+    tracked_deposits_by_outcome = tracked_deposits.group_by do |tracked_deposit|
+      outcome(tracked_deposit, status: statuses[tracked_deposit.druid])
+    end
+    tracked_deposits_by_outcome.fetch(:abandoned, []).each(&:destroy!)
+    complete(tracked_deposits_by_outcome.fetch(:complete, []))
+  end
 
   # @return [Symbol] :complete, :abandoned (no longer in flight), or :in_flight
   def outcome(tracked_deposit, status:)
@@ -33,12 +39,19 @@ class PollTrackedDepositsJob < ApplicationJob
 
     titles = titles_for(druids: tracked_deposits.map(&:druid))
     tracked_deposits.each do |tracked_deposit|
-      druid = tracked_deposit.druid
-      deliver_notification(DepositCompleteNotifier, recipient: tracked_deposit.user, druid:,
-                                                    version: tracked_deposit.version,
-                                                    title: titles.fetch(druid, DruidSupport.bare_druid_from(druid)))
-      tracked_deposit.destroy!
+      notify_complete(tracked_deposit, title: titles.fetch(tracked_deposit.druid,
+                                                           DruidSupport.bare_druid_from(tracked_deposit.druid)))
     end
+  end
+
+  # Tracking ends only once the user is notified, so a failure to notify is retried by the next run.
+  def notify_complete(tracked_deposit, title:)
+    DepositCompleteNotifier.with(druid: tracked_deposit.druid, version: tracked_deposit.version, title:)
+                           .deliver(tracked_deposit.user, queue: :real_time)
+    tracked_deposit.destroy!
+  rescue StandardError => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: tracked_deposit.druid })
   end
 
   # @return [Hash<String, String>] the titles, keyed by druid; objects not in Solr are omitted

@@ -11,7 +11,8 @@ class TrackedDeposit < ApplicationRecord
   # @param version [Integer] the version being deposited
   # @param user [User] the depositing user
   def self.track!(druid:, version:, user:)
-    find_or_initialize_by(druid:, version:).update!(user:)
+    # An upsert, so that concurrent deposits of the same version (e.g., a double submit) can't violate the unique index.
+    upsert({ druid:, version:, user_id: user.id }, unique_by: %i[druid version]) # rubocop:disable Rails/SkipsModelValidations
   end
 
   # @param status [Dor::Services::Client::ObjectVersion::VersionStatus, nil] the object's version status; nil if the

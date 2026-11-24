@@ -76,7 +76,7 @@ Notifications are built on [Noticed](https://github.com/excid3/noticed). Add a N
 
 Every Notification is stored and listed on the recipient's Notifications page until a recurring job deletes it after the retention period. Beyond that, the Notifier's `deliver_by` declarations determine how it is delivered: `DeliveryMethods::TurboToast` shows it as a toast on the user's open pages.
 
-Outcomes after accessioning starts (e.g., a Deposit becoming Complete) come from polling, not from DSA events: a Single-Object Deposit records a Tracked Deposit (druid, version, and depositing user), and a recurring job checks open Tracked Deposits about every 10 minutes with batched version status requests to DSA, notifying when one is Complete. Tracking ends when the version is Complete, or silently when it is no longer in flight (e.g., the object was purged or the draft discarded). Deposits started outside Argo-B3, Multi-Item Deposits, and Bulk Actions are not yet tracked.
+Outcomes after accessioning starts (e.g., a Deposit becoming Complete) come from polling DSA: a Single-Object Deposit records a Tracked Deposit (druid, version, and depositing user), and a recurring job checks open Tracked Deposits periodically with batched version status requests to DSA, notifying when one is Complete. Tracking ends when the version is Complete, or silently when it is no longer in flight (e.g., the object was purged or the draft discarded).
 
 ### Lookbook for SDR View Components
 

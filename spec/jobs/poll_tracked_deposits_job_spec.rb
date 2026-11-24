@@ -8,15 +8,14 @@ RSpec.describe PollTrackedDepositsJob do
   let(:user) { create(:user) }
   let(:objects_client) { instance_double(Dor::Services::Client::Objects, statuses:) }
   let(:statuses) { {} }
-  let(:solr_item) do
-    SearchResults::Item.new(solr_doc: { Search::Fields::ID => 'druid:bc123df4567',
-                                        Search::Fields::TITLE => 'The Gettysburg Address' })
-  end
+  let(:solr_docs) { [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address' }] }
   let(:toast_html) { [] }
 
   before do
     allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
-    allow(Searchers::ItemByDruid).to receive(:call).and_return([solr_item])
+    allow(Search::SolrService).to receive(:post) do
+      { 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } }
+    end
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to) do |*_args, html:, **|
       toast_html << Capybara.string(html)
     end
@@ -38,6 +37,32 @@ RSpec.describe PollTrackedDepositsJob do
     end
   end
 
+  context 'when there are more Tracked Deposits than fit in a batch' do
+    let(:solr_docs) do
+      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address' },
+       { 'id' => 'druid:cd234fg5678', 'display_title_ss' => 'A Second Title' }]
+    end
+
+    before do
+      stub_const("#{described_class}::BATCH_SIZE", 1)
+      allow(objects_client).to receive(:statuses) do |object_ids:|
+        object_ids.index_with { version_status(version: 2) }
+      end
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:)
+      create(:tracked_deposit, druid: 'druid:cd234fg5678', version: 2, user:)
+    end
+
+    it 'retrieves version statuses and titles for each batch' do
+      perform
+
+      expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:bc123df4567']).ordered
+      expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:cd234fg5678']).ordered
+      expect(Search::SolrService).to have_received(:post).twice
+      expect(user.notifications.count).to eq(2)
+      expect(TrackedDeposit.count).to eq(0)
+    end
+  end
+
   context 'when the tracked version is Complete' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2) } }
 
@@ -55,8 +80,9 @@ RSpec.describe PollTrackedDepositsJob do
                                            href: '/objects/druid:bc123df4567')
       expect(TrackedDeposit.count).to eq(0)
       expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:bc123df4567'])
-      expect(Searchers::ItemByDruid).to have_received(:call)
-        .with(druids: ['druid:bc123df4567'], user_scope: nil, fields: [Search::Fields::ID, Search::Fields::TITLE])
+      expect(Search::SolrService).to have_received(:post) do |request:|
+        expect(request).to include(fq: ['id:("druid:bc123df4567")'], fl: %w[id display_title_ss])
+      end
     end
   end
 
@@ -76,10 +102,9 @@ RSpec.describe PollTrackedDepositsJob do
   context 'when the object is not in Solr' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2) } }
 
-    before do
-      allow(Searchers::ItemByDruid).to receive(:call).and_return([])
-      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:)
-    end
+    let(:solr_docs) { [] }
+
+    before { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
 
     it 'uses the druid as the title' do
       perform
@@ -104,7 +129,7 @@ RSpec.describe PollTrackedDepositsJob do
 
       expect(TrackedDeposit.pluck(:druid)).to contain_exactly('druid:bc123df4567', 'druid:cd234fg5678')
       expect(user.notifications).to be_empty
-      expect(Searchers::ItemByDruid).not_to have_received(:call)
+      expect(Search::SolrService).not_to have_received(:post)
     end
   end
 
@@ -125,8 +150,37 @@ RSpec.describe PollTrackedDepositsJob do
     end
   end
 
+  context 'when notifying fails' do
+    let(:statuses) do
+      { 'druid:bc123df4567' => version_status(version: 2), 'druid:cd234fg5678' => version_status(version: 1) }
+    end
+    let(:solr_docs) do
+      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address' },
+       { 'id' => 'druid:cd234fg5678', 'display_title_ss' => 'Maps of Palo Alto' }]
+    end
+
+    before do
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:)
+      create(:tracked_deposit, druid: 'druid:cd234fg5678', version: 1, user:)
+      allow(Honeybadger).to receive(:notify)
+      allow(DepositCompleteNotifier).to receive(:with).and_call_original
+      allow(DepositCompleteNotifier).to receive(:with).with(hash_including(druid: 'druid:bc123df4567'))
+                                                      .and_raise(ActiveRecord::ConnectionNotEstablished)
+    end
+
+    it 'keeps tracking the deposit, so the next run notifies, and notifies of the others' do
+      perform
+
+      expect(TrackedDeposit.pluck(:druid)).to eq(['druid:bc123df4567'])
+      expect(user.notifications.sole.params).to include(druid: 'druid:cd234fg5678')
+      expect(Honeybadger).to have_received(:notify)
+    end
+  end
+
   context 'when there are more Tracked Deposits than fit in one statuses request' do
-    let(:druids) { Array.new(26) { |index| format('druid:bc%<index>03ddf%<index>04d', index:) } }
+    # Varying the first two and the last two characters.
+    let(:prefixes) { %w[bc cd df fg gh hj jk km mn np pq qr rs st tv vw wx xy yz zb bd cf dg fh gj hk] }
+    let(:druids) { prefixes.map { |prefix| "druid:#{prefix}123df45#{prefix}" } }
 
     before { druids.each { |druid| create(:tracked_deposit, druid:, version: 2, user:) } }
 
