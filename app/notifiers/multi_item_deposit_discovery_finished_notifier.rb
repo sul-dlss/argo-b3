@@ -19,11 +19,26 @@ class MultiItemDepositDiscoveryFinishedNotifier < ApplicationNotifier
       link_text = if error?
                     I18n.t('notifiers.multi_item_deposit_discovery_finished.text_with_errors',
                            name: params[:name], count: params[:error_count],
-                           formatted_count: ActiveSupport::NumberHelper.number_to_delimited(params[:error_count]))
+                           formatted_count: delimited(params[:error_count]))
                   else
                     I18n.t('notifiers.multi_item_deposit_discovery_finished.text', name: params[:name])
                   end
-      subject_link(link_text, multi_item_deposit_action_path(record))
+      subject_link(link_text, subject_path)
+    end
+
+    def subject_label
+      params[:name]
+    end
+
+    def subject_path
+      multi_item_deposit_action_path(record)
+    end
+
+    def detail
+      return unless error?
+
+      I18n.t('notifiers.multi_item_deposit_discovery_finished.detail_with_errors',
+             count: params[:error_count], formatted_count: delimited(params[:error_count]))
     end
 
     def error?

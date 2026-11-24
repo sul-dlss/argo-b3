@@ -29,6 +29,9 @@ RSpec.describe MultiItemDepositDiscoveryFinishedNotifier do
       notification = user.notifications.sole
       expect(notification.record).to eq(multi_item_deposit_action)
       expect(notification.title).to eq('Discovery finished')
+      expect(notification.subject_label).to eq('Multi-item deposit 1')
+      expect(notification.subject_path).to eq(path)
+      expect(notification.detail).to be_nil
     end
 
     it 'broadcasts a disappearing toast linking to the Multi-Item Deposit' do
@@ -48,6 +51,10 @@ RSpec.describe MultiItemDepositDiscoveryFinishedNotifier do
       expect(toast).to have_css('.toast .bg-stanford-digital-red', text: 'Discovery finished with errors')
       expect(toast).to have_no_css('.toast-disappear')
       expect(toast).to have_link('Discovery found errors in 1,200 items of Multi-item deposit 1.', href: path)
+    end
+
+    it 'summarizes the errors in the detail' do
+      expect(user.notifications.sole.detail).to eq('1,200 items have errors.')
     end
   end
 
