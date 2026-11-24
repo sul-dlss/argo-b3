@@ -13,6 +13,15 @@ reload_intervals:
 
 support_email: argo-feedback@lists.stanford.edu
 
+# Host for links in production emails; set per deploy destination (SETTINGS__HOST).
+host: ~
+
+smtp:
+  address: host.docker.internal
+  port: 25
+  # Set false if Postfix starts offering STARTTLS, as its certificate won't match host.docker.internal.
+  enable_starttls_auto: true
+
 dor_services:
   url: "http://localhost:3003"
   # To generate the token: docker-compose run dor-services-app rake generate_token

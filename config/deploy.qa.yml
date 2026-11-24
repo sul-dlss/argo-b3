@@ -9,6 +9,7 @@ servers:
 
 env:
   clear:
+    SETTINGS__HOST: argo-b3-qa.stanford.edu
     SETTINGS__SOLR__URL: https://sul-solr.stanford.edu/solr/argo_qa
     SETTINGS__DOR_SERVICES__URL: https://dor-services-qa-lb.stanford.edu
     SETTINGS__PRESERVATION_CATALOG__URL: https://preservation-catalog-qa.stanford.edu
