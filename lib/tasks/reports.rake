@@ -2,6 +2,16 @@
 
 namespace :reports do
   # One-off sweep for issue #1571. It reads only: it doesn't open versions, save objects, or start workflows.
+  #
+  # To run it in production, open a shell in the running app container:
+  #   bin/kamal-otk prod shell
+  # then, in that shell, start it in the background so it survives the shell closing:
+  #   nohup bin/rails "reports:content_errors[/tmp/content_errors.csv,4]" > /tmp/content_errors.log 2>&1 &
+  #   tail -f /tmp/content_errors.log
+  # Once it's done, copy the CSV out from a local terminal (--raw keeps Kamal's messages out of the CSV, and
+  # --roles web runs it in one container rather than also in the job container):
+  #   bin/kamal-otk prod app exec --reuse --raw --roles web "cat /tmp/content_errors.csv" > content_errors.csv
+  # /tmp is the host's, so the files survive a deploy, but a deploy while the sweep runs stops it.
   desc 'Write a CSV of the DROs whose Content errors would block a Deposit (args: path, processes; default 4)'
   task :content_errors, %i[path processes] => :environment do |_task, args| # rubocop:disable Metrics/BlockLength
     path = args.fetch(:path)
