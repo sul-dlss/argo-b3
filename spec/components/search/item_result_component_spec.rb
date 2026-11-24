@@ -15,10 +15,13 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders the result' do
       render_inline(component)
 
-      caption = page.find('table#item-result-bb123cd4567 caption')
-      expect(caption).to have_css('h3.h4 span', text: '2.')
-      expect(caption).to have_link('Test Title', href: "/objects/#{druid}/track?search_position=2")
-      expect(caption).to have_button('Pin')
+      table = page.find('table#item-result-bb123cd4567')
+      expect(table).to have_no_css('caption')
+      expect(table['aria-label']).to eq('Test Title')
+      heading = page.find('h3.h4.search-result-heading')
+      expect(heading).to have_css('span', text: '2.')
+      expect(heading).to have_link('Test Title', href: "/objects/#{druid}/track?search_position=2")
+      expect(heading).to have_button('Pin')
 
       expect(page).to have_table_value('item-result-bb123cd4567', 'Druid', 'bb123cd4567')
       expect(page).to have_css('.object-type-item .object-type-pill.rounded-pill.fs-5.fw-bold', text: 'Item')
@@ -36,9 +39,9 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'renders an unpin button beside the result title' do
       render_inline(component)
 
-      caption = page.find('table#item-result-bb123cd4567 caption')
-      expect(caption).to have_button('Unpin')
-      expect(caption).to have_css('.bi-pin-fill')
+      heading = page.find('h3.search-result-heading')
+      expect(heading).to have_button('Unpin')
+      expect(heading).to have_css('.bi-pin-fill')
     end
   end
 
@@ -48,9 +51,9 @@ RSpec.describe Search::ItemResultComponent, type: :component do
     it 'does not render a pin button' do
       render_inline(component)
 
-      caption = page.find('table#item-result-bb123cd4567 caption')
-      expect(caption).to have_no_button('Pin')
-      expect(caption).to have_no_button('Unpin')
+      heading = page.find('h3.search-result-heading')
+      expect(heading).to have_no_button('Pin')
+      expect(heading).to have_no_button('Unpin')
     end
   end
 
