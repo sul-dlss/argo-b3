@@ -316,6 +316,11 @@ en:
         files_section:
           label: 'Files'
           heading: 'Files (%{file_count})'
+        new_files:
+          label: "New files have been added. How should they be structured?"
+          append: "Append files to structure"
+          rebuild: "Rebuild structure"
+          rebuild_help: "Replaces all existing resources, including any changes to labels, order, or file settings."
         files_required: "Add at least one file to continue."
         buttons:
           cancel_confirm: "Discard unsaved changes to files?"

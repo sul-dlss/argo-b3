@@ -737,10 +737,28 @@ RSpec.describe 'Manage files' do
       upload_file('dropzone_upload2.txt')
     end
 
+    it 'asks how to structure the new file until it is deleted' do
+      build_structure_then_upload_another_file
+
+      within_fieldset('New files have been added. How should they be structured?') do
+        expect(page).to have_checked_field('Append files to structure')
+        rebuild = find_field('Rebuild structure', checked: false)
+        expect(page).to have_css("##{rebuild['aria-describedby']}",
+                                 text: 'Replaces all existing resources, including any changes to labels, order, ' \
+                                       'or file settings.')
+      end
+
+      click_button 'Delete dropzone_upload2.txt'
+
+      expect(page).to have_no_css('tbody th', exact_text: 'dropzone_upload2.txt')
+      expect(page).to have_no_text('New files have been added.')
+    end
+
     it 'appends the file to the structure when leaving the add and edit files step' do
       build_structure_then_upload_another_file
 
       original_content_file = content.content_files.sole
+      expect(page).to have_checked_field('Append files to structure')
 
       structure_files(append: true)
 
@@ -762,6 +780,19 @@ RSpec.describe 'Manage files' do
       expect(content.content_file_sets.pluck(:position)).to eq([1, 2])
       expect(ContentFileSet.exists?(original_content_file_set.id)).to be false
       expect(ContentFile.exists?(original_content_file.id)).to be false
+      expect(content.content_files.map(&:filepath)).to eq(['dropzone_upload.txt', 'dropzone_upload2.txt'])
+    end
+
+    it 'rebuilds the structure when chosen on leaving the add and edit files step' do
+      build_structure_then_upload_another_file
+
+      original_content_file_set = content.content_file_sets.sole
+
+      choose 'Rebuild structure'
+      structure_files
+
+      expect(page).to have_css('h3', text: 'Resources (2)')
+      expect(ContentFileSet.exists?(original_content_file_set.id)).to be false
       expect(content.content_files.map(&:filepath)).to eq(['dropzone_upload.txt', 'dropzone_upload2.txt'])
     end
   end

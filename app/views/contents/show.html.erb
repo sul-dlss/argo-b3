@@ -20,4 +20,20 @@
                                                       content_token: @content_token,
                                                       disabled: @content.busy?) %>
   </fieldset>
+  <%# Asks how to structure files that are not in a resource; the fields are submitted with the step's item form (see contents/files). %>
+  <% if Contents::ManageFilesFlow.new_files_question?(content: @content) %>
+    <%= fields_for :new_files, nil, builder: SdrViewComponents::TabForm::TabbedFormBuilder, html: { id: 'item_form' } do |new_files_form| %>
+      <%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(form: new_files_form, field_name: :structure,
+                                                                         label: t('edit.contents.edit.new_files.label'),
+                                                                         classes: 'mt-4') do |group| %>
+        <% group.with_radio_button(label_text: t('edit.contents.edit.new_files.append'),
+                                   input_value: ContentsController::APPEND_NEW_FILES_VALUE,
+                                   input_checked: true) %>
+        <% group.with_radio_button(label_text: t('edit.contents.edit.new_files.rebuild'),
+                                   input_value: ContentsController::REBUILD_NEW_FILES_VALUE,
+                                   help_text: t('edit.contents.edit.new_files.rebuild_help'),
+                                   variant: :help_text_below) %>
+      <% end %>
+    <% end %>
+  <% end %>
 <% end %>
