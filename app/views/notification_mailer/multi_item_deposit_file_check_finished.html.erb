@@ -1,0 +1,15 @@
+<% url = multi_item_deposit_action_url(@multi_item_deposit_action) %>
+<% if @with_errors %>
+  <p><%= t('.body_with_errors_html', deposit: @deposit_label, url: link_to(url, url)) %></p>
+  <p><%= t('.errors_found') %></p>
+  <ul>
+    <% @errors.first(NotificationMailer::MAX_LISTED_ERRORS).each do |error| %>
+      <li><%= error %></li>
+    <% end %>
+  </ul>
+  <% if @errors.size > NotificationMailer::MAX_LISTED_ERRORS %>
+    <p><%= t('.more_errors', count: @errors.size - NotificationMailer::MAX_LISTED_ERRORS) %></p>
+  <% end %>
+<% else %>
+  <p><%= t('.body_html', deposit: @deposit_label, url: link_to(url, url)) %></p>
+<% end %>

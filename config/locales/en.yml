@@ -31,6 +31,9 @@ en:
   layouts:
     application:
       product_name: "Argo B3"
+    mailer:
+      footer: 'If you have questions, please contact the SDR team at %{email}.'
+      footer_html: 'If you have questions, please contact the SDR team at %{email}.'
   time:
     formats:
       date_only: "%Y-%m-%d"
@@ -907,8 +910,6 @@ en:
         files_not_in_csv: 'Files not in structural metadata CSV: %{filepaths}'
         object_changed: 'Object changed since discovery; re-run Discover files'
         unexpected: 'An unexpected error occurred while building the structure. Contact SDR support for assistance.'
-      toasts:
-        completed: 'Completed building structure'
     deposit:
       errors:
         object_not_found: 'Object not found'
@@ -1073,6 +1074,16 @@ en:
       detail_with_errors:
         one: '1 item has errors.'
         other: '%{formatted_count} items have errors.'
+    multi_item_deposit_file_check_finished:
+      title: 'File Check finished'
+      title_with_errors: 'File Check finished with errors'
+      text: 'File Check completed for %{name}.'
+      text_with_errors:
+        one: 'File Check found errors in 1 item of %{name}.'
+        other: 'File Check found errors in %{formatted_count} items of %{name}.'
+      detail_with_errors:
+        one: '1 item has errors.'
+        other: '%{formatted_count} items have errors.'
     multi_item_deposit_initiation_errors:
       title: 'Deposit Initiation found errors'
       text:
@@ -1081,6 +1092,19 @@ en:
       detail:
         one: 'Nothing was deposited because 1 item has errors.'
         other: 'Nothing was deposited because %{formatted_count} items have errors.'
+  notification_mailer:
+    multi_item_deposit_file_check_finished:
+      deposit: 'SDR multi-item deposit %{id}'
+      subject: '%{prefix}SDR multi-item deposit %{id} file check complete'
+      subject_with_errors: '%{prefix}SDR multi-item deposit %{id} file check errors'
+      body: 'Your %{deposit} has successfully passed its file check. View details and complete the deposit in Argo at %{url}.'
+      body_html: 'Your %{deposit} has successfully passed its file check. View details and complete the deposit in Argo at %{url}.'
+      body_with_errors: 'Your %{deposit} has completed its file check with errors. You must fix the errors before depositing. View details and address the errors in Argo at %{url}.'
+      body_with_errors_html: 'Your %{deposit} has completed its file check with errors. You must fix the errors before depositing. View details and address the errors in Argo at %{url}.'
+      errors_found: 'Errors found:'
+      more_errors:
+        one: 'And 1 more error, listed in the file check report in Argo.'
+        other: 'And %{count} more errors, listed in the file check report in Argo.'
   notifications:
     heading: 'Notifications'
     tabs:

@@ -9,5 +9,6 @@
 
   <body>
     <%= yield %>
+    <p><%= t('layouts.mailer.footer_html', email: mail_to(Settings.support_email)) %></p>
   </body>
 </html>
