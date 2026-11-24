@@ -3,11 +3,13 @@
 # Notifies the user who ran a Bulk Action that its job has finished, with or without errors.
 #
 #   BulkActionFinishedNotifier.with(record: bulk_action, label: bulk_action.label,
-#                                   failure_count: bulk_action.druid_count_fail).deliver(bulk_action.user)
+#                                   failure_count: bulk_action.druid_count_fail)
+#                             .deliver(bulk_action.user, queue: :real_time)
 class BulkActionFinishedNotifier < ApplicationNotifier
   required_params :label, :failure_count
 
-  deliver_by :turbo_toast, class: 'DeliveryMethods::TurboToast'
+  # The toast is on the real_time queue, so it isn't held up behind long-running bulk action jobs.
+  deliver_by :turbo_toast, class: 'DeliveryMethods::TurboToast', queue: :real_time
 
   notification_methods do
     def title

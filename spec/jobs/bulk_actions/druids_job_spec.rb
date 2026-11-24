@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe BulkActions::DruidsJob do
+  include ActiveJob::TestHelper
   include ActiveSupport::Testing::TimeHelpers
 
   # Setting count fields to ensure that they are reset.
@@ -19,6 +20,7 @@ RSpec.describe BulkActions::DruidsJob do
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
+    allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
   end
 
   after do
@@ -66,6 +68,34 @@ RSpec.describe BulkActions::DruidsJob do
       expect(notification).to be_a(BulkActionFinishedNotifier::Notification)
       expect(notification.record).to eq(bulk_action)
       expect(notification.params).to eq(label: 'Reindex', failure_count: 1)
+    end
+
+    it 'broadcasts a toast to the user once the notification is delivered' do
+      perform_enqueued_jobs(only: [Noticed::EventJob, DeliveryMethods::TurboToast]) do
+        TestBulkActionJob.perform_now(bulk_action:, druids:)
+      end
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+        .with('notifications', bulk_action.user, target: 'toast-container', html: /Reindex completed with 1 error/)
+    end
+  end
+
+  context 'when notifying fails' do
+    before do
+      stub_const('TestBulkActionJob::JobItem', Class.new(BulkActions::BaseJobItem) do
+        def perform
+          success!(message: 'Testing successful')
+        end
+      end)
+      allow(BulkActionFinishedNotifier).to receive(:with).and_raise(ActiveRecord::StatementInvalid)
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'reports the error and leaves the bulk action completed' do
+      TestBulkActionJob.perform_now(bulk_action:, druids:)
+
+      expect(bulk_action.reload.completed?).to be true
+      expect(Honeybadger).to have_received(:notify).with(instance_of(ActiveRecord::StatementInvalid))
     end
   end
 

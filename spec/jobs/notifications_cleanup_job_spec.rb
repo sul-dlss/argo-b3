@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe NotificationsCleanupJob do
-  include ActiveSupport::Testing::TimeHelpers
-
   let(:bulk_action) { create(:bulk_action) }
   let(:user) { bulk_action.user }
 
