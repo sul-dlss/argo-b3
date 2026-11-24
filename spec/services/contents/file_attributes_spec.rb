@@ -72,8 +72,8 @@ RSpec.describe Contents::FileAttributes do
     context 'when the mime type is a deliverable image' do
       let(:mime_type) { 'image/jp2' }
 
-      it 'also preserves' do
-        expect(file_attributes).to eq({ preserve: true, shelve: true, publish: true, use: nil })
+      it 'shelves and publishes but does not preserve, as without OCR' do
+        expect(file_attributes).to eq({ preserve: false, shelve: true, publish: true, use: nil })
       end
     end
 
@@ -152,6 +152,15 @@ RSpec.describe Contents::FileAttributes do
 
     context 'when the mime type is a deliverable image' do
       let(:mime_type) { 'image/jp2' }
+
+      it 'preserves only' do
+        expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })
+      end
+    end
+
+    context 'when the mime type is a deliverable image in a file set that contains OCR' do
+      let(:mime_type) { 'image/jp2' }
+      let(:options) { { ocr: true } }
 
       it 'preserves only' do
         expect(file_attributes).to eq({ preserve: true, shelve: false, publish: false, use: nil })

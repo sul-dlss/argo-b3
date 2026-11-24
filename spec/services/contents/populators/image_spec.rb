@@ -54,10 +54,10 @@ RSpec.describe Contents::Populators::Image do
         expect(content.content_files.map(&:filepath)).to eq(%w[image_0001.jp2 image_0001.tif image_0001.xml])
       end
 
-      it 'preserves the deliverable and marks the OCR as a transcription' do
+      it 'does not preserve the deliverable and marks the OCR as a transcription' do
         structure
 
-        expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: true, shelve: true,
+        expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: false, shelve: true,
                                                                                           publish: true)
         expect(content.content_files.find_by(label: 'image_0001.xml'))
           .to have_attributes(preserve: true, shelve: true, publish: true, use: 'transcription',
@@ -136,10 +136,11 @@ RSpec.describe Contents::Populators::Image do
         create(:content_file_binary, content:, filepath: 'image_0001.txt', mime_type: 'text/plain')
       end
 
-      it 'publishes the TXT as a transcription and preserves the deliverable JP2' do
+      it 'publishes the TXT as a transcription and does not preserve the deliverable JP2' do
         structure
 
-        expect(content.content_files.find_by(label: 'image_0001.jp2')).to have_attributes(preserve: true)
+        expect(content.content_files.find_by(label: 'image_0001.jp2'))
+          .to have_attributes(preserve: false, shelve: true, publish: true)
         expect(content.content_files.find_by(label: 'image_0001.txt'))
           .to have_attributes(preserve: true, shelve: true, publish: true, use: 'transcription')
       end
@@ -298,11 +299,47 @@ RSpec.describe Contents::Populators::Image do
           .to have_attributes(preserve: true, shelve: true, publish: true, use: 'transcription')
       end
 
-      it 'updates the existing files for the file set now containing OCR' do
+      it 'leaves the existing JP2 not preserved' do
         append
 
         expect(content.content_files.find_by(label: 'image_0001.jp2'))
-          .to have_attributes(preserve: true, shelve: true, publish: true)
+          .to have_attributes(preserve: false, shelve: true, publish: true)
+      end
+
+      context 'when the existing JP2 has been set to be preserved' do
+        before do
+          content.content_files.find_by(label: 'image_0001.jp2').update!(preserve: true)
+        end
+
+        it 'leaves the existing JP2 preserved' do
+          append
+
+          expect(content.content_files.find_by(label: 'image_0001.jp2'))
+            .to have_attributes(preserve: true, shelve: true, publish: true)
+        end
+      end
+    end
+
+    context 'when the new binary is a JP2 for an existing file set that contains OCR' do
+      let!(:existing_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.tif', mime_type: 'image/tiff')
+      end
+      let!(:appended_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+      end
+
+      before do
+        create(:content_file, content_file_set: existing_content_file_set,
+                              content_file_binary: create(:content_file_binary, content:, filepath: 'image_0001.xml',
+                                                                                mime_type: 'application/xml'),
+                              label: 'image_0001.xml', use: 'transcription')
+      end
+
+      it 'gives the JP2 the default attributes' do
+        append
+
+        expect(content.content_files.find_by(content_file_binary: appended_content_file_binary))
+          .to have_attributes(preserve: false, shelve: true, publish: true)
       end
     end
 
@@ -350,12 +387,32 @@ RSpec.describe Contents::Populators::Image do
         create(:content_file_binary, content:, filepath: 'image_0001.xml', mime_type: 'application/xml')
       end
 
-      it 'preserves but does not shelve or publish the new and existing files' do
+      it 'preserves but does not shelve or publish the new file, leaving the existing JP2 alone' do
         append
 
         expect(content.content_files.find_by(label: 'image_0001.xml'))
           .to have_attributes(preserve: true, shelve: false, publish: false)
         expect(content.content_files.find_by(label: 'image_0001.jp2'))
+          .to have_attributes(preserve: false, shelve: true, publish: true)
+      end
+    end
+
+    context 'when the object is dark and the new binary is a JP2 for an existing file set' do
+      let(:cocina_object) do
+        build(:dro_with_metadata, id: content.druid).new(access: { view: 'dark', download: 'none' })
+      end
+      let!(:existing_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.xml', mime_type: 'application/xml')
+      end
+
+      let!(:appended_content_file_binary) do
+        create(:content_file_binary, content:, filepath: 'image_0001.jp2', mime_type: 'image/jp2')
+      end
+
+      it 'preserves but does not shelve or publish the JP2' do
+        append
+
+        expect(content.content_files.find_by(content_file_binary: appended_content_file_binary))
           .to have_attributes(preserve: true, shelve: false, publish: false)
       end
     end
