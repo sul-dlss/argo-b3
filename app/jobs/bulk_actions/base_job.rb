@@ -116,15 +116,10 @@ module BulkActions
       notify_finished
     end
 
-    # The bulk action has already completed, so a failure to notify is reported rather than failing the job,
-    # which a retry would perform again.
     def notify_finished
-      BulkActionFinishedNotifier.with(record: bulk_action, label: bulk_action.label,
-                                      failure_count: bulk_action.druid_count_fail)
-                                .deliver(bulk_action.user, queue: :real_time)
-    rescue StandardError => e
-      Rails.logger.error(e.full_message)
-      Honeybadger.notify(e)
+      deliver_notification(BulkActionFinishedNotifier, recipient: bulk_action.user, record: bulk_action,
+                                                       label: bulk_action.label,
+                                                       failure_count: bulk_action.druid_count_fail)
     end
 
     def log_start
