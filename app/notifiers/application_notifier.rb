@@ -1,20 +1,11 @@
 # frozen_string_literal: true
 
 # Superclass of all Notifiers, one per kind of Notification.
-# A Notifier's notifications render their title, text, and link from i18n using the event's params (no stored HTML),
-# by implementing the methods in ApplicationNotifier::Notification.
+# A Notifier's notifications render their title and text (linking to the subject) from i18n using the event's params
+# (no stored HTML): each Notifier defines `title` and `text` in its `notification_methods`, and overrides `error?`
+# when the Notification can report an error.
 class ApplicationNotifier < Noticed::Event
   notification_methods do
-    # @return [String] the Notification's title
-    def title
-      raise NotImplementedError
-    end
-
-    # @return [String] the Notification's text, linking to its subject
-    def text
-      raise NotImplementedError
-    end
-
     # @return [Boolean] whether the Notification reports an error
     def error?
       false
