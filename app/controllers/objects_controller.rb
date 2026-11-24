@@ -417,10 +417,6 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     session[:recent_object_druids] = [druid, *other_recent_druids].first(RECENT_OBJECTS_LIMIT)
   end
 
-  def turbo_prefetch?
-    request.headers['X-Sec-Purpose'] == 'prefetch'
-  end
-
   def verified_druid
     @verified_druid ||= verify_token(params[:druid])
   end

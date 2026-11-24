@@ -2,11 +2,11 @@
 
 # Helpers for asserting where a page is scrolled to, e.g., that it opens at the results of a check.
 module ScrollHelpers
-  # @return [Boolean] true if the page is scrolled so that the focused element is at the top of the window, or as near
-  #   it as the page allows (i.e., scrolled to the bottom)
-  def scrolled_to_focused_element?
+  # @return [Boolean] true if the page is scrolled so that the first element matching selector is at the top of the
+  #   window, or as near it as the page allows (i.e., scrolled to the bottom)
+  def scrolled_to?(selector)
     page.evaluate_script(<<~JS)
-      document.activeElement.getBoundingClientRect().top <= 1 ||
+      document.querySelector(#{selector.to_json}).getBoundingClientRect().top <= 1 ||
         window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1
     JS
   end

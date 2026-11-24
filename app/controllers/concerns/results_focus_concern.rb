@@ -6,14 +6,14 @@
 # Checks run in the background, and the page with the results is shown when the wait page's scheduled refresh lands
 # on it. Reloading the page, arriving by Previous or Next, or opening it from a list show the same results, and
 # should open at the top. So starting a check remembers it in the session, and the first page shown after it
-# finishes takes (forgets) it.
+# finishes takes (forgets) it. A page left before its check finished opens at the results when it is next shown.
 module ResultsFocusConcern
   extend ActiveSupport::Concern
 
   SESSION_KEY = :results_focus
   # Checks started in other tabs, or abandoned before they finished, are also remembered, so only the most recent
   # are kept to bound the size of the session.
-  MAX_REMEMBERED = 10
+  MAX_REMEMBERED = 5
 
   private
 
@@ -24,10 +24,10 @@ module ResultsFocusConcern
   end
 
   # @param record [ActiveRecord::Base] the record whose check may have finished
-  # @return [Boolean] true if a check was started for the record and not yet taken
+  # @return [Boolean] true if a check was started for the record and not yet taken. A Turbo prefetch does not take it.
   def take_results_focus?(record)
     keys = Array(session[SESSION_KEY])
-    return false unless keys.include?(results_focus_key(record))
+    return false if turbo_prefetch? || keys.exclude?(results_focus_key(record))
 
     session[SESSION_KEY] = keys - [results_focus_key(record)]
     true

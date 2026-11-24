@@ -21,6 +21,7 @@ class MultipleItemsController < ApplicationController
 
     case form_validation_action.status
     when 'valid'
+      take_results_focus?(form_validation_action) # Forgotten, since there are no results to open at.
       bulk_action = enqueue_bulk_action
       flash[:toast] = "#{bulk_action_config.label} submitted"
       redirect_to bulk_action_path(bulk_action)

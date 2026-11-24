@@ -939,6 +939,9 @@ RSpec.describe 'Multi-item deposit actions' do
 
         multi_item_deposit_action.reload.structuring_completed!
 
+        # e.g., hovering over a link to the page
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action), headers: { 'X-Sec-Purpose' => 'prefetch' }
+
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
         expect(Capybara.string(response.body)).to have_css('h2[data-controller="focus-on-load"]',
                                                            text: 'Results of checking files')

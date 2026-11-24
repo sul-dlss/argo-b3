@@ -18,6 +18,11 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # A Turbo prefetch (e.g., on hovering over a link) is not a visit, so it should not change the session.
+  def turbo_prefetch?
+    request.headers['X-Sec-Purpose'] == 'prefetch'
+  end
+
   # Adding files (e.g., "Register and add files") opens managing files on its first step.
   def manage_files_first_step_path(druid)
     edit_content_path(druid, open_on: Contents::ManageFilesFlow::OPEN_ON_FIRST)

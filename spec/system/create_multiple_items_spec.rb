@@ -554,7 +554,7 @@ RSpec.describe 'Create multiple items' do
                                text: 'Fix the errors or delete items below and click "Register items" again, ' \
                                      'or click "Clear all items and enter again."')
       expect(window_scroll_y).to be > 0
-      expect(scrolled_to_focused_element?).to be true
+      expect(scrolled_to?('.alert-danger')).to be true
 
       # Only the item with errors is displayed.
       expect(item_registrations).to have_css('.form-instance', count: 1)
@@ -580,7 +580,7 @@ RSpec.describe 'Create multiple items' do
 
       # The form opens at the choice of how to enter items.
       expect(page).to have_field('Upload CSV from computer', type: 'radio', focused: true)
-      expect(scrolled_to_focused_element?).to be true
+      expect(scrolled_to?('#item-registrations fieldset')).to be true
       expect(page).to have_text('Enter each item individually')
       expect(page).to have_no_button('Clear all items and enter again')
       expect(item_registrations).to have_css('.form-instance', count: 1)

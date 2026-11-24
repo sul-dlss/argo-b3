@@ -12,7 +12,6 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   before_action :set_multi_item_deposit_action, only: %i[edit update destroy structural_metadata_csv_template
                                                          discovery_report structure_report]
   before_action :set_structure_summary, only: %i[edit update]
-  before_action :set_focus_results, only: %i[edit]
   skip_verify_authorized only: %i[index]
 
   def index
@@ -42,10 +41,14 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     )
   end
 
-  def edit
+  # It renders each step's page, which keeps it a line over the method length limit.
+  def edit # rubocop:disable Metrics/MethodLength
     authorize! @multi_item_deposit_action
 
     return render :wait if wait?
+
+    # The step page opens at the results of a check that has just finished (see ResultsFocusConcern).
+    @focus_results = take_results_focus?(@multi_item_deposit_action)
 
     if @multi_item_deposit_action.discovery_step?
       @discovery_form = MultiItemDeposit::DiscoveryForm.from_model(@multi_item_deposit_action)
@@ -229,12 +232,6 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
 
     @structure_summary = MultiItemDeposit::StructureResults.new(multi_item_deposit_action: @multi_item_deposit_action)
                                                            .summary
-  end
-
-  # A step page opens at the results of a check that has just finished. While the check is in progress, the wait page
-  # is shown and the check is still remembered.
-  def set_focus_results
-    @focus_results = !wait? && take_results_focus?(@multi_item_deposit_action)
   end
 
   # A saved uploaded manifest is used for an upload unless another manifest is provided.

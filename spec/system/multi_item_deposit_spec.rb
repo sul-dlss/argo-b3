@@ -117,7 +117,7 @@ RSpec.describe 'Multi-item deposit' do
     # The wait page refreshes to show the results, opening at them.
     expect(page).to have_css('h2:focus', text: 'Results of checking manifest')
     expect(window_scroll_y).to be > 0
-    expect(scrolled_to_focused_element?).to be true
+    expect(scrolled_to?('h2:focus')).to be true
     expect(page).to have_css('.alert-success', text: 'No errors with manifest')
     expect(page).to have_no_css('.alert-danger')
     expect(page).to have_no_table('Error details')
@@ -159,7 +159,7 @@ RSpec.describe 'Multi-item deposit' do
     # The wait page refreshes to show the results, opening at them.
     expect(page).to have_css('h2:focus', text: 'Results of checking files')
     expect(window_scroll_y).to be > 0
-    expect(scrolled_to_focused_element?).to be true
+    expect(scrolled_to?('h2:focus')).to be true
     summary_rows = page.find('table[aria-label="Summary"]').all('tbody tr')
     expect(summary_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
       .to eq([%w[bc123df4567 folder1 1 OK file redeposit],
@@ -212,7 +212,7 @@ RSpec.describe 'Multi-item deposit' do
     # The wait page refreshes to show the errors, opening at them, and nothing is deposited.
     expect(page).to have_css('h2:focus', text: 'Results of checking version status')
     expect(window_scroll_y).to be > 0
-    expect(scrolled_to_focused_element?).to be true
+    expect(scrolled_to?('h2:focus')).to be true
     error_rows = page.find('table[aria-label="Error details"]').all('tbody tr')
     expect(error_rows.map { |row| row.all('td').map { |cell| cell.text.strip } })
       .to eq([['cd234fg5678', 'Object changed since discovery; re-run Discover files']])
