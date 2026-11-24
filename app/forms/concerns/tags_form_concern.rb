@@ -25,6 +25,16 @@ module TagsFormConcern
     after_validation :populate_tags
   end
 
+  # @param [Array<String>] tags an object's tags
+  # @return [Hash] attributes that fill a form's other, project, and ticket tag fields with the tags
+  def self.tag_fields_attributes(tags)
+    project_tags, rest = tags.partition { |tag| tag.start_with?(ProjectTagForm::PROJECT_TAG_PREFIX) }
+    ticket_tags, other_tags = rest.partition { |tag| tag.start_with?(TicketTagForm::TICKET_TAG_PREFIX) }
+    { other_tags_attributes: other_tags.map { |tag| { tag: } },
+      project_tags_attributes: project_tags.map { |tag| { tag: } },
+      ticket_tags_attributes: ticket_tags.map { |tag| { tag: } } }
+  end
+
   private
 
   # Translated when validating, since a symbol or proc message option won't survive FormErrorsSerializer.

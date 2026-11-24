@@ -55,6 +55,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
     @previously_published = republishable?
     @draft_actions_presenter = DraftActionsPresenter.new(cocina_version: @cocina_object.version, version_service:)
     @goobi_redepositable = goobi_redeposit_enabled?(version_service)
+    @registration_settings = RegistrationSettings.new(cocina_object: @cocina_object) if @solr_doc.item?
 
     track_recent_object(druid) unless turbo_prefetch?
     @pinned_tags = PinnedTag.where(user: current_user).pluck(:tag).to_set

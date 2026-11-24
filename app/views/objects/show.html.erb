@@ -60,6 +60,11 @@
                                    variant: 'outline-primary',
                                    disabled: !allowed_to?(:create?, @solr_doc.druid, with: CollectionPolicy)) %>
         <% end %>
+        <%# Opens item registration prefilled with this item's settings; the user must be able to register with its APO and collections. %>
+        <% if @solr_doc.item? %>
+          <% component.with_button(component_class: Show::CopyRegistrationSettingsDropdownComponent, druid: @solr_doc.druid,
+                                   disabled: !allowed_to?(:create?, @registration_settings, with: ItemPolicy)) %>
+        <% end %>
       <% end %>
 
       <%# The section is hidden when none of its buttons applies to the object. %>

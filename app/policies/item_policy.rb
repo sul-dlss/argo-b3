@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # Policy for items.
-# The record for create? responds to apo_druid and collection_druids, e.g., NewItemForm or ItemsRegistrationForm.
+# The record for create? responds to apo_druid and collection_druids, e.g., NewItemForm, ItemsRegistrationForm, or
+# RegistrationSettings (whether the user can register items with an existing item's settings).
 # The record for add_to_collections? and update_apo? is an item model (e.g., EditItemForm) with the requested changes.
 class ItemPolicy < ApplicationPolicy
   # NOTE: Use ObjectPolicy for show?, edit?, and update? permissions.

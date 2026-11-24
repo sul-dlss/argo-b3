@@ -9,17 +9,8 @@ class AdministrativeTagsForm < ApplicationForm
   # @param [Array<String>] tags the object's current tags
   # @return [AdministrativeTagsForm] a form with the tags split into other, project, and ticket tags
   def self.from_tags(tags)
-    project_tags, rest = tags.partition { |tag| tag.start_with?(ProjectTagForm::PROJECT_TAG_PREFIX) }
-    ticket_tags, other_tags = rest.partition { |tag| tag.start_with?(TicketTagForm::TICKET_TAG_PREFIX) }
-    new(other_tags_attributes: tag_attributes(other_tags),
-        project_tags_attributes: tag_attributes(project_tags),
-        ticket_tags_attributes: tag_attributes(ticket_tags))
+    new(TagsFormConcern.tag_fields_attributes(tags))
   end
-
-  def self.tag_attributes(tags)
-    tags.map { |tag| { tag: } }
-  end
-  private_class_method :tag_attributes
 
   # Tags are populated by validation, so call these after a successful validation.
   # @param [Array<String>] current_tags the object's current tags

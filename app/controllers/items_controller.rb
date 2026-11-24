@@ -5,6 +5,7 @@ class ItemsController < ApplicationController
   include ApoOptionsConcern
   include EditCocinaObjectConcern
   include RegisterCancelConcern
+  include RegistrationSettingsConcern
   include TokenConcern
 
   # Matches ObjectsController so its descriptive CSV download accepts the druid token.
@@ -17,11 +18,15 @@ class ItemsController < ApplicationController
   DRAFT_TO_ADD_FILES_VALUE = 'add_files'
   DEPOSIT_VALUE = 'deposit'
 
+  # The form is prefilled with the settings of the from_druid item, if given, which the user must be able to
+  # register with.
   def new
     authorize! with: ItemPolicy
+    authorize! registration_settings, to: :create?, with: ItemPolicy if registration_settings
 
-    @new_item_form = NewItemForm.new
+    @new_item_form = NewItemForm.new(registration_settings&.new_item_form_attributes || {})
     @cancel_path = register_cancel_path
+    @apply_apo_defaults_on_connect = apply_apo_defaults_on_new?
 
     set_apo_and_collection_options(form: @new_item_form)
   end
@@ -44,6 +49,7 @@ class ItemsController < ApplicationController
       redirect_to create_redirect_path
     else
       @cancel_path = root_path
+      @apply_apo_defaults_on_connect = false
       set_apo_and_collection_options(form: @new_item_form)
       render :new, status: :unprocessable_content
     end
