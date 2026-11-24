@@ -3,10 +3,10 @@
 # Notifies the owner of a Multi-Item Deposit that its File Check batch has finished, with or without errors.
 # Delivered from a job with ApplicationJob#deliver_notification.
 #
-# The email is sent 10 minutes later, unless the Multi-Item Deposit has changed since the Notification (it advanced
-# to Deposit Initiation, File Check was re-run, or a MID Item Deposit was removed), since the email would then be out
-# of date. If the Multi-Item Deposit was deleted, its Notifications are deleted with it, so the email job is
-# discarded.
+# The email is sent 10 minutes later, unless the Multi-Item Deposit has changed since the Notification (Deposit
+# Initiation was started, File Check or Discovery was re-run, or a MID Item Deposit was removed), since the email
+# would then be out of date. Moving between steps without running one does not cancel it. If the Multi-Item Deposit
+# was deleted, its Notifications are deleted with it, so the email job is discarded.
 class MultiItemDepositFileCheckFinishedNotifier < ApplicationNotifier
   EMAIL_WAIT = 10.minutes
 
@@ -21,15 +21,15 @@ class MultiItemDepositFileCheckFinishedNotifier < ApplicationNotifier
   # Evaluated when the email is due.
   # @return [Boolean] whether the Multi-Item Deposit has changed since the Notification
   def changed_since_notification?(_notification)
-    deposit_initiation_reached? || file_check_rerun? ||
+    deposit_initiation_started? || file_check_rerun? ||
       record.item_deposit_actions.count < params[:item_deposit_count]
   end
 
   private
 
-  # Returning to File Check from Deposit Initiation still counts, once Deposit Initiation has started.
-  def deposit_initiation_reached?
-    !record.structure_step? || record.initiating_deposit_started_at&.after?(created_at)
+  # Still true after returning to File Check, e.g., when Deposit Initiation found errors.
+  def deposit_initiation_started?
+    record.initiating_deposit_started_at.present? && record.initiating_deposit_started_at.after?(created_at)
   end
 
   # Re-running Discovery clears File Check's start.

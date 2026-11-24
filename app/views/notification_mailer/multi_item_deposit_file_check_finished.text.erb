@@ -3,11 +3,11 @@
 <%= t('.body_with_errors', deposit: @deposit_label, url:) %>
 
 <%= t('.errors_found') %>
-<% @errors.first(NotificationMailer::MAX_LISTED_ERRORS).each do |error| -%>
+<% @errors.each do |error| -%>
 - <%= error %>
 <% end -%>
-<% if @errors.size > NotificationMailer::MAX_LISTED_ERRORS -%>
-<%= t('.more_errors', count: @errors.size - NotificationMailer::MAX_LISTED_ERRORS) %>
+<% if @unlisted_error_count.positive? -%>
+<%= t('.more_errors', count: @unlisted_error_count) %>
 <% end -%>
 <% else -%>
 <%= t('.body', deposit: @deposit_label, url:) %>

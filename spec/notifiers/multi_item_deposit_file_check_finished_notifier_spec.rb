@@ -73,11 +73,11 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       expect(email.text_part.body.to_s).to include(
         "Your SDR multi-item deposit #{id} (Maps) has successfully passed its file check. " \
         "View details and complete the deposit in Argo at #{url}.",
-        'If you have questions, please contact the SDR team at argo-feedback@lists.stanford.edu.'
+        "If you have questions, please contact the SDR team at #{Settings.support_email}."
       )
       html = Capybara.string(email.html_part.body.to_s)
       expect(html).to have_link(url, href: url)
-      expect(html).to have_link('argo-feedback@lists.stanford.edu', href: 'mailto:argo-feedback@lists.stanford.edu')
+      expect(html).to have_link(Settings.support_email, href: "mailto:#{Settings.support_email}")
     end
   end
 
@@ -120,7 +120,7 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       send_due_email
     end
 
-    it 'says how many more errors there are' do
+    it 'lists only the first errors and says how many more there are' do
       expect(email.text_part.body.to_s).to include("- bc123df4567: No rows\nAnd 2 more errors")
       expect(email.text_part.body.to_s).not_to include('gh456jk7890')
     end
@@ -147,8 +147,14 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       expect { send_due_email }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
-    it 'cancels the email if the Multi-Item Deposit advanced to Deposit Initiation' do
+    it 'sends the email if the owner moved to another step without running one' do
       multi_item_deposit_action.update!(step: 'deposit')
+
+      expect { send_due_email }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
+    it 'cancels the email if Deposit Initiation started' do
+      multi_item_deposit_action.update!(step: 'deposit', initiating_deposit_started_at: 1.second.from_now)
 
       expect { send_due_email }.not_to(change { ActionMailer::Base.deliveries.count })
     end
@@ -177,14 +183,15 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       expect { send_due_email }.not_to(change { ActionMailer::Base.deliveries.count })
     end
 
-    it 'cancels the email if the Multi-Item Deposit was deleted, leaving the job discarded' do
+    it 'cancels the email if the Multi-Item Deposit was deleted, discarding the job' do
       multi_item_deposit_action.discard!
 
       expect { send_due_email }.not_to(change { ActionMailer::Base.deliveries.count })
+      expect(Noticed::DeliveryMethods::Email).not_to have_been_enqueued
     end
 
     it 'leaves the notification in place when the email is cancelled' do
-      multi_item_deposit_action.update!(step: 'deposit')
+      multi_item_deposit_action.update!(structuring_started_at: 1.second.from_now)
       send_due_email
 
       expect(user.notifications.count).to eq(1)
