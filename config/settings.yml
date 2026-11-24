@@ -128,3 +128,5 @@ ur_apo_druid: 'druid:hv992ry2431'
 feature_flags:
   # Lets users request speech to text (speechToTextWF) for media objects.
   speech_to_text_workflow: true
+  # Asks on the Deposit step of edit item and manage files whether to keep the previous version as a public version.
+  new_user_version: true

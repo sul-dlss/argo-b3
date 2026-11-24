@@ -597,6 +597,21 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when depositing a later version with a new user version and the feature is off' do
+      let(:version) { 2 }
+
+      before { allow(Settings.feature_flags).to receive(:new_user_version).and_return(false) }
+
+      it 'stages with accessioning without a new user version' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { new_user_version: true, version_description: 'Fix',
+                                                              access_view: 'world', access_download: 'world' } }
+
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
+      end
+    end
+
     context 'when depositing a later version as dark with a new user version' do
       let(:version) { 2 }
 

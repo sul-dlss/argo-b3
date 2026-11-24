@@ -680,6 +680,22 @@ RSpec.describe 'Items' do
       end
     end
 
+    context 'when depositing a later version with a new user version and the feature is off' do
+      let(:version_service) do
+        version_service_double(open?: true, editable?: true, version: 2, version_description: 'Changed type')
+      end
+      let(:commit) { ItemsController::DEPOSIT_VALUE }
+
+      before { allow(Settings.feature_flags).to receive(:new_user_version).and_return(false) }
+
+      it 'starts accessioning without a new user version' do
+        patch "/items/#{druid}", params: { item: item_params.merge(new_user_version: true, access_view: 'world',
+                                                                   access_download: 'world'), commit: }
+
+        expect(Sdr::Repository).to have_received(:accession).with(hash_including(context: {}))
+      end
+    end
+
     context 'when depositing a later version as dark with a new user version' do
       let(:version_service) do
         version_service_double(open?: true, editable?: true, version: 2, version_description: 'Changed type')

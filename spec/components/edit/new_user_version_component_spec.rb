@@ -34,6 +34,16 @@ RSpec.describe Edit::NewUserVersionComponent, type: :component do
     end
   end
 
+  context 'when the feature is off' do
+    before { allow(Settings.feature_flags).to receive(:new_user_version).and_return(false) }
+
+    it 'does not render' do
+      render_inline(component)
+
+      expect(page).to have_no_css('fieldset', visible: :all)
+    end
+  end
+
   context 'when depositing the first version' do
     let(:edit_item_form) do
       EditItemForm.build_from_cocina_object(cocina_object).tap do |item_form|

@@ -13,9 +13,9 @@ module Edit
 
     attr_reader :form
 
-    # The previous version of a first version is not deposited.
+    # Behind feature_flags.new_user_version. The previous version of a first version is not deposited.
     def render?
-      !form.object.initial_version?
+      Settings.feature_flags.new_user_version && !form.object.initial_version?
     end
 
     def dark?

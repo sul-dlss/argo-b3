@@ -12,10 +12,11 @@ module NewUserVersionFormConcern
     form_only_attributes :new_user_version
   end
 
-  # @return [Boolean] true if the form asks whether to create a new User Version: not for a first version, which
-  #   has no previous User Version, nor for a dark Item, whose previous User Versions are permanently withdrawn
+  # @return [Boolean] true if the form asks whether to create a new User Version (feature_flags.new_user_version):
+  #   not for a first version, which has no previous User Version, nor for a dark Item, whose previous User Versions
+  #   are permanently withdrawn
   def ask_new_user_version?
-    !initial_version? && !dark_access?
+    Settings.feature_flags.new_user_version && !initial_version? && !dark_access?
   end
 
   # @return [Boolean] true if depositing creates a new User Version
