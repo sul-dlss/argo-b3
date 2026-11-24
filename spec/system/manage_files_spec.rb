@@ -789,11 +789,15 @@ RSpec.describe 'Manage files' do
       original_content_file_set = content.content_file_sets.sole
 
       choose 'Rebuild structure'
+      # The choice is kept when another upload reloads the files.
+      upload_file('dropzone_upload3.txt')
+      expect(page).to have_checked_field('Rebuild structure')
       structure_files
 
-      expect(page).to have_css('h3', text: 'Resources (2)')
+      expect(page).to have_css('h3', text: 'Resources (3)')
       expect(ContentFileSet.exists?(original_content_file_set.id)).to be false
-      expect(content.content_files.map(&:filepath)).to eq(['dropzone_upload.txt', 'dropzone_upload2.txt'])
+      expect(content.content_files.map(&:filepath))
+        .to eq(['dropzone_upload.txt', 'dropzone_upload2.txt', 'dropzone_upload3.txt'])
     end
   end
 

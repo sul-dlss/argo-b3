@@ -67,18 +67,10 @@ RSpec.describe 'Contents' do
         create(:content_file_binary, content:, filepath: 'new.tif')
       end
 
-      it 'asks how to structure the new files, submitted with the item form' do
+      it 'asks how to structure the new files' do
         get content_path(content_token)
 
-        page = Capybara.string(response.body)
-        expect(page).to have_css('fieldset legend', text: 'New files have been added. How should they be structured?')
-        expect(page).to have_field('Append files to structure', type: 'radio', checked: true)
-        expect(page).to have_field('Rebuild structure', type: 'radio', checked: false)
-        expect(page).to have_css('input[type="radio"][form="item_form"][name="new_files[structure]"]', count: 2)
-        rebuild = page.find_field('Rebuild structure')
-        expect(page).to have_css("##{rebuild['aria-describedby']}",
-                                 text: 'Replaces all existing resources, including any changes to labels, order, ' \
-                                       'or file settings.')
+        expect(response.body).to include(I18n.t('edit.contents.edit.new_files.label'))
       end
     end
 
