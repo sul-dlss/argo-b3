@@ -1,17 +1,16 @@
 <%= tag.li class: 'mb-5' do %>
   <div class="row">
     <div class="col-md-7 col-lg-8 col-xl-9 col-xxl-10">
-      <%= render SdrViewComponents::Tables::TableComponent.new(id:) do |component| %>
-        <% component.with_caption do %>
-          <%= render Search::ResultHeadingComponent.new(index:) do |heading| %>
-            <%= heading.with_link do %>
-              <%# Prefetching would record hovered objects as recently viewed. %>
-              <%= link_to(title, track_object_path(druid:, search_position: index),
-                          data: { turbo_frame: '_top', turbo_prefetch: false }) %>
-              <%= render Pin::PinnedObjectComponent.new(druid:, pinned: pinned?) if pinnable? %>
-            <% end %>
-          <% end %>
+      <%# Not a caption: Firefox tabs to a caption's link and pin only after the table's links. %>
+      <%= render Search::ResultHeadingComponent.new(index:, classes: 'search-result-heading') do |heading| %>
+        <%= heading.with_link do %>
+          <%# Prefetching would record hovered objects as recently viewed. %>
+          <%= link_to(title, track_object_path(druid:, search_position: index),
+                      data: { turbo_frame: '_top', turbo_prefetch: false }) %>
+          <%= render Pin::PinnedObjectComponent.new(druid:, pinned: pinned?) if pinnable? %>
         <% end %>
+      <% end %>
+      <%= render SdrViewComponents::Tables::TableComponent.new(id:, label: title, show_label: false) do |component| %>
 
         <% component.with_row(label: 'Druid', values: [bare_druid]) %>
 

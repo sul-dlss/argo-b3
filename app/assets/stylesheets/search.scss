@@ -67,3 +67,10 @@ a[aria-expanded="false"] {
 [data-search-morph-keep][inert] {
   opacity: 0.6;
 }
+
+// Matches the gem's table-h3 caption, which this heading replaces above each result's table.
+.search-result-heading {
+  padding: 0.25rem 0.25rem 0.75rem; // the caption's padding plus the heading's margin
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--stanford-black);
+}

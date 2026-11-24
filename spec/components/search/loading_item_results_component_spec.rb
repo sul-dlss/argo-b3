@@ -11,9 +11,10 @@ RSpec.describe Search::LoadingItemResultsComponent, type: :component do
     render_inline(component)
 
     expect(page).to have_css('section[aria-label="Loading item, collection, and APO results"]')
-    expect(page).to have_css('ul.placeholder-glow li table caption span.placeholder', count: 3)
+    expect(page).to have_css('ul.placeholder-glow li h3.search-result-heading span.placeholder', count: 3)
+    expect(page).to have_css('ul.placeholder-glow li table[aria-label="Loading result"]', count: 3)
     expect(page).to have_css('h2.h3', text: 'Item, collection, and APO results (Loading ...)')
-    expect(page).to have_css('caption h3.h4', count: 3)
+    expect(page).to have_no_css('caption')
     table = page.first('table')
     expect(table).to have_css('tr th span.placeholder', count: 10)
     expect(table).to have_css('tr td span.placeholder', count: 10)

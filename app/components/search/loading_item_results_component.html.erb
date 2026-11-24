@@ -4,14 +4,13 @@
   <ul class="list-unstyled placeholder-glow">
     <% (1..number_of_placeholders).each do |index| %>
       <%= tag.li class: 'mb-5' do %>
-        <%= render SdrViewComponents::Tables::RawTableComponent.new(id: "placeholder-#{index}") do |component| %>
-          <% component.with_caption do %>
-            <%= render Search::ResultHeadingComponent.new(index:) do |heading| %>
-              <%= heading.with_link do %>
-                <span class="placeholder col-8"></span>
-              <% end %>
-            <% end %>
+        <%# Laid out as Search::ItemResultComponent is, so the page doesn't shift when results load. %>
+        <%= render Search::ResultHeadingComponent.new(index:, classes: 'search-result-heading') do |heading| %>
+          <%= heading.with_link do %>
+            <span class="placeholder col-8"></span>
           <% end %>
+        <% end %>
+        <%= render SdrViewComponents::Tables::RawTableComponent.new(id: "placeholder-#{index}", label: 'Loading result', show_label: false) do |component| %>
 
           <% number_of_placeholder_rows.times do %>
             <%= component.with_row do %>
