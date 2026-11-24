@@ -70,6 +70,12 @@ A dashboard for SolidQueue background jobs is available at http://localhost:3000
 
 In development (including `bin/dev-server`), email is written to `tmp/mails/` rather than sent: one file per recipient address, each email appended as a raw message (headers, then each part).
 
+### Notifications
+
+Notifications are built on [Noticed](https://github.com/excid3/noticed). Add a Notifier (a subclass of `ApplicationNotifier`) for each new kind of event a user should be told about, such as a Bulk Action finishing or Discovery finding errors; events that differ only in outcome (e.g., with or without errors) share a Notifier. A Notifier's title, text, subject, and detail render from i18n using the event's params, so no HTML is stored. Jobs send them with `ApplicationJob#deliver_notification`.
+
+Every Notification is stored and listed on the recipient's Notifications page until a recurring job deletes it after the retention period. Beyond that, the Notifier's `deliver_by` declarations determine how it is delivered: `DeliveryMethods::TurboToast` shows it as a toast on the user's open pages.
+
 ### Lookbook for SDR View Components
 
 In development, available at http://localhost:3000/lookbook

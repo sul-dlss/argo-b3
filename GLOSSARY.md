@@ -74,6 +74,9 @@ A Deposit is in error when Staging failed (fixed by saving or depositing again f
 ### Tracked Deposit
 A Deposit started in Argo-B3, remembered with who deposited it from when it starts until it is Complete, so its outcome can be reported to that user.
 
+### Notification
+A message to a user about an event in work they started (e.g., a Multi-Item Deposit settled, or a deposit failed), shown live as a toast, listed among their recent notifications, and for some events emailed. Notifications are personal; only the most recent are listed, and they are kept for a limited period.
+
 ### Purge
 Permanently deleting an object from SDR, along with its Mutable Content and staged files. Only an object that has never been submitted for accessioning can be purged, which in practice means a first version. Unlike discarding a Draft, which returns the object to its last closed version, purging leaves no object behind.
 

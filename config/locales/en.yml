@@ -1061,6 +1061,8 @@ en:
       text_with_errors:
         one: '%{label} completed with 1 error.'
         other: '%{label} completed with %{count} errors.'
+      subject_label: '%{label} (%{description})'
+      detail_with_errors: '%{failure_count} of %{total_count} objects failed.'
     multi_item_deposit_discovery_finished:
       title: 'Discovery finished'
       title_with_errors: 'Discovery finished with errors'
@@ -1068,8 +1070,29 @@ en:
       text_with_errors:
         one: 'Discovery found errors in 1 item of %{name}.'
         other: 'Discovery found errors in %{formatted_count} items of %{name}.'
+      detail_with_errors:
+        one: '1 item has errors.'
+        other: '%{formatted_count} items have errors.'
     multi_item_deposit_initiation_errors:
       title: 'Deposit Initiation found errors'
       text:
         one: 'Nothing in %{name} was deposited because 1 item has errors.'
         other: 'Nothing in %{name} was deposited because %{formatted_count} items have errors.'
+      detail:
+        one: 'Nothing was deposited because 1 item has errors.'
+        other: 'Nothing was deposited because %{formatted_count} items have errors.'
+  notifications:
+    heading: 'Notifications'
+    tabs:
+      recent: 'Recent'
+      email_settings: 'Email settings'
+    recent:
+      table_label: 'Recent notifications'
+      headers:
+        about: 'About'
+        notification: 'Notification'
+        when: 'When'
+      empty: 'No notifications.'
+      time_ago: '%{time} ago'
+    email_settings:
+      placeholder: 'Email settings are not available yet.'

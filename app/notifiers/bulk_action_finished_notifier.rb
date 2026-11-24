@@ -25,7 +25,24 @@ class BulkActionFinishedNotifier < ApplicationNotifier
                   else
                     I18n.t('notifiers.bulk_action_finished.text', label: params[:label])
                   end
-      subject_link(link_text, bulk_action_path(record))
+      subject_link(link_text, subject_path)
+    end
+
+    def subject_label
+      return params[:label] if record.description.blank?
+
+      I18n.t('notifiers.bulk_action_finished.subject_label', label: params[:label], description: record.description)
+    end
+
+    def subject_path
+      bulk_action_path(record)
+    end
+
+    def detail
+      return unless error?
+
+      I18n.t('notifiers.bulk_action_finished.detail_with_errors', failure_count: delimited(params[:failure_count]),
+                                                                  total_count: delimited(record.druid_count_total))
     end
 
     def error?

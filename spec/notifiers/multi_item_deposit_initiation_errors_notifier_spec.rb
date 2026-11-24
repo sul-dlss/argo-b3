@@ -29,6 +29,9 @@ RSpec.describe MultiItemDepositInitiationErrorsNotifier do
       notification = user.notifications.sole
       expect(notification.record).to eq(multi_item_deposit_action)
       expect(notification.title).to eq('Deposit Initiation found errors')
+      expect(notification.subject_label).to eq('Multi-item deposit 1')
+      expect(notification.subject_path).to eq(path)
+      expect(notification.detail).to eq('Nothing was deposited because 2 items have errors.')
     end
 
     it 'broadcasts a red toast that does not disappear, linking to the Multi-Item Deposit' do

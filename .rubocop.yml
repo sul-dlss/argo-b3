@@ -41,6 +41,7 @@ Metrics/BlockLength:
     - context
     - namespace
     - class_methods
+    - notification_methods # a Notifier's notification class body, like class_methods
   Exclude:
     - 'config/routes.rb'
 

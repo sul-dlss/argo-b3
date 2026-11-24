@@ -16,8 +16,21 @@ class MultiItemDepositInitiationErrorsNotifier < ApplicationNotifier
     def text
       link_text = I18n.t('notifiers.multi_item_deposit_initiation_errors.text',
                          name: params[:name], count: params[:error_count],
-                         formatted_count: ActiveSupport::NumberHelper.number_to_delimited(params[:error_count]))
-      subject_link(link_text, multi_item_deposit_action_path(record))
+                         formatted_count: delimited(params[:error_count]))
+      subject_link(link_text, subject_path)
+    end
+
+    def subject_label
+      params[:name]
+    end
+
+    def subject_path
+      multi_item_deposit_action_path(record)
+    end
+
+    def detail
+      I18n.t('notifiers.multi_item_deposit_initiation_errors.detail',
+             count: params[:error_count], formatted_count: delimited(params[:error_count]))
     end
 
     def error?
