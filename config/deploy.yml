@@ -144,6 +144,6 @@ env:
 
 # Destination-specific configuration (hosts and the env vars
 # that vary per environment: SETTINGS__SOLR__URL, SETTINGS__DOR_SERVICES__URL,
-# SETTINGS__PRESERVATION_CATALOG__URL, HONEYBADGER_ENV) lives in
+# SETTINGS__PRESERVATION_CATALOG__URL, SETTINGS__HOST, HONEYBADGER_ENV) lives in
 # config/deploy.<destination>.yml, e.g. config/deploy.qa.yml. Run with:
 #   bin/kamal deploy -d qa

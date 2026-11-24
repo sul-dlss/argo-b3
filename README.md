@@ -66,6 +66,10 @@ To run linters individually, run which ones you need:
 
 A dashboard for SolidQueue background jobs is available at http://localhost:3000/jobs
 
+### Email
+
+In development (including `bin/dev-server`), email is written to `tmp/mails/` rather than sent: one file per recipient address, each email appended as a raw message (headers, then each part).
+
 ### Lookbook for SDR View Components
 
 In development, available at http://localhost:3000/lookbook
