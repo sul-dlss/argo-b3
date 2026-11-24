@@ -366,6 +366,14 @@ RSpec.describe StageFilesJob do
                                                                   context: {})
       end
 
+      context 'with a new user version' do
+        it 'accessions the object with a new user version' do
+          job.perform(content:, user:, accession: true, new_user_version: true)
+
+          expect(Sdr::Repository).to have_received(:accession).with(hash_including(context: { userVersions: 'new' }))
+        end
+      end
+
       context 'with a lane_id' do
         it 'accessions the object in that lane' do
           job.perform(content:, user:, accession: true, lane_id: 'default')

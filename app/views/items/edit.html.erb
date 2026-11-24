@@ -79,6 +79,7 @@
                                                                           label: t('edit.items.edit.tabs.deposit.label'),
                                                                           help_text: t('edit.items.edit.tabs.deposit.help_text'),
                                                                           mark_required: true)) do |pane| %>
+        <%= render Edit::NewUserVersionComponent.new(form:) %>
         <%= render Edit::VersionDescriptionComponent.new(form:) %>
         <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form:, classes: 'mb-3') %>
 

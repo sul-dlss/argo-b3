@@ -148,17 +148,20 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
   def save_and_stage(content:)
     # Saving also saves the content's text extraction settings, resets its flow, and rebases it onto the new lock.
     @contents_item_form.save!(user_name: current_user.sunetid)
-    content.start_staging!(user: current_user, accession: deposit?)
-    # Saving may have opened a new version, so track the version the form saved.
-    if deposit?
-      TrackedDeposit.track!(druid: content.druid, version: @contents_item_form.previous_cocina_object.version,
-                            user: current_user)
-    end
+    content.start_staging!(user: current_user, accession: deposit?,
+                           new_user_version: deposit? && @contents_item_form.new_user_version?)
+    track_deposit(content:) if deposit?
     true
   rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e)
     false
+  end
+
+  # Saving may have opened a new version, so track the version the form saved.
+  def track_deposit(content:)
+    TrackedDeposit.track!(druid: content.druid, version: @contents_item_form.previous_cocina_object.version,
+                          user: current_user)
   end
 
   # Opens on the step for where managing files was entered from (see Contents::ManageFilesFlow#open_on!), then

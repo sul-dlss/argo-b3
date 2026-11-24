@@ -19,10 +19,11 @@ RSpec.describe ContentsItemForm do
   end
 
   describe '.permitted_params' do
-    it 'permits the content type, viewing direction, text extraction settings, version description, and access' do
+    it 'permits the content type, viewing direction, text extraction settings, version description, new user ' \
+       'version, and access' do
       expect(described_class.permitted_params).to eq([:content_type, :viewing_direction, :perform_ocr,
                                                       :perform_speech_to_text, :version_description,
-                                                      :overwrite_file_access,
+                                                      :overwrite_file_access, :new_user_version,
                                                       { ocr_languages: [] },
                                                       :with_embargo, :embargo_release_date, :access_view,
                                                       :access_download, :access_location, :embargo_view,

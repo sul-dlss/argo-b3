@@ -17,6 +17,10 @@ module Sdr
       Cocina::Models::ObjectType.geo => 'gisAssemblyWF',
       Cocina::Models::ObjectType.webarchive_seed => 'wasSeedPreassemblyWF'
     }.freeze
+    # The workflow context that has closing the version create a new User Version, keeping the previous one on PURL.
+    # Otherwise the latest User Version (if any) moves to the new version. The robot that ends assembly passes it on
+    # when closing the version (LyberCore::Robot#close_version).
+    NEW_USER_VERSION_CONTEXT = { userVersions: 'new' }.freeze
 
     # @param [String] druid the druid of the object
     # @return [Cocina::Models::DROWithMetadata] the returned model
@@ -137,10 +141,11 @@ module Sdr
     # @param [String] user_name the sunetid of the user performing the action
     # @param [String] lane_id the lane to use for assembly / accessioning, defaults to 'high'
     # @param [Hash] context the workflow context for the assembly workflow. Note that closing the
-    #   version does not accept a context, so it is ignored when assembly is skipped.
+    #   version does not accept a context, so only its user version mode (see NEW_USER_VERSION_CONTEXT) is passed
+    #   when assembly is skipped.
     # @return [String, nil] the name of the assembly workflow started, or nil if the version was closed
     # @raise [Error] if there is an error initiating accession
-    def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {})
+    def self.accession(cocina_object:, user_name:, lane_id: 'high', context: {}) # rubocop:disable Metrics/AbcSize
       druid = cocina_object.externalIdentifier
       object_client = Dor::Services::Client.object(druid)
       # E.g., files staged in the deposit staging location before the object became geo or a seed.
@@ -153,7 +158,7 @@ module Sdr
                                                        context: context.presence)
         end
       else
-        object_client.version.close(user_name:, lane_id:)
+        object_client.version.close(user_name:, lane_id:, user_versions: context[:userVersions])
         nil
       end
     rescue Dor::Services::Client::Error => e

@@ -372,13 +372,23 @@ RSpec.describe Sdr::Repository do
       end
     end
 
+    context 'when the object has no files and the context requests a new user version' do
+      let(:file_sets) { [] }
+
+      it 'closes the version with the new user version mode' do
+        described_class.accession(cocina_object:, user_name:, context: { runOCR: true, userVersions: 'new' })
+
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high', user_versions: 'new')
+      end
+    end
+
     context 'when the object has no files' do
       let(:file_sets) { [] }
 
       it 'closes the version to initiate accessioning and returns nil' do
         expect(described_class.accession(cocina_object:, user_name:)).to be_nil
 
-        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high', user_versions: nil)
         expect(object_client).not_to have_received(:workflow)
         expect(StagingSupport).not_to have_received(:ensure_staging_folder)
       end
@@ -432,7 +442,7 @@ RSpec.describe Sdr::Repository do
       it 'closes the version to initiate accessioning' do
         described_class.accession(cocina_object:, user_name:)
 
-        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high', user_versions: nil)
         expect(object_client).not_to have_received(:workflow)
       end
     end
@@ -443,7 +453,7 @@ RSpec.describe Sdr::Repository do
       it 'closes the version to initiate accessioning without checking staging' do
         described_class.accession(cocina_object:, user_name:)
 
-        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high')
+        expect(version_client).to have_received(:close).with(user_name:, lane_id: 'high', user_versions: nil)
         expect(object_client).not_to have_received(:workflow)
         expect(StagingSupport).not_to have_received(:staged_files?)
       end
