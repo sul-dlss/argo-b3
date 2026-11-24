@@ -71,11 +71,11 @@ module Search
 
     def combine_label_and_values(facet_config:, values:, exclude: false)
       label = facet_label(facet_config.form_field)
-      if values.one?
-        "#{label}: #{'NOT ' if exclude}#{values.first}"
-      else
-        "#{label}: #{'NOT ' if exclude}(#{values.join(" #{facet_config.operator.upcase} ")})"
-      end
+      return "#{label}: #{'NOT ' if exclude}#{values.first}" if values.one?
+
+      # Excluded values are always ORed (see ItemQueryBuilder#facet_filter_query).
+      operator = exclude ? :or : search_form.operator_for(facet_config)
+      "#{label}: #{'NOT ' if exclude}(#{values.join(" #{operator.upcase} ")})"
     end
 
     def combine_dates(date_from_value:, date_to_value:)

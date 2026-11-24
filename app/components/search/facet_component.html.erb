@@ -3,6 +3,10 @@
     <%= tag.p 'Selecting a value updates the results.', id: checkbox_description_id, class: 'visually-hidden' %>
   <% end %>
 
+  <% if operator_form_field %>
+    <%= render Search::FacetOperatorToggleComponent.new(search_form:, form_field:, operator_form_field:) %>
+  <% end %>
+
   <%= helpers.turbo_frame_tag frame_id do %>
     <%= tag.ul class: 'facet-values list-unstyled', data: { controller: ('visit' if checkbox?) } do %>
       <% facet_counts.each do |facet_count| %>

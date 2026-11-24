@@ -38,13 +38,17 @@ module Search
       value_facets = values.each_with_index.to_h { |value, index| [index.to_s, value_facet(value)] }
       facet = { type: 'query', q: '*:*', facet: value_facets }
       # The counts ignore the facet's own filters, as the facet's top values do (see FacetsBuilder).
-      facet[:domain] = { excludeTags: [facet_config.field] } if FacetsBuilder.exclude?(facet_config)
+      facet[:domain] = { excludeTags: [facet_config.field] } if exclude_own_filters?
       { self.class.key(facet_config) => facet }
     end
 
     private
 
     attr_reader :facet_config, :search_form
+
+    def exclude_own_filters?
+      FacetsBuilder.exclude?(facet_config:, search_form:)
+    end
 
     def values
       return [] if facet_config.dynamic_facet.present? || facet_config.hierarchical?

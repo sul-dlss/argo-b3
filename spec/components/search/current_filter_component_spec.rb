@@ -54,7 +54,7 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
     end
   end
 
-  context 'when a filter has multiple (ORed) values' do
+  context 'when a filter has multiple values for a checkbox facet' do
     let(:form_field) { :object_types }
     let(:values) { %w[item collection] }
     let(:search_form) do
@@ -69,6 +69,19 @@ RSpec.describe Search::CurrentFilterComponent, type: :component do
 
       expect(page).to have_css('li', text: /Object type\s+❯\s+item OR collection/)
       expect(page).to have_link('Remove Object type > item OR collection', href: '/search?projects%5B%5D=Project+1')
+    end
+  end
+
+  context 'when a filter has multiple values for a checkbox facet combined with And' do
+    let(:form_field) { :languages }
+    let(:values) { %w[English Spanish] }
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English Spanish], languages_operator: 'and') }
+
+    it 'joins the values with AND and removes them all, keeping the operator' do
+      render_inline(component)
+
+      expect(page).to have_css('li', text: /Language\s+❯\s+English AND Spanish/)
+      expect(page).to have_link('Remove Language > English AND Spanish', href: '/search?languages_operator=and')
     end
   end
 

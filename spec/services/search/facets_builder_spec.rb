@@ -52,4 +52,13 @@ RSpec.describe Search::FacetsBuilder do
                   q: 'released_to_earthworks_dtpsidv:[NOW/DAY-7DAYS TO *]'
                 })
   end
+
+  context 'with languages combined with And' do
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English Spanish], languages_operator: 'and') }
+    let(:facet_configs) { [Search::Facets::LANGUAGES] }
+
+    it 'ignores the tagged filters (the excluded languages) in the counts' do
+      expect(facet_json[Search::Fields::LANGUAGES]).to include(domain: { excludeTags: [Search::Fields::LANGUAGES] })
+    end
+  end
 end

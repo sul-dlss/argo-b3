@@ -8,8 +8,10 @@ module Search
     end
 
     # True if the facet's counts ignore the facet's own filters (see ItemQueryBuilder#facet_filter_query).
-    def self.exclude?(facet_config)
-      facet_config.operator == :or || facet_config.exclude_form_field.present?
+    # @param facet_config [Search::Facets::Config]
+    # @param search_form [SearchForm] the search, which may choose the facet's operator
+    def self.exclude?(facet_config:, search_form:)
+      search_form.operator_for(facet_config) == :or || facet_config.exclude_form_field.present?
     end
 
     # @param facet_configs [Array<Search::Facets::Config>]
@@ -36,7 +38,7 @@ module Search
 
     def facet_json_for(facet_config)
       Search::FacetBuilder.call(field: facet_config.facet_field, tag: facet_config.field,
-                                exclude: self.class.exclude?(facet_config),
+                                exclude: self.class.exclude?(facet_config:, search_form:),
                                 **facet_config.to_h.slice(:limit, :alpha_sort, :missing_value))
     end
   end

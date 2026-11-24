@@ -39,6 +39,18 @@ RSpec.describe PinnedSearch do
       expect(described_class.exists_by_search_form?(search_form:, user: create(:user))).to be false
     end
 
+    context 'with languages' do
+      let(:search_form) { ResultsSearchForm.new(languages: %w[English Spanish]) }
+
+      it 'distinguishes the search combined with And from the one combined with Or' do
+        and_search_form = ResultsSearchForm.new(languages: %w[English Spanish], languages_operator: 'and')
+        or_search_form = ResultsSearchForm.new(languages: %w[English Spanish], languages_operator: 'or')
+
+        expect(described_class.exists_by_search_form?(search_form: and_search_form, user:)).to be false
+        expect(described_class.exists_by_search_form?(search_form: or_search_form, user:)).to be true
+      end
+    end
+
     it 'returns false when a different search is pinned by the user' do
       different_search_form = ResultsSearchForm.new(query: 'different')
 

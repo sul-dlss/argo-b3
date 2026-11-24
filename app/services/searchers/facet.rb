@@ -50,7 +50,7 @@ module Searchers
       {
         facet_field => Search::FacetBuilder.call(field: facet_field, tag: facet_config.field, alpha_sort:, limit:,
                                                  page:, missing_value: facet_config.missing_value,
-                                                 exclude: Search::FacetsBuilder.exclude?(facet_config))
+                                                 exclude: Search::FacetsBuilder.exclude?(facet_config:, search_form:))
       }.merge(selected_facet_json)
     end
 

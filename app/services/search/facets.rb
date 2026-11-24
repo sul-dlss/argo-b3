@@ -40,10 +40,14 @@ module Search
       :facet_children,
       # True if the facet has a search endpoint. If true, search will be enabled.
       :facet_search,
-      # How multiple selected values for the facet are combined: :and or :or.
-      # An :or facet's counts ignore the facet's own selection (see FacetBuilder), so that all
-      # of its values remain selectable. This is used, for example, for a checkbox facet.
+      # True to display the values as checkboxes.
+      :checkbox,
+      # How multiple selected values for the facet are combined by default: :and or :or.
+      # Under :or, the facet's counts ignore the facet's own selection (see FacetsBuilder), so that all
+      # of its values remain selectable. Excluded values are always ORed.
       :operator,
+      # Provide to let users choose the operator (overriding `operator`) with an And/Or toggle.
+      :operator_form_field,
       # Hash of dynamic facet keys to Solr queries.
       # This is used for facets like released_to_earthworks.
       :dynamic_facet,
@@ -83,7 +87,7 @@ module Search
     MISSING_VALUE = '_missing_value'
 
     def Config.with_defaults(**)
-      defaults = { alpha_sort: false, limit: 100, operator: :and,
+      defaults = { alpha_sort: false, limit: 100, operator: :and, checkbox: false,
                    facet_index: false, facet_children: false, facet_search: false, missing_value: false }
       new(**defaults, **)
     end
@@ -138,6 +142,7 @@ module Search
       loading: :primary,
       field: Search::Fields::CONTENT_TYPES,
       limit: 25,
+      checkbox: true,
       operator: :or
     )
 
@@ -157,6 +162,7 @@ module Search
       loading: :secondary,
       field: Search::Fields::FILE_ROLES,
       limit: 20,
+      checkbox: true,
       operator: :or
     )
 
@@ -235,7 +241,9 @@ module Search
       facet_index: true,
       facet_search: true,
       missing_value: true,
-      operator: :or
+      checkbox: true,
+      operator: :or,
+      operator_form_field: :languages_operator
     )
 
     LAST_ACCESSIONED_DATE = Config.with_defaults(
@@ -328,6 +336,7 @@ module Search
       form_field: :object_types,
       loading: :primary,
       field: Search::Fields::OBJECT_TYPES,
+      checkbox: true,
       operator: :or
     )
 
@@ -336,6 +345,7 @@ module Search
       loading: :secondary,
       field: Search::Fields::PROCESSING_STATUS,
       limit: 10,
+      checkbox: true,
       operator: :or
     )
 

@@ -125,6 +125,30 @@ RSpec.describe Search::ItemQueryBuilder do
     end
   end
 
+  context 'with selected and excluded languages combined with And (facet filter query)' do
+    let(:search_form) do
+      ResultsSearchForm.new(languages: %w[English _missing_value], languages_exclude: %w[French German],
+                            languages_operator: 'and')
+    end
+
+    it 'ANDs the selected values without tagging them and ORs the excluded values' do
+      result = described_class.call(search_form:, user_scope:)
+      field = Search::Fields::LANGUAGES
+      expect(Array(result[:fq]))
+        .to include("(#{field}:(\"English\") AND (*:* -#{field}:[* TO *]))",
+                    "{!tag=#{field}}-#{field}:(\"French\" OR \"German\")")
+    end
+  end
+
+  context 'with multiple languages combined with And (facet filter query)' do
+    let(:search_form) { ResultsSearchForm.new(languages: %w[English Spanish], languages_operator: 'and') }
+
+    it 'ANDs the values' do
+      result = described_class.call(search_form:, user_scope:)
+      expect(Array(result[:fq])).to include("#{Search::Fields::LANGUAGES}:(\"English\" AND \"Spanish\")")
+    end
+  end
+
   context 'with admin policy druids (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(admin_policy_druids: ['druid:bc123df4567']) }
 
@@ -193,10 +217,10 @@ RSpec.describe Search::ItemQueryBuilder do
   context 'with multiple access rights exclude (facet filter query)' do
     let(:search_form) { ResultsSearchForm.new(access_rights_exclude: %w[dark world]) }
 
-    it 'ANDs the values in the tagged filter query' do
+    it 'ORs the values in the tagged filter query' do
       result = described_class.call(search_form:, user_scope:)
       expect(Array(result[:fq]))
-        .to include("{!tag=#{Search::Fields::ACCESS_RIGHTS}}-#{Search::Fields::ACCESS_RIGHTS}:(\"dark\" AND \"world\")")
+        .to include("{!tag=#{Search::Fields::ACCESS_RIGHTS}}-#{Search::Fields::ACCESS_RIGHTS}:(\"dark\" OR \"world\")")
     end
   end
 
