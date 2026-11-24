@@ -1,0 +1,6 @@
+<%= page_title(t('notifications.heading')) %>
+
+<%= render Layout::ContainerComponent.new(heading: t('notifications.heading')) do %>
+  <%= render Notifications::TabsComponent.new(active: :recent) %>
+  <%= render Notifications::RecentTableComponent.new(notifications: @notifications) %>
+<% end %>

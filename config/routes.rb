@@ -91,6 +91,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications, only: %i[index] do
+    collection do
+      get 'email_settings'
+    end
+  end
+
   resources :bulk_actions, only: %i[new index show destroy] do
     member do
       get 'file'

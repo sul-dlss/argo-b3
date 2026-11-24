@@ -1,0 +1,20 @@
+<%= render SdrViewComponents::Tables::RawTableComponent.new(label: t('notifications.recent.table_label'), show_label: false,
+                                                            id: 'notifications-table', empty_message: t('notifications.recent.empty')) do |table| %>
+  <%= table.with_header(label: t('notifications.recent.headers.about')) %>
+  <%= table.with_header(label: t('notifications.recent.headers.notification')) %>
+  <%= table.with_header(label: t('notifications.recent.headers.when')) %>
+  <% notifications.each do |notification| %>
+    <% table.with_row do %>
+      <tr>
+        <td><%= link_to notification.subject_label, notification.subject_path %></td>
+        <td>
+          <%= outcome_icon(notification) %><span class="fw-bold"><%= notification.title %></span>
+          <% if notification.detail %>
+            <div><%= notification.detail %></div>
+          <% end %>
+        </td>
+        <td class="text-nowrap"><%= time_ago(notification) %></td>
+      </tr>
+    <% end %>
+  <% end %>
+<% end %>

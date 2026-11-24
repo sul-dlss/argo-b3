@@ -2,6 +2,7 @@
   <%= header.with_primary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Feedback', path: "mailto:#{Settings.support_email}") %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: logged_in_text) %>
+    <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: t('notifications.heading'), path: notifications_path) %>
   <% end %>
   <%= header.with_secondary_navigation_link do %>
     <%= render SdrViewComponents::Elements::Navigation::NavItemComponent.new(text: 'Workflow status', path: workflow_grid_path) %>
