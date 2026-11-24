@@ -27,6 +27,12 @@ RSpec.describe 'Deposit' do
           .with(cocina_object:, user_name: user.sunetid, version_description: 'Fixed the title')
       end
 
+      it 'tracks the deposit for the depositing user' do
+        post(deposit_object_path(druid), params:)
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 2, user:)
+      end
+
       context 'when a Turbo request' do
         it 'shows the toast and refreshes the page with a turbo stream' do
           post deposit_object_path(druid), params:,
@@ -58,11 +64,12 @@ RSpec.describe 'Deposit' do
         allow(Sdr::DepositDraftService).to receive(:call).and_raise(Sdr::DepositDraftService::NotDepositableError)
       end
 
-      it 'redirects to the object page with an error' do
+      it 'redirects to the object page with an error, without tracking a deposit' do
         post(deposit_object_path(druid), params:)
 
         expect(response).to redirect_to(object_path(druid))
         expect(flash[:danger]).to eq('This draft cannot be deposited.')
+        expect(TrackedDeposit.count).to eq(0)
       end
     end
 

@@ -687,6 +687,39 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: tracked_deposits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tracked_deposits (
+    id bigint NOT NULL,
+    druid character varying NOT NULL,
+    version integer NOT NULL,
+    user_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: tracked_deposits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tracked_deposits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tracked_deposits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tracked_deposits_id_seq OWNED BY public.tracked_deposits.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -836,6 +869,13 @@ ALTER TABLE ONLY public.pinned_searches ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.pinned_tags ALTER COLUMN id SET DEFAULT nextval('public.pinned_tags_id_seq'::regclass);
+
+
+--
+-- Name: tracked_deposits id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tracked_deposits ALTER COLUMN id SET DEFAULT nextval('public.tracked_deposits_id_seq'::regclass);
 
 
 --
@@ -995,6 +1035,14 @@ ALTER TABLE ONLY public.pinned_tags
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: tracked_deposits tracked_deposits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tracked_deposits
+    ADD CONSTRAINT tracked_deposits_pkey PRIMARY KEY (id);
 
 
 --
@@ -1209,6 +1257,20 @@ CREATE UNIQUE INDEX index_pinned_tags_on_user_id_and_tag ON public.pinned_tags U
 
 
 --
+-- Name: index_tracked_deposits_on_druid_and_version; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tracked_deposits_on_druid_and_version ON public.tracked_deposits USING btree (druid, version);
+
+
+--
+-- Name: index_tracked_deposits_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tracked_deposits_on_user_id ON public.tracked_deposits USING btree (user_id);
+
+
+--
 -- Name: index_users_on_email_address; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1288,6 +1350,14 @@ ALTER TABLE ONLY public.item_deposit_actions
 
 
 --
+-- Name: tracked_deposits fk_rails_b30064419d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tracked_deposits
+    ADD CONSTRAINT fk_rails_b30064419d FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: form_validation_actions fk_rails_b84cab4fe2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1334,6 +1404,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261124230000'),
 ('20261124164108'),
 ('20261124164107'),
 ('20261113120001'),

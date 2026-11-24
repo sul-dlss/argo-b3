@@ -546,6 +546,13 @@ RSpec.describe 'Contents' do
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
         expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
       end
+
+      it 'tracks the deposit for the depositing user' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 1, user:)
+      end
     end
 
     context 'when adding an embargo' do
@@ -595,6 +602,8 @@ RSpec.describe 'Contents' do
         create(:content, :mutable, druid:, lock: cocina_object.lock, staging_state: 'staging_failed')
       end
 
+      before { create(:tracked_deposit, druid:, version: 1) }
+
       it 'stages again' do
         patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
                                              contents_item: { viewing_direction: 'right-to-left' } }
@@ -602,6 +611,13 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(content.reload.staging_state).to eq('staging')
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      end
+
+      it 'tracks the deposit for the user who deposited it again' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { viewing_direction: 'right-to-left' } }
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 1, user:)
       end
     end
 
@@ -622,12 +638,13 @@ RSpec.describe 'Contents' do
     end
 
     context 'when saving as draft' do
-      it 'stages without accessioning' do
+      it 'stages without accessioning or tracking a deposit' do
         patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(TrackedDeposit.count).to eq(0)
       end
     end
 
@@ -797,6 +814,13 @@ RSpec.describe 'Contents' do
         expect(content.reload.lock).to eq('opened-lock')
         expect(Sdr::VersionService).to have_received(:new).with(druid:).once
         expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+      end
+
+      it 'tracks the deposit of the opened version' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { version_description: 'Added files' } }
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 2, user:)
       end
     end
 

@@ -44,6 +44,17 @@ RSpec.describe 'Notifications' do
       expect(Capybara.string(response.body)).to have_text('No notifications.')
     end
 
+    it 'lists a notification without a record, about an item' do
+      DepositCompleteNotifier.with(druid: 'druid:bc123df4567', version: 2, title: 'The Gettysburg Address')
+                             .deliver(user)
+
+      get notifications_path
+
+      rendered_page = Capybara.string(response.body)
+      expect(rendered_page).to have_link('The Gettysburg Address (bc123df4567)', href: '/objects/druid:bc123df4567')
+      expect(rendered_page).to have_text('Version 2 was deposited.')
+    end
+
     context 'when an admin is impersonating' do
       let(:user) { create(:user, :admin, groups: [AuthenticationHelpers::ADMIN_GROUP]) }
 

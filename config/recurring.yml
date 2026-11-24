@@ -25,3 +25,6 @@ production:
   notifications_cleanup:
     class: NotificationsCleanupJob
     schedule: every day at 3:45am
+  poll_tracked_deposits:
+    class: PollTrackedDepositsJob
+    schedule: every 10 minutes

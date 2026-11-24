@@ -303,6 +303,7 @@ class ObjectsController < ApplicationController # rubocop:disable Metrics/ClassL
 
   def deposit_and_respond(deposit_form:, cocina_object:) # rubocop:disable Metrics/AbcSize
     deposit_form.deposit!(cocina_object:, user_name: current_user.sunetid)
+    TrackedDeposit.track!(druid: cocina_object.externalIdentifier, version: cocina_object.version, user: current_user)
     toast_and_refresh(t('show.toasts.deposit_started'), fallback_location: object_path(druid_param))
   rescue Sdr::DepositDraftService::ContentBusyError
     redirect_to object_path(druid_param), flash: { danger: t('show.warnings.content_busy') }
