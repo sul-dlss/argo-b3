@@ -61,7 +61,7 @@ RSpec.describe Search::ConfiguredFacetComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_css('ul[data-controller="hierarchical-facet-value"] li', text: 'Audio')
-      expect(page).to have_link('More Tag', href: '/search/tag_facets?facet_page=2')
+      expect(page).to have_link('More Tags', href: '/search/tag_facets?facet_page=2')
       expect(page).to have_field('Search tag', type: 'text')
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe Search::ConfiguredFacetComponent, type: :component do
       render_inline(component)
 
       expect(page).to have_link('application/pdf')
-      expect(page).to have_link('More MIME type', href: '/search/mimetype_facets?facet_page=2')
+      expect(page).to have_link('More MIME types', href: '/search/mimetype_facets?facet_page=2')
       expect(page).to have_field('Search mime type', type: 'text')
     end
   end

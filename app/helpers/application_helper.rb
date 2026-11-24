@@ -15,6 +15,12 @@ module ApplicationHelper
     I18n.t("search.facets.#{form_field}", default: form_field.to_s.humanize.singularize)
   end
 
+  # Plural facet label (e.g., for the "More <label>" paging link). Set search.facet_plurals.<form_field>
+  # where pluralizing the label's last word reads wrong.
+  def facet_plural_label(form_field)
+    I18n.t("search.facet_plurals.#{form_field}", default: facet_label(form_field).pluralize)
+  end
+
   def facet_id(form_field, suffix: nil)
     parts = [form_field.to_s.dasherize, 'facet']
     parts << suffix.to_s if suffix.present?

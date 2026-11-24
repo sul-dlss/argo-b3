@@ -89,6 +89,8 @@ en:
       released_to_searchworks_date_from: "Released to SearchWorks date from"
       released_to_searchworks_date_to: "Released to SearchWorks date to"
       wps_workflows: "Workflow > Process > Status"
+    facet_plurals:
+      wps_workflows: "Workflows"
     facet_values:
       ever: "Currently released"
       never: "Not released"
