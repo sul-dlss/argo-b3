@@ -19,7 +19,6 @@ RSpec.describe BulkActions::DruidsJob do
     allow(File).to receive(:open).and_call_original
     allow(File).to receive(:open).with(bulk_action.log_filepath, 'a').and_return(log)
     allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
-    allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
   end
 
   after do
@@ -63,9 +62,10 @@ RSpec.describe BulkActions::DruidsJob do
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('bulk_actions_history',
                                                                                  bulk_action.user)
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with('notifications', bulk_action.user,
-                                                                                target: 'toast-container',
-                                                                                html: kind_of(String))
+      notification = bulk_action.user.notifications.sole
+      expect(notification).to be_a(BulkActionFinishedNotifier::Notification)
+      expect(notification.record).to eq(bulk_action)
+      expect(notification.params).to eq(label: 'Reindex', failure_count: 1)
     end
   end
 
@@ -227,7 +227,7 @@ RSpec.describe BulkActions::DruidsJob do
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with('bulk_actions_history',
                                                                                  bulk_action.user)
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
+      expect(bulk_action.user.notifications).to be_empty
     end
   end
 

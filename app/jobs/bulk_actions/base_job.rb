@@ -114,7 +114,9 @@ module BulkActions
     def perform_broadcast
       Turbo::StreamsChannel.broadcast_refresh_to('bulk_actions_history', bulk_action.user)
 
-      broadcast_toast(title: "#{bulk_action.label} completed", user: bulk_action.user)
+      BulkActionFinishedNotifier.with(record: bulk_action, label: bulk_action.label,
+                                      failure_count: bulk_action.druid_count_fail)
+                                .deliver(bulk_action.user)
     end
 
     def log_start

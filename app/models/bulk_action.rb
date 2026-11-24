@@ -3,6 +3,7 @@
 # Model for tracking a bulk action.
 class BulkAction < ApplicationRecord
   belongs_to :user
+  has_many :noticed_events, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
 
   enum :status, {
     created: 'created',

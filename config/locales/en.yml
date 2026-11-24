@@ -1047,3 +1047,11 @@ en:
       toasts:
         added: 'Permission added'
         deleted: 'Permission deleted'
+  notifiers:
+    bulk_action_finished:
+      title: 'Bulk action finished'
+      title_with_errors: 'Bulk action finished with errors'
+      text: '%{label} completed.'
+      text_with_errors:
+        one: '%{label} completed with 1 error.'
+        other: '%{label} completed with %{count} errors.'
