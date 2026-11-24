@@ -547,6 +547,9 @@ RSpec.describe 'Create multiple items' do
       expect(page).to have_css('.alert-danger',
                                text: 'Fix the errors or delete items below and click "Register items" again, ' \
                                      'or click "Clear all items and enter again."')
+      # The alert comes before every visible field of the form.
+      expect(page).to have_no_xpath("//form[contains(@class, 'b3-form')]//*[self::input or self::textarea or " \
+                                    "self::select][following::*[contains(@class, 'alert-danger')]]")
 
       # Only the item with errors is displayed.
       expect(item_registrations).to have_css('.form-instance', count: 1)

@@ -3,6 +3,14 @@
 <%= render Layout::ContainerComponent.new(heading: t('edit.multiple_items.new.title')) do %>
   <%= form_with(model: @items_registration_form, url: multiple_items_path, class: 'b3-form',
                 data: { controller: 'content-type-dependent' }) do |form| %>
+    <% if @items_registration_form.invalid_item_registrations.any? %>
+      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger) do %>
+        <%= t('edit.multiple_items.new.invalid_items_alert',
+              register_label: t('edit.multiple_items.new.buttons.register'),
+              clear_label: t('edit.multiple_items.new.buttons.clear')) %>
+      <% end %>
+    <% end %>
+
     <%= render Edit::ContentTypeComponent.new(form:, input_data: { content_type_dependent_target: 'contentType',
                                                                    action: 'content-type-dependent#toggle' }) %>
 
@@ -99,11 +107,6 @@
       <% end %>
       <% end %>
     <% else %>
-      <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger) do %>
-        <%= t('edit.multiple_items.new.invalid_items_alert',
-              register_label: t('edit.multiple_items.new.buttons.register'),
-              clear_label: t('edit.multiple_items.new.buttons.clear')) %>
-      <% end %>
       <%= tag.div class: 'my-fieldset', data: { controller: 'has-many' } do %>
         <div data-has-many-target="container">
           <%= form.fields_for :item_registrations do |nested_form| %>
