@@ -20,4 +20,7 @@
                                                       content_token: @content_token,
                                                       disabled: @content.busy?) %>
   </fieldset>
+  <% if Contents::ManageFilesFlow.new_files_question?(content: @content) %>
+    <%= render Edit::NewFilesChoiceComponent.new %>
+  <% end %>
 <% end %>

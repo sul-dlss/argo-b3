@@ -14,6 +14,9 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
   RESTRUCTURE_VALUE = 'restructure'
   CSV_VALUE = 'csv'
   LABELS_CSV_VALUE = 'labels_csv'
+  # Values for how new files are structured when leaving add and edit files (see contents/show).
+  APPEND_NEW_FILES_VALUE = 'append'
+  REBUILD_NEW_FILES_VALUE = 'rebuild'
 
   def show
     @content_token = params[:id]
@@ -89,7 +92,8 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
       return render_invalid_step(cocina_object:, content:)
     end
 
-    @manage_files_flow.next!(@contents_item_form)
+    rebuild = params.dig(:new_files, :structure) == REBUILD_NEW_FILES_VALUE
+    @manage_files_flow.next!(@contents_item_form, rebuild:)
     redirect_to edit_content_path(content.druid)
   end
 

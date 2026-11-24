@@ -114,11 +114,11 @@ RSpec.describe Contents::ManageFilesFlow do
         create(:content_file_binary, content:, filepath: 'image2.tif', basename: 'image2')
       end
 
-      it 'opens on structure files and appends the files' do
+      it 'opens on add and edit files without appending the files, so that the user chooses how to structure them' do
         manage_files_flow.open_on!('structure')
 
-        expect(content.reload.step).to eq('structure')
-        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+        expect(content.reload.step).to eq('files')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
       end
     end
 
@@ -161,6 +161,49 @@ RSpec.describe Contents::ManageFilesFlow do
         expect(content.reload.step).to eq('structure')
         expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: false)
       end
+    end
+
+    context 'when leaving the add and edit files step with resources and files not in a resource' do
+      let(:step) { 'files' }
+
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+        create(:content_file_binary, content:, filepath: 'image2.tif', basename: 'image2')
+      end
+
+      it 'appends the files' do
+        manage_files_flow.next!(form)
+
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+      end
+
+      it 'rebuilds the resources when chosen' do
+        manage_files_flow.next!(form, rebuild: true)
+
+        expect(content.reload.step).to eq('structure')
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: false)
+      end
+    end
+  end
+
+  describe '.new_files_question?' do
+    it 'is false without resources' do
+      create(:content_file_binary, content:)
+
+      expect(described_class.new_files_question?(content:)).to be false
+    end
+
+    it 'is false when every file is in a resource' do
+      create(:content_file, content_file_set: create(:content_file_set, content:))
+
+      expect(described_class.new_files_question?(content:)).to be false
+    end
+
+    it 'is true with resources and a file not in a resource' do
+      create(:content_file, content_file_set: create(:content_file_set, content:))
+      create(:content_file_binary, content:, filepath: 'image2.tif', basename: 'image2')
+
+      expect(described_class.new_files_question?(content:)).to be true
     end
   end
 

@@ -55,6 +55,37 @@ RSpec.describe 'Contents' do
       end
     end
 
+    it 'does not ask how to structure new files' do
+      get content_path(content_token)
+
+      expect(response.body).not_to include(I18n.t('edit.contents.edit.new_files.label'))
+    end
+
+    context 'when the content has resources and files that are not in one' do
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+        create(:content_file_binary, content:, filepath: 'new.tif')
+      end
+
+      it 'asks how to structure the new files' do
+        get content_path(content_token)
+
+        expect(response.body).to include(I18n.t('edit.contents.edit.new_files.label'))
+      end
+    end
+
+    context 'when every file is in a resource' do
+      before do
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+      end
+
+      it 'does not ask how to structure new files' do
+        get content_path(content_token)
+
+        expect(response.body).not_to include(I18n.t('edit.contents.edit.new_files.label'))
+      end
+    end
+
     context 'when discovering files' do
       let!(:content) { create(:content, :mutable, druid:, lock: cocina_object.lock, mount_state: 'discovering') }
 
@@ -163,6 +194,22 @@ RSpec.describe 'Contents' do
 
         follow_redirect!
         expect(Capybara.string(response.body)).to have_css('#manage-files-step-structure')
+      end
+    end
+
+    context 'when opening on structure files with resources and files that are not in one' do
+      before do
+        allow(StructureFilesJob).to receive(:perform_later)
+        content.update!(step: 'details')
+        create(:content_file, content_file_set: create(:content_file_set, content:))
+        create(:content_file_binary, content:, filepath: 'new.tif')
+      end
+
+      it 'opens on the add and edit files step without appending the files' do
+        get edit_content_path(druid, open_on: 'structure')
+
+        expect(content.reload.step).to eq('files')
+        expect(StructureFilesJob).not_to have_received(:perform_later)
       end
     end
 
@@ -983,6 +1030,21 @@ RSpec.describe 'Contents' do
 
         expect(content.reload).to have_attributes(step: 'structure', structuring_state: 'structuring')
         expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+      end
+
+      it 'appends the files when chosen' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE,
+                                             new_files: { structure: ContentsController::APPEND_NEW_FILES_VALUE } }
+
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: true)
+      end
+
+      it 'rebuilds the structure when chosen' do
+        patch content_path(druid), params: { commit: ContentsController::NEXT_VALUE,
+                                             new_files: { structure: ContentsController::REBUILD_NEW_FILES_VALUE } }
+
+        expect(content.reload).to have_attributes(step: 'structure', structuring_state: 'structuring')
+        expect(StructureFilesJob).to have_received(:perform_later).with(content:, append: false)
       end
     end
 

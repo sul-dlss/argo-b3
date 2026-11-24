@@ -22,6 +22,13 @@ module Contents
       ItemDetails.new(content:).clear!(step: STEPS.first)
     end
 
+    # Whether add and edit files asks how new files should be structured: appended to the existing resources, or
+    # the resources rebuilt.
+    # @param content [Content]
+    def self.new_files_question?(content:)
+      content.content_file_sets.exists? && content.content_file_binaries.unassociated.exists?
+    end
+
     # @param content [Content] the mutable Content
     # @param agreement [Boolean] whether the object is an agreement, which has no item details to edit
     def initialize(content:, agreement:)
@@ -51,14 +58,16 @@ module Contents
       current_step == 'structure'
     end
 
-    # Saves the item details and moves to the next step. Leaving add and edit files structures the files, or
-    # appends the files that are not in a resource to the existing resources.
+    # Saves the item details and moves to the next step. Leaving add and edit files structures the files, or, when
+    # there are resources, appends the files that are not in a resource to them or rebuilds them, as the user chose
+    # (see #new_files_question?).
     # Only call once current_step_complete? is true.
     # @param form [ContentsItemForm]
-    def next!(form)
+    # @param rebuild [Boolean] whether to replace the existing resources rather than append to them
+    def next!(form, rebuild: false)
       leaving_step = current_step
       ItemDetails.new(content:).save!(form, step: step_at(1))
-      start_structuring! if leaving_step == 'files'
+      start_structuring!(rebuild:) if leaving_step == 'files'
     end
 
     # @param form [ContentsItemForm]
@@ -78,9 +87,9 @@ module Contents
     end
 
     # Moves to the step that entering managing files opens on. Opening on structure files opens on add and edit files
-    # when there are no files, and otherwise structures (or appends) the files that are not in a resource, as leaving
-    # add and edit files does. The step is kept while the content is busy, since discovering or structuring needs the
-    # step it started on.
+    # when there are no files, or when there are resources and files that are not in one, so that the user chooses
+    # how to structure the new files; otherwise it structures the files when there are no resources. The step is kept
+    # while the content is busy, since discovering or structuring needs the step it started on.
     # @param open_on [String] OPEN_ON_FIRST or OPEN_ON_STRUCTURE
     def open_on!(open_on)
       return if content.busy?
@@ -122,14 +131,16 @@ module Contents
     end
 
     def open_on_structure!
-      return content.update!(step: 'files') unless content.content_file_binaries.exists?
+      if !content.content_file_binaries.exists? || self.class.new_files_question?(content:)
+        return content.update!(step: 'files')
+      end
 
       content.update!(step: 'structure')
       start_structuring!
     end
 
-    def start_structuring!
-      if content.content_file_sets.none?
+    def start_structuring!(rebuild: false)
+      if rebuild || content.content_file_sets.none?
         content.start_structuring!(append: false)
       elsif content.content_file_binaries.unassociated.exists?
         content.start_structuring!(append: true)

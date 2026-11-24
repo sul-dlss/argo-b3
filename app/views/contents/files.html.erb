@@ -82,7 +82,7 @@
       <%= render SdrViewComponents::Elements::HorizontalRuleComponent.new %>
 
       <%# The heading, with the number of files, is in the frame so that it updates when the frame reloads. %>
-      <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'reloadable-frame' }, class: 'content-files-frame' do %>
+      <%= turbo_frame_tag @content, 'show', src: content_path(@content_token), data: { controller: 'reloadable-frame new-files-choice', action: 'turbo:frame-load->new-files-choice#forget' }, class: 'content-files-frame' do %>
         <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.contents.edit.files_section.label')) %>
         <%= render SdrViewComponents::Elements::SpinnerComponent.new %>
         <%# Until the files section has loaded, assume there are unassociated files. %>
