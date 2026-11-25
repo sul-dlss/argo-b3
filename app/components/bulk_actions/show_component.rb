@@ -121,7 +121,7 @@ module BulkActions
     private
 
     # @param key [Symbol] a key listed in the bulk action config's nav_links
-    # @return [Hash, nil] button arguments for the link, or nil when it is not shown yet
+    # @return [Hash, nil] button arguments for the link, or nil when it is not shown yet (or the key is unknown)
     def nav_link(key)
       case key
       when :register_more_items
@@ -129,8 +129,6 @@ module BulkActions
       when :deposit_multiple_items
         { link: multi_item_deposit_actions_path, method: :post, label: t('multi_item_deposit_actions.new'),
           disabled: !can_register_item? }
-      else
-        raise ArgumentError, "Unknown nav link #{key} for #{bulk_action.action_type}"
       end
     end
 
