@@ -83,39 +83,39 @@ RSpec.describe 'Show bulk actions history' do
 
     visit bulk_actions_path
 
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '35 selected')
-    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '35 of 35 selected')
     click_button 'Select none'
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '0 of 35 selected')
     click_button 'Select all'
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '35 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '35 of 35 selected')
     click_button 'Select none'
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
     find('.ts-dropdown .option', text: 'Redeposit').click
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '1 of 35 selected')
     click_button 'Filter'
 
     expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
     expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '1 of 35 selected')
 
     # The select (and the filter) are retained when the page reloads.
     other_redeposit_bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
     expect(page).to have_css("tr##{dom_id(other_redeposit_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '1 of 35 selected')
     expect(page).to have_no_css('#bulk-actions-filter select[multiple]:not(.tomselected)', visible: :all)
   end
 
   it 'keeps an open filter and an unsubmitted selection when the page reloads' do
     visit bulk_actions_path
 
-    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
     click_button 'Select none'
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '0 of 35 selected')
 
     bulk_action = create(:bulk_action, user:, action_type: 'REDEPOSIT')
     expect(page).to have_css("tr##{dom_id(bulk_action, 'row')}")
     expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-dropdown')
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '0 of 35 selected')
 
     # Closes the dropdown, leaving the selection unsubmitted.
     find('h1').click
@@ -123,7 +123,7 @@ RSpec.describe 'Show bulk actions history' do
 
     other_bulk_action = create(:bulk_action, user:, action_type: 'REINDEX')
     expect(page).to have_css("tr##{dom_id(other_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '0 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '0 of 35 selected')
   end
 
   context 'when an admin' do
@@ -137,11 +137,10 @@ RSpec.describe 'Show bulk actions history' do
 
       expect(page).to have_css("tr##{dom_id(user_bulk_action, 'row')}")
       expect(page).to have_no_css("tr##{dom_id(bulk_action_other_user, 'row')}")
-      expect(page).to have_css('#bulk_actions_filter_user_ids + .ts-wrapper .ts-count', text: '1 selected')
+      expect(page).to have_css('#bulk_actions_filter_user_ids-count', text: '1 of 2 selected')
 
-      find('#bulk_actions_filter_user_ids + .ts-wrapper .ts-control').click
-      click_button 'Select all'
-      expect(page).to have_css('#bulk_actions_filter_user_ids + .ts-wrapper .ts-count', text: '2 selected')
+      find('button[aria-label="Select all users"]').click
+      expect(page).to have_css('#bulk_actions_filter_user_ids-count', text: '2 of 2 selected')
       click_button 'Filter'
 
       row = page.find("tr##{dom_id(bulk_action_other_user, 'row')}")
@@ -156,8 +155,8 @@ RSpec.describe 'Show bulk actions history' do
 
     visit bulk_actions_path
 
-    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
     click_button 'Select none'
+    find('#bulk_actions_filter_action_types + .ts-wrapper .ts-control').click
     find('.ts-dropdown .option', text: 'Redeposit').click
     click_button 'Filter'
     expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
@@ -169,13 +168,14 @@ RSpec.describe 'Show bulk actions history' do
 
     expect(page).to have_css("tr##{dom_id(redeposit_bulk_action, 'row')}")
     expect(page).to have_css("tr##{dom_id(reindex_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '35 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '35 of 35 selected')
 
     page.go_back
 
     expect(page).to have_no_css("tr##{dom_id(reindex_bulk_action, 'row')}")
-    expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper .ts-count', text: '1 selected')
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', text: '1 of 35 selected')
     expect(page).to have_css('#bulk_actions_filter_action_types + .ts-wrapper', count: 1)
+    expect(page).to have_css('#bulk_actions_filter_action_types-count', count: 1)
   end
 
   it 'filters the bulk actions by status' do
@@ -184,11 +184,11 @@ RSpec.describe 'Show bulk actions history' do
 
     visit bulk_actions_path
 
-    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '4 selected')
+    expect(page).to have_css('#bulk_actions_filter_statuses-count', text: '4 of 4 selected')
+    expect(page).to have_no_css('#bulk_actions_filter_statuses + .ts-wrapper + .ts-footer button')
     find('#bulk_actions_filter_statuses + .ts-wrapper .ts-control').click
-    expect(page).to have_no_button('Select all')
     find('.ts-dropdown .option', text: 'Processing').click
-    expect(page).to have_css('#bulk_actions_filter_statuses + .ts-wrapper .ts-count', text: '3 selected')
+    expect(page).to have_css('#bulk_actions_filter_statuses-count', text: '3 of 4 selected')
     click_button 'Filter'
 
     expect(page).to have_css("tr##{dom_id(completed_bulk_action, 'row')}")

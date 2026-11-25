@@ -2,7 +2,7 @@
   <%# The form is permanent so that the filter values (and Tom Select) are retained when the frame reloads.
       The id is per object so another object's form isn't retained. %>
   <%= form_with model: @events_filter_form, url: events_object_path(druid: params[:druid]), method: :get,
-                id: "events_filter_#{DruidSupport.bare_druid_from(@druid)}", class: 'row g-3 align-items-end mb-4',
+                id: "events_filter_#{DruidSupport.bare_druid_from(@druid)}", class: 'row g-3 align-items-start mb-4',
                 data: { turbo_permanent: true, turbo_frame: "#{@druid}_events" } do |form| %>
     <%= render Elements::Forms::MultiSelectFilterComponent.new(form:, field_name: :event_types,
                                                                options: @event_types.map { |event_type| [event_type.humanize, event_type] },
@@ -11,7 +11,7 @@
                                                                 container_classes: 'col-md-3') %>
     <%= render SdrViewComponents::Forms::TextFieldComponent.new(form:, field_name: :to, label_text: 'Date to', input_type: 'datetime-local',
                                                                 container_classes: 'col-md-3') %>
-    <div class="col-md-2">
+    <div class="col-md-2 pt-4">
       <%= render SdrViewComponents::Forms::SubmitComponent.new(label: 'Filter') %>
     </div>
   <% end %>

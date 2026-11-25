@@ -4,10 +4,13 @@ export default class MorphableTomSelect {
   // @param input [HTMLElement] the select or input that Tom Select is attached to
   // @param build [Function] creates the widget and returns it
   // @param destroy [Function] tears down the widget when the controller disconnects
-  constructor (input, { build, destroy = (tomSelect) => tomSelect.destroy() }) {
+  // @param companions [Function] returns other elements the widget added to the page (e.g., after its wrapper), which
+  //   a morph keeps while the widget is in use
+  constructor (input, { build, destroy = (tomSelect) => tomSelect.destroy(), companions = () => [] }) {
     this.input = input
     this.buildWidget = build
     this.destroyWidget = destroy
+    this.companions = companions
   }
 
   connect () {
@@ -38,7 +41,7 @@ export default class MorphableTomSelect {
     const { target } = event
     // The input is being removed, so disconnect tears down the widget.
     if (target === this.input && !event.detail.newElement) return
-    if (![this.input, this.tomSelect.wrapper, this.label].includes(target)) return
+    if (![this.input, this.tomSelect.wrapper, this.label, ...this.companions()].includes(target)) return
 
     if (this.inUse()) {
       event.preventDefault()
