@@ -6,9 +6,12 @@
 #
 # The email is sent 10 minutes later, unless the Deposit has left In Error since the Notification: staging was
 # retried, the Process was retried, or the Deposit is no longer tracked (e.g., it is Complete or the draft was
-# discarded). If it went In Error again since, that later error has its own Notification and email.
+# discarded). If it went In Error again since, that later error has its own Notification and email. The email is
+# also skipped when the depositing user has turned off Deposit failed emails.
 class DepositFailedNotifier < ApplicationNotifier
   EMAIL_WAIT = 10.minutes
+
+  self.email_notifier_kind = 'deposit_failed'
 
   # title is the object's title when the Deposit went In Error; cause is one of TrackedDeposit::CAUSES;
   # error_summary is what went wrong (for Processes, each as workflow:process:message).
@@ -16,7 +19,13 @@ class DepositFailedNotifier < ApplicationNotifier
 
   deliver_by :turbo_toast, class: 'DeliveryMethods::TurboToast', queue: :real_time
   deliver_by :email, mailer: 'NotificationMailer', method: :deposit_failed,
-                     wait: EMAIL_WAIT, unless: :left_error_since_notification?
+                     wait: EMAIL_WAIT, unless: :skip_email?
+
+  # Evaluated when the email is due.
+  # @return [Boolean] whether the email should not be sent
+  def skip_email?(notification)
+    email_turned_off?(notification) || left_error_since_notification?(notification)
+  end
 
   # Evaluated when the email is due.
   # @return [Boolean] whether the Deposit has left In Error since the Notification
@@ -24,17 +33,14 @@ class DepositFailedNotifier < ApplicationNotifier
     tracked_deposit = TrackedDeposit.find_by(druid: params[:druid], version: params[:version])
     return true unless tracked_deposit&.in_error_since?(cause: params[:cause], time: created_at)
 
-    params[:cause] == 'process' && !processes_in_error?
+    # PollTrackedDepositsJob runs about as often as the email waits, so it may not yet have seen a retry.
+    params[:cause] == 'process' && process_errors.empty?
   end
 
   private
 
-  # PollTrackedDepositsJob runs about as often as the email waits, so it may not yet have seen a retry.
-  # @return [Boolean] whether Solr has the object's Processes in error now
-  def processes_in_error?
-    Searchers::ItemByDruid.call(druids: [params[:druid]], user_scope: nil,
-                                fields: [Search::Fields::ID, Search::Fields::WORKFLOW_ERRORS])
-                          .first&.workflow_errors.present?
+  def process_errors
+    Sdr::WorkflowService.process_errors(druid: params[:druid], version: params[:version])
   end
 
   notification_methods do

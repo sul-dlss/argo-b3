@@ -8,6 +8,7 @@ Argo-B3 is a Rails application supporting the management of digital objects in t
 - The database schema is `db/structure.sql` (there is no `schema.rb`); local services (Postgres, Redis, Solr, DSA, SURI) are in `compose.yaml`.
 - Authorization: `ApplicationPolicy` has `pre_check :allow_admins`, so admins pass every rule; policy rules decide only for non-admins.
 - `Current.effective_groups` is read only by the `Authentication` concern and Action Policy classes. Search and Solr services never read it; they receive a `Permissions::UserScope` as an explicit `user_scope:` argument, which controllers and jobs supply (`current_user_scope` in controllers).
+- Solr is a derived index that lags DSA. Use it for search and for display values (e.g., titles), but read the state of an object that code acts on (workflow and Process status, version status, milestones) from DSA through the `Sdr::*` services (e.g., `Sdr::WorkflowService`, `Sdr::VersionService`).
 
 ## Conventions
 

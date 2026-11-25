@@ -21,6 +21,15 @@ module Sdr
         processes.none? { |process| process.status.in?(%w[queued started]) }
     end
 
+    # @return [Array<String>] the Processes in error for the version, as workflow:process:message
+    #   (workflow:process if there is no message); empty if none
+    def self.process_errors(druid:, version:)
+      Dor::Services::Client.object(druid).workflows.workflows.flat_map do |workflow|
+        workflow.processes.select { |process| process.version == version && process.status == 'error' }
+                .map { |process| [workflow.workflow_name, process.name, process.error_message].compact.join(':') }
+      end
+    end
+
     PROCESS_NOTES = { 'skipped' => 'Skipped by', 'completed' => 'Completed by' }.freeze
 
     # Changes the status of a process in error, noting who skipped or completed it.

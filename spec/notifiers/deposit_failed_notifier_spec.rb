@@ -15,15 +15,13 @@ RSpec.describe DepositFailedNotifier do
     create(:tracked_deposit, druid:, version: 3, user:, process_errored_at: 1.second.ago)
   end
 
-  let(:solr_docs) { [{ 'id' => druid, 'wf_error_ssim' => [error_summary] }] }
+  let(:process_errors) { [error_summary] }
   let(:remedy) do
     "Retry the process from the item page, or contact SDR support at #{Settings.support_email} for assistance."
   end
 
   before do
-    allow(Search::SolrService).to receive(:post) do
-      { 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } }
-    end
+    allow(Sdr::WorkflowService).to receive(:process_errors).with(druid:, version: 3) { process_errors }
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to) do |*_args, html:, **|
       toast_html << Capybara.string(html)
     end
@@ -77,6 +75,19 @@ RSpec.describe DepositFailedNotifier do
     expect(html).to have_css('p', text: "please contact the SDR team at #{Settings.support_email}.")
   end
 
+  it 'cancels the email if the depositing user turned off Deposit failed emails after the Notification' do
+    EmailOptOut.create!(user:, notifier_kind: 'deposit_failed')
+
+    expect { send_due_email }.not_to(change { ActionMailer::Base.deliveries.count })
+    expect(user.notifications.count).to eq(1)
+  end
+
+  it 'sends the email if the depositing user turned off only other emails' do
+    EmailOptOut.create!(user:, notifier_kind: 'file_check_finished')
+
+    expect { send_due_email }.to change { ActionMailer::Base.deliveries.count }.by(1)
+  end
+
   context 'when the Process was retried' do
     before { tracked_deposit.update!(process_errored_at: nil) }
 
@@ -89,7 +100,7 @@ RSpec.describe DepositFailedNotifier do
   end
 
   context 'when the Process was retried but polling has not yet seen it' do
-    let(:solr_docs) { [{ 'id' => druid }] }
+    let(:process_errors) { [] }
 
     it 'cancels the email, keeping the notification' do
       send_due_email

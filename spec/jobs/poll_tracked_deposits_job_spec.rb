@@ -10,9 +10,11 @@ RSpec.describe PollTrackedDepositsJob do
   let(:statuses) { {} }
   let(:solr_docs) { [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address' }] }
   let(:toast_html) { [] }
+  let(:process_errors) { {} }
 
   before do
     allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
+    allow(Sdr::WorkflowService).to receive(:process_errors) { |druid:, **| process_errors.fetch(druid, []) }
     allow(Search::SolrService).to receive(:post) do
       { 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } }
     end
@@ -81,7 +83,7 @@ RSpec.describe PollTrackedDepositsJob do
       expect(TrackedDeposit.count).to eq(0)
       expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:bc123df4567'])
       expect(Search::SolrService).to have_received(:post) do |request:|
-        expect(request).to include(fq: ['id:("druid:bc123df4567")'], fl: %w[id display_title_ss wf_error_ssim])
+        expect(request).to include(fq: ['id:("druid:bc123df4567")'], fl: %w[id display_title_ss])
       end
     end
   end
@@ -135,10 +137,7 @@ RSpec.describe PollTrackedDepositsJob do
 
   context 'when a Process of the tracked version goes into error' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
-    let(:solr_docs) do
-      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address',
-         'wf_error_ssim' => ['accessionWF:shelve:Error: shelving failed'] }]
-    end
+    let(:process_errors) { { 'druid:bc123df4567' => ['accessionWF:shelve:Error: shelving failed'] } }
     let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
 
     it 'notifies the depositing user that the Deposit failed, and keeps tracking' do
@@ -163,9 +162,9 @@ RSpec.describe PollTrackedDepositsJob do
     context 'when the Process is retried and fails again' do
       it 'notifies again' do
         perform
-        solr_docs.first.delete('wf_error_ssim')
+        process_errors['druid:bc123df4567'] = []
         perform
-        solr_docs.first['wf_error_ssim'] = ['accessionWF:shelve:Error: shelving failed again']
+        process_errors['druid:bc123df4567'] = ['accessionWF:shelve:Error: shelving failed again']
         perform
 
         expect(user.notifications.count).to eq(2)
@@ -177,10 +176,7 @@ RSpec.describe PollTrackedDepositsJob do
 
   context 'when notifying of a Process in error fails' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
-    let(:solr_docs) do
-      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address',
-         'wf_error_ssim' => ['accessionWF:shelve:Error: shelving failed'] }]
-    end
+    let(:process_errors) { { 'druid:bc123df4567' => ['accessionWF:shelve:Error: shelving failed'] } }
     let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
 
     before do
@@ -197,18 +193,38 @@ RSpec.describe PollTrackedDepositsJob do
     end
   end
 
-  context 'when the object of an in-flight Deposit is not in Solr' do
+  context 'when the Process of the tracked version is retried' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
-    let(:solr_docs) { [] }
     let!(:tracked_deposit) do
       create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:, process_errored_at: 1.hour.ago)
     end
 
-    it 'leaves its errors as they were' do
+    it 'records that it is no longer in error' do
+      perform
+
+      expect(tracked_deposit.reload.process_errored_at).to be_nil
+      expect(Sdr::WorkflowService).to have_received(:process_errors).with(druid: 'druid:bc123df4567', version: 2)
+    end
+  end
+
+  context 'when getting the Processes in error from DSA fails' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let!(:tracked_deposit) do
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:, process_errored_at: 1.hour.ago)
+    end
+
+    before do
+      allow(Honeybadger).to receive(:notify)
+      allow(Sdr::WorkflowService).to receive(:process_errors).and_raise(Dor::Services::Client::Error, 'DSA failed')
+    end
+
+    it 'reports the failure and leaves its errors as they were' do
       perform
 
       expect(tracked_deposit.reload.process_errored_at).to be_present
       expect(user.notifications).to be_empty
+      expect(Honeybadger).to have_received(:notify)
+        .with(an_instance_of(Dor::Services::Client::Error), context: { druid: 'druid:bc123df4567' })
     end
   end
 
