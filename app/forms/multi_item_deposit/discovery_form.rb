@@ -142,7 +142,8 @@ module MultiItemDeposit
 
     def uploaded_manifest_must_be_readable
       if submitted_manifest_csv.blank?
-        errors.add(:manifest_file, I18n.t('edit.multi_item_deposits.fields.manifest_file.validations.blank'))
+        errors.add(:manifest_file, :blank,
+                   message: I18n.t('edit.multi_item_deposits.fields.manifest_file.validations.blank'))
       end
     rescue CsvUpload::Normalizer::Error => e
       errors.add(:manifest_file, :invalid, message: e.message)

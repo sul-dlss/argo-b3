@@ -777,16 +777,40 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:multi_item_deposit_action) do
         create(:multi_item_deposit_action, user: owner, manifest_source: 'upload',
-                                           manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n")
+                                           manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n",
+                                           manifest_filename: 'manifest-batch-2.csv')
       end
       let(:params) { { multi_item_deposit_discovery: { manifest_source: 'upload', **mount_params } } }
 
-      it 'creates the Item Deposits from the saved manifest' do
+      it 'creates the Item Deposits from the saved manifest and keeps its filename' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(multi_item_deposit_action.reload.item_deposit_actions.pluck(:druid, :path))
           .to eq([['druid:cd234fg5678', 'folder2']])
+        expect(multi_item_deposit_action.manifest_filename).to eq('manifest-batch-2.csv')
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when an earlier manifest without a filename is carried by the form' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, manifest_source: 'upload',
+                                           manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n",
+                                           manifest_filename: 'manifest-batch-2.csv')
+      end
+      let(:params) do
+        { multi_item_deposit_discovery: { manifest_source: 'upload',
+                                          manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n",
+                                          **mount_params } }
+      end
+
+      it 'does not save the saved filename with it' do
+        patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+        expect(multi_item_deposit_action.reload).to have_attributes(
+          manifest_csv: "druid,folder\ndruid:cd234fg5678,folder2\n", manifest_filename: nil
+        )
       end
     end
 

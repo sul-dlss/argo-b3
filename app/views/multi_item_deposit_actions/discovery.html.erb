@@ -54,7 +54,9 @@
            ) do %>
           <% if @discovery_form.unsaved_manifest_csv?(@multi_item_deposit_action) %>
             <%= form.hidden_field :manifest_csv, value: @discovery_form.retainable_manifest_csv %>
-            <%= form.hidden_field :manifest_filename, value: @discovery_form.retainable_manifest_filename %>
+            <% if @discovery_form.retainable_manifest_filename %>
+              <%= form.hidden_field :manifest_filename, value: @discovery_form.retainable_manifest_filename %>
+            <% end %>
           <% end %>
           <% manifest_filename = @discovery_form.retainable_manifest_filename %>
           <% if manifest_filename %>

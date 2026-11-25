@@ -50,7 +50,9 @@
          ) do %>
         <% if @structure_form.unsaved_structural_metadata_csv? %>
           <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
-          <%= form.hidden_field :structural_metadata_csv_filename, value: @structure_form.retainable_structural_metadata_csv_filename %>
+          <% if @structure_form.retainable_structural_metadata_csv_filename %>
+            <%= form.hidden_field :structural_metadata_csv_filename, value: @structure_form.retainable_structural_metadata_csv_filename %>
+          <% end %>
         <% end %>
         <% structural_metadata_csv_filename = @structure_form.retainable_structural_metadata_csv_filename %>
         <% if structural_metadata_csv_filename %>
