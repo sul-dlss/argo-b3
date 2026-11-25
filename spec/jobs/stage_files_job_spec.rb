@@ -11,7 +11,7 @@ RSpec.describe StageFilesJob do
   let(:user) { create(:user) }
   let(:content) { create(:content, :mutable, druid:, lock: 'druid-version-1', staging_state: 'staging') }
   let(:type) { Cocina::Models::ObjectType.book }
-  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-1') }
+  let(:cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-1', version: 2) }
   let(:updated_cocina_object) { instance_double(Cocina::Models::DROWithMetadata, type:, lock: 'druid-version-2') }
   let(:mutated_cocina_object) { instance_double(Cocina::Models::DRO) }
   let(:version_service) { version_service_double }
@@ -113,7 +113,8 @@ RSpec.describe StageFilesJob do
     it 'stages deposited files that need preserving from Stacks' do
       job.perform(content:, user:)
 
-      expect(Contents::StacksStager).to have_received(:call).with(content:, staging_location: Settings.staging_location)
+      expect(Contents::StacksStager).to have_received(:call)
+        .with(content:, staging_location: Settings.staging_location, version: 2)
     end
 
     context 'when staging from Stacks fails' do

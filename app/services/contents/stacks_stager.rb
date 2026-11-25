@@ -29,14 +29,19 @@ module Contents
 
     # @param [Content] content
     # @param [String] staging_location
-    def initialize(content:, staging_location:)
+    # @param [Integer] version the object's current version
+    def initialize(content:, staging_location:, version:)
       @content = content
       @staging_location = staging_location
+      @version = version
     end
 
     # @raise [Error] if any file could not be staged
     # @raise [PreservationNotFoundError] if Preservation does not have the object
     def call
+      # Preservation has only versions that finished accessioning, so nothing of a first version is preserved.
+      return if version == 1
+
       content_file_binaries = unpreserved_content_file_binaries
       return if content_file_binaries.empty?
 
@@ -47,7 +52,7 @@ module Contents
 
     private
 
-    attr_reader :content, :staging_location
+    attr_reader :content, :staging_location, :version
 
     delegate :druid, to: :content
 
