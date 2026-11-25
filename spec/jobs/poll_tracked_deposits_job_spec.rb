@@ -443,6 +443,41 @@ RSpec.describe PollTrackedDepositsJob do
       end
     end
 
+    context 'when notifying of settling fails' do
+      before do
+        druids.each { |druid| complete(druid) }
+        allow(Honeybadger).to receive(:notify)
+      end
+
+      it 'undoes settling, so the next run notifies' do
+        allow(MultiItemDepositSettledNotifier).to receive(:with).and_raise(ActiveRecord::ConnectionNotEstablished)
+        poll
+
+        expect(multi_item_deposit_action.reload.settled_at).to be_nil
+        expect(Honeybadger).to have_received(:notify)
+
+        allow(MultiItemDepositSettledNotifier).to receive(:with).and_call_original
+        poll
+
+        expect(user.notifications.count).to eq(1)
+      end
+
+      it 'keeps settling if the Notification was made, so the next run does not notify again' do
+        allow(MultiItemDepositSettledNotifier).to receive(:with).and_wrap_original do |original, **params|
+          original.call(**params).tap do |event|
+            allow(event).to receive(:deliver).and_wrap_original do |deliver, *args, **options|
+              deliver.call(*args, **options)
+              raise ActiveRecord::ConnectionNotEstablished
+            end
+          end
+        end
+        poll
+
+        expect(multi_item_deposit_action.reload.settled_at).to be_present
+        expect(user.notifications.count).to eq(1)
+      end
+    end
+
     # The worked example in the spec: settled with errors, then a retry within the 10 minutes.
     describe 'retrying within the 10 minutes' do
       before do

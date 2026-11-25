@@ -34,7 +34,10 @@ RSpec.describe MultiItemDepositSettledNotifier do
     notify(1_100)
 
     expect(Noticed::DeliveryMethods::Email).to have_been_enqueued.at(be_within(5.seconds).of(10.minutes.from_now))
-    expect(user.notifications.sole.detail).to eq('1,100 of 1,200 items have errors.')
+    notification = user.notifications.sole
+    expect(notification.detail).to eq('1,100 of 1,200 items have errors.')
+    expect(notification.subject_label).to eq(multi_item_deposit_action.name)
+    expect(notification.subject_path).to eq("/multi_item_deposit_actions/#{multi_item_deposit_action.id}")
   end
 
   context 'when the email is due' do
