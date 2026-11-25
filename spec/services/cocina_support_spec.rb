@@ -171,4 +171,29 @@ RSpec.describe CocinaSupport do
       expect(described_class.title(build(:admin_policy, title: 'My APO'))).to eq 'My APO'
     end
   end
+
+  describe '.folio_refresh_catalog_record_id' do
+    let(:dro) { build(:dro) }
+
+    def with_catalog_links(*catalog_links)
+      dro.new(identification: dro.identification.new(catalogLinks: catalog_links))
+    end
+
+    it 'returns the HRID of the Folio catalog link marked to refresh' do
+      cocina_object = with_catalog_links({ catalog: 'folio', catalogRecordId: 'a123', refresh: false },
+                                         { catalog: 'folio', catalogRecordId: 'a456', refresh: true })
+
+      expect(described_class.folio_refresh_catalog_record_id(cocina_object)).to eq 'a456'
+    end
+
+    it 'returns nil when no Folio catalog link is marked to refresh' do
+      cocina_object = with_catalog_links({ catalog: 'folio', catalogRecordId: 'a123', refresh: false })
+
+      expect(described_class.folio_refresh_catalog_record_id(cocina_object)).to be_nil
+    end
+
+    it 'returns nil for an APO' do
+      expect(described_class.folio_refresh_catalog_record_id(build(:admin_policy))).to be_nil
+    end
+  end
 end

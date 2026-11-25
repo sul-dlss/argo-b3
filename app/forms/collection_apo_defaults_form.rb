@@ -16,11 +16,4 @@ class CollectionApoDefaultsForm < CocinaModels::Collection
 
   # A collection has no files.
   def content_busy? = false
-
-  # Always accessions, since a collection cannot be saved as a draft.
-  # @param [String] user_name the sunetid of the user performing the action
-  # @raise [ActiveModel::ValidationError] if the form is invalid
-  def save!(user_name:, **)
-    super(user_name:, accession: true)
-  end
 end

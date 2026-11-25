@@ -6,9 +6,11 @@ module Elements
   class DescriptionListComponent < ApplicationComponent
     # @param hash [Hash] the hash to render
     # @param nested [Boolean] true if this list is nested in another description list
-    def initialize(hash:, nested: false)
+    # @param humanize_terms [Boolean] false to show the keys as given (e.g., labels that have acronyms)
+    def initialize(hash:, nested: false, humanize_terms: true)
       @hash = hash
       @nested = nested
+      @humanize_terms = humanize_terms
       super()
     end
 
@@ -18,7 +20,7 @@ module Elements
     end
 
     def term_label(key)
-      key.to_s.humanize
+      @humanize_terms ? key.to_s.humanize : key.to_s
     end
 
     # @return [Array] the value, with arrays rendered as one item per element

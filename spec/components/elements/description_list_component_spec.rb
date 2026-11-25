@@ -35,6 +35,16 @@ RSpec.describe Elements::DescriptionListComponent, type: :component do
     expect(page).to have_no_css('dt', text: 'Dro file parts')
   end
 
+  context 'when terms are not humanized' do
+    let(:hash) { { 'FOLIO Instance HRID' => 'a123' } }
+
+    it 'renders the terms as given' do
+      render_inline(described_class.new(hash:, humanize_terms: false))
+
+      expect(page).to have_css('dt', exact_text: 'FOLIO Instance HRID')
+    end
+  end
+
   context 'when the value is an array of hashes' do
     let(:hash) { { 'dro_file_parts' => [{ 'part_type' => 'audio' }, { 'part_type' => 'video' }] } }
 
