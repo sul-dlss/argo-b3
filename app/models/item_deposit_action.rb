@@ -6,6 +6,8 @@ class ItemDepositAction < ApplicationRecord
   delegate :user, :files_path, :file_location, to: :multi_item_deposit_action
   # The Content may be destroyed independently (e.g., by ContentCleanupJob), which nullifies content_id.
   belongs_to :content, optional: true
+  # Its Deposit, from when Deposit Initiation starts it until it is Complete.
+  has_one :tracked_deposit, dependent: :destroy
 
   # where.not(discovery_errors: []) would be NOT IN (), so the jsonb arrays are compared directly.
   scope :with_discovery_errors, -> { where("discovery_errors <> '[]'::jsonb") }

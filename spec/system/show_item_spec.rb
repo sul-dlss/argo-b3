@@ -836,6 +836,7 @@ RSpec.describe 'Show item' do
     end
 
     it 'retries the process and reloads only the workflows' do
+      allow(TrackedDeposit).to receive(:retried!).and_call_original
       visit "/objects/#{druid}"
       click_button 'Workflows'
       expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+Error/)
@@ -846,6 +847,7 @@ RSpec.describe 'Show item' do
       expect(page).to have_css('.collapsible-section-toggle', text: /accessionWF\s+Complete/)
       expect(process_client).to have_received(:update)
         .with(status: 'waiting', note: nil, version: '2', current_status: 'error')
+      expect(TrackedDeposit).to have_received(:retried!).with(druid:)
       # The page itself was not refreshed.
       expect(object_client).to have_received(:lock).once
     end

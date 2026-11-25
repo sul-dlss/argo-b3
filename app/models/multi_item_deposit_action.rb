@@ -4,8 +4,11 @@
 # A step is complete when its *_completed_at is set (by its state machine's transition);
 # failures are recorded on the ItemDepositActions.
 class MultiItemDepositAction < ApplicationRecord
+  include Settleable
+
   belongs_to :user
   has_many :item_deposit_actions, dependent: :destroy
+  has_many :tracked_deposits, through: :item_deposit_actions
   has_many :noticed_events, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
 
   # Item Deposit content types are stored as the last segment of the cocina type URI.
@@ -30,6 +33,11 @@ class MultiItemDepositAction < ApplicationRecord
     'structuring' => { structuring_state: 'structuring' },
     'not_submitted' => nil
   }.freeze
+
+  # Submitted Multi-Item Deposits that Deposit Initiation has finished starting, and that still notify when they
+  # settle, since no settled email has gone out.
+  scope :awaiting_settled_email,
+        -> { submitted_step.where(settled_email_sent_at: nil).where.not(initiating_deposit_completed_at: nil) }
 
   enum :file_location, { globus: 'globus', mount: 'mount' }, prefix: true, validate: true
   enum :step, { discovery: 'discovery', structure: 'structure', deposit: 'deposit', submitted: 'submitted' },
