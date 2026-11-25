@@ -485,7 +485,9 @@ CREATE TABLE public.multi_item_deposit_actions (
     manifest_source character varying DEFAULT 'upload'::character varying NOT NULL,
     manifest_csv text,
     globus_path character varying,
-    perform_speech_to_text boolean DEFAULT false NOT NULL
+    perform_speech_to_text boolean DEFAULT false NOT NULL,
+    manifest_filename character varying,
+    structural_metadata_csv_filename character varying
 );
 
 
@@ -1466,6 +1468,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125210000'),
 ('20261125140000'),
 ('20261124230000'),
 ('20261124164108'),

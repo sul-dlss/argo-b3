@@ -24,7 +24,16 @@ RSpec.describe ManifestCsv::Validator do
 
     it 'reports only the missing columns' do
       expect(validator).not_to be_valid
-      expect(validator.errors).to eq(['Missing columns: folder.'])
+      expect(validator.errors).to eq(['Required columns are druid and folder. Columns missing: folder.'])
+    end
+  end
+
+  context 'when both required columns are missing' do
+    let(:csv) { "filename\nfile.tif\n" }
+
+    it 'reports both missing columns' do
+      expect(validator).not_to be_valid
+      expect(validator.errors).to eq(['Required columns are druid and folder. Columns missing: druid, folder.'])
     end
   end
 

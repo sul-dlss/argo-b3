@@ -767,6 +767,9 @@ en:
         manifest_file:
           label: "Upload manifest file"
           retained: "A manifest has been uploaded. Choose a file to replace it."
+          retained_with_filename_html: "Last checked manifest: <strong>%{filename}</strong>. Choose a file to replace it."
+          validations:
+            blank: "Upload a manifest file."
         manifest_source:
           label: "Upload manifest"
           mount:
@@ -795,6 +798,7 @@ en:
         structural_metadata_csv_file:
           label: "Upload structural metadata CSV"
           retained: "A structural metadata CSV has been uploaded. Choose a file to replace it."
+          retained_with_filename_html: "Last checked structural metadata CSV: <strong>%{filename}</strong>. Choose a file to replace it."
           template: "Download structural metadata template CSV"
         version_description:
           help_text: "The version description will only be applied to items that do not already have one."

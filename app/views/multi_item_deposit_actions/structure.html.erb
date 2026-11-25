@@ -50,9 +50,13 @@
          ) do %>
         <% if @structure_form.unsaved_structural_metadata_csv? %>
           <%= form.hidden_field :structural_metadata_csv, value: @structure_form.retainable_structural_metadata_csv %>
+          <%= form.hidden_field :structural_metadata_csv_filename, value: @structure_form.retainable_structural_metadata_csv_filename %>
         <% end %>
-        <% if @structure_form.retainable_structural_metadata_csv.present? %>
-          <p class="mb-2"><%= t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %></p>
+        <% structural_metadata_csv_filename = @structure_form.retainable_structural_metadata_csv_filename %>
+        <% if structural_metadata_csv_filename %>
+          <% structural_metadata_csv_help_text = t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained_with_filename_html', filename: structural_metadata_csv_filename) %>
+        <% elsif @structure_form.retainable_structural_metadata_csv.present? %>
+          <% structural_metadata_csv_help_text = t('edit.multi_item_deposits.fields.structural_metadata_csv_file.retained') %>
         <% end %>
         <div class="my-2">
           <%= link_to structural_metadata_csv_template_multi_item_deposit_action_path(@multi_item_deposit_action), download: true do %>
@@ -62,7 +66,9 @@
         <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                                field_name: :structural_metadata_csv_file,
                                                                container_classes: 'my-field',
-                                                               label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_file.label')) %>
+                                                               label_text: t('edit.multi_item_deposits.fields.structural_metadata_csv_file.label'),
+                                                               help_text: structural_metadata_csv_help_text,
+                                                               variant: :help_text_below) %>
       <% end %>
 
       <% if @multi_item_deposit_action.mount_structural_metadata_csv_path %>

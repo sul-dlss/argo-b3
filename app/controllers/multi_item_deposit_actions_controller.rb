@@ -226,7 +226,8 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   def saved_manifest_params
     return {} unless @multi_item_deposit_action.manifest_source_upload?
 
-    { manifest_csv: @multi_item_deposit_action.manifest_csv }
+    { manifest_csv: @multi_item_deposit_action.manifest_csv,
+      manifest_filename: @multi_item_deposit_action.manifest_filename }
   end
 
   def filter_form_params
@@ -242,7 +243,8 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   def saved_structural_metadata_csv_params
     return {} unless @multi_item_deposit_action.structural_metadata_csv_source_upload?
 
-    { structural_metadata_csv: @multi_item_deposit_action.structural_metadata_csv }
+    { structural_metadata_csv: @multi_item_deposit_action.structural_metadata_csv,
+      structural_metadata_csv_filename: @multi_item_deposit_action.structural_metadata_csv_filename }
   end
 
   def structure_form_params

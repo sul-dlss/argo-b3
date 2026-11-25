@@ -12,7 +12,9 @@ RSpec.describe MultiItemDeposit::StructureForm do
   let(:csv_string) { "#{csv_header}\nbc123df4567,1,file1.tif,yes,yes,world,world,\n" }
   let(:normalized_csv_string) { "#{csv_header}\ndruid:bc123df4567,1,file1.tif,yes,yes,world,world,\n" }
   let(:csv_tempfile) { Tempfile.new(['structural', '.csv']).tap { |file| file.write(csv_string) && file.flush } }
-  let(:csv_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }
+  let(:csv_file) do
+    Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv', original_filename: 'structure-batch-3.csv')
+  end
 
   after do
     FileUtils.rm_rf(mount_directory)
@@ -76,12 +78,16 @@ RSpec.describe MultiItemDeposit::StructureForm do
     end
 
     context 'when a CSV was uploaded' do
-      let(:model_attributes) { { structural_metadata_csv: csv_string, structural_metadata_csv_source: 'upload' } }
+      let(:model_attributes) do
+        { structural_metadata_csv: csv_string, structural_metadata_csv_filename: 'structure-batch-2.csv',
+          structural_metadata_csv_source: 'upload' }
+      end
 
       before { write_mount_csv }
 
-      it 'defaults to the uploaded CSV' do
-        expect(form).to have_attributes(structural_metadata_csv_choice: 'upload', structural_metadata_csv: csv_string)
+      it 'defaults to the uploaded CSV and its filename' do
+        expect(form).to have_attributes(structural_metadata_csv_choice: 'upload', structural_metadata_csv: csv_string,
+                                        retainable_structural_metadata_csv_filename: 'structure-batch-2.csv')
       end
     end
 
@@ -139,6 +145,7 @@ RSpec.describe MultiItemDeposit::StructureForm do
 
     context 'when the uploaded file cannot be read' do
       let(:csv_tempfile) { Tempfile.new(['structural', '.txt']).tap { |file| file.write(csv_string) && file.flush } }
+      let(:csv_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }
 
       it 'reports the error' do
         form = build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)
@@ -198,13 +205,14 @@ RSpec.describe MultiItemDeposit::StructureForm do
 
   describe '#multi_item_deposit_action_attributes' do
     context 'when uploading a CSV' do
-      it 'includes the normalized CSV' do
+      it 'includes the normalized CSV and its filename' do
         form = build_form(perform_ocr: true, ocr_languages: ['', 'English'], publish_preserve_all: true,
                           structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)
 
         expect(form.multi_item_deposit_action_attributes)
           .to eq(perform_ocr: true, ocr_languages: ['English'], perform_speech_to_text: false,
-                 structural_metadata_csv: normalized_csv_string, structural_metadata_csv_source: 'upload',
+                 structural_metadata_csv: normalized_csv_string,
+                 structural_metadata_csv_filename: 'structure-batch-3.csv', structural_metadata_csv_source: 'upload',
                  publish_preserve_all: false)
       end
     end
@@ -226,7 +234,8 @@ RSpec.describe MultiItemDeposit::StructureForm do
 
         expect(form.multi_item_deposit_action_attributes)
           .to eq(perform_ocr: false, ocr_languages: [], perform_speech_to_text: false, structural_metadata_csv: nil,
-                 structural_metadata_csv_source: nil, publish_preserve_all: true)
+                 structural_metadata_csv_filename: nil, structural_metadata_csv_source: nil,
+                 publish_preserve_all: true)
       end
     end
   end

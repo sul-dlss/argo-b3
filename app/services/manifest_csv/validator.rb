@@ -39,7 +39,9 @@ module ManifestCsv
 
     def validate_columns
       missing_columns = REQUIRED_COLUMNS - csv.headers
-      errors << "Missing columns: #{missing_columns.join(', ')}." if missing_columns.any?
+      return if missing_columns.empty?
+
+      errors << "Required columns are #{REQUIRED_COLUMNS.to_sentence}. Columns missing: #{missing_columns.join(', ')}."
     end
 
     def validate_rows

@@ -336,6 +336,7 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_field('Include with your files below', type: 'radio', checked: true)
+        expect(rendered_page).to have_no_text('Last checked manifest')
         expect(rendered_page).to have_no_text('A manifest has been uploaded.')
       end
     end
@@ -345,15 +346,57 @@ RSpec.describe 'Multi-item deposit actions' do
 
       before do
         multi_item_deposit_action.update!(discovery_completed_at: Time.current, manifest_source: 'upload',
-                                          manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
+                                          manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n",
+                                          manifest_filename: 'manifest-batch-3.csv')
       end
 
-      it 'notes the saved manifest without carrying it in the form' do
+      it 'notes the saved manifest as the file field description without carrying it in the form' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_field('Upload from a computer', type: 'radio', checked: true)
-        expect(rendered_page).to have_text('A manifest has been uploaded.')
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_help',
+                                          exact_text: 'Last checked manifest: manifest-batch-3.csv. ' \
+                                                      'Choose a file to replace it.')
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_help strong',
+                                          exact_text: 'manifest-batch-3.csv')
+        expect(rendered_page).to have_css('input[type="file"]' \
+                                          '[aria-describedby~="multi_item_deposit_discovery_manifest_file_help"]')
         expect(rendered_page).to have_no_field('multi_item_deposit_discovery[manifest_csv]', type: :hidden)
+        expect(rendered_page).to have_no_field('multi_item_deposit_discovery[manifest_filename]', type: :hidden)
+      end
+    end
+
+    context 'when discovery has completed with an uploaded manifest saved without its filename' do
+      let(:owner) { user }
+
+      before do
+        multi_item_deposit_action.update!(discovery_completed_at: Time.current, manifest_source: 'upload',
+                                          manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
+      end
+
+      it 'notes the saved manifest without a filename' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_help',
+                                          exact_text: 'A manifest has been uploaded. Choose a file to replace it.')
+      end
+    end
+
+    context 'when the structure step has a saved uploaded structural metadata CSV' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structural_metadata_csv: 'druid',
+                                           structural_metadata_csv_filename: 'structure-batch-3.csv',
+                                           structural_metadata_csv_source: 'upload')
+      end
+
+      it 'notes the saved CSV as the file field description without carrying it in the form' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_css('#multi_item_deposit_structure_structural_metadata_csv_file_help',
+                                          exact_text: 'Last checked structural metadata CSV: ' \
+                                                      'structure-batch-3.csv. Choose a file to replace it.')
+        expect(rendered_page).to have_no_field('multi_item_deposit_structure[structural_metadata_csv]', type: :hidden)
       end
     end
 
@@ -673,20 +716,23 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:params) do
         { multi_item_deposit_discovery: { manifest_source: 'upload', manifest_file:, **mount_params } }
       end
-      let(:manifest_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }
+      let(:manifest_file) do
+        Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv', original_filename: 'manifest-batch-3.csv')
+      end
       let(:csv_tempfile) do
         Tempfile.new(['manifest', '.csv']).tap do |file|
           file.write("druid,folder\ncd234fg5678,folder2\n") && file.flush
         end
       end
 
-      it 'saves the normalized manifest and creates the Item Deposits from it' do
+      it 'saves the normalized manifest and its filename and creates the Item Deposits from it' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         multi_item_deposit_action.reload
         expect(multi_item_deposit_action.item_deposit_actions.pluck(:druid)).to eq(['druid:cd234fg5678'])
         expect(multi_item_deposit_action).to be_manifest_source_upload
         expect(multi_item_deposit_action.manifest_csv).to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
+        expect(multi_item_deposit_action.manifest_filename).to eq('manifest-batch-3.csv')
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
 
@@ -697,9 +743,13 @@ RSpec.describe 'Multi-item deposit actions' do
           patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
           expect(response).to have_http_status(:unprocessable_content)
-          expect(rendered_page).to have_text('A manifest has been uploaded.')
+          expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_help',
+                                            exact_text: 'Last checked manifest: manifest-batch-3.csv. ' \
+                                                        'Choose a file to replace it.')
           expect(rendered_page.find_field('multi_item_deposit_discovery[manifest_csv]', type: :hidden).value)
             .to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
+          expect(rendered_page.find_field('multi_item_deposit_discovery[manifest_filename]', type: :hidden).value)
+            .to eq('manifest-batch-3.csv')
         end
       end
     end
@@ -709,14 +759,16 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:params) do
         { multi_item_deposit_discovery: { manifest_source: 'upload',
                                           manifest_csv: "druid,folder\r\ndruid:cd234fg5678,folder2\r\n",
+                                          manifest_filename: 'manifest-batch-3.csv',
                                           **mount_params } }
       end
 
-      it 'creates the Item Deposits from the earlier manifest' do
+      it 'creates the Item Deposits from the earlier manifest and saves its filename' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(multi_item_deposit_action.reload.item_deposit_actions.pluck(:druid, :path))
           .to eq([['druid:cd234fg5678', 'folder2']])
+        expect(multi_item_deposit_action.manifest_filename).to eq('manifest-batch-3.csv')
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
     end
@@ -750,7 +802,8 @@ RSpec.describe 'Multi-item deposit actions' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(rendered_page).to have_text("can't be blank")
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_error',
+                                          exact_text: 'Upload a manifest file.')
       end
     end
 
@@ -762,7 +815,8 @@ RSpec.describe 'Multi-item deposit actions' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(rendered_page).to have_text("can't be blank")
+        expect(rendered_page).to have_css('#multi_item_deposit_discovery_manifest_file_error',
+                                          exact_text: 'Upload a manifest file.')
         expect(multi_item_deposit_action.reload.mount_path).to be_nil
       end
     end
@@ -953,16 +1007,20 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:params) do
         { multi_item_deposit_structure: {
           structural_metadata_csv_choice: 'upload',
-          structural_metadata_csv_file: Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv')
+          structural_metadata_csv_file: csv_file
         } }
       end
+      let(:csv_file) do
+        Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv', original_filename: 'structure-batch-3.csv')
+      end
 
-      it 'saves the CSV and starts structuring' do
+      it 'saves the CSV and its filename and starts structuring' do
         patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
         expect(multi_item_deposit_action.reload).to be_structuring
         expect(multi_item_deposit_action).to have_attributes(
           structural_metadata_csv: "#{csv_header}\ndruid:bc123df4567,1,file1.tif,yes,yes,world,world,\n",
+          structural_metadata_csv_filename: 'structure-batch-3.csv',
           structural_metadata_csv_source: 'upload', publish_preserve_all: false
         )
       end
@@ -971,16 +1029,26 @@ RSpec.describe 'Multi-item deposit actions' do
         let(:params) do
           { multi_item_deposit_structure: {
             structural_metadata_csv_choice: 'upload', perform_ocr: 'true', ocr_languages: [''],
-            structural_metadata_csv_file: Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv')
+            structural_metadata_csv_file: csv_file
           } }
         end
 
-        it 'retains the uploaded CSV in the re-rendered form' do
+        it 'retains the uploaded CSV in the re-rendered form and describes the file field with its filename' do
           patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
 
           expect(response).to have_http_status(:unprocessable_content)
-          expect(rendered_page).to have_text('A structural metadata CSV has been uploaded.')
+          expect(rendered_page).to have_css('#multi_item_deposit_structure_structural_metadata_csv_file_help',
+                                            exact_text: 'Last checked structural metadata CSV: ' \
+                                                        'structure-batch-3.csv. Choose a file to replace it.')
+          expect(rendered_page).to have_css('#multi_item_deposit_structure_structural_metadata_csv_file_help strong',
+                                            exact_text: 'structure-batch-3.csv')
+          expect(rendered_page).to have_css(
+            'input[type="file"]' \
+            '[aria-describedby~="multi_item_deposit_structure_structural_metadata_csv_file_help"]'
+          )
           expect(rendered_page).to have_field('multi_item_deposit_structure[structural_metadata_csv]', type: :hidden)
+          expect(rendered_page.find_field('multi_item_deposit_structure[structural_metadata_csv_filename]',
+                                          type: :hidden).value).to eq('structure-batch-3.csv')
         end
       end
     end
@@ -1066,6 +1134,7 @@ RSpec.describe 'Multi-item deposit actions' do
       let(:owner) { user }
       let(:multi_item_deposit_action) do
         create(:multi_item_deposit_action, user: owner, step: 'structure', structural_metadata_csv: 'druid',
+                                           structural_metadata_csv_filename: 'structure-batch-3.csv',
                                            structural_metadata_csv_source: 'upload')
       end
       let(:params) do
@@ -1077,6 +1146,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(multi_item_deposit_action.reload).to be_structuring
         expect(multi_item_deposit_action).to have_attributes(structural_metadata_csv: nil,
+                                                             structural_metadata_csv_filename: nil,
                                                              structural_metadata_csv_source: nil,
                                                              publish_preserve_all: true)
       end
