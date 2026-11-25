@@ -113,7 +113,49 @@ module BulkActions
       errors_tab_id if error_lines.present?
     end
 
+    # @return [Array<Hash>] button arguments for the links that the bulk action type adds to the left nav
+    def nav_links
+      bulk_action.bulk_action_config.nav_links.filter_map { |key| nav_link(key) }
+    end
+
     private
+
+    # @param key [Symbol] a key listed in the bulk action config's nav_links
+    # @return [Hash, nil] button arguments for the link, or nil when it is not shown yet
+    def nav_link(key)
+      case key
+      when :register_more_items
+        register_more_items_nav_link
+      when :deposit_multiple_items
+        { link: multi_item_deposit_actions_path, method: :post, label: t('multi_item_deposit_actions.new'),
+          disabled: !can_register_item? }
+      else
+        raise ArgumentError, "Unknown nav link #{key} for #{bulk_action.action_type}"
+      end
+    end
+
+    # Shown once the bulk action has completed, with the form prefilled with the registration settings of the first
+    # registered item (all items share them), or blank when none was registered.
+    def register_more_items_nav_link
+      return unless completed?
+
+      # A param rather than in the link, since submitting a GET form replaces its action's query string.
+      { link: new_multiple_item_path, params: { from_druid: first_registered_druid }.compact,
+        label: t('bulk_actions.show.register_more_items'), disabled: !can_register_item? }
+    end
+
+    def can_register_item?
+      helpers.allowed_to?(:new?, nil, with: ItemPolicy)
+    end
+
+    # @return [String, nil] the druid of the first item in the registration report, which lists only registered items
+    def first_registered_druid
+      filepath = bulk_action.export_filepath(:registration_report)
+      return unless File.exist?(filepath)
+
+      bare_druid = CSV.foreach(filepath, headers: true).first&.fetch('Druid')
+      DruidSupport.prefixed_druid_from(bare_druid) if bare_druid
+    end
 
     # Streams the log file once, keeping only the success and error lines rather than the whole file.
     # @return [Hash{Symbol => Array<String>}] the success and error lines of the log file

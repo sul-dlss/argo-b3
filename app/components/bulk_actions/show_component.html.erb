@@ -13,6 +13,9 @@
       <%= render Elements::ButtonListComponent.new do |component| %>
         <% component.with_button(link: bulk_actions_path, label: t('bulk_actions.tabs.history'), variant: 'outline-primary') %>
         <% component.with_button(link: new_bulk_action_path, label: t('bulk_actions.menu'), variant: 'outline-primary') %>
+        <% nav_links.each do |nav_link| %>
+          <% component.with_button(**nav_link, variant: 'outline-primary') %>
+        <% end %>
       <% end %>
     <% end %>
 

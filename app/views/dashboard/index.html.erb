@@ -40,7 +40,7 @@
       <%= render Elements::ButtonListComponent.new(title: t('dashboard.register_multiple.heading'), classes: 'mt-4') do |component| %>
         <% component.with_button(link: new_multiple_item_path, label: t('dashboard.register_multiple.register_items'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
         <% component.with_button(link: new_bulk_actions_register_csv_path, label: t('dashboard.register_multiple.register_csv'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
-        <% component.with_button(link: multi_item_deposit_actions_path, method: :post, label: t('dashboard.register_multiple.deposit_items'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
+        <% component.with_button(link: multi_item_deposit_actions_path, method: :post, label: t('multi_item_deposit_actions.new'), variant: 'outline-primary', disabled: !allowed_to?(:new?, nil, with: ItemPolicy)) %>
       <% end %>
 
       <% if allowed_to?(:admin?, nil, with: AdminPolicy) %>
