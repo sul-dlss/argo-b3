@@ -1447,6 +1447,8 @@ RSpec.describe 'Multi-item deposit actions' do
     before do
       create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567', content:)
       create(:content_file_binary, content:, filepath: 'image1.tif', mime_type: 'image/tiff')
+      allow(Sdr::Repository).to receive(:find_all)
+        .and_return('druid:bc123df4567' => build(:dro, id: 'druid:bc123df4567'))
     end
 
     context 'when the multi-item deposit action belongs to the user' do
@@ -1458,7 +1460,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to have_http_status(:ok)
         expect(response.media_type).to eq('text/csv')
         expect(response.headers['Content-Disposition']).to include('attachment; filename="structural_metadata.csv"')
-        expect(response.body.lines.second).to eq("bc123df4567,,,,image1.tif,,,,,,,,image/tiff,,,,\n")
+        expect(response.body.lines.second).to eq("bc123df4567,,,,image1.tif,,,,,dark,none,,image/tiff,,,,\n")
       end
     end
 

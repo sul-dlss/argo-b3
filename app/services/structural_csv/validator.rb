@@ -4,19 +4,34 @@ module StructuralCsv
   # Validates the structural metadata CSV rows for a single object, before any records are built.
   # See StructuralCsv::Import for the columns and how blank cells are handled.
   class Validator
-    REQUIRED_COLUMNS = %w[druid sequence filename publish preserve rights_view rights_download rights_location].freeze
+    RIGHTS_COLUMNS = %w[rights_view rights_download rights_location].freeze
+    REQUIRED_COLUMNS = (%w[druid sequence filename publish preserve] + RIGHTS_COLUMNS).freeze
 
     def self.call(...)
       new(...).call
     end
 
+    # When the rights are optional, the rights columns may be left out together (so that each file gets the default
+    # file access), and rights_location may be left out alone (as if every cell were blank).
+    # @param headers [Array<String>] the CSV's headers
+    # @param rights_optional [Boolean] whether the rights columns may be left out
+    # @return [Array<String>] the columns that the CSV must have
+    def self.required_columns(headers:, rights_optional: false)
+      return REQUIRED_COLUMNS unless rights_optional
+      return REQUIRED_COLUMNS - RIGHTS_COLUMNS unless headers.intersect?(RIGHTS_COLUMNS)
+
+      REQUIRED_COLUMNS - ['rights_location']
+    end
+
     # @param rows [Array<Row>] the rows for a single object
     # @param content_file_binaries_by_filepath [Hash<String, ContentFileBinary>] the Content's binaries
     # @param allow_file_deletion [Boolean] whether files omitted from the rows may be deleted
-    def initialize(rows:, content_file_binaries_by_filepath:, allow_file_deletion: true)
+    # @param rights_optional [Boolean] whether the rights columns may be left out (see required_columns)
+    def initialize(rows:, content_file_binaries_by_filepath:, allow_file_deletion: true, rights_optional: false)
       @all_rows = rows
       @content_file_binaries_by_filepath = content_file_binaries_by_filepath
       @allow_file_deletion = allow_file_deletion
+      @rights_optional = rights_optional
       @errors = []
     end
 
@@ -33,7 +48,7 @@ module StructuralCsv
 
     private
 
-    attr_reader :all_rows, :content_file_binaries_by_filepath, :allow_file_deletion, :errors
+    attr_reader :all_rows, :content_file_binaries_by_filepath, :allow_file_deletion, :rights_optional, :errors
 
     def add_error(row, reason)
       errors << ValidationError.new(row.number, reason)
@@ -54,7 +69,7 @@ module StructuralCsv
 
     # Validates that every required column is present in the headers.
     def validate_columns
-      (REQUIRED_COLUMNS - headers).each do |column|
+      (self.class.required_columns(headers:, rights_optional:) - headers).each do |column|
         errors << ValidationError.new(1, "Missing required column \"#{column}\"")
       end
     end
@@ -90,7 +105,10 @@ module StructuralCsv
       add_error(row, "Value for \"resource_type\" (\"#{row.value('resource_type')}\") is not a valid resource type")
     end
 
+    # Without the rights columns, the files get the default file access, so there is nothing to validate.
     def validate_access(row)
+      return unless column?('rights_view')
+
       AccessValidator.call(row:).each { |reason| add_error(row, reason) }
     end
 
@@ -110,11 +128,11 @@ module StructuralCsv
       add_error(row, "Sequence \"#{row.value('sequence')}\" is not a positive integer")
     end
 
-    # Validates that cells that cannot be blank have a value: filename, rights_view, and rights_download, as well as
-    # resource_type and mimetype when their (optional) columns are present.
+    # Validates that cells that cannot be blank have a value: filename, as well as rights_view, rights_download,
+    # resource_type, and mimetype when their columns are present.
     def validate_required_values(row)
-      required_columns = %w[filename rights_view rights_download] +
-                         %w[resource_type mimetype].select { |column| column?(column) }
+      required_columns = %w[filename] +
+                         %w[rights_view rights_download resource_type mimetype].select { |column| column?(column) }
       required_columns.each do |column|
         add_error(row, "Value for \"#{column}\" is missing") if row.blank?(column)
       end

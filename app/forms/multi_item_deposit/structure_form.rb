@@ -157,7 +157,9 @@ module MultiItemDeposit
       csv = submitted_structural_metadata_csv
       return if csv.blank?
 
-      validator = CsvUpload::Validator.new(csv:, required_headers: StructuralCsv::Validator::REQUIRED_COLUMNS)
+      required_headers = StructuralCsv::Validator.required_columns(headers: CSV.parse_line(csv) || [],
+                                                                   rights_optional: true)
+      validator = CsvUpload::Validator.new(csv:, required_headers:)
       return if validator.valid?
 
       validator.errors.each { |message| errors.add(csv_attribute, :invalid, message:) }

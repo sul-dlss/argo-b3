@@ -52,7 +52,7 @@ module MultiItemDeposit
 
       return add_missing_files_errors if missing_filepaths.any?
 
-      StructuralCsv::Import.call(rows:, content:).or { |errors| add_import_errors(errors) }
+      StructuralCsv::Import.call(rows:, content:, default_file_access:).or { |errors| add_import_errors(errors) }
     end
 
     # Validates the rows (without importing them), then adds the missing files error.
@@ -60,7 +60,8 @@ module MultiItemDeposit
       structural_csv_rows = rows.map { |number, csv_row| StructuralCsv::Row.new(number:, csv_row:) }
       content_file_binaries_by_filepath = content.content_file_binaries.index_by(&:filepath)
       add_import_errors(
-        StructuralCsv::Validator.call(rows: structural_csv_rows, content_file_binaries_by_filepath:)
+        StructuralCsv::Validator.call(rows: structural_csv_rows, content_file_binaries_by_filepath:,
+                                      rights_optional: true)
       )
       add_error(:files_not_in_csv, filepaths: missing_filepaths.sort.join(', '))
     end
@@ -70,6 +71,11 @@ module MultiItemDeposit
       item_deposit_action.structural_csv_errors.concat(
         errors.map { |error| "Row #{error.line_number}: #{error.reason}" }
       )
+    end
+
+    # Files get the Object Access when the CSV leaves out the rights columns, as they do from a populator.
+    def default_file_access
+      Contents::DefaultFileAccess.new(access: cocina_object.access).attributes
     end
 
     def populate

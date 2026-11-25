@@ -15,9 +15,9 @@ module StructuralCsv
   # - publish (boolean; required)
   # - shelve (boolean)
   # - preserve (boolean; required)
-  # - rights_view (required)
-  # - rights_download (required)
-  # - rights_location (required)
+  # - rights_view (required unless there is a default file access)
+  # - rights_download (required unless there is a default file access)
+  # - rights_location (required unless there is a default file access)
   # - mimetype
   # - role
   # - file_language
@@ -40,8 +40,10 @@ module StructuralCsv
   # | corrected_for_accessibility  | false                                  | existing value, or false        |
   # | shelve                       | error                                  | publish                         |
   # | publish, preserve            | error                                  | (required column)               |
-  # | rights_view, rights_download | error                                  | (required column)               |
-  # | rights_location              | nil (valid unless location-based)      | (required column)               |
+  # | rights_view, rights_download | error                                  | default file access (all three  |
+  # |                              |                                        | absent), else (required column) |
+  # | rights_location              | nil (valid unless location-based)      | nil with a default file access, |
+  # |                              |                                        | else (required column)          |
   # | sequence, filename           | error                                  | (required column)               |
   #
   # Boolean cells must be "yes", "no", "true", or "false" (case-insensitive).
@@ -58,14 +60,17 @@ module StructuralCsv
     #   by filename
     # @param allow_file_deletion [Boolean] whether files omitted from the rows may be deleted (otherwise, a validation
     #   error)
+    # @param default_file_access [Hash, nil] the view, download, and location for files when the rights columns are
+    #   left out (see Contents::DefaultFileAccess), or nil if the rights columns are required
     # @raise [ArgumentError] if the Content is immutable
-    def initialize(rows:, content:, allow_file_deletion: true)
+    def initialize(rows:, content:, allow_file_deletion: true, default_file_access: nil)
       raise ArgumentError, 'Content must be mutable' if content.immutable?
 
       # Build StructuralCsv:Rows (not CSV:Rows)
       @rows = rows.map { |number, csv_row| Row.new(number:, csv_row:) }
       @content = content
       @allow_file_deletion = allow_file_deletion
+      @default_file_access = default_file_access
     end
 
     # Nothing is saved unless the rows and the built records are all valid.
@@ -74,7 +79,8 @@ module StructuralCsv
     def call
       # Validates the rows without building or saving anything (e.g., to report the rows' errors together with other
       # problems that prevent the import). Returns an array of ValidationError instances(empty if the rows are valid).
-      errors = Validator.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion:)
+      errors = Validator.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion:,
+                              rights_optional: default_file_access.present?)
       return Failure(errors) if errors.any?
 
       built_content_file_sets = build_content_file_sets
@@ -87,12 +93,12 @@ module StructuralCsv
 
     private
 
-    attr_reader :rows, :content, :allow_file_deletion
+    attr_reader :rows, :content, :allow_file_deletion, :default_file_access
 
     # Entirely blank rows are ignored (as they are by the Validator).
     def build_content_file_sets
       ContentFileSetsBuilder.call(groups: Row.groups(rows.reject(&:entirely_blank?)), content:,
-                                  content_file_binaries_by_filepath:)
+                                  content_file_binaries_by_filepath:, default_file_access:)
     end
 
     def content_file_binaries_by_filepath

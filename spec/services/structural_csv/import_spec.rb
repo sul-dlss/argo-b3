@@ -287,4 +287,59 @@ RSpec.describe StructuralCsv::Import do
       expect(image1_binary.reload.mime_type).to eq('image/tiff')
     end
   end
+
+  context 'when the rights columns are absent' do
+    let(:csv_string) do
+      <<~CSV
+        druid,sequence,filename,publish,preserve
+        bc123df4567,1,image1.tif,yes,yes
+        bc123df4567,2,image2.tif,yes,yes
+        bc123df4567,3,image3.tif,yes,yes
+      CSV
+    end
+
+    context 'with a default file access' do
+      subject(:result) { described_class.call(rows:, content:, default_file_access:) }
+
+      let(:default_file_access) { { view: 'location-based', download: 'location-based', location: 'music' } }
+
+      it 'gives every file the default file access' do
+        expect(result).to be_success
+
+        expect(file_sets.flat_map(&:content_files).map { |file| file.slice(:view, :download, :location) })
+          .to all(eq('view' => 'location-based', 'download' => 'location-based', 'location' => 'music'))
+      end
+    end
+
+    context 'without a default file access' do
+      it 'returns the column errors' do
+        expect(result.failure.map(&:reason)).to eq(
+          ['Missing required column "rights_view"', 'Missing required column "rights_download"',
+           'Missing required column "rights_location"']
+        )
+      end
+    end
+  end
+
+  context 'when the rights columns are present with a default file access' do
+    subject(:result) do
+      described_class.call(rows:, content:, default_file_access: { view: 'dark', download: 'none', location: nil })
+    end
+
+    let(:csv_string) do
+      <<~CSV
+        druid,sequence,filename,publish,preserve,rights_view,rights_download
+        bc123df4567,1,image1.tif,yes,yes,stanford,stanford
+        bc123df4567,2,image2.tif,yes,yes,world,world
+        bc123df4567,3,image3.tif,yes,yes,world,world
+      CSV
+    end
+
+    it 'uses the rights from the CSV' do
+      expect(result).to be_success
+
+      expect(file_sets.first.content_files.first).to have_attributes(view: 'stanford', download: 'stanford',
+                                                                     location: nil)
+    end
+  end
 end
