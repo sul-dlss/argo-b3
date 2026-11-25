@@ -592,6 +592,16 @@ RSpec.describe StageFilesJob do
           expect(user.notifications).to be_empty
           expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
         end
+
+        it 'reports a failure to record it, still marking the Content as failed' do
+          allow(TrackedDeposit).to receive(:latest_for).and_raise(ActiveRecord::ConnectionNotEstablished)
+
+          job.perform(content:, user:, accession: true, notify: false)
+
+          expect(content.reload.staging_state).to eq('staging_failed')
+          expect(Honeybadger).to have_received(:notify).with(an_instance_of(ActiveRecord::ConnectionNotEstablished),
+                                                             context: { druid: })
+        end
       end
 
       context "when a MID Item Deposit's object is deposited again from manage files" do
