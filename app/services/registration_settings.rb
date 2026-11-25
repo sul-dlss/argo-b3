@@ -2,7 +2,8 @@
 
 # The registration settings of an existing item, copied into the forms for registering new items
 # ("Copy registration settings for" on the item show page).
-# Identifiers (source ID, catalog record ID, barcode) and the description are not copied.
+# Identifiers (source ID, catalog record ID, barcode), the description, and the Registered By tag (which
+# registering adds for whoever registers) are not copied.
 class RegistrationSettings
   # Attributes of the item's cocina model that are copied.
   COPIED_ATTRIBUTES = %i[
@@ -54,7 +55,7 @@ class RegistrationSettings
   end
 
   def tags
-    Sdr::AdministrativeTags.list(druid:)
+    Sdr::AdministrativeTags.list(druid:).reject { |tag| tag.start_with?(Sdr::Repository::REGISTERED_BY_TAG_PREFIX) }
   end
 
   def common_attributes

@@ -255,4 +255,80 @@ RSpec.describe BulkActions::ShowComponent, type: :component do
       expect(page).to have_no_table('bulk-action-tracking-sheets-table')
     end
   end
+
+  describe 'left nav' do
+    let(:user) { build_stubbed(:user) }
+    let(:left_nav_buttons) { page.all('.left-nav a, .left-nav button').map(&:text) }
+
+    before do
+      allow(Current).to receive(:user).and_return(user)
+    end
+
+    context 'when the bulk action type adds no links' do
+      let(:bulk_action) { create(:bulk_action, action_type: :reindex, status: :completed) }
+
+      it 'renders only the history and menu buttons' do
+        render_inline(component)
+
+        expect(left_nav_buttons).to eq(['Recent bulk actions', 'Bulk actions menu'])
+      end
+    end
+
+    context 'when a register multiple items bulk action is completed' do
+      let(:user) { build_stubbed(:user, groups: ['sdr:test-workgroup']) }
+      let(:bulk_action) do
+        create(:bulk_action, :with_export,
+               action_type: :register_form,
+               status: :completed,
+               export_content: "Druid,Barcode,Folio Instance HRID,Source Id,Title\n" \
+                               "mn789pq1234,,,sul:abc-1,First title\n" \
+                               "rs456tv7890,,,sul:abc-2,Second title\n")
+      end
+
+      before do
+        create(:permission, :edit, workgroup: 'sdr:test-workgroup', target_druid: 'druid:hv992ry2431')
+      end
+
+      it 'adds enabled Register more items, prefilled from the first registered item, and Deposit multiple items' do
+        render_inline(component)
+
+        expect(left_nav_buttons).to eq(['Recent bulk actions', 'Bulk actions menu', 'Register more items',
+                                        'Deposit multiple items'])
+        register_form = page.find('form[action="/multiple_items/new"][method="get"]')
+        expect(register_form).to have_field('from_druid', type: :hidden, with: 'druid:mn789pq1234')
+        expect(register_form).to have_css('button:not([disabled])', exact_text: 'Register more items')
+        expect(page).to have_css('form[action="/multi_item_deposit_actions"][method="post"] button:not([disabled])',
+                                 exact_text: 'Deposit multiple items')
+      end
+    end
+
+    context 'when a register multiple items bulk action registered no items' do
+      let(:bulk_action) do
+        create(:bulk_action, :with_export,
+               action_type: :register_form,
+               status: :completed,
+               export_content: "Druid,Barcode,Folio Instance HRID,Source Id,Title\n")
+      end
+
+      it 'links Register more items to a blank form, disabled for a user who cannot register items' do
+        render_inline(component)
+
+        register_form = page.find('form[action="/multiple_items/new"]')
+        expect(register_form).to have_no_field('from_druid', type: :hidden)
+        expect(register_form).to have_css('button[disabled]', exact_text: 'Register more items')
+        expect(page).to have_css('form[action="/multi_item_deposit_actions"] button[disabled]',
+                                 exact_text: 'Deposit multiple items')
+      end
+    end
+
+    context 'when a register multiple items bulk action is not completed' do
+      let(:bulk_action) { create(:bulk_action, action_type: :register_form, status: :started) }
+
+      it 'adds Deposit multiple items but not Register more items' do
+        render_inline(component)
+
+        expect(left_nav_buttons).to eq(['Recent bulk actions', 'Bulk actions menu', 'Deposit multiple items'])
+      end
+    end
+  end
 end

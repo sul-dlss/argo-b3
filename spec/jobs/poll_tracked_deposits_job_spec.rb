@@ -376,6 +376,27 @@ RSpec.describe PollTrackedDepositsJob do
       end
     end
 
+    context 'when the owner turned off Multi-Item Deposit settled emails' do
+      before do
+        EmailOptOut.create!(user:, notifier_kind: 'multi_item_deposit_settled')
+        fail_process('druid:bc123df4567')
+        complete('druid:cd234fg5678')
+        poll
+        send_due_emails
+      end
+
+      it 'notifies without emailing, and does not notify again on later settling' do
+        expect(user.notifications.count).to eq(1)
+        expect(emails).to be_empty
+
+        retry_process('druid:bc123df4567')
+        complete('druid:bc123df4567')
+        poll
+
+        expect(user.notifications.count).to eq(1)
+      end
+    end
+
     context 'when a MID Item Deposit could not be started' do
       before do
         multi_item_deposit_action.item_deposit_actions.find_by(druid: 'druid:bc123df4567')

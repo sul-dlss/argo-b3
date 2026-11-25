@@ -6,8 +6,12 @@
 # The complete email is sent immediately; the with errors email 10 minutes later. Either is cancelled if the
 # Multi-Item Deposit has unsettled since the Notification (an errored Process or staging was retried), even if it has
 # settled again, since its next settling notifies afresh. Once an email has gone out, settling no longer notifies.
+# The email is also skipped when the recipient has turned off Multi-Item Deposit settled emails; that still counts as
+# the email having gone out, so the recipient isn't notified again on each retry.
 class MultiItemDepositSettledNotifier < ApplicationNotifier
   EMAIL_WAIT = 10.minutes
+
+  self.email_notifier_kind = 'multi_item_deposit_settled'
 
   # error_count is the number of MID Item Deposits In Error; item_deposit_count is the number of MID Item Deposits.
   required_params :name, :error_count, :item_deposit_count
@@ -21,14 +25,14 @@ class MultiItemDepositSettledNotifier < ApplicationNotifier
     params[:error_count].positive? ? EMAIL_WAIT : 0.seconds
   end
 
-  # Evaluated when the email is due. An email that is not cancelled has gone out, so later settling no longer
-  # notifies.
-  # @return [Boolean] whether the email is cancelled
-  def email_cancelled?(_notification)
+  # Evaluated when the email is due. An email that is not cancelled has gone out, even if the recipient's switch
+  # skips it, so later settling no longer notifies.
+  # @return [Boolean] whether the email is not sent
+  def email_cancelled?(notification)
     return true if unsettled_since_notification?
 
     record.update!(settled_email_sent_at: Time.current) if record.settled_email_sent_at.nil?
-    false
+    email_turned_off?(notification)
   end
 
   private

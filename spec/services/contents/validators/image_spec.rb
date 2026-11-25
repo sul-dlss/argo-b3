@@ -90,9 +90,11 @@ RSpec.describe Contents::Validators::Image do
                       files: [['image1.jp2', 'image/jp2', false], ['image1.txt', 'text/plain', true]])
     end
 
-    it 'has an error' do
+    it 'has errors' do
       expect(result.errors).to eq(['Resource 1 (Image 1) has published files but no published JP2 file ' \
-                                   'or TIFF, PNG, or JPEG file.'])
+                                   'or TIFF, PNG, or JPEG file.',
+                                   'The item includes published files but no image resource has a published JP2 ' \
+                                   'or a TIFF, PNG, or JPEG file.'])
     end
   end
 
@@ -168,6 +170,37 @@ RSpec.describe Contents::Validators::Image do
       expect(result).to have_attributes(
         errors: [],
         warnings: ['No image resource has a published JP2 or a TIFF, PNG, or JPEG file.']
+      )
+    end
+  end
+
+  context 'when only an object resource has published files and no image has a published JP2 or a TIFF, PNG, or JPEG' do
+    before do
+      create_resource(file_set_type: 'image', label: 'Image 1', files: [['image1.jp2', 'image/jp2', false]])
+      create_resource(file_set_type: 'object', label: 'Object 1', files: [['notes.pdf', 'application/pdf', true]])
+    end
+
+    it 'has an error but no warnings' do
+      expect(result).to have_attributes(
+        errors: ['The item includes published files but no image resource has a published JP2 ' \
+                 'or a TIFF, PNG, or JPEG file.'],
+        warnings: []
+      )
+    end
+  end
+
+  context 'when dark and no image has a published JP2 or a TIFF, PNG, or JPEG but a file is published' do
+    let(:dark) { true }
+
+    before do
+      create_resource(file_set_type: 'object', label: 'Object 1', files: [['notes.pdf', 'application/pdf', true]])
+    end
+
+    it 'has a warning instead of an error' do
+      expect(result).to have_attributes(
+        errors: [],
+        warnings: ['The item includes published files but no image resource has a published JP2 ' \
+                   'or a TIFF, PNG, or JPEG file.']
       )
     end
   end

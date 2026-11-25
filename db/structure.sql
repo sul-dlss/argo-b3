@@ -344,6 +344,38 @@ ALTER SEQUENCE public.contents_id_seq OWNED BY public.contents.id;
 
 
 --
+-- Name: email_opt_outs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_opt_outs (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    notifier_kind character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: email_opt_outs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_opt_outs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_opt_outs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_opt_outs_id_seq OWNED BY public.email_opt_outs.id;
+
+
+--
 -- Name: form_validation_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -814,6 +846,13 @@ ALTER TABLE ONLY public.contents ALTER COLUMN id SET DEFAULT nextval('public.con
 
 
 --
+-- Name: email_opt_outs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_opt_outs ALTER COLUMN id SET DEFAULT nextval('public.email_opt_outs_id_seq'::regclass);
+
+
+--
 -- Name: form_validation_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -960,6 +999,14 @@ ALTER TABLE ONLY public.content_files
 
 ALTER TABLE ONLY public.contents
     ADD CONSTRAINT contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_opt_outs email_opt_outs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_opt_outs
+    ADD CONSTRAINT email_opt_outs_pkey PRIMARY KEY (id);
 
 
 --
@@ -1157,6 +1204,13 @@ CREATE UNIQUE INDEX index_contents_on_druid_and_lock_and_immutable ON public.con
 
 
 --
+-- Name: index_email_opt_outs_on_user_id_and_notifier_kind; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_opt_outs_on_user_id_and_notifier_kind ON public.email_opt_outs USING btree (user_id, notifier_kind);
+
+
+--
 -- Name: index_form_validation_actions_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1306,6 +1360,14 @@ ALTER TABLE ONLY public.content_files
 
 
 --
+-- Name: email_opt_outs fk_rails_49136c1f4a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_opt_outs
+    ADD CONSTRAINT fk_rails_49136c1f4a FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: pinned_objects fk_rails_4bde216498; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1424,7 +1486,8 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20261125120000'),
+('20261125200000'),
+('20261125140000'),
 ('20261124230000'),
 ('20261124164108'),
 ('20261124164107'),

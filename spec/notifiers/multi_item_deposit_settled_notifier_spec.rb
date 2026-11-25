@@ -56,6 +56,19 @@ RSpec.describe MultiItemDepositSettledNotifier do
       expect(user.notifications.count).to eq(1)
     end
 
+    it 'skips the email if the owner turned off Multi-Item Deposit settled emails, but records it as gone out' do
+      EmailOptOut.create!(user:, notifier_kind: 'multi_item_deposit_settled')
+
+      expect { send_due_email }.not_to change(ActionMailer::Base.deliveries, :count)
+      expect(multi_item_deposit_action.reload.settled_email_sent_at).to be_present
+    end
+
+    it 'sends the email if the owner turned off only other emails' do
+      EmailOptOut.create!(user:, notifier_kind: 'file_check_finished')
+
+      expect { send_due_email }.to change(ActionMailer::Base.deliveries, :count).by(1)
+    end
+
     it 'cancels the email if the Multi-Item Deposit has settled again since the Notification' do
       multi_item_deposit_action.update!(settled_at: 1.second.from_now)
 
