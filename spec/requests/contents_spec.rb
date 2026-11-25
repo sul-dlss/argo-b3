@@ -1210,6 +1210,30 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when rows have problems of different kinds' do
+      let(:csv_string) do
+        table = CSV.parse(StructuralCsv::Export.as_csv(content:), headers: true)
+        second_row = CSV::Row.new(table.headers, table.first.fields)
+        table.first['publish'] = 'maybe'
+        second_row['sequence'] = '2'
+        second_row['rights_view'] = 'stanfrod'
+        table << second_row
+        table.to_csv
+      end
+
+      it 'renders every error at once' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body.text).to include(
+          'Row 2: Value for "publish" ("maybe") must be yes, no, true, or false'
+        )
+        expect(response.parsed_body.text).to include(
+          'Row 3: Value for "rights_view" ("stanfrod") is not a valid view access'
+        )
+      end
+    end
+
     context 'when a file would be deleted' do
       let!(:omitted_content_file_binary) do
         create(:content_file_binary, content:, filepath: 'page_0002.tif', mime_type: 'image/tiff')
