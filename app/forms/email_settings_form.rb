@@ -19,7 +19,7 @@ class EmailSettingsForm < ApplicationForm
     opted_out_kinds = EmailOptOut::NOTIFIER_KINDS.reject { |notifier_kind| public_send(notifier_kind) }
     EmailOptOut.transaction do
       user.email_opt_outs.where.not(notifier_kind: opted_out_kinds).delete_all
-      opted_out_kinds.each { |notifier_kind| user.email_opt_outs.find_or_create_by!(notifier_kind:) }
+      opted_out_kinds.each { |notifier_kind| user.email_opt_outs.create_or_find_by!(notifier_kind:) }
     end
   end
 end
