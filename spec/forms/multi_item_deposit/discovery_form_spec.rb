@@ -4,15 +4,19 @@ require 'rails_helper'
 
 RSpec.describe MultiItemDeposit::DiscoveryForm do
   subject(:form) do
-    described_class.new(manifest_source:, manifest_file:, manifest_csv:, file_location:, mount_path:)
+    described_class.new(manifest_source:, manifest_file:, manifest_csv:, manifest_filename:, file_location:,
+                        mount_path:)
   end
 
   let(:file_location) { 'mount' }
   let(:mount_directory) { Dir.mktmpdir(nil, Rails.root.join('tmp')) }
   let(:mount_path) { mount_directory }
   let(:manifest_source) { 'upload' }
-  let(:manifest_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }
+  let(:manifest_file) do
+    Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv', original_filename: "manifest-batch-3#{extension}")
+  end
   let(:manifest_csv) { nil }
+  let(:manifest_filename) { nil }
   let(:csv_tempfile) { Tempfile.new(['manifest', extension]).tap { |file| file.write(csv_string) && file.flush } }
   let(:extension) { '.csv' }
   let(:csv_string) { "druid,folder\nbc123df4567,folder1\n" }
@@ -22,38 +26,44 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
   end
 
   context 'when the manifest is uploaded' do
-    it 'normalizes the uploaded manifest' do
+    it 'normalizes the uploaded manifest and saves its filename' do
       expect(form).to be_valid
       expect(form.submitted_manifest_csv).to eq("druid,folder\ndruid:bc123df4567,folder1\n")
+      expect(form.multi_item_deposit_action_attributes).to include(manifest_filename: 'manifest-batch-3.csv')
     end
   end
 
   context 'when the manifest was uploaded with an earlier submit' do
     let(:manifest_file) { nil }
     let(:manifest_csv) { "druid,folder\ndruid:cd234fg5678,folder2\n" }
+    let(:manifest_filename) { 'manifest-batch-2.csv' }
 
-    it 'uses the earlier manifest' do
+    it 'uses the earlier manifest and its filename' do
       expect(form).to be_valid
       expect(form.submitted_manifest_csv).to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
       expect(form.retainable_manifest_csv).to eq("druid,folder\ndruid:cd234fg5678,folder2\n")
+      expect(form.retainable_manifest_filename).to eq('manifest-batch-2.csv')
     end
   end
 
   context 'when a manifest is uploaded to replace the earlier manifest' do
     let(:manifest_csv) { "druid,folder\ndruid:cd234fg5678,folder2\n" }
+    let(:manifest_filename) { 'manifest-batch-2.csv' }
 
-    it 'uses the new manifest' do
+    it 'uses the new manifest and its filename' do
       expect(form).to be_valid
       expect(form.submitted_manifest_csv).to eq("druid,folder\ndruid:bc123df4567,folder1\n")
+      expect(form.retainable_manifest_filename).to eq('manifest-batch-3.csv')
     end
   end
 
   context 'when the uploaded manifest is valid but the mount path is not' do
     let(:mount_path) { File.join(mount_directory, 'missing') }
 
-    it 'retains the uploaded manifest' do
+    it 'retains the uploaded manifest and its filename' do
       expect(form).not_to be_valid
       expect(form.retainable_manifest_csv).to eq("druid,folder\ndruid:bc123df4567,folder1\n")
+      expect(form.retainable_manifest_filename).to eq('manifest-batch-3.csv')
     end
   end
 
@@ -71,7 +81,7 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
 
     it 'is not valid' do
       expect(form).not_to be_valid
-      expect(form.errors[:manifest_file]).to eq(["can't be blank"])
+      expect(form.errors[:manifest_file]).to eq(['Upload a manifest file.'])
     end
   end
 
@@ -127,7 +137,7 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
 
     it 'is not valid' do
       expect(form).not_to be_valid
-      expect(form.errors[:manifest_source]).to eq(['Missing columns: folder.'])
+      expect(form.errors[:manifest_source]).to eq(['Required columns are druid and folder. Columns missing: folder.'])
     end
   end
 
@@ -245,7 +255,7 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
       expect(form).to be_valid
       expect(form.multi_item_deposit_action_attributes)
         .to include(file_location: 'globus', mount_path: nil,
-                    manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
+                    manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n", manifest_filename: nil)
     end
 
     context 'when the Globus link has not been created' do
@@ -274,12 +284,14 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     it 'includes the manifest source and normalized manifest' do
       expect(form.multi_item_deposit_action_attributes)
         .to eq(description: nil, file_location: 'mount', mount_path: mount_directory, manifest_source: 'upload',
-               manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n")
+               manifest_csv: "druid,folder\ndruid:bc123df4567,folder1\n", manifest_filename: 'manifest-batch-3.csv')
     end
   end
 
   describe '#unsaved_manifest_csv?' do
-    let(:multi_item_deposit_action) { build(:multi_item_deposit_action, manifest_csv: saved_manifest_csv) }
+    let(:multi_item_deposit_action) do
+      build(:multi_item_deposit_action, manifest_csv: saved_manifest_csv, manifest_filename: 'manifest-batch-3.csv')
+    end
 
     context 'when the uploaded manifest is not saved' do
       let(:saved_manifest_csv) { "druid,folder\ndruid:cd234fg5678,folder2\n" }
@@ -294,6 +306,17 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
 
       it 'is false' do
         expect(form.unsaved_manifest_csv?(multi_item_deposit_action)).to be false
+      end
+    end
+
+    context 'when the same manifest is uploaded with another filename' do
+      let(:saved_manifest_csv) { "druid,folder\ndruid:bc123df4567,folder1\n" }
+      let(:manifest_file) do
+        Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv', original_filename: 'manifest-batch-4.csv')
+      end
+
+      it 'is true' do
+        expect(form.unsaved_manifest_csv?(multi_item_deposit_action)).to be true
       end
     end
   end

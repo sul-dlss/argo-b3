@@ -85,20 +85,29 @@ RSpec.describe 'Multi-item deposit' do
     fill_in 'Mount path', with: mount_path
     click_on 'Discover files and check manifest'
 
-    # The manifest fails validation, so discovery does not start.
+    # The manifest fails validation, so discovery does not start, but it is kept.
     expect(page).to have_text('Blank folder in rows: 3.')
+    expect(page).to have_text('Last checked manifest: invalid.csv. Choose a file to replace it.')
+    expect(accessibility_node('#multi_item_deposit_discovery_manifest_file'))
+      .to include(name: 'Upload manifest file',
+                  description: 'Blank folder in rows: 3. ' \
+                               'Last checked manifest: invalid.csv. Choose a file to replace it.')
     expect(page).to have_field('Describe this deposit', with: 'My multi-item deposit')
     expect(page).to have_field('Mount path', with: mount_path)
     expect(multi_item_deposit_action.item_deposit_actions).to be_empty
 
     attach_file 'Upload manifest file',
                 write_manifest('manifest.csv', "druid,folder\nbc123df4567,folder1\ncd234fg5678,folder2\n")
+    # Choosing a file does not change the kept manifest until the next discover.
+    expect(page).to have_text('Last checked manifest: invalid.csv.')
     fill_in 'Mount path', with: File.join(mount_path, 'missing')
     click_on 'Discover files and check manifest'
 
     # The mount path fails validation, but the uploaded manifest is retained.
     expect(page).to have_text('does not exist')
-    expect(page).to have_text('A manifest has been uploaded.')
+    expect(page).to have_text('Last checked manifest: manifest.csv. Choose a file to replace it.')
+    expect(accessibility_node('#multi_item_deposit_discovery_manifest_file'))
+      .to include(description: 'Last checked manifest: manifest.csv. Choose a file to replace it.')
 
     fill_in 'Mount path', with: mount_path
     click_on 'Discover files and check manifest'
@@ -120,7 +129,7 @@ RSpec.describe 'Multi-item deposit' do
     expect(page).to have_no_css('.alert-danger')
     expect(page).to have_no_table('Error details')
     expect(page).to have_field('Upload from a computer', checked: true)
-    expect(page).to have_text('A manifest has been uploaded.')
+    expect(page).to have_text('Last checked manifest: manifest.csv. Choose a file to replace it.')
 
     click_on 'Next'
 
@@ -140,8 +149,11 @@ RSpec.describe 'Multi-item deposit' do
     attach_file 'Upload structural metadata CSV', write_manifest('structural.csv', "druid,sequence\nbc123df4567,1\n")
     click_on 'Check files'
 
-    # The CSV fails validation, so structuring does not start.
+    # The CSV fails validation, so structuring does not start, but it is kept.
     expect(page).to have_text('missing headers: filename')
+    expect(page).to have_text('Last checked structural metadata CSV: structural.csv. Choose a file to replace it.')
+    expect(accessibility_node('#multi_item_deposit_structure_structural_metadata_csv_file')[:description])
+      .to end_with('Last checked structural metadata CSV: structural.csv. Choose a file to replace it.')
     expect(multi_item_deposit_action.reload).not_to be_structuring
 
     choose 'No'
