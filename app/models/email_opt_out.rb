@@ -6,10 +6,10 @@ class EmailOptOut < ApplicationRecord
   # The email switches, in the order the Email settings tab lists them. Each Notifier that emails names the switch
   # covering its emails with ApplicationNotifier.email_notifier_kind.
   NOTIFIER_KINDS = %w[
+    bulk_action_object_deposits_settled_with_errors
     file_check_finished
     multi_item_deposit_settled
     deposit_failed
-    bulk_action_object_deposits_settled_with_errors
     deposit_complete
   ].freeze
 

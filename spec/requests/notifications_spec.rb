@@ -73,8 +73,9 @@ RSpec.describe 'Notifications' do
 
   describe 'GET /notifications/email_settings' do
     let(:labels) do
-      ['File Check finished', 'Multi-Item Deposit settled', 'Deposit failed',
-       'Bulk Action Object Deposits settled with errors', 'Deposit complete, when someone added you as a recipient']
+      ['Bulk action deposits finish with errors', 'File check finished with or without errors',
+       'Multiple item deposit settled with or without errors', 'Single item deposit failed',
+       'Deposit complete, when someone added you as a recipient']
     end
 
     it 'renders the email settings tab with every email on' do
@@ -87,12 +88,11 @@ RSpec.describe 'Notifications' do
                                                            class: 'active')
       expect(rendered_page).to have_text("Choose which ones are also emailed to #{user.email_address}.")
       fieldset = rendered_page.find('fieldset', text: 'Email me when')
-      expect(fieldset).to have_text('Emails about something you can act on are sent 10 minutes later')
       expect(fieldset.all('.form-check-label').map { |label| label.text.strip }).to eq(labels)
       labels.each { |label| expect(fieldset).to have_checked_field(label) }
-      help_text_id = fieldset.find_field('File Check finished')['aria-describedby']
-      expect(fieldset).to have_css("##{help_text_id}", text: 'A Multi-Item Deposit you started has finished File ' \
-                                                             'Check, with or without errors.')
+      help_text_id = fieldset.find_field('Deposit complete, when someone added you as a recipient')['aria-describedby']
+      expect(fieldset).to have_css("##{help_text_id}", text: 'A Single-Object Deposit that you have been tagged as ' \
+                                                             'an additional notification recipient for is complete.')
       expect(rendered_page).to have_button('Save')
       expect(rendered_page).to have_no_link('Cancel')
     end
@@ -103,8 +103,8 @@ RSpec.describe 'Notifications' do
       get email_settings_notifications_path
 
       rendered_page = Capybara.string(response.body)
-      expect(rendered_page).to have_unchecked_field('Deposit failed')
-      expect(rendered_page).to have_checked_field('File Check finished')
+      expect(rendered_page).to have_unchecked_field('Single item deposit failed')
+      expect(rendered_page).to have_checked_field('File check finished with or without errors')
     end
   end
 
