@@ -15,5 +15,15 @@ class NotificationsController < ApplicationController
                             .limit(RECENT_LIMIT)
   end
 
-  def email_settings; end
+  def email_settings
+    @email_settings_form = EmailSettingsForm.for(Current.user)
+  end
+
+  def update_email_settings
+    @email_settings_form = EmailSettingsForm.new(EmailSettingsForm.params_from(params))
+    @email_settings_form.save!(Current.user)
+
+    flash[:toast] = t('notifications.email_settings.toasts.saved')
+    redirect_to email_settings_notifications_path, status: :see_other
+  end
 end

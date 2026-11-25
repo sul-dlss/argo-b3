@@ -1112,4 +1112,25 @@ en:
       empty: 'No notifications.'
       time_ago: '%{time} ago'
     email_settings:
-      placeholder: 'Email settings are not available yet.'
+      intro: 'You always see notifications in Argo. Choose which ones are also emailed to %{email_address}.'
+      legend: 'Email me when'
+      help_text: 'Emails about something you can act on are sent 10 minutes later, and not sent if you act on it first.'
+      notifier_kinds:
+        file_check_finished:
+          label: 'File Check finished'
+          help_text: 'A Multi-Item Deposit you started has finished File Check, with or without errors.'
+        multi_item_deposit_settled:
+          label: 'Multi-Item Deposit settled'
+          help_text: 'Every MID Item Deposit of a Multi-Item Deposit you started, or were added to as a recipient, is Complete or In Error.'
+        deposit_failed:
+          label: 'Deposit failed'
+          help_text: 'A Single-Object Deposit you started, or were added to as a recipient, is In Error.'
+        bulk_action_object_deposits_settled_with_errors:
+          label: 'Bulk Action Object Deposits settled with errors'
+          help_text: 'Every Bulk Action Object Deposit of a Bulk Action you ran is Complete or In Error, and at least one is In Error.'
+        deposit_complete:
+          label: 'Deposit complete, when someone added you as a recipient'
+          help_text: 'A Single-Object Deposit someone added you to as a recipient is Complete.'
+      save: 'Save'
+      toasts:
+        saved: 'Email settings saved.'

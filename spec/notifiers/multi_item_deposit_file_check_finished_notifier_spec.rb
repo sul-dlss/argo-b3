@@ -191,6 +191,18 @@ RSpec.describe MultiItemDepositFileCheckFinishedNotifier do
       expect(Noticed::DeliveryMethods::Email).not_to have_been_enqueued
     end
 
+    it 'cancels the email if the owner turned off File Check finished emails after the Notification' do
+      EmailOptOut.create!(user:, notifier_kind: 'file_check_finished')
+
+      expect { send_due_email }.not_to(change { ActionMailer::Base.deliveries.count })
+    end
+
+    it 'sends the email if the owner turned off only other emails' do
+      EmailOptOut.create!(user:, notifier_kind: 'deposit_failed')
+
+      expect { send_due_email }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
     it 'leaves the notification in place when the email is cancelled' do
       multi_item_deposit_action.update!(structuring_started_at: 1.second.from_now)
       send_due_email

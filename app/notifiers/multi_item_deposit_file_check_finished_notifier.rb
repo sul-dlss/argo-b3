@@ -6,9 +6,12 @@
 # The email is sent 10 minutes later, unless the Multi-Item Deposit has changed since the Notification (Deposit
 # Initiation was started, File Check or Discovery was re-run, or a MID Item Deposit was removed), since the email
 # would then be out of date. Moving between steps without running one does not cancel it. If the Multi-Item Deposit
-# was deleted, its Notifications are deleted with it, so the email job is discarded.
+# was deleted, its Notifications are deleted with it, so the email job is discarded. The email is also skipped when
+# the owner has turned off File Check finished emails.
 class MultiItemDepositFileCheckFinishedNotifier < ApplicationNotifier
   EMAIL_WAIT = 10.minutes
+
+  self.email_notifier_kind = 'file_check_finished'
 
   # error_count is the number of MID Item Deposits with File Check errors; item_deposit_count is the number of MID
   # Item Deposits that File Check checked, so that removing one cancels the email.
@@ -16,7 +19,13 @@ class MultiItemDepositFileCheckFinishedNotifier < ApplicationNotifier
 
   deliver_by :turbo_toast, class: 'DeliveryMethods::TurboToast', queue: :real_time
   deliver_by :email, mailer: 'NotificationMailer', method: :multi_item_deposit_file_check_finished,
-                     wait: EMAIL_WAIT, unless: :changed_since_notification?
+                     wait: EMAIL_WAIT, unless: :skip_email?
+
+  # Evaluated when the email is due.
+  # @return [Boolean] whether the email should not be sent
+  def skip_email?(notification)
+    email_turned_off?(notification) || changed_since_notification?(notification)
+  end
 
   # Evaluated when the email is due.
   # @return [Boolean] whether the Multi-Item Deposit has changed since the Notification

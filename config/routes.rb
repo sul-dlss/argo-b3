@@ -94,6 +94,7 @@ Rails.application.routes.draw do
   resources :notifications, only: %i[index] do
     collection do
       get 'email_settings'
+      patch 'email_settings', action: :update_email_settings
     end
   end
 
