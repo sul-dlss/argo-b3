@@ -408,6 +408,59 @@ RSpec.describe MultiItemDepositAction do
     end
   end
 
+  describe '.awaiting_settled_email' do
+    let!(:awaiting) do
+      create(:multi_item_deposit_action, step: 'submitted', initiating_deposit_completed_at: 1.hour.ago)
+    end
+
+    before do
+      create(:multi_item_deposit_action, step: 'submitted', initiating_deposit_completed_at: 1.hour.ago,
+                                         settled_email_sent_at: 1.minute.ago)
+      create(:multi_item_deposit_action, step: 'submitted', initiating_deposit_completed_at: nil)
+      create(:multi_item_deposit_action, step: 'deposit', initiating_deposit_completed_at: 1.hour.ago)
+    end
+
+    it 'returns the Submitted Multi-Item Deposits that have been started and have not had a settled email' do
+      expect(described_class.awaiting_settled_email).to eq([awaiting])
+    end
+  end
+
+  describe '#record_settling!' do
+    let(:multi_item_deposit_action) { create(:multi_item_deposit_action, step: 'submitted') }
+    let(:item_deposit_action) { create(:item_deposit_action, multi_item_deposit_action:) }
+
+    context 'when a MID Item Deposit is in flight' do
+      before { create(:tracked_deposit, item_deposit_action:) }
+
+      it 'is unsettled' do
+        multi_item_deposit_action.update!(settled_at: 1.minute.ago)
+        multi_item_deposit_action.record_settling!
+
+        expect(multi_item_deposit_action.settled_at).to be_nil
+        expect(multi_item_deposit_action).not_to be_newly_settled
+      end
+    end
+
+    context 'when every MID Item Deposit is Complete or In Error' do
+      before do
+        create(:tracked_deposit, item_deposit_action:, process_errored_at: 1.minute.ago)
+        create(:item_deposit_action, multi_item_deposit_action:, deposit_errors: ['Failed'])
+        create(:item_deposit_action, multi_item_deposit_action:)
+      end
+
+      it 'settles once' do
+        multi_item_deposit_action.record_settling!
+
+        expect(multi_item_deposit_action).to be_newly_settled
+        expect(multi_item_deposit_action.settled_at).to be_within(1.second).of(Time.current)
+
+        multi_item_deposit_action.reload.record_settling!
+
+        expect(multi_item_deposit_action).not_to be_newly_settled
+      end
+    end
+  end
+
   describe '#discardable?' do
     it 'is true in the discovery, structure, and deposit steps' do
       expect(described_class.new(step: :discovery)).to be_discardable

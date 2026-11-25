@@ -23,6 +23,8 @@ RSpec.describe ResetWorkflowErrorsJob do
   end
 
   it 'resets the workflow errors for the matching items' do
+    allow(TrackedDeposit).to receive(:process_retried!)
+
     job.perform(workflow_name:, process_name:, search_form:, effective_groups: user.groups)
 
     expect(Searchers::DruidList).to have_received(:call)
@@ -35,6 +37,8 @@ RSpec.describe ResetWorkflowErrorsJob do
     expect(object_client).to have_received(:workflow).twice.with(workflow_name)
     expect(workflow_client).to have_received(:process).twice.with(process_name)
     expect(process_client).to have_received(:update).twice.with(status: 'waiting', current_status: 'error')
+    expect(TrackedDeposit).to have_received(:process_retried!).with(druid: 'druid:fm262cb0015')
+    expect(TrackedDeposit).to have_received(:process_retried!).with(druid: 'druid:rt276nw8963')
   end
 
   context 'with an impersonated workgroup', :solr do

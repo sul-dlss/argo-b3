@@ -1,0 +1,6 @@
+<% url = multi_item_deposit_action_url(@multi_item_deposit_action) %>
+<% if @error_count.positive? %>
+  <p>Your <%= @deposit_label %> has completed with errors: <%= pluralize(number_with_delimiter(@error_count), 'item') %> of <%= number_with_delimiter(@item_deposit_count) %> could not be deposited. View details and address the errors in Argo at <%= link_to url, url %>.</p>
+<% else %>
+  <p>Your <%= @deposit_label %> is complete: every item has been deposited. View details in Argo at <%= link_to url, url %>.</p>
+<% end %>

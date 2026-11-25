@@ -16,6 +16,15 @@ class NotificationMailer < ApplicationMailer
     mail to: params[:recipient].email_address, subject: file_check_finished_subject
   end
 
+  def multi_item_deposit_settled
+    @multi_item_deposit_action = params[:record]
+    @error_count = params[:error_count]
+    @item_deposit_count = params[:item_deposit_count]
+    @deposit_label = deposit_label
+
+    mail to: params[:recipient].email_address, subject: settled_subject
+  end
+
   def deposit_failed
     @druid = params[:druid]
     @bare_druid = DruidSupport.bare_druid_from(@druid)
@@ -27,6 +36,11 @@ class NotificationMailer < ApplicationMailer
   end
 
   private
+
+  def settled_subject
+    outcome = @error_count.positive? ? 'completed with errors' : 'complete'
+    "#{description_prefix}SDR multi-item deposit #{@multi_item_deposit_action.id} #{outcome}"
+  end
 
   def file_check_finished_subject
     outcome = @with_errors ? 'errors' : 'complete'

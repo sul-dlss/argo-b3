@@ -4,6 +4,10 @@
 # Complete, and when it goes from no Process in error for its version (in any workflow) to some. Tracking ends when
 # the Deposit is Complete, or silently when its version is no longer in flight (e.g., the object was purged or the
 # draft discarded). An error does not end tracking.
+#
+# A MID Item Deposit never notifies on its own: its Process errors are recorded the same way, and once its Tracked
+# Deposits are polled, each Multi-Item Deposit that has settled since the last run notifies its owner
+# (MultiItemDepositSettledNotifier), until a settled email has gone out for it.
 class PollTrackedDepositsJob < ApplicationJob
   queue_as :cleanup
   # Overlapping runs (e.g., when queued behind other jobs) would notify twice.
@@ -14,6 +18,7 @@ class PollTrackedDepositsJob < ApplicationJob
 
   def perform
     TrackedDeposit.includes(:user).find_in_batches(batch_size: BATCH_SIZE) { |batch| poll(batch) }
+    MultiItemDepositAction.awaiting_settled_email.includes(:user).find_each { |mid| settle(mid) }
   end
 
   private
@@ -23,9 +28,28 @@ class PollTrackedDepositsJob < ApplicationJob
     tracked_deposits_by_outcome = tracked_deposits.group_by do |tracked_deposit|
       outcome(tracked_deposit, status: statuses[tracked_deposit.druid])
     end
-    tracked_deposits_by_outcome.delete(:abandoned)&.each(&:destroy!)
-    report(complete: tracked_deposits_by_outcome.fetch(:complete, []),
+    tracked_deposits_by_outcome.delete(:abandoned)&.each { |tracked_deposit| abandon(tracked_deposit) }
+    report(complete: end_complete_item_deposits(tracked_deposits_by_outcome.fetch(:complete, [])),
            in_flight: tracked_deposits_by_outcome.fetch(:in_flight, []))
+  end
+
+  # A Complete MID Item Deposit counts toward its Multi-Item Deposit's settling, rather than notifying.
+  # @return [Array<TrackedDeposit>] the other Complete Deposits
+  def end_complete_item_deposits(tracked_deposits)
+    item_deposits, others = tracked_deposits.partition(&:item_deposit_action_id)
+    item_deposits.each(&:destroy!)
+    others
+  end
+
+  # An abandoned MID Item Deposit was not deposited, so it is recorded as In Error, as a Deposit start failure is,
+  # rather than counting as Complete toward its Multi-Item Deposit.
+  def abandon(tracked_deposit)
+    tracked_deposit.transaction do
+      tracked_deposit.item_deposit_action&.update!(
+        deposit_errors: [I18n.t('multi_item_deposit.deposit.errors.deposit_abandoned')]
+      )
+      tracked_deposit.destroy!
+    end
   end
 
   # Notifies of Complete Deposits and of Deposits whose Processes went into error.
@@ -63,5 +87,36 @@ class PollTrackedDepositsJob < ApplicationJob
   rescue StandardError => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: tracked_deposit.druid })
+  end
+
+  # Settling is recorded before notifying, so that the email can tell whether the Multi-Item Deposit has unsettled
+  # since. If notifying fails, settling is undone, so the next run notifies.
+  def settle(multi_item_deposit_action)
+    multi_item_deposit_action.record_settling!
+    return unless multi_item_deposit_action.newly_settled?
+
+    MultiItemDepositSettledNotifier.with(record: multi_item_deposit_action, name: multi_item_deposit_action.name,
+                                         error_count: item_deposits_in_error_count(multi_item_deposit_action),
+                                         item_deposit_count: multi_item_deposit_action.item_deposit_actions.count)
+                                   .deliver(multi_item_deposit_action.user, queue: :real_time)
+  rescue StandardError => e
+    undo_settling(multi_item_deposit_action)
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { multi_item_deposit_action_id: multi_item_deposit_action.id })
+  end
+
+  # Unless the Notification was made, in which case the next run would notify again.
+  def undo_settling(multi_item_deposit_action)
+    return if multi_item_deposit_action.noticed_events.exists?(created_at: multi_item_deposit_action.settled_at..)
+
+    multi_item_deposit_action.update_columns(settled_at: nil) # rubocop:disable Rails/SkipsModelValidations
+  end
+
+  # A MID Item Deposit is In Error if its deposit could not be started (a Deposit start failure, which has no Tracked
+  # Deposit) or its Tracked Deposit is in error.
+  # @return [Integer] the number of MID Item Deposits In Error
+  def item_deposits_in_error_count(multi_item_deposit_action)
+    multi_item_deposit_action.item_deposit_actions.with_deposit_errors.count +
+      multi_item_deposit_action.tracked_deposits.in_error.count
   end
 end

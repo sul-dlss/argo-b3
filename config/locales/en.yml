@@ -933,6 +933,7 @@ en:
         not_closeable: 'The open version cannot be closed for this object'
         unexpected: 'An unexpected error occurred while checking the deposit. Contact SDR support for assistance.'
         deposit_failed: 'An unexpected error occurred while depositing. Contact SDR support for assistance.'
+        deposit_abandoned: 'The deposit stopped before it was complete: the draft was discarded or the object purged.'
       toasts:
         started: 'Deposit started'
   dashboard:
@@ -1112,6 +1113,16 @@ en:
       detail_with_errors:
         one: '1 item has errors.'
         other: '%{formatted_count} items have errors.'
+    multi_item_deposit_settled:
+      title: 'Multi-item deposit complete'
+      title_with_errors: 'Multi-item deposit completed with errors'
+      text: 'All items of %{name} were deposited.'
+      text_with_errors:
+        one: '%{name} completed with errors in 1 item.'
+        other: '%{name} completed with errors in %{formatted_count} items.'
+      detail_with_errors:
+        one: '1 of %{formatted_total_count} items has errors.'
+        other: '%{formatted_count} of %{formatted_total_count} items have errors.'
     multi_item_deposit_initiation_errors:
       title: 'Deposit Initiation found errors'
       text:
