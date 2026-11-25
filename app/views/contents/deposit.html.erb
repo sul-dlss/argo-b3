@@ -4,6 +4,7 @@
     <p class="mb-3"><%= t('edit.contents.steps.deposit_help_text') %></p>
 
     <% unless @contents_item_form.initial_version? %>
+      <%= render Edit::NewUserVersionComponent.new(form: item_form) %>
       <%= render Edit::VersionDescriptionComponent.new(form: item_form) %>
     <% end %>
 

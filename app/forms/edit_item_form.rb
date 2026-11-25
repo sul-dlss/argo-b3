@@ -13,6 +13,7 @@ class EditItemForm < CocinaModels::Dro
   include EmbargoFormConcern
   include FileAccessFormConcern
   include ContentDepositFormConcern
+  include NewUserVersionFormConcern
   include CollectionFormConcern
   include CatalogRecordIdFormConcern
   include CatalogRecordIdExistsFormConcern

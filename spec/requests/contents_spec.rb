@@ -170,6 +170,34 @@ RSpec.describe 'Contents' do
       end
     end
 
+    context 'when on the deposit step of a later version' do
+      let(:version) { 2 }
+      let(:legend) { 'Do you want to keep the previous version accessible as a public version?' }
+
+      before do
+        content.update!(step: 'deposit', content_type: Cocina::Models::ObjectType.book, access_view: 'world',
+                        access_download: 'world')
+      end
+
+      it 'asks whether to keep the previous version public' do
+        get edit_content_path(druid)
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css('fieldset:not([hidden]) legend', text: legend)
+      end
+
+      context 'when the item details make the item dark' do
+        before { content.update!(access_view: 'dark', access_download: 'none') }
+
+        it 'hides the question' do
+          get edit_content_path(druid)
+
+          page = Capybara.string(response.body)
+          expect(page).to have_css('fieldset[hidden][disabled] legend', text: legend, visible: :hidden)
+        end
+      end
+    end
+
     context 'when opening on the first step' do
       before { content.update!(step: 'deposit') }
 
@@ -543,7 +571,8 @@ RSpec.describe 'Contents' do
             description: cocina_object.description
           ), user_name: user.sunetid, description: nil)
         expect(content.reload).to have_attributes(lock: 'updated-lock', staging_state: 'staging')
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
         expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
       end
 
@@ -552,6 +581,59 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(TrackedDeposit.sole).to have_attributes(druid:, version: 1, user:)
+      end
+    end
+
+    context 'when depositing a later version with a new user version' do
+      let(:version) { 2 }
+
+      it 'stages with accessioning and a new user version' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { new_user_version: true, version_description: 'Fix',
+                                                              access_view: 'world', access_download: 'world' } }
+
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: true)
+      end
+    end
+
+    context 'when depositing a later version with a new user version and the feature is off' do
+      let(:version) { 2 }
+
+      before { allow(Settings.feature_flags).to receive(:new_user_version).and_return(false) }
+
+      it 'stages with accessioning without a new user version' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { new_user_version: true, version_description: 'Fix',
+                                                              access_view: 'world', access_download: 'world' } }
+
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
+      end
+    end
+
+    context 'when depositing a later version as dark with a new user version' do
+      let(:version) { 2 }
+
+      it 'stages with accessioning without a new user version' do
+        patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE,
+                                             contents_item: { new_user_version: true, version_description: 'Fix',
+                                                              access_view: 'dark', access_download: 'none' } }
+
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
+      end
+    end
+
+    context 'when saving a later version as a draft with a new user version' do
+      let(:version) { 2 }
+
+      it 'stages without accessioning or a new user version' do
+        patch content_path(druid), params: { commit: ContentsController::DRAFT_VALUE,
+                                             contents_item: { new_user_version: true, version_description: 'Fix' } }
+
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
       end
     end
 
@@ -578,7 +660,8 @@ RSpec.describe 'Contents' do
         patch content_path(druid), params: { commit: ContentsController::DEPOSIT_VALUE }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
         expect(flash[:toast]).to eq(I18n.t('edit.items.new.toasts.staging_started'))
       end
     end
@@ -610,7 +693,8 @@ RSpec.describe 'Contents' do
 
         expect(response).to redirect_to(object_path(druid))
         expect(content.reload.staging_state).to eq('staging')
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
       end
 
       it 'tracks the deposit for the user who deposited it again' do
@@ -643,7 +727,8 @@ RSpec.describe 'Contents' do
                                              contents_item: { viewing_direction: 'right-to-left' } }
 
         expect(response).to redirect_to(object_path(druid))
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
         expect(TrackedDeposit.count).to eq(0)
       end
     end
@@ -656,7 +741,8 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq(cocina_object.lock)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
       end
     end
 
@@ -671,7 +757,8 @@ RSpec.describe 'Contents' do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_ocr: true,
                                                   ocr_languages: ['English'])
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
       end
     end
 
@@ -685,7 +772,8 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload).to have_attributes(lock: cocina_object.lock, perform_speech_to_text: true)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
       end
     end
 
@@ -746,7 +834,8 @@ RSpec.describe 'Contents' do
                                                contents_item: { content_type: Cocina::Models::ObjectType.book } }
 
           expect(response).to redirect_to(object_path(druid))
-          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+          expect(StageFilesJob).to have_received(:perform_later)
+            .with(content:, accession: false, user:, new_user_version: false)
         end
       end
 
@@ -756,7 +845,8 @@ RSpec.describe 'Contents' do
                                                contents_item: { content_type: Cocina::Models::ObjectType.object } }
 
           expect(response).to redirect_to(object_path(druid))
-          expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+          expect(StageFilesJob).to have_received(:perform_later)
+            .with(content:, accession: true, user:, new_user_version: false)
         end
       end
     end
@@ -813,7 +903,8 @@ RSpec.describe 'Contents' do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(content.reload.lock).to eq('opened-lock')
         expect(Sdr::VersionService).to have_received(:new).with(druid:).once
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
       end
 
       it 'tracks the deposit of the opened version' do
@@ -848,7 +939,8 @@ RSpec.describe 'Contents' do
         expect(version_service).to have_received(:update_description)
           .with(description: 'Added files', user_name: user.sunetid)
         expect(Sdr::VersionService).not_to have_received(:open)
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: true, user:, new_user_version: false)
       end
     end
 
@@ -865,7 +957,8 @@ RSpec.describe 'Contents' do
         expect(response).to redirect_to(object_path(druid))
         expect(Sdr::Repository).to have_received(:update)
         expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
-        expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+        expect(StageFilesJob).to have_received(:perform_later)
+          .with(content:, accession: false, user:, new_user_version: false)
       end
 
       context 'when depositing' do

@@ -126,6 +126,54 @@ RSpec.describe 'Edit an item' do
     expect(content_file.reload).to have_attributes(view: 'dark', download: 'none', shelve: false, publish: false)
   end
 
+  it 'asks whether to keep the previous version public unless the item is made dark' do
+    allow(Sdr::Repository).to receive(:find).and_return(world_cocina_object)
+    allow(version_client).to receive(:open).and_return(world_cocina_object.new(version: 2, lock: 'opened-lock'))
+    legend = 'Do you want to keep the previous version accessible as a public version?'
+
+    visit edit_item_path(druid)
+
+    find_by_id('deposit-tab').click
+    within('fieldset', text: legend) do
+      expect(page).to have_field('No', type: 'radio', checked: true)
+    end
+
+    click_button 'APO, collection, rights'
+    select 'Dark', from: 'View access'
+    find_by_id('deposit-tab').click
+    expect(page).to have_no_css('legend', text: legend)
+
+    click_button 'APO, collection, rights'
+    select 'World', from: 'View access'
+    find_by_id('deposit-tab').click
+    within('fieldset', text: legend) { choose 'Yes' }
+    fill_in 'Version description', with: 'Corrected the title'
+    click_button 'Deposit', type: 'submit'
+
+    expect(page).to have_toast('Item updated and deposit started.')
+    expect(Sdr::Repository).to have_received(:accession).with(hash_including(context: { userVersions: 'new' }))
+  end
+
+  it 'deposits without a new user version when the item is made dark after choosing to keep the previous version' do
+    allow(Sdr::Repository).to receive(:find).and_return(world_cocina_object)
+    allow(version_client).to receive(:open).and_return(world_cocina_object.new(version: 2, lock: 'opened-lock'))
+
+    visit edit_item_path(druid)
+
+    find_by_id('deposit-tab').click
+    within('fieldset', text: 'Do you want to keep the previous version accessible as a public version?') do
+      choose 'Yes'
+    end
+    click_button 'APO, collection, rights'
+    select 'Dark', from: 'View access'
+    find_by_id('deposit-tab').click
+    fill_in 'Version description', with: 'Made dark'
+    click_button 'Deposit', type: 'submit'
+
+    expect(page).to have_toast('Item updated and deposit started.')
+    expect(Sdr::Repository).to have_received(:accession).with(hash_including(context: {}))
+  end
+
   context 'when the item has Folio catalog links' do
     let(:cocina_object) do
       build(:dro_with_metadata, id: druid, source_id: 'sul:original').then do |dro|

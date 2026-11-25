@@ -8,6 +8,7 @@ class ContentsItemForm < CocinaModels::Dro
   include EditCocinaObjectFormConcern
   include EmbargoFormConcern
   include FileAccessFormConcern
+  include NewUserVersionFormConcern
 
   form_only_attributes :perform_ocr, :ocr_languages, :perform_speech_to_text, :with_embargo, :overwrite_file_access
 
@@ -36,7 +37,7 @@ class ContentsItemForm < CocinaModels::Dro
 
   def self.permitted_params
     [:content_type, :viewing_direction, :perform_ocr, :perform_speech_to_text, :version_description,
-     :overwrite_file_access, { ocr_languages: [] }, *ACCESS_PARAMS]
+     :overwrite_file_access, :new_user_version, { ocr_languages: [] }, *ACCESS_PARAMS]
   end
 
   # @param cocina_object [Cocina::Models::DROWithMetadata]

@@ -1,0 +1,15 @@
+<%= render SdrViewComponents::Forms::RadioButtonGroupComponent.new(
+      form:,
+      field_name: :new_user_version,
+      label: t('edit.items.fields.new_user_version.label'),
+      mark_required: true,
+      classes: 'mb-3',
+      hidden: dark?,
+      disabled: dark?,
+      data: { controller: 'new-user-version', action: 'change@document->new-user-version#update' }
+    ) do |group| %>
+  <% group.with_radio_button(label_text: t('edit.items.fields.new_user_version.yes'), input_value: 'true',
+                             container_classes: 'my-fieldset') %>
+  <% group.with_radio_button(label_text: t('edit.items.fields.new_user_version.no'), input_value: 'false',
+                             container_classes: 'my-fieldset') %>
+<% end %>

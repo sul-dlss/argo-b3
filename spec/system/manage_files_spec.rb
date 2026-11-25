@@ -135,7 +135,8 @@ RSpec.describe 'Manage files' do
                                                )),
               user_name: user.sunetid, description: nil)
       expect(content.reload).to have_attributes(perform_ocr: true, ocr_languages: ['English'])
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      expect(StageFilesJob).to have_received(:perform_later)
+        .with(content:, accession: true, user:, new_user_version: false)
     end
 
     it 'overwrites the file access, which is required while dark' do
@@ -160,7 +161,8 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_current_path("/objects/#{druid}")
       expect(content_file.reload).to have_attributes(view: 'stanford', download: 'stanford')
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: false, user:)
+      expect(StageFilesJob).to have_received(:perform_later)
+        .with(content:, accession: false, user:, new_user_version: false)
     end
   end
 
@@ -234,7 +236,8 @@ RSpec.describe 'Manage files' do
     click_button 'Save as draft'
 
     expect(page).to have_current_path("/objects/#{druid}")
-    expect(StageFilesJob).to have_received(:perform_later).with(content: mutable_content, accession: false, user:)
+    expect(StageFilesJob).to have_received(:perform_later)
+      .with(content: mutable_content, accession: false, user:, new_user_version: false)
   end
 
   context 'when discarding the draft' do
@@ -416,7 +419,8 @@ RSpec.describe 'Manage files' do
       deposit
 
       expect(page).to have_current_path("/objects/#{druid}")
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      expect(StageFilesJob).to have_received(:perform_later)
+        .with(content:, accession: true, user:, new_user_version: false)
     end
   end
 
@@ -668,7 +672,8 @@ RSpec.describe 'Manage files' do
       expect(page).to have_current_path("/objects/#{druid}")
       expect(content.content_files.sole).to have_attributes(view: 'dark', download: 'none', publish: false,
                                                             shelve: false)
-      expect(StageFilesJob).to have_received(:perform_later).with(content:, accession: true, user:)
+      expect(StageFilesJob).to have_received(:perform_later)
+        .with(content:, accession: true, user:, new_user_version: false)
     end
   end
 
