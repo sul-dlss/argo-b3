@@ -139,14 +139,18 @@ RSpec.describe BulkActions::ImportStructuralMetadataJob do
 
   context 'when the rows are invalid' do
     let(:csv_file) do
-      "#{exported_csv}bc123df4567,Image 3,image,3,image3.tif,,yes,yes,yes,world,world,,image/tiff,,,,\n"
+      "#{exported_csv}bc123df4567,Image 3,image,3,image3.tif,,yes,yes,yes,world,world,,image/tiff,,,,\n" \
+        "bc123df4567,Image 4,image,4,image2.tif,,yes,yes,yes,stanfrod,world,,image/tiff,,,,\n"
     end
 
-    it 'does not update the object and logs the errors' do
+    it 'does not update the object and logs every error on the object\'s line' do
       job.perform_now
 
       expect(Sdr::Repository).not_to have_received(:update)
-      expect(log.string).to include('Error: Row 4: image3.tif is not an existing file (files cannot be added)')
+      expect(log.string).to include(
+        "line 2\t#{druid}\tError: Row 4: image3.tif is not an existing file (files cannot be added); " \
+        'Row 5: Value for "rights_view" ("stanfrod") is not a valid view access'
+      )
       expect(bulk_action.reload.druid_count_fail).to eq(1)
       expect(Content.count).to eq(0)
     end

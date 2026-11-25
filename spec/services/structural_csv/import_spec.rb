@@ -262,7 +262,7 @@ RSpec.describe StructuralCsv::Import do
     end
   end
 
-  context 'when the built records are invalid' do
+  context 'when the resource type, shelve, or access rights are invalid' do
     let(:csv_string) do
       <<~CSV
         #{headers}
@@ -276,10 +276,10 @@ RSpec.describe StructuralCsv::Import do
       expect(result).to be_failure
       expect(result.failure).to eq(
         [
-          StructuralCsv::ValidationError.new(2, 'File set type is not included in the list'),
-          StructuralCsv::ValidationError.new(3, 'image2.tif: Shelve requires publish or preserve'),
+          StructuralCsv::ValidationError.new(2, 'Value for "resource_type" ("bogus") is not a valid resource type'),
+          StructuralCsv::ValidationError.new(3, 'Value for "shelve" ("yes") requires publish or preserve'),
           StructuralCsv::ValidationError.new(
-            4, 'image3.tif: Access rights are not a valid combination of view, download, and location'
+            4, 'Access rights (view "location-based", download "none", location blank) are not a valid combination'
           )
         ]
       )

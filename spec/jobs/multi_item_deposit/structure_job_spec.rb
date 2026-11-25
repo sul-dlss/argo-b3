@@ -217,6 +217,26 @@ RSpec.describe MultiItemDeposit::StructureJob do
     end
   end
 
+  context 'when discovered files are not in the structural metadata CSV and its rows have errors' do
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,filename,publish,preserve,rights_view,rights_download,rights_location
+        #{druid},1,page1.tif,maybe,yes,stanfrod,world,
+      CSV
+    end
+
+    it 'records the row errors and then the missing files, and retains the files' do
+      expect(perform.structural_csv_errors).to eq(
+        [
+          'Row 2: Value for "publish" ("maybe") must be yes, no, true, or false',
+          'Row 2: Value for "rights_view" ("stanfrod") is not a valid view access',
+          'Files not in structural metadata CSV: page2.tif'
+        ]
+      )
+      expect(content.reload.content_file_binaries.pluck(:filepath)).to contain_exactly('page1.tif', 'page2.tif')
+    end
+  end
+
   context 'when the Content was deposited from manage files since discovery' do
     before do
       create(:content_file_set, content:, label: 'Deposited')

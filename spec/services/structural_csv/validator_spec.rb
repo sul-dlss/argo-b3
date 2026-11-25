@@ -103,6 +103,157 @@ RSpec.describe StructuralCsv::Validator do
     end
   end
 
+  context 'when access values are not allowed' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,stanfrod,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,2,image2.tif,,yes,yes,no,world,everyone,,image/tiff,,,,
+        bc123df4567,Image 3,image,3,image1.tif,,yes,yes,no,citation-only,none,,image/tiff,,,,
+        bc123df4567,Image 4,image,4,image2.tif,,yes,yes,no,location-based,none,moon,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns an error naming the column and value, and not an invalid combination error' do
+      expect(reasons).to eq(
+        [
+          [2, 'Value for "rights_view" ("stanfrod") is not a valid view access'],
+          [3, 'Value for "rights_download" ("everyone") is not a valid download access'],
+          [4, 'Value for "rights_view" ("citation-only") is not a valid view access'],
+          [5, 'Value for "rights_location" ("moon") is not a valid location']
+        ]
+      )
+    end
+  end
+
+  context 'when access values are not a valid combination' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,stanford,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,2,image2.tif,,yes,yes,no,location-based,none,,image/tiff,,,,
+        bc123df4567,Image 3,image,3,image1.tif,,yes,yes,no,dark,world,spec,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns an error naming the values' do
+      expect(reasons).to eq(
+        [
+          [2, 'Access rights (view "stanford", download "world", location blank) are not a valid combination'],
+          [3, 'Access rights (view "location-based", download "none", location blank) are not a valid combination'],
+          [4, 'Access rights (view "dark", download "world", location "spec") are not a valid combination']
+        ]
+      )
+    end
+  end
+
+  context 'when a location is given for access that is not location-based' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,world,world,spec,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns no errors, since the location is not used' do
+      expect(errors).to be_empty
+    end
+  end
+
+  context 'when an access value is missing' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns only the missing value error' do
+      expect(reasons).to eq([[2, 'Value for "rights_view" is missing']])
+    end
+  end
+
+  context 'when a file is shelved without being published or preserved' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,no,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,2,image2.tif,,maybe,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns an error, except when publish or preserve is not a boolean' do
+      expect(reasons).to eq(
+        [
+          [2, 'Value for "shelve" ("yes") requires publish or preserve'],
+          [3, 'Value for "publish" ("maybe") must be yes, no, true, or false']
+        ]
+      )
+    end
+  end
+
+  context 'when a resource type is not allowed' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,bogus,1,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns an error' do
+      expect(reasons).to eq([[2, 'Value for "resource_type" ("bogus") is not a valid resource type']])
+    end
+  end
+
+  context 'when a resource type in a group is missing or not allowed' do
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,bogus,1,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 1,image,1,image2.tif,,yes,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 1,,1,image1.tif,,yes,yes,no,world,world,,image/tiff,,,,
+        bc123df4567,Image 1,page,1,image2.tif,,yes,yes,no,world,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'reports it once, and compares only the allowed resource types' do
+      expect(reasons).to eq(
+        [
+          [2, 'Value for "resource_type" ("bogus") is not a valid resource type'],
+          [4, 'Value for "resource_type" is missing'],
+          [4, 'image1.tif appears more than once for sequence 1'],
+          [5, 'Value for "resource_type" must be the same for every row with sequence 1'],
+          [5, 'image2.tif appears more than once for sequence 1']
+        ]
+      )
+    end
+  end
+
+  context 'when there are problems in several rows and of several kinds' do
+    subject(:errors) { described_class.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion: false) }
+
+    let(:csv_string) do
+      <<~CSV
+        #{headers}
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,maybe,world,world,,image/tiff,,,,
+        bc123df4567,Image 2,image,2,image1.tif,,yes,yes,no,world,world,,image/jpeg,,,,
+        bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,stanfrod,world,,image/tiff,,,,
+      CSV
+    end
+
+    it 'returns every error, by row number, with errors that are not for a row last' do
+      expect(reasons).to eq(
+        [
+          [2, 'Value for "preserve" ("maybe") must be yes, no, true, or false'],
+          [3, 'image1.tif has different mimetypes ("image/tiff" and "image/jpeg")'],
+          [4, 'Value for "rights_view" ("stanfrod") is not a valid view access'],
+          [4, 'Rows for sequence 1 must be together'],
+          [nil, 'Files would be deleted: image2.tif. Select "Allow files to be deleted" to delete them.']
+        ]
+      )
+    end
+  end
+
   context 'when a file is new' do
     let(:csv_string) do
       <<~CSV
