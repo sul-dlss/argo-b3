@@ -51,8 +51,13 @@ module MultiItemDeposit
       return add_error(:no_rows) if rows.empty?
 
       import = StructuralCsv::Import.new(rows:, content:)
-      return import.call.or { |errors| add_import_errors(errors) } if missing_filepaths.empty?
+      return add_missing_files_errors(import) if missing_filepaths.any?
 
+      import.call.or { |errors| add_import_errors(errors) }
+    end
+
+    # @param import [StructuralCsv::Import]
+    def add_missing_files_errors(import)
       add_import_errors(import.validate)
       add_error(:files_not_in_csv, filepaths: missing_filepaths.sort.join(', '))
     end

@@ -72,7 +72,9 @@ module StructuralCsv
     # @return [Dry::Monads::Result] Success if the content was successfully updated, or
     #   Failure with an Array<ValidationError>
     def call
-      errors = validate
+      # Validates the rows without building or saving anything (e.g., to report the rows' errors together with other
+      # problems that prevent the import). Returns an array of ValidationError instances(empty if the rows are valid).
+      errors = Validator.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion:)
       return Failure(errors) if errors.any?
 
       built_content_file_sets = build_content_file_sets
@@ -81,13 +83,6 @@ module StructuralCsv
 
       save(built_content_file_sets)
       Success()
-    end
-
-    # Validates the rows without building or saving anything (e.g., to report the rows' errors together with other
-    # problems that prevent the import).
-    # @return [Array<ValidationError>]
-    def validate
-      Validator.call(rows:, content_file_binaries_by_filepath:, allow_file_deletion:)
     end
 
     private
