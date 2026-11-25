@@ -4,6 +4,7 @@ Decide whether an agent can implement the issue, following the installed plugin'
 
 - **Recommend, then decide.** Don't wait for direction after step 2: make the call yourself.
 - **Verify** as the skill says (reproduce a bug where you can; the environment can run the app and specs). Verify a screen reader report with the `screen-reader-bug` skill.
+- **Sourced layout.** For a UI change, every layout value the change needs (sizes, widths, gaps, padding, alignment, placement) comes from the issue's text, from values read from its Figma design (e.g., colors, type), or from a convention established in the codebase or `DESIGN_STANDARDS.md` (e.g., the spacing between form inputs). A screenshot shows intent, not values: any value you would have to estimate is a question for the `human please` comment, naming the element and the property. An agent brief gives each layout value with its source.
 - **Don't grill.** Questions you would have asked the maintainer go into the `human please` comment instead.
 - **Don't close the issue or write to `.out-of-scope/`**, whatever the outcome, and don't mention `.out-of-scope/` in comments.
 - **Earlier triage**: if the issue has triage comments from an earlier run, follow the skill's "Resuming a previous session": read the answers given since, and don't re-ask what's resolved.
