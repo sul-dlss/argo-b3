@@ -728,7 +728,9 @@ CREATE TABLE public.tracked_deposits (
     version integer NOT NULL,
     user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    staging_failed_at timestamp(6) without time zone,
+    process_errored_at timestamp(6) without time zone
 );
 
 
@@ -1467,6 +1469,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261125140000'),
+('20261125120000'),
 ('20261124230000'),
 ('20261124164108'),
 ('20261124164107'),

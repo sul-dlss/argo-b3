@@ -41,6 +41,8 @@ module Sdr
       raise ContentBusyError, I18n.t('errors.content_busy') if content_busy?
 
       Dor::Services::Client.object(druid).destroy(user_name:)
+      # A purged object's Deposits are no longer in flight, so a pending Deposit failed email is cancelled.
+      TrackedDeposit.where(druid:).destroy_all
       Content.delete_mutable_and_staged_files(druid:)
     rescue Dor::Services::Client::Error => e
       raise Error, "Purging failed: #{e.message}"

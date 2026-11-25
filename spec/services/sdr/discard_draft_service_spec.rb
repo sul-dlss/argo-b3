@@ -41,6 +41,15 @@ RSpec.describe Sdr::DiscardDraftService do
       expect(Content.exists?(immutable_content.id)).to be true
       expect(StagingSupport.staged_files?(druid:)).to be false
     end
+
+    it "ends tracking of the discarded version's Deposit" do
+      create(:tracked_deposit, druid:, version: 1)
+      create(:tracked_deposit, druid:, version: 2)
+
+      discard_draft
+
+      expect(TrackedDeposit.pluck(:version)).to eq([1])
+    end
   end
 
   context 'when the open version is the first version' do
