@@ -911,8 +911,6 @@ en:
         files_not_in_csv: 'Files not in structural metadata CSV: %{filepaths}'
         object_changed: 'Object changed since discovery; re-run Discover files'
         unexpected: 'An unexpected error occurred while building the structure. Contact SDR support for assistance.'
-      toasts:
-        completed: 'Completed building structure'
     deposit:
       errors:
         object_not_found: 'Object not found'
@@ -1079,6 +1077,16 @@ en:
       text_with_errors:
         one: 'Discovery found errors in 1 item of %{name}.'
         other: 'Discovery found errors in %{formatted_count} items of %{name}.'
+      detail_with_errors:
+        one: '1 item has errors.'
+        other: '%{formatted_count} items have errors.'
+    multi_item_deposit_file_check_finished:
+      title: 'File Check finished'
+      title_with_errors: 'File Check finished with errors'
+      text: 'File Check completed for %{name}.'
+      text_with_errors:
+        one: 'File Check found errors in 1 item of %{name}.'
+        other: 'File Check found errors in %{formatted_count} items of %{name}.'
       detail_with_errors:
         one: '1 item has errors.'
         other: '%{formatted_count} items have errors.'

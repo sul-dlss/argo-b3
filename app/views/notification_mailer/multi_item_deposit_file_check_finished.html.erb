@@ -1,0 +1,15 @@
+<% url = multi_item_deposit_action_url(@multi_item_deposit_action) %>
+<% if @with_errors %>
+  <p>Your <%= @deposit_label %> has completed its file check with errors. You must fix the errors before depositing. View details and address the errors in Argo at <%= link_to url, url %>.</p>
+  <p>Errors found:</p>
+  <ul>
+    <% @errors.each do |error| %>
+      <li><%= error %></li>
+    <% end %>
+  </ul>
+  <% if @unlisted_error_count.positive? %>
+    <p>And <%= pluralize(@unlisted_error_count, 'more error') %>, listed in the file check report in Argo.</p>
+  <% end %>
+<% else %>
+  <p>Your <%= @deposit_label %> has successfully passed its file check. View details and complete the deposit in Argo at <%= link_to url, url %>.</p>
+<% end %>
