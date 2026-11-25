@@ -72,8 +72,8 @@ class Content < ApplicationRecord
   # @param stage_files_options [Hash] additional keyword arguments for StageFilesJob#perform
   def start_staging!(user:, **stage_files_options)
     clear_other_staging_failures!
-    TrackedDeposit.staging_retried!(druid:)
     staging_started!
+    TrackedDeposit.staging_retried!(druid:)
     StageFilesJob.perform_later(content: self, user:, **stage_files_options)
   end
 

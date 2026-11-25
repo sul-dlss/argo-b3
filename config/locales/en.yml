@@ -1069,6 +1069,7 @@ en:
       text: 'Version %{version} of %{label} failed to deposit.'
       subject_label: '%{title} (%{bare_druid})'
       staging_failed: 'Staging failed. %{reason}'
+      process_errors: '%{errors}. Retry the process from the item page, or contact SDR support at %{email} for assistance.'
     bulk_action_finished:
       title: 'Bulk action finished'
       title_with_errors: 'Bulk action finished with errors'

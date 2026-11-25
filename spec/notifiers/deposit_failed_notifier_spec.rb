@@ -15,7 +15,15 @@ RSpec.describe DepositFailedNotifier do
     create(:tracked_deposit, druid:, version: 3, user:, process_errored_at: 1.second.ago)
   end
 
+  let(:solr_docs) { [{ 'id' => druid, 'wf_error_ssim' => [error_summary] }] }
+  let(:remedy) do
+    "Retry the process from the item page, or contact SDR support at #{Settings.support_email} for assistance."
+  end
+
   before do
+    allow(Search::SolrService).to receive(:post) do
+      { 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } }
+    end
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to) do |*_args, html:, **|
       toast_html << Capybara.string(html)
     end
@@ -37,7 +45,7 @@ RSpec.describe DepositFailedNotifier do
     expect(notification.title).to eq('Deposit failed')
     expect(notification.subject_label).to eq('The Gettysburg Address (bc123df4567)')
     expect(notification.subject_path).to eq("/objects/#{druid}")
-    expect(notification.detail).to eq(error_summary)
+    expect(notification.detail).to eq("#{error_summary}. #{remedy}")
     expect(notification).to be_error
   end
 
@@ -47,7 +55,7 @@ RSpec.describe DepositFailedNotifier do
     expect(toast).to have_no_css('.toast-disappear')
     expect(toast).to have_link('Version 3 of The Gettysburg Address (bc123df4567) failed to deposit.',
                                href: "/objects/#{druid}")
-    expect(toast).to have_text(error_summary)
+    expect(toast).to have_text("#{error_summary}. #{remedy}")
   end
 
   it 'enqueues the email for 10 minutes later' do
@@ -71,6 +79,17 @@ RSpec.describe DepositFailedNotifier do
 
   context 'when the Process was retried' do
     before { tracked_deposit.update!(process_errored_at: nil) }
+
+    it 'cancels the email, keeping the notification' do
+      send_due_email
+
+      expect(ActionMailer::Base.deliveries).to be_empty
+      expect(user.notifications.count).to eq(1)
+    end
+  end
+
+  context 'when the Process was retried but polling has not yet seen it' do
+    let(:solr_docs) { [{ 'id' => druid }] }
 
     it 'cancels the email, keeping the notification' do
       send_due_email

@@ -22,7 +22,19 @@ class DepositFailedNotifier < ApplicationNotifier
   # @return [Boolean] whether the Deposit has left In Error since the Notification
   def left_error_since_notification?(_notification)
     tracked_deposit = TrackedDeposit.find_by(druid: params[:druid], version: params[:version])
-    !tracked_deposit&.in_error_since?(cause: params[:cause], time: created_at)
+    return true unless tracked_deposit&.in_error_since?(cause: params[:cause], time: created_at)
+
+    params[:cause] == 'process' && !processes_in_error?
+  end
+
+  private
+
+  # PollTrackedDepositsJob runs about as often as the email waits, so it may not yet have seen a retry.
+  # @return [Boolean] whether Solr has the object's Processes in error now
+  def processes_in_error?
+    Searchers::ItemByDruid.call(druids: [params[:druid]], user_scope: nil,
+                                fields: [Search::Fields::ID, Search::Fields::WORKFLOW_ERRORS])
+                          .first&.workflow_errors.present?
   end
 
   notification_methods do
@@ -33,7 +45,7 @@ class DepositFailedNotifier < ApplicationNotifier
     def text
       link = subject_link(I18n.t('notifiers.deposit_failed.text', label: subject_label, version: params[:version]),
                           subject_path)
-      ActionController::Base.helpers.safe_join([link, params[:error_summary]], ' ')
+      ActionController::Base.helpers.safe_join([link, detail], ' ')
     end
 
     def subject_label
@@ -45,8 +57,12 @@ class DepositFailedNotifier < ApplicationNotifier
       object_path(params[:druid])
     end
 
+    # The staging failure's summary already says what to do.
     def detail
-      params[:error_summary]
+      return params[:error_summary] unless params[:cause] == 'process'
+
+      I18n.t('notifiers.deposit_failed.process_errors', errors: params[:error_summary].delete_suffix('.'),
+                                                        email: Settings.support_email)
     end
 
     def error?
