@@ -26,6 +26,8 @@ module MultiItemDeposit
     attribute :manifest_file, :uploaded_file
     # The manifest provided earlier: saved, or carried by a re-rendered form.
     attribute :manifest_csv, :string
+    # The filename of the manifest provided earlier.
+    attribute :manifest_filename, :string
     validate :uploaded_manifest_must_be_readable, if: :upload_manifest_source?
     validate :mount_manifest_must_exist, if: -> { mount_manifest_source? && files_path_errors.empty? }
     validate :manifest_csv_must_be_valid, if: :manifest_found?
@@ -46,16 +48,25 @@ module MultiItemDeposit
       nil
     end
 
+    # @return [String, nil] the filename of the retainable manifest
+    def retainable_manifest_filename
+      return if retainable_manifest_csv.blank?
+
+      manifest_file&.original_filename || manifest_filename
+    end
+
     # @param multi_item_deposit_action [MultiItemDepositAction]
     # @return [Boolean] whether the uploaded manifest is not saved, so a re-rendered form must carry it
     def unsaved_manifest_csv?(multi_item_deposit_action)
-      retainable_manifest_csv.present? && retainable_manifest_csv != multi_item_deposit_action.manifest_csv
+      retainable_manifest_csv.present? &&
+        (retainable_manifest_csv != multi_item_deposit_action.manifest_csv ||
+         retainable_manifest_filename != multi_item_deposit_action.manifest_filename)
     end
 
     # @return [Hash] the attributes to save on the MultiItemDepositAction
     def multi_item_deposit_action_attributes
       { description:, file_location:, mount_path: (mount_path if mount_file_location?), manifest_source:,
-        manifest_csv: submitted_manifest_csv }
+        manifest_csv: submitted_manifest_csv, manifest_filename: retainable_manifest_filename }
     end
 
     private
@@ -129,7 +140,10 @@ module MultiItemDeposit
     end
 
     def uploaded_manifest_must_be_readable
-      errors.add(:manifest_file, :blank) if submitted_manifest_csv.blank?
+      if submitted_manifest_csv.blank?
+        errors.add(:manifest_file, :blank,
+                   message: I18n.t('edit.multi_item_deposits.fields.manifest_file.validations.blank'))
+      end
     rescue CsvUpload::Normalizer::Error => e
       errors.add(:manifest_file, :invalid, message: e.message)
     end

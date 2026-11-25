@@ -18,6 +18,8 @@ module MultiItemDeposit
     attribute :structural_metadata_csv_file, :uploaded_file
     # The structural metadata CSV uploaded earlier: saved, or carried by a re-rendered form.
     attribute :structural_metadata_csv, :string
+    # The filename of the structural metadata CSV uploaded earlier.
+    attribute :structural_metadata_csv_filename, :string
     validate :uploaded_structural_metadata_csv_must_be_present, if: :upload_choice?
     validate :mount_structural_metadata_csv_must_exist, if: :mount_choice?
     validate :structural_metadata_csv_must_be_valid, if: -> { csv_attribute && errors[csv_attribute].empty? }
@@ -32,7 +34,10 @@ module MultiItemDeposit
       super
       self.multi_item_deposit_action = multi_item_deposit_action
       prefill_text_extraction_settings(multi_item_deposit_action)
-      self.structural_metadata_csv = nil unless multi_item_deposit_action.structural_metadata_csv_source_upload?
+      unless multi_item_deposit_action.structural_metadata_csv_source_upload?
+        self.structural_metadata_csv = nil
+        self.structural_metadata_csv_filename = nil
+      end
       self.structural_metadata_csv_choice = default_structural_metadata_csv_choice
       self
     end
@@ -53,10 +58,18 @@ module MultiItemDeposit
       nil
     end
 
+    # @return [String, nil] the filename of the retainable CSV
+    def retainable_structural_metadata_csv_filename
+      return if retainable_structural_metadata_csv.blank?
+
+      structural_metadata_csv_file&.original_filename || structural_metadata_csv_filename
+    end
+
     # @return [Boolean] whether the uploaded CSV is not saved, so a re-rendered form must carry it
     def unsaved_structural_metadata_csv?
       retainable_structural_metadata_csv.present? &&
-        retainable_structural_metadata_csv != multi_item_deposit_action&.structural_metadata_csv
+        (retainable_structural_metadata_csv != multi_item_deposit_action&.structural_metadata_csv ||
+         retainable_structural_metadata_csv_filename != multi_item_deposit_action&.structural_metadata_csv_filename)
     end
 
     # @return [Hash] the attributes to save on the MultiItemDepositAction
@@ -80,10 +93,12 @@ module MultiItemDeposit
 
     def structural_metadata_attributes
       if none_choice?
-        return { structural_metadata_csv: nil, structural_metadata_csv_source: nil, publish_preserve_all: }
+        return { structural_metadata_csv: nil, structural_metadata_csv_filename: nil,
+                 structural_metadata_csv_source: nil, publish_preserve_all: }
       end
 
       { structural_metadata_csv: submitted_structural_metadata_csv,
+        structural_metadata_csv_filename: retainable_structural_metadata_csv_filename,
         structural_metadata_csv_source: structural_metadata_csv_choice, publish_preserve_all: false }
     end
 
