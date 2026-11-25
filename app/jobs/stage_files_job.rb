@@ -140,8 +140,14 @@ class StageFilesJob < ApplicationJob
     content.reload
     content.staging_errored! if content.staging?
     Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
+    report_failure(druid: content.druid, error:, user:, notify:, accession:)
+  end
+
+  def report_failure(druid:, error:, user:, notify:, accession:)
+    # A Multi-Item Deposit stages its MID Item Deposits without notifying; the failure counts toward its settling.
+    return record_item_deposit_staging_failure(druid:) if accession && !notify
     return unless notify
-    return if accession && notify_deposit_failed(druid: content.druid, error:)
+    return if accession && notify_deposit_failed(druid:, error:)
 
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'), text: staging_failed_text(error:),
                     user:, disappearing: false, variant: :red)
@@ -149,7 +155,7 @@ class StageFilesJob < ApplicationJob
 
   # A Single-Object Deposit whose staging failed is In Error, so its depositing user gets a Deposit failed
   # Notification in place of the staging failed toast.
-  # @return [Boolean] true if notified; false if the Deposit isn't tracked or notifying failed
+  # @return [Boolean] true if notified; false if the Deposit isn't tracked, is a MID Item Deposit, or notifying failed
   def notify_deposit_failed(druid:, error:)
     tracked_deposit = TrackedDeposit.latest_for(druid:)
     return false unless tracked_deposit
@@ -158,11 +164,18 @@ class StageFilesJob < ApplicationJob
       title: Searchers::TitlesByDruid.call(druids: [druid])[druid],
       error_summary: I18n.t('notifiers.deposit_failed.staging_failed', reason: staging_failed_text(error:))
     )
-    true
   rescue StandardError => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: })
     false
+  end
+
+  def record_item_deposit_staging_failure(druid:)
+    tracked_deposit = TrackedDeposit.latest_for(druid:)
+    tracked_deposit.staging_failed! if tracked_deposit&.item_deposit_action_id
+  rescue StandardError => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: })
   end
 
   def staging_failed_text(error:)

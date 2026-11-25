@@ -487,7 +487,9 @@ CREATE TABLE public.multi_item_deposit_actions (
     globus_path character varying,
     perform_speech_to_text boolean DEFAULT false NOT NULL,
     manifest_filename character varying,
-    structural_metadata_csv_filename character varying
+    structural_metadata_csv_filename character varying,
+    settled_at timestamp(6) without time zone,
+    settled_email_sent_at timestamp(6) without time zone
 );
 
 
@@ -732,7 +734,8 @@ CREATE TABLE public.tracked_deposits (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     staging_failed_at timestamp(6) without time zone,
-    process_errored_at timestamp(6) without time zone
+    process_errored_at timestamp(6) without time zone,
+    item_deposit_action_id bigint
 );
 
 
@@ -1322,6 +1325,13 @@ CREATE UNIQUE INDEX index_tracked_deposits_on_druid_and_version ON public.tracke
 
 
 --
+-- Name: index_tracked_deposits_on_item_deposit_action_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tracked_deposits_on_item_deposit_action_id ON public.tracked_deposits USING btree (item_deposit_action_id);
+
+
+--
 -- Name: index_tracked_deposits_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1389,6 +1399,14 @@ ALTER TABLE ONLY public.pinned_tags
 
 ALTER TABLE ONLY public.pinned_searches
     ADD CONSTRAINT fk_rails_9363851b70 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: tracked_deposits fk_rails_9450457005; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tracked_deposits
+    ADD CONSTRAINT fk_rails_9450457005 FOREIGN KEY (item_deposit_action_id) REFERENCES public.item_deposit_actions(id) ON DELETE CASCADE;
 
 
 --
@@ -1470,6 +1488,7 @@ ALTER TABLE ONLY public.content_file_sets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125220000'),
 ('20261125210000'),
 ('20261125140000'),
 ('20261125120000'),

@@ -88,11 +88,14 @@ module MultiItemDeposit
                                                                      error_count:)
     end
 
-    # A failure is recorded on the Item Deposit, so that the other Item Deposits are still deposited.
+    # A failure (a Deposit start failure) is recorded on the Item Deposit, so that the other Item Deposits are still
+    # deposited. Each Item Deposit that is started is tracked, so that its outcome counts toward the Multi-Item
+    # Deposit's settling. It is tracked before staging starts, so that a staging failure is recorded on it.
     def deposit(item_deposit_action)
       content = item_deposit_action.content
-      lock = open_version(druid: item_deposit_action.druid) || content.lock
-      content.update!(lock:, **text_extraction_settings(item_deposit_action))
+      opened_cocina_object = open_version(druid: item_deposit_action.druid)
+      content.update!(lock: opened_cocina_object&.lock || content.lock, **text_extraction_settings(item_deposit_action))
+      track(item_deposit_action, version: opened_cocina_object&.version)
       # A batch of items goes in the default lane, leaving the high lane for single deposits.
       content.start_staging!(user:, accession: true, notify: false, staging_location: Settings.assembly_location,
                              lane_id: 'default')
@@ -100,12 +103,18 @@ module MultiItemDeposit
       handle_deposit_error(e, item_deposit_action:)
     end
 
+    # @param version [Integer, nil] the opened version, or nil to track the open version
+    def track(item_deposit_action, version:)
+      druid = item_deposit_action.druid
+      TrackedDeposit.track!(druid:, version: version || statuses[druid].version, user:, item_deposit_action:)
+    end
+
     # The description of an already open version is left as is.
-    # @return [String, nil] the lock of the object with the opened version, if a version was opened
+    # @return [Cocina::Models::DROWithMetadata, nil] the object with the opened version, if a version was opened
     def open_version(druid:)
       return if statuses[druid].open?
 
-      Sdr::VersionService.open(druid:, description: version_description, opening_user_name: user.sunetid).lock
+      Sdr::VersionService.open(druid:, description: version_description, opening_user_name: user.sunetid)
     end
 
     # Each Item Deposit gets only the text extraction settings for its own content type.
@@ -124,7 +133,11 @@ module MultiItemDeposit
     def handle_deposit_error(error, item_deposit_action:)
       Rails.logger.error(error.full_message)
       Honeybadger.notify(error)
-      item_deposit_action.update!(deposit_errors: [message(:errors, :deposit_failed)])
+      # A Deposit start failure is In Error without a Tracked Deposit (e.g., if staging could not be started).
+      item_deposit_action.transaction do
+        TrackedDeposit.where(item_deposit_action:).destroy_all
+        item_deposit_action.update!(deposit_errors: [message(:errors, :deposit_failed)])
+      end
     end
 
     # Returns the user to the deposit step, since checking fails before anything is deposited.

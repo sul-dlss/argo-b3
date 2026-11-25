@@ -580,6 +580,46 @@ RSpec.describe StageFilesJob do
           expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
         end
       end
+
+      context 'when a Multi-Item Deposit stages a MID Item Deposit' do
+        let!(:tracked_deposit) do
+          create(:tracked_deposit, druid:, version: 2, user:, item_deposit_action: create(:item_deposit_action))
+        end
+
+        it 'records the staging failure on its Tracked Deposit, without notifying' do
+          job.perform(content:, user:, accession: true, notify: false)
+
+          expect(tracked_deposit.reload.staging_failed_at).to be_present
+          expect(user.notifications).to be_empty
+          expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to)
+        end
+
+        it 'reports a failure to record it, still marking the Content as failed' do
+          allow(TrackedDeposit).to receive(:latest_for).and_raise(ActiveRecord::ConnectionNotEstablished)
+
+          job.perform(content:, user:, accession: true, notify: false)
+
+          expect(content.reload.staging_state).to eq('staging_failed')
+          expect(Honeybadger).to have_received(:notify).with(an_instance_of(ActiveRecord::ConnectionNotEstablished),
+                                                             context: { druid: })
+        end
+      end
+
+      context "when a MID Item Deposit's object is deposited again from manage files" do
+        let!(:tracked_deposit) do
+          create(:tracked_deposit, druid:, version: 2, user:, item_deposit_action: create(:item_deposit_action))
+        end
+
+        it 'records the staging failure and broadcasts the staging failed toast instead of Deposit failed' do
+          job.perform(content:, user:, accession: true)
+
+          expect(tracked_deposit.reload.staging_failed_at).to be_present
+          expect(user.notifications).to be_empty
+          expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+            .with('notifications', user, target: 'toast-container',
+                                         html: a_string_including('Staging failed', Settings.support_email))
+        end
+      end
     end
   end
 end

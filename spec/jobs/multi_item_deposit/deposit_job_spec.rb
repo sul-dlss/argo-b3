@@ -33,10 +33,10 @@ RSpec.describe MultiItemDeposit::DepositJob do
     instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, open?: false, openable?: true)
   end
   let(:other_status) do
-    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, open?: true, closeable?: true)
+    instance_double(Dor::Services::Client::ObjectVersion::VersionStatus, open?: true, closeable?: true, version: 3)
   end
   let(:statuses) { { druid => status, other_druid => other_status } }
-  let(:opened_cocina_object) { build(:dro_with_metadata, id: druid).new(lock: 'opened-lock') }
+  let(:opened_cocina_object) { build(:dro_with_metadata, id: druid, version: 2).new(lock: 'opened-lock') }
 
   before do
     create(:permission, :edit, workgroup: 'workgroup:depositors', target_druid: apo_druid)
@@ -133,6 +133,25 @@ RSpec.describe MultiItemDeposit::DepositJob do
       end
     end
 
+    it 'tracks the Deposit of each MID Item Deposit, for the opened or open version' do
+      perform
+
+      expect(item_deposit_action.reload.tracked_deposit).to have_attributes(druid:, version: 2, user:)
+      expect(other_item_deposit_action.reload.tracked_deposit).to have_attributes(druid: other_druid, version: 3,
+                                                                                  user:)
+    end
+
+    it 'tracks each MID Item Deposit before its staging starts, so that a staging failure is recorded on it' do
+      tracked_when_staging = []
+      allow(StageFilesJob).to receive(:perform_later) do |content:, **|
+        tracked_when_staging << TrackedDeposit.exists?(druid: content.druid)
+      end
+
+      perform
+
+      expect(tracked_when_staging).to eq([true, true])
+    end
+
     it 'looks up the user permissions once' do
       allow(Permission).to receive(:where).and_call_original
 
@@ -170,10 +189,29 @@ RSpec.describe MultiItemDeposit::DepositJob do
                                                          notify: false, staging_location: Settings.assembly_location,
                                                          lane_id: 'default')
         expect(StageFilesJob).not_to have_been_enqueued.with(hash_including(content:))
+        # A Deposit start failure is In Error without being tracked.
+        expect(item_deposit_action.reload.tracked_deposit).to be_nil
+        expect(other_item_deposit_action.reload.tracked_deposit).to be_present
         expect(multi_item_deposit_action).to have_attributes(
           step: 'submitted', initiating_deposit_state: 'initiating_deposit_not_in_progress'
         )
       end
+    end
+  end
+
+  context 'when starting staging fails' do
+    before do
+      allow(Honeybadger).to receive(:notify)
+      allow(StageFilesJob).to receive(:perform_later).and_call_original
+      allow(StageFilesJob).to receive(:perform_later).with(hash_including(content:)).and_raise(ActiveJob::EnqueueError)
+    end
+
+    it 'records a Deposit start failure without tracking that MID Item Deposit' do
+      perform
+
+      expect(item_deposit_action.reload.deposit_errors).to be_present
+      expect(item_deposit_action.tracked_deposit).to be_nil
+      expect(other_item_deposit_action.reload.tracked_deposit).to be_present
     end
   end
 
