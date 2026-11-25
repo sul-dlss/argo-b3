@@ -30,6 +30,10 @@ For changes to views, components, SCSS, UI JavaScript, or user-facing copy, also
 - Refer to Solr fields by the constants in `app/services/search/fields.rb`.
 - Put CSV import / export services in a `<Kind>Csv` namespace (`::Import`, `::Export`, `::Validator`), e.g., `app/services/descriptive_csv/`, `app/services/structural_csv/`.
 
+## Documentation
+
+- When a change adds a pattern or configuration that later changes will repeat (e.g., a new option in a configuration such as `BulkActions::Config`, or a new kind of thing that future work will add more of), describe it in the matching `README.md` section: a step in its "Adding ..." recipe, or a new "Adding ..." section. Say what to add and where, not how the code implements it (see `AGENTS.md`).
+
 ## Specs
 
 ### What to test
