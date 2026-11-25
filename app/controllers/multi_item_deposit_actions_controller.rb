@@ -137,8 +137,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     end
     return proceed_to_structure if params[:commit] == NEXT_VALUE
 
-    form_params = discovery_form_params
-    @discovery_form = MultiItemDeposit::DiscoveryForm.new(form_params.with_defaults(saved_manifest_params(form_params)))
+    @discovery_form = MultiItemDeposit::DiscoveryForm.new(discovery_form_params.with_defaults(saved_manifest_params))
     return render :discovery, status: :unprocessable_content unless @discovery_form.valid?
 
     MultiItemDeposit::DiscoveryStarter.call(multi_item_deposit_action: @multi_item_deposit_action,
@@ -190,8 +189,7 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
   end
 
   def build_submitted_structure_form
-    form_params = structure_form_params
-    MultiItemDeposit::StructureForm.new(form_params.with_defaults(saved_structural_metadata_csv_params(form_params)))
+    MultiItemDeposit::StructureForm.new(structure_form_params.with_defaults(saved_structural_metadata_csv_params))
                                    .tap { |form| form.multi_item_deposit_action = @multi_item_deposit_action }
   end
 
@@ -224,11 +222,9 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
                                                            .summary
   end
 
-  # A saved uploaded manifest is used for an upload unless another manifest is provided. Its filename is used only
-  # with it, so that it is not attached to a manifest carried by the form.
-  def saved_manifest_params(form_params)
+  # A saved uploaded manifest is used for an upload unless another manifest is provided.
+  def saved_manifest_params
     return {} unless @multi_item_deposit_action.manifest_source_upload?
-    return {} if form_params.key?(:manifest_csv)
 
     { manifest_csv: @multi_item_deposit_action.manifest_csv,
       manifest_filename: @multi_item_deposit_action.manifest_filename }
@@ -243,11 +239,9 @@ class MultiItemDepositActionsController < ApplicationController # rubocop:disabl
     MultiItemDeposit::DiscoveryForm.params_from(params).merge(multi_item_deposit_action: @multi_item_deposit_action)
   end
 
-  # A saved uploaded structural metadata CSV is used for an upload unless another CSV is provided. As for the
-  # manifest, its filename is used only with it.
-  def saved_structural_metadata_csv_params(form_params)
+  # A saved uploaded structural metadata CSV is used for an upload unless another CSV is provided.
+  def saved_structural_metadata_csv_params
     return {} unless @multi_item_deposit_action.structural_metadata_csv_source_upload?
-    return {} if form_params.key?(:structural_metadata_csv)
 
     { structural_metadata_csv: @multi_item_deposit_action.structural_metadata_csv,
       structural_metadata_csv_filename: @multi_item_deposit_action.structural_metadata_csv_filename }

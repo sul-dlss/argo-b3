@@ -248,10 +248,14 @@ RSpec.describe MultiItemDeposit::StructureForm do
     end
 
     context 'when the upload is saved' do
-      let(:model_attributes) { { structural_metadata_csv: csv_string, structural_metadata_csv_source: 'upload' } }
+      let(:model_attributes) do
+        { structural_metadata_csv: csv_string, structural_metadata_csv_filename: 'structure.csv',
+          structural_metadata_csv_source: 'upload' }
+      end
 
       it 'is false' do
-        form = build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv: csv_string)
+        form = build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv: csv_string,
+                          structural_metadata_csv_filename: 'structure.csv')
 
         expect(form).not_to be_unsaved_structural_metadata_csv
       end

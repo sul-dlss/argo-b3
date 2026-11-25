@@ -18,7 +18,7 @@ module MultiItemDeposit
     attribute :structural_metadata_csv_file, :uploaded_file
     # The structural metadata CSV uploaded earlier: saved, or carried by a re-rendered form.
     attribute :structural_metadata_csv, :string
-    # The filename of the structural metadata CSV uploaded earlier, if known.
+    # The filename of the structural metadata CSV uploaded earlier.
     attribute :structural_metadata_csv_filename, :string
     validate :uploaded_structural_metadata_csv_must_be_present, if: :upload_choice?
     validate :mount_structural_metadata_csv_must_exist, if: :mount_choice?
@@ -58,16 +58,11 @@ module MultiItemDeposit
       nil
     end
 
-    # @return [String, nil] the filename of the retainable CSV, if known (it is not for a CSV saved before
-    #   filenames were kept)
+    # @return [String, nil] the filename of the retainable CSV
     def retainable_structural_metadata_csv_filename
       return if retainable_structural_metadata_csv.blank?
 
-      if structural_metadata_csv_file.present?
-        structural_metadata_csv_file.original_filename
-      else
-        structural_metadata_csv_filename.presence
-      end
+      structural_metadata_csv_file&.original_filename || structural_metadata_csv_filename
     end
 
     # @return [Boolean] whether the uploaded CSV is not saved, so a re-rendered form must carry it

@@ -26,7 +26,7 @@ module MultiItemDeposit
     attribute :manifest_file, :uploaded_file
     # The manifest provided earlier: saved, or carried by a re-rendered form.
     attribute :manifest_csv, :string
-    # The filename of the manifest provided earlier, if known.
+    # The filename of the manifest provided earlier.
     attribute :manifest_filename, :string
     validate :uploaded_manifest_must_be_readable, if: :upload_manifest_source?
     validate :mount_manifest_must_exist, if: -> { mount_manifest_source? && files_path_errors.empty? }
@@ -48,12 +48,11 @@ module MultiItemDeposit
       nil
     end
 
-    # @return [String, nil] the filename of the retainable manifest, if known (it is not for a manifest saved
-    #   before filenames were kept)
+    # @return [String, nil] the filename of the retainable manifest
     def retainable_manifest_filename
       return if retainable_manifest_csv.blank?
 
-      manifest_file.present? ? manifest_file.original_filename : manifest_filename.presence
+      manifest_file&.original_filename || manifest_filename
     end
 
     # @param multi_item_deposit_action [MultiItemDepositAction]

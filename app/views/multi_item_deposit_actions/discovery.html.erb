@@ -54,16 +54,10 @@
            ) do %>
           <% if @discovery_form.unsaved_manifest_csv?(@multi_item_deposit_action) %>
             <%= form.hidden_field :manifest_csv, value: @discovery_form.retainable_manifest_csv %>
-            <% if @discovery_form.retainable_manifest_filename %>
-              <%= form.hidden_field :manifest_filename, value: @discovery_form.retainable_manifest_filename %>
-            <% end %>
+            <%= form.hidden_field :manifest_filename, value: @discovery_form.retainable_manifest_filename %>
           <% end %>
           <% manifest_filename = @discovery_form.retainable_manifest_filename %>
-          <% if manifest_filename %>
-            <% manifest_help_text = t('edit.multi_item_deposits.fields.manifest_file.retained_with_filename_html', filename: manifest_filename) %>
-          <% elsif @discovery_form.retainable_manifest_csv.present? %>
-            <% manifest_help_text = t('edit.multi_item_deposits.fields.manifest_file.retained') %>
-          <% end %>
+          <% manifest_help_text = t('edit.multi_item_deposits.fields.manifest_file.retained_html', filename: manifest_filename) if manifest_filename %>
           <%= render SdrViewComponents::Forms::FileComponent.new(form:,
                                                                  field_name: :manifest_file,
                                                                  container_classes: 'my-field',
