@@ -23,10 +23,13 @@ module StructuralCsv
     # @param content [Content]
     # @param content_file_binaries_by_filepath [Hash<String, ContentFileBinary>] the Content's binaries. The mime
     #   types of these binaries are updated (but not saved).
-    def initialize(groups:, content:, content_file_binaries_by_filepath:)
+    # @param default_file_access [Hash, nil] the view, download, and location for files when the rights columns are
+    #   left out
+    def initialize(groups:, content:, content_file_binaries_by_filepath:, default_file_access: nil)
       @groups = groups
       @content = content
       @content_file_binaries_by_filepath = content_file_binaries_by_filepath
+      @default_file_access = default_file_access
     end
 
     # @return [Array<BuiltContentFileSet>]
@@ -43,7 +46,7 @@ module StructuralCsv
 
     private
 
-    attr_reader :groups, :content, :content_file_binaries_by_filepath
+    attr_reader :groups, :content, :content_file_binaries_by_filepath, :default_file_access
 
     # Note that content_id (rather than content) is set so that the ContentFileSet is not added to
     # content.content_file_sets (and so destroyed along with the existing ContentFileSets).
@@ -69,8 +72,11 @@ module StructuralCsv
       )
     end
 
-    # Location only applies to location-based access.
+    # Location only applies to location-based access. Without the rights columns (validated as allowed only with a
+    # default file access), the default file access is used.
     def access_attributes(row)
+      return default_file_access.slice(:view, :download, :location) unless row.present?('rights_view')
+
       {
         view: row.value('rights_view'),
         download: row.value('rights_download'),

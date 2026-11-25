@@ -237,6 +237,74 @@ RSpec.describe MultiItemDeposit::StructureJob do
     end
   end
 
+  context 'when the structural metadata CSV leaves out the rights columns' do
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,resource_type,filename,publish,preserve
+        #{druid},1,page,page1.tif,yes,yes
+        #{druid},2,page,page2.tif,yes,yes
+      CSV
+    end
+
+    def file_access
+      content.reload.content_files.map { |content_file| [content_file.view, content_file.download] }
+    end
+
+    context 'when the object is citation-only' do
+      let(:access) { { view: 'citation-only', download: 'none' } }
+
+      it 'gives every file dark access' do
+        expect(perform.structural_csv_errors).to eq([])
+        expect(file_access).to eq([%w[dark none], %w[dark none]])
+      end
+    end
+
+    context 'when the object is embargoed' do
+      let(:access) do
+        { view: 'stanford', download: 'stanford',
+          embargo: { releaseDate: 1.month.from_now.iso8601, view: 'world', download: 'world' } }
+      end
+
+      it 'gives every file the current access' do
+        expect(perform.structural_csv_errors).to eq([])
+        expect(file_access).to eq([%w[stanford stanford], %w[stanford stanford]])
+      end
+    end
+  end
+
+  context 'when the structural metadata CSV leaves out only rights_location' do
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,resource_type,filename,publish,preserve,rights_view,rights_download
+        #{druid},1,page,page1.tif,yes,yes,world,world
+        #{druid},2,page,page2.tif,yes,yes,location-based,location-based
+      CSV
+    end
+
+    it 'records an error for the location-based row' do
+      expect(perform.structural_csv_errors).to eq(
+        ['Row 3: Access rights (view "location-based", download "location-based", location blank) ' \
+         'are not a valid combination']
+      )
+    end
+  end
+
+  context 'when the structural metadata CSV has rights_location but not rights_view or rights_download' do
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,filename,publish,preserve,rights_location
+        #{druid},1,page1.tif,yes,yes,
+      CSV
+    end
+
+    it 'records the missing columns, as well as the missing files' do
+      expect(perform.structural_csv_errors).to eq(
+        ['Row 1: Missing required column "rights_view"', 'Row 1: Missing required column "rights_download"',
+         'Files not in structural metadata CSV: page2.tif']
+      )
+    end
+  end
+
   context 'when the Content was deposited from manage files since discovery' do
     before do
       create(:content_file_set, content:, label: 'Deposited')

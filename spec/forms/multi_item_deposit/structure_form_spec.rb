@@ -143,6 +143,38 @@ RSpec.describe MultiItemDeposit::StructureForm do
       end
     end
 
+    context 'when the uploaded CSV leaves out the rights columns' do
+      let(:csv_string) { "druid,sequence,filename,publish,preserve\nbc123df4567,1,file1.tif,yes,yes\n" }
+
+      it 'is valid' do
+        expect(build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)).to be_valid
+      end
+    end
+
+    context 'when the uploaded CSV leaves out only rights_location' do
+      let(:csv_string) do
+        "druid,sequence,filename,publish,preserve,rights_view,rights_download\n" \
+          "bc123df4567,1,file1.tif,yes,yes,world,world\n"
+      end
+
+      it 'is valid' do
+        expect(build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)).to be_valid
+      end
+    end
+
+    context 'when the uploaded CSV has some rights columns but not rights_view' do
+      let(:csv_string) do
+        "druid,sequence,filename,publish,preserve,rights_download\nbc123df4567,1,file1.tif,yes,yes,world\n"
+      end
+
+      it 'reports the missing column' do
+        form = build_form(structural_metadata_csv_choice: 'upload', structural_metadata_csv_file: csv_file)
+
+        expect(form).not_to be_valid
+        expect(form.errors[:structural_metadata_csv_file]).to eq(['missing headers: rights_view.'])
+      end
+    end
+
     context 'when the uploaded file cannot be read' do
       let(:csv_tempfile) { Tempfile.new(['structural', '.txt']).tap { |file| file.write(csv_string) && file.flush } }
       let(:csv_file) { Rack::Test::UploadedFile.new(csv_tempfile.path, 'text/csv') }

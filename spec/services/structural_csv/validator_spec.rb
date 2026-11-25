@@ -378,4 +378,84 @@ RSpec.describe StructuralCsv::Validator do
       expect(errors).to be_empty
     end
   end
+
+  describe '.required_columns' do
+    let(:base_columns) { %w[druid sequence filename publish preserve] }
+
+    it 'requires the rights columns unless they are optional' do
+      expect(described_class.required_columns(headers: base_columns)).to eq(described_class::REQUIRED_COLUMNS)
+    end
+
+    it 'requires no rights columns when they are optional and all left out' do
+      expect(described_class.required_columns(headers: base_columns, rights_optional: true)).to eq(base_columns)
+    end
+
+    it 'requires rights_view and rights_download when they are optional and any is present' do
+      expect(described_class.required_columns(headers: base_columns + ['rights_location'], rights_optional: true))
+        .to eq(base_columns + %w[rights_view rights_download])
+    end
+  end
+
+  context 'when the rights are optional' do
+    subject(:errors) { described_class.call(rows:, content_file_binaries_by_filepath:, rights_optional: true) }
+
+    context 'when the rights columns are left out' do
+      let(:csv_string) do
+        <<~CSV
+          druid,sequence,filename,publish,preserve
+          bc123df4567,1,image1.tif,yes,yes
+          bc123df4567,2,image2.tif,yes,yes
+        CSV
+      end
+
+      it 'returns no errors' do
+        expect(errors).to be_empty
+      end
+    end
+
+    context 'when only rights_location is left out' do
+      let(:csv_string) do
+        <<~CSV
+          druid,sequence,filename,publish,preserve,rights_view,rights_download
+          bc123df4567,1,image1.tif,yes,yes,world,world
+          bc123df4567,2,image2.tif,yes,yes,location-based,location-based
+        CSV
+      end
+
+      it 'treats every location as blank' do
+        expect(reasons).to eq(
+          [[3, 'Access rights (view "location-based", download "location-based", location blank) ' \
+               'are not a valid combination']]
+        )
+      end
+    end
+
+    context 'when rights_view or rights_download is left out of the rights columns' do
+      let(:csv_string) do
+        <<~CSV
+          druid,sequence,filename,publish,preserve,rights_location
+          bc123df4567,1,image1.tif,yes,yes,
+        CSV
+      end
+
+      it 'returns the column errors' do
+        expect(reasons).to eq(
+          [[1, 'Missing required column "rights_view"'], [1, 'Missing required column "rights_download"']]
+        )
+      end
+    end
+
+    context 'when an access value is missing' do
+      let(:csv_string) do
+        <<~CSV
+          #{headers}
+          bc123df4567,Image 1,image,1,image1.tif,,yes,yes,no,world,,,image/tiff,,,,
+        CSV
+      end
+
+      it 'returns the missing value error' do
+        expect(reasons).to eq([[2, 'Value for "rights_download" is missing']])
+      end
+    end
+  end
 end
