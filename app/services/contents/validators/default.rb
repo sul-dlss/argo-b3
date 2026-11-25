@@ -35,8 +35,13 @@ module Contents
 
       delegate :errors, :warnings, to: :result
 
+      # An unsaved Content (e.g., from Contents::Builder.build) has only the file sets built in memory.
       def content_file_sets
-        @content_file_sets ||= content.content_file_sets.includes(content_files: :content_file_binary).to_a
+        @content_file_sets ||= if content.new_record?
+                                 content.content_file_sets.to_a
+                               else
+                                 content.content_file_sets.includes(content_files: :content_file_binary).to_a
+                               end
       end
 
       # Violations are only warnings for a dark object, since none of its files are expected to be published.

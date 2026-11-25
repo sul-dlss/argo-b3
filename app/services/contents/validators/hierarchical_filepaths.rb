@@ -20,11 +20,9 @@ module Contents
       private
 
       def hierarchical_filepaths
-        @hierarchical_filepaths ||= content.content_files
-                                           .joins(:content_file_binary)
-                                           .where('cardinality(content_file_binaries.path_parts) > 0')
-                                           .order('content_file_sets.position', :position)
-                                           .pluck('content_file_binaries.filepath')
+        @hierarchical_filepaths ||= content_file_sets.flat_map(&:content_files)
+                                                     .select { |content_file| content_file.path_parts.any? }
+                                                     .map(&:filepath)
       end
     end
   end

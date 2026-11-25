@@ -814,6 +814,7 @@ DEPENDENCIES
   noticed (~> 3.0)
   okcomputer
   overmind
+  parallel
   parallel_tests
   pg
   positioning
