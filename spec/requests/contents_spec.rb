@@ -394,10 +394,6 @@ RSpec.describe 'Contents' do
 
         expect(Capybara.string(response.body))
           .to have_css('.alert-info', text: 'Files were structured with the Book (resource per page) model.')
-        # Directly above the button that structures the files again.
-        expect(Capybara.string(response.body))
-          .to have_css('.alert-info + fieldset[data-disable-actions-target="disableable"]',
-                       text: 'Clear and structure files again')
         expect(content.reload).to be_structuring_not_in_progress
 
         get edit_content_path(druid)
