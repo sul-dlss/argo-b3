@@ -175,6 +175,28 @@ RSpec.describe PollTrackedDepositsJob do
     end
   end
 
+  context 'when notifying of a Process in error fails' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let(:solr_docs) do
+      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address',
+         'wf_error_ssim' => ['accessionWF:shelve:Error: shelving failed'] }]
+    end
+    let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
+
+    before do
+      allow(Honeybadger).to receive(:notify)
+      allow(DepositFailedNotifier).to receive(:with).and_raise(ActiveRecord::ConnectionNotEstablished)
+    end
+
+    it 'reports the failure and leaves the error unrecorded, so the next run notifies' do
+      perform
+
+      expect(tracked_deposit.reload.process_errored_at).to be_nil
+      expect(Honeybadger).to have_received(:notify)
+        .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), context: { druid: 'druid:bc123df4567' })
+    end
+  end
+
   context 'when the object of an in-flight Deposit is not in Solr' do
     let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
     let(:solr_docs) { [] }
