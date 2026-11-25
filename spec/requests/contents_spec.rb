@@ -931,12 +931,13 @@ RSpec.describe 'Contents' do
                             content_file_binary: create(:content_file_binary, content:, mime_type: 'image/tiff'))
     end
 
-    it 'renders the strategy, the validation frame, the restructure button, the CSV uploads, update labels, ' \
-       'and delete all' do
+    it 'renders the validation frame, the restructure button, the CSV uploads, update labels, and delete all ' \
+       'without naming a model' do
       get edit_content_path(druid)
 
       page = response.parsed_body
-      expect(page.text).to include('Strategy for structuring: Book (resource per page)')
+      expect(page.text).not_to include('Book (resource per page)')
+      expect(page.at_css('.alert-info')).to be_nil
       frame = page.at_css("turbo-frame#structure-validation_content_#{content.id}")
       # The selected content type and access are read from the content, so they are not params.
       expect(frame['src']).to match(%r{\A/contents/[^/?]+/structure/validation\z})
@@ -959,16 +960,6 @@ RSpec.describe 'Contents' do
       expect(labels_form.at_css('input[name="_method"]')['value']).to eq('patch')
       expect(labels_form.at_css('button').text.strip).to eq('Update labels if you reordered resources')
       expect(page.text).not_to include('Append files to structure')
-    end
-
-    context 'when item details were saved with the content' do
-      before { content.update!(content_type: Cocina::Models::ObjectType.image) }
-
-      it 'renders the strategy for the saved content type' do
-        get edit_content_path(druid)
-
-        expect(response.body).to include('Strategy for structuring: Image (resource per image)')
-      end
     end
 
     context 'when the content type does not have numbered labels' do
@@ -1231,6 +1222,30 @@ RSpec.describe 'Contents' do
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('Row 2: page_0002.tif is not an existing file (files cannot be added)')
         expect(content.content_file_sets.reload.sole.content_files.sole.content_file_binary).to eq(content_file_binary)
+      end
+    end
+
+    context 'when rows have problems of different kinds' do
+      let(:csv_string) do
+        table = CSV.parse(StructuralCsv::Export.as_csv(content:), headers: true)
+        second_row = CSV::Row.new(table.headers, table.first.fields)
+        table.first['publish'] = 'maybe'
+        second_row['sequence'] = '2'
+        second_row['rights_view'] = 'stanfrod'
+        table << second_row
+        table.to_csv
+      end
+
+      it 'renders every error at once' do
+        upload
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body.text).to include(
+          'Row 2: Value for "publish" ("maybe") must be yes, no, true, or false'
+        )
+        expect(response.parsed_body.text).to include(
+          'Row 3: Value for "rights_view" ("stanfrod") is not a valid view access'
+        )
       end
     end
 

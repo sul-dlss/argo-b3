@@ -25,6 +25,16 @@ class NotificationMailer < ApplicationMailer
     mail to: params[:recipient].email_address, subject: settled_subject
   end
 
+  def deposit_failed
+    @druid = params[:druid]
+    @bare_druid = DruidSupport.bare_druid_from(@druid)
+    @title = params[:title]
+    # The body adds its own period.
+    @error_summary = params[:error_summary].delete_suffix('.')
+
+    mail to: params[:recipient].email_address, subject: "SDR deposit error: “#{@title}”"
+  end
+
   private
 
   def settled_subject

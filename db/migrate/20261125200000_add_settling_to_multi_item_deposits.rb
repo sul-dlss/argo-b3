@@ -4,9 +4,6 @@ class AddSettlingToMultiItemDeposits < ActiveRecord::Migration[8.1]
   def change
     # A MID Item Deposit's Tracked Deposit counts toward its Multi-Item Deposit's settled Notification.
     add_reference :tracked_deposits, :item_deposit_action, foreign_key: { on_delete: :cascade }
-    add_column :tracked_deposits, :in_error, :boolean, null: false, default: false
-    # When an error of the Deposit was last retried in Argo-B3.
-    add_column :tracked_deposits, :retried_at, :datetime
     # When the Multi-Item Deposit last settled; nil while it is unsettled.
     add_column :multi_item_deposit_actions, :settled_at, :datetime
     # When a settled email went out; after that, settling no longer notifies.

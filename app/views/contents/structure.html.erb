@@ -12,20 +12,20 @@
                                                       labels_csv_download_path: labels_csv_content_structure_path(content_id: @content_token)) %>
     <% end %>
 
-    <%= render Edit::StructuringResultAlertComponent.new(structuring_result: @structuring_result, populator_selection: @populator_selection) %>
-
     <%= fields_for :contents_item_form, @contents_item_form do |item_form| %>
       <%= render SdrViewComponents::Forms::InvalidFeedbackComponent.new(field_name: :content, form: item_form, classes: 'mb-3') %>
     <% end %>
 
     <% if @content.content_file_binaries.none? %>
       <p>No files.</p>
+      <%= render Edit::StructuringResultAlertComponent.new(structuring_result: @structuring_result, populator_selection: @populator_selection) %>
     <% else %>
       <% unassociated_count = @content.content_file_binaries.unassociated.count %>
       <% if unassociated_count.positive? %>
         <p data-unassociated-files-target="unassociated"><%= t('edit.contents.structure.unassociated_files', count: unassociated_count) %></p>
       <% end %>
-      <%= render Edit::StructurePopulatorComponent.new(content_record: @content, populator_selection: @populator_selection) %>
+      <%= render Edit::StructuringResultAlertComponent.new(structuring_result: @structuring_result, populator_selection: @populator_selection) %>
+      <%= render Edit::StructureButtonComponent.new(content_record: @content) %>
       <% if @content.content_file_sets.any? %>
         <%# Reloaded when a resource changes (see content_file_sets/show). %>
         <%= turbo_frame_tag @content, 'structure-validation', src: validation_content_structure_path(@content_token), refresh: 'morph', data: { controller: 'reloadable-frame' } %>

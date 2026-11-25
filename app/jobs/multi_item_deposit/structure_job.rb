@@ -44,11 +44,25 @@ module MultiItemDeposit
       end
     end
 
+    # When discovered files are missing from the CSV, nothing is imported (since the import would destroy them), but
+    # the rows are still validated, so that every problem is reported at once. The missing files are not an error for
+    # a row, so they are reported last.
     def import
       return add_error(:no_rows) if rows.empty?
-      return add_error(:files_not_in_csv, filepaths: missing_filepaths.sort.join(', ')) if missing_filepaths.any?
+
+      return add_missing_files_errors if missing_filepaths.any?
 
       StructuralCsv::Import.call(rows:, content:).or { |errors| add_import_errors(errors) }
+    end
+
+    # Validates the rows (without importing them), then adds the missing files error.
+    def add_missing_files_errors
+      structural_csv_rows = rows.map { |number, csv_row| StructuralCsv::Row.new(number:, csv_row:) }
+      content_file_binaries_by_filepath = content.content_file_binaries.index_by(&:filepath)
+      add_import_errors(
+        StructuralCsv::Validator.call(rows: structural_csv_rows, content_file_binaries_by_filepath:)
+      )
+      add_error(:files_not_in_csv, filepaths: missing_filepaths.sort.join(', '))
     end
 
     # @param errors [Array<StructuralCsv::ValidationError>]

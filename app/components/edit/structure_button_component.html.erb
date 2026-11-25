@@ -1,12 +1,3 @@
-<p>Strategy for structuring: <%= actual_populator_label %></p>
-<% if fallback_to_default_model? %>
-  <p>Reasons for not using <%= populator_for_content_type_label %></p>
-  <ul>
-    <% reason_labels.each do |reason_label| %>
-      <li><%= reason_label %></li>
-    <% end %>
-  </ul>
-<% end %>
 <%# In a fieldset so that it is disabled while uploading a CSV. %>
 <fieldset data-disable-actions-target="disableable">
   <%= render SdrViewComponents::Elements::ButtonFormComponent.new(link: content_path(content_record.druid),

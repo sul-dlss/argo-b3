@@ -405,8 +405,6 @@ RSpec.describe 'Manage files' do
       structure_files
 
       expect(page).to have_css('.alert-info', text: 'Files were structured with the File (resource per file) model.')
-      expect(page).to have_css('p', text: 'Strategy for structuring: File (resource per file)')
-      expect(page).to have_no_text('Reasons for not using')
       expect(page).to have_css('h3', text: 'Resources (1)')
 
       content_file_set = content.content_file_sets.sole
@@ -569,7 +567,6 @@ RSpec.describe 'Manage files' do
       structure_files
 
       expect(page).to have_css('.alert-info', text: 'Files were structured with the Book (resource per page) model.')
-      expect(page).to have_css('p', text: 'Strategy for structuring: Book (resource per page)')
       expect(mutable_content.content_file_sets.sole).to have_attributes(file_set_type: 'page', label: 'Page 1')
     end
   end
@@ -589,8 +586,12 @@ RSpec.describe 'Manage files' do
         expect(page).to have_text('The Book (resource per page) model was not used because:')
         expect(page).to have_css('li', text: 'there are no image files')
       end
-      expect(page).to have_css('p', text: 'Strategy for structuring: Default (resource per file)')
-      expect(page).to have_text('Reasons for not using Book (resource per page)')
+
+      # The model is named only once, right after structuring.
+      visit current_path
+      expect(page).to have_css('h3', text: 'Resources (1)')
+      expect(page).to have_no_text('Book (resource per page)')
+      expect(page).to have_no_text('Default (resource per file)')
     end
   end
 

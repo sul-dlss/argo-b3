@@ -393,7 +393,7 @@ RSpec.describe 'Create an item' do
       click_button 'Add another tag'
       fill_in_tag 'item[other_tags_attributes][1][tag]', with: 'Project : Argo'
 
-      within 'fieldset', text: 'Tags' do
+      within_fieldset 'Tags' do
         within first('.form-instance') do
           click_button 'Remove'
         end

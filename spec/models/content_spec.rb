@@ -295,24 +295,12 @@ RSpec.describe Content do
       expect(other_object_failed_content.reload.staging_state).to eq('staging_failed')
     end
 
-    it 'marks the Tracked Deposits of the druid as retried, since staging failed' do
-      allow(TrackedDeposit).to receive(:retried!)
+    it 'retries the staging of a Deposit of the druid whose staging failed' do
+      tracked_deposit = create(:tracked_deposit, druid:, staging_failed_at: 1.hour.ago)
 
       content.start_staging!(user:)
 
-      expect(TrackedDeposit).to have_received(:retried!).with(druid:)
-    end
-
-    context 'when staging has not failed' do
-      subject(:content) { create(:content, druid: 'druid:fg123hj4567', lock: 'lock-2') }
-
-      it 'does not mark Tracked Deposits as retried' do
-        allow(TrackedDeposit).to receive(:retried!)
-
-        content.start_staging!(user:)
-
-        expect(TrackedDeposit).not_to have_received(:retried!)
-      end
+      expect(tracked_deposit.reload.staging_failed_at).to be_nil
     end
   end
 end

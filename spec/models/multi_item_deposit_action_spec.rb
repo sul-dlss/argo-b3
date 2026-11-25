@@ -443,7 +443,7 @@ RSpec.describe MultiItemDepositAction do
 
     context 'when every MID Item Deposit is Complete or In Error' do
       before do
-        create(:tracked_deposit, item_deposit_action:, in_error: true)
+        create(:tracked_deposit, item_deposit_action:, process_errored_at: 1.minute.ago)
         create(:item_deposit_action, multi_item_deposit_action:, deposit_errors: ['Failed'])
         create(:item_deposit_action, multi_item_deposit_action:)
       end

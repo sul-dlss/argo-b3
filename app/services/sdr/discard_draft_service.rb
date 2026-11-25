@@ -37,6 +37,8 @@ module Sdr
       raise NotDiscardableError, 'Draft cannot be discarded' unless discardable?
 
       version_service.discard
+      # The discarded version's Deposit is no longer in flight, so a pending Deposit failed email is cancelled.
+      TrackedDeposit.where(druid:, version: cocina_object.version).destroy_all
       # Staged files belong only to the open version, so all of the object's staged files are deleted.
       Content.delete_mutable_and_staged_files(druid:)
     end

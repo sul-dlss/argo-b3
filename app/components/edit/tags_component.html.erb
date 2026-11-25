@@ -8,23 +8,25 @@
                                                              input_rows: 3) %>
 </div>
 
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: other_tag_label) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :other_tags,
-                                                   form_component: Edit::OtherTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another tag') %>
-<% end %>
+<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: individual_tags_label) do %>
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: other_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :other_tags,
+                                                     form_component: Edit::OtherTagComponent,
+                                                     container_classes: 'my-fieldset',
+                                                     add_button_label: 'Add another tag') %>
+  <% end %>
 
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: project_tag_label) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :project_tags,
-                                                   form_component: Edit::ProjectTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another project') %>
-<% end %>
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: project_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :project_tags,
+                                                     form_component: Edit::ProjectTagComponent,
+                                                     container_classes: 'my-fieldset',
+                                                     add_button_label: 'Add another project') %>
+  <% end %>
 
-<%= render SdrViewComponents::Forms::FieldsetComponent.new(label: ticket_tag_label) do %>
-  <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :ticket_tags,
-                                                   form_component: Edit::TicketTagComponent,
-                                                   container_classes: 'my-fieldset',
-                                                   add_button_label: 'Add another ticket') %>
+  <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: ticket_tag_label) do %>
+    <%= render Elements::Forms::HasManyComponent.new(form:, field_name: :ticket_tags,
+                                                     form_component: Edit::TicketTagComponent,
+                                                     container_classes: 'my-fieldset',
+                                                     add_button_label: 'Add another ticket') %>
+  <% end %>
 <% end %>

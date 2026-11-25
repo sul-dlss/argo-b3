@@ -136,7 +136,7 @@ RSpec.describe MultiItemDeposit::DepositJob do
     it 'tracks the Deposit of each MID Item Deposit, for the opened or open version' do
       perform
 
-      expect(item_deposit_action.reload.tracked_deposit).to have_attributes(druid:, version: 2, user:, in_error: false)
+      expect(item_deposit_action.reload.tracked_deposit).to have_attributes(druid:, version: 2, user:)
       expect(other_item_deposit_action.reload.tracked_deposit).to have_attributes(druid: other_druid, version: 3,
                                                                                   user:)
     end

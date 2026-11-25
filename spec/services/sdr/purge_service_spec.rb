@@ -76,6 +76,15 @@ RSpec.describe Sdr::PurgeService do
         StagingSupport.delete_staged_files(druid:)
       end
 
+      it "ends tracking of the object's Deposits" do
+        create(:tracked_deposit, druid:, version: 1)
+        create(:tracked_deposit, druid: 'druid:cd234fg5678', version: 1)
+
+        described_class.purge(druid:, user_name:)
+
+        expect(TrackedDeposit.pluck(:druid)).to eq(['druid:cd234fg5678'])
+      end
+
       it 'performs purge and deletes the mutable content and staged files' do
         described_class.purge(druid:, user_name:)
         expect(object_client).to have_received(:destroy).with(user_name:)

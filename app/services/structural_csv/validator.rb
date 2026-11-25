@@ -20,14 +20,15 @@ module StructuralCsv
       @errors = []
     end
 
-    # Missing columns are reported alone, since the row checks would just be noise.
+    # Missing columns are reported alone, since the row checks would just be noise. Otherwise, every problem is
+    # reported, so that the CSV can be fixed in one pass, by row number and with errors that are not for a row last.
     # @return [Array<ValidationError>]
     def call
       validate_columns
       return errors if errors.any?
 
       validate_rows
-      errors
+      errors.sort_by.with_index { |error, index| [error.line_number ? 0 : 1, error.line_number.to_i, index] }
     end
 
     private
@@ -69,13 +70,37 @@ module StructuralCsv
       validate_file_deletion
     end
 
-    # Validates the values of a single row.
+    # Validates the values of a single row. A value is reported once: when it is missing or not allowed, the checks
+    # that depend on it (e.g., the combination of access rights) are skipped.
     def validate_row(row)
       validate_sequence(row)
       validate_required_values(row)
       validate_required_booleans(row)
       validate_optional_booleans(row)
       validate_content_file_binary(row)
+      validate_resource_type(row)
+      validate_access(row)
+      validate_shelve(row)
+    end
+
+    # Validates that resource_type (when its column is present and the cell has a value) is a file set type.
+    def validate_resource_type(row)
+      return if !column?('resource_type') || row.blank?('resource_type') || valid_resource_type?(row)
+
+      add_error(row, "Value for \"resource_type\" (\"#{row.value('resource_type')}\") is not a valid resource type")
+    end
+
+    def validate_access(row)
+      AccessValidator.call(row:).each { |reason| add_error(row, reason) }
+    end
+
+    # Validates that a shelved file is published or preserved. Without a shelve column, shelve follows publish.
+    def validate_shelve(row)
+      return unless column?('shelve')
+      return unless %w[shelve publish preserve].all? { |column| row.boolean?(column) }
+      return unless row.boolean('shelve') && !row.boolean('publish') && !row.boolean('preserve')
+
+      add_error(row, "Value for \"shelve\" (\"#{row.value('shelve')}\") requires publish or preserve")
     end
 
     # Validates that the sequence is a positive integer (e.g., not blank, 0, 01, or 1.0).
@@ -168,15 +193,21 @@ module StructuralCsv
     end
 
     # Validates that resource_label and resource_type (when their columns are present) are the same for every row in
-    # a group, since they are values of the file set.
+    # a group, since they are values of the file set. A resource type that is missing or not allowed is already
+    # reported, so it is not compared.
     def validate_group_consistency(group)
       %w[resource_label resource_type].select { |column| column?(column) }.each do |column|
-        group.drop(1).each do |row|
-          next if row.value(column) == group.first.value(column)
+        compared_rows = column == 'resource_type' ? group.select { |row| valid_resource_type?(row) } : group
+        compared_rows.drop(1).each do |row|
+          next if row.value(column) == compared_rows.first.value(column)
 
           add_error(row, "Value for \"#{column}\" must be the same for every row with sequence #{row.sequence}")
         end
       end
+    end
+
+    def valid_resource_type?(row)
+      FileSetTypes::ALL.include?(row.value('resource_type'))
     end
 
     # Validates that a filename appears at most once in a group. The same filename in different groups is allowed

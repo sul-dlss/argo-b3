@@ -3,6 +3,10 @@
 # Methods for determining the valid combinations of view, download, and location access rights,
 # and for their labels.
 class AccessRightsSupport
+  # The view rights a file may have (citation-only is only for objects).
+  FILE_VIEW_RIGHTS = %w[world stanford location-based dark].freeze
+  DOWNLOAD_RIGHTS = %w[world stanford location-based none].freeze
+
   # @param view_or_download_right [String] e.g., 'citation-only'
   # @return [String] the label for a view or download right, e.g., 'Citation Only'
   def self.view_or_download_label(view_or_download_right)

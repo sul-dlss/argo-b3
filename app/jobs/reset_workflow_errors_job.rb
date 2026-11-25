@@ -16,7 +16,7 @@ class ResetWorkflowErrorsJob < ApplicationJob
     druids.each do |druid|
       Dor::Services::Client.object(druid).workflow(workflow_name).process(process_name)
                            .update(status: 'waiting', current_status: 'error')
-      TrackedDeposit.retried!(druid:)
+      TrackedDeposit.process_retried!(druid:)
     end
   end
 

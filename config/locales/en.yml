@@ -640,6 +640,8 @@ en:
             label: 'Globus'
         goobi:
           deposit: 'Deposit with Goobi'
+        individual_tags:
+          label: 'Or enter tags individually'
         license:
           label: "License"
           help_link: "Get help selecting a license"
@@ -1065,6 +1067,12 @@ en:
       text: 'Version %{version} of %{label} was deposited.'
       subject_label: '%{title} (%{bare_druid})'
       detail: 'Version %{version} was deposited.'
+    deposit_failed:
+      title: 'Deposit failed'
+      text: 'Version %{version} of %{label} failed to deposit.'
+      subject_label: '%{title} (%{bare_druid})'
+      staging_failed: 'Staging failed. %{reason}'
+      process_errors: '%{errors}. Retry the process from the item page, or contact SDR support at %{email} for assistance.'
     bulk_action_finished:
       title: 'Bulk action finished'
       title_with_errors: 'Bulk action finished with errors'

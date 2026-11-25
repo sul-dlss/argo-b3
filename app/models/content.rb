@@ -67,14 +67,13 @@ class Content < ApplicationRecord
     Honeybadger.notify(e, context: { druid: })
   end
 
-  # Staging supersedes staging failures for other Contents for the druid (e.g., one for an earlier lock), so staging
-  # after a failure retries it.
+  # Staging supersedes staging failures for other Contents for the druid (e.g., one for an earlier lock), and retries
+  # the staging of a Deposit whose staging failed.
   # @param stage_files_options [Hash] additional keyword arguments for StageFilesJob#perform
   def start_staging!(user:, **stage_files_options)
-    retrying = Content.where(druid:).with_staging_state(:staging_failed).exists?
     clear_other_staging_failures!
     staging_started!
-    TrackedDeposit.retried!(druid:) if retrying
+    TrackedDeposit.staging_retried!(druid:)
     StageFilesJob.perform_later(content: self, user:, **stage_files_options)
   end
 

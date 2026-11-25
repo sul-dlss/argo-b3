@@ -27,7 +27,7 @@ class WorkflowProcessesController < ApplicationController
     # The show page's cached solr doc is keyed on the lock, which process changes do not change.
     Rails.cache.delete(CacheSupport.solr_doc_cache_key(druid:))
     # The process is no longer in error, whether retried, skipped, or completed.
-    TrackedDeposit.retried!(druid:)
+    TrackedDeposit.process_retried!(druid:)
   end
 
   def redirect_with_danger(message)

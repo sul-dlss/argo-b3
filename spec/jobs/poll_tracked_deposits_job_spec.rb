@@ -10,9 +10,11 @@ RSpec.describe PollTrackedDepositsJob do
   let(:statuses) { {} }
   let(:solr_docs) { [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address' }] }
   let(:toast_html) { [] }
+  let(:process_errors) { {} }
 
   before do
     allow(Dor::Services::Client).to receive(:objects).and_return(objects_client)
+    allow(Sdr::WorkflowService).to receive(:process_errors) { |druid:, **| process_errors.fetch(druid, []) }
     allow(Search::SolrService).to receive(:post) do
       { 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } }
     end
@@ -128,38 +130,101 @@ RSpec.describe PollTrackedDepositsJob do
       perform
 
       expect(TrackedDeposit.pluck(:druid)).to contain_exactly('druid:bc123df4567', 'druid:cd234fg5678')
-      expect(TrackedDeposit.where(in_error: true)).to be_empty
       expect(user.notifications).to be_empty
-      expect(Search::SolrService).to have_received(:post).once do |request:|
-        expect(request).to include(fl: %w[id wf_error_ssim])
+      expect(Search::SolrService).to have_received(:post).once
+    end
+  end
+
+  context 'when a Process of the tracked version goes into error' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let(:process_errors) { { 'druid:bc123df4567' => ['accessionWF:shelve:Error: shelving failed'] } }
+    let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
+
+    it 'notifies the depositing user that the Deposit failed, and keeps tracking' do
+      perform
+
+      notification = user.notifications.sole
+      expect(notification.params).to include(druid: 'druid:bc123df4567', version: 2, cause: 'process',
+                                             title: 'The Gettysburg Address',
+                                             error_summary: 'accessionWF:shelve:Error: shelving failed')
+      expect(toast_html.sole).to have_link('Version 2 of The Gettysburg Address (bc123df4567) failed to deposit.',
+                                           href: '/objects/druid:bc123df4567')
+      expect(tracked_deposit.reload.process_errored_at).to be_present
+    end
+
+    it 'does not notify again while the Process stays in error' do
+      perform
+      perform
+
+      expect(user.notifications.count).to eq(1)
+    end
+
+    context 'when the Process is retried and fails again' do
+      it 'notifies again' do
+        perform
+        process_errors['druid:bc123df4567'] = []
+        perform
+        process_errors['druid:bc123df4567'] = ['accessionWF:shelve:Error: shelving failed again']
+        perform
+
+        expect(user.notifications.count).to eq(2)
+        expect(Noticed::Event.order(:created_at).last.params)
+          .to include(error_summary: 'accessionWF:shelve:Error: shelving failed again')
       end
     end
   end
 
-  context 'when the tracked version is in error' do
-    let(:statuses) do
-      { 'druid:bc123df4567' => version_status(version: 2, open: true),
-        'druid:cd234fg5678' => version_status(version: 2, open: true),
-        'druid:df345gh6789' => version_status(version: 2, open: true) }
+  context 'when notifying of a Process in error fails' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let(:process_errors) { { 'druid:bc123df4567' => ['accessionWF:shelve:Error: shelving failed'] } }
+    let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
+
+    before do
+      allow(Honeybadger).to receive(:notify)
+      allow(DepositFailedNotifier).to receive(:with).and_raise(ActiveRecord::ConnectionNotEstablished)
     end
-    let(:solr_docs) do
-      [{ 'id' => 'druid:bc123df4567', 'wf_error_ssim' => ['assemblyWF:jp2-create:failed'] },
-       { 'id' => 'druid:cd234fg5678' }, { 'id' => 'druid:df345gh6789' }]
+
+    it 'reports the failure and leaves the error unrecorded, so the next run notifies' do
+      perform
+
+      expect(tracked_deposit.reload.process_errored_at).to be_nil
+      expect(Honeybadger).to have_received(:notify)
+        .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), context: { druid: 'druid:bc123df4567' })
+    end
+  end
+
+  context 'when the Process of the tracked version is retried' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let!(:tracked_deposit) do
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:, process_errored_at: 1.hour.ago)
+    end
+
+    it 'records that it is no longer in error' do
+      perform
+
+      expect(tracked_deposit.reload.process_errored_at).to be_nil
+      expect(Sdr::WorkflowService).to have_received(:process_errors).with(druid: 'druid:bc123df4567', version: 2)
+    end
+  end
+
+  context 'when getting the Processes in error from DSA fails' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let!(:tracked_deposit) do
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:, process_errored_at: 1.hour.ago)
     end
 
     before do
-      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:)
-      create(:tracked_deposit, druid: 'druid:cd234fg5678', version: 2, user:)
-      create(:tracked_deposit, druid: 'druid:df345gh6789', version: 2, user:, in_error: true)
-      create(:content, :mutable, druid: 'druid:cd234fg5678', staging_state: 'staging_failed')
+      allow(Honeybadger).to receive(:notify)
+      allow(Sdr::WorkflowService).to receive(:process_errors).and_raise(Dor::Services::Client::Error, 'DSA failed')
     end
 
-    it 'records which have a Process in error or failed staging, and keeps tracking them' do
+    it 'reports the failure and leaves its errors as they were' do
       perform
 
-      expect(TrackedDeposit.where(in_error: true).pluck(:druid)).to contain_exactly('druid:bc123df4567',
-                                                                                    'druid:cd234fg5678')
+      expect(tracked_deposit.reload.process_errored_at).to be_present
       expect(user.notifications).to be_empty
+      expect(Honeybadger).to have_received(:notify)
+        .with(an_instance_of(Dor::Services::Client::Error), context: { druid: 'druid:bc123df4567' })
     end
   end
 
@@ -245,12 +310,12 @@ RSpec.describe PollTrackedDepositsJob do
     end
 
     def fail_process(druid)
-      solr_docs.find { |doc| doc['id'] == druid }['wf_error_ssim'] = ['accessionWF:shelve:failed']
+      process_errors[druid] = ['accessionWF:shelve:failed']
     end
 
     def retry_process(druid)
-      solr_docs.find { |doc| doc['id'] == druid }.delete('wf_error_ssim')
-      TrackedDeposit.retried!(druid:)
+      process_errors[druid] = []
+      TrackedDeposit.process_retried!(druid:)
     end
 
     # Polls without sending emails that are due later.
@@ -413,17 +478,19 @@ RSpec.describe PollTrackedDepositsJob do
 
     context 'when a MID Item Deposit failed staging' do
       before do
-        create(:content, :mutable, druid: 'druid:bc123df4567', staging_state: 'staging_failed')
+        TrackedDeposit.find_by(druid: 'druid:bc123df4567').staging_failed!
         complete('druid:cd234fg5678')
         poll
       end
 
-      it 'counts it as In Error' do
-        expect(user.notifications.sole.params).to include(error_count: 1)
+      it 'counts it as In Error, without notifying of the MID Item Deposit on its own' do
+        notification = user.notifications.sole
+        expect(notification).to be_a(MultiItemDepositSettledNotifier::Notification)
+        expect(notification.params).to include(error_count: 1)
       end
 
       it 'unsettles when staging is retried, cancelling the email' do
-        Content.find_by(druid: 'druid:bc123df4567').start_staging!(user:, accession: true)
+        create(:content, :mutable, druid: 'druid:bc123df4567').start_staging!(user:, accession: true)
 
         expect(multi_item_deposit_action.reload.settled_at).to be_nil
         expect { send_due_emails }.not_to(change(emails, :count))
@@ -441,26 +508,6 @@ RSpec.describe PollTrackedDepositsJob do
         expect(multi_item_deposit_action.item_deposit_actions.find_by(druid: 'druid:bc123df4567').deposit_errors)
           .to eq(['The deposit stopped before it was complete: the draft was discarded or the object purged.'])
         expect(user.notifications.sole.params).to include(error_count: 1)
-      end
-    end
-
-    context 'when Solr still shows a Process in error just after it was retried' do
-      before do
-        fail_process('druid:bc123df4567')
-        complete('druid:cd234fg5678')
-        poll
-        TrackedDeposit.retried!(druid: 'druid:bc123df4567')
-        poll
-      end
-
-      it 'stays unsettled until the grace period has passed' do
-        expect(multi_item_deposit_action.reload.settled_at).to be_nil
-        expect(user.notifications.count).to eq(1)
-
-        travel TrackedDeposit::RETRY_GRACE_PERIOD + 1.second
-        poll
-
-        expect(user.notifications.count).to eq(2)
       end
     end
 

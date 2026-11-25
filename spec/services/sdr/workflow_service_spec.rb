@@ -136,6 +136,40 @@ RSpec.describe Sdr::WorkflowService do
     end
   end
 
+  describe '.process_errors' do
+    subject(:process_errors) { described_class.process_errors(druid:, version: 2) }
+
+    let(:xml) do
+      <<~XML
+        <workflows objectId="druid:bc123cd4567">
+          <workflow objectId="druid:bc123cd4567" id="accessionWF">
+            <process version="1" status="error" name="shelve" errorMessage="Old error"/>
+            <process version="2" status="error" name="shelve" errorMessage="Error: shelving failed"/>
+            <process version="2" status="waiting" name="publish"/>
+          </workflow>
+          <workflow objectId="druid:bc123cd4567" id="assemblyWF">
+            <process version="1" status="error" name="exif-collect"/>
+            <process version="2" status="completed" name="exif-collect"/>
+          </workflow>
+          <workflow objectId="druid:bc123cd4567" id="releaseWF">
+            <process version="1" status="error" name="release-publish"/>
+          </workflow>
+          <workflow objectId="druid:bc123cd4567" id="ocrWF">
+            <process version="2" status="error" name="fetch-files"/>
+          </workflow>
+        </workflows>
+      XML
+    end
+
+    before do
+      allow(object_client).to receive(:workflows).and_return(Dor::Services::Response::Workflows.new(xml: Nokogiri::XML(xml)))
+    end
+
+    it 'returns the Processes in error for the version, ignoring earlier versions\' errors' do
+      expect(process_errors).to eq(['accessionWF:shelve:Error: shelving failed', 'ocrWF:fetch-files'])
+    end
+  end
+
   describe '#accessioned?' do
     let(:milestones_client) { instance_double(Dor::Services::Client::Milestones) }
 
