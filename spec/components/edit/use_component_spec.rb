@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Edit::UseComponent, type: :component do
-  let(:component) { described_class.new(form:) }
+  let(:component) { described_class.new(form:, label_text: 'Role for image1.tif') }
   let(:form) { ActionView::Helpers::FormBuilder.new(:content_file, content_file_form, vc_test_view_context, {}) }
   let(:content_file_form) { ContentFileForm.new(use:) }
   let(:use) { 'derivative' }
@@ -11,7 +11,7 @@ RSpec.describe Edit::UseComponent, type: :component do
   it 'renders the role select' do
     render_inline(component)
 
-    expect(page).to have_select('Role', selected: 'derivative', options: described_class::USES)
+    expect(page).to have_select('Role for image1.tif', selected: 'derivative', options: described_class::USES)
     expect(page).to have_css('select[data-controller="creatable-select"]')
   end
 
@@ -21,7 +21,8 @@ RSpec.describe Edit::UseComponent, type: :component do
     it 'adds the use as an option' do
       render_inline(component)
 
-      expect(page).to have_select('Role', selected: 'supplement', with_options: %w[supplement transcription])
+      expect(page).to have_select('Role for image1.tif', selected: 'supplement',
+                                                         with_options: %w[supplement transcription])
     end
   end
 

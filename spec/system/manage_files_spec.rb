@@ -872,7 +872,7 @@ RSpec.describe 'Manage files' do
     it 'updates the role of a file' do
       build_structure_then_edit_resource
 
-      select_multi_option('transcription', from: 'Role')
+      select_multi_option('transcription', from: 'Role for dropzone_upload.txt')
       click_button 'Save'
 
       expect(page).to have_toast('Resource updated')
@@ -883,12 +883,50 @@ RSpec.describe 'Manage files' do
     it 'updates the role of a file to one that is not listed' do
       build_structure_then_edit_resource
 
-      find_multi_select('Role').find('.ts-control input').set('supplement')
+      find_multi_select('Role for dropzone_upload.txt').find('.ts-control input').set('supplement')
       find('.ts-dropdown .create', text: 'supplement').click
       click_button 'Save'
 
       expect(page).to have_toast('Resource updated')
       expect(content.content_files.sole.use).to eq('supplement')
+    end
+
+    it 'does not submit the form when enter is pressed in a role' do
+      build_structure_then_edit_resource
+
+      role_input = find_multi_select('Role for dropzone_upload.txt').find('.ts-control input')
+      role_input.set('supplement')
+      find('.ts-dropdown .create', text: 'supplement')
+      # Creates the role, then (with the dropdown closed) does nothing.
+      role_input.send_keys(:enter)
+      expect(page).to have_no_css('.ts-dropdown .create')
+      role_input.send_keys(:enter)
+
+      expect(page).to have_button('Save')
+      expect(content.content_files.sole.use).to be_nil
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource updated')
+      expect(content.content_files.sole.use).to eq('supplement')
+    end
+
+    it 'requires publish or preserve, then saves them' do
+      build_structure_then_edit_resource
+
+      # The file of a dark object is preserved but not published.
+      expect(page).to have_unchecked_field('Publish dropzone_upload.txt')
+      uncheck 'Preserve dropzone_upload.txt'
+      click_button 'Save'
+
+      expect(page).to have_css('tbody tr .invalid-feedback', text: 'Select publish, preserve, or both.')
+      expect(content.content_files.sole).to have_attributes(publish: false, preserve: true)
+
+      check 'Preserve dropzone_upload.txt'
+      select_multi_option('transcription', from: 'Role for dropzone_upload.txt')
+      click_button 'Save'
+
+      expect(page).to have_toast('Resource updated')
+      expect(content.content_files.sole).to have_attributes(publish: false, preserve: true, use: 'transcription')
     end
 
     it 'deletes the resource' do
@@ -936,7 +974,7 @@ RSpec.describe 'Manage files' do
 
       expect(page).to have_no_text('Saving will delete this resource.')
       click_button 'Remove dropzone_upload.txt'
-      expect(page).to have_no_field('Role')
+      expect(page).to have_no_field('Role for dropzone_upload.txt')
       expect(page).to have_css('[role="alert"]', text: 'Saving will delete this resource.')
 
       click_button 'Save'

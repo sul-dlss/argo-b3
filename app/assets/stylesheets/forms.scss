@@ -63,3 +63,91 @@
 turbo-frame[aria-busy="true"] .spinner-on-frame-submit .submit-spinner {
   display: flex !important;
 }
+
+// Edit resource form (Edit::FileSetComponent): a table with one row of inputs per file.
+// Design standard deviation: LAY-6. Column minimum widths are in ch, since they depend on the values the
+// inputs show (e.g., a MIME type such as application/pdf), which have no matching Bootstrap utility.
+.file-set-edit-table {
+  // Narrower gaps between columns, so that the table fits a 1280px wide window.
+  > :not(caption) > * > * {
+    padding-left: $spacer * .25;
+    padding-right: $spacer * .25;
+  }
+
+  > :not(caption) > * > :first-child {
+    padding-left: $spacer * .5;
+  }
+
+  > :not(caption) > * > :last-child {
+    padding-right: $spacer * .5;
+  }
+
+  .file-set-filename {
+    min-width: 13ch;
+    width: auto;
+  }
+
+  .file-set-mime-type {
+    min-width: 17ch;
+  }
+
+  .file-set-access {
+    min-width: 15ch;
+  }
+
+  .file-set-select {
+    min-width: 12ch;
+  }
+
+  // About as narrow as the header, since language tags are short (e.g., en).
+  .file-set-language {
+    min-width: 10.5ch;
+    width: 1%;
+  }
+
+  // Rows are top aligned so that an error below a field doesn't move it, so the filename is offset to line up
+  // with the text of the inputs.
+  td.file-set-filename {
+    padding-top: calc(#{$table-cell-padding-y} + #{$input-padding-y} + #{$input-border-width});
+  }
+
+  // Tom Select's text box stays on the line of the chosen value, and adds no width when the field is active
+  // (it is shown only then), so the field keeps its width.
+  // Without a caret or validation icon, the space for them isn't needed.
+  .ts-wrapper.no-caret:not(.is-invalid) {
+    --ts-pr-caret: 0px;
+  }
+
+  .ts-control {
+    flex-wrap: nowrap;
+
+    > input {
+      min-width: 0;
+      width: 0;
+    }
+  }
+
+  // Tom Select hides the text box of a filled field far to the left, so focusing it would scroll the table there.
+  .input-hidden .ts-control > input {
+    left: 0;
+  }
+
+  // Checkboxes in a cell have a visually hidden label, so the form-check padding is not needed.
+  .form-check {
+    min-height: 0;
+    padding-left: 0;
+
+    // Not floated, so that an error is shown below the checkbox. Offset to line up with the middle of the inputs.
+    .form-check-input {
+      float: none;
+      margin-left: 0;
+      margin-top: calc((#{$input-height} - #{$form-check-input-width}) / 2);
+    }
+  }
+}
+
+// Design standard deviation: LAY-6. The label input in the resource header is sized for typical labels
+// (e.g., "Page 12"), which has no matching Bootstrap utility.
+.file-set-label-field input {
+  min-width: 20ch;
+}

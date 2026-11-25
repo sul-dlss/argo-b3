@@ -62,10 +62,10 @@ class ContentFileSetForm < ApplicationForm
         view: content_file_form.view,
         download: content_file_form.download,
         location: content_file_form.location,
-        publish: content_file_form.publish?,
-        preserve: content_file_form.preserve?,
+        publish: content_file_form.publish,
+        preserve: content_file_form.preserve,
         # Shelve follows publish.
-        shelve: content_file_form.publish?,
+        shelve: content_file_form.publish,
         _destroy: content_file_form.marked_for_destruction?
       }
     end

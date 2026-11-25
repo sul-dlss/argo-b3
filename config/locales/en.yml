@@ -424,6 +424,10 @@ en:
         deleted: 'File deleted'
     content_file_sets:
       all_files_removed: 'Saving will delete this resource.'
+      files_table:
+        empty: 'No files.'
+        label: 'Files for resource %{index}'
+      heading: 'Resource %{index}'
       buttons:
         delete: 'Delete resource %{index}'
         delete_confirm: 'Delete resource %{index} and its files?'
@@ -433,28 +437,44 @@ en:
       fields:
         content_files:
           access:
-            label: 'Access'
             validations:
               invalid: 'is not a valid combination of view, download, and location'
-          administrative:
-            label: 'Administrative'
-            options:
-              preserve_only: 'Preserve only'
-              publish_and_preserve: 'Publish and preserve'
-              publish_only: 'Publish only'
-            validations:
-              required: 'must be selected'
+          actions:
+            label: 'Actions'
           corrected_for_accessibility:
-            label: 'Corrected for accessibility'
+            label: 'Accessible'
+            row_label: '%{filepath} corrected for accessibility'
+          download:
+            label: 'Download'
+            row_label: 'Download access for %{filepath}'
+          filepath:
+            label: 'File name'
           language_tag:
             label: 'Language'
             placeholder: 'Select or enter a language'
+            row_label: 'Language for %{filepath}'
+          location:
+            label: 'Location'
+            row_label: 'Location for %{filepath}'
           mime_type:
             label: 'MIME type'
             placeholder: 'Select or enter a MIME type'
+            row_label: 'MIME type for %{filepath}'
+          preserve:
+            label: 'Preserve'
+            row_label: 'Preserve %{filepath}'
+          publish:
+            label: 'Publish'
+            row_label: 'Publish %{filepath}'
+            validations:
+              required: 'Select publish, preserve, or both.'
           use:
             label: 'Role'
             placeholder: 'Select or enter a role'
+            row_label: 'Role for %{filepath}'
+          view:
+            label: 'View'
+            row_label: 'View access for %{filepath}'
         file_set_type:
           label: 'Resource type'
         label:

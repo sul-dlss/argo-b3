@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Edit::FileLanguageComponent, type: :component do
-  let(:component) { described_class.new(form:) }
+  let(:component) { described_class.new(form:, label_text: 'Language for image1.tif') }
   let(:form) { ActionView::Helpers::FormBuilder.new(:content_file, content_file_form, vc_test_view_context, {}) }
   let(:content_file_form) { ContentFileForm.new(language_tag:) }
   let(:language_tag) { 'de' }
@@ -11,7 +11,7 @@ RSpec.describe Edit::FileLanguageComponent, type: :component do
   it 'renders the language select' do
     render_inline(component)
 
-    expect(page).to have_select('Language', selected: 'de', options: described_class::LANGUAGE_TAGS)
+    expect(page).to have_select('Language for image1.tif', selected: 'de', options: described_class::LANGUAGE_TAGS)
     expect(page).to have_css('select[data-controller="creatable-select"]')
   end
 
@@ -21,7 +21,7 @@ RSpec.describe Edit::FileLanguageComponent, type: :component do
     it 'adds the language tag as an option' do
       render_inline(component)
 
-      expect(page).to have_select('Language', selected: 'en-US', with_options: %w[en-US en])
+      expect(page).to have_select('Language for image1.tif', selected: 'en-US', with_options: %w[en-US en])
     end
   end
 
