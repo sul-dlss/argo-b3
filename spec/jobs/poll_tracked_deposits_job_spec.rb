@@ -81,7 +81,7 @@ RSpec.describe PollTrackedDepositsJob do
       expect(TrackedDeposit.count).to eq(0)
       expect(objects_client).to have_received(:statuses).with(object_ids: ['druid:bc123df4567'])
       expect(Search::SolrService).to have_received(:post) do |request:|
-        expect(request).to include(fq: ['id:("druid:bc123df4567")'], fl: %w[id display_title_ss])
+        expect(request).to include(fq: ['id:("druid:bc123df4567")'], fl: %w[id display_title_ss wf_error_ssim])
       end
     end
   end
@@ -129,7 +129,64 @@ RSpec.describe PollTrackedDepositsJob do
 
       expect(TrackedDeposit.pluck(:druid)).to contain_exactly('druid:bc123df4567', 'druid:cd234fg5678')
       expect(user.notifications).to be_empty
-      expect(Search::SolrService).not_to have_received(:post)
+      expect(Search::SolrService).to have_received(:post).once
+    end
+  end
+
+  context 'when a Process of the tracked version goes into error' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let(:solr_docs) do
+      [{ 'id' => 'druid:bc123df4567', 'display_title_ss' => 'The Gettysburg Address',
+         'wf_error_ssim' => ['accessionWF:shelve:Error: shelving failed'] }]
+    end
+    let!(:tracked_deposit) { create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:) }
+
+    it 'notifies the depositing user that the Deposit failed, and keeps tracking' do
+      perform
+
+      notification = user.notifications.sole
+      expect(notification.params).to include(druid: 'druid:bc123df4567', version: 2, cause: 'process',
+                                             title: 'The Gettysburg Address',
+                                             error_summary: 'accessionWF:shelve:Error: shelving failed')
+      expect(toast_html.sole).to have_link('Version 2 of The Gettysburg Address (bc123df4567) failed to deposit.',
+                                           href: '/objects/druid:bc123df4567')
+      expect(tracked_deposit.reload.process_errored_at).to be_present
+    end
+
+    it 'does not notify again while the Process stays in error' do
+      perform
+      perform
+
+      expect(user.notifications.count).to eq(1)
+    end
+
+    context 'when the Process is retried and fails again' do
+      it 'notifies again' do
+        perform
+        solr_docs.first.delete('wf_error_ssim')
+        perform
+        solr_docs.first['wf_error_ssim'] = ['accessionWF:shelve:Error: shelving failed again']
+        perform
+
+        expect(user.notifications.count).to eq(2)
+        expect(Noticed::Event.order(:created_at).last.params)
+          .to include(error_summary: 'accessionWF:shelve:Error: shelving failed again')
+      end
+    end
+  end
+
+  context 'when the object of an in-flight Deposit is not in Solr' do
+    let(:statuses) { { 'druid:bc123df4567' => version_status(version: 2, accessioning: true) } }
+    let(:solr_docs) { [] }
+    let!(:tracked_deposit) do
+      create(:tracked_deposit, druid: 'druid:bc123df4567', version: 2, user:, process_errored_at: 1.hour.ago)
+    end
+
+    it 'leaves its errors as they were' do
+      perform
+
+      expect(tracked_deposit.reload.process_errored_at).to be_present
+      expect(user.notifications).to be_empty
     end
   end
 

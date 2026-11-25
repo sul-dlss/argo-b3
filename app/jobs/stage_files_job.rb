@@ -30,7 +30,7 @@ class StageFilesJob < ApplicationJob
 
     perform_broadcast
   rescue StandardError => e
-    handle_failure(error: e, content:, user:, notify:)
+    handle_failure(error: e, content:, user:, notify:, accession:)
   end
 
   attr_reader :content, :user, :notify, :staging_location
@@ -132,7 +132,7 @@ class StageFilesJob < ApplicationJob
   end
 
   # Uses the arguments passed to #perform, since the failure may have happened before they were assigned.
-  def handle_failure(error:, content:, user:, notify:)
+  def handle_failure(error:, content:, user:, notify:, accession:)
     Rails.logger.error(error.full_message)
     Honeybadger.notify(error)
 
@@ -141,9 +141,34 @@ class StageFilesJob < ApplicationJob
     content.staging_errored! if content.staging?
     Turbo::StreamsChannel.broadcast_refresh_to('objects', content.druid)
     return unless notify
+    return if accession && notify_deposit_failed(druid: content.druid, error:)
 
     broadcast_toast(title: I18n.t('edit.items.new.toasts.staging_failed'), text: staging_failed_text(error:),
                     user:, disappearing: false, variant: :red)
+  end
+
+  # A Single-Object Deposit whose staging failed is In Error, so its depositing user gets a Deposit failed
+  # Notification in place of the staging failed toast.
+  # @return [Boolean] true if notified; false if the Deposit isn't tracked or notifying failed
+  def notify_deposit_failed(druid:, error:)
+    tracked_deposit = TrackedDeposit.latest_for(druid:)
+    return false unless tracked_deposit
+
+    tracked_deposit.staging_failed!(
+      title: title_for(druid:),
+      error_summary: I18n.t('notifiers.deposit_failed.staging_failed', reason: staging_failed_text(error:))
+    )
+    true
+  rescue StandardError => e
+    Rails.logger.error(e.full_message)
+    Honeybadger.notify(e, context: { druid: })
+    false
+  end
+
+  # @return [String] the object's title, or its bare druid if it is not in Solr
+  def title_for(druid:)
+    Searchers::ItemByDruid.call(druids: [druid], user_scope: nil, fields: [Search::Fields::ID, Search::Fields::TITLE])
+                          .first&.title || DruidSupport.bare_druid_from(druid)
   end
 
   def staging_failed_text(error:)

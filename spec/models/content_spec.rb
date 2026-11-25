@@ -294,5 +294,13 @@ RSpec.describe Content do
       expect(other_failed_content.reload.staging_state).to eq('staging_not_in_progress')
       expect(other_object_failed_content.reload.staging_state).to eq('staging_failed')
     end
+
+    it 'retries the staging of a Deposit of the druid whose staging failed' do
+      tracked_deposit = create(:tracked_deposit, druid:, staging_failed_at: 1.hour.ago)
+
+      content.start_staging!(user:)
+
+      expect(tracked_deposit.reload.staging_failed_at).to be_nil
+    end
   end
 end

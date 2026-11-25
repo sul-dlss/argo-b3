@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe StageFilesJob do
+  include ActiveJob::TestHelper
+
   subject(:job) { described_class.new }
 
   let(:druid) { 'druid:bc123df4567' }
@@ -502,6 +504,71 @@ RSpec.describe StageFilesJob do
           .with('notifications', user, target: 'toast-container',
                                        html: a_string_including('Staging failed', Settings.support_email,
                                                                 'bg-stanford-digital-red'))
+      end
+
+      context 'when the Deposit is tracked' do
+        let!(:tracked_deposit) { create(:tracked_deposit, druid:, version: 2, user:) }
+        let(:solr_docs) { [{ 'id' => druid, 'display_title_ss' => 'The Gettysburg Address' }] }
+
+        before do
+          create(:tracked_deposit, druid:, version: 1, user:)
+          allow(Search::SolrService).to receive(:post)
+            .and_return({ 'response' => { 'numFound' => solr_docs.size, 'start' => 0, 'docs' => solr_docs } })
+        end
+
+        it 'notifies the depositing user that the Deposit failed, in place of the staging failed toast' do
+          perform_enqueued_jobs(only: [Noticed::EventJob, DeliveryMethods::TurboToast]) do
+            job.perform(content:, user:, accession: true)
+          end
+
+          expect(tracked_deposit.reload.staging_failed_at).to be_present
+          notification = user.notifications.sole
+          expect(notification.params).to include(druid:, version: 2, cause: 'staging', title: 'The Gettysburg Address',
+                                                 error_summary: 'Staging failed. Contact SDR support at ' \
+                                                                "#{Settings.support_email} for assistance.")
+          expect(Noticed::Event.sole).to be_a(DepositFailedNotifier)
+          expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).once
+          expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+            .with('notifications', user, target: 'toast-container', html: a_string_including('Deposit failed'))
+        end
+
+        context 'when the object is not in Solr' do
+          let(:solr_docs) { [] }
+
+          it 'uses the druid as the title' do
+            job.perform(content:, user:, accession: true)
+
+            expect(user.notifications.sole.params).to include(title: 'bc123df4567')
+          end
+        end
+
+        context 'when notifying fails' do
+          before { allow(DepositFailedNotifier).to receive(:with).and_raise(ActiveRecord::ConnectionNotEstablished) }
+
+          it 'broadcasts the staging failed toast instead' do
+            job.perform(content:, user:, accession: true)
+
+            expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+              .with('notifications', user, target: 'toast-container',
+                                           html: a_string_including('Staging failed', Settings.support_email))
+            expect(tracked_deposit.reload.staging_failed_at).to be_nil
+          end
+        end
+
+        context 'when saving a draft' do
+          before { allow(Sdr::Repository).to receive(:update).and_raise(Sdr::Repository::Error, 'Update failed') }
+
+          it 'broadcasts the staging failed toast, without notifying' do
+            job.perform(content:, user:, accession: false)
+
+            expect(content.reload.staging_state).to eq('staging_failed')
+            expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+              .with('notifications', user, target: 'toast-container',
+                                           html: a_string_including('Staging failed', Settings.support_email))
+            expect(user.notifications).to be_empty
+            expect(tracked_deposit.reload.staging_failed_at).to be_nil
+          end
+        end
       end
 
       context 'when notifying is not requested' do
