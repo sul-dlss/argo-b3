@@ -72,8 +72,7 @@ class MultipleItemsController < ApplicationController
     @apo_options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = @items_registration_form.collection_druids
-    titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
-    @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
+    @collection_options = Searchers::TitlesByDruid.call(druids:).map { |druid, title| [title, druid] }
   end
 
   def items_registration_form_params

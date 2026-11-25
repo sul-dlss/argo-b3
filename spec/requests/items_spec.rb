@@ -49,7 +49,7 @@ RSpec.describe 'Items' do
       allow(Sdr::Repository).to receive_messages(find: cocina_object, release_tags:)
       allow(Sdr::AdministrativeTags).to receive(:list).and_return(['Project : Maps'])
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
-      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['My Collection', 'druid:xz987wv6543']])
+      allow(Searchers::TitlesByDruid).to receive(:call).and_return('druid:xz987wv6543' => 'My Collection')
       sign_in(user)
     end
 
@@ -100,19 +100,19 @@ RSpec.describe 'Items' do
         create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:bc123df4567')
         create(:permission, :edit, workgroup: user.groups.first, target_druid: 'druid:xz987wv6543')
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
-        allow(Searchers::CollectionListByDruid).to receive(:call)
-          .and_return([['Art History Slides', 'druid:bc123df4567']])
+        allow(Searchers::TitlesByDruid).to receive(:call)
+          .and_return('druid:bc123df4567' => 'Art History Slides', 'druid:xz987wv6543' => 'xz987wv6543')
         sign_in(user)
       end
 
-      it 'renders the selected collections, labeling those not found with the bare druid' do
+      it 'renders the selected collections, labeled with their titles' do
         # No title is provided, so the item is invalid.
         post '/items', params: { item: { collection_druids: ['', 'druid:bc123df4567', 'druid:xz987wv6543'] } }
 
         expect(response).to have_http_status(:unprocessable_content)
         page = Capybara.string(response.body)
         expect(page).to have_select('Collections', visible: :all, selected: ['Art History Slides', 'xz987wv6543'])
-        expect(Searchers::CollectionListByDruid).to have_received(:call)
+        expect(Searchers::TitlesByDruid).to have_received(:call)
           .with(druids: %w[druid:bc123df4567 druid:xz987wv6543])
       end
 
@@ -164,8 +164,9 @@ RSpec.describe 'Items' do
       allow(Sdr::VersionService).to receive(:new).and_return(version_service)
       allow(Sdr::PurgeService).to receive(:purgeable?).and_return(true)
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
-      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
-      allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+      allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+        druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+      end
       sign_in(user)
     end
 
@@ -326,14 +327,14 @@ RSpec.describe 'Items' do
         let(:apo_druid) { cocina_object.administrative.hasAdminPolicy }
 
         before do
-          allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([['Restricted APO', apo_druid]])
+          allow(Searchers::TitlesByDruid).to receive(:call).and_return(apo_druid => 'Restricted APO')
         end
 
         it 'adds the APO as an option labeled with its title' do
           get "/items/#{druid}/edit"
 
           expect(Capybara.string(response.body)).to have_select('APO', selected: 'Restricted APO')
-          expect(Searchers::AdminPolicyListByDruid).to have_received(:call).with(druids: ['druid:hv992ry2431'])
+          expect(Searchers::TitlesByDruid).to have_received(:call).with(druids: ['druid:hv992ry2431'])
         end
       end
 
@@ -680,8 +681,9 @@ RSpec.describe 'Items' do
         create(:content_file, content_file_set: create(:content_file_set, content:, file_set_type: 'file'),
                               publish: true)
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
-        allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
-        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+        allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+          druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+        end
       end
 
       it 'renders the edit page with the error without depositing' do
@@ -702,8 +704,9 @@ RSpec.describe 'Items' do
         # A file that has not been staged is an unsaved change.
         create(:content_file_binary, content:, file_location: 'attached')
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
-        allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
-        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+        allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+          druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+        end
       end
 
       context 'when depositing' do
@@ -776,8 +779,9 @@ RSpec.describe 'Items' do
 
       before do
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
-        allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
-        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([])
+        allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+          druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+        end
       end
 
       it 'renders the edit page without saving' do

@@ -31,7 +31,9 @@ RSpec.describe 'Edit an item' do
     allow(Sdr::Repository).to receive(:update) { |cocina_object:, **| cocina_object.new(lock: 'updated-lock') }
     allow(version_client).to receive(:open).and_return(opened_cocina_object)
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([])
-    allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
+    allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+      druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+    end
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return([])
   end
 
@@ -204,7 +206,7 @@ RSpec.describe 'Edit an item' do
     end
 
     before do
-      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['Art History Slides', collection_druid]])
+      allow(Searchers::TitlesByDruid).to receive(:call).and_return(collection_druid => 'Art History Slides')
     end
 
     it 'removes the item from all collections' do

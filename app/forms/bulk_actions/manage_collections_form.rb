@@ -9,12 +9,7 @@ module BulkActions
 
     # Title and druid pairs for the selected collections, so the select can be rebuilt after a validation error.
     def collection_options
-      return [] if collection_druids.empty?
-
-      collection_titles = Searchers::CollectionListByDruid.call(druids: collection_druids).to_h(&:reverse)
-      collection_druids.map do |druid|
-        [collection_titles[druid] || DruidSupport.bare_druid_from(druid), druid]
-      end
+      Searchers::TitlesByDruid.call(druids: collection_druids).map { |druid, title| [title, druid] }
     end
   end
 end

@@ -18,7 +18,7 @@ RSpec.describe 'Create a new update collections bulk action' do
     sign_in user
 
     allow(Searchers::CollectionList).to receive(:call).and_return([[collection_title, collection_druid]])
-    allow(Searchers::CollectionListByDruid).to receive(:call).and_return([[collection_title, collection_druid]])
+    allow(Searchers::TitlesByDruid).to receive(:call).and_return(collection_druid => collection_title)
   end
 
   it 'submits an update collections bulk action' do

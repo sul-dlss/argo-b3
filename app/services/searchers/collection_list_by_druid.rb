@@ -11,7 +11,7 @@ module Searchers
 
     # @param druids [Array<String>] prefixed druids
     # @param user_scope [Permissions::UserScope, nil] the permission scope of the requesting user, to limit to the
-    #   collections the user can edit. Omit for collections that are already selected, which must not be dropped.
+    #   collections the user can edit; nil skips checks. For selected collections' titles, use TitlesByDruid.
     # @param apo_druid [String, nil] if provided, limits to the collections governed by this APO
     def initialize(druids:, user_scope: nil, apo_druid: nil)
       @druids = druids

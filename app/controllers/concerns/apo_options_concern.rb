@@ -14,12 +14,6 @@ module ApoOptionsConcern
     options = Searchers::AdminPolicyList.call(user_scope: current_user_scope, editable: true)
     return options if current_apo_druid.blank? || options.any? { |_title, druid| druid == current_apo_druid }
 
-    [[apo_title(apo_druid: current_apo_druid), current_apo_druid]] + options
-  end
-
-  # Falls back to the bare druid if the APO is not found.
-  def apo_title(apo_druid:)
-    titles = Searchers::AdminPolicyListByDruid.call(druids: [apo_druid]).to_h(&:reverse)
-    titles[apo_druid] || DruidSupport.bare_druid_from(apo_druid)
+    [[Searchers::TitlesByDruid.call(druids: [current_apo_druid])[current_apo_druid], current_apo_druid]] + options
   end
 end
