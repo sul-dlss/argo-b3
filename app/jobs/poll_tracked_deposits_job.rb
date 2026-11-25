@@ -32,9 +32,9 @@ class PollTrackedDepositsJob < ApplicationJob
   def report(complete:, in_flight:)
     return if complete.empty? && in_flight.empty?
 
-    titles = titles_for(druids: (complete + in_flight).map(&:druid))
-    complete.each { |tracked_deposit| notify_complete(tracked_deposit, title: title_for(tracked_deposit, titles:)) }
-    in_flight.each { |tracked_deposit| check_process_errors(tracked_deposit, titles:) }
+    titles = Searchers::TitlesByDruid.call(druids: (complete + in_flight).map(&:druid))
+    complete.each { |tracked_deposit| notify_complete(tracked_deposit, title: titles[tracked_deposit.druid]) }
+    in_flight.each { |tracked_deposit| check_process_errors(tracked_deposit, title: titles[tracked_deposit.druid]) }
   end
 
   # @return [Symbol] :complete, :abandoned (no longer in flight), or :in_flight
@@ -56,22 +56,12 @@ class PollTrackedDepositsJob < ApplicationJob
   end
 
   # A failure to get the Processes or to notify is retried by the next run (see TrackedDeposit#process_errors_found!).
-  def check_process_errors(tracked_deposit, titles:)
+  def check_process_errors(tracked_deposit, title:)
     workflow_errors = Sdr::WorkflowService.process_errors(druid: tracked_deposit.druid,
                                                           version: tracked_deposit.version)
-    tracked_deposit.process_errors_found!(workflow_errors:, title: title_for(tracked_deposit, titles:))
+    tracked_deposit.process_errors_found!(workflow_errors:, title:)
   rescue StandardError => e
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: tracked_deposit.druid })
-  end
-
-  def title_for(tracked_deposit, titles:)
-    titles[tracked_deposit.druid] || DruidSupport.bare_druid_from(tracked_deposit.druid)
-  end
-
-  # @return [Hash<String, String>] the titles, keyed by druid; objects not in Solr are omitted
-  def titles_for(druids:)
-    Searchers::ItemByDruid.call(druids: druids.uniq, user_scope: nil, fields: [Search::Fields::ID, Search::Fields::TITLE])
-                          .to_h { |item| [item.druid, item.title] }
   end
 end

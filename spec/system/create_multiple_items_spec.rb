@@ -295,8 +295,8 @@ RSpec.describe 'Create multiple items' do
       allow(Searchers::CollectionList).to receive(:call).and_return(
         [['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']]
       )
-      allow(Searchers::CollectionListByDruid).to receive(:call)
-        .and_return([['Art History Slides', 'druid:bc123df4567'], ['Art Maps', 'druid:gh456jk7890']])
+      allow(Searchers::TitlesByDruid).to receive(:call)
+        .and_return('druid:bc123df4567' => 'Art History Slides', 'druid:gh456jk7890' => 'Art Maps')
     end
 
     it 'enqueues a register form bulk action with the collections' do

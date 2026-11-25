@@ -49,7 +49,9 @@ RSpec.describe 'Apply APO defaults when editing an item' do
 
     allow(Searchers::AdminPolicyList).to receive(:call).and_return([[apo_title, apo_druid],
                                                                     [other_apo_title, other_apo_druid]])
-    allow(Searchers::CollectionListByDruid).to receive(:call).and_return([])
+    allow(Searchers::TitlesByDruid).to receive(:call) do |druids:|
+      druids.index_with { |druid| DruidSupport.bare_druid_from(druid) }
+    end
     allow(Sdr::WorkflowService).to receive(:submitted?).and_return(false)
     allow(Sdr::VersionService).to receive(:new)
       .and_return(version_service_double(open?: true, version_description: 'Fixing the rights'))

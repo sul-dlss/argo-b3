@@ -278,7 +278,7 @@ RSpec.describe 'Collections' do
       before do
         create(:permission, :edit, workgroup: 'sdr:collection-workgroup', target_druid: druid)
         allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My other APO', 'druid:cd234fg5678']])
-        allow(Searchers::AdminPolicyListByDruid).to receive(:call).and_return([['My APO', apo_druid]])
+        allow(Searchers::TitlesByDruid).to receive(:call).and_return(apo_druid => 'My APO')
       end
 
       it 'adds the current APO as an option, so that saving does not change it' do

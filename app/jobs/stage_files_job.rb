@@ -155,7 +155,7 @@ class StageFilesJob < ApplicationJob
     return false unless tracked_deposit
 
     tracked_deposit.staging_failed!(
-      title: title_for(druid:),
+      title: Searchers::TitlesByDruid.call(druids: [druid])[druid],
       error_summary: I18n.t('notifiers.deposit_failed.staging_failed', reason: staging_failed_text(error:))
     )
     true
@@ -163,12 +163,6 @@ class StageFilesJob < ApplicationJob
     Rails.logger.error(e.full_message)
     Honeybadger.notify(e, context: { druid: })
     false
-  end
-
-  # @return [String] the object's title, or its bare druid if it is not in Solr
-  def title_for(druid:)
-    Searchers::ItemByDruid.call(druids: [druid], user_scope: nil, fields: [Search::Fields::ID, Search::Fields::TITLE])
-                          .first&.title || DruidSupport.bare_druid_from(druid)
   end
 
   def staging_failed_text(error:)

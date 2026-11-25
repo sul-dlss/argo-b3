@@ -110,8 +110,7 @@ class ItemsController < ApplicationController
     @apo_options = apo_options(current_apo_druid: form.previous_cocina_object&.administrative&.hasAdminPolicy)
     # Only the selected collections are options, since other options are loaded as the user types.
     druids = form.collection_druids
-    titles = Searchers::CollectionListByDruid.call(druids:).to_h(&:reverse)
-    @collection_options = druids.map { |druid| [titles[druid] || DruidSupport.bare_druid_from(druid), druid] }
+    @collection_options = Searchers::TitlesByDruid.call(druids:).map { |druid, title| [title, druid] }
   end
 
   def create_redirect_path

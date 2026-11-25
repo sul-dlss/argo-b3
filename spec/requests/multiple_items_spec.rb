@@ -49,7 +49,7 @@ RSpec.describe 'Multiple items' do
       allow(Sdr::Repository).to receive(:find).and_return(cocina_object)
       allow(Sdr::AdministrativeTags).to receive(:list).and_return(['Project : Maps'])
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
-      allow(Searchers::CollectionListByDruid).to receive(:call).and_return([['My Collection', 'druid:xz987wv6543']])
+      allow(Searchers::TitlesByDruid).to receive(:call).and_return('druid:xz987wv6543' => 'My Collection')
       goobi_workflow = Dor::Services::Response::Workflow.new(
         xml: '<workflow id="goobiWF"><process version="1" status="completed" name="start"/></workflow>'
       )
@@ -127,11 +127,11 @@ RSpec.describe 'Multiple items' do
       create(:permission, :edit, workgroup:, target_druid: 'druid:bc123df4567')
       create(:permission, :edit, workgroup:, target_druid: 'druid:xz987wv6543')
       allow(Searchers::AdminPolicyList).to receive(:call).and_return([['My APO', 'druid:hv992ry2431']])
-      allow(Searchers::CollectionListByDruid).to receive(:call)
-        .and_return([['Art History Slides', 'druid:bc123df4567']])
+      allow(Searchers::TitlesByDruid).to receive(:call)
+        .and_return('druid:bc123df4567' => 'Art History Slides', 'druid:xz987wv6543' => 'xz987wv6543')
     end
 
-    it 'renders the selected collections, labeling those not found with the bare druid' do
+    it 'renders the selected collections, labeled with their titles' do
       post multiple_items_path, params: {
         commit: MultipleItemsController::CLEAR_VALUE,
         items_registration: { collection_druids: ['', 'druid:bc123df4567', 'druid:xz987wv6543'] }
@@ -140,7 +140,7 @@ RSpec.describe 'Multiple items' do
       expect(response).to have_http_status(:unprocessable_content)
       page = Capybara.string(response.body)
       expect(page).to have_select('Collections', visible: :all, selected: ['Art History Slides', 'xz987wv6543'])
-      expect(Searchers::CollectionListByDruid).to have_received(:call)
+      expect(Searchers::TitlesByDruid).to have_received(:call)
         .with(druids: %w[druid:bc123df4567 druid:xz987wv6543])
     end
   end
@@ -205,8 +205,7 @@ RSpec.describe 'Multiple items' do
       end
 
       before do
-        allow(Searchers::CollectionListByDruid).to receive(:call)
-          .and_return([['Art History Slides', 'druid:bc123df4567']])
+        allow(Searchers::TitlesByDruid).to receive(:call).and_return('druid:bc123df4567' => 'Art History Slides')
       end
 
       it 'renders the selected collections' do
@@ -215,7 +214,7 @@ RSpec.describe 'Multiple items' do
         expect(response).to have_http_status(:unprocessable_content)
         page = Capybara.string(response.body)
         expect(page).to have_select('Collections', visible: :all, selected: ['Art History Slides'])
-        expect(Searchers::CollectionListByDruid).to have_received(:call).with(druids: ['druid:bc123df4567'])
+        expect(Searchers::TitlesByDruid).to have_received(:call).with(druids: ['druid:bc123df4567'])
       end
     end
 
