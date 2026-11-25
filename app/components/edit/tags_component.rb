@@ -11,6 +11,10 @@ module Edit
 
     attr_reader :form
 
+    def individual_tags_label
+      t('edit.items.fields.individual_tags.label')
+    end
+
     def other_tag_label
       t('edit.items.fields.other_tag.label').pluralize
     end

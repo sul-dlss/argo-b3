@@ -15,6 +15,15 @@ RSpec.describe Edit::TagsComponent, type: :component do
     expect(page).to have_css('fieldset legend', text: 'Tickets')
   end
 
+  it 'nests the fieldset for each type of tag in a fieldset for entering tags individually' do
+    render_inline(component)
+
+    outer_fieldset = page.find(:fieldset, 'Or enter tags individually')
+    expect(outer_fieldset).to have_css('fieldset legend', text: 'Tags')
+    expect(outer_fieldset).to have_css('fieldset legend', text: 'Project names')
+    expect(outer_fieldset).to have_css('fieldset legend', text: 'Tickets')
+  end
+
   it 'renders the fields for the tags' do
     render_inline(component)
 

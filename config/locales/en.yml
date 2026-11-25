@@ -640,6 +640,8 @@ en:
             label: 'Globus'
         goobi:
           deposit: 'Deposit with Goobi'
+        individual_tags:
+          label: 'Or enter tags individually'
         license:
           label: "License"
           help_link: "Get help selecting a license"
