@@ -141,6 +141,17 @@ RSpec.describe MultiItemDeposit::DepositJob do
                                                                                   user:)
     end
 
+    it 'tracks each MID Item Deposit before its staging starts, so that a staging failure is recorded on it' do
+      tracked_when_staging = []
+      allow(StageFilesJob).to receive(:perform_later) do |content:, **|
+        tracked_when_staging << TrackedDeposit.exists?(druid: content.druid)
+      end
+
+      perform
+
+      expect(tracked_when_staging).to eq([true, true])
+    end
+
     it 'looks up the user permissions once' do
       allow(Permission).to receive(:where).and_call_original
 

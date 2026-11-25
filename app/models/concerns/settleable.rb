@@ -16,11 +16,15 @@ module Settleable
 
   # Records whether it is settled: no Tracked Deposit is still in flight without an error.
   # After this, `newly_settled?` says whether it has settled since it was last recorded.
+  # The row is locked while checking and recording, so that a concurrent unsettle! (a retry) waits and then
+  # unsettles what this records, rather than being overwritten by it.
   def record_settling!
-    if tracked_deposits.not_in_error.exists?
-      update!(settled_at: nil) if settled_at
-    elsif settled_at.nil?
-      update!(settled_at: Time.current)
+    with_lock do
+      if tracked_deposits.not_in_error.exists?
+        update!(settled_at: nil) if settled_at
+      elsif settled_at.nil?
+        update!(settled_at: Time.current)
+      end
     end
   end
 
