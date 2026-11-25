@@ -1058,6 +1058,11 @@ en:
         added: 'Permission added'
         deleted: 'Permission deleted'
   notifiers:
+    deposit_complete:
+      title: 'Deposit complete'
+      text: 'Version %{version} of %{label} was deposited.'
+      subject_label: '%{title} (%{bare_druid})'
+      detail: 'Version %{version} was deposited.'
     bulk_action_finished:
       title: 'Bulk action finished'
       title_with_errors: 'Bulk action finished with errors'

@@ -411,6 +411,7 @@ RSpec.describe 'Items' do
                 user_name: user.sunetid, description: nil)
         expect(Sdr::Repository).not_to have_received(:accession)
         expect(version_service).not_to have_received(:update_description)
+        expect(TrackedDeposit.count).to eq(0)
       end
     end
 
@@ -657,6 +658,12 @@ RSpec.describe 'Items' do
                 context: {})
           .ordered
       end
+
+      it 'tracks the deposit for the depositing user' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 1, user:)
+      end
     end
 
     context 'when depositing a structure that is invalid for the content type' do
@@ -736,6 +743,12 @@ RSpec.describe 'Items' do
         expect(Sdr::Repository).not_to have_received(:update)
         expect(Sdr::Repository).to have_received(:accession)
           .with(cocina_object: opened_cocina_object, user_name: user.sunetid, context: {})
+      end
+
+      it 'tracks the deposit of the opened version' do
+        patch "/items/#{druid}", params: { item: item_params, commit: }
+
+        expect(TrackedDeposit.sole).to have_attributes(druid:, version: 2, user:)
       end
     end
 

@@ -149,6 +149,11 @@ class ContentsController < ContentsApplicationController # rubocop:disable Metri
     # Saving also saves the content's text extraction settings, resets its flow, and rebases it onto the new lock.
     @contents_item_form.save!(user_name: current_user.sunetid)
     content.start_staging!(user: current_user, accession: deposit?)
+    # Saving may have opened a new version, so track the version the form saved.
+    if deposit?
+      TrackedDeposit.track!(druid: content.druid, version: @contents_item_form.previous_cocina_object.version,
+                            user: current_user)
+    end
     true
   rescue Sdr::Repository::Error => e
     Rails.logger.error(e.full_message)

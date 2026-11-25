@@ -72,6 +72,10 @@ class ItemsController < ApplicationController
     return render_invalid_edit unless @edit_item_form.valid?(deposit? ? :deposit : nil)
 
     @edit_item_form.save!(user_name: current_user.sunetid, accession: deposit?)
+    # Saving may have opened a new version, so track the version the form deposited.
+    if deposit?
+      TrackedDeposit.track!(druid: @druid, version: @edit_item_form.previous_cocina_object.version, user: current_user)
+    end
     redirect_updated
   end
 
