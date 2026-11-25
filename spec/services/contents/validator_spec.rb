@@ -21,7 +21,9 @@ RSpec.describe Contents::Validator do
 
   context 'without a content type' do
     it 'validates for the content type of the cocina object' do
-      expect(result.errors).to eq([error])
+      expect(result.errors).to eq([error,
+                                   'The item includes published files but no page resource has a published JP2 ' \
+                                   'or a TIFF, PNG, or JPEG file.'])
     end
   end
 
@@ -87,7 +89,9 @@ RSpec.describe Contents::Validator do
     let(:content_type) { Cocina::Models::ObjectType.image }
 
     it 'validates image resources' do
-      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.'])
+      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.',
+                                   'The item includes published files but no image resource has a published JP2 ' \
+                                   'or a TIFF, PNG, or JPEG file.'])
     end
   end
 
@@ -95,7 +99,9 @@ RSpec.describe Contents::Validator do
     let(:content_type) { Cocina::Models::ObjectType.map }
 
     it 'validates image resources' do
-      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.'])
+      expect(result.errors).to eq(['Resource 1 (File 1) has published files but is not an image or object resource.',
+                                   'The item includes published files but no image resource has a published JP2 ' \
+                                   'or a TIFF, PNG, or JPEG file.'])
     end
   end
 

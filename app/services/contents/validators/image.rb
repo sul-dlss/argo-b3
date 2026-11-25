@@ -24,9 +24,7 @@ module Contents
         content_file_sets.each.with_index(1) do |content_file_set, index|
           validate_content_file_set(content_file_set:, index:)
         end
-        unless any_resource_with_image?
-          warnings << "No #{file_set_type} resource has a published JP2 or a TIFF, PNG, or JPEG file."
-        end
+        validate_any_resource_with_image
 
         result
       end
@@ -54,6 +52,22 @@ module Contents
 
         add_warning_or_error("#{name} has published files but is not #{article} #{file_set_type} " \
                              'or object resource.')
+      end
+
+      # Without an image, the viewer can't display any of the item's published files.
+      def validate_any_resource_with_image
+        return if any_resource_with_image?
+
+        if any_published_file?
+          add_warning_or_error("The item includes published files but no #{file_set_type} resource has " \
+                               'a published JP2 or a TIFF, PNG, or JPEG file.')
+        else
+          warnings << "No #{file_set_type} resource has a published JP2 or a TIFF, PNG, or JPEG file."
+        end
+      end
+
+      def any_published_file?
+        content_file_sets.any? { |content_file_set| content_file_set.content_files.any?(&:publish) }
       end
 
       def any_resource_with_image?
