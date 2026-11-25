@@ -11,6 +11,7 @@ RSpec.describe Contents::StacksStager do
   let(:md5_digest) { stacks_md5 }
   let(:preserve) { true }
   let(:file_location) { 'deposited' }
+  let(:version) { 2 }
   let(:content_file_binary) do
     create(:content_file_binary, content:, file_location:, filepath: 'folder1/image1.jp2', md5_digest:)
   end
@@ -42,7 +43,7 @@ RSpec.describe Contents::StacksStager do
   end
 
   def stage
-    described_class.call(content:, staging_location:)
+    described_class.call(content:, staging_location:, version:)
   end
 
   context 'when a deposited, preserved file is not in preservation' do
@@ -67,7 +68,7 @@ RSpec.describe Contents::StacksStager do
   end
 
   context 'when the object is not in preservation' do
-    let(:stager) { described_class.new(content:, staging_location:) }
+    let(:stager) { described_class.new(content:, staging_location:, version:) }
 
     before do
       allow(objects_client).to receive(:signature_catalog).and_raise(Preservation::Client::NotFoundError)
@@ -85,7 +86,7 @@ RSpec.describe Contents::StacksStager do
   end
 
   context 'when Preservation has the object only on retry' do
-    let(:stager) { described_class.new(content:, staging_location:) }
+    let(:stager) { described_class.new(content:, staging_location:, version:) }
     let(:catalog_md5) { stacks_md5 }
 
     before do
@@ -101,6 +102,22 @@ RSpec.describe Contents::StacksStager do
       stager.call
 
       expect(stager).to have_received(:sleep).once
+      expect(a_request(:get, stacks_url)).not_to have_been_made
+      expect(content_file_binary.reload.file_location).to eq('deposited')
+    end
+  end
+
+  context 'when the object is at its first version' do
+    let(:version) { 1 }
+
+    before do
+      allow(objects_client).to receive(:signature_catalog).and_raise(Preservation::Client::NotFoundError)
+    end
+
+    it 'does not check preservation or stage the file' do
+      stage
+
+      expect(objects_client).not_to have_received(:signature_catalog)
       expect(a_request(:get, stacks_url)).not_to have_been_made
       expect(content_file_binary.reload.file_location).to eq('deposited')
     end

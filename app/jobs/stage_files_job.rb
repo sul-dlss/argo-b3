@@ -111,7 +111,7 @@ class StageFilesJob < ApplicationJob
       content_file_binary.file_location_stage!
     end
     # Before SDR is updated, so that a failure leaves the cocina object unchanged.
-    Contents::StacksStager.call(content:, staging_location:)
+    Contents::StacksStager.call(content:, staging_location:, version: cocina_object.version)
   end
 
   # Files deleted while managing files keep their staged copies until the cocina object no longer references them.
