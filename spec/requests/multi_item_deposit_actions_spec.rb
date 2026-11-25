@@ -294,7 +294,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('.alert-danger', text: 'We found errors with the manifest.')
         expect(rendered_page).to have_css(
           '.alert-danger',
-          text: 'Please fix your manifest and / or files and click "Discover files and check manifest" again.'
+          text: 'Fix the errors listed below and click "Discover files and check manifest" again.'
         )
 
         table = rendered_page.find('table[aria-label="Error details"]')
@@ -436,6 +436,43 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_link(
           'Download report', href: structure_report_multi_item_deposit_action_path(multi_item_deposit_action), count: 1
         )
+      end
+
+      it 'renders the no errors alert when structuring found only warnings' do
+        multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_warnings: ['A warning'])
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_no_css('.alert-danger')
+        expect(rendered_page).to have_css('.alert-success', text: 'No errors with files or structural metadata CSV')
+        expect(rendered_page).to have_css('.alert-success', text: 'Click "Next" to proceed.')
+        expect(rendered_page).to have_xpath("//h2[normalize-space()='Results of checking files']" \
+                                            "/following::*[contains(@class, 'alert-success')]" \
+                                            "[following::h3[normalize-space()='Summary']]")
+      end
+
+      it 'renders the errors alert when structuring found errors' do
+        multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_errors: ['An error'])
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_no_css('.alert-success')
+        expect(rendered_page).to have_css('.alert-danger',
+                                          text: 'We found errors with the files and/or structural metadata CSV.')
+        expect(rendered_page).to have_css(
+          '.alert-danger',
+          text: 'Fix the errors listed below and click "Check files" again. If you have edited the files in the ' \
+                'mount location or Globus, click "Previous" and run "Discover files and check manifest" again ' \
+                'before proceeding to "Check files".'
+        )
+      end
+
+      it 'does not render a results alert before structuring has completed' do
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_no_css('.alert-success, .alert-danger')
       end
 
       it 'does not render the summary before structuring has completed' do

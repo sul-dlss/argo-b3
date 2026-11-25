@@ -742,9 +742,18 @@ en:
           speech_to_text_heading: "For media content types"
         discovery_errors_alert:
           title: "We found errors with the manifest."
-          body: 'Please fix your manifest and / or files and click "%{discover_label}" again.'
+          body: 'Fix the errors listed below and click "%{discover_label}" again.'
         no_discovery_errors_alert:
           title: "No errors with manifest"
+          body: 'Click "%{next_label}" to proceed.'
+        structure_errors_alert:
+          title: "We found errors with the files and/or structural metadata CSV."
+          body: >-
+            Fix the errors listed below and click "%{build_structure_label}" again.
+            If you have edited the files in the mount location or Globus, click "%{previous_label}" and
+            run "%{discover_label}" again before proceeding to "%{build_structure_label}".
+        no_structure_errors_alert:
+          title: "No errors with files or structural metadata CSV"
           body: 'Click "%{next_label}" to proceed.'
       fields:
         description:
