@@ -72,11 +72,15 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     :exports,
     :cancellable,
     # Duration after creation when the bulk action is destroyed (by ExpiredBulkActionsCleanupJob).
-    :expires_after
+    :expires_after,
+    # Keys of the links that the bulk action show page adds to its left nav, in display order
+    # (see BulkActions::ShowComponent#nav_link).
+    :nav_links
   ) do
-    # Members not given are nil.
-    def initialize(cancellable: true, close_version: false, controller: 'forms', exports: [], **attrs)
-      super(**members.index_with(nil), **attrs, cancellable:, close_version:, controller:, exports:)
+    # Members not given are nil, except those with these defaults.
+    def initialize(**attrs)
+      super(**members.index_with(nil),
+            cancellable: true, close_version: false, controller: 'forms', exports: [], nav_links: [], **attrs)
     end
 
     # Convert BulkActions::AddWorkflowJob to 'ADD_WORKFLOW'
@@ -441,6 +445,7 @@ module BulkActions # rubocop:disable Metrics/ModuleLength
     label: 'Register new druids (via a form)',
     help_text: 'Register druids.',
     exports: REGISTER_EXPORTS,
-    job: BulkActions::RegisterFormJob
+    job: BulkActions::RegisterFormJob,
+    nav_links: %i[register_more_items deposit_multiple_items]
   )
 end

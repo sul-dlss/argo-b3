@@ -35,13 +35,13 @@ RSpec.describe RegistrationSettings do
 
   before do
     allow(Sdr::AdministrativeTags).to receive(:list)
-      .and_return(['Project : Maps', 'Ticket : DIGREQ-1', 'Registered By : jdoe'])
+      .and_return(['Project : Maps', 'Ticket : DIGREQ-1', 'Registered By : jdoe', 'Maps : Batch 1'])
     allow(Sdr::Repository).to receive(:release_tags).and_return(release_tags)
     allow(Sdr::WorkflowService).to receive(:workflows_for).and_return(workflows)
   end
 
   describe '#items_registration_form_attributes' do
-    it 'copies the settings and tags but not the identifiers or description' do
+    it 'copies the settings and tags but not the identifiers, description, or Registered By tag' do
       expect(registration_settings.items_registration_form_attributes).to eq(
         content_type: 'https://cocina.sul.stanford.edu/models/book',
         apo_druid: 'druid:hv992ry2431',
@@ -57,7 +57,7 @@ RSpec.describe RegistrationSettings do
         use_and_reproduction_statement: 'Property rights reside with the repository.',
         copyright: 'Copyright © Stanford University.',
         license: 'https://creativecommons.org/licenses/by/4.0/legalcode',
-        other_tags_attributes: [{ tag: 'Registered By : jdoe' }],
+        other_tags_attributes: [{ tag: 'Maps : Batch 1' }],
         project_tags_attributes: [{ tag: 'Project : Maps' }],
         ticket_tags_attributes: [{ tag: 'Ticket : DIGREQ-1' }],
         deposit_with_goobi: true

@@ -937,7 +937,6 @@ en:
       heading: 'Register or deposit multiple items'
       register_items: 'Register multiple items'
       register_csv: 'Register multiple items (via CSV)'
-      deposit_items: 'Deposit multiple items'
     admin:
       heading: 'Admin'
       manage_permissions: 'Manage permissions'
@@ -1016,12 +1015,16 @@ en:
     delete_failed: 'Bulk action could not be cleared.'
     delete_success: 'Bulk action successfully deleted.'
     delete_confirm: 'Delete this bulk action from history? Its log and export files will also be deleted. This cannot be undone.'
+    show:
+      register_more_items: 'Register more items'
     redeposit:
       note: 'If objects are not already in draft state, a new draft will be opened before depositing.'
       fields:
         version_description:
           help_text: 'The version description will be applied to objects that are not drafts (drafts keep current version description).'
   multi_item_deposit_actions:
+    # Shared by the header, the dashboard, and bulk action show pages.
+    new: 'Deposit multiple items'
     history:
       heading: 'Multi-item deposits'
       empty: 'No multi-item deposits yet'

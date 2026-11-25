@@ -427,6 +427,10 @@ A bulk action is defined by its configuration in `services/bulk_actions.rb`. Eac
 4. If the form has fields beyond the druid list (or CSV upload), add a `views/bulk_actions/<bulk action>/new.html.erb` view; otherwise the default view is used. Add a controller (a subclass of `BulkActions::FormsController`, named by the configuration's `controller`) only when rendering the form needs something the form can't provide, such as options limited to what the user may edit.
 5. The bulk action forms request spec covers rendering every form and submitting those that use `BulkActions::BasicForm`. For other forms, add a request spec, or a system spec only when the form depends on JavaScript (e.g., multi-selects or fields toggled by other fields). (The job can be stubbed out.)
 
+### Adding left nav links to a bulk action's show page
+
+Every bulk action show page's left nav links to the bulk action history and menu. A bulk action type can add its own links after them (e.g., "Register more items" and "Deposit multiple items" for registering multiple items) by listing link keys in its configuration's `nav_links`. `BulkActions::ShowComponent` turns each key into a button, deciding its target, label, and whether it is shown yet or disabled for the user. A key the component doesn't know shows no link, so cover each new link in the component spec. If links for many bulk action types accumulate, consider moving each link into its own small class rather than growing the component.
+
 ## Agent workflow
 
 Infrastructure Team members can hand an issue to Claude by labelling it. Each request runs in its own Claude Code cloud session, which can run the app, linters, and specs.
