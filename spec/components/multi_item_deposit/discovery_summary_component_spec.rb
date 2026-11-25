@@ -39,6 +39,13 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       expect(page).to have_css('a[download] i[aria-hidden="true"]')
     end
 
+    it 'renders the boxes centered in a compact row' do
+      render_inline(component)
+
+      expect(page).to have_css('.object-type-multi-item-deposit .box-row-compact > .card.text-center', count: 3)
+      expect(page).to have_no_css('.show-box')
+    end
+
     it 'renders the number of items' do
       render_inline(component)
 

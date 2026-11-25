@@ -1,4 +1,4 @@
-<%# The boxes match the bulk action show page's; object-type-multi-item-deposit sets their colors. %>
+<%# The boxes are the bulk action show page's, in a compact row; object-type-multi-item-deposit sets their colors. %>
 <div class="object-type-multi-item-deposit mb-4">
   <div class="d-flex flex-wrap align-items-baseline column-gap-4 mb-2">
     <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h3, text: t('multi_item_deposit.discovery_summary.heading'), classes: 'mb-0') %>
@@ -7,23 +7,17 @@
       <%= helpers.download_icon(aria: { hidden: true }, classes: 'me-1') %> <%= t('multi_item_deposit.discovery_summary.download_report') %>
     <% end %>
   </div>
-  <%= render Show::BoxRowComponent.new do %>
-    <div class="show-box">
-      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.item_count'), heading_level: :h4) do %>
-        <p class="mb-0 text-center fs-4"><%= item_count %></p>
-      <% end %>
-    </div>
-    <div class="show-box">
-      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.error_count'), heading_level: :h4, classes: error_classes) do %>
-        <p class="mb-0 text-center fs-4"><%= items_with_errors_count %></p>
-      <% end %>
-    </div>
+  <%= render Show::BoxRowComponent.new(compact: true) do %>
+    <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.item_count'), heading_level: :h4, classes: 'text-center') do %>
+      <p class="mb-0 fs-4"><%= item_count %></p>
+    <% end %>
+    <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.error_count'), heading_level: :h4, classes: ['text-center', error_classes]) do %>
+      <p class="mb-0 fs-4"><%= items_with_errors_count %></p>
+    <% end %>
     <% if content_types %>
-      <div class="show-box">
-        <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.content_types'), heading_level: :h4) do %>
-          <p class="mb-0 text-center"><%= content_types %></p>
-        <% end %>
-      </div>
+      <%= render Show::BoxComponent.new(heading: t('multi_item_deposit.discovery_summary.content_types'), heading_level: :h4, classes: 'text-center') do %>
+        <p class="mb-0"><%= content_types %></p>
+      <% end %>
     <% end %>
   <% end %>
 </div>

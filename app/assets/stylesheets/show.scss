@@ -147,6 +147,14 @@
   }
 }
 
+// A compact row of boxes (Show::BoxRowComponent compact:), e.g., the Multi-Item Deposit summaries (issue #1623).
+// Boxes share the height of the row's tallest box, since flex items stretch.
+// Design standard deviation: LAY-6 (exact sizes in app SCSS). The design gives each box a fixed width (about 170px
+// of content area); no Bootstrap utility sets a fixed width.
+.box-row-compact > * {
+  width: 13rem;
+}
+
 // The when (row header) cells of the events table are not bold.
 #events-table tbody th {
   font-weight: normal;
