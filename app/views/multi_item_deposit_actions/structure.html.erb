@@ -10,6 +10,19 @@
     <% if @multi_item_deposit_action.structuring_completed_at.present? %>
       <%= render SdrViewComponents::Elements::HeadingComponent.new(level: :h2, text: t('edit.multi_item_deposits.edit.structure_results.heading'), classes: 'mb-3') %>
 
+      <% if @multi_item_deposit_action.structuring_succeeded? %>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :success, title: t('edit.multi_item_deposits.edit.no_structure_errors_alert.title')) do %>
+          <%= t('edit.multi_item_deposits.edit.no_structure_errors_alert.body', next_label: t('edit.multi_item_deposits.edit.buttons.next')) %>
+        <% end %>
+      <% else %>
+        <%= render SdrViewComponents::Elements::AlertComponent.new(variant: :danger, title: t('edit.multi_item_deposits.edit.structure_errors_alert.title')) do %>
+          <%= t('edit.multi_item_deposits.edit.structure_errors_alert.body',
+                build_structure_label: t('edit.multi_item_deposits.edit.buttons.build_structure'),
+                previous_label: t('edit.multi_item_deposits.edit.buttons.previous'),
+                discover_label: t('edit.multi_item_deposits.edit.buttons.discover')) %>
+        <% end %>
+      <% end %>
+
       <%= render MultiItemDeposit::StructureSummaryComponent.new(multi_item_deposit_action: @multi_item_deposit_action, summary: @structure_summary) %>
 
       <%= render MultiItemDeposit::SummaryTableComponent.new(multi_item_deposit_action: @multi_item_deposit_action) %>
