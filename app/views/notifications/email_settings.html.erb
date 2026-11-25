@@ -1,6 +1,27 @@
 <%= page_title(t('notifications.heading')) %>
 
+<% content_for :head do %>
+  <meta name="turbo-refresh-method" content="morph">
+  <meta name="turbo-refresh-scroll" content="preserve">
+<% end %>
+
 <%= render Layout::ContainerComponent.new(heading: t('notifications.heading')) do %>
   <%= render Notifications::TabsComponent.new(active: :email_settings) %>
-  <p><%= t('notifications.email_settings.placeholder') %></p>
+  <p class="fw-bold"><%= t('notifications.email_settings.intro', email_address: Current.user.email_address) %></p>
+  <%= form_with model: @email_settings_form, url: email_settings_notifications_path, method: :patch, class: 'b3-form' do |form| %>
+    <%= render SdrViewComponents::Forms::FieldsetComponent.new(label: t('notifications.email_settings.legend')) do %>
+      <% EmailOptOut::NOTIFIER_KINDS.each do |notifier_kind| %>
+        <%= render SdrViewComponents::Forms::CheckboxComponent.new(
+              form:,
+              field_name: notifier_kind,
+              label_text: t("notifications.email_settings.notifier_kinds.#{notifier_kind}.label"),
+              help_text: t("notifications.email_settings.notifier_kinds.#{notifier_kind}.help_text", default: nil),
+              container_classes: 'my-field'
+            ) %>
+      <% end %>
+    <% end %>
+    <%= render Elements::FormFooterComponent.new do %>
+      <%= render SdrViewComponents::Forms::SubmitComponent.new(label: t('notifications.email_settings.save')) %>
+    <% end %>
+  <% end %>
 <% end %>

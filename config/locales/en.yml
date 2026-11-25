@@ -1115,4 +1115,20 @@ en:
       empty: 'No notifications.'
       time_ago: '%{time} ago'
     email_settings:
-      placeholder: 'Email settings are not available yet.'
+      intro: 'You will always see notifications in Argo. Choose which ones are also emailed to %{email_address}.'
+      legend: 'Email me when'
+      notifier_kinds:
+        bulk_action_object_deposits_settled_with_errors:
+          label: 'Bulk action deposits finish with errors'
+        file_check_finished:
+          label: 'File check finished with or without errors'
+        multi_item_deposit_settled:
+          label: 'Multiple item deposit settled with or without errors'
+        deposit_failed:
+          label: 'Single item deposit failed'
+        deposit_complete:
+          label: 'Deposit complete, when someone added you as a recipient'
+          help_text: 'A Single-Object Deposit that you have been tagged as an additional notification recipient for is complete.'
+      save: 'Save'
+      toasts:
+        saved: 'Email settings saved.'

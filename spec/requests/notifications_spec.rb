@@ -72,7 +72,13 @@ RSpec.describe 'Notifications' do
   end
 
   describe 'GET /notifications/email_settings' do
-    it 'renders the email settings tab' do
+    let(:labels) do
+      ['Bulk action deposits finish with errors', 'File check finished with or without errors',
+       'Multiple item deposit settled with or without errors', 'Single item deposit failed',
+       'Deposit complete, when someone added you as a recipient']
+    end
+
+    it 'renders the email settings tab with every email on' do
       get email_settings_notifications_path
 
       expect(response).to have_http_status(:ok)
@@ -80,6 +86,53 @@ RSpec.describe 'Notifications' do
       expect(rendered_page).to have_css('h1', exact_text: 'Notifications')
       expect(rendered_page).to have_link('Email settings', href: '/notifications/email_settings',
                                                            class: 'active')
+      expect(rendered_page).to have_text("Choose which ones are also emailed to #{user.email_address}.")
+      fieldset = rendered_page.find('fieldset', text: 'Email me when')
+      expect(fieldset.all('.form-check-label').map { |label| label.text.strip }).to eq(labels)
+      labels.each { |label| expect(fieldset).to have_checked_field(label) }
+      help_text_id = fieldset.find_field('Deposit complete, when someone added you as a recipient')['aria-describedby']
+      expect(fieldset).to have_css("##{help_text_id}", text: 'A Single-Object Deposit that you have been tagged as ' \
+                                                             'an additional notification recipient for is complete.')
+      expect(rendered_page).to have_button('Save')
+      expect(rendered_page).to have_no_link('Cancel')
+    end
+
+    it 'shows the emails the user turned off as unchecked' do
+      EmailOptOut.create!(user:, notifier_kind: 'deposit_failed')
+
+      get email_settings_notifications_path
+
+      rendered_page = Capybara.string(response.body)
+      expect(rendered_page).to have_unchecked_field('Single item deposit failed')
+      expect(rendered_page).to have_checked_field('File check finished with or without errors')
+    end
+  end
+
+  describe 'PATCH /notifications/email_settings' do
+    let(:email_settings) do
+      { file_check_finished: '1', multi_item_deposit_settled: '0', deposit_failed: '0',
+        bulk_action_object_deposits_settled_with_errors: '1', deposit_complete: '1' }
+    end
+
+    before { EmailOptOut.create!(user:, notifier_kind: 'file_check_finished') }
+
+    it 'stores an opt-out for each email turned off, and none for those turned on' do
+      patch email_settings_notifications_path, params: { email_settings: }
+
+      expect(response).to redirect_to('/notifications/email_settings')
+      expect(response).to have_http_status(:see_other)
+      expect(flash[:toast]).to eq('Email settings saved.')
+      expect(user.email_opt_outs.pluck(:notifier_kind)).to contain_exactly('multi_item_deposit_settled',
+                                                                           'deposit_failed')
+    end
+
+    it "leaves other users' opt-outs alone" do
+      other_user = create(:user)
+      EmailOptOut.create!(user: other_user, notifier_kind: 'deposit_complete')
+
+      patch email_settings_notifications_path, params: { email_settings: }
+
+      expect(other_user.email_opt_outs.pluck(:notifier_kind)).to eq(['deposit_complete'])
     end
   end
 end
