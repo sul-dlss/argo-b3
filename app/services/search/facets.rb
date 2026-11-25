@@ -27,6 +27,10 @@ module Search
       # Form field for the from/to dates in a date range facet.
       :date_from_form_field,
       :date_to_form_field,
+      # True to offer From / To year inputs (dates_from / dates_to). Only for the Year facet, whose range is
+      # queried on the integer Search::Fields::PUBLICATION_YEAR, since the string field it displays would
+      # compare years as strings (e.g., 201 falls between 2000 and 2020).
+      :year_range,
       # The routing resource that serves this facet's endpoints, e.g. :tag_facets.
       # Routes are drawn from this (see ROUTED) and served by Search::FacetsController.
       # Path helpers are resolved from this plus the search form's route scope.
@@ -88,7 +92,8 @@ module Search
 
     def Config.with_defaults(**)
       defaults = { alpha_sort: false, limit: 100, operator: :and, checkbox: false,
-                   facet_index: false, facet_children: false, facet_search: false, missing_value: false }
+                   facet_index: false, facet_children: false, facet_search: false, missing_value: false,
+                   year_range: false }
       new(**defaults, **)
     end
 
@@ -150,10 +155,10 @@ module Search
       form_field: :dates,
       loading: :secondary,
       field: Search::Fields::PUBLICATION_DATE,
+      year_range: true,
       limit: 25,
       facet_resource: :date_facets,
       facet_index: true,
-      facet_search: true,
       missing_value: true
     )
 

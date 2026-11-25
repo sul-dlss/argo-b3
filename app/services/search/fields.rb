@@ -62,6 +62,8 @@ module Search
     PRESERVATION_SIZE = 'preserved_size_lpsidv'
     PUBLICATION_CREATED_DATE = 'originInfo_date_created_tesim'
     PUBLICATION_DATE = 'publication_year_ssidv'
+    # Integer publication year, for range queries.
+    PUBLICATION_YEAR = 'publication_year_ipsidv'
     PUBLICATION_PLACE = 'originInfo_place_placeTerm_tesim'
     PUBLISHER = 'originInfo_publisher_tesim'
     PURL = 'purl_ss'

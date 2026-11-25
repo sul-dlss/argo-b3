@@ -34,6 +34,7 @@ FactoryBot.define do
       collection_titles { ['David Rumsey Map Collection'] }
       admin_policy_titles { ['University Archives'] }
       dates { ['2001'] }
+      publication_year { Integer(dates.first, exception: false) }
       topics { ['Marching bands'] }
       regions { ['Palo Alto'] }
       genres { ['Maps'] }
@@ -89,6 +90,7 @@ FactoryBot.define do
         Search::Fields::APO_TITLE_DRUID => admin_policy_titles.map { |title| "#{title}:#{apo_druid}" },
         Search::Fields::PUBLISHER => publisher,
         Search::Fields::PUBLICATION_DATE => dates,
+        Search::Fields::PUBLICATION_YEAR => publication_year,
         Search::Fields::PUBLICATION_PLACE => publication_place,
         Search::Fields::SOURCE_ID => source_id,
         Search::Fields::TOPICS => topics,

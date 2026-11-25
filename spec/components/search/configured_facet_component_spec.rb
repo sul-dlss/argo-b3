@@ -52,6 +52,20 @@ RSpec.describe Search::ConfiguredFacetComponent, type: :component do
     end
   end
 
+  context 'with a facet with a year range' do
+    let(:facet_config) { Search::Facets::DATES }
+    let(:facet_count) { SearchResults::FacetCount.new(value: '2001', count: 10) }
+
+    it 'renders a basic facet with year range inputs and without facet search' do
+      render_inline(component)
+
+      expect(page).to have_link('2001')
+      expect(page).to have_no_field('Search year')
+      expect(page).to have_field('From', type: 'number')
+      expect(page).to have_field('To', type: 'number')
+    end
+  end
+
   context 'with a hierarchical facet' do
     let(:facet_config) { Search::Facets::TAGS }
     let(:facet_counts) { instance_double(SearchResults::HierarchicalFacetCounts, page: 1, total_pages: 2, any?: true) }

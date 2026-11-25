@@ -36,7 +36,7 @@ module Search
       else
         Search::FacetComponent.new(facet_counts:, search_form:, form_field:, exclude_form_field:,
                                    operator_form_field:, facet_page_path_helper:, facet_search_path_helper:,
-                                   checkbox: facet_config.checkbox)
+                                   checkbox: facet_config.checkbox, year_range: facet_config.year_range)
       end
     end
 

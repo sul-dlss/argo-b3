@@ -44,11 +44,19 @@ module Search
           if facet_config.dynamic_facet.present?
             queries << dynamic_facet_filter_query(facet_config:)
           else
-            queries << facet_filter_query(facet_config:)
-            queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
+            queries.concat(value_facet_filter_queries(facet_config:))
           end
         end
       end.compact
+    end
+
+    # @param facet_config [Search::Facets::Config] a value (i.e., not dynamic) facet
+    # @return [Array<String, nil>] the filter queries for the selected, excluded, and year range values
+    def value_facet_filter_queries(facet_config:)
+      [facet_filter_query(facet_config:)].tap do |queries|
+        queries << facet_filter_query(facet_config:, exclude: true) if facet_config.exclude_form_field.present?
+        queries << year_range_filter_query if facet_config.year_range
+      end
     end
 
     # The terms parser is not subject to the boolean clause limit, so it handles large Multi-Item Deposits.
@@ -124,6 +132,15 @@ module Search
       from_part = date_from.present? ? date_from.strftime('%Y-%m-%dT00:00:00Z') : '*'
       to_part = date_to.present? ? date_to.strftime('%Y-%m-%dT23:59:59Z') : '*'
       "#{facet_config.field}:[#{from_part} TO #{to_part}]"
+    end
+
+    # Filter query for the Year facet's year range.
+    def year_range_filter_query
+      year_from = search_form.dates_from
+      year_to = search_form.dates_to
+      return if year_from.nil? && year_to.nil?
+
+      "#{PUBLICATION_YEAR}:[#{year_from || '*'} TO #{year_to || '*'}]"
     end
 
     def query_fields # rubocop:disable Metrics/MethodLength
