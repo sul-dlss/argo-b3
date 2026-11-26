@@ -289,7 +289,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_link(
           'Download report', href: discovery_report_multi_item_deposit_action_path(multi_item_deposit_action)
         )
-        expect(rendered_page).to have_css('.card.text-danger', text: '# of errors')
+        expect(rendered_page).to have_css('.card.text-danger', text: 'Number with errors')
         expect(rendered_page).to have_no_css('.alert-success')
         expect(rendered_page).to have_css('.alert-danger', text: 'We found errors with the manifest.')
         expect(rendered_page).to have_css(
@@ -431,7 +431,7 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(rendered_page).to have_css('h2', text: 'Results of checking files')
         expect(fields_before('Results of checking files')).to be_empty
         expect(rendered_page).to have_css('h3', text: 'Summary')
-        expect(rendered_page).to have_css('.card', text: '# with errors')
+        expect(rendered_page).to have_css('.card', text: 'Number with errors')
         expect(rendered_page).to have_css('table[aria-label="Summary"] td', text: 'bc123df4567')
         expect(rendered_page).to have_link(
           'Download report', href: structure_report_multi_item_deposit_action_path(multi_item_deposit_action), count: 1
@@ -1123,7 +1123,7 @@ RSpec.describe 'Multi-item deposit actions' do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(rendered_page).to have_css('h3', text: 'Summary')
-        expect(rendered_page).to have_css('.card', text: '# of items') do |box|
+        expect(rendered_page).to have_css('.card', text: 'Number of items') do |box|
           box.has_css?('.card-text p', exact_text: '0')
         end
       end
