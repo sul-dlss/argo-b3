@@ -105,11 +105,17 @@ module MultiItemDeposit
     end
 
     # Rows keep their line numbers in the whole CSV, so that errors refer to the user's spreadsheet.
+    # Druids are compared bare, since the manifest and the CSV may each give them with or without the druid: prefix
+    # (e.g., a downloaded template or structural metadata CSV has bare druids).
     # @return [Array<Array(Integer, CSV::Row)>] the rows for this object
     def rows
       @rows ||= CSV.parse(structural_metadata_csv, headers: true).each.with_index(2)
                    .map { |row, number| [number, row] }
-                   .select { |_number, row| row['druid'] == druid }
+                   .select { |_number, row| DruidSupport.bare_druid_from(row['druid']) == bare_druid }
+    end
+
+    def bare_druid
+      @bare_druid ||= DruidSupport.bare_druid_from(druid)
     end
 
     # Discovered files must all be in the CSV, since StructuralCsv::Import destroys the files that are omitted.

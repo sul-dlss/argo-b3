@@ -168,6 +168,43 @@ RSpec.describe MultiItemDeposit::StructureJob do
     end
   end
 
+  context 'when the structural metadata CSV has bare druids and the manifest has prefixed druids' do
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,resource_type,filename,publish,preserve,rights_view,rights_download,rights_location
+        bc123df4567,1,page,page2.tif,no,yes,world,world,
+        bc123df4567,2,page,page1.tif,no,yes,world,world,
+      CSV
+    end
+
+    it 'imports the rows for the object' do
+      perform
+
+      expect(item_deposit_action.structural_csv_errors).to eq([])
+      expect(file_set_summary).to eq([['page', ['page2.tif']], ['page', ['page1.tif']]])
+    end
+  end
+
+  context 'when the structural metadata CSV has prefixed druids and the manifest has bare druids' do
+    let(:item_deposit_action) do
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'bc123df4567', content:, content_type:)
+    end
+    let(:structural_metadata_csv) do
+      <<~CSV
+        druid,sequence,resource_type,filename,publish,preserve,rights_view,rights_download,rights_location
+        #{druid},1,page,page2.tif,no,yes,world,world,
+        #{druid},2,page,page1.tif,no,yes,world,world,
+      CSV
+    end
+
+    it 'imports the rows for the object' do
+      perform
+
+      expect(item_deposit_action.structural_csv_errors).to eq([])
+      expect(file_set_summary).to eq([['page', ['page2.tif']], ['page', ['page1.tif']]])
+    end
+  end
+
   context 'when the structural metadata CSV rows are invalid' do
     let(:structural_metadata_csv) do
       <<~CSV

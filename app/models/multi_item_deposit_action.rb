@@ -84,6 +84,12 @@ class MultiItemDepositAction < ApplicationRecord
   end
 
   # Structuring has completed and found no errors, so the deposit can proceed to the deposit step.
+  # Item Deposits without a Content (e.g., with discovery errors) are omitted, since they have no files.
+  # @return [ActiveRecord::Relation<ItemDepositAction>] in manifest order
+  def item_deposit_actions_with_content
+    item_deposit_actions.where.not(content_id: nil).includes(:content).order(:manifest_line_number)
+  end
+
   def structuring_succeeded?
     structuring_completed_at.present? && item_deposit_actions.with_structure_errors.none?
   end
