@@ -16,6 +16,24 @@ RSpec.describe MountForm do
     expect(form).to be_valid
   end
 
+  context 'when the path has backslashes and surrounding spaces' do
+    let(:path) { "  #{mount_directory.tr('/', '\\\\')}  " }
+
+    it 'turns them into forward slashes and strips the spaces' do
+      expect(form.path).to eq(mount_directory)
+      expect(form).to be_valid
+    end
+  end
+
+  context 'when the path mixes backslashes and forward slashes' do
+    let(:path) { mount_directory.sub(%r{/(?=[^/]+$)}, '\\\\') }
+
+    it 'turns the backslashes into forward slashes' do
+      expect(form.path).to eq(mount_directory)
+      expect(form).to be_valid
+    end
+  end
+
   context 'when the path is blank' do
     let(:path) { '' }
 

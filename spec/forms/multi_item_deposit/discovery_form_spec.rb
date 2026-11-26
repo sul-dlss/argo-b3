@@ -57,6 +57,16 @@ RSpec.describe MultiItemDeposit::DiscoveryForm do
     end
   end
 
+  context 'when the mount path has backslashes and surrounding spaces' do
+    let(:mount_path) { "  #{mount_directory.tr('/', '\\\\')}  " }
+
+    it 'turns them into forward slashes and strips the spaces' do
+      expect(form).to be_valid
+      expect(form.mount_path).to eq(mount_directory)
+      expect(form.multi_item_deposit_action_attributes).to include(mount_path: mount_directory)
+    end
+  end
+
   context 'when the uploaded manifest is valid but the mount path is not' do
     let(:mount_path) { File.join(mount_directory, 'missing') }
 

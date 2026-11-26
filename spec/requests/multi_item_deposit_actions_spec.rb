@@ -756,6 +756,17 @@ RSpec.describe 'Multi-item deposit actions' do
         expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
       end
 
+      context 'when the mount path with backslashes is not valid' do
+        let(:mount_params) { { file_location: 'mount', mount_path: '\\dor\\staging/missing' } }
+
+        it 'renders the discovery page with the mount path in forward slashes' do
+          patch(multi_item_deposit_action_path(multi_item_deposit_action), params:)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(rendered_page).to have_field('multi_item_deposit_discovery[mount_path]', with: '/dor/staging/missing')
+        end
+      end
+
       context 'when the mount path is not valid' do
         let(:mount_params) { { file_location: 'mount', mount_path: File.join(mount_directory, 'missing') } }
 

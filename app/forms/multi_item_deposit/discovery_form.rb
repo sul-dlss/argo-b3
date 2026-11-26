@@ -6,7 +6,8 @@ module MultiItemDeposit
     MANIFEST_FILENAME = 'manifest.csv'
 
     inherit_attributes_from MultiItemDepositAction, only: %i[description mount_path]
-    normalizes_whitespace :description, :mount_path
+    normalizes_whitespace :description
+    normalizes_path :mount_path
 
     attribute :file_location, :string, default: MultiItemDepositAction.file_locations[:mount]
     validates :file_location, inclusion: { in: MultiItemDepositAction.file_locations.values }
