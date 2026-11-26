@@ -10,14 +10,22 @@ module Show
 
     # @param heading_level [Symbol] the heading's level, so that the box fits the page's heading outline
     # @param classes [Array<String>, String] additional classes for the box (e.g., text-danger to color its text)
-    def initialize(heading:, heading_level: :h2, classes: [])
+    # @param body_classes [Array<String>, String] additional classes for the box's body (e.g., p-2 for less padding)
+    # @param heading_classes [Array<String>, String] additional classes for the heading (e.g., fs-6 for a small box)
+    def initialize(heading:, heading_level: :h2, classes: [], body_classes: [], heading_classes: [])
       @heading = heading
       @heading_level = heading_level
       @classes = classes
+      @body_classes = body_classes
+      @heading_classes = heading_classes
       super()
     end
 
-    attr_reader :heading, :heading_level
+    attr_reader :heading, :heading_level, :body_classes
+
+    def heading_classes(*base)
+      merge_classes(*base, *Array(@heading_classes))
+    end
 
     def classes
       merge_classes('border object-type-border object-type-bg-light', *Array(@classes))
