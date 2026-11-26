@@ -29,4 +29,15 @@ RSpec.describe Show::BoxComponent, type: :component do
       expect(page).to have_no_css('h2')
     end
   end
+
+  context 'with body and heading classes' do
+    let(:component) { described_class.new(heading: '# of items', body_classes: 'p-2', heading_classes: 'fs-6') }
+
+    it 'adds the classes to the body and the heading' do
+      render_inline(component) { '3' }
+
+      expect(page).to have_css('.card > .card-body.p-2', text: '3')
+      expect(page).to have_css('h2.card-title.fs-6', text: '# of items')
+    end
+  end
 end

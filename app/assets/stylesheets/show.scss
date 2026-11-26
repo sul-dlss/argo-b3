@@ -11,6 +11,22 @@
   }
 }
 
+// A box in a compact Show::BoxRowComponent (e.g., the Multi-Item Deposit summaries).
+// Design standard deviation: LAY-6. The designer's 170px width and 75px minimum height have no Bootstrap utility.
+// The height is a minimum, so a long value wraps and makes its box (and, by stretching, the others in the line) taller.
+.box-row-compact > .show-box {
+  display: flex;
+  width: 170px;
+
+  > .border {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 75px;
+    overflow-wrap: anywhere;
+    overflow-y: visible;
+  }
+}
+
 // Object show page
 .object-show {
   .embargo-banner {

@@ -39,6 +39,13 @@ RSpec.describe MultiItemDeposit::DiscoverySummaryComponent, type: :component do
       expect(page).to have_css('a[download] i[aria-hidden="true"]')
     end
 
+    it 'renders the boxes in a compact row, with less padding' do
+      render_inline(component)
+
+      expect(page).to have_css('.box-row-compact > .show-box > .card > .card-body.p-2', count: 3)
+      expect(page).to have_css('.box-row-compact h4.card-title.fs-6.fw-bold', count: 3)
+    end
+
     it 'renders the number of items' do
       render_inline(component)
 
