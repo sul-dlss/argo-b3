@@ -13,6 +13,16 @@ RSpec.describe LinkHelper do
     end
   end
 
+  describe '#link_to_object_in_new_tab' do
+    it 'opens the object in a new tab, says so, and disables Turbo prefetching' do
+      link = Capybara.string(helper.link_to_object_in_new_tab('bc123df4567', 'druid:bc123df4567'))
+
+      expect(link).to have_link('bc123df4567 (opens in new tab)', href: '/objects/druid:bc123df4567')
+      expect(link).to have_css('a[target="_blank"][rel="noopener"][data-turbo-prefetch="false"]')
+      expect(link).to have_css('a span.visually-hidden', text: '(opens in new tab)')
+    end
+  end
+
   describe '#link_to_new_tab' do
     it 'opens in a new tab and says so' do
       link = Capybara.string(helper.link_to_new_tab('SearchWorks', 'https://searchworks.stanford.edu/view/bc123df4567'))

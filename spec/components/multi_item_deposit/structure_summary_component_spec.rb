@@ -31,16 +31,16 @@ RSpec.describe MultiItemDeposit::StructureSummaryComponent, type: :component do
   it 'renders the number of items' do
     render_inline(component)
 
-    expect(page).to have_css('.object-type-multi-item-deposit .card', text: '# of items') do |box|
-      box.has_css?('h4.card-title', text: '# of items') && box.has_css?('.card-text p', exact_text: '1,200')
+    expect(page).to have_css('.object-type-multi-item-deposit .card', text: 'Number of items') do |box|
+      box.has_css?('h4.card-title', text: 'Number of items') && box.has_css?('.card-text p', exact_text: '1,200')
     end
   end
 
   it 'renders the number of Item Deposits with errors as danger' do
     render_inline(component)
 
-    expect(page).to have_css('.card.text-danger', text: '# with errors') do |box|
-      box.has_css?('h4.card-title', text: '# with errors') && box.has_css?('.card-text p', exact_text: '10')
+    expect(page).to have_css('.card.text-danger', text: 'Number with errors') do |box|
+      box.has_css?('h4.card-title', text: 'Number with errors') && box.has_css?('.card-text p', exact_text: '10')
     end
   end
 
@@ -68,7 +68,7 @@ RSpec.describe MultiItemDeposit::StructureSummaryComponent, type: :component do
     it 'renders the number of Item Deposits with errors as success' do
       render_inline(component)
 
-      expect(page).to have_css('.card.text-success', text: '# with errors') do |box|
+      expect(page).to have_css('.card.text-success', text: 'Number with errors') do |box|
         box.has_css?('.card-text p', exact_text: '0')
       end
     end

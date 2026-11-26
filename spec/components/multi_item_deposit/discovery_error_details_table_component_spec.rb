@@ -30,8 +30,11 @@ RSpec.describe MultiItemDeposit::DiscoveryErrorDetailsTableComponent, type: :com
         .to eq(['Manifest line number', 'Druid', 'Folder', 'Error'])
 
       rows = table.all('tbody tr')
-      expect(rows.map { |row| row.all('td').first(3).map { |cell| cell.text.strip } })
-        .to eq([%w[2 bc123df4567 folder1], %w[3 cd234fg5678 folder2], %w[4 df345gh6789 folder3]])
+      expect(rows.map { |row| row.all('td').first(3).map { |cell| cell.text.squish } })
+        .to eq([['2', 'bc123df4567 (opens in new tab)', 'folder1'], ['3', 'cd234fg5678 (opens in new tab)', 'folder2'],
+                ['4', 'df345gh6789 (opens in new tab)', 'folder3']])
+      expect(rows[0]).to have_link('bc123df4567 (opens in new tab)', href: '/objects/druid:bc123df4567')
+      expect(rows[0]).to have_css('a[target="_blank"][rel="noopener"]')
 
       # Only errors are styled as errors.
       expect(rows[0]).to have_css('td > span.text-danger', text: 'Not an Item')

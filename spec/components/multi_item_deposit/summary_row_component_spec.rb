@@ -18,8 +18,10 @@ RSpec.describe MultiItemDeposit::SummaryRowComponent, type: :component do
 
     it 'renders the row with an OK status' do
       expect(rows.size).to eq(1)
-      expect(rows.first.all('td').map { |cell| cell.text.strip })
-        .to eq(['bc123df4567', 'folder1', '2', 'OK', 'book', 'new item'])
+      expect(rows.first.all('td').map { |cell| cell.text.squish })
+        .to eq(['bc123df4567 (opens in new tab)', 'folder1', '2', 'OK', 'book', 'new item'])
+      expect(rows.first).to have_link('bc123df4567 (opens in new tab)', href: '/objects/druid:bc123df4567')
+      expect(rows.first).to have_css('a[target="_blank"][rel="noopener"]')
     end
   end
 

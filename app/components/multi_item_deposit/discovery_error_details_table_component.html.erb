@@ -9,7 +9,9 @@
         <%= item_deposit_action.manifest_line_number %>
       <% end %>
       <% row_component.with_cell do %>
-        <%= bare_druid(item_deposit_action) %>
+        <%# Design standard deviation: LINK-2. Per #1649, the object opens in a new tab so that the user does not leave
+            the deposit page. %>
+        <%= helpers.link_to_object_in_new_tab(bare_druid(item_deposit_action), item_deposit_action.druid) %>
       <% end %>
       <% row_component.with_cell do %>
         <%= item_deposit_action.path %>

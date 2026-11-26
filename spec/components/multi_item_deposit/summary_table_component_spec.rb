@@ -29,10 +29,10 @@ RSpec.describe MultiItemDeposit::SummaryTableComponent, type: :component do
       expect(table).to have_css('caption', text: 'Summary')
       expect(table.all('th').map { |header| header.text.strip })
         .to eq(['Druid', 'Folder', 'Number of files', 'Status', 'Content type', 'Deposit type'])
-      expect(table.all('tbody tr').map { |row| row.all('td').map { |cell| cell.text.strip } })
-        .to eq([['bc123df4567', 'folder2', '0', 'OK', 'book', 'new item'],
-                ['cd234fg5678', 'folder3', '2', 'OK', 'image', 'redeposit'],
-                ['df345gh6789', 'folder4', '0', 'OK', '', 'redeposit']])
+      expect(table.all('tbody tr').map { |row| row.all('td').map { |cell| cell.text.squish } })
+        .to eq([['bc123df4567 (opens in new tab)', 'folder2', '0', 'OK', 'book', 'new item'],
+                ['cd234fg5678 (opens in new tab)', 'folder3', '2', 'OK', 'image', 'redeposit'],
+                ['df345gh6789 (opens in new tab)', 'folder4', '0', 'OK', '', 'redeposit']])
     end
   end
 
@@ -51,7 +51,8 @@ RSpec.describe MultiItemDeposit::SummaryTableComponent, type: :component do
       render_inline(component)
 
       rows = page.all('table[aria-label="Summary"] tbody tr')
-      expect(rows.map { |row| row.first('td').text.strip }).to eq(%w[bc123df4567 cd234fg5678 df345gh6789])
+      expect(rows.map { |row| row.first('td a')[:href] })
+        .to eq(%w[bc123df4567 cd234fg5678 df345gh6789].map { |druid| "/objects/druid:#{druid}" })
 
       status_cells = rows.map { |row| row.all('td')[3] }
       expect(status_cells[0].all('ul li > span.text-danger').map { |error| error.text.squish })
@@ -81,8 +82,9 @@ RSpec.describe MultiItemDeposit::SummaryTableComponent, type: :component do
       render_inline(component)
 
       rows = page.all('table[aria-label="Summary"] tbody tr')
-      expect(rows.map { |row| row.first('td').text.strip })
-        .to eq(%w[df345gh6789 gh567jk8901 cd234fg5678 fg456hj7890 bc123df4567])
+      expect(rows.map { |row| row.first('td a')[:href] })
+        .to eq(%w[df345gh6789 gh567jk8901 cd234fg5678 fg456hj7890 bc123df4567]
+          .map { |druid| "/objects/druid:#{druid}" })
     end
   end
 end
