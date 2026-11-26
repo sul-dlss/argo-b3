@@ -15,6 +15,13 @@ class ItemDepositAction < ApplicationRecord
     where("structural_csv_errors <> '[]'::jsonb").or(where("content_type_structure_errors <> '[]'::jsonb"))
   }
 
+  # Whether File Check built a structure for the Item's Content. There is no stored flag: a structure is built when
+  # there are no structural CSV errors, and StructureJob records file changes only after building it (an unexpected
+  # error clears them, as it discards the structure).
+  def structure_built?
+    structural_csv_errors.empty? && file_changes.present?
+  end
+
   def structure_errors
     structural_csv_errors + content_type_structure_errors
   end

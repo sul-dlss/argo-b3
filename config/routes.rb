@@ -181,6 +181,7 @@ Rails.application.routes.draw do
     get 'structural_metadata_csv_template', on: :member
     get 'discovery_report', on: :member
     get 'structure_report', on: :member
+    get 'structural_metadata', on: :member
     resource :globus, only: %i[new create], controller: 'multi_item_deposit_globus'
   end
 

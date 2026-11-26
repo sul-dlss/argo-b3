@@ -756,6 +756,7 @@ en:
           heading: "Results of checking manifest"
         structure_results:
           heading: "Results of checking files"
+          download_structural_metadata: "Download structural metadata"
         text_extraction:
           ocr_heading: "For book, image, or document/PDF content types"
           speech_to_text_heading: "For media content types"

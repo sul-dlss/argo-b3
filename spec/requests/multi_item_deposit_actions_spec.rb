@@ -438,6 +438,19 @@ RSpec.describe 'Multi-item deposit actions' do
         )
       end
 
+      it 'renders the structural metadata download in line with the results heading' do
+        multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
+        create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_errors: ['An error'])
+
+        get edit_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(rendered_page).to have_css('.d-flex:has(> h2) a[download]', text: 'Download structural metadata')
+        expect(rendered_page).to have_link(
+          'Download structural metadata',
+          href: structural_metadata_multi_item_deposit_action_path(multi_item_deposit_action)
+        )
+      end
+
       it 'renders the no errors alert when structuring found only warnings' do
         multi_item_deposit_action.update!(structuring_started_at: 1.minute.ago, structuring_completed_at: Time.current)
         create(:item_deposit_action, multi_item_deposit_action:, content_type_structure_warnings: ['A warning'])
@@ -473,6 +486,7 @@ RSpec.describe 'Multi-item deposit actions' do
         get edit_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(rendered_page).to have_no_css('.alert-success, .alert-danger')
+        expect(rendered_page).to have_no_link('Download structural metadata', exact: true)
       end
 
       it 'does not render the summary before structuring has completed' do
@@ -1567,6 +1581,58 @@ RSpec.describe 'Multi-item deposit actions' do
 
       it 'denies access' do
         get structure_report_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
+  describe 'structural_metadata' do
+    let(:multi_item_deposit_action) do
+      create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_completed_at: Time.current)
+    end
+    let(:content) { create(:content, :mutable, druid: 'druid:bc123df4567') }
+
+    before do
+      create(:item_deposit_action, multi_item_deposit_action:, druid: 'druid:bc123df4567', content:,
+                                   structural_csv_errors: ['Row 2: Missing filename'])
+      create(:content_file_binary, content:, filepath: 'image1.tif', mime_type: 'image/tiff')
+    end
+
+    context 'when the multi-item deposit action belongs to the user' do
+      let(:owner) { user }
+
+      it 'downloads the structural metadata CSV' do
+        get structural_metadata_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq('text/csv')
+        filename = "multi_item_deposit_#{multi_item_deposit_action.id}_structural_metadata.csv"
+        expect(response.headers['Content-Disposition']).to include("attachment; filename=\"#{filename}\"")
+        expect(response.body.lines.first).to eq("#{StructuralCsv::Export::HEADERS.join(',')}\n")
+        expect(response.body.lines.second).to eq("bc123df4567,,,,image1.tif,,,,,,,,image/tiff,,,,\n")
+      end
+    end
+
+    context 'when checking files has not completed' do
+      let(:owner) { user }
+      let(:multi_item_deposit_action) do
+        create(:multi_item_deposit_action, user: owner, step: 'structure', structuring_state: 'structuring',
+                                           structuring_completed_at: nil)
+      end
+
+      it 'redirects to the Multi-Item Deposit' do
+        get structural_metadata_multi_item_deposit_action_path(multi_item_deposit_action)
+
+        expect(response).to redirect_to(edit_multi_item_deposit_action_path(multi_item_deposit_action))
+      end
+    end
+
+    context 'when the multi-item deposit action belongs to another user' do
+      let(:owner) { create(:user) }
+
+      it 'denies access' do
+        get structural_metadata_multi_item_deposit_action_path(multi_item_deposit_action)
 
         expect(response).to redirect_to(root_path)
       end
