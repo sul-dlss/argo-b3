@@ -22,6 +22,15 @@ module NormalizationConcern
       end
     end
 
+    # Strips whitespace from the given path attributes, turns backslashes (e.g., in a path pasted from Windows)
+    # into forward slashes, and normalizes blank values to nil.
+    # @param names [Array<Symbol>] the attributes to normalize
+    def normalizes_path(*names)
+      names.each do |name|
+        normalizes name, with: ->(value) { value.strip.tr('\\', '/').presence }
+      end
+    end
+
     # Removes blank entries (e.g., a blank option submitted from a select field) from array attributes.
     # @param names [Array<Symbol>] the attributes to normalize
     def normalizes_array_compact_blank(*names)

@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Content mount' do
   let(:content) { create(:content, druid: 'druid:bc123df4567') }
+  let(:rendered_page) { Capybara.string(response.body) }
   let(:content_token) { Rails.application.message_verifier(:argo).generate(content.id, purpose: 'contents') }
 
   before do
@@ -45,6 +46,15 @@ RSpec.describe 'Content mount' do
           expect(content.reload.mount_state).to eq('discovery_not_in_progress')
           expect(DiscoverFilesJob).not_to have_been_enqueued
         end
+      end
+    end
+
+    context 'with a mount path with backslashes that does not exist' do
+      it 'renders the form with the path in forward slashes' do
+        post content_mount_path(content_id: content_token), params: { mount: { path: ' \\dor\\staging/missing ' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(rendered_page).to have_field('mount[path]', with: '/dor/staging/missing')
       end
     end
 
