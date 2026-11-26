@@ -13,6 +13,12 @@ module LinkHelper
     link_to(label, object_path(druid:), data: data.merge(turbo_prefetch: false), **)
   end
 
+  # Links to an object's show page in a new tab, with the external-link icon and an announcement.
+  # Unlike link_to_new_tab, this is for a page inside Argo B3, so callers must justify it as a LINK-2 deviation.
+  def link_to_object_in_new_tab(label, druid, **)
+    link_to_object(new_tab_label(label), druid, target: '_blank', rel: 'noopener', **)
+  end
+
   # Links to a page outside Argo B3 in a new tab, with the external-link icon and an announcement.
   def link_to_new_tab(label, url, **)
     link_to(new_tab_label(label), url, target: '_blank', rel: 'noopener', **)
